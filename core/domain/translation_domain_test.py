@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 
 from core import feconf, utils
@@ -1054,3 +1055,73 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         ):
             with self.swap(written_translation, 'data_format', 2):
                 written_translation.validate()
+
+
+class MachineTranslationProviderMappingTests(test_utils.GenericTestBase):
+    """Tests for the MachineTranslationProviderMapping domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        # We mock the JSON file contents so the tests run quickly and don't
+        # fail if the actual asset file is modified in the future.
+        self.mock_providers_json = json.dumps(
+            {'hi': ['azure', 'gcp'], 'es': ['azure']}
+        )
+        self.swap_get_file_contents = self.swap(
+            utils, 'get_file_contents', lambda x: self.mock_providers_json
+        )
+
+    def test_initialization(self) -> None:
+        mapping_dict = {'hi': 'azure'}
+        mapping_obj = translation_domain.MachineTranslationProviderMapping(
+            mapping_dict
+        )
+        self.assertEqual(mapping_obj.language_to_provider_mapping, mapping_dict)
+
+    def test_validate_with_valid_mapping_passes(self) -> None:
+        mapping_dict = {'hi': 'azure', 'es': 'azure'}
+        mapping_obj = translation_domain.MachineTranslationProviderMapping(
+            mapping_dict
+        )
+
+        # 'hi' and 'es' are already valid language codes in Oppia, so
+        # we only need to mock the JSON whitelist.
+        with self.swap_get_file_contents:
+            mapping_obj.validate()
+
+    def test_validate_with_non_dict_raises_error(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because we intentionally test
+        # wrong inputs that we can normally catch by typing.
+        mapping_obj = translation_domain.MachineTranslationProviderMapping(
+            ['hi', 'azure']  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'language_to_provider_mapping must be a dictionary.',
+        ):
+            mapping_obj.validate()
+
+    def test_validate_with_invalid_language_code_raises_error(self) -> None:
+        mapping_dict = {'invalid_lang': 'azure'}
+        mapping_obj = translation_domain.MachineTranslationProviderMapping(
+            mapping_dict
+        )
+
+        with self.swap_get_file_contents:
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Invalid language code: invalid_lang'
+            ):
+                mapping_obj.validate()
+
+    def test_validate_with_unsupported_provider_raises_error(self) -> None:
+        mapping_dict = {'hi': 'aws'}
+        mapping_obj = translation_domain.MachineTranslationProviderMapping(
+            mapping_dict
+        )
+
+        with self.swap_get_file_contents:
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Provider aws does not support language hi.',
+            ):
+                mapping_obj.validate()

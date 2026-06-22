@@ -1466,6 +1466,24 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         ):
             sanitize_url('www.oppia.org')
 
+    def test_weak_multiple_schema(self) -> None:
+        """Tests normalization and error handling for weak_multiple schema."""
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_WEAK_MULTIPLE,
+            'options': ['int', 'basestring'],
+        }
+
+        self.assertEqual(schema_utils.normalize_against_schema(1, schema), 1)
+        self.assertEqual(
+            schema_utils.normalize_against_schema('hello', schema), 'hello'
+        )
+
+        # Type not in options raises an exception.
+        with self.assertRaisesRegex(
+            Exception, 'Type of None is not present in options'
+        ):
+            schema_utils.normalize_against_schema(None, schema)
+
 
 class ValidateArgumentHavingSpecificClass(test_utils.GenericTestBase):
     """Test class is to validate the arguments which have a corresponding domain

@@ -24,10 +24,11 @@ from core import feconf
 from core.domain import exp_domain, translation_domain, translation_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import skill_domain, story_domain, topic_domain
     from mypy_imports import translate_services, translation_models
 
 
@@ -329,11 +330,17 @@ def get_displayable_translation_languages(
 
 
 def get_translation_counts(
-    entity_type: feconf.TranslatableEntityType, entity: exp_domain.Exploration
+    entity_type: feconf.TranslatableEntityType,
+    entity: Union[
+        exp_domain.Exploration,
+        story_domain.Story,
+        skill_domain.Skill,
+        topic_domain.Topic,
+    ],
 ) -> Dict[str, int]:
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the
-    exploration.
+    entity.
 
     Returns:
         dict(str, int). A dict with language code as a key and number of
@@ -345,8 +352,10 @@ def get_translation_counts(
         )
     )
     return {
-        entity_translation.language_code: entity.get_translation_count(
-            entity_translation
+        entity_translation.language_code: (
+            entity.get_translation_count(entity_translation)
+            if isinstance(entity, translation_domain.BaseTranslatableObject)
+            else len(entity_translation.translations)
         )
         for entity_translation in entity_translations
     }
@@ -380,3 +389,99 @@ def get_translatable_text(
         )
 
     return state_names_to_content_id_mapping
+
+
+def is_automatic_translation_enabled() -> bool:
+    """Returns whether the automatic translation feature is enabled.
+
+    Returns:
+        bool. True if automatic translation is enabled, False otherwise.
+    """
+    model = translation_models.MachineTranslationPolicyModel.get(
+        translation_models.MACHINE_TRANSLATION_POLICY_ID, strict=False
+    )
+    if model is None:
+        return False
+    # Here we use cast because BooleanProperty returns Any type at the
+    # type-checking level, but we know the stored value is always bool.
+    return cast(bool, model.automatic_translation_is_enabled)
+
+
+def get_machine_translation_provider_mapping() -> Dict[str, str]:
+    """Returns the current language-to-provider mapping.
+
+    Returns:
+        dict. A dict mapping language codes to provider identifiers.
+        Returns an empty dict if no configuration exists yet.
+    """
+    model = translation_models.MachineTranslationPolicyModel.get(
+        translation_models.MACHINE_TRANSLATION_POLICY_ID, strict=False
+    )
+    if model is None:
+        return {}
+    # Here we use cast because JsonProperty returns Any type at the
+    # type-checking level, but we know the stored value is always
+    # Dict[str, str].
+    return cast(Dict[str, str], model.language_to_provider_mapping)
+
+
+def update_automatic_translation_status(
+    automatic_translation_is_enabled: bool,
+) -> None:
+    """Updates the automatic translation enabled/disabled flag.
+
+    Args:
+        automatic_translation_is_enabled: bool. Whether to enable or
+            disable automatic translation suggestions.
+    """
+    model = translation_models.MachineTranslationPolicyModel.get(
+        translation_models.MACHINE_TRANSLATION_POLICY_ID, strict=False
+    )
+    if model is None:
+        model = translation_models.MachineTranslationPolicyModel(
+            id=translation_models.MACHINE_TRANSLATION_POLICY_ID,
+            automatic_translation_is_enabled=automatic_translation_is_enabled,
+            language_to_provider_mapping={},
+        )
+    else:
+        model.automatic_translation_is_enabled = (
+            automatic_translation_is_enabled
+        )
+    model.update_timestamps()
+    model.put()
+
+
+def save_machine_translation_provider_mapping(
+    language_to_provider_mapping: Dict[str, str],
+) -> None:
+    """Validates and saves the language-to-provider mapping.
+
+    Args:
+        language_to_provider_mapping: dict. A dict mapping language codes
+            to translation provider identifiers.
+            E.g. {'hi': 'azure', 'es': 'gcp'}.
+
+    Raises:
+        utils.ValidationError. If the mapping contains invalid language
+            codes or unsupported providers.
+    """
+    mapping_domain_object = (
+        translation_domain.MachineTranslationProviderMapping(
+            language_to_provider_mapping
+        )
+    )
+    mapping_domain_object.validate()
+
+    model = translation_models.MachineTranslationPolicyModel.get(
+        translation_models.MACHINE_TRANSLATION_POLICY_ID, strict=False
+    )
+    if model is None:
+        model = translation_models.MachineTranslationPolicyModel(
+            id=translation_models.MACHINE_TRANSLATION_POLICY_ID,
+            automatic_translation_is_enabled=False,
+            language_to_provider_mapping=language_to_provider_mapping,
+        )
+    else:
+        model.language_to_provider_mapping = language_to_provider_mapping
+    model.update_timestamps()
+    model.put()

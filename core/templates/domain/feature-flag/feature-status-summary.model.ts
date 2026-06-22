@@ -36,7 +36,6 @@ export enum FeatureNames {
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
   ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
   ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
-  EnableMultipleClassrooms = 'enable_multiple_classrooms',
   RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
   HighlightSentencesDuringAutomaticVoiceoverPlayback = 'highlight_sentences_during_automatic_voiceover_playback',
@@ -48,6 +47,10 @@ export enum FeatureNames {
   EnableReadyForReviewTest = 'enable_ready_for_review_test',
   EnableCampaignBanner = 'enable_financial_literacy_campaign_banner',
   EnableCampaignBannerTestMode = 'enable_financial_literacy_campaign_banner_test_mode',
+  EnableAutomaticTranslationSuggestions = 'enable_automatic_translation_suggestions',
+  EnableCertificateAssessment = 'enable_certificate_assessment',
+  WebGeneralFeedbackModalEnabled = 'web_general_feedback_modal_enabled',
+  ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
 }
 
 export interface FeatureStatusSummaryBackendDict {

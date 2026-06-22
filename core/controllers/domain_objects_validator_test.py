@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import copy
 import datetime
 import os
 
@@ -25,6 +26,7 @@ from core.controllers import domain_objects_validator
 from core.domain import (
     blog_services,
     change_domain,
+    general_feedback_domain,
     improvements_domain,
     question_domain,
     state_domain,
@@ -33,7 +35,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union, cast
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -824,3 +826,966 @@ class ValidateSkillIdsTests(test_utils.GenericTestBase):
     def test_valid_skill_ids_do_not_raise_exception(self) -> None:
         valid_skill_ids: str = 'skillid12345'
         domain_objects_validator.validate_skill_ids(valid_skill_ids)
+
+
+class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
+    """Tests for general feedback session_info validation."""
+
+    # Here we use object because session-info diagnostics include heterogeneous
+    # nested dict/list payload values from client logs.
+    def _as_dict(self, value: object) -> Dict[object, object]:
+        """Returns value after asserting it is a dict."""
+        if not isinstance(value, dict):
+            raise AssertionError('Expected dict.')
+        return value
+
+    # Here we use object because session-info diagnostics include heterogeneous
+    # nested dict/list payload values from client logs.
+    def _as_list_of_dicts(self, value: object) -> List[Dict[object, object]]:
+        """Returns value after asserting it is a list of dicts."""
+        if not isinstance(value, list):
+            raise AssertionError('Expected list.')
+        for item in value:
+            if not isinstance(item, dict):
+                raise AssertionError('Expected dict item.')
+        return value
+
+    def setUp(self) -> None:
+        super().setUp()
+        # Here we use object because session-info diagnostics are heterogeneous
+        # JSON-like payloads (nested dict/list values) from client logs.
+        self.session_info: Dict[str, object] = {
+            'console_logs_json': [
+                {
+                    'error_message': 'TypeError: Cannot read properties of undefined',
+                    'log_level': 'error',
+                    'timestamp_msecs': 1767225600000,
+                    'stack_trace': (
+                        'TypeError: Cannot read properties of undefined\n'
+                        ' at FeedbackComponent.submit (feedback.component.ts:45)'
+                    ),
+                }
+            ],
+            'failed_requests_json': [
+                {
+                    'url': '/createhandler/web_feedback',
+                    'method': 'POST',
+                    'status_code': 500,
+                    'timestamp_msecs': 1767225601000,
+                    'status_text': 'Internal Server Error',
+                    'error_message': 'Request failed with status code 500',
+                }
+            ],
+            'navigation_history_json': [
+                {
+                    'path': '/learn/math',
+                    'timestamp_msecs': 1767225590000,
+                },
+                {
+                    'path': '/explore/exp0',
+                    'timestamp_msecs': 1767225600000,
+                },
+            ],
+            'environment_json': {
+                'client_time_msecs': 1767225602000,
+                'timezone_offset_mins': -330,
+                'user_agent': (
+                    'Mozilla/5.0 (X11; Linux x86_64) '
+                    'AppleWebKit/537.36 Chrome/136.0 Safari/537.36'
+                ),
+                'viewport': {
+                    'width': 1920,
+                    'height': 1080,
+                },
+                'page': {
+                    'url': 'http://oppia.org/explore/exp0',
+                    'title': 'Fractions Exploration',
+                },
+                'locale': {
+                    'language_code': 'en',
+                    'direction': 'ltr',
+                },
+            },
+        }
+
+    def test_is_feedback_submission_from_allowed_feedback_page_hostname(
+        self,
+    ) -> None:
+        for hostname in feconf.ALLOWED_FEEDBACK_PAGE_HOSTS:
+            self.assertTrue(
+                domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                    hostname
+                )
+            )
+        self.assertTrue(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'www.oppia.org'
+            )
+        )
+        self.assertTrue(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'oppiatestserver.org'
+            )
+        )
+        self.assertTrue(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'subdomain.oppiatestserver.org'
+            )
+        )
+        self.assertFalse(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'fakeoppia.org'
+            )
+        )
+
+    def test_validate_general_feedback_page_url(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Page URL must start with http:// or https://.'
+        ):
+            domain_objects_validator.validate_general_feedback_page_url(
+                'httpps://fakeoppia.org'
+            )
+        with self.assertRaisesRegex(
+            Exception,
+            'Hostname of the page URL is not allowed for feedback submission.',
+        ):
+            domain_objects_validator.validate_general_feedback_page_url(
+                'http://fakeoppia.org'
+            )
+        with self.assertRaisesRegex(
+            Exception,
+            'Page URL exceeds maximum length of %d characters.'
+            % (feconf.MAX_PAGE_URL_LENGTH),
+        ):
+            domain_objects_validator.validate_general_feedback_page_url(
+                'https://www.oppia.org/%s' % ('a' * feconf.MAX_PAGE_URL_LENGTH)
+            )
+        self.assertEqual(
+            domain_objects_validator.validate_general_feedback_page_url(
+                '  https://www.oppia.org/learn/math  '
+            ),
+            'https://www.oppia.org/learn/math',
+        )
+
+    def test_localhost_is_allowed_in_non_prod_env(self) -> None:
+        with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+            self.assertTrue(
+                domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                    'localhost'
+                )
+            )
+
+    def test_localhost_is_rejected_in_prod_env(self) -> None:
+        with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+            self.assertFalse(
+                domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                    'localhost'
+                )
+            )
+
+    def _create_valid_feedback_payload(
+        self,
+    ) -> general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict:
+        """Returns a valid general feedback payload."""
+        return {
+            'category': 'platform',
+            'description': 'Useful feedback.',
+            'page_url': 'http://localhost:8181',
+            'language_code': 'en',
+            'rating': 5,
+            'target_type': 'general',
+            'target_id': None,
+            'screenshot_filename': None,
+            'submit_anonymously': True,
+            'include_session_info': False,
+            'session_info': None,
+            'captcha_token': None,
+            'screenshot_file': None,
+        }
+
+    def _copy_feedback_payload(
+        self,
+        payload: (
+            general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict
+        ),
+    ) -> general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict:
+        """Returns a copy of a general feedback payload."""
+        # Here we use cast because copy.deepcopy() does not preserve the exact
+        # TypedDict type in Oppia's current type checker.
+        return cast(
+            general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict,
+            copy.deepcopy(payload),
+        )
+
+    def _cast_to_screenshot_files(
+        self, files: Dict[Union[str, int], Union[str, int]]
+    ) -> Dict[str, str]:
+        """Returns files cast to the screenshot file dict type."""
+        # Here we use cast because these tests intentionally pass invalid
+        # screenshot file dicts to exercise runtime validation.
+        return cast(Dict[str, str], files)
+
+    def test_validate_general_feedback_submit_payload_coupling(self) -> None:
+        payload = self._create_valid_feedback_payload()
+
+        # Valid payload.
+        domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+            payload
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info must be provided if include_session_info is True.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['include_session_info'] = True
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info should not be provided when include_session_info is '
+            'False.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['session_info'] = self.session_info
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        valid_payload = self._copy_feedback_payload(payload)
+        valid_payload['include_session_info'] = True
+        valid_payload['session_info'] = self.session_info
+
+        domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+            valid_payload
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Description is required.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['description'] = '   '
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Description is required.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            # Here we use cast because this test intentionally passes None for
+            # the description to exercise runtime validation.
+            invalid_payload['description'] = cast(str, None)
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Lesson feedback requires target_type=exploration.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['category'] = 'lesson'
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Lesson feedback requires target_id.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['category'] = 'lesson'
+            invalid_payload['target_type'] = 'exploration'
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        valid_lesson_payload = self._copy_feedback_payload(payload)
+        valid_lesson_payload.update(
+            {
+                'category': 'lesson',
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+            }
+        )
+
+        domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+            valid_lesson_payload
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Platform feedback requires target_type=general.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['target_type'] = 'exploration'
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Platform feedback should not specify target_id.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['target_id'] = 'exp_id'
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Screenshot file requires a screenshot filename.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['screenshot_file'] = {'screenshot.png': 'data'}
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Screenshot filename requires screenshot file data.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['screenshot_filename'] = 'screenshot.png'
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Screenshot filename is invalid.',
+        ):
+            invalid_payload = self._copy_feedback_payload(payload)
+            invalid_payload['screenshot_filename'] = 'invalid.txt'
+            invalid_payload['screenshot_file'] = {'invalid.txt': 'data'}
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                invalid_payload
+            )
+
+        valid_screenshot_payload = self._copy_feedback_payload(payload)
+        valid_screenshot_payload.update(
+            {
+                'screenshot_filename': 'screenshot.png',
+                'screenshot_file': {
+                    'screenshot.png': 'data',
+                },
+            }
+        )
+
+        domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+            valid_screenshot_payload
+        )
+
+    def test_validate_general_feedback_screenshot_file(self) -> None:
+        self.assertIsNone(
+            domain_objects_validator.validate_general_feedback_screenshot_file(
+                None
+            )
+        )
+        valid_file = {'screenshot.png': 'data'}
+        self.assertEqual(
+            domain_objects_validator.validate_general_feedback_screenshot_file(
+                valid_file
+            ),
+            valid_file,
+        )
+
+        with self.assertRaisesRegex(
+            Exception, 'Only one screenshot file is allowed.'
+        ):
+            domain_objects_validator.validate_general_feedback_screenshot_file(
+                {
+                    'first.png': 'data',
+                    'second.png': 'data',
+                }
+            )
+        invalid_files = self._cast_to_screenshot_files({1: 'data'})
+        with self.assertRaisesRegex(Exception, 'Filename should be a string.'):
+            domain_objects_validator.validate_general_feedback_screenshot_file(
+                invalid_files
+            )
+
+        invalid_files = self._cast_to_screenshot_files({'screenshot.png': 1})
+        with self.assertRaisesRegex(
+            Exception, 'Screenshot data should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_screenshot_file(
+                invalid_files
+            )
+
+    def test_validate_general_feedback_session_info_log_entries_happy_path(
+        self,
+    ) -> None:
+        validated_info = domain_objects_validator.validate_general_feedback_session_info_log_entries(
+            self.session_info
+        )
+        environment_json = self._as_dict(validated_info['environment_json'])
+        page_json = self._as_dict(environment_json['page'])
+        self.assertEqual(
+            page_json['url'],
+            'http://oppia.org/explore/exp0',
+        )
+
+    def test_validate_general_feedback_session_info_rejects_unknown_top_level_keys(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['unknown_key'] = True
+        with self.assertRaisesRegex(
+            Exception, 'Session info contains unknown keys: unknown_key'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_top_level_types(
+        self,
+    ) -> None:
+        test_cases = [
+            (
+                'console_logs_json',
+                'not_a_list',
+                'console_logs_json should be a list.',
+            ),
+            (
+                'failed_requests_json',
+                'not_a_list',
+                'failed_requests_json should be a list.',
+            ),
+            (
+                'navigation_history_json',
+                'not_a_list',
+                'navigation_history_json should be a list.',
+            ),
+            (
+                'environment_json',
+                'not_a_dict',
+                'environment_json should be a dict.',
+            ),
+        ]
+        for key, value, expected_error in test_cases:
+            invalid_session_info = copy.deepcopy(self.session_info)
+            invalid_session_info[key] = value
+            with self.assertRaisesRegex(Exception, expected_error):
+                (
+                    domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                        invalid_session_info
+                    )
+                )
+
+    def test_validate_general_feedback_session_info_rejects_too_many_entries(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['console_logs_json'] = [{}] * (
+            feconf.MAX_SESSION_INFO_LOG_ENTRIES + 1
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Session info log entries exceed maximum allowed limit.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_console_error_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['console_logs_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'console_logs_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
+        )
+        console_logs_json[0]['error_message'] = 1
+        with self.assertRaisesRegex(
+            Exception,
+            'error_message in console_logs_json should be a string.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
+        )
+        console_logs_json[0]['error_message'] = 'a' * (
+            feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'error_message in console_logs_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
+        )
+        console_logs_json[0]['timestamp_msecs'] = 'not_an_int'
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info console_logs_json.timestamp_msecs should be an int.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
+        )
+        console_logs_json[0]['log_level'] = 'not_a_valid_log_level'
+        with self.assertRaisesRegex(
+            Exception, 'Invalid log_level in console_logs_json.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
+        )
+        console_logs_json[0]['stack_trace'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'stack_trace in console_logs_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
+        )
+        console_logs_json[0]['stack_trace'] = 'a' * (
+            feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'stack_trace in console_logs_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_failed_request_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['failed_requests_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'failed_requests_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['url'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'url in failed_requests_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['url'] = 'a' * (feconf.MAX_PAGE_URL_LENGTH + 1)
+        with self.assertRaisesRegex(
+            Exception,
+            'url in failed_requests_json exceeds maximum length of %d characters.'
+            % feconf.MAX_PAGE_URL_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['method'] = 100
+        with self.assertRaisesRegex(
+            Exception, 'method in failed_requests_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['method'] = 'a' * (
+            feconf.MAX_SESSION_INFO_METHOD_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'method in failed_requests_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_METHOD_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['status_code'] = '500'
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info failed_requests_json.status_code should be an int.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['timestamp_msecs'] = 'not_an_int'
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info failed_requests_json.timestamp_msecs should be an int.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['status_text'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'status_text in failed_requests_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_navigation_and_environment_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['navigation_history_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'navigation_history_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['status_text'] = 'a' * (
+            feconf.MAX_SESSION_INFO_STATUS_TEXT_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'status_text in failed_requests_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_STATUS_TEXT_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['error_message'] = 1
+        with self.assertRaisesRegex(
+            Exception,
+            'error_message in failed_requests_json should be a string.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
+        )
+        failed_requests_json[0]['error_message'] = 'a' * (
+            feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'error_message in failed_requests_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_navigation_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['navigation_history_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'navigation_history_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        navigation_history_json = self._as_list_of_dicts(
+            invalid_session_info['navigation_history_json']
+        )
+        navigation_history_json[0]['path'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'path in navigation_history_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        navigation_history_json = self._as_list_of_dicts(
+            invalid_session_info['navigation_history_json']
+        )
+        navigation_history_json[0]['path'] = 'a' * (
+            feconf.MAX_PAGE_URL_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'path in navigation_history_json exceeds maximum length of %d characters.'
+            % feconf.MAX_PAGE_URL_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        navigation_history_json = self._as_list_of_dicts(
+            invalid_session_info['navigation_history_json']
+        )
+        navigation_history_json[0]['timestamp_msecs'] = 'not_an_int'
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info navigation_history_json.timestamp_msecs should be an int.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_environment_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['page'] = 'not_a_dict'
+        with self.assertRaisesRegex(
+            Exception, 'page in environment_json should be a dict.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        page_json = self._as_dict(environment_json['page'])
+        page_json['url'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'Session info page.url should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        page_json = self._as_dict(environment_json['page'])
+        page_json['title'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'Session info page.title should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        page_json = self._as_dict(environment_json['page'])
+        page_json['title'] = 'a' * (
+            feconf.MAX_SESSION_INFO_PAGE_FIELD_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Session info page.title is too long.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['viewport'] = 'not_a_dict'
+        with self.assertRaisesRegex(
+            Exception, 'Session info viewport should be a dict.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        viewport_json = self._as_dict(environment_json['viewport'])
+        viewport_json['width'] = 'not_an_int'
+        with self.assertRaisesRegex(
+            Exception, 'Session info viewport.width should be an int.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['locale'] = 'not_a_dict'
+        with self.assertRaisesRegex(
+            Exception, 'Session info locale should be a dict.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        locale_json = self._as_dict(environment_json['locale'])
+        locale_json['language_code'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'Session info locale.language_code should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        locale_json = self._as_dict(environment_json['locale'])
+        locale_json['language_code'] = 'invalid_code'
+        with self.assertRaisesRegex(
+            Exception, 'Session info locale.language_code is invalid.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        locale_json = self._as_dict(environment_json['locale'])
+        locale_json['direction'] = 'invalid'
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info locale.direction should be "ltr" or "rtl".',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_user_agent_and_timestamps(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['user_agent'] = 100
+        with self.assertRaisesRegex(
+            Exception, 'user_agent in environment_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['client_time_msecs'] = 'not_an_int'
+        with self.assertRaisesRegex(
+            Exception, 'Session info client_time_msecs should be an int.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['user_agent'] = 'a' * (
+            feconf.MAX_SESSION_INFO_USER_AGENT_LENGTH + 1
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'user_agent in environment_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_USER_AGENT_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
+        )
+        environment_json['timezone_offset_mins'] = 'not_an_int'
+        with self.assertRaisesRegex(
+            Exception, 'Session info timezone_offset_mins should be an int.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )

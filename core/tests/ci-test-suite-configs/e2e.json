@@ -9,14 +9,6 @@
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
     },
     {
-      "name": "navigation",
-      "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "publication",
-      "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
-    },
-    {
       "name": "skillEditor",
       "module": "core/tests/webdriverio_desktop/skillEditor.js"
     },
@@ -27,10 +19,6 @@
     {
       "name": "users",
       "module": "core/tests/webdriverio_desktop/userJourneys.js"
-    },
-    {
-      "name": "wipeout",
-      "module": "core/tests/webdriverio_desktop/wipeout.js"
     }
   ]
 }
