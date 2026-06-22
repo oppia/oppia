@@ -880,6 +880,11 @@ export class BaseUser {
     await element.type(text);
   }
 
+  /**
+   * Checks if the value of text input with the given selector is equal to the given value.
+   * @param selector - The selector of the text input.
+   * @param value - The expected value of the text input.
+   */
   async expectInputValueToBe(selector: string, value: string): Promise<void> {
     await this.expectElementToBeVisible(selector);
     const element = await this.page.$(selector);

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance test from E2E Migration Doc
- * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/edit?gid=888982708#gid=888982708&range=A154:A156
+ * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FU1ADL4QO-eLZIuTowIA/edit?gid=888982708#gid=888982708
  *
  * LI.10. Play a collection
  */
@@ -29,7 +29,7 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in Learner viewing a collection', function () {
+describe('Logged-in Learner', function () {
   let collectionEditor: CollectionEditor & ExplorationEditor;
   let viewerUser: LoggedOutUser & LoggedInUser & ExplorationEditor;
 
@@ -110,6 +110,10 @@ describe('Logged-in Learner viewing a collection', function () {
       // Navigate to community library via the "Learn" navbar.
       await viewerUser.navigateToCommunityLibraryOnNavbar();
       await viewerUser.expectCollectionToBeVisibleInLibrary('Numbers');
+      await viewerUser.expectScreenshotToMatch(
+        'communityLibraryWithNumbersCollection',
+        __dirname
+      );
 
       // Click on the "Numbers" collection.
       await viewerUser.clickOnCollectionInLibrary('Numbers');
