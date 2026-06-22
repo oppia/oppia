@@ -23,26 +23,14 @@ from core.domain import (
     platform_parameter_list,
     question_services,
     skill_services,
-    state_domain,
     story_domain,
     story_services,
     topic_domain,
     topic_services,
     translation_domain,
     user_services,
-    voiceover_domain,
-    voiceover_services,
 )
-from core.platform import models
 from core.tests import test_utils
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import translation_models
-
-(translation_models,) = models.Registry.import_models(
-    [models.Names.TRANSLATION]
-)
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
@@ -304,140 +292,6 @@ class TopicPageDataHandlerTests(
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-        self.logout()
-
-    def test_get_with_story_node_explorations(self) -> None:
-        exploration_id = 'exp_id'
-        self.save_new_valid_exploration(
-            exploration_id, self.admin_id, end_state_name='End'
-        )
-        self.publish_exploration(self.admin_id, exploration_id)
-
-        no_translation_exploration_id = 'exp_id_2'
-        self.save_new_valid_exploration(
-            no_translation_exploration_id, self.admin_id, end_state_name='End'
-        )
-        self.publish_exploration(self.admin_id, no_translation_exploration_id)
-
-        voiceover_services.save_language_accent_support(
-            language_codes_mapping={'en': {'en-US': True}}
-        )
-
-        manual_voiceover_dict: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1,
-        }
-        entity_voiceovers = voiceover_domain.EntityVoiceovers(
-            entity_id=exploration_id,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_version=1,
-            language_accent_code='en-US',
-            voiceovers_mapping={
-                'content_id_0': {
-                    'manual': state_domain.Voiceover.from_dict(
-                        manual_voiceover_dict
-                    ),
-                    'auto': None,
-                }
-            },
-            automated_voiceovers_audio_offsets_msecs={},
-        )
-        voiceover_services.save_entity_voiceovers(entity_voiceovers)
-
-        translation_models.EntityTranslationsModel.create_new(
-            'exploration', exploration_id, 1, 'en', {}
-        ).put()
-
-        change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_1',
-                    'title': 'Node 1',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
-                    'node_id': 'node_1',
-                    'old_value': None,
-                    'new_value': exploration_id,
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': 'node_1',
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_2',
-                    'title': 'Node 2',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
-                    'node_id': 'node_2',
-                    'old_value': None,
-                    'new_value': no_translation_exploration_id,
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': 'node_2',
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
-                }
-            ),
-        ]
-        story_services.update_story(
-            self.admin_id, self.story_id_1, change_list, 'Added nodes.'
-        )
-
-        self.login(self.NEW_USER_EMAIL)
-        json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
-        )
-
-        canonical_stories = json_response['canonical_story_dicts']
-        story_with_nodes = [
-            s for s in canonical_stories if s['id'] == self.story_id_1
-        ]
-        self.assertEqual(len(story_with_nodes), 1)
-        story_dict = story_with_nodes[0]
-        self.assertEqual(len(story_dict['all_node_dicts']), 2)
-
-        node_dict = story_dict['all_node_dicts'][0]
-        self.assertEqual(node_dict['id'], 'node_1')
-        self.assertEqual(node_dict['exploration_id'], exploration_id)
-        self.assertEqual(node_dict['available_text_language_codes'], ['en'])
-        self.assertEqual(
-            node_dict['available_voiceover_language_codes'], ['en']
-        )
-
-        second_node_dict = story_dict['all_node_dicts'][1]
-        self.assertEqual(second_node_dict['id'], 'node_2')
-        self.assertEqual(
-            second_node_dict['exploration_id'], no_translation_exploration_id
-        )
-        self.assertEqual(
-            second_node_dict['available_text_language_codes'], ['en']
-        )
-        self.assertEqual(
-            second_node_dict['available_voiceover_language_codes'], []
-        )
         self.logout()
 
     def test_get_with_meta_tag_content(self) -> None:

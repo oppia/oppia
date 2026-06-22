@@ -90,7 +90,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             nodes: Sequence[story_domain.StoryNode],
         ) -> None:
             for node in nodes:
-                if node.exploration_id:  # pragma: no cover
+                if node.exploration_id:
                     exploration_ids.add(node.exploration_id)
 
         for story_summary in canonical_story_summaries:
@@ -212,7 +212,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             available_text_language_codes: List[str] = []
             available_voiceover_language_codes: List[str] = []
 
-            if node.exploration_id:  # pragma: no cover
+            if node.exploration_id:
                 available_text_language_codes = (
                     exploration_id_to_available_text_languages.get(
                         node.exploration_id, []
