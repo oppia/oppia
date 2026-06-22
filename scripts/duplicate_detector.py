@@ -271,5 +271,5 @@ def main() -> None:
             logging.error('Issue #%s: Failed to add comment: %s', current_id, e)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

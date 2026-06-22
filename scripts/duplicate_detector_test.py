@@ -126,3 +126,319 @@ class GetTemplateLinesTests(unittest.TestCase):
         self.assertEqual(result, set())
         mock_isdir.assert_called()
         mock_isfile.assert_called()
+
+    @mock.patch('os.walk')
+    @mock.patch('os.path.isdir')
+    @mock.patch('os.path.isfile', return_value=False)
+    def test_get_template_lines_with_dir(
+        self,
+        mock_isfile: mock.MagicMock,
+        mock_isdir: mock.MagicMock,
+        mock_walk: mock.MagicMock,
+    ) -> None:
+        """Test that get_template_lines parses directory."""
+        mock_isdir.side_effect = lambda path: 'ISSUE_TEMPLATE' in path
+        # Add 'ignore.txt' to hit the 51->50 branch (files that don't end in .md or .yml)
+        mock_walk.return_value = [
+            (
+                '/fake/ISSUE_TEMPLATE',
+                [],
+                ['bug.md', 'feature.yml', 'ignore.txt'],
+            )
+        ]
+
+        file_contents = "name: bug\ntitle: bug\n### Description\nThis is a template line that is very long."
+        m = mock.mock_open(read_data=file_contents)
+        with mock.patch('builtins.open', m):
+            result = duplicate_detector.get_template_lines('/fake')
+            self.assertIn("this is a template line that is very long.", result)
+        mock_isfile.assert_called()
+
+    @mock.patch('os.path.isfile')
+    @mock.patch('os.path.isdir', return_value=False)
+    def test_get_template_lines_with_file(
+        self, mock_isdir: mock.MagicMock, mock_isfile: mock.MagicMock
+    ) -> None:
+        """Test that get_template_lines parses file."""
+        mock_isfile.side_effect = lambda path: 'PULL_REQUEST_TEMPLATE' in path
+        file_contents = (
+            "name: bug\nThis is another template line that is very long."
+        )
+        m = mock.mock_open(read_data=file_contents)
+        with mock.patch('builtins.open', m):
+            result = duplicate_detector.get_template_lines('/fake')
+            self.assertIn(
+                "this is another template line that is very long.", result
+            )
+        mock_isdir.assert_called()
+
+
+class MainTests(unittest.TestCase):
+    """Tests for the main function."""
+
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_manual_trigger_no_issues_found(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+    ) -> None:
+        """Test main gracefully returning when no issues found."""
+        mock_environ_get.side_effect = lambda k, d='': (
+            'workflow_dispatch' if k == 'GITHUB_EVENT_NAME' else d
+        )
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = []
+
+        duplicate_detector.main()
+        mock_get_all_open_issues.assert_called()
+
+    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_manual_trigger_with_duplicate(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+        mock_urlopen: mock.MagicMock,
+        mock_cos_sim: mock.MagicMock,
+    ) -> None:
+        """Test main identifies duplicates via manual trigger."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'workflow_dispatch',
+                'START_ISSUE_NUMBER': '1',
+                'END_ISSUE_NUMBER': '10',
+                'THRESHOLD_SCORE': '0.8',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = [
+            {
+                'number': 0,
+                'title': 'issue 0',
+                'body': 'body 0',
+                'user': {'login': 'user0'},
+            },
+            {
+                'number': 1,
+                'title': 'issue 1',
+                'body': 'body 1',
+                'user': {'login': 'user1'},
+            },
+            {
+                'number': 2,
+                'title': 'issue 2',
+                'body': 'body 2',
+                'user': {'login': 'user2'},
+            },
+            {
+                'number': 11,
+                'title': 'issue 11',
+                'body': 'body 11',
+                'user': {'login': 'user11'},
+            },  # Hits branch 169->168
+        ]
+
+        # mock cos_sim to return a tensor with an item() method
+        # Return 0.9 for the first comparison, then 0.5 for the second to hit branch 218->211
+        mock_tensor1 = mock.MagicMock()
+        mock_tensor1.item.return_value = 0.9
+        mock_tensor2 = mock.MagicMock()
+        mock_tensor2.item.return_value = 0.5
+        mock_cos_sim.side_effect = [
+            mock_tensor1,
+            mock_tensor1,
+            mock_tensor2,
+            mock_tensor1,
+            mock_tensor2,
+        ]
+
+        duplicate_detector.main()
+        self.assertEqual(mock_urlopen.call_count, 4)
+
+    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_manual_trigger_no_duplicate(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+        mock_urlopen: mock.MagicMock,
+        mock_cos_sim: mock.MagicMock,
+    ) -> None:
+        """Test main when there are no duplicates."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'workflow_dispatch',
+                'START_ISSUE_NUMBER': '1',
+                'END_ISSUE_NUMBER': '10',
+                'THRESHOLD_SCORE': '0.8',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = [
+            {
+                'number': 1,
+                'title': 'issue 1',
+                'body': 'body 1',
+                'user': {'login': 'user1'},
+            },
+            {
+                'number': 2,
+                'title': 'issue 2',
+                'body': 'body 2',
+                'user': {'login': 'user2'},
+            },
+            {
+                'number': 15,
+                'title': 'issue 15',
+                'body': 'body 15',
+                'user': {'login': 'user15'},
+            },  # Hits branch 169->168
+        ]
+
+        mock_tensor = mock.MagicMock()
+        mock_tensor.item.return_value = 0.5
+        mock_cos_sim.return_value = mock_tensor
+
+        duplicate_detector.main()
+        mock_urlopen.assert_not_called()
+
+    @mock.patch('builtins.open')
+    @mock.patch('os.path.exists')
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_automatic_trigger_no_issue_in_event(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+        mock_exists: mock.MagicMock,
+        mock_open: mock.MagicMock,
+    ) -> None:
+        """Test main automatic trigger exits when no issue is present."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'issues',
+                'GITHUB_EVENT_PATH': '/fake/path.json',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_exists.return_value = True
+        m = mock.mock_open(read_data='{}')
+        mock_open.side_effect = m
+
+        duplicate_detector.main()
+        mock_get_all_open_issues.assert_not_called()
+
+    @mock.patch('builtins.open')
+    @mock.patch('os.path.exists')
+    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_automatic_trigger_with_duplicate(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+        mock_urlopen: mock.MagicMock,
+        mock_cos_sim: mock.MagicMock,
+        mock_exists: mock.MagicMock,
+        mock_open: mock.MagicMock,
+    ) -> None:
+        """Test main automatic trigger finds duplicates."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'issues',
+                'GITHUB_EVENT_PATH': '/fake/path.json',
+                'THRESHOLD_SCORE': '0.8',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_exists.side_effect = lambda p: p == '/fake/path.json'
+        m = mock.mock_open(
+            read_data='{"issue": {"number": 2, "title": "t", "body": "b"}}'
+        )
+        mock_open.side_effect = m
+
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = [
+            {'number': 1, 'title': 'issue 1', 'body': 'body 1'}
+        ]
+
+        mock_tensor = mock.MagicMock()
+        mock_tensor.item.return_value = 0.9
+        mock_cos_sim.return_value = mock_tensor
+
+        duplicate_detector.main()
+        self.assertEqual(mock_urlopen.call_count, 2)
+
+    @mock.patch('builtins.open')
+    @mock.patch('os.path.exists')
+    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_automatic_trigger_urllib_error(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+        mock_urlopen: mock.MagicMock,
+        mock_cos_sim: mock.MagicMock,
+        mock_exists: mock.MagicMock,
+        mock_open: mock.MagicMock,
+    ) -> None:
+        """Test main catches urllib errors gracefully."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'issues',
+                'GITHUB_EVENT_PATH': '/fake/path.json',
+                'THRESHOLD_SCORE': '0.8',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_exists.side_effect = lambda p: p == '/fake/path.json'
+        m = mock.mock_open(
+            read_data='{"issue": {"number": 2, "title": "t", "body": "b"}}'
+        )
+        mock_open.side_effect = m
+
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = [
+            {'number': 1, 'title': 'issue 1', 'body': 'body 1'}
+        ]
+
+        mock_tensor = mock.MagicMock()
+        mock_tensor.item.return_value = 0.9
+        mock_cos_sim.return_value = mock_tensor
+
+        mock_urlopen.side_effect = Exception("API error")
+
+        duplicate_detector.main()
+        self.assertEqual(mock_urlopen.call_count, 2)
