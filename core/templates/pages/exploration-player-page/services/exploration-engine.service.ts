@@ -198,7 +198,7 @@ export class ExplorationEngineService {
     oldStateCard: StateCard,
     outcome: Outcome,
     envs: Record<string, string>[]
-  ): string | null {
+  ): string {
     const oldInteractionId = oldStateCard.getInteractionId();
     const oldInteractionArgs =
       oldStateCard.getInteractionCustomizationArgs() as TextInputCustomizationArgs;
@@ -222,9 +222,6 @@ export class ExplorationEngineService {
       }
     }
 
-    if (!outcome.feedback.html) {
-      return null;
-    }
     return this.expressionInterpolationService.processHtml(
       outcome.feedback.html,
       envs
@@ -794,17 +791,12 @@ export class ExplorationEngineService {
     // Compute the data for the next state.
     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
     oldParams.answer = answer;
-    let feedbackHtml: string | null = this._getFeedback(
+    let feedbackHtml: string = this._getFeedback(
       answer,
       oldStateCard,
       classificationResult.outcome,
       [oldParams]
     );
-    if (feedbackHtml === null) {
-      this.answerIsBeingProcessed = false;
-      this.alertsService.addWarning('Feedback content should not be empty.');
-      return false;
-    }
     let newParams = newState
       ? this.makeParams(oldParams, newState.paramChanges, [oldParams])
       : oldParams;

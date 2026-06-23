@@ -1161,65 +1161,6 @@ describe('Exploration engine service ', () => {
       expect(submitAnswerSuccessCb.calls.mostRecent().args[10]).toBeNull();
     }));
 
-    it(
-      'should show warning message if the feedback ' + 'content is empty',
-      () => {
-        let initSuccessCb = jasmine.createSpy('success');
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let answer = 'answer';
-        // Triggers the empty-feedback branch by making the html getter return ''.
-        spyOnProperty(
-          answerClassificationResult.outcome.feedback,
-          'html',
-          'get'
-        ).and.returnValue('');
-
-        let lastCard = StateCard.createNewCard(
-          'Card 1',
-          'Content html',
-          'Interaction text',
-          {} as Interaction,
-          'content_id'
-        );
-
-        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-          false
-        );
-        spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-          'Start'
-        );
-        spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
-        spyOn(
-          answerClassificationService,
-          'getMatchingClassificationResult'
-        ).and.returnValue(answerClassificationResult);
-        let alertsServiceSpy = spyOn(
-          alertsService,
-          'addWarning'
-        ).and.callThrough();
-
-        explorationEngineService.init(
-          explorationDict,
-          1,
-          null,
-          true,
-          ['en'],
-          [],
-          initSuccessCb
-        );
-
-        explorationEngineService.submitAnswer(
-          answer,
-          textInputService as InteractionRulesService & TextInputRulesService,
-          submitAnswerSuccessCb
-        );
-
-        expect(alertsServiceSpy).toHaveBeenCalledWith(
-          'Feedback content should not be empty.'
-        );
-      }
-    );
-
     it('should show warning message if the parameters ' + 'are empty', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let submitAnswerSuccessCb = jasmine.createSpy('success');
