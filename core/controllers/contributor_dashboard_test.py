@@ -3241,7 +3241,9 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.exp_id = 'exp1'
-        self.save_new_valid_exploration(self.exp_id, self.admin_id)
+        self.save_new_valid_exploration(
+            self.exp_id, self.admin_id, content_html='<p>Content HTML</p>'
+        )
 
         self.skill_id = 'skill1'
         self.save_new_skill(
@@ -3294,6 +3296,33 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
+    def test_handler_returns_correct_fields_for_translatable_contents(
+        self,
+    ) -> None:
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+        )
+        self.assertEqual(response['version'], 1)
+        self.assertEqual(len(response['translatable_contents']), 1)
+
+        content = response['translatable_contents'][0]
+        self.assertEqual(content['content_id'], 'content_0')
+        self.assertEqual(content['content_type'], 'content')
+        self.assertEqual(content['content_format'], 'html')
+        self.assertEqual(content['content_value'], '<p>Content HTML</p>')
+        self.assertEqual(content['grouping_key'], 'Introduction')
+
+        # Ensure exploration-specific/unwanted fields are NOT returned.
+        self.assertNotIn('state_name', content)
+        self.assertNotIn('interaction_id', content)
+        self.assertNotIn('rule_type', content)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
     def test_handler_returns_400_for_skill(self) -> None:
         response = self.get_json(
             '%s?language_code=hi&entity_type=skill&entity_id=%s'
@@ -3336,3 +3365,148 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             response['error'],
             'Translation for entity_type story is not supported yet.',
         )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_filters_out_in_review_suggestions(self) -> None:
+        self.signup('suggester@example.com', 'suggester')
+        suggester_id = self.get_user_id_from_email('suggester@example.com')
+        exp = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state_name = list(exp.states.keys())[0]
+        content_id = list(
+            exp.states[state_name]
+            .get_translatable_contents_collection()
+            .content_id_to_translatable_content.keys()
+        )[0]
+
+        change_dict: Dict[str, change_domain.AcceptableChangeDictTypes] = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': state_name,
+            'content_id': content_id,
+            'language_code': 'hi',
+            'content_html': '<p>Content HTML</p>',
+            'translation_html': '<p>Translation</p>',
+            'data_format': 'html',
+        }
+
+        # Check that it returns the translatable content before creating the suggestion.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+        )
+        self.assertEqual(len(response['translatable_contents']), 1)
+        self.assertEqual(
+            response['translatable_contents'][0]['content_id'], content_id
+        )
+
+        # Create suggestion.
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.exp_id,
+            exp.version,
+            suggester_id,
+            change_dict,
+            'Translation suggestion',
+        )
+
+        # Check that the translatable content is now filtered out.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+        )
+        self.assertEqual(len(response['translatable_contents']), 0)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_filters_out_already_translated_contents(self) -> None:
+        exp = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state_name = list(exp.states.keys())[0]
+        content_id = list(
+            exp.states[state_name]
+            .get_translatable_contents_collection()
+            .content_id_to_translatable_content.keys()
+        )[0]
+
+        # Check that it returns the translatable content before translating.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+        )
+        self.assertEqual(len(response['translatable_contents']), 1)
+
+        # Add translation.
+        translated_content = translation_domain.TranslatedContent(
+            '<p>Translation HTML</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.exp_id,
+            exp.version,
+            'hi',
+            content_id,
+            translated_content,
+        )
+
+        # Check that the translatable content is now filtered out.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+        )
+        self.assertEqual(len(response['translatable_contents']), 0)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_filters_out_list_formats_for_non_reviewer(self) -> None:
+        self.logout()
+        # Create a new user who is NOT a reviewer for language 'hi'.
+        self.signup('contributor@example.com', 'contributor')
+        contributor_id = self.get_user_id_from_email('contributor@example.com')
+        self.login('contributor@example.com')
+
+        # Mock get_all_contents_which_need_translations to return a list format content.
+        mock_get_translatable_content_return_value = {
+            'content_0': translation_domain.TranslatableContent(
+                content_id='content_0',
+                content_type=translation_domain.ContentType.CONTENT,
+                content_format=(
+                    translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING
+                ),
+                content_value=['string1', 'string2'],
+            )
+        }
+
+        with unittest.mock.patch.object(
+            exp_domain.Exploration,
+            'get_all_contents_which_need_translations',
+            return_value=mock_get_translatable_content_return_value,
+        ):
+            # Check that list format content is skipped for non-reviewer.
+            response = self.get_json(
+                '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+                % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+            )
+            self.assertEqual(len(response['translatable_contents']), 0)
+
+            # Mark user as a reviewer for 'hi'.
+            user_services.allow_user_to_review_translation_in_language(
+                contributor_id, 'hi'
+            )
+
+            # Check that list format content is now returned since they are a reviewer.
+            response = self.get_json(
+                '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+                % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+            )
+            self.assertEqual(len(response['translatable_contents']), 1)
