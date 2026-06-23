@@ -595,3 +595,38 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].entity_id, 'exp1')
         self.assertEqual(results[1].entity_id, 'exp2')
         self.assertIsNone(results[2])
+
+    def test_get_by_topic(self) -> None:
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp1',
+            topic_ids=['topic1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp2',
+            topic_ids=['topic1', 'topic2'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+
+        results = opportunity_models.TranslationOpportunityModel.get_by_topic(
+            'topic1'
+        )
+        self.assertEqual(len(results), 2)
+        self.assertEqual({r.entity_id for r in results}, {'exp1', 'exp2'})
+
+        results = opportunity_models.TranslationOpportunityModel.get_by_topic(
+            'topic2'
+        )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entity_id, 'exp2')
+
+        results = opportunity_models.TranslationOpportunityModel.get_by_topic(
+            'non_existent_topic'
+        )
+        self.assertEqual(len(results), 0)

@@ -171,6 +171,9 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  // The default state name for translation suggestions of non-exploration entities.
+  "DEFAULT_SUGGESTION_STATE_NAME": "Generic Content",
+
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
   // any new class, topic, skill, exploration or subtopic is added or a
@@ -7111,16 +7114,21 @@ export default {
       "TITLE": "I18N_DONATE_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "name",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+          "CONTENT": "Your donation helps fund free, localized educational resources for children in under-resourced communities."
         },
         {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+          "CONTENT": "Your donation helps fund free, localized educational resources for children in under-resourced communities."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:title",
+          "CONTENT": "Donate to Oppia | Support Global Education"
         }
       ]
     },
@@ -7207,8 +7215,26 @@ export default {
     },
     "PARTNERSHIPS": {
       "ROUTE": "partnerships",
-      "TITLE": "Partnerships | Oppia",
-      "META": []
+      "TITLE": "I18N_PARTNERSHIPS_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Discover how schools and non-profit organizations leverage Oppia's offline capability to eliminate learning deficits."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Discover how schools and non-profit organizations leverage Oppia's offline capability to eliminate learning deficits."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:title",
+          "CONTENT": "Partner with Oppia | NGOs and Schools"
+        }
+      ]
     },
     "PLAYBOOK": {
       "ROUTE": "creator-guidelines",
@@ -7531,8 +7557,26 @@ export default {
     },
     "VOLUNTEER": {
       "ROUTE": "volunteer",
-      "TITLE": "Volunteer | Oppia",
-      "META": []
+      "TITLE": "I18N_VOLUNTEER_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Contribute your translation, engineering, or content design skills to make education accessible to all."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Contribute your translation, engineering, or content design skills to make education accessible to all."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:title",
+          "CONTENT": "Volunteer with Oppia | Join Our Global Team"
+        }
+      ]
     },
     "CLASSROOM": {
       "ROUTE": "learn/:classroom_url_fragment",
@@ -7755,20 +7799,25 @@ export default {
     },
     "SPLASH": {
       "ROUTE": "",
-      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "TITLE": "Personalized Online Learning from Oppia",
       "LIGHTWEIGHT": true,
       "META": [
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "name",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Empowering children globally through free, high-quality, story-based adaptive lessons."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Empowering children globally through free, high-quality, story-based adaptive lessons."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:title",
+          "CONTENT": "Personalized Online Learning from Oppia"
         }
       ]
     }
