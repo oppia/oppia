@@ -216,6 +216,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "logged-out-user/crawl-main-oppia-pages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/crawl-main-oppia-pages.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts",
       "framework": "puppeteer"
@@ -377,8 +382,8 @@
     },
     {
       "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
@@ -398,11 +403,6 @@
     {
       "name": "logged-in-learner/manage-in-progress-and-completed-lessons-and-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-lessons-and-skill.spec.ts",
-      "framework": "puppeteer"
-    },
-    {
-      "name": "logged-in-learner/manage-in-progress-and-completed-community-lessons-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-community-lessons-and-skill.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -427,8 +427,8 @@
     },
     {
       "name": "logged-in-learner/sets-goal-on-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
@@ -437,8 +437,8 @@
     },
     {
       "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",

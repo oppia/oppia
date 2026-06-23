@@ -696,13 +696,14 @@ class TranslatableContentsHandlerV2(
 
 
 class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of ReviewableOpportunitiesHandler's
+    """Dict representation of LessonsPinningHandler's
     normalized_request dictionary.
     """
 
     language_code: str
     topic_id: str
     opportunity_id: Optional[str]
+    entity_type: str
 
 
 class LessonsPinningHandler(
@@ -722,6 +723,13 @@ class LessonsPinningHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
+                },
+                'default_value': feconf.ENTITY_TYPE_EXPLORATION,
+            },
         },
     }
 
@@ -733,11 +741,16 @@ class LessonsPinningHandler(
         topic_name = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
+        entity_type = self.normalized_payload['entity_type']
         if language_code and topic_name:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             topic_id = topic.id
             opportunity_services.update_pinned_opportunity_model(
-                self.user_id, language_code, topic_id, opportunity_id
+                self.user_id,
+                language_code,
+                topic_id,
+                opportunity_id,
+                entity_type=entity_type,
             )
         self.render_json(self.values)
 

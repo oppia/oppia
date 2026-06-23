@@ -18,12 +18,13 @@ from __future__ import annotations
 
 from core import feconf
 from core.controllers import acl_decorators, base
+from core.domain import certificate_assessment_services
 
-from typing import Dict
+from typing import Any, Dict
 
 
 class CertificateAssessmentOfferingHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, Any], Dict[str, Any]]
 ):
     """Handler for creating and listing certificate assessment offerings."""
 
@@ -31,18 +32,79 @@ class CertificateAssessmentOfferingHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'POST': {},
+        'POST': {
+            'title': {'schema': {'type': 'basestring'}},
+            'description': {'schema': {'type': 'basestring'}},
+            'classroom_id': {'schema': {'type': 'basestring'}},
+            'topics': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'topic_id',
+                                'schema': {'type': 'basestring'},
+                            },
+                        ],
+                        'required': ['topic_id'],
+                    },
+                }
+            },
+            'total_questions': {'schema': {'type': 'int'}},
+            'time_limit_in_minutes': {'schema': {'type': 'int'}},
+            'demonstrates': {
+                'schema': {
+                    'type': 'list',
+                    'items': {'type': 'basestring'},
+                    'validators': [
+                        {
+                            'id': 'has_length_at_least',
+                            'min_value': 1,
+                        }
+                    ],
+                }
+            },
+            'async_status': {'schema': {'type': 'basestring'}},
+        },
     }
 
     @acl_decorators.can_access_certificate_dashboard
     def get(self) -> None:
-        """Returns an empty list of certificate offerings (stub)."""
-        self.render_json({'certificate_offerings': []})
+        """Returns all certificate assessment offerings."""
+        certificate_offerings = (
+            certificate_assessment_services.get_certificate_assessment_offerings()
+        )
+        self.render_json(
+            {
+                'certificate_offerings': [
+                    certificate_offering.to_dict()
+                    for certificate_offering in certificate_offerings
+                ]
+            }
+        )
 
     @acl_decorators.can_access_certificate_dashboard
     def post(self) -> None:
-        """Returns a dummy certificate_id (stub)."""
-        self.render_json({'certificate_id': 'dummy_id'})
+        """Creates a certificate assessment offering."""
+        assert self.normalized_payload is not None
+        certificate_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title=self.normalized_payload['title'],
+            description=self.normalized_payload['description'],
+            classroom_id=self.normalized_payload['classroom_id'],
+            topic_ids=[
+                topic['topic_id'] for topic in self.normalized_payload['topics']
+            ],
+            total_questions=self.normalized_payload['total_questions'],
+            time_limit_in_minutes=self.normalized_payload[
+                'time_limit_in_minutes'
+            ],
+            demonstrates=self.normalized_payload['demonstrates'],
+            async_status=self.normalized_payload['async_status'],
+        )
+        self.render_json(
+            {'certificate_id': certificate_offering.certificate_id}
+        )
 
 
 class CertificateAssessmentOfferingByIdHandler(
