@@ -41,14 +41,6 @@ import {By} from '@angular/platform-browser';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
-import {
-  ComponentFixture,
-  TestBed,
-  waitForAsync,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
-import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 class MockWindowRef {
   nativeWindow = {
