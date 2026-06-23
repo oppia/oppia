@@ -2266,7 +2266,21 @@ export class CurriculumAdmin extends TopicManager {
    */
   async editClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.page.waitForSelector(classroomTileSelector);
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        const tiles = Array.from(document.querySelectorAll(selector));
+        return tiles.some(tile => {
+          const span =
+            tile.querySelector('.e2e-test-classroom-tile-name') ||
+            tile.querySelector('span');
+          return span && span.textContent?.trim() === name;
+        });
+      },
+      {},
+      classroomTileSelector,
+      classroomName
+    );
+
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {
