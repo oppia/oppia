@@ -3720,7 +3720,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             {},
             [],
             [],
-            {},
+            0,
         )
         with self.swap(
             opportunity_services,
@@ -3802,7 +3802,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             {},
             [],
             [],
-            {},
+            0,
         )
         with self.swap(
             opportunity_services,
