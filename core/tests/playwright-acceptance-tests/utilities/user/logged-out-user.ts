@@ -269,6 +269,12 @@ export class LoggedOutUser extends BaseUser {
         );
       }
 
+      // TODO(#26453): The search page fires /searchhandler/data multiple
+      // times on load, causing Angular to re-render the search results list and
+      // detach ElementHandle references mid-operation. To avoid stale handles,
+      // we re-query the DOM by selector and index on each poll and at click time
+      // rather than holding an ElementHandle across async boundaries. Remove this
+      // workaround once the upstream re-rendering issue is fixed.
       await this.page.waitForFunction(
         ({selector, index, clickableFn}) => {
           const element = document.querySelectorAll(selector)[index];
