@@ -29,9 +29,6 @@ import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
 import {
-  ComponentFixture,
-  TestBed,
-  waitForAsync,
   fakeAsync,
   tick,
 } from '@angular/core/testing';
