@@ -171,7 +171,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.translationLanguageService.onActiveLanguageAccentChanged.subscribe(
         () => {
           let newLanguageAccentCode =
-            this.localStorageService.getLastSelectedLanguageAccentCode() as string;
+            this.translationLanguageService.getActiveLanguageAccentCode() as string;
           this.updateLanguageAccentCode(newLanguageAccentCode);
         }
       )

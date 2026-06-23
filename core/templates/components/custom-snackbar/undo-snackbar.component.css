@@ -1,0 +1,24 @@
+.snackbar-container {
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.oppia-snackbar-message {
+  align-items: center;
+  display: flex;
+}
+
+.oppia-action-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: space-evenly;
+}
+
+.undo-button {
+  color: #27b8a7;
+}
+
+.dismiss-button {
+  color: #bdbdbd;
+}

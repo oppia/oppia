@@ -458,6 +458,21 @@ class TranslationOpportunityModel(base_models.BaseModel):
         return cls.get_multi(model_ids)
 
     @classmethod
+    def get_by_topic(
+        cls, topic_id: str
+    ) -> Sequence[TranslationOpportunityModel]:
+        """Returns all the models corresponding to the specific topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Returns:
+            list(TranslationOpportunityModel). A list of
+            TranslationOpportunityModel associated with the given topic_id.
+        """
+        return cls.query(cls.topic_ids == topic_id).fetch()
+
+    @classmethod
     def create_new(
         cls,
         entity_type: str,
