@@ -45,6 +45,7 @@ import {
   StoryContents,
 } from 'domain/story/story-contents-object.model';
 import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
+import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockNgbModalRef {
@@ -1368,5 +1369,49 @@ describe('Story Editor Component having three story nodes', () => {
     expect(
       storyEditorStateService.setNewChapterPublicationIsDisabled
     ).toHaveBeenCalledWith(true);
+  });
+
+  it('should return null from getArcColorForNode when node has no arc', () => {
+    expect(component.getArcColorForNode('node_1')).toBeNull();
+  });
+
+  it('should return null from getArcColorForNode when arc index is invalid', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+
+    expect(component.getArcColorForNode('node_2')).toBeNull();
+  });
+
+  it('should return a color from the palette in getArcColorForNode', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+
+    const color = component.getArcColorForNode('node_2');
+    expect(color).toBe(StoryDomainConstants.ARC_COLOR_PALETTE[0]);
+  });
+
+  it('should call editArc via onEditArcClick when node has an arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    spyOn(component, 'editArc');
+
+    component.onEditArcClick('node_2');
+
+    expect(component.editArc).toHaveBeenCalledWith('arc_1');
+  });
+
+  it('should call removeArcBoundary via onRemoveArcClick when node has an arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    spyOn(component, 'removeArcBoundary');
+
+    component.onRemoveArcClick('node_2');
+
+    expect(component.removeArcBoundary).toHaveBeenCalledWith('arc_1');
   });
 });
