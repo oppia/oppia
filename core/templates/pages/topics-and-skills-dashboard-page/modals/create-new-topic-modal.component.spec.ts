@@ -28,10 +28,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
-import {
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import {fakeAsync, tick} from '@angular/core/testing';
 import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 describe('Create new topic modal', () => {
