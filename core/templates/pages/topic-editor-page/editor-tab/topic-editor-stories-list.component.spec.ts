@@ -25,7 +25,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
