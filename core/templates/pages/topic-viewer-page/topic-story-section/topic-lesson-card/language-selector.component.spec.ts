@@ -18,6 +18,7 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
+import {SimpleChange} from '@angular/core';
 
 import {LanguageSelectorComponent} from './language-selector.component';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -31,6 +32,7 @@ describe('LanguageSelectorComponent', () => {
     const languageUtilServiceSpy = jasmine.createSpyObj('LanguageUtilService', [
       'getContentLanguageDescription',
       'getAudioLanguageDescription',
+      'getLanguageCodesRelatedToAudioLanguageCode',
     ]);
 
     TestBed.configureTestingModule({
@@ -120,6 +122,10 @@ describe('LanguageSelectorComponent', () => {
     component.selectedTextLanguageCode = 'pt';
     component.availableVoiceoverLanguageCodes = ['en'];
     component.selectedVoiceoverLanguageCode = null;
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'pt', true),
+      availableVoiceoverLanguageCodes: new SimpleChange([], ['en'], true),
+    });
 
     expect(component.getSelectedVoiceoverLanguageLabel()).toBe(
       'No accents available'
@@ -130,6 +136,14 @@ describe('LanguageSelectorComponent', () => {
   it('should return true from hasVoiceoverLanguageOptions when voiceover languages exist', () => {
     component.selectedTextLanguageCode = 'en';
     component.availableVoiceoverLanguageCodes = ['en', 'en-us', 'hi'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'en', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['en', 'en-us', 'hi'],
+        true
+      ),
+    });
 
     expect(component.hasVoiceoverLanguageOptions()).toBeTrue();
   });
@@ -137,6 +151,10 @@ describe('LanguageSelectorComponent', () => {
   it('should return false from hasVoiceoverLanguageOptions when no voiceover languages', () => {
     component.selectedTextLanguageCode = 'en';
     component.availableVoiceoverLanguageCodes = ['hi'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'en', true),
+      availableVoiceoverLanguageCodes: new SimpleChange([], ['hi'], true),
+    });
 
     expect(component.hasVoiceoverLanguageOptions()).toBeFalse();
   });
@@ -144,6 +162,14 @@ describe('LanguageSelectorComponent', () => {
   it('should return filtered voiceover languages for selected text language', () => {
     component.selectedTextLanguageCode = 'pt';
     component.availableVoiceoverLanguageCodes = ['en', 'pt', 'pt-br', 'hi'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'pt', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['en', 'pt', 'pt-br', 'hi'],
+        true
+      ),
+    });
 
     expect(component.filteredVoiceoverLanguageCodes).toEqual(['pt', 'pt-br']);
   });
@@ -151,8 +177,39 @@ describe('LanguageSelectorComponent', () => {
   it('should return empty filtered voiceover languages when text language is not selected', () => {
     component.selectedTextLanguageCode = null;
     component.availableVoiceoverLanguageCodes = ['en', 'en-us'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange('en', null, false),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['en', 'en-us'],
+        true
+      ),
+    });
 
     expect(component.filteredVoiceoverLanguageCodes).toEqual([]);
+  });
+
+  it('should include voiceover languages matched via relatedLanguages', () => {
+    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.callFake(
+      (code: string) => {
+        if (code === 'fat') {
+          return ['ak', 'fat'];
+        }
+        return [code];
+      }
+    );
+    component.selectedTextLanguageCode = 'ak';
+    component.availableVoiceoverLanguageCodes = ['ak', 'fat', 'en'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'ak', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['ak', 'fat', 'en'],
+        true
+      ),
+    });
+
+    expect(component.filteredVoiceoverLanguageCodes).toEqual(['ak', 'fat']);
   });
 
   it('should show validation error when showValidationError is true and no text language selected', () => {

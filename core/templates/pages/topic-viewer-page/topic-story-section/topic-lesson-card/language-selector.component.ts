@@ -16,7 +16,14 @@
  * @fileoverview Reusable lesson language selector UI.
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 import './language-selector.component.css';
@@ -26,7 +33,7 @@ import './language-selector.component.css';
   templateUrl: './language-selector.component.html',
   styleUrls: ['./language-selector.component.css'],
 })
-export class LanguageSelectorComponent {
+export class LanguageSelectorComponent implements OnChanges {
   @Input() availableTextLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageCodes: string[] = [];
   @Input() selectedTextLanguageCode: string | null = null;
@@ -38,11 +45,23 @@ export class LanguageSelectorComponent {
     string | null
   >();
 
+  filteredVoiceoverLanguageCodes: string[] = [];
+
   constructor(private languageUtilService: LanguageUtilService) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.availableVoiceoverLanguageCodes ||
+      changes.selectedTextLanguageCode
+    ) {
+      this.recomputeFilteredVoiceoverLanguageCodes();
+    }
+  }
 
   onTextLanguageChange(newLanguageCode: string): void {
     this.selectedTextLanguageCode = newLanguageCode || null;
     this.selectedTextLanguageCodeChange.emit(this.selectedTextLanguageCode);
+    this.recomputeFilteredVoiceoverLanguageCodes();
     this.clearSelectedVoiceoverLanguageIfInvalid();
   }
 
@@ -57,20 +76,30 @@ export class LanguageSelectorComponent {
     return this.filteredVoiceoverLanguageCodes.length > 0;
   }
 
-  get filteredVoiceoverLanguageCodes(): string[] {
+  private recomputeFilteredVoiceoverLanguageCodes(): void {
     if (!this.selectedTextLanguageCode) {
-      return [];
+      this.filteredVoiceoverLanguageCodes = [];
+      return;
     }
 
-    const selectedTextLanguageRootCode = this.getLanguageRootCode(
+    const textRootCode = this.getLanguageRootCode(
       this.selectedTextLanguageCode
     );
 
-    return this.availableVoiceoverLanguageCodes.filter(
-      voiceoverLanguageCode =>
-        this.getLanguageRootCode(voiceoverLanguageCode) ===
-        selectedTextLanguageRootCode
-    );
+    this.filteredVoiceoverLanguageCodes =
+      this.availableVoiceoverLanguageCodes.filter(voiceoverCode => {
+        if (this.getLanguageRootCode(voiceoverCode) === textRootCode) {
+          return true;
+        }
+
+        const relatedCodes =
+          this.languageUtilService.getLanguageCodesRelatedToAudioLanguageCode(
+            voiceoverCode
+          );
+        return (
+          relatedCodes !== undefined && relatedCodes.includes(textRootCode)
+        );
+      });
   }
 
   getValidSelectedVoiceoverLanguageCode(): string | null {
