@@ -64,10 +64,11 @@ export class ContributionOpportunitiesService {
 
   private async _getSkillOpportunitiesAsync(
     cursor: string,
-    searchQuery: string = ''
+    searchQuery?: string
   ): Promise<SkillOpportunitiesDict> {
+    const query = searchQuery || '';
     return this.contributionOpportunitiesBackendApiService
-      .fetchSkillOpportunitiesAsync(cursor, searchQuery)
+      .fetchSkillOpportunitiesAsync(cursor, query)
       .then(({opportunities, nextCursor, more}) => {
         this._skillOpportunitiesCursor = nextCursor;
         this._moreSkillOpportunitiesAvailable = more;
@@ -104,9 +105,10 @@ export class ContributionOpportunitiesService {
   }
 
   async getSkillOpportunitiesAsync(
-    searchQuery: string = ''
+    searchQuery?: string
   ): Promise<SkillOpportunitiesDict> {
-    return this._getSkillOpportunitiesAsync('', searchQuery);
+    const query = searchQuery || '';
+    return this._getSkillOpportunitiesAsync('', query);
   }
 
   async getTranslationOpportunitiesAsync(
@@ -117,12 +119,13 @@ export class ContributionOpportunitiesService {
   }
 
   async getMoreSkillOpportunitiesAsync(
-    searchQuery: string = ''
+    searchQuery?: string
   ): Promise<SkillOpportunitiesDict> {
+    const query = searchQuery || '';
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(
         this._skillOpportunitiesCursor,
-        searchQuery
+        query
       );
     }
     throw new Error('No more skill opportunities available.');

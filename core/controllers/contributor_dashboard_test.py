@@ -225,6 +225,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic_id_to_prerequisite_topic_ids={topic_id: []},
         )
 
+        # Test matching against the skill_description (e.g. 'A math skill').
         response = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'search_query': 'math'},
@@ -233,7 +234,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['opportunities']), 1)
         self.assertEqual(response['opportunities'][0]['id'], skill_id_math)
 
-        # Test case-insensitivity against the 'algebra' topic name.
+        # Test matching against the topic_name (e.g. 'ALGEBRA' matches 'algebra').
         response_case = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'search_query': 'ALGEBRA'},

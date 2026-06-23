@@ -227,9 +227,11 @@ class ContributionOpportunitiesHandler(
                         'skill_description'
                     ]
 
-                    # This conditional bypasses filtering if no search query exists.
-                    # Otherwise, it performs a case-insensitive substring match on
-                    # both the skill description and topic name.
+                    # We filter here in the controller rather than the service/model layer because:
+                    # 1. Datastore does not natively support case-insensitive substring matching.
+                    # 2. SkillOpportunityModel does not store topic_name, so we must fetch the
+                    #    paginated batch, map the topics, and filter them in memory.
+                    # This performs a case-insensitive match on both the skill description and topic name.
                     if search_query is None or (
                         search_query.lower() in skill_description.lower()
                         or search_query.lower() in topic_name.lower()
