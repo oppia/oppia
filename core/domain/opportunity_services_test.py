@@ -2462,3 +2462,122 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         assert exp_1_opp is not None
         self.assertEqual(exp_1_opp.entity_id, 'exp_1')
         self.assertIsNone(opportunities['exp_nonexistent'])
+
+    def test_delete_translation_opportunities_with_empty_ids(self) -> None:
+        # This covers the edge case where entity_ids is empty.
+        opportunity_services.delete_translation_opportunities(
+            {feconf.ENTITY_TYPE_EXPLORATION: []}
+        )
+
+    def test_get_translation_opportunities_by_entity_ids_story(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_STORY: ['story_id_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_STORY, ['story_id_1', 'nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        story_opp = opportunities['story_id_1']
+        self.assertIsNotNone(story_opp)
+        assert story_opp is not None
+        self.assertEqual(story_opp.entity_id, 'story_id_1')
+        self.assertIsNone(opportunities['nonexistent'])
+
+    def test_get_translation_opportunities_by_entity_ids_skill(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_SKILL: ['skill_id_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_SKILL, ['skill_id_1', 'nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        skill_opp = opportunities['skill_id_1']
+        self.assertIsNotNone(skill_opp)
+        assert skill_opp is not None
+        self.assertEqual(skill_opp.entity_id, 'skill_id_1')
+        self.assertIsNone(opportunities['nonexistent'])
+
+    def test_get_translation_opportunities_by_entity_ids_topic(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_TOPIC: ['topic_id_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_TOPIC, ['topic_id_1', 'nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        topic_opp = opportunities['topic_id_1']
+        self.assertIsNotNone(topic_opp)
+        assert topic_opp is not None
+        self.assertEqual(topic_opp.entity_id, 'topic_id_1')
+        self.assertIsNone(opportunities['nonexistent'])
+
+    def test_update_translation_opp_for_legacy_skill_or_exp_with_untracked_language(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_1']}
+        )
+        # Delete the translation counts cache.
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        model.translation_counts = {}
+        model.update_timestamps()
+        model.put()
+        with self.swap(
+            translation_services, 'get_translation_counts', lambda *args: {}
+        ):
+            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+
+    def test_update_translation_opp_for_legacy_skill_or_exp_with_completed_language(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_1']}
+        )
+        # Delete the translation counts cache.
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        model.translation_counts = {}
+        model.update_timestamps()
+        model.put()
+
+        self.assertIn('hi', model.incomplete_translation_language_codes)
+
+        with self.swap(
+            translation_services,
+            'get_translation_counts',
+            lambda *args: {'hi': 1},
+        ):
+            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        self.assertNotIn('hi', model.incomplete_translation_language_codes)

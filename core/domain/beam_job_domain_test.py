@@ -58,6 +58,20 @@ class BeamJobRunTests(test_utils.TestBase):
         self.assertEqual(run.job_started_on, self.NOW)
         self.assertEqual(run.job_updated_on, self.NOW)
         self.assertTrue(run.job_is_synchronous)
+        self.assertIsNone(run.dataflow_job_id)
+
+    def test_usage_asynchronous(self) -> None:
+        run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, False, 'xyz'
+        )
+
+        self.assertEqual(run.job_id, '123')
+        self.assertEqual(run.job_name, 'FooJob')
+        self.assertEqual(run.job_state, 'RUNNING')
+        self.assertEqual(run.job_started_on, self.NOW)
+        self.assertEqual(run.job_updated_on, self.NOW)
+        self.assertFalse(run.job_is_synchronous)
+        self.assertEqual(run.dataflow_job_id, 'xyz')
 
     def test_to_dict(self) -> None:
         run = beam_job_domain.BeamJobRun(
@@ -73,8 +87,40 @@ class BeamJobRunTests(test_utils.TestBase):
                 'job_started_on_msecs': utils.get_time_in_millisecs(self.NOW),
                 'job_updated_on_msecs': utils.get_time_in_millisecs(self.NOW),
                 'job_is_synchronous': True,
+                'dataflow_job_id': None,
             },
         )
+
+    def test_validate_passes(self) -> None:
+        run_sync = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True
+        )
+        run_sync.validate()
+
+        run_async = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, False, 'xyz'
+        )
+        run_async.validate()
+
+    def test_validate_fails_for_synchronous_job_with_dataflow_id(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Synchronous jobs cannot have a dataflow job ID.',
+        ):
+            beam_job_domain.BeamJobRun(
+                '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True, 'xyz'
+            )
+
+    def test_validate_fails_for_asynchronous_job_without_dataflow_id(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Asynchronous jobs must have a dataflow job ID.',
+        ):
+            beam_job_domain.BeamJobRun(
+                '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, False
+            )
 
 
 class AggregateBeamJobRunResultTests(test_utils.TestBase):
