@@ -730,7 +730,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
 
         # Load allowlist once before the loop.
         allowlist_path = os.path.join(
-            os.getcwd(), 'scripts', 'linters', 'modal_allowlist.json'
+            os.path.dirname(__file__), 'modal_allowlist.json'
         )
         with open(allowlist_path, 'r', encoding='utf-8') as f:
             allowlist = json.load(f)
@@ -768,9 +768,10 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                 )
 
             # Check 2: Opener Components (call ngbModal.open)
-            if bool(
-                re.search(r'\bngbModal\.open\b', file_content_without_comments)
-            ):
+            modal_open_matches = re.findall(
+                r'\bngbModal\.open\b', file_content_without_comments
+            )
+            if modal_open_matches:
                 if not bool(
                     re.search(
                         r'\bMatBottomSheet\b', file_content_without_comments
@@ -784,12 +785,13 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                     )
 
                 # Check 3: Backdrop static.
-                if not bool(
-                    re.search(
+                num_static_backdrops = len(
+                    re.findall(
                         r'backdrop\s*:\s*[\'"]static[\'"]',
                         file_content_without_comments,
                     )
-                ):
+                )
+                if len(modal_open_matches) > num_static_backdrops:
                     failed = True
                     error_messages.append(
                         '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
