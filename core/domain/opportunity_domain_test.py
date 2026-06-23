@@ -651,6 +651,9 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'topic_name': 'Fractions',
             'entity_description': 'Introduction to Fractions',
             'currently_available_to_learners': True,
+            'story_title': None,
+            'language_code': None,
+            'reviewer_only_content_count': None,
         }
 
         self.assertEqual(card_info.to_dict(), expected_dict)
@@ -666,6 +669,9 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'topic_name': 'Fractions',
             'entity_description': 'Introduction to Fractions',
             'currently_available_to_learners': True,
+            'story_title': None,
+            'language_code': None,
+            'reviewer_only_content_count': None,
             'translation_in_review_counts': {'en': 1},
             'is_pinned': False,
         }

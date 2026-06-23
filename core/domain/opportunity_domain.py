@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.constants import constants
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class PartialExplorationOpportunitySummaryDict(TypedDict):
@@ -658,6 +658,14 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     topic_name: str
     entity_description: str
     currently_available_to_learners: bool
+    # The following properties are temporary backward-compatibility fields added
+    # to match the legacy ExplorationOpportunitySummary dictionary format
+    # expected by the frontend.
+    # TODO(#24933): Delete these fields in Milestone 2 when the frontend is fully
+    # refactored to use generic TranslationOpportunity objects directly.
+    story_title: Optional[str]
+    language_code: Optional[str]
+    reviewer_only_content_count: Optional[int]
 
 
 class ClientSideTranslationOpportunityCardInfoDict(
@@ -683,6 +691,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         topic_name: str,
         entity_description: str,
         currently_available_to_learners: bool,
+        story_title: Optional[str] = None,
+        language_code: Optional[str] = None,
+        reviewer_only_content_count: Optional[int] = None,
     ) -> None:
         """Constructs a TranslationOpportunityCardInfo domain object."""
         super().__init__(
@@ -704,6 +715,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.topic_name = topic_name
         self.entity_description = entity_description
         self.currently_available_to_learners = currently_available_to_learners
+        self.story_title = story_title
+        self.language_code = language_code
+        self.reviewer_only_content_count = reviewer_only_content_count
 
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
@@ -721,6 +735,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'currently_available_to_learners': (
                 self.currently_available_to_learners
             ),
+            'story_title': self.story_title,
+            'language_code': self.language_code,
+            'reviewer_only_content_count': self.reviewer_only_content_count,
         }
 
     def to_client_side_dict(
@@ -753,6 +770,11 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'entity_description': opportunity_dict['entity_description'],
             'currently_available_to_learners': opportunity_dict[
                 'currently_available_to_learners'
+            ],
+            'story_title': opportunity_dict['story_title'],
+            'language_code': opportunity_dict['language_code'],
+            'reviewer_only_content_count': opportunity_dict[
+                'reviewer_only_content_count'
             ],
             'translation_in_review_counts': translation_in_review_counts,
             'is_pinned': is_pinned,

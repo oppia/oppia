@@ -42,6 +42,7 @@ import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-
 import {TranslationOpportunitiesComponent} from './translation-opportunities.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {LazyLoadingComponent} from 'components/common-layout-directives/common-elements/lazy-loading.component';
 import {CkEditorCopyToolbarComponent} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -66,6 +67,14 @@ class MockUserService {
       can_review_translation_for_language_codes: [],
     });
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    EnableTranslationOppsWithNewOppModels: {
+      isEnabled: false,
+    },
+  };
 }
 
 describe('Translation opportunities component', () => {
@@ -123,6 +132,10 @@ describe('Translation opportunities component', () => {
         {
           provide: UserService,
           useClass: MockUserService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
