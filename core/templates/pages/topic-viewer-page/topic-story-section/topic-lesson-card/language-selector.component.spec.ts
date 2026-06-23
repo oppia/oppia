@@ -116,7 +116,7 @@ describe('LanguageSelectorComponent', () => {
     ).toHaveBeenCalledWith(null);
   });
 
-  it('should return no accents available label when no matching voiceover options exist', () => {
+  it('should return no accents label when no matching voiceover options exist', () => {
     component.selectedTextLanguageCode = 'pt';
     component.availableVoiceoverLanguageCodes = ['en'];
     component.selectedVoiceoverLanguageCode = null;

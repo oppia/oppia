@@ -5,7 +5,9 @@
 }
 
 .topic-lesson-language-selector {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  width: 308px;
 }
 
 .topic-lesson-language-selector-row {
@@ -14,7 +16,7 @@
   gap: 8px;
   min-width: auto;
   overflow: visible;
-  width: auto;
+  width: 100%;
 }
 
 .topic-lesson-language-selector-row--compact {
@@ -23,7 +25,7 @@
   gap: 8px;
   min-width: auto;
   overflow: visible;
-  width: auto;
+  width: 100%;
 }
 
 .topic-lesson-language-selector-select-container {
@@ -126,11 +128,17 @@
 .topic-lesson-language-selector-note {
   color: #5f6368;
   font-size: 12px;
-  margin: 4px 0 0;
+  line-height: 1.35;
+  margin: 10px 0 0;
+  padding-left: 2px;
   width: 100%;
 }
 
 @media (max-width: 600px) {
+  .topic-lesson-language-selector {
+    width: 100%;
+  }
+
   .topic-lesson-language-selector-row,
   .topic-lesson-language-selector-row--compact {
     align-items: center;
