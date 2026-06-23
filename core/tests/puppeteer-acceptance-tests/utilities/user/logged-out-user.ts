@@ -621,6 +621,10 @@ const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
 const collectionPreviewTileLinkSelector =
   '.oppia-exploration-summary-tile a[href*="/explore/"]';
 
+const viewSolutionButtonSelector = '.e2e-test-view-solution';
+const viewHintButtonSelector = '.e2e-test-view-hint';
+const textAreaInputSelector = 'textarea.e2e-test-description-box';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -7762,6 +7766,54 @@ export class LoggedOutUser extends BaseUser {
         `Expected share footer "${expectedText}" but found "${actualText}".`
       );
     }
+  }
+
+  /**
+   * Function to submit an text input answer.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitTextInputAnsswer(answer: string): Promise<void> {
+    await this.expectElementToBeVisible(textAreaInputSelector);
+
+    await this.typeInInputField(textAreaInputSelector, answer);
+    await this.expectElementValueToBe(textAreaInputSelector, answer);
+
+    await this.clickOnSubmitAnswerButton();
+  }
+  /**
+   * Polls until the "View Solution" button becomes visible in the preview tab.
+   * The solution button is only unlocked after enough wrong submissions and
+   * hint consumption, so this method drives that process automatically by
+   * submitting the given wrong answer and consuming any newly-revealed hint on
+   * each iteration. Fails if the button is still not visible after 5 retries.
+   */
+  async waitForSolutionButtonToBeVisible(wrongAnswer: string): Promise<void> {
+    let isSolutionVisible = await this.isElementVisible(
+      viewSolutionButtonSelector,
+      true,
+      2000
+    );
+    for (let i = 0; i < 5 && !isSolutionVisible; i++) {
+      await this.submitTextInputAnsswer(wrongAnswer);
+      await this.expectResponseFeedbackToBe('Try again.');
+
+      const isHintVisible = await this.isElementVisible(
+        viewHintButtonSelector,
+        true,
+        2000
+      );
+      if (isHintVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+
+      isSolutionVisible = await this.isElementVisible(
+        viewSolutionButtonSelector,
+        true,
+        2000
+      );
+    }
+    expect(isSolutionVisible).toBe(true);
   }
 }
 

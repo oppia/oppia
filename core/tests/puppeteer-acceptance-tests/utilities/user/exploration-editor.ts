@@ -8159,42 +8159,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Polls until the "View Solution" button becomes visible in the preview tab.
-   * The solution button is only unlocked after enough wrong submissions and
-   * hint consumption, so this method drives that process automatically by
-   * submitting the given wrong answer and consuming any newly-revealed hint on
-   * each iteration. Fails if the button is still not visible after 5 retries.
-   */
-  async waitForSolutionButtonToBeVisible(wrongAnswer: string): Promise<void> {
-    let isSolutionVisible = await this.isElementVisible(
-      viewSolutionButtonSelector,
-      true,
-      2000
-    );
-    for (let i = 0; i < 5 && !isSolutionVisible; i++) {
-      await this.submitTextInputAnsswer(wrongAnswer);
-      await this.expectResponseFeedbackToBe('Try again.');
-
-      const isHintVisible = await this.isElementVisible(
-        viewHintButtonSelector,
-        true,
-        2000
-      );
-      if (isHintVisible) {
-        await this.viewHint();
-        await this.closeHintModal();
-      }
-
-      isSolutionVisible = await this.isElementVisible(
-        viewSolutionButtonSelector,
-        true,
-        2000
-      );
-    }
-    expect(isSolutionVisible).toBe(true);
-  }
-
-  /**
    * Waits for the solution modal body to be visible and asserts that it
    * contains every string in expectedTexts.
    * Uses commonModalBodySelector which is already defined in this file.
