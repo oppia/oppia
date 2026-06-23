@@ -1,3 +1,21 @@
+<div id="translationTabTourContainerContent" [hidden]="true">
+  <p tabindex="0">
+    Hello, welcome to the Translation Tab! This tour will walk you through the translation page. Hit the "Next" button to begin.
+  </p>
+</div>
+
+<div id="translationTabOverviewContent" [hidden]="true">
+  <p tabindex="0">
+    Start your translation by choosing the language that you want to translate to.
+  </p>
+</div>
+
+<div id="translationTabStatusGraphContent" [hidden]="true">
+  <p tabindex="0">
+    Then, choose a card from the exploration overview by clicking on the card. The selected card will have a bold border. Cards with missing translations are coloured yellow or red. These are good places to start.
+  </p>
+</div>
+
 <oppia-loading-message [message]="'Loading'" *ngIf="languageAccentsAreLoading"></oppia-loading-message>
 
 <div class="oppia-translation-tab e2e-test-translation-tab-container" *ngIf="showTranslationTabSubDirectives && !languageAccentsAreLoading">

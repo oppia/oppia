@@ -67,14 +67,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   misconceptionsBySkill: MisconceptionSkillMap = {};
   TabName = '';
   interactionIsShown = false;
-  _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
   _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
   tutorialInProgress = false;
   explorationId = '';
   stateName: string | null = null;
   index: number = 0;
   validationErrorIsShown: boolean = false;
-  private shepherdTourSteps: object[] = [];
 
   constructor(
     private editabilityService: EditabilityService,
@@ -131,16 +129,18 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
+  private getTourContent(id: string): string {
+    const element = document.getElementById(id + 'Content');
+    return element ? element.innerHTML : '';
+  }
+
   private buildEditorTabTourSteps(): object[] {
     const steps = [
       {
         id: 'editorTabTourContainer',
         attachTo: {element: '#editorTabTourContainer', on: 'top'},
         title: 'Creating in Oppia',
-        text: [
-          'Explorations are learning experiences that you create using Oppia. ' +
-            'Think of explorations as a conversation between a student and a tutor.',
-        ],
+        text: this.getTourContent('editorTabTourContainer'),
         buttons: [
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
         ],
@@ -154,12 +154,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         id: 'editorTabTourContentEditorTab',
         attachTo: {element: '#editorTabTourContentEditorTab', on: 'top'},
         title: 'Content',
-        text: [
-          "An Oppia exploration is divided into several 'cards'. The first part of a " +
-            'card is the <strong>content</strong>. Use the content section to set the ' +
-            'scene. Tell the learner a story, give them some information, and then ask a ' +
-            'relevant question.',
-        ],
+        text: this.getTourContent('editorTabTourContentEditorTab'),
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -177,14 +172,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
           on: 'top',
         },
         title: 'Interaction',
-        text: [
-          "After you've written the content of your conversation, choose an " +
-            'interaction type. An interaction is how you want your learner to ' +
-            'respond to your question.',
-          'Oppia has several built-in interactions, including:',
-          '<ul><li>Multiple Choice</li><li>Text/Number input</li><li>Code snippets</li></ul>',
-          'and more.',
-        ],
+        text: this.getTourContent(
+          'editorTabTourSlideStateInteractionEditorTab'
+        ),
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -199,12 +189,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         id: 'editorTabTourStateResponsesTab',
         attachTo: {element: '#editorTabTourStateResponsesTab', on: 'top'},
         title: 'Responses',
-        text: [
-          'After the learner uses the interaction you created, it is your turn again ' +
-            'to choose how your exploration will respond to their input. You can send a ' +
-            'learner to a new card or have them repeat the same card, depending on how ' +
-            'they answer.',
-        ],
+        text: this.getTourContent('editorTabTourStateResponsesTab'),
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -223,10 +208,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         id: 'editorTabTourPreviewTab',
         attachTo: {element: '#tutorialPreviewTab', on: 'top'},
         title: 'Preview',
-        text: [
-          'At any time, you can click the <strong>preview</strong> button to play ' +
-            'through your exploration.',
-        ],
+        text: this.getTourContent('editorTabTourPreviewTab'),
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -241,7 +223,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         id: 'editorTabTourSaveDraft',
         attachTo: {element: '#editorTabTourSaveDraft', on: 'top'},
         title: 'Save',
-        text: ["When you're done making changes, be sure to save your work."],
+        text: this.getTourContent('editorTabTourSaveDraft'),
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -260,13 +242,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         id: 'editorTabTourTutorialComplete',
         attachTo: {element: '#editorTabTourTutorialComplete', on: 'top'},
         title: 'Tutorial Complete',
-        text: [
-          'Now for the fun part...',
-          "That's the end of the tour! To finish up, here are some things we suggest:",
-          '<ul><li>Create your first card!</li><li>Preview your exploration.</li>' +
-            '<li>Check out more resources in the <a href="https://oppia.github.io/#/" ' +
-            'target="_blank" rel="noopener">Help Center</a>.</li></ul>',
-        ],
+        text: this.getTourContent('editorTabTourTutorialComplete'),
         buttons: [
           {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
           {

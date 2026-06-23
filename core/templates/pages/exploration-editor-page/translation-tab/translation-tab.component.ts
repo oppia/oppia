@@ -44,12 +44,6 @@ import {TranslationLanguageService} from './services/translation-language.servic
 export class TranslationTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  _ID_TUTORIAL_TRANSLATION_LANGUAGE: string = '#tutorialTranslationLanguage';
-
-  _ID_TUTORIAL_TRANSLATION_STATE: string = '#tutorialTranslationState';
-
-  _ID_TUTORIAL_TRANSLATION_OVERVIEW: string = '#tutorialTranslationOverview';
-
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -105,6 +99,11 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
+  private getTourContent(id: string): string {
+    const element = document.getElementById(id + 'Content');
+    return element ? element.innerHTML : '';
+  }
+
   initTranslationTab(): void {
     this.stateTutorialFirstTimeService.initTranslation(
       this.pageContextService.getExplorationId()
@@ -148,10 +147,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           id: 'translationTabTourContainer',
           attachTo: {element: '#translationTabTourContainer', on: 'bottom'},
           title: 'Translations In Oppia',
-          text: [
-            'Hello, welcome to the Translation Tab! This tour will walk you ' +
-              'through the translation page. Hit the "Next" button to begin.',
-          ],
+          text: this.getTourContent('translationTabTourContainer'),
           buttons: [
             {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
           ],
@@ -165,9 +161,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           id: 'translationTabOverview',
           attachTo: {element: '#translationTabOverview', on: 'bottom'},
           title: 'Choose Language',
-          text: [
-            'Start your translation by choosing the language that you want to translate to.',
-          ],
+          text: this.getTourContent('translationTabOverview'),
           buttons: [
             {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
             {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -182,11 +176,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           id: 'translationTabStatusGraph',
           attachTo: {element: '#translationTabStatusGraph', on: 'bottom'},
           title: 'Choose a Card to Translate',
-          text: [
-            'Then, choose a card from the exploration overview by clicking on the card. ' +
-              'The selected card will have a bold border. Cards with missing translations ' +
-              'are coloured yellow or red. These are good places to start.',
-          ],
+          text: this.getTourContent('translationTabStatusGraph'),
           buttons: [
             {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
             {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -201,11 +191,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           id: 'translationTabCardOptions',
           attachTo: {element: '#translationTabCardOptions', on: 'bottom'},
           title: 'Choose a Part of the Card to Translate',
-          text: [
-            'Next, choose a part of the lesson card to translate. This menu at the top ' +
-              'lists all the translatable parts of the card. Within each tab, multiple ' +
-              'sections may be available for translating.',
-          ],
+          text: this.getTourContent('translationTabCardOptions'),
           buttons: [
             {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
             {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -220,10 +206,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           id: 'translationTabRecordingOverview',
           attachTo: {element: '#translationTabRecordingOverview', on: 'bottom'},
           title: 'Recording Audio',
-          text: [
-            'To create audio translations in Oppia, we recommend using the upload button ' +
-              'to upload audio files from your computer. You can also record via your browser.',
-          ],
+          text: this.getTourContent('translationTabRecordingOverview'),
           buttons: [
             {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
             {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -236,9 +219,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
             on: 'bottom',
           },
           title: 'Re-record/Re-upload audio',
-          text: [
-            'The audio recording also has options related to updating and deleting translations.',
-          ],
+          text: this.getTourContent('translationTabReRecordingOverview'),
           buttons: [
             {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
             {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
@@ -248,12 +229,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           id: 'translationTabTutorialComplete',
           attachTo: {element: '#translationTabTutorialComplete', on: 'bottom'},
           title: 'Tutorial Complete',
-          text: [
-            'Now, you are ready to begin adding translations to your explorations! ' +
-              'This marks the end of this tour. Remember to save your progress periodically ' +
-              'using the save button in the navigation bar at the top. ' +
-              'Thank you for making this lesson more accessible for non-native speakers!',
-          ],
+          text: this.getTourContent('translationTabTutorialComplete'),
           buttons: [
             {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
             {
