@@ -99,8 +99,6 @@ const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 
-const learnerGreetingsSelector = '.e2e-test-learner-greetings';
-
 // Common > Lesson Card.
 const commonLessonCardContainerSelector =
   '.e2e-test-redesigned-lesson-card-container';
@@ -109,6 +107,8 @@ const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
+
+const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 
 // Common > Remove modal selectors.
 const removeModalContainerSelector =

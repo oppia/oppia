@@ -727,3 +727,9 @@ indexes:
   properties:
   - name: __key__
     direction: desc
+
+- kind: TranslationOpportunityModel
+  properties:
+  - name: entity_type
+  - name: incomplete_translation_language_codes
+  - name: created_on
