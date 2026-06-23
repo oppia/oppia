@@ -28,11 +28,24 @@ import {
   ImagesData,
 } from 'services/image-local-storage.service';
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('TranslateTextBackendApiService', () => {
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let httpTestingController: HttpTestingController;
   let imageLocalStorageService: ImageLocalStorageService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   const getTranslatableItem = (text: string) => {
     return {
       content_format: 'html',
@@ -44,8 +57,15 @@ describe('TranslateTextBackendApiService', () => {
   };
 
   beforeEach(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextBackendApiService = TestBed.inject(
@@ -90,6 +110,48 @@ describe('TranslateTextBackendApiService', () => {
 
         expect(successHandler).toHaveBeenCalledWith(
           TranslatableTexts.createFromBackendDict(sampleDataResults)
+        );
+      })
+    );
+
+    it(
+      'should correctly request translatable texts for V2 when ' +
+        'feature flag is enabled',
+      fakeAsync(() => {
+        spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+          EnableTranslationOppsWithNewOppModels: {
+            isEnabled: true,
+          },
+        } as unknown as FeatureStatusChecker);
+
+        successHandler = jasmine.createSpy('success');
+        failHandler = jasmine.createSpy('error');
+
+        const sampleDataResults = {
+          translatable_contents: [
+            {
+              content_id: 'contentId1',
+              content_type: 'content',
+              content_format: 'html',
+              content_value: 'text1',
+            },
+          ],
+          version: '2',
+        };
+
+        translateTextBackendApiService
+          .getTranslatableTextsAsync('1', 'en')
+          .then(successHandler, failHandler);
+
+        const req = httpTestingController.expectOne(
+          '/gettranslatablecontentshandlerv2?entity_id=1&entity_type=exploration&language_code=en'
+        );
+        expect(req.request.method).toEqual('GET');
+        req.flush(sampleDataResults);
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(
+          TranslatableTexts.createFromBackendDictV2(sampleDataResults)
         );
       })
     );
