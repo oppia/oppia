@@ -20,6 +20,7 @@ import {
   TranslatableItem,
   TranslatableItemBackendDict,
 } from './translatable-content.model';
+import {AppConstants} from 'app.constants';
 
 export interface ContentIdToContentBackendDictMapping {
   [contentId: string]: TranslatableItemBackendDict;
@@ -38,6 +39,19 @@ export interface StateNamesToContentIdMapping {
 
 export interface TranslatableTextsBackendDict {
   state_names_to_content_id_mapping: StateNamesToContentIdBackendDictMapping;
+  version: string;
+}
+
+export interface TranslatableContentBackendDictV2 {
+  content_id: string;
+  content_type: string;
+  content_format: string;
+  content_value: string | string[];
+  grouping_key?: string | null;
+}
+
+export interface TranslatableTextsBackendDictV2 {
+  translatable_contents: TranslatableContentBackendDictV2[];
   version: string;
 }
 
@@ -61,6 +75,31 @@ export class TranslatableTexts {
         );
       }
       stateNamesToContentIdMapping[stateName] = contentIdMapping;
+    }
+    return new TranslatableTexts(
+      stateNamesToContentIdMapping,
+      backendDict.version
+    );
+  }
+
+  static createFromBackendDictV2(
+    backendDict: TranslatableTextsBackendDictV2
+  ): TranslatableTexts {
+    const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
+    for (const content of backendDict.translatable_contents) {
+      const stateName =
+        content.grouping_key || AppConstants.DEFAULT_SUGGESTION_STATE_NAME;
+      if (!stateNamesToContentIdMapping.hasOwnProperty(stateName)) {
+        stateNamesToContentIdMapping[stateName] = {};
+      }
+      stateNamesToContentIdMapping[stateName][content.content_id] =
+        new TranslatableItem(
+          content.content_value,
+          content.content_format,
+          content.content_type,
+          null,
+          null
+        );
     }
     return new TranslatableTexts(
       stateNamesToContentIdMapping,
