@@ -43,6 +43,7 @@ export class LanguageSelectorComponent {
   onTextLanguageChange(newLanguageCode: string): void {
     this.selectedTextLanguageCode = newLanguageCode || null;
     this.selectedTextLanguageCodeChange.emit(this.selectedTextLanguageCode);
+    this.clearSelectedVoiceoverLanguageIfInvalid();
   }
 
   onVoiceoverLanguageChange(newLanguageCode: string): void {
@@ -53,7 +54,53 @@ export class LanguageSelectorComponent {
   }
 
   hasVoiceoverLanguageOptions(): boolean {
-    return this.availableVoiceoverLanguageCodes.length > 0;
+    return this.filteredVoiceoverLanguageCodes.length > 0;
+  }
+
+  get filteredVoiceoverLanguageCodes(): string[] {
+    if (!this.selectedTextLanguageCode) {
+      return [];
+    }
+
+    const selectedTextLanguageRootCode = this.getLanguageRootCode(
+      this.selectedTextLanguageCode
+    );
+
+    return this.availableVoiceoverLanguageCodes.filter(
+      voiceoverLanguageCode =>
+        this.getLanguageRootCode(voiceoverLanguageCode) ===
+        selectedTextLanguageRootCode
+    );
+  }
+
+  getValidSelectedVoiceoverLanguageCode(): string | null {
+    if (
+      this.selectedVoiceoverLanguageCode &&
+      this.filteredVoiceoverLanguageCodes.includes(
+        this.selectedVoiceoverLanguageCode
+      )
+    ) {
+      return this.selectedVoiceoverLanguageCode;
+    }
+
+    return null;
+  }
+
+  getSelectedVoiceoverLanguageLabel(): string {
+    const selectedVoiceoverLanguageCode =
+      this.getValidSelectedVoiceoverLanguageCode();
+
+    if (selectedVoiceoverLanguageCode) {
+      return this.getLanguageDescription(selectedVoiceoverLanguageCode);
+    }
+
+    return this.hasVoiceoverLanguageOptions()
+      ? 'Select'
+      : 'No accents available';
+  }
+
+  shouldShowNoAccentsMessage(): boolean {
+    return !this.hasVoiceoverLanguageOptions();
   }
 
   shouldShowTextLanguageValidationError(): boolean {
@@ -66,5 +113,21 @@ export class LanguageSelectorComponent {
       this.languageUtilService.getAudioLanguageDescription(languageCode) ||
       languageCode
     );
+  }
+
+  private clearSelectedVoiceoverLanguageIfInvalid(): void {
+    if (
+      this.selectedVoiceoverLanguageCode &&
+      !this.filteredVoiceoverLanguageCodes.includes(
+        this.selectedVoiceoverLanguageCode
+      )
+    ) {
+      this.selectedVoiceoverLanguageCode = null;
+      this.selectedVoiceoverLanguageCodeChange.emit(null);
+    }
+  }
+
+  private getLanguageRootCode(languageCode: string): string {
+    return languageCode.split('-')[0].toLowerCase();
   }
 }

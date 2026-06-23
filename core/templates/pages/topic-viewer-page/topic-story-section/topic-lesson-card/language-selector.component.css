@@ -123,6 +123,13 @@
   width: 100%;
 }
 
+.topic-lesson-language-selector-note {
+  color: #5f6368;
+  font-size: 12px;
+  margin: 4px 0 0;
+  width: 100%;
+}
+
 @media (max-width: 600px) {
   .topic-lesson-language-selector-row,
   .topic-lesson-language-selector-row--compact {

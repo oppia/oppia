@@ -35,19 +35,19 @@
     <div class="topic-lesson-language-selector-text-block">
       <span class="topic-lesson-language-selector-chip-label">Audio</span>
       <span class="topic-lesson-language-selector-selected-value">
-        {{ selectedVoiceoverLanguageCode ? getLanguageDescription(selectedVoiceoverLanguageCode) : 'Auto' }}
+        {{ getSelectedVoiceoverLanguageLabel() }}
       </span>
     </div>
 
     <select
             id="topic-lesson-voiceover-language"
             class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
-            [ngModel]="selectedVoiceoverLanguageCode"
+            [ngModel]="getValidSelectedVoiceoverLanguageCode()"
             (ngModelChange)="onVoiceoverLanguageChange($event)"
-            aria-label="Voiceover language selector">
-      <option [ngValue]="null">Auto</option>
+            aria-label="Voiceover language selector"
+            [disabled]="!hasVoiceoverLanguageOptions()">
       <option
-              *ngFor="let voiceoverLanguageCode of availableVoiceoverLanguageCodes"
+              *ngFor="let voiceoverLanguageCode of filteredVoiceoverLanguageCodes"
               [value]="voiceoverLanguageCode">
         {{ getLanguageDescription(voiceoverLanguageCode) }}
       </option>
@@ -58,6 +58,13 @@
     </i>
   </div>
 </div>
+
+<p
+   class="topic-lesson-language-selector-note"
+   *ngIf="shouldShowNoAccentsMessage()"
+   aria-live="polite">
+  No accents available for selected text language.
+</p>
 
 <p
    class="topic-lesson-language-selector-error"

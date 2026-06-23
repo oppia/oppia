@@ -88,6 +88,23 @@ describe('LanguageSelectorComponent', () => {
     ).toHaveBeenCalledWith('hi');
   });
 
+  it('should clear selected voiceover language when it does not match selected text language', () => {
+    spyOn(component.selectedVoiceoverLanguageCodeChange, 'emit');
+    spyOn(component.selectedTextLanguageCodeChange, 'emit');
+    component.availableVoiceoverLanguageCodes = ['en', 'pt-br'];
+    component.selectedVoiceoverLanguageCode = 'en';
+
+    component.onTextLanguageChange('pt');
+
+    expect(component.selectedTextLanguageCodeChange.emit).toHaveBeenCalledWith(
+      'pt'
+    );
+    expect(component.selectedVoiceoverLanguageCode).toBeNull();
+    expect(
+      component.selectedVoiceoverLanguageCodeChange.emit
+    ).toHaveBeenCalledWith(null);
+  });
+
   it('should emit null when empty string is passed to voiceover language change', () => {
     spyOn(component.selectedVoiceoverLanguageCodeChange, 'emit');
 
@@ -99,16 +116,43 @@ describe('LanguageSelectorComponent', () => {
     ).toHaveBeenCalledWith(null);
   });
 
+  it('should return no accents available label when no matching voiceover options exist', () => {
+    component.selectedTextLanguageCode = 'pt';
+    component.availableVoiceoverLanguageCodes = ['en'];
+    component.selectedVoiceoverLanguageCode = null;
+
+    expect(component.getSelectedVoiceoverLanguageLabel()).toBe(
+      'No accents available'
+    );
+    expect(component.shouldShowNoAccentsMessage()).toBeTrue();
+  });
+
   it('should return true from hasVoiceoverLanguageOptions when voiceover languages exist', () => {
-    component.availableVoiceoverLanguageCodes = ['en', 'hi'];
+    component.selectedTextLanguageCode = 'en';
+    component.availableVoiceoverLanguageCodes = ['en', 'en-us', 'hi'];
 
     expect(component.hasVoiceoverLanguageOptions()).toBeTrue();
   });
 
   it('should return false from hasVoiceoverLanguageOptions when no voiceover languages', () => {
-    component.availableVoiceoverLanguageCodes = [];
+    component.selectedTextLanguageCode = 'en';
+    component.availableVoiceoverLanguageCodes = ['hi'];
 
     expect(component.hasVoiceoverLanguageOptions()).toBeFalse();
+  });
+
+  it('should return filtered voiceover languages for selected text language', () => {
+    component.selectedTextLanguageCode = 'pt';
+    component.availableVoiceoverLanguageCodes = ['en', 'pt', 'pt-br', 'hi'];
+
+    expect(component.filteredVoiceoverLanguageCodes).toEqual(['pt', 'pt-br']);
+  });
+
+  it('should return empty filtered voiceover languages when text language is not selected', () => {
+    component.selectedTextLanguageCode = null;
+    component.availableVoiceoverLanguageCodes = ['en', 'en-us'];
+
+    expect(component.filteredVoiceoverLanguageCodes).toEqual([]);
   });
 
   it('should show validation error when showValidationError is true and no text language selected', () => {
