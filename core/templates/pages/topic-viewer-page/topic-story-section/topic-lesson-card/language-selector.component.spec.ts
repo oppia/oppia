@@ -233,6 +233,50 @@ describe('LanguageSelectorComponent', () => {
     expect(component.shouldShowTextLanguageValidationError()).toBeFalse();
   });
 
+  it('should return selected voiceover language code when it is valid', () => {
+    component.selectedTextLanguageCode = 'en';
+    component.availableVoiceoverLanguageCodes = ['en', 'en-us'];
+    component.selectedVoiceoverLanguageCode = 'en';
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'en', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['en', 'en-us'],
+        true
+      ),
+    });
+
+    expect(component.getValidSelectedVoiceoverLanguageCode()).toBe('en');
+  });
+
+  it('should return null from getValidSelectedVoiceoverLanguageCode when selected code is not in filtered list', () => {
+    component.selectedTextLanguageCode = 'en';
+    component.availableVoiceoverLanguageCodes = ['en-us'];
+    component.selectedVoiceoverLanguageCode = 'pt';
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'en', true),
+      availableVoiceoverLanguageCodes: new SimpleChange([], ['en-us'], true),
+    });
+
+    expect(component.getValidSelectedVoiceoverLanguageCode()).toBeNull();
+  });
+
+  it('should return null from getValidSelectedVoiceoverLanguageCode when no voiceover is selected', () => {
+    component.selectedTextLanguageCode = 'en';
+    component.availableVoiceoverLanguageCodes = ['en', 'en-us'];
+    component.selectedVoiceoverLanguageCode = null;
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'en', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['en', 'en-us'],
+        true
+      ),
+    });
+
+    expect(component.getValidSelectedVoiceoverLanguageCode()).toBeNull();
+  });
+
   it('should return content language description for language code', () => {
     languageUtilService.getContentLanguageDescription.and.returnValue('French');
 
