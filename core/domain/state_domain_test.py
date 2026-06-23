@@ -2859,7 +2859,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.interaction.customization_args[
                 'allowExponentialNotation'
             ].to_customization_arg_dict(),
-            {'value': True},
+            {'value': False},
         )
 
     def test_solution_validation(self) -> None:

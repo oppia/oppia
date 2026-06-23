@@ -57,7 +57,7 @@ class NumericInput(base.BaseInteraction):
                 'Allow exponential notation (e.g. "1.8e39") in learner input.'
             ),
             'schema': {'type': 'bool'},
-            'default_value': True,
+            'default_value': False,
         },
     ]
 
