@@ -54,6 +54,32 @@ const filledRatingStarSelector = '.fas.fa-star';
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
+
+const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
+const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
+const goalsSectionSelector = '.e2e-test-goals-section';
+const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
+const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
+const addGoalsButtonInRedesignedLearnerDashboard = '.e2e-test-add-goals-button';
+const newGoalsListInRedesignedLearnerDashboard = '.e2e-test-new-goals-list';
+const goalCheckboxInRedesignedLearnerDashboard =
+  '.oppia-learner-dash-goals-checkbox';
+
+const learnerGreetingsSelector = '.e2e-test-learner-greetings';
+
+// Common > Remove modal selectors.
+const removeModalContainerSelector =
+  '.e2e-test-remove-activity-modal-container';
+const removeModalHeaderSelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-header';
+const removeModalBodySelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-body';
+const removeModalCancelButtonSelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-cancel-delete-button';
+const removeModalConfirmButtonSelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
 
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
@@ -62,6 +88,18 @@ const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 
 export class LoggedInUser extends BaseUser {
+  /**
+   * Function to add a goal in the redesigned learner dashboard.
+   * @param {string} goal - The goal to add.
+   */
+  async addGoalInRedesignedLearnerDashboard(goal: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await this.clickOnGoalCheckboxInRedesignedLearnerDashboard(goal);
+    await this.submitGoalInRedesignedLearnerDashboard();
+  }
+
   /**
    * Adds a lesson to the 'Play Later' list from community library page.
    * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
@@ -136,12 +174,185 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Clicks on the given button in the remove activity modal.
+   * @param {'Remove' | 'Cancel'} button - The button to click.
+   */
+  async clickButtonInRemoveActivityModal(
+    button: 'Remove' | 'Cancel'
+  ): Promise<void> {
+    await this.page.waitForSelector(removeModalContainerSelector);
+
+    if (button === 'Remove') {
+      await this.clickOnElementWithSelector(removeModalConfirmButtonSelector);
+    } else if (button === 'Cancel') {
+      await this.clickOnElementWithSelector(removeModalCancelButtonSelector);
+    }
+
+    await this.page.waitForSelector(removeModalContainerSelector, {
+      state: 'hidden',
+    });
+  }
+
+  /**
+   * Function to click on the add goals button in the redesigned learner dashboard.
+   */
+  async clickOnAddGoalsButtonInRedesignedLearnerDashboard(): Promise<void> {
+    await this.page.waitForSelector(
+      addGoalsButtonInRedesignedLearnerDashboard,
+      {
+        state: 'visible',
+      }
+    );
+    await this.clickOnElementWithSelector(
+      addGoalsButtonInRedesignedLearnerDashboard
+    );
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Function to click on the goal checkbox in the redesigned learner dashboard.
+   * @param {string} goal - The goal to click on.
+   * @param {boolean} checked - Whether the goal should be checked or not.
+   */
+  async clickOnGoalCheckboxInRedesignedLearnerDashboard(
+    goal: string,
+    checked: boolean = true
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    const newGoalsCheckboxes = await this.page.$$(
+      goalCheckboxInRedesignedLearnerDashboard
+    );
+
+    for (const checkbox of newGoalsCheckboxes) {
+      const checkboxText = await checkbox.evaluate(el =>
+        el.textContent?.trim()
+      );
+
+      const isChecked = await checkbox.$eval(
+        'input',
+        el => (el as HTMLInputElement).checked
+      );
+
+      if (isChecked === checked) {
+        showMessage(`Skipped: Add ${goal} to goals.`);
+        break;
+      }
+
+      if (checkboxText === goal) {
+        const goalCheckbox = await checkbox.$('label');
+        if (!goalCheckbox) {
+          throw new Error(`Could not find goal checkbox for ${goal}`);
+        }
+        await goalCheckbox.click();
+        await this.page.waitForFunction(
+          ({element, checked}: {element: Element; checked: boolean}) => {
+            const inputElement = (element as HTMLInputElement).querySelector(
+              'input'
+            );
+            return inputElement?.checked === checked;
+          },
+          {element: goalCheckbox, checked}
+        );
+        break;
+      }
+    }
+  }
+
+  /**
    * Navigates to the learner dashboard.
    */
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(homeTabSectionInLearnerDashboard);
+  }
+
+  /**
+   * Navigates to the learner dashboard using profile dropdown in the navbar.
+   */
+  async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(profileDropdown, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(learnerDashboardMenuLink, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(learnerDashboardMenuLink);
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Navigates to the goals section of the learner dashboard.
+   */
+  async navigateToGoalsSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(goalsSectionSelector);
+      await this.clickOnElementWithSelector(goalsSectionSelector);
+
+      try {
+        await this.page.waitForSelector(currentGoalsSectionSelector, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Timeout')) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOnElementWithSelector(goalsSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+
+      await this.expectElementToBeVisible(goalsSectionContainerSelector);
+    } else {
+      await this.page.waitForSelector(goalsSectionSelector);
+      const goalSectionElement = await this.page.$(goalsSectionSelector);
+      if (!goalSectionElement) {
+        throw new Error('Progress section not found.');
+      }
+      await goalSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(goalsSectionContainerSelector);
+  }
+
+  /**
+   * Checks if the learner greetings are present.
+   * @param {string} expectedGreetings - The expected greetings.
+   */
+  async expectLearnerGreetingsToBe(expectedGreetings: string): Promise<void> {
+    await this.page.waitForSelector(learnerGreetingsSelector);
+
+    const greetings = await this.page.$eval(learnerGreetingsSelector, el =>
+      el.textContent?.trim()
+    );
+
+    expect(greetings).toBe(expectedGreetings);
+  }
+
+  /**
+   * Function to verify the add goals button in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the button should be visible or not.
+   */
+  async expectAddGoalsButtonInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      addGoalsButtonInRedesignedLearnerDashboard,
+      visible
+    );
   }
 
   /**
@@ -162,6 +373,67 @@ export class LoggedInUser extends BaseUser {
         expectedCount: 5,
       }
     );
+  }
+
+  /**
+   * Function to verify the heading of the goals section in the learner dashboard.
+   * @param {string} heading - The heading to check for.
+   * @param {boolean} visible - Whether the heading should be visible or not.
+   */
+  async expectRedesignedGoalsSectionToContainHeading(
+    heading: string,
+    visible: boolean = true
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      ({
+        selector,
+        heading,
+        visible,
+      }: {
+        selector: string;
+        heading: string;
+        visible: boolean;
+      }) => {
+        const headingElements = document.querySelectorAll(selector);
+        const headings = Array.from(headingElements).map(h =>
+          h.textContent?.trim()
+        );
+        return headings.includes(heading) === visible;
+      },
+      {selector: goalsHeadingInRedesignedDashbaordSelector, heading, visible}
+    );
+  }
+
+  /**
+   * Expects the remove activity model to be displayed.
+   * @param {string} [header] - The header of the modal.
+   */
+  async expectRemoveActivityModelToBeDisplayed(
+    header?: string,
+    body?: string
+  ): Promise<void> {
+    // Check for the modal container.
+    await this.page.waitForSelector(removeModalContainerSelector);
+
+    // Check for the header.
+    if (header) {
+      await this.page.waitForSelector(removeModalHeaderSelector);
+      const headerText = await this.page.$eval(
+        removeModalHeaderSelector,
+        el => el.textContent
+      );
+      expect(headerText).toEqual(header);
+    }
+
+    // Check for the body.
+    if (body) {
+      await this.page.waitForSelector(removeModalBodySelector);
+      const bodyText = await this.page.$eval(
+        removeModalBodySelector,
+        el => el.textContent
+      );
+      expect(bodyText).toEqual(body);
+    }
   }
 
   /**
@@ -439,6 +711,21 @@ export class LoggedInUser extends BaseUser {
 
     await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
     await this.expectElementToBeVisible(learnerPlaylistModalSelector, false);
+  }
+
+  /**
+   * Function to submit a goal in the redesigned learner dashboard.
+   */
+  async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
+    await this.page.waitForSelector(
+      `${addNewGoalButtonSelector}:not([disabled])`,
+      {state: 'visible'}
+    );
+    await this.waitForElementToBeClickable(addNewGoalButtonSelector);
+    await this.page.click(addNewGoalButtonSelector);
+    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
+      state: 'hidden',
+    });
   }
 
   /**
