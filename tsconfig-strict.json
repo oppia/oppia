@@ -92,5 +92,5 @@
   ],
   "exclude": [
     "core/tests/playwright-acceptance-tests"
-  ],
+  ]
 }
