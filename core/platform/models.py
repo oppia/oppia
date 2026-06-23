@@ -487,6 +487,22 @@ class _Gae(Platform):
             return cloud_translate_services
 
     @classmethod
+    def import_machine_translate_services(cls) -> ModuleType:
+        """Imports and returns the machine translation services module.
+
+        Returns:
+            module. The machine translation services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.translate import translate_emulator
+
+            return translate_emulator
+        else:
+            from core.platform.translate import azure_translate_services
+
+            return azure_translate_services
+
+    @classmethod
     def import_storage_services(cls) -> ModuleType:
         """Imports and returns cloud_translate_services module.
 
@@ -530,6 +546,15 @@ class Registry:
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
     }
+
+    @classmethod
+    def import_machine_translate_services(cls) -> ModuleType:
+        """Imports and returns machine_translate_services module.
+
+        Returns:
+            module. The machine_translate_services module.
+        """
+        return cls._get().import_machine_translate_services()
 
     @classmethod
     def _get(cls) -> Type[_Gae]:

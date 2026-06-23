@@ -41,6 +41,7 @@ const cookieBannerAcceptButton =
   'button.e2e-test-oppia-cookie-banner-accept-button';
 const isMobile = process.env.MOBILE === 'true';
 const specName = process.env.SPEC_NAME;
+const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`;
 
 /**
  * Mapping of user roles to their respective factory functions.
@@ -190,7 +191,7 @@ export class UserFactory {
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
       recordVideo: {
-        dir: `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`,
+        dir: VIDEO_RECORDING_DIR,
       },
     });
     const page = await context.newPage();
@@ -252,7 +253,7 @@ export class UserFactory {
   ): Promise<LoggedOutUser> {
     const context = await browser.newContext({
       recordVideo: {
-        dir: `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`,
+        dir: VIDEO_RECORDING_DIR,
       },
     });
     const page = await context.newPage();
