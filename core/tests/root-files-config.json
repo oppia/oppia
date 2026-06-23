@@ -17,6 +17,7 @@
     "core/README.md",
     "core/templates/components/skills-mastery-list/skills-mastery-list-concept-card-modal.controller.ts",
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.css",
+    "core/templates/components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component.css",
     "core/templates/components/forms/validators/README.md",
     "core/templates/css/README.md",
     "core/templates/domain/statistics/learner-answer-details.model.ts",
