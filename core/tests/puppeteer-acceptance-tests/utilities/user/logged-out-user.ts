@@ -7795,7 +7795,7 @@ export class LoggedOutUser extends BaseUser {
     );
     for (let i = 0; i < 5 && !isSolutionVisible; i++) {
       await this.submitTextInputAnsswer(wrongAnswer);
-      await this.expectResponseFeedbackToBe('Try again.');
+      await this.expectOppiaFeedbackToBe('Try again.');
 
       const isHintVisible = await this.isElementVisible(
         viewHintButtonSelector,
