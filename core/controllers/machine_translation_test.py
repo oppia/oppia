@@ -18,12 +18,13 @@
 
 from __future__ import annotations
 
+from core import utils
 from core.domain import feature_flag_services
 from core.domain import machine_translation_services
 from core.domain import translation_services
 from core.tests import test_utils
 
-from typing import Any
+from typing import Any, Dict
 
 
 class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
@@ -142,5 +143,118 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
 
             self.assertEqual(response['translated_text'], 'नमस्ते दुनिया')
             self.assertEqual(response['translation_provider'], 'azure')
+
+        self.logout()
+
+
+class TranslationProviderMappingHandlerTests(test_utils.ControllerTestBase):
+    """Tests for the TranslationProviderMappingHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.valid_payload = {
+            'provider_mapping': {'hi': 'azure', 'es': 'google'}
+        }
+
+        self.feature_flag_swap = self.swap(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args, **kwargs: True,
+        )
+
+    def test_get_mapping_successfully(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        domain_swap = self.swap(
+            machine_translation_services,
+            'get_translation_provider_mapping',
+            lambda: {'hi': 'azure'},
+        )
+
+        with self.feature_flag_swap, domain_swap:
+            response = self.get_json('/translation-provider-mapping')
+
+        self.assertEqual(response['provider_mapping'], {'hi': 'azure'})
+        self.logout()
+
+    def test_get_fails_if_feature_flag_disabled(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        flag_swap = self.swap(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args, **kwargs: False,
+        )
+
+        with flag_swap:
+            self.get_json(
+                '/translation-provider-mapping', expected_status_int=404
+            )
+
+        self.logout()
+
+    def test_put_mapping_successfully(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        saved_mapping = {}
+
+        def mock_update_mapping(new_mapping: Dict[str, str]) -> None:
+            saved_mapping.update(new_mapping)
+
+        domain_swap = self.swap(
+            machine_translation_services,
+            'update_translation_provider_mapping',
+            mock_update_mapping,
+        )
+
+        with self.feature_flag_swap, domain_swap:
+            response = self.put_json(
+                '/translation-provider-mapping', self.valid_payload
+            )
+
+        self.assertEqual(response['status'], 'success')
+        self.assertEqual(saved_mapping, self.valid_payload['provider_mapping'])
+        self.logout()
+
+    def test_put_fails_with_validation_error(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        def mock_update_mapping_fails(new_mapping: Dict[str, str]) -> None:
+            raise utils.ValidationError('Invalid provider specified.')
+
+        domain_swap = self.swap(
+            machine_translation_services,
+            'update_translation_provider_mapping',
+            mock_update_mapping_fails,
+        )
+
+        with self.feature_flag_swap, domain_swap:
+            response = self.put_json(
+                '/translation-provider-mapping',
+                self.valid_payload,
+                expected_status_int=400,
+            )
+
+        self.assertEqual(response['error'], 'Invalid provider specified.')
+        self.logout()
+
+    def test_put_fails_if_feature_flag_disabled(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        flag_swap = self.swap(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args, **kwargs: False,
+        )
+
+        with flag_swap:
+            self.put_json(
+                '/translation-provider-mapping',
+                self.valid_payload,
+                expected_status_int=404,
+            )
 
         self.logout()

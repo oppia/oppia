@@ -502,6 +502,10 @@ URLS = [
         machine_translation.MachineTranslationGenerateHandler,
     ),
     get_redirect_route(
+        r'/translation-provider-mapping',
+        machine_translation.TranslationProviderMappingHandler,
+    ),
+    get_redirect_route(
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler,
     ),

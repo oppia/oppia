@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import feature_flag_list
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feature_flag_services
@@ -90,3 +91,70 @@ class MachineTranslationGenerateHandler(
                 'translation_provider': provider_id,
             }
         )
+
+
+class TranslationProviderMappingHandler(
+    base.BaseHandler[Dict[str, Any], Dict[str, Any]]
+):
+    """Handler for fetching and updating the translation provider mapping."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
+        'GET': {},
+        'PUT': {
+            'provider_mapping': {
+                'schema': {
+                    'type': 'dict',
+                    'keys': {'type': 'unicode'},
+                    'values': {'type': 'unicode'},
+                }
+            }
+        },
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests to fetch the current language-to-provider mapping."""
+
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            self.user_id,
+        ):
+            raise self.PageNotFoundException()
+
+        # TODO(#24714): In Milestone 2 (PR 2.1), replace open_access with strict
+        # role-based access control to verify the user is a Translation Admin.
+
+        mapping = (
+            machine_translation_services.get_translation_provider_mapping()
+        )
+
+        self.render_json({'provider_mapping': mapping})
+
+    @acl_decorators.open_access
+    def put(self) -> None:
+        """Handles PUT requests to update the language-to-provider mapping."""
+
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            self.user_id,
+        ):
+            raise self.PageNotFoundException()
+
+        # TODO(#24714): In Milestone 2 (PR 2.1), replace open_access with strict
+        # role-based access control to verify the user is a Translation Admin.
+
+        new_mapping = self.payload.get('provider_mapping')
+
+        try:
+            machine_translation_services.update_translation_provider_mapping(
+                new_mapping
+            )
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+        except Exception as e:
+            raise self.InternalServerErrorException(str(e))
+
+        self.render_json({'status': 'success'})
