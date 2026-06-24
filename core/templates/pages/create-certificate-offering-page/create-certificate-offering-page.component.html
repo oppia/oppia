@@ -16,6 +16,7 @@
     <oppia-certificate-offering-add-topic-items
       *ngIf="isAddTopicsSection()"
       [certificateAssessmentOffering]="certificateAssessmentOffering"
+      [classroomId]="certificateAssessmentOffering.classroomId"
       (topicDataChange)="updateTopicData($event)"
       (navigateToReviewAndAvailabilitySection)="navigateToReviewAndAvailabilitySection()"
       (navigateToDetailsSection)="navigateToDetailsSection()">
@@ -24,8 +25,8 @@
     <oppia-certificate-offering-review-and-availability
       *ngIf="isReviewAndAvailabilitySection()"
       [certificateAssessmentOffering]="certificateAssessmentOffering"
-      [useStubData]="true"
       (saveCertificateOffering)="saveCertificateOffering()"
+      (saveCertificateAsNotReady)="saveCertificateAsNotReady()"
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
     </oppia-certificate-offering-review-and-availability>
   </div>

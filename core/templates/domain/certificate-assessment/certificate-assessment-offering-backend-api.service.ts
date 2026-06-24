@@ -30,6 +30,18 @@ interface UpdateCertificateOfferingBackendResponse {
   certificate_id: string;
 }
 
+interface ValidateCertificateAssessmentOfferingBackendResponse {
+  is_valid: boolean;
+  validation_errors: {
+    [topicId: string]: {
+      easy: {required: number; available: number};
+      medium: {required: number; available: number};
+      hard: {required: number; available: number};
+    };
+  };
+  validation_message: string;
+}
+
 interface GetCertificateOfferingBackendResponse {
   certificate_offering: {
     certificate_id: string;
@@ -185,6 +197,31 @@ export class CertificateAssessmentOfferingBackendApiService {
         .then(
           () => {
             resolve();
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error || errorResponse.message);
+          }
+        );
+    });
+  }
+
+  async validateCertificateAssessmentOfferingAsync(
+    topicIds: string[],
+    totalQuestions: number
+  ): Promise<ValidateCertificateAssessmentOfferingBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post<ValidateCertificateAssessmentOfferingBackendResponse>(
+          CertificateAssessmentDomainConstants.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL,
+          {
+            topic_ids: topicIds,
+            total_questions: totalQuestions,
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
           },
           errorResponse => {
             reject(errorResponse?.error?.error || errorResponse.message);

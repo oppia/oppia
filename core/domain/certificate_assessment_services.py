@@ -19,10 +19,135 @@
 from __future__ import annotations
 
 from core import feconf, utils
-from core.domain import certificate_assessment_domain
+from core.constants import constants
+from core.domain import (
+    certificate_assessment_domain,
+    question_services,
+    skill_fetchers,
+    topic_fetchers,
+)
 from core.storage.certificate_assessment import gae_models
 
-from typing import List, cast
+from typing import Dict, List, cast
+
+
+def _get_topic_name_to_question_ids_map(
+    topic_ids: List[str],
+) -> Dict[str, List[str]]:
+    """Returns a mapping from topic ID to unique question IDs for its skills."""
+    topic_id_to_question_ids: Dict[str, List[str]] = {}
+    for topic_id in topic_ids:
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise utils.ValidationError('Topic %s does not exist.' % topic_id)
+
+        question_ids = set()
+        for skill_id in topic.get_all_skill_ids():
+            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            if skill is None:
+                continue
+            question_skill_links = (
+                question_services.get_question_skill_links_of_skill(
+                    skill_id, skill.description
+                )
+            )
+            for question_skill_link in question_skill_links:
+                question_ids.add(question_skill_link.question_id)
+
+        topic_id_to_question_ids[topic_id] = sorted(question_ids)
+    return topic_id_to_question_ids
+
+
+def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
+    """Distributes questions over medium, easy and hard in a repeating cycle."""
+    counts = {'easy': 0, 'medium': 0, 'hard': 0}
+    cycle = ['medium', 'easy', 'hard']
+    for index in range(total_questions):
+        counts[cycle[index % len(cycle)]] += 1
+    return counts
+
+
+def _get_topic_validation_result(
+    available_questions: int, required_questions: int
+) -> Dict[str, Dict[str, int]]:
+    """Returns the required/available breakdown for one topic."""
+    required = _get_difficulty_counts(required_questions)
+    available = _get_difficulty_counts(available_questions)
+    return {
+        'easy': {
+            'required': required['easy'],
+            'available': available['easy'],
+        },
+        'medium': {
+            'required': required['medium'],
+            'available': available['medium'],
+        },
+        'hard': {
+            'required': required['hard'],
+            'available': available['hard'],
+        },
+    }
+
+
+def validate_certificate_assessment_offering(
+    topic_ids: List[str], total_questions: int
+) -> Dict[str, object]:
+    """Pre-validates whether a certificate offering can be created.
+
+    Args:
+        topic_ids: list(str). The selected topic IDs for the certificate.
+        total_questions: int. The total number of questions requested.
+
+    Returns:
+        dict. Contains is_valid, validation_errors and validation_message.
+    """
+    if not topic_ids:
+        raise utils.ValidationError(
+            'topic_ids must contain at least one topic.'
+        )
+    if total_questions < 1:
+        raise utils.ValidationError(
+            'total_questions must be a positive integer.'
+        )
+
+    topic_name_to_question_ids_map = _get_topic_name_to_question_ids_map(
+        topic_ids
+    )
+    base_questions_per_topic = total_questions // len(topic_ids)
+    remainder = total_questions % len(topic_ids)
+
+    validation_errors: Dict[str, Dict[str, Dict[str, int]]] = {}
+    message_parts: List[str] = []
+    is_valid = True
+
+    for index, topic_id in enumerate(topic_ids):
+        required_questions = base_questions_per_topic + (
+            1 if index < remainder else 0
+        )
+        available_questions = len(topic_name_to_question_ids_map[topic_id])
+        validation_result = _get_topic_validation_result(
+            available_questions, required_questions
+        )
+        validation_errors[topic_id] = validation_result
+        if available_questions < required_questions:
+            is_valid = False
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+            topic_name = topic.name if topic is not None else topic_id
+            message_parts.append(
+                '%s needs %d unique questions but only %d are available.'
+                % (topic_name, required_questions, available_questions)
+            )
+
+    validation_message = (
+        'Certificate assessment is valid.'
+        if is_valid
+        else ' '.join(message_parts)
+    )
+    return {
+        'is_valid': is_valid,
+        'validation_errors': validation_errors,
+        'validation_message': validation_message,
+    }
 
 
 def _model_to_domain(

@@ -21,4 +21,6 @@ export const CertificateAssessmentDomainConstants = {
     '/certificate_assessment_offering_handler',
   CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL:
     '/certificate_assessment_offering_handler/<certificate_id>',
+  VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
+    '/validate_certificate_assessment_offering_handler',
 } as const;

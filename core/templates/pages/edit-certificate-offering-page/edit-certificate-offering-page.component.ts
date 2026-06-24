@@ -123,6 +123,24 @@ export class EditCertificateOfferingPageComponent implements OnInit {
     }
   }
 
+  async updateCertificateOfferingAsNotReady(): Promise<void> {
+    this.certificateAssessmentOffering =
+      CertificateAssessmentOfferingData.createFromBackendDict({
+        certificate_id: this.certificateAssessmentOffering.certificateId,
+        title: this.certificateAssessmentOffering.title,
+        description: this.certificateAssessmentOffering.description,
+        classroom_id: this.certificateAssessmentOffering.classroomId,
+        topic_data: this.certificateAssessmentOffering.topicData,
+        demonstrates: this.certificateAssessmentOffering.demonstrates,
+        total_questions: this.certificateAssessmentOffering.totalQuestions,
+        time_limit_in_minutes:
+          this.certificateAssessmentOffering.timeLimitInMinutes,
+        async_status: 'Not_Ready',
+        version: this.certificateAssessmentOffering.version,
+      });
+    await this.updateCertificateOffering();
+  }
+
   navigateBackToDashboard(): void {
     this.router.navigate(['/certificate-offering-dashboard']);
   }

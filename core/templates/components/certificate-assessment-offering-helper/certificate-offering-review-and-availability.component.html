@@ -83,6 +83,9 @@
     <h3 class="oppia-certificate-review-section-heading">
       Overall Status
     </h3>
+    <p *ngIf="validationMessage" class="oppia-certificate-review-overall-desc">
+      {{ validationMessage }}
+    </p>
     <ng-container *ngIf="!isValid">
       <p class="oppia-certificate-review-overall-status
                 oppia-certificate-review-overall-status--fail">
@@ -132,8 +135,14 @@
           ‹ Back
         </button>
         <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
+                [disabled]="!isValid"
+                [attr.aria-disabled]="!isValid"
                 (click)="onSaveClicked()">
           {{ getSaveButtonText() }}
+        </button>
+        <button type="button" class="oppia-certificate-review-btn--secondary e2e-test-certificate-review-save-not-ready-btn"
+                (click)="onSaveAsNotReadyClicked()">
+          {{ getSaveAsNotReadyButtonText() }}
         </button>
       </div>
     </ng-container>

@@ -28,6 +28,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 
 import './certificate-offering-review-and-availability.component.css';
@@ -77,6 +79,12 @@ export interface ReadinessErrorMessage {
   isZero: boolean;
 }
 
+export interface ValidationResponse {
+  is_valid: boolean;
+  validation_errors: ValidationErrors;
+  validation_message: string;
+}
+
 @Component({
   selector: 'oppia-certificate-offering-review-and-availability',
   templateUrl: './certificate-offering-review-and-availability.component.html',
@@ -89,20 +97,15 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   @Input() isEditMode: boolean = false;
   @Input() useStubData: boolean = false;
 
-  // These two inputs will be wired from the real validation API response.
-  // TODO(##24717 - M1.13): Replace the stub path below with the backend contract once the
-  // validation endpoint is implemented.
-  @Input() isValid: boolean = true;
-  @Input() validationErrors: ValidationErrors = {};
-
-  // Map of topic_id to human-readable topic name.
-  // Wired from real data.
-  @Input() topicNameMap: {[topicId: string]: string} = {};
-
   @Output() saveCertificateOffering = new EventEmitter<void>();
+  @Output() saveCertificateAsNotReady = new EventEmitter<void>();
   @Output() navigateToAddTopicsSection = new EventEmitter<void>();
 
   // Derived display data - rebuilt whenever inputs change.
+  isValid: boolean = true;
+  validationErrors: ValidationErrors = {};
+  topicNameMap: {[topicId: string]: string} = {};
+  validationMessage: string = '';
   topicReadinessRows: TopicReadinessRow[] = [];
   errorMessages: ReadinessErrorMessage[] = [];
 
@@ -137,17 +140,85 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     },
   };
 
-  ngOnInit(): void {
+  constructor(
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+  ) {}
+
+  async ngOnInit(): Promise<void> {
     if (this.useStubData) {
       this.validationErrors = this.STUB_VALIDATION_ERRORS;
       this.isValid = this.STUB_IS_VALID;
       this.topicNameMap = this.STUB_TOPIC_NAME_MAP;
+      this.validationMessage =
+        'Fractions and Percentages still need more questions.';
+      this._buildDisplayData();
+      return;
     }
-    this._buildDisplayData();
+
+    if (
+      Object.keys(this.validationErrors).length > 0 ||
+      Object.keys(this.topicNameMap).length > 0
+    ) {
+      this._buildDisplayData();
+      return;
+    }
+
+    await this._loadValidationState();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.validationErrors || changes.topicNameMap) {
+    if (
+      this.useStubData &&
+      (changes.validationErrors || changes.topicNameMap)
+    ) {
+      this._buildDisplayData();
+    }
+  }
+
+  private async _loadValidationState(): Promise<void> {
+    try {
+      const classroomSummaries =
+        await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
+      const selectedClassroom = classroomSummaries.find(
+        classroom =>
+          classroom.classroom_id ===
+          this.certificateAssessmentOffering.classroomId
+      );
+      if (!selectedClassroom) {
+        throw new Error('Selected classroom could not be found.');
+      }
+      const classroomData =
+        await this.classroomBackendApiService.fetchClassroomDataAsync(
+          selectedClassroom.url_fragment
+        );
+      const topicNameById: {[topicId: string]: string} = {};
+      classroomData.getTopicSummaries().forEach(topic => {
+        topicNameById[topic.getId()] = topic.getName();
+      });
+      this.topicNameMap = topicNameById;
+
+      const topicIds = Object.keys(
+        this.certificateAssessmentOffering.topicData || {}
+      );
+      const totalQuestions =
+        this.certificateAssessmentOffering.totalQuestions || 0;
+      const validationResponse =
+        await this.certificateAssessmentOfferingBackendApiService.validateCertificateAssessmentOfferingAsync(
+          topicIds,
+          totalQuestions
+        );
+      this.validationErrors = validationResponse.validation_errors;
+      this.isValid = validationResponse.is_valid;
+      this.validationMessage = validationResponse.validation_message;
+      this._buildDisplayData();
+    } catch (error: unknown) {
+      this.isValid = false;
+      this.validationErrors = {};
+      this.validationMessage =
+        error instanceof Error && error.message
+          ? error.message
+          : 'Unable to validate this certificate.';
       this._buildDisplayData();
     }
   }
@@ -210,11 +281,19 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   }
 
   getSaveButtonText(): string {
-    return this.isEditMode ? 'Update Certificate' : 'Save Certificate';
+    return this.isEditMode ? 'Update Certificate' : 'Create Certificate';
+  }
+
+  getSaveAsNotReadyButtonText(): string {
+    return 'Save as Not Ready';
   }
 
   onSaveClicked(): void {
     this.saveCertificateOffering.emit();
+  }
+
+  onSaveAsNotReadyClicked(): void {
+    this.saveCertificateAsNotReady.emit();
   }
 
   onBackClicked(): void {

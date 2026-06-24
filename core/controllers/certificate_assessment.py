@@ -42,10 +42,49 @@ class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
     async_status: str
 
 
+class ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict(
+    TypedDict
+):
+    """Dict representation of the validation handler payload."""
+
+    topic_ids: List[str]
+    total_questions: int
+
+
 class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of certificate_id path args."""
 
     certificate_id: str
+
+
+class ValidateCertificateAssessmentOfferingHandler(
+    base.BaseHandler[
+        ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        Dict[str, str],
+    ]
+):
+    """Validates whether a certificate offering can be created or updated."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'topic_ids': {
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+            },
+            'total_questions': {'schema': {'type': 'int'}},
+        },
+    }
+
+    @acl_decorators.can_access_certificate_dashboard
+    def post(self) -> None:
+        """Validates the selected topics and total question count."""
+        assert self.normalized_payload is not None
+        validation_result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=self.normalized_payload['topic_ids'],
+            total_questions=self.normalized_payload['total_questions'],
+        )
+        self.render_json(validation_result)
 
 
 class CertificateAssessmentOfferingHandler(
