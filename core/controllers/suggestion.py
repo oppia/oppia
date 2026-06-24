@@ -1219,7 +1219,7 @@ def _get_target_id_to_exploration_opportunity_dict(
     Optional[
         Union[
             opportunity_domain.PartialExplorationOpportunitySummaryDict,
-            opportunity_domain.TranslationOpportunityCardInfoDict,
+            opportunity_domain.ClientSideTranslationOpportunityCardInfoDict,
         ]
     ],
 ]:
@@ -1234,7 +1234,7 @@ def _get_target_id_to_exploration_opportunity_dict(
     Returns:
         dict. Dict mapping target_id to corresponding exploration opportunity
         dict, which can be in ExplorationOpportunitySummary or
-        TranslationOpportunityCardInfo representation depending on the feature flag.
+        client-side TranslationOpportunityCardInfo representation depending on the feature flag.
     """
     target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict: Dict[
@@ -1242,7 +1242,7 @@ def _get_target_id_to_exploration_opportunity_dict(
         Optional[
             Union[
                 opportunity_domain.PartialExplorationOpportunitySummaryDict,
-                opportunity_domain.TranslationOpportunityCardInfoDict,
+                opportunity_domain.ClientSideTranslationOpportunityCardInfoDict,
             ]
         ],
     ] = {}
@@ -1261,8 +1261,22 @@ def _get_target_id_to_exploration_opportunity_dict(
             list(target_ids),
             language_code,
         )
+        target_id_to_in_review_count: Dict[str, int] = {}
+        for suggestion in suggestions:
+            if suggestion.language_code == language_code:
+                target_id_to_in_review_count[suggestion.target_id] = (
+                    target_id_to_in_review_count.get(suggestion.target_id, 0)
+                    + 1
+                )
         for card in card_infos:
-            opportunity_id_to_opportunity_dict[card.entity_id] = card.to_dict()
+            translation_in_review_counts = {}
+            if card.entity_id in target_id_to_in_review_count:
+                translation_in_review_counts = {
+                    language_code: target_id_to_in_review_count[card.entity_id]
+                }
+            opportunity_id_to_opportunity_dict[card.entity_id] = (
+                card.to_client_side_dict(translation_in_review_counts, False)
+            )
         for tid in target_ids:
             if tid not in opportunity_id_to_opportunity_dict:
                 opportunity_id_to_opportunity_dict[tid] = None
