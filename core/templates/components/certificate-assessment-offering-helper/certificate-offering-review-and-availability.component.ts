@@ -95,6 +95,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
+  @Input() isCertificateValid: boolean = true;
   @Input() useStubData: boolean = false;
 
   @Output() saveCertificateOffering = new EventEmitter<void>();
