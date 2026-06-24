@@ -32,6 +32,7 @@ import {
 import {
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
 } from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {AlertsService} from 'services/alerts.service';
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
@@ -180,7 +181,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         }
       );
       postModalRef.componentInstance.action =
-        CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+        CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED;
       await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {

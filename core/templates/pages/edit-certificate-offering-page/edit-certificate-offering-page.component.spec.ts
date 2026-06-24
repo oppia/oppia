@@ -31,10 +31,17 @@ import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {AlertsService} from 'services/alerts.service';
 
-const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
-const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+const CERTIFICATE_OFFERING_UPDATED_ACTION =
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+const CERTIFICATE_OFFERING_NOT_READY_ACTION =
+  CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY;
 
 describe('Edit Certificate Offering Page Component', () => {
   let component: EditCertificateOfferingPageComponent;
@@ -310,7 +317,7 @@ describe('Edit Certificate Offering Page Component', () => {
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
     expect(secondModalRef.componentInstance.action).toBe(
-      CERTIFICATE_OFFERING_UPDATED_ACTION
+      CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));

@@ -21,6 +21,9 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 
 describe('Certificate Offering Review And Availability Component', () => {
   let component: CertificateOfferingReviewAndAvailabilityComponent;
@@ -28,7 +31,28 @@ describe('Certificate Offering Review And Availability Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [CertificateOfferingReviewAndAvailabilityComponent],
+      providers: [
+        {
+          provide: ClassroomBackendApiService,
+          useValue: {
+            getAllClassroomsSummaryAsync: async () => Promise.resolve([]),
+            fetchClassroomDataAsync: async () => Promise.resolve(null),
+          },
+        },
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: {
+            validateCertificateAssessmentOfferingAsync: async () =>
+              Promise.resolve({
+                is_valid: true,
+                validation_errors: {},
+                validation_message: '',
+              }),
+          },
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
