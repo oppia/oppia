@@ -233,7 +233,9 @@ describe('Answer Classification Service', () => {
           state.name as string,
           state.interaction,
           '0',
-          null as unknown as InteractionRulesService
+          // This throws "Argument of type 'null' is not assignable to parameter of type 'InteractionRulesService'.". We need to suppress this error because we need to test the runtime error thrown when interactionRulesService is null.
+          // @ts-expect-error
+          null
         )
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.'
@@ -383,7 +385,9 @@ describe('Answer Classification Service', () => {
             state.name as string,
             state.interaction,
             '0',
-            null as unknown as InteractionRulesService
+            // This throws "Argument of type 'null' is not assignable to parameter of type 'InteractionRulesService'.". We need to suppress this error because we need to test the runtime error thrown when interactionRulesService is null.
+            // @ts-expect-error
+            null
           )
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.'

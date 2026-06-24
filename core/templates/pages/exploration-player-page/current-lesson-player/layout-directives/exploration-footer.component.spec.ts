@@ -356,7 +356,7 @@ describe('ExplorationFooterComponent', () => {
       tick();
 
       expect(component.explorationId).toBe('exp1');
-      expect(component.iframed).toBeTrue();
+      expect(component.iframed).toBe(true);
       expect(
         explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
       ).toHaveBeenCalledWith(['exp1']);
@@ -637,7 +637,7 @@ describe('ExplorationFooterComponent', () => {
     () => {
       spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(component.hintsAndSolutionsAreSupported).toBe(true);
 
       spyOnProperty(
         questionPlayerEngineService,
@@ -647,7 +647,7 @@ describe('ExplorationFooterComponent', () => {
       component.ngOnInit();
       mockResultsLoadedEventEmitter.emit(true);
 
-      expect(component.hintsAndSolutionsAreSupported).toBeFalse();
+      expect(component.hintsAndSolutionsAreSupported).toBe(false);
     }
   );
 
@@ -925,7 +925,7 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should open concept card when user clicks on the icon', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(),
@@ -1282,7 +1282,7 @@ describe('ExplorationFooterComponent', () => {
     component.setLearnerHasViewedLessonInfoTooltip();
     tick();
 
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(false);
   }));
 
   it('should correctly mark lesson info tooltip as viewed', () => {
@@ -1290,10 +1290,10 @@ describe('ExplorationFooterComponent', () => {
       editableExplorationBackendApiService,
       'recordLearnerHasViewedLessonInfoModalOnce'
     ).and.returnValue(Promise.resolve());
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(false);
     component.userIsLoggedIn = true;
     component.learnerHasViewedLessonInfo();
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(true);
     expect(
       editableExplorationBackendApiService.recordLearnerHasViewedLessonInfoModalOnce
     ).toHaveBeenCalled();
@@ -1312,7 +1312,7 @@ describe('ExplorationFooterComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(component.hintsAndSolutionsAreSupported).toBe(true);
       expect(
         questionPlayerEngineService.resultsPageIsLoadedEventEmitter.subscribe
       ).toHaveBeenCalled();
@@ -1384,20 +1384,26 @@ describe('ExplorationFooterComponent', () => {
 
   it('should handle null state.name and terminal state in openProgressReminderModal', fakeAsync(() => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
-    spyOn(explorationEngineService, 'getState').and.returnValue({
-      name: null,
-    } as unknown as State);
-    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue({
-      isTerminal: () => true,
-    } as unknown as StateCard);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      State.createDefaultState(null, 'content', 'default_outcome')
+    );
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      StateCard.createNewCard(
+        'End',
+        '<p>Testing</p>',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        'content'
+      )
+    );
     component.checkpointCount = 2;
     component.completedCheckpointsCount = 0;
     component.expInfo = null;
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(),
-      } as unknown as NgbModalRef;
+      } as NgbModalRef;
     });
     component.openProgressReminderModal();
     tick();
@@ -1408,23 +1414,29 @@ describe('ExplorationFooterComponent', () => {
 
   it('should handle null state.name and terminal state in openInformationCardModal', fakeAsync(() => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
-    spyOn(explorationEngineService, 'getState').and.returnValue({
-      name: null,
-    } as unknown as State);
-    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue({
-      isTerminal: () => false,
-    } as unknown as StateCard);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      State.createDefaultState(null, 'content', 'default_outcome')
+    );
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      StateCard.createNewCard(
+        'End',
+        '<p>Testing</p>',
+        '',
+        new Interaction([], [], {}, null, [], 'TextInput', null),
+        'content'
+      )
+    );
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
       1
     );
     component.checkpointCount = 2;
     component.completedCheckpointsCount = 0;
     component.expInfo = null;
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(),
-      } as unknown as NgbModalRef;
+      } as NgbModalRef;
     });
     component.openInformationCardModal();
     tick();
@@ -1435,28 +1447,34 @@ describe('ExplorationFooterComponent', () => {
 
   it('should handle lastCheckpointWasCompleted in openInformationCardModal', fakeAsync(() => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
-    spyOn(explorationEngineService, 'getState').and.returnValue({
-      name: 'Start',
-    } as unknown as State);
-    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue({
-      isTerminal: () => true,
-    } as unknown as StateCard);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      State.createDefaultState('Start', 'content', 'default_outcome')
+    );
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      StateCard.createNewCard(
+        'End',
+        '<p>Testing</p>',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        'content'
+      )
+    );
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
       3
     );
     component.checkpointCount = 3;
     component.lastCheckpointWasCompleted = true;
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(),
-      } as unknown as NgbModalRef;
+      } as NgbModalRef;
     });
     component.openInformationCardModal();
     tick();
     fixture.detectChanges();
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.completedCheckpointsCount).toEqual(3);
-    expect(component.lastCheckpointWasCompleted).toBeTrue();
+    expect(component.lastCheckpointWasCompleted).toBe(true);
   }));
 });

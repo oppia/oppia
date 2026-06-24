@@ -2030,7 +2030,7 @@ describe('Conversation skin component', () => {
       'stateName',
       '',
       '',
-      new Interaction([], [], {}, null, [], null as unknown as string, null),
+      new Interaction([], [], {}, null, [], '', null),
       [],
       ''
     );

@@ -883,11 +883,10 @@ export class ExplorationEngineService {
       refresherExplorationId,
       missingPrerequisiteSkillId as string,
       onSameCard,
-      // We use 'as unknown as string' here because the external callback
-      // defined in conversation-flow.service.ts expects a strict 'string',
-      // but our internal data models supply 'null'. This bypasses the TS
-      // compiler mismatch without altering the expected external signature.
-      null as unknown as string,
+      // The external callback defined in conversation-flow.service.ts expects
+      // a strict 'string'. We pass an empty string instead of null to maintain
+      // strict typing compliance.
+      '',
       oldStateName === this.exploration.initStateName,
       isFirstHit,
       false,
