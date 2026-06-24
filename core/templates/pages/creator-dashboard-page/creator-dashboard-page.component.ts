@@ -289,6 +289,9 @@ export class CreatorDashboardPageComponent {
   }
 
   truncate(input: string, length: number): string {
+    if (length <= 0) {
+      return input;
+    }
     if (input.length > length) {
       return input.substring(0, length) + '...';
     }

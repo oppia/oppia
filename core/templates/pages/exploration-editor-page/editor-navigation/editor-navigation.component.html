@@ -1,4 +1,6 @@
-<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [class.mobile-navbar-toggled]="mobileNavOptionsAreShown" aria-label="Mobile navbar options" role="button"></i>
+<button class="show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [class.mobile-navbar-toggled]="mobileNavOptionsAreShown" aria-label="Mobile navbar options">
+  <i class="fa fa-book"></i>
+</button>
 <div class="navbar-mobile-container">
   <div class="navbar-mobile-options e2e-test-mobile-navigation-bar-container" *ngIf="mobileNavOptionsAreShown">
     <div  placement="top-start" class="exp-nav-dropdown-container">
@@ -84,7 +86,7 @@
 
         <div *ngIf="isEditableOutsideTutorialMode()">
           <div [class.disable-save-button]="!connectedToInternet || !isExplorationSaveable()">
-            <button class="btn publish-button e2e-test-save-changes-for-small-screens"
+            <button type="button" class="btn publish-button e2e-test-save-changes-for-small-screens"
                     [class.btn-success]="connectedToInternet && isExplorationSaveable()"
                     (click)="saveChanges()"
                     [disabled]="!connectedToInternet || !isExplorationSaveable()">
