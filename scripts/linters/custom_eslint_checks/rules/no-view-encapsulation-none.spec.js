@@ -72,8 +72,7 @@ ruleTester.run('no-view-encapsulation-none', rule, {
     {
       code: 'var x = { encapsulation: ViewEncapsulation.None };',
       filename:
-        'oppia/core/templates/pages/splash-page/' +
-        'splash-page.component.ts',
+        'oppia/core/templates/pages/splash-page/' + 'splash-page.component.ts',
     },
   ],
 
