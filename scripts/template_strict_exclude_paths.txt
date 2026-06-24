@@ -193,8 +193,3 @@ extensions/objects/templates/subtitled-unicode-editor.component.ts
 extensions/objects/templates/svg-editor.component.ts
 extensions/objects/templates/translatable-html-content-id.component.ts
 extensions/objects/templates/translatable-set-of-normalized-string-editor.component.ts
-extensions/objects/templates/translatable-set-of-unicode-string-editor.component.ts
-extensions/value_generators/templates/copier.component.ts
-extensions/value_generators/templates/random-selector.component.ts
-extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts
-extensions/visualizations/oppia-visualization-sorted-tiles.component.ts
