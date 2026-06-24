@@ -448,6 +448,14 @@
   padding: 0;
   width: 190px;
 }
+
+.oppia-top-navigation-bar .e2e-test-profile-link strong {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: break-word;
+}
 .oppia-top-navigation-bar .oppia-navbar-dropdown-item {
   display: flex;
   flex-direction: column;
