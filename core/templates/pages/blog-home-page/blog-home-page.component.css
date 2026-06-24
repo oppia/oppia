@@ -163,6 +163,16 @@ ngb-pagination .page-item.active .page-link {
   color: #333;
 }
 
+ngb-pagination .page-item.disabled:not(:first-child):not(:last-child) {
+  display: none;
+}
+
+ngb-pagination .page-item.disabled:first-child .page-link,
+ngb-pagination .page-item.disabled:last-child .page-link {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 ngb-pagination ul li:last-child.page-item {
   margin-left: 4px;
 }
