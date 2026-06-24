@@ -34,16 +34,6 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   navbarTitle: string | null = null;
-  _TAB_NAMES_TO_HUMAN_READABLE_NAMES: object = {
-    main: 'Edit',
-    translation: 'Translation',
-    preview: 'Preview',
-    settings: 'Settings',
-    stats: 'Statistics',
-    improvements: 'Improvements',
-    history: 'History',
-    feedback: 'Feedback',
-  };
 
   constructor(
     private explorationTitleService: ExplorationTitleService,
@@ -56,19 +46,6 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
     this.focusManagerService.setFocus(
       ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL
     );
-  }
-
-  getCurrentTabName(): string {
-    const that = this;
-    type TabNamesToHumanReadableNamesKeys =
-      keyof typeof that._TAB_NAMES_TO_HUMAN_READABLE_NAMES;
-    if (!this.routerService.getActiveTabName()) {
-      return '';
-    } else {
-      return this._TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-        this.routerService.getActiveTabName() as TabNamesToHumanReadableNamesKeys
-      ];
-    }
   }
 
   ngOnInit(): void {
@@ -90,12 +67,7 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
       this.navbarTitle = null;
       return;
     }
-    const _MAX_TITLE_LENGTH = 20;
     this.navbarTitle = String(this.explorationTitleService.savedMemento);
-    if (this.navbarTitle.length > _MAX_TITLE_LENGTH) {
-      this.navbarTitle =
-        this.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...';
-    }
   }
 
   ngOnDestroy(): void {

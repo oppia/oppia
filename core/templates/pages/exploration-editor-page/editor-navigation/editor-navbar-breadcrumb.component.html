@@ -3,10 +3,6 @@
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <span *ngIf="navbarTitle">
       {{navbarTitle}}
-      <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-icon"></span>
-      <span>
-        {{ getCurrentTabName() }}
-      </span>
     </span>
     <span *ngIf="navbarTitle === ''" (click)="editTitle()" class="oppia-untitled-exploration-text">
       Untitled Exploration

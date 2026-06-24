@@ -87,7 +87,7 @@ describe('Editor Navbar Breadcrumb component', () => {
   });
 
   it('should initialize component properties after controller is initialized', () => {
-    expect(component.navbarTitle).toBe('Exploration Title...');
+    expect(component.navbarTitle).toBe('Exploration Title Example Very Long');
   });
 
   it('should set navbarTitle to null when exploration title is not yet initialized', () => {
@@ -112,20 +112,10 @@ describe('Editor Navbar Breadcrumb component', () => {
     }
   );
 
-  it('should get an empty current tab name when there is no active tab', () => {
-    spyOn(routerService, 'getActiveTabName').and.returnValue('');
-    expect(component.getCurrentTabName()).toBe('');
-  });
-
-  it('should get current tab name when there is an active tab', () => {
-    spyOn(routerService, 'getActiveTabName').and.returnValue('settings');
-    expect(component.getCurrentTabName()).toBe('Settings');
-  });
-
   it('should update nav bar title when exploration property changes', fakeAsync(() => {
     mockExplorationPropertyChangedEventEmitter.emit('title');
     tick();
 
-    expect(component.navbarTitle).toBe('Exploration Title...');
+    expect(component.navbarTitle).toBe('Exploration Title Example Very Long');
   }));
 });
