@@ -26,7 +26,7 @@
       [certificateAssessmentOffering]="certificateAssessmentOffering"
       [isEditMode]="true"
       (saveCertificateOffering)="updateCertificateOffering()"
-      (saveCertificateAsNotReady)="updateCertificateOfferingAsNotReady()"
+      (isCertificateValidChange)="isCertificateValid = $event"
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
     </oppia-certificate-offering-review-and-availability>
   </div>

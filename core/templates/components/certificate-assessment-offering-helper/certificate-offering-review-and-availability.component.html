@@ -135,14 +135,8 @@
           ‹ Back
         </button>
         <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
-                [disabled]="!isValid"
-                [attr.aria-disabled]="!isValid"
                 (click)="onSaveClicked()">
           {{ getSaveButtonText() }}
-        </button>
-        <button type="button" class="oppia-certificate-review-btn--secondary e2e-test-certificate-review-save-not-ready-btn"
-                (click)="onSaveAsNotReadyClicked()">
-          {{ getSaveAsNotReadyButtonText() }}
         </button>
       </div>
     </ng-container>

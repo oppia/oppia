@@ -99,8 +99,8 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   @Input() useStubData: boolean = false;
 
   @Output() saveCertificateOffering = new EventEmitter<void>();
-  @Output() saveCertificateAsNotReady = new EventEmitter<void>();
   @Output() navigateToAddTopicsSection = new EventEmitter<void>();
+  @Output() isCertificateValidChange = new EventEmitter<boolean>();
 
   // Derived display data - rebuilt whenever inputs change.
   isValid: boolean = true;
@@ -154,6 +154,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
       this.validationMessage =
         'Fractions and Percentages still need more questions.';
       this._buildDisplayData();
+      this.isCertificateValidChange.emit(this.isValid);
       return;
     }
 
@@ -213,6 +214,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
       this.isValid = validationResponse.is_valid;
       this.validationMessage = validationResponse.validation_message;
       this._buildDisplayData();
+      this.isCertificateValidChange.emit(this.isValid);
     } catch (error: unknown) {
       this.isValid = false;
       this.validationErrors = {};
@@ -221,6 +223,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
           ? error.message
           : 'Unable to validate this certificate.';
       this._buildDisplayData();
+      this.isCertificateValidChange.emit(this.isValid);
     }
   }
 
@@ -285,16 +288,8 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     return this.isEditMode ? 'Update Certificate' : 'Create Certificate';
   }
 
-  getSaveAsNotReadyButtonText(): string {
-    return 'Save as Not Ready';
-  }
-
   onSaveClicked(): void {
     this.saveCertificateOffering.emit();
-  }
-
-  onSaveAsNotReadyClicked(): void {
-    this.saveCertificateAsNotReady.emit();
   }
 
   onBackClicked(): void {

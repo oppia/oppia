@@ -26,7 +26,7 @@
       *ngIf="isReviewAndAvailabilitySection()"
       [certificateAssessmentOffering]="certificateAssessmentOffering"
       (saveCertificateOffering)="saveCertificateOffering()"
-      (saveCertificateAsNotReady)="saveCertificateAsNotReady()"
+      (isCertificateValidChange)="isCertificateValid = $event"
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
     </oppia-certificate-offering-review-and-availability>
   </div>
