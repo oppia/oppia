@@ -8164,9 +8164,11 @@ export class ExplorationEditor extends BaseUser {
    * Uses commonModalBodySelector which is already defined in this file.
    */
   async expectSolutionModalToContain(expectedTexts: string[]): Promise<void> {
-    await this.page.waitForSelector(commonModalBodySelector, {visible: true});
+    await this.page.waitForSelector('ngb-modal-window.modal.show .modal-body', {
+      visible: true,
+    });
     const modalText = await this.page.$eval(
-      commonModalBodySelector,
+      'ngb-modal-window.modal.show .modal-body',
       el => el.textContent || ''
     );
     for (const text of expectedTexts) {
