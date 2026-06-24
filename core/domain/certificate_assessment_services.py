@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf, utils
-from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
     question_services,
@@ -28,7 +27,15 @@ from core.domain import (
 )
 from core.storage.certificate_assessment import gae_models
 
-from typing import Dict, List, cast
+from typing import Dict, List, TypedDict, cast
+
+
+class CertificateAssessmentOfferingValidationResultDict(TypedDict):
+    """Dict representation of certificate offering validation results."""
+
+    is_valid: bool
+    validation_errors: Dict[str, Dict[str, Dict[str, int]]]
+    validation_message: str
 
 
 def _get_topic_name_to_question_ids_map(
@@ -91,7 +98,7 @@ def _get_topic_validation_result(
 
 def validate_certificate_assessment_offering(
     topic_ids: List[str], total_questions: int
-) -> Dict[str, object]:
+) -> CertificateAssessmentOfferingValidationResultDict:
     """Pre-validates whether a certificate offering can be created.
 
     Args:
