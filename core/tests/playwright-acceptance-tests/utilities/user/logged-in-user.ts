@@ -90,14 +90,14 @@ const filledRatingStarSelector = '.fas.fa-star';
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
-const profileDropdown = '.e2e-test-profile-dropdown';
-const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
 const emptyProgressSectionContainerSelector =
   '.e2e-test-empty-progress-section';
 const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 
 const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
@@ -114,8 +114,6 @@ const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 
-const learnerGreetingsSelector = '.e2e-test-learner-greetings';
-
 // Common > Lesson Card.
 const commonLessonCardContainerSelector =
   '.e2e-test-redesigned-lesson-card-container';
@@ -124,6 +122,8 @@ const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
+
+const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 
 // Common > Remove modal selectors.
 const removeModalContainerSelector =

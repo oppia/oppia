@@ -33,6 +33,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -652,6 +653,7 @@ class TranslatableContentsHandlerV2(
 
         entity_type = self.normalized_request['entity_type']
         entity_id = self.normalized_request['entity_id']
+        language_code = self.normalized_request['language_code']
 
         domain_object = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -669,24 +671,78 @@ class TranslatableContentsHandlerV2(
                 'Invalid entity_id: %s' % entity_id
             )
 
-        translatable_contents_collection = (
-            domain_object.get_translatable_contents_collection()
+        suggestions = []
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            suggestions = suggestion_services.get_translation_suggestions_in_review_by_exploration(
+                entity_id, language_code
+            )
+
+        entity_translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(entity_type),
+            entity_id,
+            domain_object.version,
+            language_code,
         )
 
-        translatable_contents = []
-        for (
-            content
-        ) in (
-            translatable_contents_collection.content_id_to_translatable_content.values()
-        ):
-            translatable_contents.append(
-                {
-                    'content_id': content.content_id,
-                    'content_type': content.content_type.value,
-                    'content_format': content.content_format.value,
-                    'content_value': content.content_value,
-                }
+        reviewable_language_codes = []
+        if self.user_id:
+            contribution_rights = user_services.get_user_contribution_rights(
+                self.user_id
             )
+            reviewable_language_codes = (
+                contribution_rights.can_review_translation_for_language_codes
+            )
+
+        contents_which_need_translation = (
+            domain_object.get_all_contents_which_need_translations(
+                entity_translations
+            )
+        )
+
+        content_id_to_grouping_key = {}
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            for state_name, state in domain_object.states.items():
+                translatable_contents_collection = (
+                    state.get_translatable_contents_collection()
+                )
+                for (
+                    content_id
+                ) in (
+                    translatable_contents_collection.content_id_to_translatable_content
+                ):
+                    content_id_to_grouping_key[content_id] = state_name
+
+        translatable_contents = []
+        for content in contents_which_need_translation.values():
+            # Skip list-format content if the user does not have reviewer
+            # rights for the selected language. Translating list contents
+            # (such as answer choices) requires reviewer privileges.
+            if (
+                language_code not in reviewable_language_codes
+                and content.is_data_format_list()
+            ):
+                continue
+
+            # Skip content that already has a suggestion in review to
+            # prevent duplicate translation submissions.
+            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if any(
+                    s.change_cmd.content_id == content.content_id
+                    for s in suggestions
+                ):
+                    continue
+
+            content_dict = {
+                'content_id': content.content_id,
+                'content_type': content.content_type.value,
+                'content_format': content.content_format.value,
+                'content_value': content.content_value,
+                'grouping_key': (
+                    content_id_to_grouping_key.get(content.content_id)
+                ),
+            }
+
+            translatable_contents.append(content_dict)
 
         self.values = {
             'version': domain_object.version,
