@@ -119,6 +119,36 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should forward the provided async status when creating', fakeAsync(() => {
+    mockCertificateOfferingData = new CertificateAssessmentOfferingData(
+      '',
+      'Sample Title',
+      'Sample Description',
+      'sample_classroom',
+      {topic_1: 1},
+      3,
+      15,
+      ['Learn math'],
+      'Not_Ready',
+      1
+    );
+
+    caos
+      .createCertificateAssessmentOfferingAsync(mockCertificateOfferingData)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.body.async_status).toEqual('Not_Ready');
+    req.flush({certificate_id: 'mock_certificate_id'});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith('mock_certificate_id');
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should use rejection handler if creation of certificate assessment offering fails', fakeAsync(() => {
     caos
       .createCertificateAssessmentOfferingAsync(mockCertificateOfferingData)
@@ -246,6 +276,42 @@ describe('Certificate Assessment Offering backend api service', () => {
     req.flush({
       certificate_id: 'mock_certificate_id',
     });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith('mock_certificate_id');
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should forward the provided async status when updating', fakeAsync(() => {
+    mockCertificateOfferingData = new CertificateAssessmentOfferingData(
+      '',
+      'Sample Title',
+      'Sample Description',
+      'sample_classroom',
+      {topic_1: 1},
+      3,
+      15,
+      ['Learn math'],
+      'Available',
+      1
+    );
+
+    caos
+      .updateCertificateAssessmentOfferingAsync(
+        'mock_certificate_id',
+        mockCertificateOfferingData
+      )
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+        '<certificate_id>',
+        'mock_certificate_id'
+      )
+    );
+    expect(req.request.body.async_status).toEqual('Available');
+    req.flush({certificate_id: 'mock_certificate_id'});
 
     flushMicrotasks();
 

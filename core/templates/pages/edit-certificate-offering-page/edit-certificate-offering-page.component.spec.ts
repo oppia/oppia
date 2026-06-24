@@ -63,7 +63,6 @@ describe('Edit Certificate Offering Page Component', () => {
           useValue: {
             addWarning: () => {},
             addSuccessMessage: () => {},
-            addWarning: () => {},
           },
         },
         {
@@ -266,7 +265,9 @@ describe('Edit Certificate Offering Page Component', () => {
     );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
@@ -303,7 +304,9 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(modalSpy).toHaveBeenCalledTimes(2);
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
     expect(secondModalRef.componentInstance.action).toBe(
@@ -331,7 +334,9 @@ describe('Edit Certificate Offering Page Component', () => {
 
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Not_Ready',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);

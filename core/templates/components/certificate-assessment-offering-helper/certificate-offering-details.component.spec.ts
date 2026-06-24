@@ -114,6 +114,45 @@ describe('Certificate Offering Details Component', () => {
     expect(component.demonstratesList).toEqual(['Learn math', 'Learn science']);
   });
 
+  it('should sync form fields when the offering input changes after init', () => {
+    component.title = 'Stale title';
+    component.description = 'Stale description';
+    component.classroomId = 'stale_classroom';
+    component.timeLimitInMinutes = 12;
+    component.totalQuestions = 2;
+    component.demonstratesList = ['Stale outcome'];
+
+    component.certificateAssessmentOffering =
+      CertificateAssessmentOfferingData.createFromBackendDict({
+        certificate_id: 'certificate_1',
+        title: 'Loaded title',
+        description: 'Loaded description',
+        classroom_id: 'science',
+        topic_data: {},
+        demonstrates: ['Loaded outcome'],
+        total_questions: 6,
+        time_limit_in_minutes: 25,
+        async_status: 'Available',
+        version: 1,
+      });
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: CertificateAssessmentOfferingData.createEmpty(),
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.title).toEqual('Loaded title');
+    expect(component.description).toEqual('Loaded description');
+    expect(component.classroomId).toEqual('science');
+    expect(component.timeLimitInMinutes).toEqual(25);
+    expect(component.totalQuestions).toEqual(6);
+    expect(component.demonstratesList).toEqual(['Loaded outcome']);
+  });
+
   it('should restore values from initial values when provided', () => {
     component.initialValues = {
       title: 'Initial title',

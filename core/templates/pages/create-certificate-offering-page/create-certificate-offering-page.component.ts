@@ -118,9 +118,27 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         return;
       }
 
+      const certificateAssessmentOfferingForSave =
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: this.certificateAssessmentOffering.certificateId,
+          title: this.certificateAssessmentOffering.title,
+          description: this.certificateAssessmentOffering.description,
+          classroom_id: this.certificateAssessmentOffering.classroomId,
+          topic_data: this.certificateAssessmentOffering.topicData,
+          demonstrates: this.certificateAssessmentOffering.demonstrates,
+          total_questions: this.certificateAssessmentOffering.totalQuestions,
+          time_limit_in_minutes:
+            this.certificateAssessmentOffering.timeLimitInMinutes,
+          async_status:
+            action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
+              ? 'Not_Ready'
+              : 'Available',
+          version: this.certificateAssessmentOffering.version,
+        });
+
       const certificateId =
         await this.certificateAssessmentOfferingBackendApiService.createCertificateAssessmentOfferingAsync(
-          this.certificateAssessmentOffering
+          certificateAssessmentOfferingForSave
         );
 
       if (!certificateId) {

@@ -200,7 +200,9 @@ describe('Create Certificate Offering Page Component', () => {
       CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
     );
     expect(apiSpy).toHaveBeenCalledWith(
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Not_Ready',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
@@ -236,7 +238,9 @@ describe('Create Certificate Offering Page Component', () => {
 
     expect(modalSpy).toHaveBeenCalledTimes(2);
     expect(apiSpy).toHaveBeenCalledWith(
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate created.');
     expect(secondModalRef.componentInstance.action).toBe(
