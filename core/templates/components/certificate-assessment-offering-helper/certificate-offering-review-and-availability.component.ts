@@ -18,15 +18,7 @@
  * and edit flows.
  */
 
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
@@ -90,13 +82,12 @@ export interface ValidationResponse {
   templateUrl: './certificate-offering-review-and-availability.component.html',
 })
 export class CertificateOfferingReviewAndAvailabilityComponent
-  implements OnInit, OnChanges
+  implements OnInit
 {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
   @Input() isCertificateValid: boolean = true;
-  @Input() useStubData: boolean = false;
 
   @Output() saveCertificateOffering = new EventEmitter<void>();
   @Output() navigateToAddTopicsSection = new EventEmitter<void>();
@@ -110,54 +101,12 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   topicReadinessRows: TopicReadinessRow[] = [];
   errorMessages: ReadinessErrorMessage[] = [];
 
-  // Stub data.
-  // Mirrors the exact shape the validation API returns.
-  // Replaced by real @Input() values.
-  private readonly STUB_TOPIC_NAME_MAP: {
-    [topicId: string]: string;
-  } = {
-    topic_adding_numbers: 'Adding Numbers',
-    topic_fractions: 'Fractions',
-    topic_percentages: 'Percentages',
-  };
-
-  private readonly STUB_IS_VALID: boolean = false;
-
-  private readonly STUB_VALIDATION_ERRORS: ValidationErrors = {
-    topic_adding_numbers: {
-      easy: {required: 5, available: 5},
-      medium: {required: 5, available: 8},
-      hard: {required: 3, available: 4},
-    },
-    topic_fractions: {
-      easy: {required: 5, available: 6},
-      medium: {required: 10, available: 3},
-      hard: {required: 3, available: 0},
-    },
-    topic_percentages: {
-      easy: {required: 5, available: 4},
-      medium: {required: 5, available: 5},
-      hard: {required: 3, available: 2},
-    },
-  };
-
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    if (this.useStubData) {
-      this.validationErrors = this.STUB_VALIDATION_ERRORS;
-      this.isValid = this.STUB_IS_VALID;
-      this.topicNameMap = this.STUB_TOPIC_NAME_MAP;
-      this.validationMessage =
-        'Fractions and Percentages still need more questions.';
-      this._buildDisplayData();
-      this.isCertificateValidChange.emit(this.isValid);
-      return;
-    }
-
     if (
       Object.keys(this.validationErrors).length > 0 ||
       Object.keys(this.topicNameMap).length > 0
@@ -167,15 +116,6 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     }
 
     await this._loadValidationState();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      this.useStubData &&
-      (changes.validationErrors || changes.topicNameMap)
-    ) {
-      this._buildDisplayData();
-    }
   }
 
   private async _loadValidationState(): Promise<void> {
@@ -285,7 +225,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   }
 
   getSaveButtonText(): string {
-    return this.isEditMode ? 'Update Certificate' : 'Create Certificate';
+    return this.isEditMode ? 'Update Certificate' : 'Save Certificate';
   }
 
   onSaveClicked(): void {

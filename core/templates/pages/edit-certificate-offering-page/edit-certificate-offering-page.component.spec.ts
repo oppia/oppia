@@ -268,7 +268,7 @@ describe('Edit Certificate Offering Page Component', () => {
 
     expect(modalSpy).toHaveBeenCalled();
     expect(modalRef.componentInstance.action).toBe(
-      CERTIFICATE_OFFERING_UPDATED_ACTION
+      CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',

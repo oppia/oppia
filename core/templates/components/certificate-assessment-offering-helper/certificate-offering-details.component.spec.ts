@@ -17,7 +17,13 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  waitForAsync,
+} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
@@ -75,6 +81,31 @@ describe('Certificate Offering Details Component', () => {
       CertificateAssessmentOfferingData.createEmpty();
     fixture.detectChanges();
   });
+
+  it('should load classroom options on init', async () => {
+    await component.loadClassrooms();
+
+    expect(component.classroomOptions.map(classroom => classroom.name)).toEqual(
+      ['Math', 'Science']
+    );
+    expect(component.classroomLoadErrorMessage).toEqual('');
+  });
+
+  it('should show an error message when loading classrooms fails', fakeAsync(() => {
+    spyOn(console, 'error');
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(Promise.reject(new Error('boom')));
+
+    component.loadClassrooms();
+    flushMicrotasks();
+
+    expect(component.classroomOptions).toEqual([]);
+    expect(component.classroomLoadErrorMessage).toEqual(
+      'Unable to load classrooms. Please try again.'
+    );
+  }));
 
   it('should emit events correctly when clicking next button', () => {
     const offeringChangeSpy = spyOn(
@@ -399,5 +430,25 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getDemonstratesValidationError()).toContain(
       'at most 200 characters'
     );
+  });
+
+  it('should return normalized demonstrates and classroom name in form data', async () => {
+    await component.loadClassrooms();
+    component.title = '  Certificate title  ';
+    component.description = '  Certificate description  ';
+    component.classroomId = 'science';
+    component.timeLimitInMinutes = 30;
+    component.totalQuestions = 5;
+    component.demonstratesList = [' Learn math ', ''];
+
+    expect(component.getFormData()).toEqual({
+      title: 'Certificate title',
+      description: 'Certificate description',
+      classroomId: 'science',
+      classroomName: 'Science',
+      timeLimitInMinutes: 30,
+      totalQuestions: 5,
+      demonstrates: ['Learn math'],
+    });
   });
 });

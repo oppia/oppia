@@ -145,7 +145,7 @@ describe('Certificate Offering Add Topic Items Component', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(
       CertificateOfferingAddTopicItemsComponent
     );
@@ -156,7 +156,8 @@ describe('Certificate Offering Add Topic Items Component', () => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     component.classroomId = 'math_classroom_id';
     fixture.detectChanges();
-  });
+    flushMicrotasks();
+  }));
 
   it('should load classroom topics from the selected classroom', fakeAsync(() => {
     flushMicrotasks();
@@ -371,22 +372,29 @@ describe('Certificate Offering Add Topic Items Component', () => {
   }));
 
   it('should show an error message when classroom topics fail to load', fakeAsync(() => {
+    spyOn(console, 'error');
     spyOn(
       classroomBackendApiService,
-      'fetchClassroomDataAsync'
-    ).and.returnValue(Promise.reject(new Error('boom')));
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'science_classroom_id',
+          name: 'Science',
+          url_fragment: 'science',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
 
     component.classroomId = 'bad_id';
     component.ngOnChanges({
       classroomId: {
         currentValue: 'bad_id',
         previousValue: 'math_classroom_id',
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-      certificateAssessmentOffering: {
-        currentValue: component.certificateAssessmentOffering,
-        previousValue: CertificateAssessmentOfferingData.createEmpty(),
         firstChange: false,
         isFirstChange: () => false,
       },
@@ -397,5 +405,42 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(component.classroomLoadErrorMessage).toEqual(
       'Unable to load topics for this classroom.'
     );
+  }));
+
+  it('should clear classroom state when no classroom is selected', fakeAsync(() => {
+    flushMicrotasks();
+    const classroomSummarySpy = spyOn(
+      classroomBackendApiService,
+      'getAllClassroomsSummaryAsync'
+    );
+    const classroomDataSpy = spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    );
+    component.availableTopics = [component.availableTopics[0]];
+    component.classroomName = 'Old name';
+    component.classroomLoadErrorMessage = 'Old error';
+    component.certificateAssessmentOffering.topicData = {topic_1: 1};
+    component.selectedTopics = [component.availableTopics[0]];
+    component.selectedTopicIds = new Set(['topic_1']);
+
+    component.classroomId = '';
+    component.ngOnChanges({
+      classroomId: {
+        currentValue: '',
+        previousValue: 'math_classroom_id',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+    flushMicrotasks();
+
+    expect(classroomSummarySpy).not.toHaveBeenCalled();
+    expect(classroomDataSpy).not.toHaveBeenCalled();
+    expect(component.availableTopics).toEqual([]);
+    expect(component.classroomName).toEqual('');
+    expect(component.classroomLoadErrorMessage).toEqual('');
+    expect(component.selectedTopicIds.has('topic_1')).toBeTrue();
+    expect(component.selectedTopics).toEqual([]);
   }));
 });
