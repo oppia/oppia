@@ -45,6 +45,9 @@ import {UploadBlogPostThumbnailModalComponent} from 'pages/blog-dashboard-page/m
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {BlogCardPreviewModalComponent} from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -209,10 +212,11 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   getDateStringInWords(naiveDateTime: string): string {
-    let datestring = naiveDateTime.substring(0, naiveDateTime.length - 7);
-    return dayjs(datestring, 'MM-DD-YYYY, HH:mm:ss').format(
-      'MMMM D, YYYY [at] hh:mm A'
-    );
+    const datestring = naiveDateTime.substring(0, naiveDateTime.length - 7);
+    return dayjs
+      .utc(datestring, 'MM/DD/YYYY, HH:mm:ss')
+      .local()
+      .format('MMMM D, YYYY [at] hh:mm A');
   }
 
   updateLocalTitleValue(): void {

@@ -19,6 +19,9 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 import {BlogDashboardPageService} from '../services/blog-dashboard-page.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {BlogPostActionConfirmationModalComponent} from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
@@ -64,7 +67,10 @@ export class BlogDashboardTileComponent implements OnInit {
   }
 
   getDateStringInWords(naiveDate: string): string {
-    return dayjs(naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMM D, YYYY');
+    return dayjs
+      .utc(naiveDate.split(',')[0], 'MM/DD/YYYY')
+      .local()
+      .format('MMM D, YYYY');
   }
 
   editBlogPost(): void {

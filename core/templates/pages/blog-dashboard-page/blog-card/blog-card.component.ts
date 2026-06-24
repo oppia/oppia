@@ -25,6 +25,9 @@ import {BlogPostPageConstants} from 'pages/blog-post-page/blog-post-page.constan
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 import {UserService} from 'services/user.service';
 
 @Component({
@@ -74,7 +77,10 @@ export class BlogCardComponent implements OnInit {
   }
 
   getDateStringInWords(naiveDate: string): string {
-    return dayjs(naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+    return dayjs
+      .utc(naiveDate.split(',')[0], 'MM/DD/YYYY')
+      .local()
+      .format('MMMM D, YYYY');
   }
 
   navigateToBlogPostPage(): void {
