@@ -131,6 +131,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
   private getTourContent(id: string): string {
     const element = document.getElementById(id + 'Content');
+    // eslint-disable-next-line oppia/no-inner-html
     return element ? element.innerHTML : '';
   }
 
