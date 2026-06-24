@@ -100,11 +100,12 @@ export interface GetOpportunitiesResponse {
 }
 
 export interface ContributionDetails {
-  skill_description: string;
-  skill_rubrics: Rubric[];
-  chapter_title: string;
-  story_title: string;
+  skill_description?: string;
+  skill_rubrics?: Rubric[];
+  chapter_title?: string;
+  story_title?: string;
   topic_name: string;
+  entity_description?: string;
 }
 
 export interface SuggestionDetails {
@@ -254,12 +255,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         subheading =
           ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
       } else {
-        subheading =
-          details.topic_name +
-          ' / ' +
-          details.story_title +
-          ' / ' +
-          details.chapter_title;
+        if (
+          this.featureService.status.EnableTranslationOppsWithNewOppModels
+            .isEnabled
+        ) {
+          subheading = details.topic_name + ' / ' + details.entity_description;
+        } else {
+          subheading =
+            details.topic_name +
+            ' / ' +
+            details.story_title +
+            ' / ' +
+            details.chapter_title;
+        }
       }
 
       const requiredData = {
@@ -344,6 +352,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
       suggestionId,
     ]);
+    // Reload opportunities to refresh progress bars after accepting suggestion.
+    this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
   }
 
   _showQuestionSuggestionModal(
@@ -407,12 +417,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   ): void {
     const details = this.contributions[initialSuggestionId]
       .details as ContributionDetails;
-    const subheading =
-      details.topic_name +
-      ' / ' +
-      details.story_title +
-      ' / ' +
-      details.chapter_title;
+    let subheading = '';
+    if (
+      this.featureService.status.EnableTranslationOppsWithNewOppModels.isEnabled
+    ) {
+      subheading = details.topic_name + ' / ' + details.entity_description;
+    } else {
+      subheading =
+        details.topic_name +
+        ' / ' +
+        details.story_title +
+        ' / ' +
+        details.chapter_title;
+    }
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent,
       {

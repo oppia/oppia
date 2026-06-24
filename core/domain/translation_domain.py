@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import enum
+import json
 
 from core import feconf, utils
 from core.constants import constants
@@ -606,7 +607,12 @@ class EntityTranslation:
         )
 
     def validate(self) -> None:
-        """Validates the EntityTranslation object."""
+        """Validates the EntityTranslation object.
+
+        Raises:
+            utils.ValidationError. One or more attributes of the
+                EntityTranslation are invalid.
+        """
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
                 'entity_type must be a string, recieved %r' % self.entity_type
@@ -1096,3 +1102,55 @@ class ContentIdGenerator:
 
         self.next_content_id_index += 1
         return content_id
+
+
+class MachineTranslationProviderMapping:
+    """Domain object representing the mapping of language codes to their
+    configured translation providers.
+    """
+
+    def __init__(self, language_to_provider_mapping: Dict[str, str]) -> None:
+        """Initializes a MachineTranslationProviderMapping instance.
+
+        Args:
+            language_to_provider_mapping: dict. A dict mapping
+                ISO 639-1 language codes to translation provider identifiers.
+                E.g. {'hi': 'azure', 'es': 'gcp'}.
+        """
+        self.language_to_provider_mapping = language_to_provider_mapping
+
+    def validate(self) -> None:
+        """Validates the language-to-provider mapping.
+
+        Raises:
+            utils.ValidationError. If the mapping is not a dictionary.
+            utils.ValidationError. If any language code is invalid.
+            utils.ValidationError. If any provider does not support the
+                given language.
+        """
+
+        if not isinstance(self.language_to_provider_mapping, dict):
+            raise utils.ValidationError(
+                'language_to_provider_mapping must be a dictionary.'
+            )
+        machine_translation_providers = json.loads(
+            utils.get_file_contents('assets/machine_translation_providers.json')
+        )
+
+        for (
+            language_code,
+            provider,
+        ) in self.language_to_provider_mapping.items():
+            if not utils.is_valid_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code: %s' % language_code
+                )
+            supported_providers = machine_translation_providers.get(
+                language_code, []
+            )
+
+            if provider not in supported_providers:
+                raise utils.ValidationError(
+                    'Provider %s does not support language %s.'
+                    % (provider, language_code)
+                )

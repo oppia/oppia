@@ -34,6 +34,13 @@ export class TopicLessonCardComponent implements OnInit {
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
   @Input() startUrl: string = '';
+  @Input() lessonProgressStatus:
+    | 'not_started'
+    | 'in_progress'
+    | 'completed'
+    | 'coming_soon' = 'not_started';
+  @Input() totalCheckpointsCount: number = 0;
+  @Input() visitedCheckpointsCount: number = 0;
 
   resolvedThumbnailUrl: string = '';
 
@@ -45,6 +52,13 @@ export class TopicLessonCardComponent implements OnInit {
   ngOnInit(): void {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
+  }
+
+  get showCheckpointBar(): boolean {
+    return (
+      this.lessonProgressStatus !== 'coming_soon' &&
+      this.totalCheckpointsCount > 0
+    );
   }
 
   navigateTo(url: string): void {
