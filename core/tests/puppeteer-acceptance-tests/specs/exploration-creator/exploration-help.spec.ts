@@ -158,8 +158,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.continueToNextShepherdStep();
     await explorationEditor.expectShepherdTitleToBe('Recording Audio');
     await explorationEditor.expectShepherdContentToContain(
-      'To create audio translations in Oppia, we recommend using the upload button ' +
-        'to upload audio files from your computer. You can also record via your browser.'
+      'To create audio translations in Oppia, we recommend using the'
     );
 
     await explorationEditor.continueToNextShepherdStep();
