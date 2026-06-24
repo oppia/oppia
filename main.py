@@ -115,8 +115,8 @@ if not constants.EMULATOR_MODE:
 # handler in production (via client.setup_logging() above).
 if constants.EMULATOR_MODE:
     from core import (
-        utils as core_utils,
-    )  # pylint: disable=wrong-import-position
+        utils as core_utils,  # pylint: disable=wrong-import-position
+    )
 
     _colored_handler = logging.StreamHandler()
     _colored_handler.setFormatter(core_utils.ColoredFormatter())

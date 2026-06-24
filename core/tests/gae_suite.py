@@ -119,6 +119,7 @@ def main(args: Optional[List[str]] = None) -> None:
     sys.path = [path for path in sys.path if 'coverage' not in path]
 
     import logging  # pylint: disable=import-outside-toplevel
+
     from core import utils  # pylint: disable=import-outside-toplevel
 
     handler = logging.StreamHandler()
