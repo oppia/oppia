@@ -2478,6 +2478,9 @@ class StateVersionHistoryHandler(
         if version_history is None:
             raise self.NotFoundException
 
+        if state_name not in version_history.state_version_history:
+            raise self.NotFoundException
+
         state_version_history = version_history.state_version_history[
             state_name
         ]
