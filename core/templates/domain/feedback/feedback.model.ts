@@ -16,9 +16,135 @@
  * @fileoverview Type definitions for web user feedback APIs
  */
 
-export type FeedbackCategory = 'platform' | 'lesson' | 'not_sure';
+export enum FeedbackModalType {
+  LESSON_FEEDBACK = 'lesson_feedback',
+  LESSON_ISSUE = 'lesson_issue',
+  SITE_ISSUE = 'site_issue',
+}
 
-export type FeedbackSubmitCategory = 'platform' | 'lesson';
+export interface LessonFeedbackMetadata {
+  explorationId: string;
+  explorationVersion: number;
+  stateName: string;
+  stateIndex: number;
+  learnerCurrentAnswer: string | null;
+}
+
+export interface LessonFeedbackMetadataBackendDict {
+  exploration_id: string;
+  exploration_version: number;
+  state_name: string;
+  state_index: number;
+  learner_current_answer: string | null;
+}
+
+export interface SendALessonFeedbackBackendDict {
+  feedback_text: string;
+  exploration_context: LessonFeedbackMetadataBackendDict;
+}
+
+export class SendALessonFeedbackModel {
+  constructor(
+    public readonly feedbackText: string,
+    public readonly explorationContext: LessonFeedbackMetadata
+  ) {}
+
+  static createForSubmission(params: {
+    feedbackText: string;
+    exploration_context: LessonFeedbackMetadata;
+  }): SendALessonFeedbackModel {
+    return new SendALessonFeedbackModel(
+      params.feedbackText,
+      params.exploration_context
+    );
+  }
+
+  toBackendDict(): SendALessonFeedbackBackendDict {
+    return {
+      feedback_text: this.feedbackText,
+      exploration_context: {
+        exploration_id: this.explorationContext.explorationId,
+        exploration_version: this.explorationContext.explorationVersion,
+        state_name: this.explorationContext.stateName,
+        state_index: this.explorationContext.stateIndex,
+        learner_current_answer: this.explorationContext.learnerCurrentAnswer,
+      },
+    };
+  }
+}
+
+export type ReportAnIssueCategory =
+  | 'typo'
+  | 'broken_layout_or_image'
+  | 'confusing_or_incorrect_answer'
+  | 'other_or_not_sure';
+
+export type ReportType = 'lesson' | 'site';
+
+export interface IssueReportBackendDict {
+  source: ReportType;
+  report_message: string;
+  exploration_context: LessonFeedbackMetadataBackendDict | null;
+  category: ReportAnIssueCategory | null;
+  include_technical_logs: boolean;
+  session_info: FeedbackSessionInfo | null;
+  screenshot_filename: string | null;
+}
+
+export class IssueReportModel {
+  constructor(
+    public readonly source: ReportType,
+    public readonly reportMessage: string,
+    public readonly explorationContext: LessonFeedbackMetadata | null,
+    public readonly category: ReportAnIssueCategory | null,
+    public readonly includeTechnicalLogs: boolean,
+    public readonly sessionInfo: FeedbackSessionInfo | null,
+    public readonly screenshotFilename: string | null
+  ) {}
+
+  static createForSubmission(params: {
+    source: ReportType;
+    reportMessage: string;
+    explorationContext: LessonFeedbackMetadata | null;
+    category: ReportAnIssueCategory | null;
+    includeTechnicalLogs: boolean;
+    sessionInfo: FeedbackSessionInfo | null;
+    screenshotFilename: string | null;
+  }): IssueReportModel {
+    return new IssueReportModel(
+      params.source,
+      params.reportMessage,
+      params.explorationContext,
+      params.category,
+      params.includeTechnicalLogs,
+      params.sessionInfo,
+      params.screenshotFilename
+    );
+  }
+
+  toBackendDict(): IssueReportBackendDict {
+    return {
+      source: this.source,
+      report_message: this.reportMessage,
+      exploration_context: this.explorationContext
+        ? {
+            exploration_id: this.explorationContext.explorationId,
+            exploration_version: this.explorationContext.explorationVersion,
+            state_name: this.explorationContext?.stateName,
+            state_index: this.explorationContext.stateIndex,
+            learner_current_answer:
+              this.explorationContext.learnerCurrentAnswer,
+          }
+        : null,
+      category: this.category,
+      include_technical_logs: this.includeTechnicalLogs,
+      // Strip session info if user didn't opt in.
+      session_info:
+        this.includeTechnicalLogs && this.sessionInfo ? this.sessionInfo : null,
+      screenshot_filename: this.screenshotFilename,
+    };
+  }
+}
 
 export type FeedbackStatus =
   | 'open'
@@ -65,72 +191,10 @@ export interface FeedbackSessionInfo {
   };
 }
 
-export interface FeedbackMessage {
-  message_index: number;
-  author_id: string | null;
-  author_status: 'learner' | 'editor' | 'feedback_admin';
-  text: string | null;
-  created_on_msecs: number;
-  screenshot_filename?: string | null;
-  screenshot_url?: string | null;
-  updated_status: FeedbackStatus | null;
-}
-
-export interface FeedbackSubmitPayload {
-  category: FeedbackSubmitCategory;
-  target_type: 'exploration' | 'general';
-  target_id: string | null;
-  description: string;
-  page_url: string;
-  language_code: string;
-  rating: number;
-  screenshot_filename: string | null;
-  submit_anonymously: boolean;
-  include_session_info: boolean;
-  session_info: FeedbackSessionInfo | null;
-  captcha_token: string | null;
-  screenshot_file?: Record<string, string> | null;
-}
-
-export interface FeedbackSubmitResponse {
-  thread_id: string;
-}
-
 export interface FeedbackCaptchaConfigResponse {
   site_key: string | null;
 }
 
-export interface FeedbackThreadSummary {
+export interface FeedbackSubmitResponse {
   id: string;
-  category: FeedbackCategory;
-  description_preview: string;
-  page_url: string;
-  status: FeedbackStatus;
-  created_on_msecs: number;
-  rating: number | null;
-  has_screenshot: boolean;
-  has_session_info: boolean;
-}
-
-export interface FeedbackThreadDetail {
-  id: string;
-  category: FeedbackCategory;
-  description: string;
-  page_url: string;
-  language_code: string;
-  status: FeedbackStatus;
-  created_on_msecs: number;
-  rating: number | null;
-  target_type?: 'exploration' | null;
-  target_id?: string | null;
-  user_id?: string | null;
-  session_info: FeedbackSessionInfo | null;
-  can_edit_exploration?: boolean;
-  messages: FeedbackMessage[];
-}
-
-export interface FeedbackListResponse {
-  results: FeedbackThreadSummary[];
-  cursor: string | null;
-  more: boolean;
 }
