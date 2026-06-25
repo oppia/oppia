@@ -83,6 +83,7 @@ class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     cursor: Optional[str]
     language_code: Optional[str]
     topic_name: Optional[str]
+    search_query: Optional[str]
 
 
 class ContributionOpportunitiesHandler(
@@ -110,6 +111,10 @@ class ContributionOpportunitiesHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'search_query': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -130,11 +135,12 @@ class ContributionOpportunitiesHandler(
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
+        search_query = self.normalized_request.get('search_query')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
-                    search_cursor
+                    search_cursor, search_query
                 )
             )
 
@@ -162,7 +168,7 @@ class ContributionOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(
-        self, cursor: Optional[str]
+        self, cursor: Optional[str], search_query: Optional[str] = None
     ) -> Tuple[List[ClientSideSkillOpportunityDict], Optional[str], bool]:
         """Returns a list of skill opportunities available for questions with
         a corresponding topic name.
@@ -171,6 +177,9 @@ class ContributionOpportunitiesHandler(
             cursor: str or None. If provided, the list of returned entities
                 starts from this datastore cursor. Otherwise, the returned
                 entities start from the beginning of the full list of entities.
+            search_query: str or None. An optional string to filter skill
+                opportunities by. It is a case-insensitive substring match
+                for skill description or topic name.
 
         Returns:
             3-tuple(opportunities, cursor, more). where:
@@ -213,23 +222,33 @@ class ContributionOpportunitiesHandler(
                     in classroom_topic_skill_id_to_topic_name
                 ):
                     skill_opportunity_dict = skill_opportunity.to_dict()
-                    client_side_skill_opportunity_dict: (
-                        ClientSideSkillOpportunityDict
-                    ) = {
-                        'id': skill_opportunity_dict['id'],
-                        'skill_description': skill_opportunity_dict[
-                            'skill_description'
-                        ],
-                        'question_count': skill_opportunity_dict[
-                            'question_count'
-                        ],
-                        'topic_name': (
-                            classroom_topic_skill_id_to_topic_name[
-                                skill_opportunity.id
-                            ]
-                        ),
-                    }
-                    opportunities.append(client_side_skill_opportunity_dict)
+                    topic_name = classroom_topic_skill_id_to_topic_name[
+                        skill_opportunity.id
+                    ]
+                    skill_description = skill_opportunity_dict[
+                        'skill_description'
+                    ]
+
+                    # We filter here in the controller rather than the service/model layer because:
+                    # 1. Datastore does not natively support case-insensitive substring matching.
+                    # 2. SkillOpportunityModel does not store topic_name, so we must fetch the
+                    #    paginated batch, map the topics, and filter them in memory.
+                    # This performs a case-insensitive match on both the skill description and topic name.
+                    if search_query is None or (
+                        search_query.lower() in skill_description.lower()
+                        or search_query.lower() in topic_name.lower()
+                    ):
+                        client_side_skill_opportunity_dict: (
+                            ClientSideSkillOpportunityDict
+                        ) = {
+                            'id': skill_opportunity_dict['id'],
+                            'skill_description': skill_description,
+                            'question_count': skill_opportunity_dict[
+                                'question_count'
+                            ],
+                            'topic_name': topic_name,
+                        }
+                        opportunities.append(client_side_skill_opportunity_dict)
             if (
                 not more
                 or len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE

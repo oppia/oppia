@@ -78,12 +78,40 @@ const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const tagsField = '.e2e-test-chip-list-tags';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
+const multipleChoiceResponseDropdown =
+  'mat-select.e2e-test-main-html-select-selector';
+const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
+const responseModalBodySelector = '.e2e-test-response-modal-body';
+const floatFormInput = '.e2e-test-float-form-input';
+const addResponseOptionButton = 'button.e2e-test-add-list-entry';
+const textInputInteractionOption =
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
+const intEditorField = '.e2e-test-editor-int';
+
+const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
+const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
+const addNewResponseButton = 'button.e2e-test-add-new-response';
+const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const addAnotherResponseButton = 'button.e2e-test-add-another-response';
+
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
+const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
+const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
+
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
-const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -161,6 +189,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForLoadState('networkidle');
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
+    // Wait for active tab panel fade transition to complete.
+    await this.page.waitForSelector('css=.tab-pane.active.show', {
+      timeout: 90000,
+    });
 
     const interactionElement = await this.page.waitForSelector(
       `xpath=//*[contains(normalize-space(text()), "${tileText}")]`,
@@ -179,6 +211,84 @@ export class ExplorationEditor extends BaseUser {
       await this.expectElementToBeVisible(addInteractionModalSelector, false);
     }
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Adds the response details in the response modal.
+   * @param feedback The feedback to be added in the response modal.
+   * @param destination The destination to be added in the response modal.
+   * @param responseIsCorrect The response is correct or not.
+   * @param isLastResponse Whether the response is the last response or not.
+   */
+  async addResponseDetailsInResponseModal(
+    feedback: string,
+    destination?: string,
+    responseIsCorrect?: boolean,
+    isLastResponse: boolean = true
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(feedbackEditorSelector);
+    await this.typeInInputField(stateContentInputField, feedback);
+    await this.expectTextContentToBe(stateContentInputField, feedback);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    if (destination) {
+      await this.select(destinationCardSelector, '/');
+      await this.typeInInputField(addStateInput, destination);
+    }
+    if (responseIsCorrect) {
+      await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
+    }
+    if (isLastResponse) {
+      await this.page.waitForSelector(addNewResponseButton, {
+        state: 'visible',
+      });
+      await this.clickOnElementWithSelector(addNewResponseButton);
+      await this.page
+        .waitForSelector(responseModalHeaderSelector, {
+          state: 'hidden',
+        })
+        .catch(async () => {
+          await this.clickOnElementWithSelector(addNewResponseButton);
+        });
+    } else {
+      await this.clickOnElementWithSelector(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // to the "Save Draft" request from change-list.service.ts
+      // to get executed, the Add Response modal to fully appear
+      // and all the fields in it to become clickable before
+      // moving on to next steps.
+      await this.page.waitForLoadState('networkidle');
+    }
+  }
+
+  /**
+   * Function to add responses to the interactions.
+   * Currently, it only handles 'Number Input', 'Multiple Choice', 'Number Input', and 'Text Input' interaction types.
+   * @param {string} interactionType - The type of the interaction.
+   * @param {string} answer - The response to be added.
+   * @param {string} feedback - The feedback for the response.
+   * @param {string} destination - The destination state for the response.
+   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
+   */
+  async addResponsesToTheInteraction(
+    interactionType: string,
+    answer: string,
+    feedback: string,
+    destination?: string,
+    responseIsCorrect?: boolean,
+    isLastResponse: boolean = true
+  ): Promise<void> {
+    await this.updateAnswersInResponseModal(
+      interactionType as INTERACTION_TYPES,
+      answer
+    );
+
+    await this.addResponseDetailsInResponseModal(
+      feedback,
+      destination,
+      responseIsCorrect,
+      isLastResponse
+    );
   }
 
   /**
@@ -324,6 +434,54 @@ export class ExplorationEditor extends BaseUser {
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
+  /**
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
+   */
+  async editDefaultResponseFeedbackInExplorationEditorPage(
+    defaultResponseFeedback: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(defaultFeedbackTab, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(defaultFeedbackTab);
+
+    if (defaultResponseFeedback) {
+      await this.updateDefaultResponseFeedbackInExplorationEditorPage(
+        defaultResponseFeedback
+      );
+    }
+
+    if (directToCard) {
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+      await this.page.selectOption(destinationSelectorDropdown, directToCard);
+      await this.page.click(saveDestinationButtonSelector);
+      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.typeInInputField(
+        addDestinationStateWhenStuckInput,
+        directToCardWhenStuck
+      );
+      await this.page.click(saveStuckDestinationButtonSelector);
+      await this.expectElementToBeVisible(
+        saveStuckDestinationButtonSelector,
+        false
+      );
+    }
+  }
+
   /**
    * Verifies that the customize interaction header is visible and contains the expected title.
    * @param {string} title The expected title of the customize interaction header.
@@ -447,6 +605,13 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
     });
+  }
+
+  /**
+   * Function to navigate to exploration editor.
+   */
+  async navigateToExplorationEditorPage(): Promise<void> {
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
   }
 
   /**
@@ -603,6 +768,105 @@ export class ExplorationEditor extends BaseUser {
       await publishExploration();
       return await confirmPublish();
     }
+  }
+
+  /**
+   * This function updates the answers in the response modal.
+   * @param {INTERACTION_TYPES} interactionType - The type of the interaction.
+   * @param {string} answer - The answer to set in the response modal.
+   */
+  async updateAnswersInResponseModal(
+    interactionType: INTERACTION_TYPES,
+    answer: string
+  ): Promise<void> {
+    switch (interactionType) {
+      case INTERACTION_TYPES.NUMBER_INPUT:
+        await this.waitForElementToStabilize(
+          `${responseModalBodySelector} ${floatFormInput}`
+        );
+        await this.typeInInputField(
+          `${responseModalBodySelector} ${floatFormInput}`,
+          answer
+        );
+        break;
+      case INTERACTION_TYPES.MULTIPLE_CHOICE:
+        await this.page.waitForSelector(multipleChoiceResponseDropdown, {
+          state: 'visible',
+          timeout: 5000,
+        });
+        await this.clickOnElementWithSelector(multipleChoiceResponseDropdown);
+        await this.page.waitForSelector(multipleChoiceResponseOption, {
+          state: 'visible',
+        });
+
+        await this.page.evaluate(
+          ({
+            answer,
+            multipleChoiceResponseOption,
+          }: {
+            answer: string;
+            multipleChoiceResponseOption: string;
+          }) => {
+            const optionElements = Array.from(
+              document.querySelectorAll(multipleChoiceResponseOption)
+            );
+            const element = optionElements.find(
+              el => el.textContent?.trim() === answer
+            ) as HTMLElement;
+            if (element) {
+              element.click();
+            } else {
+              throw new Error(`Cannot find "${answer}" in options.`);
+            }
+          },
+          {answer, multipleChoiceResponseOption}
+        );
+        break;
+      case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(responseModalBodySelector, {
+          state: 'visible',
+        });
+        await this.clickOnElementWithSelector(addResponseOptionButton);
+        await this.page.waitForSelector(textInputInteractionOption);
+        await this.page.type(textInputInteractionOption, answer);
+        break;
+      case INTERACTION_TYPES.FRACTION_INPUT:
+        await this.page.waitForSelector(intEditorField, {
+          state: 'visible',
+        });
+        await this.clearAllTextFrom(intEditorField);
+        await this.typeInInputField(intEditorField, answer);
+        break;
+      // Add cases for other interaction types here
+      // case 'otherInteractionType':
+      //   await this.type(otherFormInput, answer);
+      //   break;
+      default:
+        throw new Error(`Unsupported interaction type: ${interactionType}`);
+    }
+  }
+
+  /**
+   * Function to update the default response feedback for a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   */
+  async updateDefaultResponseFeedbackInExplorationEditorPage(
+    defaultResponseFeedback: string
+  ): Promise<void> {
+    await this.page.waitForSelector(openOutcomeFeedBackEditor, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
+    await this.clickOnElementWithSelector(stateContentInputField);
+    await this.typeInInputField(
+      stateContentInputField,
+      defaultResponseFeedback
+    );
+    await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
+
+    await this.page.waitForSelector(saveOutcomeDestButton, {
+      state: 'hidden',
+    });
   }
 
   /**
