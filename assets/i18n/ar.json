@@ -653,7 +653,6 @@
 	"I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH": "يجب ألّا يقل طول الموضوع عن <[min]> من الأحرف.",
 	"I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "الموضوع مطلوب.",
 	"I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "إنشاء موضوع",
-	"I18N_FEEDBACK_FLOATING_BUTTON": "تعليق",
 	"I18N_FEEDBACK_INSTRUCTION": "يجب أن تتكون ملاحظات إبداء الرأي من <[count]> حرفا على الأكثر.",
 	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "مجهول",
 	"I18N_FEEDBACK_MODAL_HEADER": "أعطي تعليقا على هذا الدرس",

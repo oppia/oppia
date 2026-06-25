@@ -653,7 +653,6 @@
 	"I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH": "Het onderwerp moet minimaal <[min]> tekens lang zijn.",
 	"I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Onderwerp is vereist.",
 	"I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Onderwerp aanmaken",
-	"I18N_FEEDBACK_FLOATING_BUTTON": "Terugkoppeling",
 	"I18N_FEEDBACK_INSTRUCTION": "Het terugkoppelingsbericht mag maximaal <[count]> tekens lang zijn.",
 	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anoniem",
 	"I18N_FEEDBACK_MODAL_HEADER": "Terugkoppeling over leze les geven",
