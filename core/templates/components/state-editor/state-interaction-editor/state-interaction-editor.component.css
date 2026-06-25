@@ -54,6 +54,10 @@ oppia-state-interaction-editor .oppia-state-interaction-content {
   margin-top: 0;
 }
 
+oppia-state-interaction-editor .oppia-interaction-preview-container oppia-interactive-number-with-units .oppia-units-input-error {
+  margin-top: 0;
+}
+
 oppia-state-interaction-editor .oppia-interaction-preview-container,
 :host .oppia-interaction-preview-container {
   padding: 5px;
@@ -89,7 +93,12 @@ oppia-state-interaction-editor .oppia-delete-interaction-icon {
 
   oppia-state-interaction-editor .oppia-exp-interaction-card-header-container {
     background-color: #fff;
-    padding: 0;
+    padding: 16px 16px 0;
+  }
+
+  oppia-state-interaction-editor .oppia-exp-interaction-container {
+    padding-bottom: 16px;
+    width: 78%;
   }
 
   oppia-state-interaction-editor .oppia-editor-card-with-avatar {

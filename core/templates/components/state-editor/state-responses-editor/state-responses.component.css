@@ -151,7 +151,7 @@ oppia-state-responses .optional-misconception-list-no-action {
   }
 
   oppia-state-responses .oppia-editor-card-section {
-    padding: 10px;
+    padding: 10px 30px;
   }
 
   oppia-state-responses state-responses .solicit-answer-checkbox {
