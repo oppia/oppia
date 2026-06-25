@@ -150,6 +150,7 @@ describe('Lesson Creator', function () {
         LONG_CONTENT
       );
 
+      await explorationEditor.expectNextCardButtonTextToBe('Continue');
       await explorationEditor.continueToNextCard(true);
 
       await explorationEditor.navigateToEditorTab();
