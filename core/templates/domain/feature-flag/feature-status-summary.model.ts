@@ -49,7 +49,7 @@ export enum FeatureNames {
   EnableCampaignBannerTestMode = 'enable_financial_literacy_campaign_banner_test_mode',
   EnableAutomaticTranslationSuggestions = 'enable_automatic_translation_suggestions',
   EnableCertificateAssessment = 'enable_certificate_assessment',
-  WebGeneralFeedbackModalEnabled = 'web_general_feedback_modal_enabled',
+  WebFeedbackModalEnabled = 'web_feedback_modal_enabled',
   ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
 }
 
