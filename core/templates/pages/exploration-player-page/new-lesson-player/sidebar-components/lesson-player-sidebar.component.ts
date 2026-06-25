@@ -36,6 +36,9 @@ import {
 } from '@angular/material/bottom-sheet';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
+import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
@@ -58,6 +61,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
   constructor(
     private mobileMenuService: MobileMenuService,
     private pageContextService: PageContextService,
+    private platformFeatureService: PlatformFeatureService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
@@ -165,5 +169,27 @@ export class LessonPlayerSidebarComponent implements OnInit {
 
   isUserLoggedIn(): boolean {
     return this.conversationFlowService.getIsLoggedIn();
+  }
+
+  isWebFeedbackModalFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.WebFeedbackModalEnabled.isEnabled;
+  }
+
+  showReportAnIssueModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType =
+      FeedbackModalType.LESSON_ISSUE;
+  }
+
+  showSendLessonFeedbackModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType =
+      FeedbackModalType.LESSON_FEEDBACK;
   }
 }
