@@ -18,6 +18,7 @@
 
 import {AbstractControl, ValidationErrors} from '@angular/forms';
 import {AppConstants} from 'app.constants';
+import {NumberConversionService} from 'services/number-conversion.service';
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {UnderscoresToCamelCasePipe} from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
@@ -28,7 +29,8 @@ type FilterArgsType = Parameters<ValidatorFunctionType>[0];
 
 export const validate = (
   control: AbstractControl,
-  validators: OppiaValidator[]
+  validators: OppiaValidator[],
+  numberConversionService: NumberConversionService
 ): ValidationErrors | null => {
   let underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
   if (!validators || validators.length === 0) {
@@ -50,9 +52,13 @@ export const validate = (
     if (SchemaValidators[validatorName]) {
       const error = (
         SchemaValidators[validatorName] as (
-          arg: FilterArgsType
+          arg: FilterArgsType,
+          numberConversionService: NumberConversionService
         ) => ReturnType<ValidatorFunctionType>
-      )(filterArgs)(control);
+      )(
+        filterArgs,
+        numberConversionService
+      )(control);
       if (error !== null) {
         errorsPresent = true;
         allValidationErrors = {...allValidationErrors, ...error};
@@ -122,12 +128,18 @@ export class SchemaValidators {
     };
   }
 
-  static isAtLeast(args: {
-    minValue: number;
-  }): (control: AbstractControl) => ValidationErrors | null {
+  static isAtLeast(
+    args: {minValue: number},
+    numberConversionService: NumberConversionService
+  ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = parseFloat(control.value);
-      if (!isNaN(value) && value >= args.minValue) {
+      const value =
+        control.value === null || control.value === undefined
+          ? null
+          : numberConversionService.convertToEnglishDecimal(
+              String(control.value)
+            );
+      if (value !== null && value >= args.minValue) {
         return null;
       }
       return {
@@ -136,12 +148,18 @@ export class SchemaValidators {
     };
   }
 
-  static isAtMost(args: {
-    maxValue: number;
-  }): (control: AbstractControl) => ValidationErrors | null {
+  static isAtMost(
+    args: {maxValue: number},
+    numberConversionService: NumberConversionService
+  ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = parseFloat(control.value);
-      if (!isNaN(value) && value <= args.maxValue) {
+      const value =
+        control.value === null || control.value === undefined
+          ? null
+          : numberConversionService.convertToEnglishDecimal(
+              String(control.value)
+            );
+      if (value !== null && value <= args.maxValue) {
         return null;
       }
       return {
@@ -150,7 +168,10 @@ export class SchemaValidators {
     };
   }
 
-  static isFloat(): (control: AbstractControl) => ValidationErrors | null {
+  static isFloat(
+    args: null,
+    numberConversionService: NumberConversionService
+  ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
       var FLOAT_REGEXP = /(?=.*\d)^\-?\d*(\.|\,)?\d*\%?$/;
       // This regex accepts floats in the following formats:
@@ -173,19 +194,16 @@ export class SchemaValidators {
         if (FLOAT_REGEXP.test(viewValue)) {
           if (viewValue.slice(-1) === '%') {
             // This is a percentage, so the input needs to be divided by 100.
-            return isNaN(
-              parseFloat(
-                // TODO(#15455): Use the numeric-service to get the current
-                // decimal separator.
-                viewValue.substring(0, viewValue.length - 1).replace(',', '.')
-              ) / 100.0
-            )
+            const converted = numberConversionService.convertToEnglishDecimal(
+              viewValue.substring(0, viewValue.length - 1)
+            );
+            return converted === null
               ? {isFloat: 'Not float', actual: control.value}
               : null;
           } else {
-            // TODO(#15455): Use the numeric-service to get the current
-            // decimal separator.
-            return isNaN(parseFloat(viewValue.replace(',', '.')))
+            return numberConversionService.convertToEnglishDecimal(
+              viewValue
+            ) === null
               ? {isFloat: 'Not float', actual: control.value}
               : null;
           }

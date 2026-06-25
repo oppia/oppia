@@ -30,7 +30,7 @@ import {StateCard} from '../../../domain/state_card/state-card.model';
 import {PageContextService} from '../../../services/page-context.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -40,15 +40,7 @@ describe('Current Interaction Service', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
   let interactionRulesService: InteractionRulesService;
-  const displayedCard = new StateCard(
-    '',
-    '',
-    '',
-    {} as Interaction,
-    [],
-    {} as RecordedVoiceovers,
-    ''
-  );
+  const displayedCard = new StateCard('', '', '', {} as Interaction, [], '');
 
   // This mock is required since PageContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -150,8 +142,15 @@ describe('Current Interaction Service', () => {
   });
 
   it('should throw error on submitting when submitAnswerFn is null', () => {
-    let interaction = new Interaction([], [], {}, null, [], null, null);
-    let recordedVoiceovers = new RecordedVoiceovers({});
+    let interaction = new Interaction(
+      [],
+      [],
+      {} as InteractionCustomizationArgs,
+      null,
+      [],
+      null,
+      null
+    );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(
@@ -159,7 +158,6 @@ describe('Current Interaction Service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         interaction,
-        recordedVoiceovers,
         ''
       )
     );
@@ -212,9 +210,7 @@ describe('Current Interaction Service', () => {
 
     currentInteractionService.updateCurrentAnswer('answer');
 
-    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(
-      'answer'
-    );
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledWith('answer');
   });
 
   it('should check if "no response error" should be displayed', () => {
@@ -223,7 +219,7 @@ describe('Current Interaction Service', () => {
     );
     spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
 
-    expect(currentInteractionService.showNoResponseError()).toBeTrue();
+    expect(currentInteractionService.showNoResponseError()).toBe(true);
   });
   it('should update answer validity using updateAnswerIsValid', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
@@ -247,8 +243,8 @@ describe('Current Interaction Service', () => {
       false
     );
 
-    expect(currentInteractionService.showInvalidResponseError()).toBeTrue();
-    expect(currentInteractionService.showInvalidResponseError()).toBeFalse();
+    expect(currentInteractionService.showInvalidResponseError()).toBe(true);
+    expect(currentInteractionService.showInvalidResponseError()).toBe(false);
     expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
   });
 });

@@ -864,38 +864,100 @@ def managed_acceptance_tests_server(
         filedata = json.load(f)
         for suites in filedata.values():
             for suite in suites:
-                available_suites[suite['name']] = suite['module']
+                available_suites[suite['name']] = {
+                    'module': suite['module'],
+                    'framework': suite['framework'],
+                }
+
     if suite_name not in available_suites:
         raise Exception('Invalid suite name: %s' % suite_name)
 
-    os.environ['HEADLESS'] = 'true' if headless else 'false'
-    os.environ['MOBILE'] = 'true' if mobile else 'false'
-    os.environ['SPEC_NAME'] = suite_name
-    os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
+    suite_config = available_suites[suite_name]
+    module = suite_config['module']
+    framework = suite_config['framework']
 
-    nodemodules_jest_bin_path = os.path.join(
-        common.NODE_MODULES_PATH, '.bin', 'jest'
-    )
+    # TODO(#24715): Remove the puppeteer framework once the
+    # migration from Puppeteer to Playwright is complete.
+    if framework == 'puppeteer':
+        os.environ['HEADLESS'] = 'true' if headless else 'false'
+        os.environ['MOBILE'] = 'true' if mobile else 'false'
+        os.environ['SPEC_NAME'] = suite_name
+        os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
 
-    acceptance_tests_args = [
-        nodemodules_jest_bin_path,
-        '%s' % os.path.join(available_suites[suite_name]),
-        '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js',
-    ]
+        nodemodules_jest_bin_path = os.path.join(
+            common.NODE_MODULES_PATH, '.bin', 'jest'
+        )
 
-    # OK to use shell=True here because we are passing string literals,
-    # and verifying that the passed suite-name are within the list of
-    # the suites we have, so there is no risk of a shell-injection attack.
-    managed_acceptance_tests_proc = managed_process(
-        acceptance_tests_args,
-        human_readable_name='Acceptance Tests Server',
-        shell=True,
-        raise_on_nonzero_exit=False,
-        stdout=stdout,
-    )
+        acceptance_tests_args = [
+            nodemodules_jest_bin_path,
+            '%s' % os.path.join(module),
+            '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js',
+        ]
 
-    with managed_acceptance_tests_proc as proc:
-        yield proc
+        # OK to use shell=True here because we are passing string literals,
+        # and verifying that the passed suite-name are within the list of
+        # the suites we have, so there is no risk of a shell-injection attack.
+        managed_acceptance_tests_proc = managed_process(
+            acceptance_tests_args,
+            human_readable_name='Acceptance Tests Server',
+            shell=True,
+            raise_on_nonzero_exit=False,
+            stdout=stdout,
+        )
+
+        with managed_acceptance_tests_proc as proc:
+            yield proc
+
+    elif framework == 'playwright':
+        playwright_dir = os.path.join(
+            common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
+        )
+        # Use the local Playwright binary directly instead of npx
+        # to avoid version resolution or download attempts.
+        playwright_bin = os.path.join(
+            playwright_dir, 'node_modules', '.bin', 'playwright'
+        )
+        playwright_env = {
+            **os.environ,
+            # Prepend Node 20 bin so npx uses the correct runtime.
+            'PATH': os.pathsep.join(
+                [
+                    os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin'),
+                    os.environ['PATH'],
+                ]
+            ),
+            'NODE': os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin', 'node'),
+            'HEADLESS': 'true' if headless else 'false',
+            'MOBILE': 'true' if mobile else 'false',
+            'PROD_ENV': 'true' if prod_env else 'false',
+            'SPEC_NAME': suite_name,
+        }
+        playwright_args = [
+            playwright_bin,
+            'test',
+            module,
+            '--config=./core/tests/playwright-acceptance-tests/'
+            'playwright.config.ts',
+        ]
+        if headless is False:
+            playwright_args.append('--headed')
+
+        managed_proc = managed_process(
+            playwright_args,
+            human_readable_name='Acceptance Tests Server',
+            shell=False,
+            raise_on_nonzero_exit=False,
+            stdout=stdout,
+            env=playwright_env,
+        )
+        with managed_proc as proc:
+            yield proc
+
+    else:
+        raise Exception(
+            'Suite "%s" has invalid framework: "%s". '
+            'Must be "puppeteer" or "playwright".' % (suite_name, framework)
+        )
 
 
 def run_ng_compilation() -> None:

@@ -174,12 +174,12 @@ def create_thread(
         thread_model.put()
     # Update the session info for the thread.
     if session_info is not None:
-        console_errors_json = session_info.get('console_errors_json')
+        console_logs_json = session_info.get('console_logs_json')
         failed_requests_json = session_info.get('failed_requests_json')
         navigation_history_json = session_info.get('navigation_history_json')
         environment_json = session_info.get('environment_json')
-        if not isinstance(console_errors_json, list):
-            console_errors_json = []
+        if not isinstance(console_logs_json, list):
+            console_logs_json = []
         if not isinstance(failed_requests_json, list):
             failed_requests_json = []
         if not isinstance(navigation_history_json, list):
@@ -188,7 +188,7 @@ def create_thread(
             environment_json = {}
         general_feedback_models.FeedbackSessionLogModel.create(
             thread_id=thread_id,
-            console_errors_json=console_errors_json,
+            console_logs_json=console_logs_json,
             failed_requests_json=failed_requests_json,
             navigation_history_json=navigation_history_json,
             environment_json=environment_json,
