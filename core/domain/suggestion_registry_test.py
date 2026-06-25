@@ -50,7 +50,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, suggestion_models
 
-suggestion_models, opportunity_models = models.Registry.import_models(
+(suggestion_models, opportunity_models) = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.OPPORTUNITY]
 )
 
