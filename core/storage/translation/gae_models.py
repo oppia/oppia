@@ -238,6 +238,9 @@ class EntityTranslationsModel(base_models.BaseModel):
         )
 
 
+MACHINE_TRANSLATION_POLICY_ID = 'machine_translation_policy'
+
+
 class MachineTranslationModel(base_models.BaseModel):
     """Model for storing machine generated translations for the purpose of
     preventing duplicate generation. Machine translations are used for reference
@@ -400,6 +403,186 @@ class MachineTranslationModel(base_models.BaseModel):
                 'hashed_source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'source_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'target_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+
+class MachineTranslationPolicyModel(base_models.BaseModel):
+    """Singleton model for storing machine translation policy configuration.
+    There should only be one instance of this model, identified by
+    MACHINE_TRANSLATION_POLICY_ID.
+    """
+
+    automatic_translation_is_enabled = datastore_services.BooleanProperty(
+        required=True, indexed=False, default=False
+    )
+    # A dict mapping language codes to their translation provider identifiers.
+    # E.g. {'hi': 'azure', 'es': 'gcp'}
+    language_to_provider_mapping = datastore_services.JsonProperty(
+        required=True, default={}
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'automatic_translation_is_enabled': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'language_to_provider_mapping': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+            },
+        )
+
+
+class AutoTranslationCacheModel(base_models.BaseModel):
+    """Model for caching AI-generated translations to avoid duplicate
+    API calls. Model instances are mapped by a deterministic key generated
+    from the source and target language codes, followed by a SHA-1 hash
+    of the source text, formatted as:
+
+        [source_language_code].[target_language_code].[hashed_source_text]
+
+    See AutoTranslationCacheModel._generate_id() below for details.
+    """
+
+    # The untranslated source text.
+    source_text = datastore_services.TextProperty(required=True, indexed=False)
+    # The language code for the source text language.
+    source_language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    # The language code for the target translation language.
+    target_language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    # The AI-generated translation of the source text into the target language.
+    translated_text = datastore_services.TextProperty(
+        required=True, indexed=False
+    )
+
+    @staticmethod
+    def _generate_id(
+        source_language_code: str,
+        target_language_code: str,
+        hashed_source_text: str,
+    ) -> str:
+        """Generates a deterministic key for an AutoTranslationCacheModel
+        instance.
+
+        Args:
+            source_language_code: str. The language code for the source text.
+            target_language_code: str. The language code for the translation.
+            hashed_source_text: str. A SHA-1 hash of the source text.
+
+        Returns:
+            str. The deterministically generated identifier of the form:
+            [source_language_code].[target_language_code].[hashed_source_text]
+        """
+        return '%s.%s.%s' % (
+            source_language_code,
+            target_language_code,
+            hashed_source_text,
+        )
+
+    @classmethod
+    def get_translation(
+        cls,
+        source_language_code: str,
+        target_language_code: str,
+        source_text: str,
+    ) -> Optional[AutoTranslationCacheModel]:
+        """Gets a cached translation by language codes and source text.
+
+        Args:
+            source_language_code: str. The language code for the source text.
+            target_language_code: str. The language code for the translation.
+            source_text: str. The untranslated source text.
+
+        Returns:
+            AutoTranslationCacheModel|None. The cached model instance if
+            found, or None if no cached translation exists.
+        """
+        hashed_source_text = utils.convert_to_hash(source_text, 50)
+        instance_id = cls._generate_id(
+            source_language_code, target_language_code, hashed_source_text
+        )
+        return cls.get(instance_id, strict=False)
+
+    @classmethod
+    def create(
+        cls,
+        source_language_code: str,
+        target_language_code: str,
+        source_text: str,
+        translated_text: str,
+    ) -> str:
+        """Creates a new AutoTranslationCacheModel instance.
+
+        Args:
+            source_language_code: str. The language code for the source text.
+            target_language_code: str. The language code for the translation.
+            source_text: str. The untranslated source text.
+            translated_text: str. The sanitized AI-generated translation.
+
+        Returns:
+            str. The ID of the newly created model instance.
+        """
+        hashed_source_text = utils.convert_to_hash(source_text, 50)
+        entity_id = cls._generate_id(
+            source_language_code, target_language_code, hashed_source_text
+        )
+        cache_entity = cls(
+            id=entity_id,
+            source_text=source_text,
+            source_language_code=source_language_code,
+            target_language_code=target_language_code,
+            translated_text=translated_text,
+        )
+        cache_entity.put()
+        return entity_id
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model is not associated with users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model is not associated with users."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model is not associated with users."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'source_language_code': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'target_language_code': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
                 'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )

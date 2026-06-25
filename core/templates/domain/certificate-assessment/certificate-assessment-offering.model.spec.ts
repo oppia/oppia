@@ -51,6 +51,7 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(emptyOffering.topicData).toEqual({});
     expect(emptyOffering.totalQuestions).toEqual(0);
     expect(emptyOffering.timeLimitInMinutes).toEqual(0);
+    expect(emptyOffering.demonstrates).toEqual([]);
     expect(emptyOffering.asyncStatus).toEqual('Not_Ready');
     expect(emptyOffering.version).toEqual(0);
   });
@@ -68,6 +69,7 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.topicData).toEqual({topic_1: 5, topic_2: 10});
     expect(offering.totalQuestions).toEqual(15);
     expect(offering.timeLimitInMinutes).toEqual(60);
+    expect(offering.demonstrates).toEqual([]);
     expect(offering.asyncStatus).toEqual('Ready');
     expect(offering.version).toEqual(1);
   });
@@ -82,6 +84,7 @@ describe('Certificate Assessment Offering Data Model', () => {
     offering.topicData = {topic_3: 20};
     offering.totalQuestions = 20;
     offering.timeLimitInMinutes = 90;
+    offering.demonstrates = ['Learn math'];
 
     expect(offering.title).toEqual('Updated Title');
     expect(offering.description).toEqual('Updated Description');
@@ -89,5 +92,6 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.topicData).toEqual({topic_3: 20});
     expect(offering.totalQuestions).toEqual(20);
     expect(offering.timeLimitInMinutes).toEqual(90);
+    expect(offering.demonstrates).toEqual(['Learn math']);
   });
 });

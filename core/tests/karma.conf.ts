@@ -18,7 +18,7 @@ if (argv.specs_to_run !== undefined) {
 }
 
 const SPECS_PATTERN =
-  /^(?!.*(puppeteer-acceptance-tests|((valid|invalid)[_-][\w\d.\-])|@nodelib|openapi3-ts|@bcoe)).*((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/;
+  /^(?!.*(puppeteer-acceptance-tests|playwright-acceptance-tests|((valid|invalid)[_-][\w\d.\-])|@nodelib|openapi3-ts|@bcoe)).*((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/;
 
 let context: RegExp | Record<string, string> = SPECS_PATTERN;
 if (argv.specs_to_run !== undefined) {
@@ -94,6 +94,7 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
       'core/tests/puppeteer-acceptance-tests/*',
+      'core/tests/playwright-acceptance-tests/*',
     ],
     proxies: {
       // Karma serves files under the /base directory.
