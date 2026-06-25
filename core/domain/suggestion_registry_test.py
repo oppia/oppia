@@ -28,7 +28,6 @@ from core.domain import (
     exp_services,
     fs_services,
     html_validation_service,
-    opportunity_services,
     platform_parameter_list,
     question_domain,
     question_services,
@@ -133,6 +132,22 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             self.base_suggestion.convert_html_in_suggestion_change(
                 conversion_fn
             )
+
+    def test_get_author_name_with_deleted_user(self) -> None:
+        self.base_suggestion.author_id = 'deleted_id'
+        with self.swap(
+            user_services, 'get_usernames', lambda *args, **kwargs: [None]
+        ):
+            self.assertEqual(
+                self.base_suggestion.get_author_name(), '[Deleted User]'
+            )
+
+    def test_get_author_name_with_valid_user(self) -> None:
+        self.base_suggestion.author_id = 'valid_id'
+        with self.swap(
+            user_services, 'get_usernames', lambda *args, **kwargs: ['username']
+        ):
+            self.assertEqual(self.base_suggestion.get_author_name(), 'username')
 
 
 class SuggestionEditStateContentDict(TypedDict):
@@ -1978,14 +1993,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date,
         )
 
-        with self.swap(
-            opportunity_services,
-            'update_translation_opportunity_with_accepted_suggestion',
-            lambda *args: None,
-        ):
-            suggestion.accept(
-                'Accepted suggestion by translator: Add translation change.'
-            )
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.'
+        )
 
         old_version_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
