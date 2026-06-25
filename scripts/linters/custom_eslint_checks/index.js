@@ -22,6 +22,3 @@ var requireIndex = require('requireindex');
 
 // Import all rules in custom_eslint_checks/rules.
 module.exports.rules = requireIndex(__dirname + '/rules');
-module.exports.rules[
-  'no-view-encapsulation-none'
-] = require('./rules/no-view-encapsulation-none.js');
