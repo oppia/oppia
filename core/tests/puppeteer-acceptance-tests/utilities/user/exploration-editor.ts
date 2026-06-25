@@ -7999,6 +7999,10 @@ export class ExplorationEditor extends BaseUser {
     }
     showMessage(
       'Arabic text rendered correctly inside text node: ' + arabicTextContent
+    );
+  }
+
+  /**
    * Expects explorations displayed in the grid to match the provided order.
    * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
    */
