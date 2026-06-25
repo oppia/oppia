@@ -1,0 +1,75 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Certificate Offering Dashboard</h1>
+
+    <button type="button" class="btn btn-primary"
+            [routerLink]="createCertificateOfferingRoute">
+      + New Certificate
+    </button>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <caption class="visually-hidden">
+            List of certificates with status and actions
+          </caption>
+
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Certificate Title</th>
+              <th scope="col">Topics</th>
+              <th scope="col">Time</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let certificateOffering of certificateOfferings">
+              <td>
+                <span class="fw-semibold">{{ certificateOffering.title }}</span>
+              </td>
+
+              <td>{{ certificateOffering.topicsLabel }}</td>
+              <td>{{ certificateOffering.timeLabel }}</td>
+
+              <td>
+                <span class="badge bg-secondary">
+                  {{ certificateOffering.status }}
+                </span>
+              </td>
+
+              <td class="text-end">
+                <div class="btn-group" role="group" aria-label="Certificate actions"
+                >
+                  <button type="button" class="btn btn-sm btn-outline-secondary"
+                 [routerLink]="getEditCertificateOfferingRoute(certificateOffering.certificateId)"
+                  >
+                    Edit
+                  </button>
+
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                          (click)="openDeleteCertificateOfferingModal(certificateOffering.certificateId)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- TODO(#24717-M1.14): Implement empty state. -->
+            <!--
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">
+                No certificates found.
+              </td>
+            </tr>
+            -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

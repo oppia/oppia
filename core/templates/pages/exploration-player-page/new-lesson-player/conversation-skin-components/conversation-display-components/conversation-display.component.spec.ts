@@ -135,14 +135,7 @@ describe('Conversation display component', () => {
       null
     ),
     [],
-    // This throws "Argument of type 'null' is not assignable to parameter of
-    // type 'RecordedVoiceovers'." We need to suppress this error because of
-    // the need to test validations. This throws an error only in the
-    // frontend tests and not in the frontend.
-    // @ts-ignore
-    null,
-    '',
-    null
+    ''
   );
 
   beforeEach(waitForAsync(() => {
@@ -294,26 +287,26 @@ describe('Conversation display component', () => {
 
   it('should return true if in exploration context', () => {
     spyOn(pageContextService, 'isInExplorationContext').and.returnValue(true);
-    expect(componentInstance.isInExplorationPlayerContext()).toBeTrue();
+    expect(componentInstance.isInExplorationPlayerContext()).toBe(true);
     expect(pageContextService.isInExplorationContext).toHaveBeenCalled();
   });
 
   it('should return false if not in exploration context', () => {
     spyOn(pageContextService, 'isInExplorationContext').and.returnValue(false);
-    expect(componentInstance.isInExplorationPlayerContext()).toBeFalse();
+    expect(componentInstance.isInExplorationPlayerContext()).toBe(false);
     expect(pageContextService.isInExplorationContext).toHaveBeenCalled();
   });
 
   it('should return true if displayedCard is not completed', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeTrue();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(true);
   });
 
   it('should return false if displayedCard is completed', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(false);
   });
 
   describe('shouldResponseHistoryBeShown', () => {
@@ -328,7 +321,7 @@ describe('Conversation display component', () => {
         {},
       ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalse();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
 
     it('should return true if interaction is inline and pairCount > 1', () => {
@@ -338,28 +331,28 @@ describe('Conversation display component', () => {
         {},
       ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeTrue();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(true);
     });
 
     it('should return false if interaction is inline and pairCount <= 1', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalse();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
 
     it('should return true if interaction is not inline and pairCount > 0', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeTrue();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(true);
     });
 
     it('should return false if interaction is not inline and pairCount == 0', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalse();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
   });
 
@@ -832,7 +825,7 @@ describe('Conversation display component', () => {
       mockOnNewCardAvailableEventEmitter
     );
     spyOn(currentInteractionService, 'registerPresubmitHook').and.callFake(
-      callb => callb()
+      (callb: () => void) => callb()
     );
     spyOn(audioPlayerService, 'clear');
     spyOn(audioPreloaderService, 'clearMostRecentlyRequestedAudioFilename');
@@ -867,7 +860,7 @@ describe('Conversation display component', () => {
   it('should tell if audio bar is expanded on mobile device', () => {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
-    expect(componentInstance.isAudioBarExpandedOnMobileDevice()).toBeTrue();
+    expect(componentInstance.isAudioBarExpandedOnMobileDevice()).toBe(true);
   });
 
   it('should update displayed card', fakeAsync(() => {
@@ -878,15 +871,18 @@ describe('Conversation display component', () => {
     );
     mockOnNewCardAvailableEventEmitter.emit();
     spyOn(currentInteractionService, 'registerPresubmitHook').and.callFake(
-      callb => callb()
+      (callb: () => void) => callb()
     );
     spyOn(mockDisplayedCard, 'getInteraction').and.returnValue(
-      // This throws "Type 'null' is not assignable to type
-      // 'InteractionCustomizationArgs'." We need to suppress this error
-      // because of the need to test validations. This throws an error
-      // because the value of interaction is null.
-      // @ts-ignore
-      new Interaction([], [], null, null, [], '', null)
+      new Interaction(
+        [],
+        [],
+        {} as InteractionCustomizationArgs,
+        null,
+        [],
+        '',
+        null
+      )
     );
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
     spyOn(audioPlayerService, 'clear');
@@ -901,11 +897,11 @@ describe('Conversation display component', () => {
   it('should check if interaction is inline', () => {
     componentInstance.conceptCardIsBeingShown = true;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isInteractionInline()).toBeTrue();
+    expect(componentInstance.isInteractionInline()).toBe(true);
     componentInstance.conceptCardIsBeingShown = false;
     spyOn(mockDisplayedCard, 'isInteractionInline').and.returnValue(false);
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isInteractionInline()).toBeFalse();
+    expect(componentInstance.isInteractionInline()).toBe(false);
   });
 
   it('should get content audio highlight class', () => {
@@ -936,38 +932,38 @@ describe('Conversation display component', () => {
   it('should toggle show previous responses', () => {
     componentInstance.arePreviousResponsesShown = false;
     componentInstance.toggleShowPreviousResponses();
-    expect(componentInstance.arePreviousResponsesShown).toBeTrue();
+    expect(componentInstance.arePreviousResponsesShown).toBe(true);
   });
 
   it('should tell if window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    expect(componentInstance.isWindowNarrow()).toBeTrue();
+    expect(componentInstance.isWindowNarrow()).toBe(true);
   });
 
   it('should show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(300);
-    expect(componentInstance.canWindowShowTwoCards()).toBeFalse();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(false);
   });
 
   it('should tell if audio bar can be shown', () => {
     componentInstance.isIframed = false;
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
-    expect(componentInstance.showAudioBar()).toBeTrue();
+    expect(componentInstance.showAudioBar()).toBe(true);
   });
 
   it('should tell if content audio translation is available', () => {
     componentInstance.conceptCardIsBeingShown = true;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isContentAudioTranslationAvailable()).toBeFalse();
+    expect(componentInstance.isContentAudioTranslationAvailable()).toBe(false);
     componentInstance.conceptCardIsBeingShown = false;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isContentAudioTranslationAvailable()).toBeTrue();
+    expect(componentInstance.isContentAudioTranslationAvailable()).toBe(true);
   });
 
   it('should tell if on a terminal card', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isTerminal').and.returnValue(true);
-    expect(componentInstance.isOnTerminalCard()).toBeTrue();
+    expect(componentInstance.isOnTerminalCard()).toBe(true);
   });
 
   it('should get input response pair id', () => {
