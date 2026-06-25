@@ -38,6 +38,7 @@ const siteAdminPageUrl = testConstants.URLs.AdminPage;
 const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const splashPageUrl = testConstants.URLs.splash;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
+const loginPageUrl = testConstants.URLs.Login;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -56,6 +57,8 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
+const errorContainerSelector = '.e2e-test-error-container';
+const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const confirmUsernameField = '.e2e-test-confirm-username-field';
@@ -718,6 +721,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
+  }
+
+  /**
    * This function navigates to the given topic URL and checks if the page displays
    * an 'Error 404' message.
    * @param {string} topicUrlFragment - The URL fragment of the topic to check.
@@ -853,6 +863,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(deleteMyAcccountButton, {
       hidden: true,
     });
+    showMessage(`Account deleted for ${username}.`);
   }
 
   /**
@@ -2205,14 +2216,31 @@ export class LoggedInUser extends BaseUser {
    * @param {number} statusCode - The expected error status code.
    */
   async expectErrorPage(statusCode: number): Promise<void> {
-    const isErrorPresent = await this.isTextPresentOnPage(
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(errorContainerSelector);
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const errorContainer = document.querySelector(selector);
+        return Boolean(
+          errorContainer && errorContainer.textContent?.includes(expectedText)
+        );
+      },
+      {timeout: 30000},
+      errorContainerSelector,
       `Error ${statusCode}`
     );
 
-    if (!isErrorPresent) {
-      throw new Error(
-        `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+    const errorHeading = await this.page.$(errorPageHeadingSelector);
+    if (errorHeading) {
+      const errorHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorHeading
       );
+      if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
+        throw new Error(
+          `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+        );
+      }
     }
 
     showMessage(`User is on error page with status code ${statusCode}.`);
