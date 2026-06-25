@@ -485,7 +485,9 @@ describe('Story Editor Page Component', () => {
 
     storyEditorNavigationService.activeTab = 'unknown_tab';
     tick();
-    expect(component.getNavbarText()).toEqual('');
+    expect(() => component.getNavbarText()).toThrowError(
+      'Invalid active tab: unknown_tab'
+    );
   }));
 
   it('should init page on undo redo change applied', () => {

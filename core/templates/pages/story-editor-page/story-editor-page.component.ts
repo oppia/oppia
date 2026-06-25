@@ -129,7 +129,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     } else if (activeTab === 'chapter_editor') {
       return 'Chapter Editor';
     }
-    return '';
+    throw new Error('Invalid active tab: ' + activeTab);
   }
 
   isWarningsAreShown(value: boolean): void {
