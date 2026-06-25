@@ -29,6 +29,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
 } from 'domain/exploration/written-translation.model';
+import {AppConstants} from 'app.constants';
 
 export interface TranslatableItem {
   translation: string | string[];
@@ -149,7 +150,12 @@ export class TranslateTextService {
     };
   }
 
-  init(expId: string, languageCode: string, successCallback: () => void): void {
+  init(
+    expId: string,
+    languageCode: string,
+    successCallback: () => void,
+    entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+  ): void {
     this.stateWiseContentIds = {};
     this.stateNamesList = [];
     this.stateAndContent = [];
@@ -160,7 +166,7 @@ export class TranslateTextService {
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackendApiService
-      .getTranslatableTextsAsync(expId, languageCode)
+      .getTranslatableTextsAsync(expId, languageCode, entityType)
       .then((translatableTexts: TranslatableTexts) => {
         this.stateWiseContents = translatableTexts.stateWiseContents;
         this.activeExpVersion = translatableTexts.explorationVersion;
