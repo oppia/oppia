@@ -20,6 +20,7 @@ import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
+import isElementClickable from '../../functions/is-element-clickable';
 
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 
@@ -438,23 +439,29 @@ export class LoggedOutUser extends BaseUser {
         );
       }
 
+      // TODO(#26453): The search page fires /searchhandler/data multiple
+      // times on load, causing Angular to re-render the search results list and
+      // detach ElementHandle references mid-operation. To avoid stale handles,
+      // we re-query the DOM by selector and index on each poll and at click time
+      // rather than holding an ElementHandle across async boundaries. Remove this
+      // workaround once the upstream re-rendering issue is fixed.
       await this.page.waitForFunction(
-        ({
-          selector,
-          index,
-          clickable,
-        }: {
-          selector: string;
-          index: number;
-          clickable: boolean;
-        }) => {
+        ({selector, index, clickableFn}) => {
           const element = document.querySelectorAll(selector)[index];
           if (!element) {
             return false;
           }
-          return window.__isElementClickable(element, clickable);
+          const fn = new Function(
+            'element',
+            `return (${clickableFn})(element)`
+          );
+          return fn(element);
         },
-        {selector: lessonCardTitleSelector, index: lessonIndex, clickable: true}
+        {
+          selector: lessonCardTitleSelector,
+          index: lessonIndex,
+          clickableFn: isElementClickable.toString(),
+        }
       );
 
       await this.page.evaluate(
