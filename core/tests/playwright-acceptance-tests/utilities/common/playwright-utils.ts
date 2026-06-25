@@ -650,11 +650,6 @@ export class BaseUser {
           },
           element
         );
-        await this.page.evaluate(({el, a, b}) => isElementClickable(el, a, b), {
-          el: element,
-          a: true,
-          b: true,
-        });
         const reasonsText =
           clickabilityDiagnostics.reasons.length > 0
             ? clickabilityDiagnostics.reasons
@@ -862,7 +857,7 @@ export class BaseUser {
   /**
    * Waits for an element to stabilize.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   * @param {number} timeout - The timeout in milliseconds. Defaults to 5000.
+   * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
     selector: string | ElementHandle<Element>,

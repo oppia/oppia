@@ -442,8 +442,8 @@
     },
     {
       "name": "logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/access-pages-that-require-higher-privileges",
