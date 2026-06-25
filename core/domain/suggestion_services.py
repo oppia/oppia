@@ -258,9 +258,31 @@ def create_suggestion(
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change_cmd['state_name'], str)
         assert isinstance(change_cmd['content_id'], str)
-        content_html = exploration.get_content_html(
-            change_cmd['state_name'], change_cmd['content_id']
-        )
+
+        state_name = change_cmd['state_name']
+        content_id = change_cmd['content_id']
+
+        # This check and loop act as a backward-compatibility fallback layer for
+        # generic V2 suggestion payloads (which do not specify exploration-specific
+        # state names in change commands directly) or legacy translation suggestions.
+        # It resolves the generic placeholder state name to the correct exploration
+        # state name by matching content IDs.
+        if (
+            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+            or state_name not in exploration.states
+        ):
+            for s_name, state in exploration.states.items():
+                if (
+                    content_id
+                    in state.get_translatable_contents_collection().content_id_to_translatable_content
+                ):
+                    state_name = s_name
+                    new_change_cmd = dict(change_cmd)
+                    new_change_cmd['state_name'] = state_name
+                    change_cmd = new_change_cmd
+                    break
+
+        content_html = exploration.get_content_html(state_name, content_id)
         if content_html != change_cmd['content_html']:
 
             raise Exception(
@@ -274,9 +296,7 @@ def create_suggestion(
             target_id, language_code
         )
         for existing_suggestion in existing_suggestions:
-            if existing_suggestion.change_cmd['content_id'] == (
-                change_cmd['content_id']
-            ):
+            if existing_suggestion.change_cmd['content_id'] == (content_id):
                 raise Exception(
                     'A translation suggestion for this content already exists '
                     'and is currently in review.'
@@ -290,14 +310,12 @@ def create_suggestion(
             exploration.version,
             language_code,
         )
-        if change_cmd['content_id'] in entity_translation.translations:
-            if not entity_translation.translations[
-                change_cmd['content_id']
-            ].needs_update:
+        if content_id in entity_translation.translations:
+            if not entity_translation.translations[content_id].needs_update:
                 raise Exception(
                     'The content with content_id %s has already been '
                     'translated to %s and is up-to-date.'
-                    % (change_cmd['content_id'], language_code)
+                    % (content_id, language_code)
                 )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -852,6 +870,7 @@ def accept_suggestion(
         Exception. The suggestion is not valid.
         Exception. The commit message is empty.
     """
+
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
 
@@ -917,6 +936,14 @@ def accept_suggestion(
     suggestion.accept(commit_message)
 
     _update_suggestion(suggestion)
+
+    # Update the translation opportunity model with the new translation count.
+    if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            suggestion.target_id,
+            suggestion.change_cmd.language_code,
+            suggestion.target_type,
+        )
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review decreases by one, since this

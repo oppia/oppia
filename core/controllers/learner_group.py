@@ -27,7 +27,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, TypedDict, Union
+from typing import Dict, List, Set, TypedDict, Union
 
 LEARNER_GROUP_SCHEMA = {
     'group_title': {
@@ -1067,9 +1067,54 @@ class LearnerStoriesChaptersProgressHandler(
     # types of values but in this handler we are rendering List
     # value. Also, once the value type is changed, please remove
     # List[Mapping[str, Any]] from render_json's argument type.
+    def _can_user_access_stories_chapters_progress(
+        self, target_user_id: str, story_ids: List[str]
+    ) -> bool:
+        """Checks whether the current user can access chapter progress.
+
+        A learner can always access their own chapter progress. A facilitator
+        can access a learner's chapter progress only for stories assigned in
+        learner groups they facilitate and only when the learner has enabled
+        progress sharing in at least one such group.
+
+        Args:
+            target_user_id: str. The user id whose progress is being fetched.
+            story_ids: list(str). The story ids whose chapter progress is being
+                fetched.
+
+        Returns:
+            bool. Whether the current user can access the requested progress.
+        """
+        assert self.user_id is not None
+
+        if self.user_id == target_user_id:
+            return True
+
+        accessible_story_ids: Set[str] = set()
+        learner_groups = (
+            learner_group_fetchers.get_learner_groups_of_facilitator(
+                self.user_id
+            )
+        )
+
+        for learner_group in learner_groups:
+            if target_user_id not in learner_group.learner_user_ids:
+                continue
+
+            progress_sharing_permission = (
+                learner_group_fetchers.can_multi_learners_share_progress(
+                    [target_user_id], learner_group.group_id
+                )
+            )[0]
+            if progress_sharing_permission:
+                accessible_story_ids.update(learner_group.story_ids)
+
+        return set(story_ids).issubset(accessible_story_ids)
+
     @acl_decorators.can_access_learner_groups
     def get(self, username: str) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         assert self.normalized_request is not None
         story_ids = self.normalized_request['story_ids']
         user_id = user_services.get_user_id_from_username(username)
@@ -1077,6 +1122,13 @@ class LearnerStoriesChaptersProgressHandler(
             raise Exception(
                 'No learner user_id found for the given learner username: %s'
                 % username
+            )
+
+        if not self._can_user_access_stories_chapters_progress(
+            user_id, story_ids
+        ):
+            raise self.UnauthorizedUserException(
+                'You are not allowed to access this learner progress.'
             )
 
         stories_chapters_progress = (

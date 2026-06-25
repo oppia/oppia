@@ -30,7 +30,6 @@ from core.domain import (
     exp_services,
     fs_services,
     html_cleaner,
-    opportunity_services,
     platform_parameter_list,
     platform_parameter_services,
     question_domain,
@@ -180,7 +179,8 @@ class BaseSuggestion:
         Returns:
             str. The username of the author of the suggestion.
         """
-        return user_services.get_username(self.author_id)
+        usernames = user_services.get_usernames([self.author_id], strict=False)
+        return usernames[0] if usernames[0] is not None else '[Deleted User]'
 
     def get_score_sub_type(self) -> str:
         """Returns the second part of the score category. The second part refers
@@ -840,11 +840,10 @@ class SuggestionTranslateContent(BaseSuggestion):
             translated_content,
         )
 
-        (
-            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
-                self.target_id, self.language_code
-            )
-        )
+        # NOTE: Do not call update_translation_opportunity_with_accepted_suggestion
+        # here, as it's already called in accept_suggestion() in suggestion_services.py
+        # after the suggestion status is updated. Calling it here causes a duplicate
+        # update and the opportunity model won't reflect the correct counts.
 
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
