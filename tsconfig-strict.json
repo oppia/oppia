@@ -26,6 +26,9 @@
       "app.constants": [
         "core/templates/app.constants"
       ],
+      "base-components/*": [
+        "core/templates/base-components/*"
+      ],
       "components/*": [
         "core/templates/components/*"
       ],

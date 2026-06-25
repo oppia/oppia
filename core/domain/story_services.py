@@ -101,6 +101,19 @@ def _create_story(
     story.version += 1
     create_story_summary(story.id)
 
+    exp_ids = story.story_contents.get_all_linked_exp_ids()
+    new_exploration_context_models = [
+        exp_models.ExplorationContextModel(id=exp_id, story_id=story.id)
+        for exp_id in exp_ids
+    ]
+    if new_exploration_context_models:
+        exp_models.ExplorationContextModel.update_timestamps_multi(
+            new_exploration_context_models
+        )
+        exp_models.ExplorationContextModel.put_multi(
+            new_exploration_context_models
+        )
+
 
 def save_new_story(committer_id: str, story: story_domain.Story) -> None:
     """Saves a new story.

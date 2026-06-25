@@ -528,6 +528,14 @@
             <span *ngIf="unreadThreadsCount !== 0">({{ unreadThreadsCount }})</span>
           </a>
         </li>
+        <hr class="oppia-top-right-menu-item-separator" *ngIf="isWebFeedbackModalEnabled">
+        <li class="nav-item"
+            *ngIf="isWebFeedbackModalEnabled">
+          <a (click)="openSiteFeedbackModal()"
+             class="dropdown-item nav-link e2e-test-report-site-problem-link">
+              {{'I18N_FOOTER_REPORT_WEBSITE_ISSUE' | translate}}
+          </a>
+        </li>
         <hr class="oppia-top-right-menu-item-separator">
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"

@@ -124,8 +124,16 @@ export class OpportunitiesListItemComponent {
       this.opportunityHeadingTruncationLength = 40;
     }
     if (this.opportunity) {
-      if (this.opportunity.progressPercentage) {
-        this.progressPercentage = `${Math.floor(this.opportunity.progressPercentage)}%`;
+      // We explicitly check for undefined and null instead of using a simple
+      // truthiness check (i.e., `if (this.opportunity.progressPercentage)`).
+      // This is because a progress percentage of 0 is falsy, which previously
+      // caused the progress bar to incorrectly fail to initialize or update
+      // for opportunities with 0% progress.
+      if (
+        this.opportunity.progressPercentage !== undefined &&
+        this.opportunity.progressPercentage !== null
+      ) {
+        this.progressPercentage = `${Math.floor(Number(this.opportunity.progressPercentage))}%`;
         if (
           this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         ) {
