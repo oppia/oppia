@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import datetime
+import importlib
+import os
 
 from core import feconf
 from core.platform.taskqueue import dev_mode_taskqueue_services
@@ -170,3 +172,18 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             dev_mode_taskqueue_services._task_handler(  # pylint: disable=protected-access
                 dummy_url, correct_payload, queue_name
             )
+
+    def test_task_handler_uses_localhost_when_env_var_not_set(self) -> None:
+        original_value = os.environ.pop('APP_ENGINE_HOST', None)
+
+        try:
+            importlib.reload(dev_mode_taskqueue_services)
+            self.assertEqual(
+                dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_HOST,
+                'localhost',
+            )
+        finally:
+            if original_value is not None:
+                os.environ['APP_ENGINE_HOST'] = original_value
+
+        importlib.reload(dev_mode_taskqueue_services)
