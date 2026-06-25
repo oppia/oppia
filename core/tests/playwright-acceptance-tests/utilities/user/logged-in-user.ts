@@ -81,11 +81,22 @@ const removeModalCancelButtonSelector =
 const removeModalConfirmButtonSelector =
   '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
 
+const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
+const reportExplorationTextAreaSelector =
+  '.e2e-test-report-exploration-text-area';
+const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
+const submitReportButtonSelector = '.e2e-test-submit-report-button';
+
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 
 // Community Library.
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
+const closeModalButton = '.e2e-test-close-modal-btn';
+
+// Exploration player selectors.
+const explorationSuccessfullyFlaggedMessage =
+  '.e2e-test-exploration-flagged-success-message';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -711,6 +722,35 @@ export class LoggedInUser extends BaseUser {
 
     await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
     await this.expectElementToBeVisible(learnerPlaylistModalSelector, false);
+  }
+
+  /**
+   * This function is used to report an exploration. It clicks on the report button,
+   * opens the report modal, selects an issue, types a description, and submits the report.
+   * @param {string} issueName - The name of the issue to report.
+   * @param {string} issueDescription - The description of the issue.
+   */
+  async reportExploration(issueDescription: string): Promise<void> {
+    await this.page.waitForSelector(reportExplorationButtonSelector, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(reportExplorationButtonSelector);
+    await this.page.waitForSelector(issueTypeSelector);
+    await this.waitForElementToStabilize(issueTypeSelector);
+    await this.page.click(issueTypeSelector);
+    await this.typeInInputField(
+      reportExplorationTextAreaSelector,
+      issueDescription
+    );
+
+    await this.clickOnElementWithSelector(submitReportButtonSelector);
+
+    await this.waitForElementToStabilize(closeModalButton);
+    await this.clickOnElementWithSelector(closeModalButton);
+
+    await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
+      state: 'hidden',
+    });
   }
 
   /**

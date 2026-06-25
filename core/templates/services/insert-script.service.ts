@@ -23,6 +23,7 @@ export enum KNOWN_SCRIPTS {
   UNKNOWN = 'UNKNOWN',
   MATHJAX = 'MATHJAX',
   PENCILCODE = 'PENCILCODE',
+  TURNSTILE = 'TURNSTILE',
 }
 
 @Injectable({
@@ -76,6 +77,12 @@ export class InsertScriptService {
           break;
         case KNOWN_SCRIPTS.PENCILCODE:
           scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
+          break;
+        case KNOWN_SCRIPTS.TURNSTILE:
+          scriptElement.src =
+            'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+          scriptElement.async = true;
+          scriptElement.defer = true;
           break;
         default:
           return false;
