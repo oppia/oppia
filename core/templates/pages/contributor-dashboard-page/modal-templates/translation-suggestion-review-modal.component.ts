@@ -60,9 +60,10 @@ interface EditedContentDict {
 }
 
 interface ActiveContributionDetailsDict {
-  chapter_title: string;
-  story_title: string;
+  chapter_title?: string;
+  story_title?: string;
   topic_name: string;
+  entity_description?: string;
 }
 
 export interface SuggestionChangeDict {
@@ -292,10 +293,19 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
     );
-    this.subheading =
-      `${this.activeContribution.details.topic_name} / ` +
-      `${this.activeContribution.details.story_title} / ` +
-      `${this.activeContribution.details.chapter_title}`;
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      this.subheading =
+        `${this.activeContribution.details.topic_name} / ` +
+        `${this.activeContribution.details.entity_description}`;
+    } else {
+      this.subheading =
+        `${this.activeContribution.details.topic_name} / ` +
+        `${this.activeContribution.details.story_title} / ` +
+        `${this.activeContribution.details.chapter_title}`;
+    }
 
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
@@ -734,6 +744,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   isDeprecatedTranslationSuggestionCommand(): boolean {
     return this.activeSuggestion.change_cmd.cmd === 'add_translation';
+  }
+
+  get chapterTitle(): string {
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled &&
+      this.activeContribution.details
+    ) {
+      return this.activeContribution.details.entity_description || '';
+    }
+    return this.activeContribution.details?.chapter_title || '';
   }
 
   doesTranslationContainTags(): boolean {

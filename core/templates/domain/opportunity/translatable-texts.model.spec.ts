@@ -69,4 +69,102 @@ describe('Translatable Texts model', () => {
   it('should get version number', () => {
     expect(sampleTranslatableTexts.explorationVersion).toBe('1');
   });
+
+  it('should create from V2 backend dict', () => {
+    const sampleBackendDictV2 = {
+      translatable_contents: [
+        {
+          content_id: '1',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text1',
+        },
+        {
+          content_id: '2',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text2',
+        },
+        {
+          content_id: '3',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text3',
+        },
+      ],
+      version: '2',
+    };
+
+    const translatableTexts =
+      TranslatableTexts.createFromBackendDictV2(sampleBackendDictV2);
+
+    const expectedStatewiseContents = {
+      'Generic Content': {
+        1: new TranslatableItem('text1', 'html', 'content', null, null),
+        2: new TranslatableItem('text2', 'html', 'content', null, null),
+        3: new TranslatableItem('text3', 'html', 'content', null, null),
+      },
+    };
+
+    expect(translatableTexts.stateWiseContents).toEqual(
+      expectedStatewiseContents
+    );
+    expect(translatableTexts.explorationVersion).toBe('2');
+  });
+
+  it('should create from V2 backend dict with grouping keys', () => {
+    const sampleBackendDictV2 = {
+      translatable_contents: [
+        {
+          content_id: '1',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text1',
+          grouping_key: 'state1',
+        },
+        {
+          content_id: '2',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text2',
+          grouping_key: 'state1',
+        },
+        {
+          content_id: '3',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text3',
+          grouping_key: 'state2',
+        },
+        {
+          content_id: '4',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text4',
+        },
+      ],
+      version: '2',
+    };
+
+    const translatableTexts =
+      TranslatableTexts.createFromBackendDictV2(sampleBackendDictV2);
+
+    const expectedStatewiseContents = {
+      state1: {
+        1: new TranslatableItem('text1', 'html', 'content', null, null),
+        2: new TranslatableItem('text2', 'html', 'content', null, null),
+      },
+      state2: {
+        3: new TranslatableItem('text3', 'html', 'content', null, null),
+      },
+      'Generic Content': {
+        4: new TranslatableItem('text4', 'html', 'content', null, null),
+      },
+    };
+
+    expect(translatableTexts.stateWiseContents).toEqual(
+      expectedStatewiseContents
+    );
+    expect(translatableTexts.explorationVersion).toBe('2');
+  });
 });
