@@ -650,7 +650,10 @@ describe('Questions List Component', () => {
           questionId: 'qId',
         })
       );
-      spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync');
+      spyOn(
+        editableQuestionBackendApiService,
+        'editQuestionSkillLinksAsync'
+      ).and.returnValue(Promise.resolve(question));
 
       component.saveAndPublishQuestion('Commit');
       tick();
@@ -693,7 +696,7 @@ describe('Questions List Component', () => {
     spyOn(
       editableQuestionBackendApiService,
       'updateQuestionAsync'
-    ).and.returnValue(Promise.resolve(null));
+    ).and.returnValue(Promise.resolve(question));
     spyOn(questionUndoRedoService, 'clearChanges');
     spyOn(questionsListService, 'getQuestionSummariesAsync');
 
@@ -1008,7 +1011,7 @@ describe('Questions List Component', () => {
       spyOn(
         editableQuestionBackendApiService,
         'editQuestionSkillLinksAsync'
-      ).and.returnValue(Promise.resolve());
+      ).and.returnValue(Promise.resolve(question));
 
       component.removeQuestionFromSkill(questionId, 1);
       tick();
@@ -1040,7 +1043,7 @@ describe('Questions List Component', () => {
       spyOn(
         editableQuestionBackendApiService,
         'editQuestionSkillLinksAsync'
-      ).and.returnValue(Promise.resolve());
+      ).and.returnValue(Promise.resolve(question));
 
       component.removeQuestionFromSkill(questionId, 1);
       tick();
@@ -1071,7 +1074,7 @@ describe('Questions List Component', () => {
       spyOn(
         editableQuestionBackendApiService,
         'editQuestionSkillLinksAsync'
-      ).and.returnValue(Promise.resolve());
+      ).and.returnValue(Promise.resolve(question));
       spyOn(component, 'removeQuestionSkillLinkAsync');
 
       component.removeQuestionFromSkill(questionId, 1);
@@ -1300,7 +1303,7 @@ describe('Questions List Component', () => {
     spyOn(
       editableQuestionBackendApiService,
       'editQuestionSkillLinksAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(Promise.resolve(question));
     spyOn(questionsListService, 'getQuestionSummariesAsync');
     spyOn(component, 'saveAndPublishQuestion');
 
@@ -1324,13 +1327,18 @@ describe('Questions List Component', () => {
     spyOn(
       editableQuestionBackendApiService,
       'editQuestionSkillLinksAsync'
-    ).and.returnValue(Promise.resolve());
+    ).and.returnValue(Promise.resolve(question));
+    spyOn(alertsService, 'addSuccessMessage');
 
     component.updateSkillLinkage();
 
     tick(500);
 
     expect(component.skillLinkageModificationsArray).toEqual([]);
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Question saved successfully.',
+      2000
+    );
   }));
 
   it(
