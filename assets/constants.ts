@@ -171,6 +171,9 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  // The default state name for translation suggestions of non-exploration entities.
+  "DEFAULT_SUGGESTION_STATE_NAME": "Generic Content",
+
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
   // any new class, topic, skill, exploration or subtopic is added or a

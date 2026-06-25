@@ -566,6 +566,10 @@ AZURE_TEXT_TO_SPEECH_REGION = 'centralus'
 
 OPPIA_CONTENT_TAG_DELIMITER = '; '
 
+# Azure Translator API configuration for automatic translation suggestions.
+AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
+AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
+
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature

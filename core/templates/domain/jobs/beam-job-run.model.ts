@@ -82,6 +82,7 @@ export interface BeamJobRunBackendDict {
   job_started_on_msecs: number;
   job_updated_on_msecs: number;
   job_is_synchronous: boolean;
+  dataflow_job_id: string | null;
 }
 
 export class BeamJobRun {
@@ -93,7 +94,8 @@ export class BeamJobRun {
     public readonly jobState: BeamJobRunState,
     public readonly jobStartedOnMsecs: number,
     public readonly jobUpdatedOnMsecs: number,
-    public readonly jobIsSynchronous: boolean
+    public readonly jobIsSynchronous: boolean,
+    public readonly dataflowJobId: string | null = null
   ) {
     switch (jobState) {
       case 'RUNNING':
@@ -186,6 +188,17 @@ export class BeamJobRun {
     }
   }
 
+  getDataflowUrl(): string | null {
+    if (this.dataflowJobId) {
+      return (
+        'https://console.cloud.google.com/dataflow/jobs/us-central1/' +
+        this.dataflowJobId +
+        ';graphView=0'
+      );
+    }
+    return null;
+  }
+
   static createFromBackendDict(backendDict: BeamJobRunBackendDict): BeamJobRun {
     return new BeamJobRun(
       backendDict.job_id,
@@ -193,7 +206,8 @@ export class BeamJobRun {
       backendDict.job_state,
       backendDict.job_started_on_msecs,
       backendDict.job_updated_on_msecs,
-      backendDict.job_is_synchronous
+      backendDict.job_is_synchronous,
+      backendDict.dataflow_job_id ?? null
     );
   }
 }
