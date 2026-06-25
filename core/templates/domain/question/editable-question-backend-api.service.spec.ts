@@ -282,7 +282,7 @@ describe('EditableQuestionBackendApiService', () => {
     question.question_state_data.content.html = 'New Question Content';
     question.version = 2;
     const questionWrapper = {
-      questionDict: question,
+      question_dict: question,
     };
 
     editableQuestionBackendApiService
@@ -301,7 +301,9 @@ describe('EditableQuestionBackendApiService', () => {
     updateReq.flush(questionWrapper);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(question);
+    expect(successHandler).toHaveBeenCalledWith(
+      Question.createFromBackendDict(question)
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -350,10 +352,14 @@ describe('EditableQuestionBackendApiService', () => {
       `/manage_question_skill_link/${questionId}`
     );
     expect(req.request.method).toEqual('PUT');
-    req.flush({status: 200});
+    req.flush({
+      question_dict: sampleDataResults.questionDict,
+    });
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(
+      Question.createFromBackendDict(sampleDataResults.questionDict)
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

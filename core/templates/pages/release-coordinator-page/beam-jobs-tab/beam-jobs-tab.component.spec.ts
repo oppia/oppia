@@ -204,20 +204,20 @@ describe('Beam Jobs Tab Component', () => {
     await input.setValue('Fo');
     fixture.detectChanges();
 
-    expect(await autocomplete.getOptions()).toHaveSize(1);
-    expect(await table.getRows()).toHaveSize(1);
+    expect((await autocomplete.getOptions()).length).toEqual(1);
+    expect((await table.getRows()).length).toEqual(1);
 
     await input.setValue('Fob');
     fixture.detectChanges();
 
-    expect(await autocomplete.getOptions()).toHaveSize(0);
-    expect(await table.getRows()).toHaveSize(0);
+    expect((await autocomplete.getOptions()).length).toEqual(0);
+    expect((await table.getRows()).length).toEqual(0);
 
     await input.setValue('Ba');
     fixture.detectChanges();
 
-    expect(await autocomplete.getOptions()).toHaveSize(2);
-    expect(await table.getRows()).toHaveSize(2);
+    expect((await autocomplete.getOptions()).length).toEqual(2);
+    expect((await table.getRows()).length).toEqual(2);
 
     component.ngOnDestroy();
   });
@@ -252,7 +252,8 @@ describe('Beam Jobs Tab Component', () => {
       'PENDING',
       0,
       0,
-      false
+      false,
+      null
     );
     const startNewJobSpy = spyOn(
       backendApiService,
@@ -272,7 +273,7 @@ describe('Beam Jobs Tab Component', () => {
     );
     await startNewButton.click();
 
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(1);
 
     const confirmButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -283,7 +284,7 @@ describe('Beam Jobs Tab Component', () => {
     await fixture.whenStable();
 
     expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
 
     component.ngOnDestroy();
@@ -320,7 +321,7 @@ describe('Beam Jobs Tab Component', () => {
     );
     await cancelButton.click();
 
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(1);
 
     const confirmButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -331,7 +332,7 @@ describe('Beam Jobs Tab Component', () => {
     await fixture.whenStable();
 
     expect(cancelBeamJobRunSpy).toHaveBeenCalledWith(runningFooJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
     expect(component.beamJobRuns.value).not.toContain(runningFooJob);
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
 
@@ -364,9 +365,61 @@ describe('Beam Jobs Tab Component', () => {
     await dialog.close();
 
     expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(doneBarJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
 
     component.ngOnDestroy();
+  });
+
+  it('should display View on Dataflow button for jobs with dataflowJobId', async () => {
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
+
+    const failedAsyncJob = new BeamJobRun(
+      '123',
+      'FooJob',
+      'FAILED',
+      0,
+      0,
+      false,
+      'xyz-123'
+    );
+    component.beamJobRuns.next([failedAsyncJob]);
+
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
+    fixture.detectChanges();
+
+    const dataflowLink = Array.from(
+      fixture.nativeElement.querySelectorAll('a')
+    ).find(el =>
+      (el as HTMLAnchorElement).textContent?.includes('View on Dataflow')
+    ) as HTMLAnchorElement;
+    expect(dataflowLink).toBeTruthy();
+    expect(dataflowLink.getAttribute('disabled')).toBeNull();
+    expect(dataflowLink.getAttribute('href')).toContain(
+      failedAsyncJob.getDataflowUrl()
+    );
+  });
+
+  it('should have disabled Dataflow button for jobs without dataflowJobId', async () => {
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
+
+    const failedSyncJob = new BeamJobRun('123', 'FooJob', 'FAILED', 0, 0, true);
+    component.beamJobRuns.next([failedSyncJob]);
+
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
+    fixture.detectChanges();
+
+    const dataflowLink = Array.from(
+      fixture.nativeElement.querySelectorAll('a')
+    ).find(el =>
+      (el as HTMLAnchorElement).textContent?.includes('View on Dataflow')
+    ) as HTMLAnchorElement;
+    expect(dataflowLink).toBeTruthy();
+    expect(dataflowLink.getAttribute('disabled')).toEqual('true');
+    expect(dataflowLink.getAttribute('href')).toBeNull();
   });
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {

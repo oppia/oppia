@@ -32,6 +32,7 @@ import {ExplorationEditorModal} from '../common/exploration-editor';
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
+const emptyCreatorDashboardMessageSelector = '.oppia-dashboard-empty-text p';
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
@@ -62,12 +63,16 @@ const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 const editRoleButton = '.e2e-test-edit-roles';
 const addUsernameInputBox = '#newMemberUsername';
 const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const managerRoleOption = 'Manager (can edit permissions)';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 const creationModalSelector = '.e2e-test-creation-modal';
 const createExplorationFromModalSelector = '.e2e-test-create-exploration';
 const modalWindowSelector = 'ngb-modal-window.modal.show';
+const rolesHeaderSelector = '.e2e-test-roles-header';
+const rolesContentSelector = '.e2e-test-roles-content';
+const usernameSelector = '.e2e-test-role-username';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -207,12 +212,7 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 const settingsContainerSelector =
@@ -246,6 +246,13 @@ const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
+const explorationGridCardTitleSelector =
+  '.e2e-test-exploration-dashboard-card .e2e-test-exp-summary-tile-title';
+const explorationListRowTitleSelector = '.e2e-test-exp-summary-row-title';
+const explorationListItemSelector = '.exploration-list-item';
+const averageRatingsCardSelector = '.average-ratings';
+const totalPlaysCardSelector = '.total-plays';
+const openFeedbackCardSelector = '.total-open-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
@@ -253,9 +260,6 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const historyTabButton = '.e2e-test-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
-const totalPlaysSelector = '.e2e-test-oppia-total-plays';
-const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
-const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
@@ -280,6 +284,7 @@ const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
 const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
+const ownersListSelector = '.e2e-test-owner-role-names';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
@@ -479,6 +484,18 @@ const saveRecommendationModalSaveButtonSelector =
 const nextCardButtonSelector = '.e2e-test-next-card-button';
 const viewSolutionButtonSelector = '.e2e-test-view-solution';
 const viewHintButtonSelector = '.e2e-test-view-hint';
+const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
+
+const explorationGridSelector = '.e2e-test-exploration-dashboard-card';
+
+const explorationListSelector = '.oppia-dashboard-table';
+
+const explorationGridRatingSelector = '.e2e-test-exp-summary-tile-rating';
+
+const explorationGridFeedbackSelector =
+  '.e2e-test-exp-summary-tile-open-feedback';
+
+const explorationGridViewsSelector = '.e2e-test-exp-summary-tile-num-views';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -2537,7 +2554,20 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
+    await this.waitForCreatorDashboardToLoad();
     showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Waits for the creator dashboard content to finish loading.
+   */
+  async waitForCreatorDashboardToLoad(): Promise<void> {
+    await this.expectElementToBeVisible(
+      creatorDashboardContainerSelector,
+      true
+    );
+    await this.waitForPageToFullyLoad();
+    await this.waitForNetworkIdle({idleTime: 1000});
   }
 
   /**
@@ -2599,6 +2629,9 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    // Ensure the editor is fully loaded before attempting to navigate.
+    await this.waitForPageToFullyLoad();
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2610,19 +2643,23 @@ export class ExplorationEditor extends BaseUser {
         });
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
+      // Wait until the expanded mobile navbar is visible before clicking it.
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
+      // Open the navbar dropdown, then navigate to Settings.
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOnElementWithSelector(basicSettingsDropdown);
-      await this.clickOnElementWithSelector(advanceSettingsDropdown);
-      await this.clickOnElementWithSelector(rolesSettingsDropdown);
-      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
-      await this.clickOnElementWithSelector(permissionSettingsDropdown);
-      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
+      // Use expandSettingsTabSection which checks if already expanded.
+      await this.expectElementToBeVisible(basicSettingsDropdown);
+      await this.expandSettingsTabSection('Basic Settings');
+      await this.expandSettingsTabSection('Advanced Features');
+      await this.expandSettingsTabSection('Roles');
+      await this.expandSettingsTabSection('Voice Artists');
+      await this.expandSettingsTabSection('Permissions');
+      await this.expandSettingsTabSection('Feedback');
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -2638,7 +2675,9 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Expands the specified settings tab section.
-   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * Supports Basic Settings, Advanced Features, Roles, Voice Artists,
+   * Permissions, Feedback, and Controls sections.
+   * Note: Roles and Voice Artists sections are only available for exploration creators.
    * @param section - The name of the section to expand.
    */
   async expandSettingsTabSection(
@@ -2647,6 +2686,8 @@ export class ExplorationEditor extends BaseUser {
       | 'Advanced Features'
       | 'Roles'
       | 'Voice Artists'
+      | 'Permissions'
+      | 'Feedback'
       | 'Controls'
   ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
@@ -2662,6 +2703,17 @@ export class ExplorationEditor extends BaseUser {
     const sectionContentSelector = `.e2e-test-${identifier}-content`;
     const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
 
+    // Check if the section header exists (some sections like Roles and Voice Artists
+    // are only available for exploration creators).
+    const sectionHeaderExists = await this.page.$(sectionHeaderSelector);
+    if (!sectionHeaderExists) {
+      showMessage(
+        `Skipped: Expanding ${section} section.\n` +
+          'Reason: Section is not available (only available for exploration creators).'
+      );
+      return;
+    }
+
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
@@ -2673,7 +2725,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Expand the section.
     await this.expectElementToBeVisible(sectionHeaderSelector);
-    await this.page.click(sectionHeaderSelector);
+    await this.clickOnElementWithSelector(sectionHeaderSelector);
     await this.expectElementToBeVisible(sectionContentSelector);
   }
 
@@ -2731,7 +2783,7 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.,
+   * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
    */
   async publishExplorationWithMetadata(
@@ -2743,13 +2795,8 @@ export class ExplorationEditor extends BaseUser {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
-        await this.page.waitForSelector(mobileNavbarDropdown, {
-          visible: true,
-        });
+        await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
         const element = await this.page.$(mobileNavbarOptions);
-        // If the element is not present, it means the mobile navigation bar is not expanded.
-        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-        // which expands the mobile navigation bar.
         if (!element) {
           await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
         }
@@ -2762,7 +2809,6 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(publishExplorationButtonSelector);
       }
     };
-
     const fillExplorationMetadataDetails = async () => {
       await this.clickOnElementWithSelector(explorationTitleInput);
       await this.typeInInputField(explorationTitleInput, title);
@@ -2837,21 +2883,22 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      const mobileNavbarElement = await this.getElementInParent(
+        mobileNavbarOptions
+      ).catch(() => null);
       if (!mobileNavbarElement) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        await this.expectElementToBeVisible(mobileNavbarDropdown);
       }
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
+      await this.expectElementToBeVisible(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
 
-    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
   /**
@@ -3567,6 +3614,96 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Opens the Roles form.
+   * Uses existing helpers and resilient fallbacks for mobile/constrained
+   * viewports.
+   */
+  async openRolesForm(): Promise<void> {
+    // Precondition: The caller must navigate to the Settings tab first.
+    // This helper intentionally avoids navigation so expectation methods do
+    // not perform extra interactions as side effects.
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Roles');
+    }
+
+    await this.expectElementToBeVisible(rolesHeaderSelector);
+
+    // The edit button opens the roles form via Angular handler. Try a normal
+    // click first, then fallback to dispatching low-level mouse events if the
+    // add-user input does not appear.
+    await this.page.waitForSelector(editRolesButtonSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+    await this.clickOnElementWithSelector(editRoleButton);
+
+    try {
+      await this.page.waitForSelector(addUsernameInputBox, {
+        visible: true,
+        timeout: 3000,
+      });
+      return;
+    } catch (e) {
+      showMessage(
+        'Edit roles click did not open the form; performing in-page click fallback.'
+      );
+      await this.page.evaluate((editRoleButtonSelector: string) => {
+        const el = document.querySelector(
+          editRoleButtonSelector
+        ) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, editRoleButton);
+      await this.page.waitForSelector(addUsernameInputBox, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
+
+    // Verify the roles form is open by checking the add-user input is visible.
+    await this.expectElementToBeVisible(addUsernameInputBox);
+  }
+
+  /**
+   * Expects the exploration to be community owned in the Settings tab.
+   * @param expectedCommunityOwnedMessage The expected community-owned text.
+   */
+  async expectExplorationToBeCommunityOwned(
+    expectedCommunityOwnedMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityOwnedMessageSelector);
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          const messageText = element?.textContent?.trim() || '';
+          return messageText.includes(expectedText);
+        },
+        {timeout: 5000},
+        communityOwnedMessageSelector,
+        expectedCommunityOwnedMessage
+      );
+    } catch {
+      const messageText = await this.page.$eval(
+        communityOwnedMessageSelector,
+        el => el.textContent?.trim() || ''
+      );
+      throw new Error(
+        `Expected community-owned message to contain "${expectedCommunityOwnedMessage}", but got: "${messageText}"`
+      );
+    }
+  }
+
+  /**
    * Assigns a role of manager to any guest user.
    */
   async assignUserToManagerRole(username: string): Promise<void> {
@@ -3577,16 +3714,60 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    const [managerOption] = await this.page.$x(
-      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
     );
-    await managerOption.click();
-    await this.page.waitForSelector(tagFilterDropdownSelector, {
-      hidden: true,
-    });
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
     showMessage(`${username} has been added as manager role.`);
+  }
+
+  /**
+   * Assigns a role of manager to any guest user assuming the Roles form is
+   * already open and the username input is visible. This avoids re-clicking the
+   * edit button when it may be unreliable in constrained viewports.
+   * @param {string} username - The username to assign the manager role to.
+   */
+  async assignUserToManagerRoleAfterFormOpen(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameSelector);
+    await this.expectElementToBeClickable(addUsernameInputBox);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
+    await this.clickOnElementWithSelector(saveRoleButton);
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
+    showMessage(
+      `${username} has been added as manager role (after form open).`
+    );
   }
 
   /**
@@ -3603,7 +3784,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as collaboratorRole.`);
   }
 
@@ -3623,7 +3804,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addRoleDropdown);
     await this.clickOnElementWithText(playtesterRoleOption);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as playtester.`);
   }
 
@@ -3884,6 +4065,9 @@ export class ExplorationEditor extends BaseUser {
   async selectDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
+    await this.page.waitForSelector(addStateInput, {
+      visible: true,
+    });
     await this.typeInInputField(addStateInput, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
@@ -4090,6 +4274,16 @@ export class ExplorationEditor extends BaseUser {
         }
         throw error;
       }
+    }
+
+    // On mobile the state-graph modal uses an NgBootstrap CSS fade-out animation.
+    // Wait for it to fully disappear before returning, otherwise the modal
+    // backdrop can obstruct the editor content (e.g., stateEditSelector)
+    // in the next call.
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        hidden: true,
+      });
     }
   }
 
@@ -5230,8 +5424,10 @@ export class ExplorationEditor extends BaseUser {
     const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
+    await this.expectElementToBeVisible(addStateInput);
     await this.typeInInputField(addStateInput, lastInteraction);
     await this.clickOnElementWithSelector(addNewResponseButton);
+    await this.expectElementToBeVisible(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -5247,7 +5443,7 @@ export class ExplorationEditor extends BaseUser {
     const explorationId = await this.publishExplorationWithMetadata(
       'Simple Math Exploration',
       'This is goal here',
-      'Algebra'
+      'Mathematics'
     );
 
     // Check if publish button is disabled (post-check)
@@ -5393,6 +5589,37 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error(`User ${username} is not a subscriber.`);
     }
+  }
+
+  /**
+   * Checks whether the specified user is a manager of the exploration.
+   * Verifies by checking that the username appears explicitly in the Managers section.
+   */
+  async expectUserToBeExplorationManager(username: string): Promise<void> {
+    // Verify the username is listed in the Managers section (the definitive check per CUJ).
+    await this.expectElementToBeVisible(rolesContentSelector);
+    const owners = await this.page.$$(ownersListSelector);
+    if (owners.length === 0) {
+      throw new Error('Managers list is empty or not found.');
+    }
+
+    const ownerUsernames = await this.page.$$eval(
+      ownersListSelector,
+      elements =>
+        elements
+          .map(element => element.textContent?.trim() || '')
+          .filter(Boolean)
+    );
+
+    if (!ownerUsernames.includes(username)) {
+      throw new Error(
+        `Expected user "${username}" to be listed as manager, but not found in: ${ownerUsernames.join(
+          ', '
+        )}`
+      );
+    }
+
+    showMessage(`User ${username} is listed as a manager of this exploration.`);
   }
 
   /**
@@ -5930,6 +6157,8 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < answerItems.length - 1; i++) {
       const option = answerItems[i];
 
+      // Re-query the list fresh after each drag so stale handles from
+      // Angular re-renders do not cause incorrect source/destination picks.
       const optionElements = await this.page.$$(dragAndDropItemSelector);
       const destinationElement = optionElements[i];
 
@@ -5947,6 +6176,10 @@ export class ExplorationEditor extends BaseUser {
 
       if (!sourceElement) {
         throw new Error(`Option "${option}" not found.`);
+      }
+
+      if (sourceElement === destinationElement) {
+        continue;
       }
 
       // Ensure that elements have stabilized before we start dragging.
@@ -5968,6 +6201,9 @@ export class ExplorationEditor extends BaseUser {
         destBox.x + destBox.width / 2,
         destBox.y + destBox.height / 2
       );
+
+      // Wait for the list to settle after the drag before the next iteration.
+      await this.page.waitForTimeout(500);
     }
 
     await this.clickOnSubmitAnswerButton();
@@ -5979,21 +6215,51 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedUsers - The expected count of users who submitted ratings.
    */
   async expectAverageRatingAndUsersToBe(
-    expectedRating: number,
+    expectedRating: number | string,
     expectedUsers: number
   ): Promise<void> {
-    await this.page.waitForSelector(avarageRatingSelector, {
-      visible: true,
-    });
-    const avarageRating = await this.page.$eval(
-      avarageRatingSelector,
-      element => parseFloat((element as HTMLElement).innerText.trim())
+    await this.expectElementToBeVisible(averageRatingsCardSelector, true);
+
+    const ratingElements = await this.page.$$(
+      `${averageRatingsCardSelector} .stat-value-with-rating, ` +
+        `${averageRatingsCardSelector} .stat-value-without-rating`
     );
-    if (avarageRating !== expectedRating) {
-      throw new Error(
-        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+    let ratingText = '';
+
+    for (const element of ratingElements) {
+      const rect = await element.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      ratingText = await this.page.evaluate(
+        el => (el as HTMLElement).innerText.trim() || '',
+        element
       );
+      break;
     }
+
+    // Handle "N/A" case.
+    if (expectedRating === 'N/A') {
+      if (ratingText !== 'N/A') {
+        throw new Error(
+          'Expected average rating to be "N/A", but found "' + ratingText + '".'
+        );
+      }
+    } else {
+      const ratingValue = parseFloat(ratingText);
+
+      if (ratingValue !== expectedRating) {
+        throw new Error(
+          'Expected average rating to be ' +
+            expectedRating +
+            ', but found ' +
+            ratingValue +
+            '.'
+        );
+      }
+    }
+
     const totalUsersText = await this.page.$eval(
       usersCountInRatingSelector,
       el => (el as HTMLElement).innerText.trim() || ''
@@ -6013,12 +6279,28 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of open feedback entries.
    */
   async expectOpenFeedbacksToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(openFeedbackCardSelector, true);
     const numberOfOpenFeedbacks = await this.page.$eval(
-      numberOfOpenFeedbacksSelector,
-      el => parseInt((el as HTMLElement).innerText.trim(), 10)
+      openFeedbackCardSelector,
+      card => {
+        const statValue = Array.from(
+          (card as HTMLElement).querySelectorAll(
+            '.stat-value-with-rating, .stat-value-without-rating'
+          )
+        ).find(element => {
+          const htmlElement = element as HTMLElement;
+          const style = window.getComputedStyle(htmlElement);
+          const rect = htmlElement.getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        }) as HTMLElement | undefined;
+
+        return parseInt(statValue?.innerText.trim() || '0', 10);
+      }
     );
     if (numberOfOpenFeedbacks !== number) {
       throw new Error(
@@ -6032,12 +6314,26 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected total play count.
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(totalPlaysSelector, {
-      visible: true,
-    });
-    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
-      parseInt((el as HTMLElement).innerText.trim(), 10)
+    await this.expectElementToBeVisible(totalPlaysCardSelector, true);
+    const totalPlaysElements = await this.page.$$(
+      `${totalPlaysCardSelector} .stat-value-with-rating, ` +
+        `${totalPlaysCardSelector} .stat-value-without-rating`
     );
+    let numberOfTotalPlays = 0;
+
+    for (const el of totalPlaysElements) {
+      const rect = await el.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      const text = await this.page.evaluate(
+        element => (element as HTMLElement).innerText.trim() || '0',
+        el
+      );
+      numberOfTotalPlays = parseInt(text, 10) || 0;
+      break;
+    }
     if (numberOfTotalPlays !== number) {
       throw new Error(
         `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
@@ -8006,7 +8302,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(creatorDashboardMenuLink);
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
-    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+    await this.waitForCreatorDashboardToLoad();
   }
 
   /**
@@ -8186,6 +8482,347 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(previewRestartButton, {
       visible: true,
     });
+   * Expects explorations displayed in the grid to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInGridInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationGridSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationGridCardTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects explorations displayed in the list to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInListInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationListSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationListRowTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the grid to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenFeedback - The expected open feedback text.
+   * @param {string} expectedViews - The expected views text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectGridCardDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenFeedback: string,
+    expectedViews: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationGridCardTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationGridCardTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    const cardHandle = await titleElement.evaluateHandle(
+      (element, cardSelector) => element.closest(cardSelector),
+      explorationGridSelector
+    );
+    const card = cardHandle.asElement();
+
+    if (!card) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string,
+        expectedRatingText: string,
+        expectedFeedbackText: string,
+        expectedViewsText: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getStatisticText(ratingSelector) === expectedRatingText &&
+          getStatisticText(feedbackSelector) === expectedFeedbackText &&
+          getStatisticText(viewsSelector) === expectedViewsText
+        );
+      },
+      {},
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector,
+      expectedRating,
+      expectedOpenFeedback,
+      expectedViews
+    );
+
+    const cardDetails = await this.page.evaluate(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return {
+          rating: getStatisticText(ratingSelector),
+          feedback: getStatisticText(feedbackSelector),
+          views: getStatisticText(viewsSelector),
+        };
+      },
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector
+    );
+
+    if (cardDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${cardDetails.rating}".`
+      );
+    }
+
+    if (cardDetails.feedback !== expectedOpenFeedback) {
+      throw new Error(
+        `Expected open feedback "${expectedOpenFeedback}" but found "${cardDetails.feedback}".`
+      );
+    }
+
+    if (cardDetails.views !== expectedViews) {
+      throw new Error(
+        `Expected views "${expectedViews}" but found "${cardDetails.views}".`
+      );
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the list to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenThreads - The expected open threads text.
+   * @param {string} expectedPlays - The expected plays text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectListDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenThreads: string,
+    expectedPlays: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationListRowTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationListRowTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+    const rowHandle = await titleElement.evaluateHandle(
+      (element, rowSelector) => element.closest(rowSelector),
+      explorationListItemSelector
+    );
+    const row = rowHandle.asElement();
+
+    if (!row) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        rowElement: Element,
+        expectedRatingText: string,
+        expectedOpenThreadsText: string,
+        expectedPlaysText: string
+      ) => {
+        const getCellText = (cellSelector: string): string => {
+          return (
+            (
+              rowElement.querySelector(cellSelector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getCellText('td:nth-child(2)') === expectedRatingText &&
+          getCellText('td:nth-child(3)') === expectedPlaysText &&
+          getCellText('td:nth-child(4)') === expectedOpenThreadsText
+        );
+      },
+      {},
+      row,
+      expectedRating,
+      expectedOpenThreads,
+      expectedPlays
+    );
+
+    const rowDetails = await this.page.evaluate((rowElement: Element) => {
+      const getCellText = (cellSelector: string): string => {
+        return (
+          (
+            rowElement.querySelector(cellSelector) as HTMLElement | null
+          )?.textContent?.trim() || ''
+        );
+      };
+
+      return {
+        rating: getCellText('td:nth-child(2)'),
+        plays: getCellText('td:nth-child(3)'),
+        openThreads: getCellText('td:nth-child(4)'),
+      };
+    }, row);
+
+    if (rowDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${rowDetails.rating}".`
+      );
+    }
+
+    if (rowDetails.openThreads !== expectedOpenThreads) {
+      throw new Error(
+        `Expected open threads "${expectedOpenThreads}" but found "${rowDetails.openThreads}".`
+      );
+    }
+
+    if (rowDetails.plays !== expectedPlays) {
+      throw new Error(
+        `Expected plays "${expectedPlays}" but found "${rowDetails.plays}".`
+      );
+    }
+  }
+
+  /**
+   * Switches the exploration editor to list view.
+   */
+  async switchToListView(): Promise<void> {
+    await this.expectElementToBeVisible(listViewButtonSelector, true);
+
+    // If list is already visible and grid is hidden, we can pass.
+    const listVisibleInitially = await this.isElementVisible(
+      explorationListSelector,
+      true,
+      500
+    );
+    const gridVisibleInitially = await this.isElementVisible(
+      explorationGridSelector,
+      true,
+      500
+    );
+
+    if (listVisibleInitially && !gridVisibleInitially) {
+      await this.waitForCreatorDashboardToLoad();
+      return;
+    }
+
+    await this.clickOnElementWithSelector(listViewButtonSelector);
+
+    // Wait until the list container is visible and the grid container is hidden.
+    await this.page.waitForFunction(
+      (listSel: string, gridSel: string) => {
+        const list = document.querySelector(listSel);
+        const grid = document.querySelector(gridSel);
+
+        const isVisible = (el: Element | null) => {
+          if (!el) {
+            return false;
+          }
+          const style = window.getComputedStyle(el as Element);
+          const rect = (el as HTMLElement).getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        };
+
+        return isVisible(list) && !isVisible(grid);
+      },
+      {},
+      explorationListSelector,
+      explorationGridSelector
+    );
+
+    await this.waitForCreatorDashboardToLoad();
+  }
+
+  /**
+   * Utility to verify the empty-dashboard message on the Creator Dashboard.
+   * @param expectedText - The expected message text.
+   */
+  async expectCreatorDashboardMessageToBe(expectedText: string): Promise<void> {
+    await this.expectTextContentToBe(
+      emptyCreatorDashboardMessageSelector,
+      expectedText
+    );
   }
 }
 
