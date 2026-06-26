@@ -1,4 +1,5 @@
 [
+    "core/templates/base-components/feedback-modal.component.ts",
     "core/templates/base-components/oppia-footer.component.ts",
     "core/templates/base-components/thanks-for-subscribing-modal.component.ts",
     "core/templates/components/button-directives/exploration-embed-button-modal.component.ts",
@@ -7,6 +8,7 @@
     "core/templates/components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component.ts",
     "core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.ts",
     "core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component.ts",
+    "core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.ts",
     "core/templates/components/entity-creation-services/story-creation-backend-api.service.ts",
     "core/templates/components/entity-creation-services/topic-creation.service.ts",
     "core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.ts",
@@ -139,6 +141,7 @@
     "core/templates/pages/exploration-editor-page/translation-tab/voiceover-card/voiceover-card.component.ts",
     "core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component.ts",
     "core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.ts",
+    "core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/learner-local-nav.component.ts",
     "core/templates/pages/exploration-player-page/current-lesson-player/modals/display-hint-modal.component.ts",
     "core/templates/pages/exploration-player-page/current-lesson-player/modals/display-solution-interstitial-modal.component.ts",
     "core/templates/pages/exploration-player-page/current-lesson-player/modals/display-solution-modal.component.ts",
