@@ -80,6 +80,54 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch all certificate offerings', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentOfferingsAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      certificate_offerings: [
+        {
+          certificate_id: 'mock_certificate_id',
+          title: 'Sample Certificate',
+          description: 'Sample Description',
+          classroom_id: 'sample_classroom',
+          topic_ids: ['topic_1', 'topic_2'],
+          total_questions: 4,
+          time_limit_in_minutes: 20,
+          demonstrates: ['Sample skill'],
+          async_status: 'Available',
+          version: 1,
+        },
+      ],
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith([
+      new CertificateAssessmentOfferingData(
+        'mock_certificate_id',
+        'Sample Certificate',
+        'Sample Description',
+        'sample_classroom',
+        {
+          topic_1: 1,
+          topic_2: 1,
+        },
+        4,
+        20,
+        ['Sample skill'],
+        'Available',
+        1
+      ),
+    ]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should include provided topic ids in the stub payload', fakeAsync(() => {
     mockCertificateOfferingData = new CertificateAssessmentOfferingData(
       '',
@@ -173,6 +221,33 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Error occurred while creating offering.'
+    );
+  }));
+
+  it('should use rejection handler if fetching certificate offerings fails', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentOfferingsAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {},
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      jasmine.stringMatching(
+        /^Http failure response for .*: 500 Internal Server Error$/
+      )
     );
   }));
 

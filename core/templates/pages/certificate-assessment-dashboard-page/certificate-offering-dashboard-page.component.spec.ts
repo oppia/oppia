@@ -19,6 +19,7 @@
 import {
   ComponentFixture,
   TestBed,
+  CUSTOM_ELEMENTS_SCHEMA,
   fakeAsync,
   flushMicrotasks,
 } from '@angular/core/testing';
@@ -29,6 +30,7 @@ import {AlertsService} from 'services/alerts.service';
 
 import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 
 describe('CertificateOfferingDashboardPageComponent', () => {
   let component: CertificateOfferingDashboardPageComponent;
@@ -41,6 +43,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [CertificateOfferingDashboardPageComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
           provide: AlertsService,
@@ -52,6 +55,8 @@ describe('CertificateOfferingDashboardPageComponent', () => {
         {
           provide: CertificateAssessmentOfferingBackendApiService,
           useValue: {
+            getCertificateAssessmentOfferingsAsync: async () =>
+              Promise.resolve([]),
             deleteCertificateAssessmentOfferingAsync: async () =>
               Promise.resolve(),
           },
@@ -86,6 +91,91 @@ describe('CertificateOfferingDashboardPageComponent', () => {
       true
     );
   });
+
+  it('should load real certificate offerings on init', fakeAsync(() => {
+    const loadSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingsAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: 'certificate_1',
+          title: 'Algebra Certificate',
+          description: 'Covers equations.',
+          classroom_id: 'math_classroom_01',
+          topic_data: {topic_1: 1, topic_2: 1},
+          demonstrates: ['Equations'],
+          total_questions: 8,
+          time_limit_in_minutes: 40,
+          async_status: 'Available',
+          version: 1,
+        }),
+      ])
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(loadSpy).toHaveBeenCalled();
+    expect(component.certificateOfferings).toEqual([
+      {
+        certificateId: 'certificate_1',
+        title: 'Algebra Certificate',
+        topicsLabel: '2 topics',
+        timeLabel: '40 min',
+        status: 'Available',
+      },
+    ]);
+  }));
+
+  it('should display not_ready as Not Ready', () => {
+    expect(component.getHumanReadableStatus('not_ready')).toBe('Not Ready');
+  });
+
+  it('should leave other statuses unchanged', () => {
+    expect(component.getHumanReadableStatus('Available')).toBe('Available');
+  });
+
+  it('should show empty state when there are no certificate offerings', fakeAsync(() => {
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(component.certificateOfferings).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain(
+      'No certificate created yet.'
+    );
+  }));
+
+  it('should render not_ready as Not Ready in the table', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingsAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: 'certificate_1',
+          title: 'Algebra Certificate',
+          description: 'Covers equations.',
+          classroom_id: 'math_classroom_01',
+          topic_data: {topic_1: 1},
+          demonstrates: ['Equations'],
+          total_questions: 8,
+          time_limit_in_minutes: 40,
+          async_status: 'not_ready',
+          version: 1,
+        }),
+      ])
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Not Ready');
+    expect(fixture.nativeElement.textContent).not.toContain('not_ready');
+  }));
 
   it('should build the edit certificate offering route', () => {
     expect(component.getEditCertificateOfferingRoute('mock_id')).toEqual(

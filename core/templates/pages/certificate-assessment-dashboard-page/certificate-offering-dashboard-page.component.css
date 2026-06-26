@@ -1,0 +1,231 @@
+
+.oppia-certificate-offering-dashboard {
+    padding-bottom: 2rem;
+  }
+
+  .oppia-certificate-offering-hero {
+    align-items: flex-start;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding: 7.5rem 0 0 0;
+  }
+
+  .oppia-certificate-offering-description {
+    color: #5f6368;
+    font-size: 1.05rem;
+    margin-bottom: 0;
+  }
+
+  .oppia-total-badge {
+    background: #f5f6f7;
+    border: 1px solid #e2e5e8;
+    color: #6c757d;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+  }
+
+.oppia-certificate-offering-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  gap: 0;
+  margin-top: 110px;
+  padding: 15px 28px;
+  overflow: hidden;
+  width: 100% !important;
+}
+
+.oppia-certificate-offering-table thead th {
+  background: #f2f4f6;
+  border: 1px solid #dfe3e8;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.oppia-certificate-offering-table tbody tr,
+.oppia-certificate-offering-table tbody td {
+  border: 1px solid #dfe3e8;
+}
+
+.oppia-certificate-offering-table td {
+  padding: 18px 20px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.oppia-certificate-offering-table td {
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  vertical-align: middle;
+}
+
+.oppia-topics-count {
+  color: #212529;
+  font-size: 14px;
+}
+
+.oppia-status-badge {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  padding: 0.9em 0.9em;
+}
+
+.oppia-status-badge.oppia-status-available {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+
+.oppia-status-badge.oppia-status-blocked {
+  background-color: #fbe7ea;
+  color: #c5293f;
+}
+.oppia-title-cell {
+  max-width: 540px;
+  padding-left: 25px;
+  padding-right: 25px;
+  text-align: left !important;
+  width: 540px;
+}
+
+.oppia-title-cell .oppia-certificate-title {
+  display: inline-block;
+  max-width: 490px;
+}
+
+.oppia-status-cell,
+.oppia-actions-cell {
+  text-align: center;
+}
+.oppia-title-th {
+  text-align: left !important;
+  padding: 0 20px;
+}
+
+.oppia-certificate-title {
+  color: #212529;
+  font-size: 14px;
+  line-height: 1.4;
+  max-width: 420px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.oppia-status-badge.oppia-status-not-ready {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.oppia-action-buttons {
+  gap: 0.5rem;
+}
+
+.oppia-certificate-offering-table {
+  border: 1px solid #dfe3e8;
+  width: 100%;
+}
+
+.oppia-edit-btn {
+  background-color: transparent;
+  border: 1px solid #00645c;
+  border-radius: 0.375rem;
+  color: #00645c;
+  padding: 0.3rem 0.9rem;
+}
+
+.oppia-edit-btn:hover,
+.oppia-edit-btn:focus {
+  background-color: #00645c;
+  color: #fff;
+}
+
+.oppia-delete-btn {
+  border: 1px solid #dc3545;
+  background-color: transparent;
+  border-radius: 0.375rem;
+  color: #dc3545;
+  padding: 0.3rem 0.9rem;
+}
+
+.oppia-delete-btn:hover,
+.oppia-delete-btn:focus {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.oppia-table-footer {
+  border-top: 1px solid #eee;
+}
+
+.oppia-pagination-controls {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+.oppia-pagination-button {
+  background: #fff;
+  border: 1px solid #cfd5dc;
+  color: #27635c;
+  min-width: 100px;
+}
+
+.oppia-pagination-button:disabled {
+  color: #9aa3ab;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.oppia-pagination-count {
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.card-header.bg-white {
+  background: #fff !important;
+  border-bottom: 1px solid #eef0f2 !important;
+  min-height: 56px;
+}
+
+.oppia-certificate-offering-dashboard .btn.btn-primary.oppia-new-certificate-btn {
+  background-color: #00645c !important;
+  border-color: #00645c !important;
+  color: #fff !important;
+  margin-top: 0.35rem;
+  white-space: nowrap;
+}
+
+.oppia-certificate-offering-dashboard .btn.btn-primary.oppia-new-certificate-btn:focus,
+.oppia-certificate-offering-dashboard .btn.btn-primary.oppia-new-certificate-btn:hover {
+  background-color: #004d47 !important;
+  border-color: #004d47 !important;
+  color: #fff !important;
+}
+
+@media screen and (max-width: 767px) {
+    .oppia-certificate-offering-hero {
+      align-items: stretch;
+      flex-direction: column;
+      margin-top: 1.5rem;
+    }
+
+    .oppia-new-certificate-btn {
+      width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-certificate-offering-hero {
+    padding-top: 3rem;
+  }
+}

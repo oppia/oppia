@@ -59,6 +59,21 @@ interface GetCertificateOfferingBackendResponse {
   };
 }
 
+interface GetCertificateOfferingsBackendResponse {
+  certificate_offerings: Array<{
+    certificate_id: string;
+    title: string;
+    description: string;
+    classroom_id: string;
+    topic_ids: string[];
+    total_questions: number;
+    time_limit_in_minutes: number;
+    demonstrates: string[];
+    async_status: string;
+    version: number;
+  }>;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -70,6 +85,54 @@ export class CertificateAssessmentOfferingBackendApiService {
       '<certificate_id>',
       certificateId
     );
+  }
+
+  async getCertificateAssessmentOfferingsAsync(): Promise<
+    CertificateAssessmentOfferingData[]
+  > {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<GetCertificateOfferingsBackendResponse>(
+          CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              response.certificate_offerings.map(
+                certificateOfferingBackendDict => {
+                  const topicData: {
+                    [topicId: string]: number;
+                  } = {};
+                  for (const topicId of certificateOfferingBackendDict.topic_ids) {
+                    topicData[topicId] = 1;
+                  }
+                  return CertificateAssessmentOfferingData.createFromBackendDict(
+                    {
+                      certificate_id:
+                        certificateOfferingBackendDict.certificate_id,
+                      title: certificateOfferingBackendDict.title,
+                      description: certificateOfferingBackendDict.description,
+                      classroom_id: certificateOfferingBackendDict.classroom_id,
+                      topic_data: topicData,
+                      demonstrates: certificateOfferingBackendDict.demonstrates,
+                      total_questions:
+                        certificateOfferingBackendDict.total_questions,
+                      time_limit_in_minutes:
+                        certificateOfferingBackendDict.time_limit_in_minutes,
+                      async_status: certificateOfferingBackendDict.async_status,
+                      version: certificateOfferingBackendDict.version,
+                    }
+                  );
+                }
+              )
+            );
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error || errorResponse.message);
+          }
+        );
+    });
   }
 
   async getCertificateAssessmentOfferingAsync(

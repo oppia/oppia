@@ -15,14 +15,14 @@
 /**
  * @fileoverview Component for certificate offering dashboard.
  */
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
-
+import './certificate-offering-dashboard-page.component.css';
 interface CertificateOfferingSummary {
   certificateId: string;
   title: string;
@@ -34,16 +34,11 @@ interface CertificateOfferingSummary {
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
 })
-export class CertificateOfferingDashboardPageComponent {
-  certificateOfferings: CertificateOfferingSummary[] = [
-    {
-      certificateId: 'dummy_id',
-      title: 'Certificate Title',
-      topicsLabel: '-',
-      timeLabel: '-',
-      status: 'Draft',
-    },
-  ];
+export class CertificateOfferingDashboardPageComponent implements OnInit {
+  readonly certificatesPerPage = 5;
+  certificateOfferings: CertificateOfferingSummary[] = [];
+  isLoading = true;
+  currentPage = 1;
 
   createCertificateOfferingRoute =
     '/' +
@@ -55,6 +50,96 @@ export class CertificateOfferingDashboardPageComponent {
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private ngbModal: NgbModal
   ) {}
+
+  async ngOnInit(): Promise<void> {
+    await this.loadCertificateOfferings();
+  }
+
+  private async loadCertificateOfferings(): Promise<void> {
+    try {
+      const certificateOfferings =
+        await this.certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingsAsync();
+      this.certificateOfferings = certificateOfferings
+        .map(certificateOffering => ({
+          certificateId: certificateOffering.certificateId,
+          title: certificateOffering.title,
+          topicsLabel: this.getTopicsLabel(certificateOffering.topicData),
+          timeLabel: `${certificateOffering.timeLimitInMinutes} min`,
+          status: certificateOffering.asyncStatus,
+        }))
+        .sort((first, second) => first.title.localeCompare(second.title));
+      this.currentPage = 1;
+    } catch {
+      this.alertsService.addWarning('Failed to load certificate offerings.');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private getTopicsLabel(topicData: {[topicId: string]: number}): string {
+    const topicCount = Object.keys(topicData).length;
+    return topicCount.toString();
+  }
+
+  getHumanReadableStatus(status: string): string {
+    if (status.toLowerCase() === 'not_ready') {
+      return 'Not Ready';
+    }
+    return status;
+  }
+
+  get totalCertificateOfferings(): number {
+    return this.certificateOfferings.length;
+  }
+
+  get totalPages(): number {
+    return Math.max(
+      1,
+      Math.ceil(this.totalCertificateOfferings / this.certificatesPerPage)
+    );
+  }
+
+  get paginatedCertificateOfferings(): CertificateOfferingSummary[] {
+    const startIndex = (this.currentPage - 1) * this.certificatesPerPage;
+    return this.certificateOfferings.slice(
+      startIndex,
+      startIndex + this.certificatesPerPage
+    );
+  }
+
+  get startIndex(): number {
+    if (this.totalCertificateOfferings === 0) {
+      return 0;
+    }
+    return (this.currentPage - 1) * this.certificatesPerPage + 1;
+  }
+
+  get endIndex(): number {
+    return Math.min(
+      this.currentPage * this.certificatesPerPage,
+      this.totalCertificateOfferings
+    );
+  }
+
+  canGoToPreviousPage(): boolean {
+    return this.currentPage > 1;
+  }
+
+  canGoToNextPage(): boolean {
+    return this.currentPage < this.totalPages;
+  }
+
+  goToPreviousPage(): void {
+    if (this.canGoToPreviousPage()) {
+      this.currentPage -= 1;
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.canGoToNextPage()) {
+      this.currentPage += 1;
+    }
+  }
 
   getEditCertificateOfferingRoute(certificateId: string): string {
     return (
@@ -88,6 +173,9 @@ export class CertificateOfferingDashboardPageComponent {
         certificateOffering =>
           certificateOffering.certificateId !== certificateId
       );
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
       this.alertsService.addSuccessMessage('Certificate deleted successfully.');
     } catch {
       this.alertsService.addWarning('Failed to delete certificate.');
