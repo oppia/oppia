@@ -7881,6 +7881,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
     expect(isSolutionVisible).toBe(true);
+  }
   /**
    * Verifies that sitemap.xml contains valid XML URL entries.
    */
