@@ -28,6 +28,7 @@ import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor, RTE_BUTTON_TITLES} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -45,6 +46,8 @@ const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const activeModalMathJaxSvgSelector = '.modal-dialog .MathJax_SVG svg';
+const activeModalMathJaxTextSelector = '.modal-dialog .MathJax_SVG text';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
@@ -7618,6 +7621,432 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectFeedbackPageTobeVisible(): Promise<void> {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Adds a math formula to the current card's content using the RTE toolbar.
+   * This opens the state content editor, inserts a math formula via the
+   * CKEditor math button, and saves the content.
+   * @param {string} latex - The LaTeX expression to insert.
+   * @param {string} [expectedText] - The text expected to be rendered inside the MathJax SVG text node.
+   */
+  async addMathFormulaToCardContent(
+    latex: string,
+    expectedText?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
+
+    // Insert mathematical formula via the RTE toolbar.
+    const rteEditor = new RTEEditor(this.page, this.page);
+    await rteEditor.clickOnRTEOptionWithTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.EN
+    );
+    await this.waitForNetworkIdle();
+    await rteEditor.typeMathExpression(latex);
+
+    if (expectedText) {
+      await this.expectMathJaxToRenderArabicTextInSvgTextNode(expectedText);
+    }
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Math formula added to card content successfully.');
+  }
+
+  /**
+   * Asserts that Arabic text in a MathJax-rendered formula is preserved as a
+   * single contiguous string inside a text element, rather than being
+   * split into disconnected SVG text nodes. This verifies that the
+   * mtextFontInherit configuration is working correctly (Fixes #26148).
+   * @param {string} expectedText - The Arabic text expected inside the
+   *   text node.
+   */
+  async expectMathJaxToRenderArabicTextInSvgTextNode(
+    expectedText: string
+  ): Promise<void> {
+    // Math interactions require heavy MathJax rendering and take significantly
+    // longer to load than other interactions.
+    await this.page.waitForSelector(activeModalMathJaxSvgSelector, {
+      timeout: 15000,
+    });
+
+    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(
+      (svgSelector, textSelector) => {
+        const svgElement = document.querySelector(svgSelector);
+        const textNodes = document.querySelectorAll(textSelector);
+        return {
+          arabicTextContent:
+            Array.from(textNodes)
+              .map(node => node.textContent?.trim() || '')
+              .filter(text => text !== '')
+              .join(' | ') || null,
+          rawSvgHtml: svgElement ? svgElement.textContent : null,
+        };
+      },
+      activeModalMathJaxSvgSelector,
+      activeModalMathJaxTextSelector
+    );
+
+    if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
+      throw new Error(
+        `Expected MathJax to render Arabic text "${expectedText}" inside an ` +
+          `SVG <text> element, but found: "${arabicTextContent}". ` +
+          `Raw SVG HTML for debugging: \n${rawSvgHtml}\n ` +
+          'This indicates that mtextFontInherit is not working correctly.'
+      );
+    }
+    showMessage(
+      'Arabic text rendered correctly inside text node: ' + arabicTextContent
+    );
+  }
+
+  /**
+   * Expects explorations displayed in the grid to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInGridInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationGridSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationGridCardTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects explorations displayed in the list to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInListInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationListSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationListRowTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the grid to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenFeedback - The expected open feedback text.
+   * @param {string} expectedViews - The expected views text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectGridCardDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenFeedback: string,
+    expectedViews: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationGridCardTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationGridCardTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    const cardHandle = await titleElement.evaluateHandle(
+      (element, cardSelector) => element.closest(cardSelector),
+      explorationGridSelector
+    );
+    const card = cardHandle.asElement();
+
+    if (!card) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string,
+        expectedRatingText: string,
+        expectedFeedbackText: string,
+        expectedViewsText: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getStatisticText(ratingSelector) === expectedRatingText &&
+          getStatisticText(feedbackSelector) === expectedFeedbackText &&
+          getStatisticText(viewsSelector) === expectedViewsText
+        );
+      },
+      {},
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector,
+      expectedRating,
+      expectedOpenFeedback,
+      expectedViews
+    );
+
+    const cardDetails = await this.page.evaluate(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return {
+          rating: getStatisticText(ratingSelector),
+          feedback: getStatisticText(feedbackSelector),
+          views: getStatisticText(viewsSelector),
+        };
+      },
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector
+    );
+
+    if (cardDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${cardDetails.rating}".`
+      );
+    }
+
+    if (cardDetails.feedback !== expectedOpenFeedback) {
+      throw new Error(
+        `Expected open feedback "${expectedOpenFeedback}" but found "${cardDetails.feedback}".`
+      );
+    }
+
+    if (cardDetails.views !== expectedViews) {
+      throw new Error(
+        `Expected views "${expectedViews}" but found "${cardDetails.views}".`
+      );
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the list to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenThreads - The expected open threads text.
+   * @param {string} expectedPlays - The expected plays text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectListDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenThreads: string,
+    expectedPlays: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationListRowTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationListRowTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+    const rowHandle = await titleElement.evaluateHandle(
+      (element, rowSelector) => element.closest(rowSelector),
+      explorationListItemSelector
+    );
+    const row = rowHandle.asElement();
+
+    if (!row) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        rowElement: Element,
+        expectedRatingText: string,
+        expectedOpenThreadsText: string,
+        expectedPlaysText: string
+      ) => {
+        const getCellText = (cellSelector: string): string => {
+          return (
+            (
+              rowElement.querySelector(cellSelector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getCellText('td:nth-child(2)') === expectedRatingText &&
+          getCellText('td:nth-child(3)') === expectedPlaysText &&
+          getCellText('td:nth-child(4)') === expectedOpenThreadsText
+        );
+      },
+      {},
+      row,
+      expectedRating,
+      expectedOpenThreads,
+      expectedPlays
+    );
+
+    const rowDetails = await this.page.evaluate((rowElement: Element) => {
+      const getCellText = (cellSelector: string): string => {
+        return (
+          (
+            rowElement.querySelector(cellSelector) as HTMLElement | null
+          )?.textContent?.trim() || ''
+        );
+      };
+
+      return {
+        rating: getCellText('td:nth-child(2)'),
+        plays: getCellText('td:nth-child(3)'),
+        openThreads: getCellText('td:nth-child(4)'),
+      };
+    }, row);
+
+    if (rowDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${rowDetails.rating}".`
+      );
+    }
+
+    if (rowDetails.openThreads !== expectedOpenThreads) {
+      throw new Error(
+        `Expected open threads "${expectedOpenThreads}" but found "${rowDetails.openThreads}".`
+      );
+    }
+
+    if (rowDetails.plays !== expectedPlays) {
+      throw new Error(
+        `Expected plays "${expectedPlays}" but found "${rowDetails.plays}".`
+      );
+    }
+  }
+
+  /**
+   * Switches the exploration editor to list view.
+   */
+  async switchToListView(): Promise<void> {
+    await this.expectElementToBeVisible(listViewButtonSelector, true);
+
+    // If list is already visible and grid is hidden, we can pass.
+    const listVisibleInitially = await this.isElementVisible(
+      explorationListSelector,
+      true,
+      500
+    );
+    const gridVisibleInitially = await this.isElementVisible(
+      explorationGridSelector,
+      true,
+      500
+    );
+
+    if (listVisibleInitially && !gridVisibleInitially) {
+      await this.waitForCreatorDashboardToLoad();
+      return;
+    }
+
+    await this.clickOnElementWithSelector(listViewButtonSelector);
+
+    // Wait until the list container is visible and the grid container is hidden.
+    await this.page.waitForFunction(
+      (listSel: string, gridSel: string) => {
+        const list = document.querySelector(listSel);
+        const grid = document.querySelector(gridSel);
+
+        const isVisible = (el: Element | null) => {
+          if (!el) {
+            return false;
+          }
+          const style = window.getComputedStyle(el as Element);
+          const rect = (el as HTMLElement).getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        };
+
+        return isVisible(list) && !isVisible(grid);
+      },
+      {},
+      explorationListSelector,
+      explorationGridSelector
+    );
+
+    await this.waitForCreatorDashboardToLoad();
+  }
+
+  /**
+   * Utility to verify the empty-dashboard message on the Creator Dashboard.
+   * @param expectedText - The expected message text.
+   */
+  async expectCreatorDashboardMessageToBe(expectedText: string): Promise<void> {
+    await this.expectTextContentToBe(
+      emptyCreatorDashboardMessageSelector,
+      expectedText
+    );
   }
 }
 
