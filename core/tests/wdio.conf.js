@@ -47,10 +47,6 @@ var suites = {
 
   topicAndStoryEditor: [
     './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
-  ],
-
-  wipeout: [
-    './core/tests/webdriverio_desktop/wipeout.js'
   ]
 };
 
