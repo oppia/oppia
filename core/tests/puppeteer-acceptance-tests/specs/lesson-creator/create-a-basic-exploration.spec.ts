@@ -108,7 +108,7 @@ describe('Lesson Creator', function () {
         INTERACTION_TYPES.CONTINUE_BUTTON
       );
 
-      // Open the customization modal, save, and verify the modal closes
+      // Open the customization modal, save, and verify the modal closes.
       await explorationEditor.clickOnTestExploration();
       await explorationEditor.expectModalTitleToBe(
         'Customize Interaction (Continue Button)'
