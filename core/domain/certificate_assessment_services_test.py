@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import utils
 from core.domain import (
     certificate_assessment_services,
     classroom_config_domain,
@@ -141,7 +140,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            utils.ValidationError,
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException,
             'Certificate assessment offering .* does not exist.',
         ):
             certificate_assessment_services.get_certificate_assessment_offering(
