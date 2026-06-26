@@ -37,11 +37,16 @@
   <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
     <div class="content">
-      <div class="card" *ngFor="let section of sections">
-        <div class="card-header">
+      <div class="card" *ngFor="let section of sections; let i = index">
+        <div class="card-header"
+             [class.card-header-highlighted]="isSectionHighlighted(i)"
+             (click)="toggleSection(i)"
+             (keydown.enter)="toggleSection(i)"
+             tabindex="0">
           <h3 class="card-title">{{ section.heading.unicode }}</h3>
+          <i class="material-icons card-chevron" [class.expanded]="isSectionExpanded(i)">expand_more</i>
         </div>
-        <div class="card-content">
+        <div class="card-content" *ngIf="isSectionExpanded(i)">
           <oppia-rte-output-display [rteString]="section.content.html">
           </oppia-rte-output-display>
         </div>
@@ -130,12 +135,22 @@
   .card {
     background-color: #fff;
     border: none !important;
+    margin-bottom: 12px;
     overflow: hidden;
   }
 
   .card-header {
+    align-items: center;
     background-color: #003b36;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
     padding: 10px 10px;
+    user-select: none;
+  }
+
+  .card-header-highlighted {
+    background-color: #00645c;
   }
 
   .card-title {
@@ -144,7 +159,16 @@
     font-size: 18px;
     font-weight: 700;
     margin: 0;
-    text-align: center;
+  }
+
+  .card-chevron {
+    color: #fff;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .card-chevron.expanded {
+    transform: rotate(180deg);
   }
 
   .card-content {
@@ -279,11 +303,11 @@
     }
 
     .card-header {
-      padding: 15px 15px;
+      padding: 15px;
     }
 
     .card-title {
-      font-size: 18px;
+      font-size: 16px;
     }
 
     .card-content {

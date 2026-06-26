@@ -356,6 +356,7 @@ describe('Subtopic viewer page', function () {
       'subtopic-url'
     );
     spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
 
     spyOn(
       subtopicViewerBackendApiService,
@@ -370,7 +371,151 @@ describe('Subtopic viewer page', function () {
 
     expect(component.sections).toEqual(subtopicDataObject.getSections());
     expect(component.pageContents).toBeNull();
+    expect(component.expandedSectionIndices).toEqual(new Set([0]));
+    expect(component.highlightedSectionIndex).toBe(-1);
   }));
+
+  it('should expand first section by default when sections are loaded', fakeAsync(() => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic-url'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom-url'
+    );
+    spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'subtopic-url'
+    );
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    spyOn(
+      subtopicViewerBackendApiService,
+      'fetchSubtopicDataAsync'
+    ).and.returnValue(Promise.resolve(subtopicDataObject));
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(topicDataObject)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.expandedSectionIndices).toEqual(new Set([0]));
+    expect(component.isSectionExpanded(0)).toBeTrue();
+    expect(component.isSectionExpanded(1)).toBeFalse();
+    expect(component.highlightedSectionIndex).toBe(-1);
+    expect(component.isSectionHighlighted(0)).toBeFalse();
+  }));
+
+  it('should pre-expand and highlight a section when section query param is provided', fakeAsync(() => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic-url'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom-url'
+    );
+    spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'subtopic-url'
+    );
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlService, 'getUrlParams').and.returnValue({section: '0'});
+    spyOn(
+      subtopicViewerBackendApiService,
+      'fetchSubtopicDataAsync'
+    ).and.returnValue(Promise.resolve(subtopicDataObject));
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(topicDataObject)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.expandedSectionIndices).toEqual(new Set([0]));
+    expect(component.highlightedSectionIndex).toBe(0);
+    expect(component.isSectionExpanded(0)).toBeTrue();
+    expect(component.isSectionHighlighted(0)).toBeTrue();
+  }));
+
+  it('should fall back to first section when section query param is out of range', fakeAsync(() => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic-url'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom-url'
+    );
+    spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'subtopic-url'
+    );
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlService, 'getUrlParams').and.returnValue({section: '99'});
+    spyOn(
+      subtopicViewerBackendApiService,
+      'fetchSubtopicDataAsync'
+    ).and.returnValue(Promise.resolve(subtopicDataObject));
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(topicDataObject)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.expandedSectionIndices).toEqual(new Set([0]));
+    expect(component.highlightedSectionIndex).toBe(-1);
+  }));
+
+  it('should toggle a section open then closed', () => {
+    component.expandedSectionIndices = new Set([0]);
+
+    component.toggleSection(1);
+    expect(component.expandedSectionIndices.has(1)).toBeTrue();
+
+    component.toggleSection(1);
+    expect(component.expandedSectionIndices.has(1)).toBeFalse();
+  });
+
+  it('should collapse current section when toggling it while expanded', () => {
+    component.expandedSectionIndices = new Set([2]);
+
+    component.toggleSection(2);
+
+    expect(component.expandedSectionIndices.has(2)).toBeFalse();
+    expect(component.isSectionExpanded(2)).toBeFalse();
+  });
+
+  it('should allow multiple sections to be open simultaneously', () => {
+    component.expandedSectionIndices = new Set([0]);
+
+    component.toggleSection(1);
+    component.toggleSection(2);
+
+    expect(component.isSectionExpanded(0)).toBeTrue();
+    expect(component.isSectionExpanded(1)).toBeTrue();
+    expect(component.isSectionExpanded(2)).toBeTrue();
+  });
+
+  it('should report correct isSectionExpanded values', () => {
+    component.expandedSectionIndices = new Set([1]);
+
+    expect(component.isSectionExpanded(0)).toBeFalse();
+    expect(component.isSectionExpanded(1)).toBeTrue();
+    expect(component.isSectionExpanded(2)).toBeFalse();
+  });
+
+  it('should report correct isSectionHighlighted values', () => {
+    component.highlightedSectionIndex = 2;
+
+    expect(component.isSectionHighlighted(0)).toBeFalse();
+    expect(component.isSectionHighlighted(1)).toBeFalse();
+    expect(component.isSectionHighlighted(2)).toBeTrue();
+  });
+
+  it('should not highlight any section when highlightedSectionIndex is -1', () => {
+    component.highlightedSectionIndex = -1;
+
+    expect(component.isSectionHighlighted(0)).toBeFalse();
+    expect(component.isSectionHighlighted(1)).toBeFalse();
+  });
 
   it(
     'should obtain translated title and set it whenever the ' +

@@ -73,6 +73,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   subtopicSummaryIsShown: boolean = false;
   isPracticeTabDisplayed: boolean = false;
   currentSubtopicId!: number;
+  expandedSectionIndices: Set<number> = new Set([0]);
+  highlightedSectionIndex: number = -1;
 
   constructor(
     private alertsService: AlertsService,
@@ -146,6 +148,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       ([subtopicDataObject, topicDataObject]) => {
         if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
           this.sections = subtopicDataObject.getSections();
+          this.initializeSectionExpansion();
         } else {
           this.pageContents = subtopicDataObject.getPageContents();
         }
@@ -225,6 +228,40 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
         this.parentTopicTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  initializeSectionExpansion(): void {
+    const params = this.urlService.getUrlParams();
+    if (Object.prototype.hasOwnProperty.call(params, 'section')) {
+      const sectionIndex = parseInt(params.section, 10);
+      if (
+        !isNaN(sectionIndex) &&
+        this.sections !== null &&
+        sectionIndex >= 0 &&
+        sectionIndex < this.sections.length
+      ) {
+        this.expandedSectionIndices = new Set([sectionIndex]);
+        this.highlightedSectionIndex = sectionIndex;
+        return;
+      }
+    }
+    this.expandedSectionIndices = new Set([0]);
+  }
+
+  isSectionExpanded(index: number): boolean {
+    return this.expandedSectionIndices.has(index);
+  }
+
+  isSectionHighlighted(index: number): boolean {
+    return this.highlightedSectionIndex === index;
+  }
+
+  toggleSection(index: number): void {
+    if (this.expandedSectionIndices.has(index)) {
+      this.expandedSectionIndices.delete(index);
+    } else {
+      this.expandedSectionIndices.add(index);
+    }
   }
 
   openStudyGuide(event?: MouseEvent): void {
