@@ -1850,6 +1850,22 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the placeholder attribute of the given input or textarea
+   * element matches the expected value.
+   * @param {string} selector - The CSS selector of the element.
+   * @param {string} expectedPlaceholder - The expected placeholder text.
+   */
+  async expectElementPlaceholderToBe(
+    selector: string,
+    expectedPlaceholder: string
+  ): Promise<void> {
+    const placeholder = await this.page.$eval(
+      selector,
+      el => (el as HTMLInputElement | HTMLTextAreaElement).placeholder
+    );
+    expect(placeholder).toBe(expectedPlaceholder);
+  }
+  /**
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(

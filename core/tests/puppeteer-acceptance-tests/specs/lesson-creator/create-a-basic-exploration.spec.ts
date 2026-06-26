@@ -296,11 +296,10 @@ describe('Lesson Creator', function () {
         CARD_NAMES.THIRD,
         'Explain why "Bold text" is the correct option.'
       );
-      const textInputPlaceholder = await explorationEditor.page.$eval(
+      await explorationEditor.expectElementPlaceholderToBe(
         'textarea.e2e-test-description-box',
-        el => (el as HTMLTextAreaElement).placeholder
+        'Type an answer'
       );
-      expect(textInputPlaceholder).toBe('Type an answer');
 
       await explorationEditor.submitTextInputAnsswer('');
       await explorationEditor.expectAnswerErrorMessageToBe(
@@ -392,18 +391,10 @@ describe('Lesson Creator', function () {
       await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
 
       await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.page.waitForSelector(
+      await explorationEditor.expectElementPlaceholderToBe(
         '.e2e-test-float-form-input',
-        {
-          visible: true,
-        }
+        'Ingresa un número'
       );
-
-      const placeholderText = await explorationEditor.page.$eval(
-        '.e2e-test-float-form-input',
-        el => (el as HTMLInputElement).placeholder
-      );
-      expect(placeholderText).toBe('Ingresa un número');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
