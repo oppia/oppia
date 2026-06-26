@@ -17,10 +17,11 @@
  */
 
 import {ViewportSize} from '@playwright/test';
-import {expect, Page, ElementHandle} from '@playwright/test';
+import test, {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import fs from 'fs';
 
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
@@ -505,6 +506,20 @@ export class BaseUser {
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(-1, -1);
     await currentPage.waitForTimeout(5000);
+
+    const snapshotPath = test
+      .info()
+      .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
+
+    if (
+      !fs.existsSync(snapshotPath) &&
+      process.env.UPDATE_SNAPSHOTS !== 'true'
+    ) {
+      throw new Error(
+        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
+          'Run with --update_snapshots to generate it.'
+      );
+    }
 
     let failureTrigger = 0;
 
