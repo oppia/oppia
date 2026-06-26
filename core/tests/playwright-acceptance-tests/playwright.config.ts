@@ -17,6 +17,12 @@
  */
 
 import {defineConfig, devices} from '@playwright/test';
+import path from 'path';
+
+const PLAYWRIGHT_RESULTS_DIR = path.resolve(
+  __dirname,
+  '../../../../oppia_full_stack_test_playwright_results'
+);
 
 const isMobile = process.env.MOBILE === 'true';
 const isCI = process.env.PROD_ENV === 'true';
@@ -29,6 +35,7 @@ export default defineConfig({
     },
     timeout: 10000,
   },
+  outputDir: PLAYWRIGHT_RESULTS_DIR,
   testDir: './specs',
   timeout: 300000,
   fullyParallel: false,
