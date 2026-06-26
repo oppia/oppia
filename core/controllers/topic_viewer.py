@@ -28,12 +28,29 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
+    story_domain,
     story_fetchers,
     topic_fetchers,
     topic_services,
 )
 
-from typing import Any, Dict, List
+from typing import Dict, List, Optional, TypedDict
+
+
+class StoryDisplayDict(TypedDict, total=False):
+    """Type for the story dict displayed on the topic viewer page."""
+
+    id: str
+    title: str
+    description: str
+    node_titles: List[str]
+    thumbnail_bg_color: Optional[str]
+    thumbnail_filename: Optional[str]
+    url_fragment: str
+    story_is_published: bool
+    completed_node_titles: List[str]
+    all_node_dicts: List[story_domain.StoryNodeDict]
+    arcs: List[story_domain.ArcDict]
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -73,13 +90,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
-        # Here we use type Any because the dict values are of mixed types
-        # (str, bool, list).
         are_story_arcs_enabled = feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
             None,
         )
-        canonical_story_dicts: List[Dict[str, Any]] = []
+        canonical_story_dicts: List[StoryDisplayDict] = []
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
@@ -98,9 +113,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             story_summary_dict = story_summary.to_human_readable_dict()
             story = story_fetchers.get_story_by_id(story_summary.id)
-            # Here we use type Any because the dict values are of mixed types
-            # (str, bool, list).
-            canonical_story_dict: Dict[str, Any] = {
+            canonical_story_dict: StoryDisplayDict = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
@@ -118,9 +131,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 ]
             canonical_story_dicts.append(canonical_story_dict)
 
-        # Here we use type Any because the dict values are of mixed types
-        # (str, bool, list).
-        additional_story_dicts: List[Dict[str, Any]] = []
+        additional_story_dicts: List[StoryDisplayDict] = []
         for story_summary in additional_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
@@ -134,9 +145,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             story_summary_dict = story_summary.to_human_readable_dict()
             story = story_fetchers.get_story_by_id(story_summary.id)
-            # Here we use type Any because the dict values are of mixed types
-            # (str, bool, list).
-            additional_story_dict: Dict[str, Any] = {
+            additional_story_dict: StoryDisplayDict = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
