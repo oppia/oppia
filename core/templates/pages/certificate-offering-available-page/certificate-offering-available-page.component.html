@@ -1,0 +1,62 @@
+<background-banner></background-banner>
+<div class="container position-relative oppia">
+  <div>
+    <div>
+      <h1 tabindex="0">
+        Availble certificate offering
+      </h1>
+    </div>
+    <button type="button" class="btn btn-primary"
+      [routerLink]="['/learn', classroomUrlFragment]">
+      Exit
+    </button>
+  </div>
+
+  <section class="oppia-certificate-offering-available-page__panel">
+    <div class="oppia-certificate-offering-available-page__tiles">
+      <article class="oppia-certificate-offering-available-page__tile">
+        <div class="oppia-certificate-offering-available-page__tile-top">
+          <div>
+            <h3>Everyday Arithmetic</h3>
+            <p class="oppia-certificate-offering-available-page__tile-subtitle">
+              Number Confidence
+            </p>
+          </div>
+          <span class="oppia-certificate-offering-available-page__status">
+            Not attempted
+          </span>
+        </div>
+
+        <div class="oppia-certificate-offering-available-page__actions">
+          <button type="button" class="btn btn-primary">
+            Continue to assessment
+          </button>
+        </div>
+      </article>
+
+      <article class="oppia-certificate-offering-available-page__tile">
+        <div class="oppia-certificate-offering-available-page__tile-top">
+          <div>
+            <h3>Everyday Arithmetic</h3>
+            <p class="oppia-certificate-offering-available-page__tile-subtitle">
+              Number Confidence
+            </p>
+          </div>
+          <span
+            class="oppia-certificate-offering-available-page__status oppia-certificate-offering-available-page__status--passed">
+            Passed
+          </span>
+        </div>
+
+        <div class="oppia-certificate-offering-available-page__actions">
+          <button type="button" class="btn btn-secondary">
+            Check score
+          </button>
+          <button type="button" class="btn btn-primary">
+            Retry assessment
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

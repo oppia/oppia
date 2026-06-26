@@ -38,6 +38,15 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CERTIFICATE_OFFERING_AVAILABLE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/certificate-offering-available-page/certificate-offering-available-page.module'
+      ).then(m => m.CertificateOfferingAvailablePageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.ROUTE,
     loadChildren: () =>
       import('pages/maintenance-page/maintenance-page.module').then(

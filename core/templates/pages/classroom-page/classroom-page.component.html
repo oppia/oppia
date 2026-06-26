@@ -61,6 +61,13 @@
           <a [routerLink]="['/diagnostic-test-player']" [queryParams]="{ classroom: classroomData.getUrlFragment() }" class="e2e-test-take-diagnostic-test">{{ 'I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON' | translate }}</a>
         </div>
       </div>
+      <div>
+        <div class="certificate-offering-info">
+          <h4>Ready to show what you’ve learned?</h4>
+          <p>Take a certificate assessment and earn recognition for what you know.</p>
+        </div>
+        <a [href]="'/learn/' + classroomData.getUrlFragment() + '/certificate-offering-available'" class="e2e-test-take-certificate-assessment">Learn more</a>
+      </div>
       <div class="topic-tiles-container">
         <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
              class="oppia-topic-summary-tile e2e-test-topic-summary-tile">

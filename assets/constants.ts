@@ -6682,6 +6682,25 @@ export default {
         }
       ]
     },
+    "CERTIFICATE_OFFERING_AVAILABLE": {
+      "ROUTE": "learn/:classroomUrlFragment/certificate-offering-available",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "TITLE": "Certificate Offering Available | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        }
+      ]
+    },
     "CREATE_CERTIFICATE_OFFERING": {
       "ROUTE": "create-certificate-assessment-offering",
       "TITLE": "Create Certificate Offering | Oppia",

@@ -279,6 +279,32 @@ describe('Classroom Page Component', () => {
     );
   }));
 
+  it('should link to the classroom certificate assessment page', () => {
+    component.classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      true,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    fixture.detectChanges();
+
+    let certificateAssessmentLink = fixture.nativeElement.querySelector(
+      '.e2e-test-take-certificate-assessment'
+    );
+    expect(certificateAssessmentLink.getAttribute('href')).toBe(
+      '/learn/math/certificate-offering-available'
+    );
+  });
+
   it(
     'should obtain translated page title whenever the selected' +
       'language changes',
