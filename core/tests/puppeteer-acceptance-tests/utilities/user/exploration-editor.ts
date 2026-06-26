@@ -8485,6 +8485,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(previewRestartButton, {
       visible: true,
     });
+  }
+  /*
    * Adds a math formula to the current card's content using the RTE toolbar.
    * This opens the state content editor, inserts a math formula via the
    * CKEditor math button, and saves the content.
@@ -8527,6 +8529,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} expectedText - The Arabic text expected inside the
    *   text node.
    */
+
   async expectMathJaxToRenderArabicTextInSvgTextNode(
     expectedText: string
   ): Promise<void> {
