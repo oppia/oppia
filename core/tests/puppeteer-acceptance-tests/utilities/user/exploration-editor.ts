@@ -485,8 +485,6 @@ const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
 
 const nextCardButtonSelector = '.e2e-test-next-card-button';
-const viewSolutionButtonSelector = '.e2e-test-view-solution';
-const viewHintButtonSelector = '.e2e-test-view-hint';
 const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
 
 const explorationGridSelector = '.e2e-test-exploration-dashboard-card';
