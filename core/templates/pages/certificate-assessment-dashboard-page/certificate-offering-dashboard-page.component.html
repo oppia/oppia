@@ -51,9 +51,7 @@
               </td>
               <td>{{ certificateOffering.timeLabel }}</td>
               <td class="oppia-status-cell">
-                <span
-                  class="badge oppia-status-badge"
-                  [ngClass]="{
+                <span class="badge oppia-status-badge" [ngClass]="{
                     'oppia-status-available': certificateOffering.status.toLowerCase().includes('available'),
                     'oppia-status-blocked': certificateOffering.status.toLowerCase().includes('blocked'),
                     'oppia-status-not-ready': certificateOffering.status.toLowerCase().includes('not ready') || certificateOffering.status.toLowerCase().includes('not_ready')
@@ -83,21 +81,15 @@
           Showing {{ startIndex }} to {{ endIndex }} of {{ totalCertificateOfferings }} certificates
         </span>
         <div class="oppia-pagination-controls" aria-label="Certificate pagination">
-          <button
-            type="button"
-            class="btn btn-sm oppia-pagination-button"
-            [disabled]="!canGoToPreviousPage()"
-            (click)="goToPreviousPage()">
+          <button type="button" class="btn btn-sm oppia-pagination-button" [disabled]="!canGoToPreviousPage()"
+                  (click)="goToPreviousPage()">
             &lt; Previous
           </button>
           <span class="oppia-pagination-count" aria-live="polite">
             {{ currentPage }}
           </span>
-          <button
-            type="button"
-            class="btn btn-sm oppia-pagination-button"
-            [disabled]="!canGoToNextPage()"
-            (click)="goToNextPage()">
+          <button type="button" class="btn btn-sm oppia-pagination-button" [disabled]="!canGoToNextPage()"
+                  (click)="goToNextPage()">
             Next &gt;
           </button>
         </div>
