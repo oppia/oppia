@@ -372,6 +372,7 @@ const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
 const resumeExplorationButton = '.resume-button';
 const restartExplorationButton = '.restart-button';
 const saveProgressButton = '.save-progress-btn';
+const saveProgressBtnTooltipSelector = '.save-progress-btn-tooltip';
 const createAccountButton = '.create-account-btn';
 const validityInfoTextSelector = '.guide-text';
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
@@ -5262,6 +5263,18 @@ export class LoggedOutUser extends BaseUser {
    */
   async saveProgress(): Promise<void> {
     await this.page.waitForSelector(saveProgressButton, {visible: true});
+
+    // TODO(#26357): Remove this wait once the frontend race condition is fixed.
+    // The saveProgressBtnTooltipSelector div is rendered directly below the
+    // button in a flex column when checkpointStatusArray[0] === 'in-progress'.
+    // This happens when the modal opens before Angular's async checkpoint
+    // service has updated completedCheckpointsCount. While the tooltip is
+    // present, elementFromPoint at the button's center returns the tooltip div
+    // instead of the button, causing waitForElementToBeClickable to time out.
+    // We wait here until the tooltip disappears (i.e. completedCheckpointsCount
+    // has been updated to reflect the reached checkpoint).
+    await this.expectElementToBeVisible(saveProgressBtnTooltipSelector, false);
+
     await this.clickOnElementWithSelector(saveProgressButton);
 
     await this.page.waitForSelector(signInBoxInSaveProressModalSelector, {
