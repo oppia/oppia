@@ -71,6 +71,7 @@ import {
   NgZone,
   Type,
 } from '@angular/core';
+import {Direction} from '@angular/cdk/bidi';
 import {createCustomElement} from '@angular/elements';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
@@ -184,7 +185,7 @@ export const registerCustomElements = (injector: Injector): void => {
 })
 export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
   @Output() public initialized: EventEmitter<void> = new EventEmitter();
-  direction: string = 'ltr';
+  direction: Direction = 'ltr';
 
   static classroomBackendApiService: ClassroomBackendApiService;
   static pageContextService: PageContextService;

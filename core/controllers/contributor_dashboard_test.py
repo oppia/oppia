@@ -195,6 +195,58 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
+    def test_get_skill_opportunity_with_search_query(self) -> None:
+        topic_id = '20'
+        topic_name = 'algebra'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id,
+            topic_name,
+            'url-fragment-twenty',
+            'description',
+            'fragm-t',
+        )
+        skill_id_math = 'skill_id_math'
+        skill_id_other = 'skill_id_other'
+        self._publish_valid_topic(topic, [])
+
+        self.save_new_skill(
+            skill_id_math, self.admin_id, description='A math skill'
+        )
+        topic_services.add_uncategorized_skill(
+            self.admin_id, topic.id, skill_id_math
+        )
+
+        self.save_new_skill(
+            skill_id_other, self.admin_id, description='Another skill'
+        )
+        topic_services.add_uncategorized_skill(
+            self.admin_id, topic.id, skill_id_other
+        )
+
+        self.save_new_valid_classroom(
+            classroom_id=classroom_config_services.get_new_classroom_id(),
+            topic_id_to_prerequisite_topic_ids={topic_id: []},
+        )
+
+        # Test matching against the skill_description (e.g. 'A math skill').
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'search_query': 'math'},
+        )
+
+        self.assertEqual(len(response['opportunities']), 1)
+        self.assertEqual(response['opportunities'][0]['id'], skill_id_math)
+
+        # Test matching against the topic_name (e.g. 'ALGEBRA' matches 'algebra').
+        response_case = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'search_query': 'ALGEBRA'},
+        )
+
+        self.assertEqual(len(response_case['opportunities']), 2)
+        returned_ids = [opp['id'] for opp in response_case['opportunities']]
+        self.assertItemsEqual(returned_ids, [skill_id_math, skill_id_other])
+
     def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
         self,
     ) -> None:
