@@ -7693,7 +7693,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     throw new Error(
-      `Could not find any exploration tiles on the collection page.`
+      'Could not find any exploration tiles on the collection page.'
     );
   }
 
