@@ -219,6 +219,36 @@ export class UserFactory {
   };
 
   /**
+   * This function creates a new browser context for a user who will sign up
+   * manually during the test. Unlike createNewUser, it does NOT call
+   * signUpNewUser — the test drives the signup flow itself.
+   * Use this for CUJs that test the signup UX (e.g. LI.1).
+   */
+  static createUserForSignup = async function (
+    browser: Browser
+  ): Promise<LoggedInUser & LoggedOutUser> {
+    const context = await browser.newContext({
+      recordVideo: {
+        dir: `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`,
+      },
+    });
+    const page = await context.newPage();
+
+    const user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
+      LoggedOutUserFactory(page),
+      LoggedInUserFactory(page),
+    ]);
+
+    await page.goto(testConstants.URLs.Home);
+    await user.waitForPageToFullyLoad();
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
+    user.userHasAcceptedCookies = true;
+
+    activeUsers.push(user);
+    return user;
+  };
+
+  /**
    * The function creates a new super admin user and returns the instance
    * of that user.
    */
@@ -263,7 +293,8 @@ export class UserFactory {
     ]);
 
     await page.goto(testConstants.URLs.Home);
-    await page.locator(cookieBannerAcceptButton).click();
+    await user.waitForPageToFullyLoad();
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
 
     activeUsers.push(user);
     return user;

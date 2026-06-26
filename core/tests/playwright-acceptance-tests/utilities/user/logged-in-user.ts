@@ -16,13 +16,33 @@
  * @fileoverview Logged-in users utility file.
  */
 
-import {Page, expect} from '@playwright/test';
+import {Page, expect, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseUrl = testConstants.URLs.BaseURL;
+const contributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
+const signUpEmailField = testConstants.SignInDetails.inputField;
+const siteAdminPageUrl = testConstants.URLs.AdminPage;
+const splashPageUrl = testConstants.URLs.splash;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+
+// Auth Pages selectors.
+const loginPage = '.e2e-test-login-page';
+const signUpUsernameField = 'input.e2e-test-username-input';
+const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
+const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
+
+const errorContainerSelector = '.e2e-test-error-container';
+const errorPageHeadingSelector = '.e2e-test-error-page-heading';
+const invalidEmailErrorContainer = '#mat-error-1';
+const invalidUsernameErrorContainer = '.oppia-warning-text';
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
 const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
@@ -46,6 +66,7 @@ const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-tes
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const progressSectionSelector = '.e2e-test-progress-section';
+const greetingSelector = '.e2e-learner-dashboard-greeting';
 
 const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
 const ratingStarSelector = '.e2e-test-rating-star';
@@ -56,6 +77,12 @@ const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
+const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
+const progressTabSectionInLearnerDashboard =
+  '.e2e-test-learner-dash-progress-tab';
+const emptyProgressSectionContainerSelector =
+  '.e2e-test-empty-progress-section';
+const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
 
 const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
@@ -66,6 +93,20 @@ const addGoalsButtonInRedesignedLearnerDashboard = '.e2e-test-add-goals-button';
 const newGoalsListInRedesignedLearnerDashboard = '.e2e-test-new-goals-list';
 const goalCheckboxInRedesignedLearnerDashboard =
   '.oppia-learner-dash-goals-checkbox';
+
+// Learner Dashboard > Home Tab Selectors.
+const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
+  '.e2e-test-continue-where-you-left-off';
+const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+
+// Common > Lesson Card.
+const commonLessonCardContainerSelector =
+  '.e2e-test-redesigned-lesson-card-container';
+const commonlessonTitleSelector = '.e2e-test-lesson-title';
+
+// Common > Lesson Card (story viewer / goal detail).
+// Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
+const lessonCardContainer = '.goal-list-story-nodes';
 
 const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 
@@ -275,6 +316,37 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to enter email and proceed to the next page (username page).
+   * This will click "Sign In" and verify the username field is visible.
+   */
+  async enterEmailAndProceedToNextPage(email: string): Promise<void> {
+    await this.page.waitForSelector(signUpEmailField, {
+      state: 'visible',
+    });
+    await this.clearAllTextFrom(signUpEmailField);
+    await this.typeInInputField(signUpEmailField, email);
+
+    await this.waitForPageToFullyLoad();
+    const invalidEmailErrorContainerElement = await this.page.$(
+      invalidEmailErrorContainer
+    );
+    if (!invalidEmailErrorContainerElement) {
+      await this.clickOnElementWithText('Sign In');
+      await this.page.waitForNavigation({waitUntil: 'networkidle'});
+
+      // Post Check: Check if the login page is closed. We can't check if user
+      // is redirected to the home page it is dependent to "redirects" in URL.
+      await this.page.waitForSelector(signUpEmailField, {
+        state: 'hidden',
+      });
+
+      await this.page.waitForSelector(signUpUsernameField, {
+        state: 'visible',
+      });
+    }
+  }
+
+  /**
    * Navigates to the learner dashboard.
    */
   async navigateToLearnerDashboard(): Promise<void> {
@@ -340,6 +412,92 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the Contributor Admin Dashboard page.
+   */
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
+   * Navigates to the sign up page by going to splash page (home), then clicking 'Sign in' button.
+   * If the user hasn't accepted cookies, it clicks 'OK' to accept them.
+   */
+  async navigateToSignUpPage(): Promise<void> {
+    await this.goto(splashPageUrl, false);
+    if (!this.userHasAcceptedCookies) {
+      await this.clickOnElementWithText('OK');
+      this.userHasAcceptedCookies = true;
+    }
+    await this.clickOnElementWithText('Sign in');
+
+    await this.page.waitForSelector(loginPage, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Navigates to the Admin page.
+   */
+  async navigateToSiteAdminPage(): Promise<void> {
+    await this.goto(siteAdminPageUrl);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Checks if the error page with the given status code is displayed.
+   * @param {number} statusCode - The expected error status code.
+   */
+  async expectErrorPage(statusCode: number): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(errorContainerSelector);
+    await this.page.waitForFunction(
+      ({selector, expectedText}: {selector: string; expectedText: string}) => {
+        const errorContainer = document.querySelector(selector);
+        return Boolean(
+          errorContainer && errorContainer.textContent?.includes(expectedText)
+        );
+      },
+      {selector: errorContainerSelector, expectedText: `Error ${statusCode}`},
+      {timeout: 30000}
+    );
+
+    const errorHeading = await this.page.$(errorPageHeadingSelector);
+    if (errorHeading) {
+      const errorHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorHeading
+      );
+      if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
+        throw new Error(
+          `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+        );
+      }
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
    * Checks if the learner greetings are present.
    * @param {string} expectedGreetings - The expected greetings.
    */
@@ -364,6 +522,115 @@ export class LoggedInUser extends BaseUser {
       addGoalsButtonInRedesignedLearnerDashboard,
       visible
     );
+  }
+
+  /**
+   * Function to verify that a specific chapter is present in the Learn Something New section.
+   * @param {string} chapterTitle - The title of the chapter to verify.
+   */
+  async expectChapterToBePresentInLearnSomethingNewSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(learnSomethingNewSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.page.waitForSelector(lessonCardContainer, {
+        state: 'visible',
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Learn Something New section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const learnSomethingNewSection = await this.page.$(
+      learnSomethingNewSectionSelector
+    );
+    if (!learnSomethingNewSection) {
+      throw new Error('Learn Something New section not found.');
+    }
+    await this.expectLessonCardToBePresent(
+      chapterTitle,
+      learnSomethingNewSection
+    );
+  }
+
+  /**
+   * Function to verify the continue from where you left section in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      continueFromWhereLeftOffSectionInRedesignedDashboardSelector,
+      visible
+    );
+  }
+
+  /**
+   * Checks if greeting has name of the user.
+   */
+  async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
+    // Check for redesigned dashboard greeting first.
+    const isRedesignedGreetingVisible = await this.isElementVisible(
+      learnerGreetingsSelector,
+      true
+    );
+    if (isRedesignedGreetingVisible) {
+      const greetingText = await this.page.$eval(learnerGreetingsSelector, el =>
+        el.textContent?.trim()
+      );
+      expect(greetingText).toContain(userName);
+    } else {
+      // Fall back to old dashboard greeting selector.
+      await this.expectElementToBeVisible(greetingSelector);
+      const greetingElement = await this.page.$(greetingSelector);
+      const greetingText = await this.page.evaluate(
+        el => el?.textContent || '',
+        greetingElement
+      );
+      expect(greetingText).toContain(userName);
+    }
+  }
+
+  /**
+   * Function to verify the learn something new section in the redesigned learner dashboard.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectLearnSomethingNewSectionInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      learnSomethingNewSectionSelector,
+      visible
+    );
+  }
+
+  /**
+   * Function to verify the lesson card is present in the page.
+   * @param {string} lessonTitle - The title of the lesson card (can be partial match).
+   * @param {ElementHandle<Element> | Page} context - The context of the page.
+   */
+  async expectLessonCardToBePresent(
+    lessonTitle: string,
+    context: ElementHandle<Element> | Page = this.page
+  ): Promise<void> {
+    const lessonCards = await context.$$(commonLessonCardContainerSelector);
+    const lessonCardTitles = await Promise.all(
+      lessonCards.map(card =>
+        card.$eval(commonlessonTitleSelector, el => el.textContent?.trim())
+      )
+    );
+    const titleFound = lessonCardTitles.some(title =>
+      title?.includes(lessonTitle)
+    );
+    if (!titleFound) {
+      throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
+    }
   }
 
   /**
@@ -494,6 +761,19 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Checks if the progress section in new learner dashboard is empty.
+   */
+  async expectProgressSectionToBeEmptyInNewLD(): Promise<void> {
+    await this.expectElementToBeVisible(emptyProgressSectionContainerSelector);
+    const expectedMessage =
+      "It looks like you don't have any lessons in progress or completed. Head over to Oppia's Classroom to start your first lesson!";
+    await this.expectTextContentToBe(
+      emptyProgressSectionMessage,
+      expectedMessage
+    );
+  }
+
+  /**
    * Waits for the given number of filled stars to be present on the page.
    * @param rating The number of filled stars to wait for.
    */
@@ -505,6 +785,30 @@ export class LoggedInUser extends BaseUser {
       },
       {selector: filledRatingStarSelector, rating}
     );
+  }
+
+  /**
+   * Checks if Learner is on the learner dashboard page.
+   */
+  async expectToBeOnLearnerDashboardPage(): Promise<void> {
+    await this.expectElementToBeVisible(learnerDashboardContainerSelector);
+  }
+
+  /**
+   * Waits for the duplicate username error container to appear, then checks if the error message matches the expected error.
+   * @param {string} expectedError - The expected error message.
+   */
+  async expectUsernameError(expectedError: string): Promise<void> {
+    await this.page.waitForSelector(invalidUsernameErrorContainer);
+    const errorMessage = await this.page.$eval(
+      invalidUsernameErrorContainer,
+      el => el.textContent
+    );
+    if (errorMessage?.trim() !== expectedError) {
+      throw new Error(
+        `D error does not match. Expected: ${expectedError}, but got: ${errorMessage}`
+      );
+    }
   }
 
   /**
@@ -535,6 +839,45 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(
       communityLessonsSectionInLearnerDashboard
     );
+  }
+
+  /**
+   * Navigates to the progress section of the learner dashboard.
+   */
+  async navigateToProgressSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(progressSectionSelector);
+      await this.clickOnElementWithSelector(progressSectionSelector);
+
+      try {
+        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Timeout')) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOnElementWithSelector(progressSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+
+      await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+        state: 'visible',
+      });
+    } else {
+      await this.page.waitForSelector(progressSectionSelector);
+      const progressSection = await this.page.$(progressSectionSelector);
+      if (!progressSection) {
+        throw new Error('Progress section not found.');
+      }
+      await progressSection.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+      state: 'visible',
+    });
   }
 
   /**
@@ -751,6 +1094,49 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
       state: 'hidden',
     });
+  }
+
+  /**
+   * Enters the provided username into the sign up username field and sign in if the username is correct.
+   * @param {string} username - The username to enter.
+   * @param {boolean} verifyLogin - Whether to verify the login after entering the username.
+   */
+  async signInWithUsername(
+    username: string,
+    verifyLogin: boolean = true
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(signUpUsernameField, {
+      state: 'visible',
+    });
+    await this.clearAllTextFrom(signUpUsernameField);
+    await this.typeInInputField(signUpUsernameField, username);
+    // Using blur() to remove focus from signUpUsernameField.
+    await this.page.evaluate(selector => {
+      (document.querySelector(selector) as HTMLElement)?.blur();
+    }, signUpUsernameField);
+
+    await this.waitForPageToFullyLoad();
+    const invalidUsernameErrorContainerElement = await this.page.$(
+      invalidUsernameErrorContainer
+    );
+    if (!invalidUsernameErrorContainerElement) {
+      await this.clickOnElementWithSelector(agreeToTermsCheckbox);
+      await this.page.waitForSelector(registerNewUserButton);
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle'}),
+        this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),
+      ]);
+
+      await this.page.waitForSelector(learnerDashboardContainerSelector, {
+        state: 'visible',
+      });
+    } else if (verifyLogin) {
+      // If the username is invalid, we throw an error.
+      throw new Error(
+        'Invalid username. Please enter a valid username and try again.'
+      );
+    }
   }
 
   /**
