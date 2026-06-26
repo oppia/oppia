@@ -191,43 +191,40 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     return this.platformFeatureService.status.StoryEditorArcs.isEnabled;
   }
 
-  getArcIdForNode(nodeId: string): string | null {
+  getArcIdForNode(nodeId: string): string {
     for (const arc of this.storyContents.getArcs()) {
       if (arc.getNodeIds().indexOf(nodeId) !== -1) {
         return arc.getId();
       }
     }
-    return null;
+    throw new Error('Node ' + nodeId + ' does not belong to any arc.');
   }
 
-  getArcForNode(nodeId: string): ArcModel | null {
+  getArcForNode(nodeId: string): ArcModel {
     const arcId = this.getArcIdForNode(nodeId);
-    if (!arcId) {
-      return null;
-    }
     const arcIndex = this.storyContents.getArcIndex(arcId);
-    return arcIndex === -1 ? null : this.storyContents.getArcs()[arcIndex];
+    if (arcIndex === -1) {
+      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+    }
+    return this.storyContents.getArcs()[arcIndex];
   }
 
-  getArcSequenceNumber(nodeId: string): number | null {
+  getArcSequenceNumber(nodeId: string): number {
     const arcId = this.getArcIdForNode(nodeId);
-    if (!arcId) {
-      return null;
-    }
     const arcIndex = this.storyContents.getArcIndex(arcId);
-    return arcIndex === -1 ? null : arcIndex + 1;
+    if (arcIndex === -1) {
+      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+    }
+    return arcIndex + 1;
   }
 
   getArcColorForNode(
     nodeId: string
-  ): (typeof StoryDomainConstants.ARC_COLOR_PALETTE)[number] | null {
+  ): (typeof StoryDomainConstants.ARC_COLOR_PALETTE)[number] {
     const arcId = this.getArcIdForNode(nodeId);
-    if (!arcId) {
-      return null;
-    }
     const arcIndex = this.storyContents.getArcIndex(arcId);
     if (arcIndex === -1) {
-      return null;
+      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
     }
     const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
     return palette[arcIndex % palette.length];
@@ -247,13 +244,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   splitIntoArc(nodeIndex: number): void {
     const nodeId = this.linearNodesList[nodeIndex].getId();
     const sourceArcId = this.getArcIdForNode(nodeId);
-    if (!sourceArcId) {
-      return;
-    }
     const sourceArcIndex = this.storyContents.getArcIndex(sourceArcId);
-    if (sourceArcIndex === -1) {
-      return;
-    }
     const sourceArc = this.storyContents.getArcs()[sourceArcIndex];
     const sourceArcNodeIds = [...sourceArc.getNodeIds()];
     const splitIdx = sourceArcNodeIds.indexOf(nodeId);
@@ -288,10 +279,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   onEditArcClick(nodeId: string): void {
-    const arcId = this.getArcIdForNode(nodeId);
-    if (arcId) {
-      this.editArc(arcId);
-    }
+    this.editArc(this.getArcIdForNode(nodeId));
   }
 
   editArc(arcId: string): void {
@@ -332,10 +320,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   onRemoveArcClick(nodeId: string): void {
-    const arcId = this.getArcIdForNode(nodeId);
-    if (arcId) {
-      this.removeArcBoundary(arcId);
-    }
+    this.removeArcBoundary(this.getArcIdForNode(nodeId));
   }
 
   removeArcBoundary(arcId: string): void {

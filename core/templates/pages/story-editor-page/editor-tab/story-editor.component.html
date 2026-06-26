@@ -204,24 +204,24 @@
                     <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && (idx === 0 || !isSameArc(idx))"
                          class="inline-arc-boundary-row">
                       <div class="arc-boundary-header"
-                           [style.background-color]="getArcColorForNode(node.getId())?.headerBg || '#eef7ef'"
-                           [style.border-color]="getArcColorForNode(node.getId())?.headerBorder || '#b8dbbf'">
-                        <div class="arc-boundary-info">
-                          <div class="arc-boundary-title-row">
-                            <span class="arc-boundary-flag-badge"
-                                  [style.background-color]="getArcColorForNode(node.getId())?.flagBg || '#27a844'"
-                                  aria-hidden="true">
-                              <i class="fa fa-flag"></i>
-                            </span>
-                            <span class="arc-boundary-title">
-                              {{ getArcForNode(node.getId())?.getTitle() }}
-                            </span>
-                          </div>
-                          <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                            {{ getArcForNode(node.getId())?.getDescription() }}
-                          </span>
-                          <span class="arc-boundary-chapter-count">
-                            {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
+                           [style.background-color]="getArcColorForNode(node.getId()).headerBg"
+                           [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
+                         <div class="arc-boundary-info">
+                           <div class="arc-boundary-title-row">
+                             <span class="arc-boundary-flag-badge"
+                                   [style.background-color]="getArcColorForNode(node.getId()).flagBg"
+                                   aria-hidden="true">
+                               <i class="fa fa-flag"></i>
+                             </span>
+                             <span class="arc-boundary-title">
+                               {{ getArcForNode(node.getId()).getTitle() }}
+                             </span>
+                           </div>
+                           <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId()).getDescription()">
+                             {{ getArcForNode(node.getId()).getDescription() }}
+                           </span>
+                           <span class="arc-boundary-chapter-count">
+                             {{ getArcForNode(node.getId()).getNodeIds().length }} chapters
                           </span>
                         </div>
                         <div class="arc-boundary-actions">
@@ -450,23 +450,23 @@
                     <tr *ngIf="idx === 0 || !isSameArc(idx)" class="arc-header-row">
                       <td colspan="7" class="arc-header-cell">
                         <div class="arc-header-card"
-                             [style.background-color]="getArcColorForNode(node.getId())?.headerBg || '#eef7ef'"
-                             [style.border-color]="getArcColorForNode(node.getId())?.headerBorder || '#b8dbbf'">
-                          <div class="arc-header-left">
-                            <span class="arc-flag-badge"
-                                  [style.background-color]="getArcColorForNode(node.getId())?.flagBg || '#27a844'">
-                              <i class="fa fa-flag" aria-hidden="true"></i>
-                            </span>
-                            <div class="arc-header-text">
-                              <span class="arc-header-title">
-                                {{ getArcForNode(node.getId())?.getTitle() }}
-                              </span>
-                              <span class="arc-header-description"
-                                    *ngIf="getArcForNode(node.getId())?.getDescription()">
-                                {{ getArcForNode(node.getId())?.getDescription() }}
-                              </span>
-                              <span class="arc-header-chapter-count">
-                                {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
+                              [style.background-color]="getArcColorForNode(node.getId()).headerBg"
+                              [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
+                           <div class="arc-header-left">
+                             <span class="arc-flag-badge"
+                                   [style.background-color]="getArcColorForNode(node.getId()).flagBg">
+                               <i class="fa fa-flag" aria-hidden="true"></i>
+                             </span>
+                             <div class="arc-header-text">
+                               <span class="arc-header-title">
+                                 {{ getArcForNode(node.getId()).getTitle() }}
+                               </span>
+                               <span class="arc-header-description"
+                                     *ngIf="getArcForNode(node.getId()).getDescription()">
+                                 {{ getArcForNode(node.getId()).getDescription() }}
+                               </span>
+                               <span class="arc-header-chapter-count">
+                                 {{ getArcForNode(node.getId()).getNodeIds().length }} chapters
                               </span>
                             </div>
                           </div>
@@ -501,7 +501,7 @@
                         [ngClass]="{
                           'arc-chapter-row--before-split': idx < linearNodesList.length - 1 && isSameArc(idx + 1)
                         }"
-                        [style.border-left-color]="getArcColorForNode(node.getId())?.rowAccent || '#27a844'"
+                        [style.border-left-color]="getArcColorForNode(node.getId()).rowAccent"
                         (click)="navigateToChapterWithId(node.getId(), idx)"
                         cdkDrag
                         [cdkDragDisabled]="isDragAndDropDisabled(node)"
