@@ -60,7 +60,7 @@ interface GetCertificateOfferingBackendResponse {
 }
 
 interface GetCertificateOfferingsBackendResponse {
-  certificate_offerings: Array<{
+  certificate_offerings: {
     certificate_id: string;
     title: string;
     description: string;
@@ -71,7 +71,7 @@ interface GetCertificateOfferingsBackendResponse {
     demonstrates: string[];
     async_status: string;
     version: number;
-  }>;
+  }[];
 }
 
 @Injectable({

@@ -48,17 +48,17 @@
   vertical-align: middle;
 }
 
-.oppia-certificate-offering-table tbody tr,
-.oppia-certificate-offering-table tbody td {
-  border: 1px solid #dfe3e8;
-}
-
 .oppia-certificate-offering-table td {
   padding: 18px 20px;
-  text-align: center;
   padding-bottom: 1rem;
   padding-top: 1rem;
+  text-align: center;
   vertical-align: middle;
+}
+
+.oppia-certificate-offering-table tbody td,
+.oppia-certificate-offering-table tbody tr {
+  border: 1px solid #dfe3e8;
 }
 
 .oppia-topics-count {
