@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -29,11 +29,14 @@ from core.domain import (
     exp_services,
     feedback_services,
     fs_services,
+    opportunity_domain,
     opportunity_services,
     question_domain,
     question_services,
     rights_domain,
     rights_manager,
+    skill_domain,
+    skill_fetchers,
     skill_services,
     state_domain,
     story_domain,
@@ -41,6 +44,7 @@ from core.domain import (
     suggestion_registry,
     suggestion_services,
     topic_domain,
+    topic_fetchers,
     topic_services,
     translation_domain,
     user_services,
@@ -48,14 +52,20 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union, cast
+from typing import Dict, Final, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, suggestion_models
+    from mypy_imports import (
+        datastore_services,
+        opportunity_models,
+        suggestion_models,
+    )
 
 datastore_services = models.Registry.import_datastore_services()
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+opportunity_models, suggestion_models = models.Registry.import_models(
+    [models.Names.OPPORTUNITY, models.Names.SUGGESTION]
+)
 
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
@@ -991,7 +1001,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x,
+            lambda x, y, z: None,
         ):
             self.put_json(
                 '%s/exploration/%s/%s'
@@ -1286,7 +1296,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x,
+            lambda x, y, z: None,
         ):
             self.put_json(
                 '%s/exploration/%s/%s'
@@ -1922,7 +1932,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x,
+            lambda x, y, z: None,
         ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
@@ -2699,7 +2709,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'], suggestion_models.STATUS_ACCEPTED
         )
-        (questions, merged_question_skill_links) = (
+        questions, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
                 1, [self.SKILL_ID], 0
             )
@@ -3341,6 +3351,52 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
         self.logout()
 
+    def test_reject_suggestion_to_skill_with_different_suggestion_type(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s'
+            % (feconf.SUGGESTION_LIST_URL_PREFIX, self.author_id)
+        )['suggestions'][0]
+
+        suggestion_id = suggestion_to_accept['suggestion_id']
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        # Create a mock suggestion with a different suggestion_type.
+        class MockSuggestion:
+            def __init__(
+                self, original_suggestion: suggestion_registry.BaseSuggestion
+            ):
+                self.suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                self.target_id = original_suggestion.target_id
+                self.target_type = original_suggestion.target_type
+
+        mock_suggestion = MockSuggestion(suggestion)
+
+        # Swap suggestion_services.get_suggestion_by_id to return our mock suggestion.
+        swap_get_suggestion = self.swap(
+            suggestion_services,
+            'get_suggestion_by_id',
+            lambda _: mock_suggestion,
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_get_suggestion:
+            self.put_json(
+                '%s/skill/%s/%s'
+                % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_id,
+                ),
+                {'action': 'reject', 'review_message': 'Rejected!'},
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
 
 class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the UserSubmittedSuggestionsHandler."""
@@ -3567,6 +3623,32 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         self.assertEqual(response['next_offset'], 1)
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_new_opportunity_models(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: [self.EXP_ID]}
+        )
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
         response = self.get_json(
             '/getsubmittedsuggestions/topic/translate_content',
             {
@@ -3576,6 +3658,287 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(response, {})
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_new_opportunity_models_coverage_edge_cases(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        # 1. Setup 'exp_no_opp' (will have no translation opportunity).
+        self.save_new_valid_exploration(
+            'exp_no_opp',
+            self.owner_id,
+            title='Exploration title no opp',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_no_opp')
+
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(
+            self.owner_id,
+            'exp_no_opp',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>new content html</p>',
+                        },
+                    }
+                )
+            ],
+            'Add content',
+        )
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_no_opp']}
+        )
+        csrf_token = self.get_new_csrf_token()
+        allowed_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        dummy_opp_no_opp = opportunity_domain.ExplorationOpportunitySummary(
+            'exp_no_opp',
+            self.TOPIC_ID,
+            'Topic',
+            self.STORY_ID,
+            'Story',
+            'Node',
+            1,
+            allowed_language_codes,
+            {},
+            [],
+            [],
+            {},
+        )
+        with self.swap(
+            opportunity_services,
+            'get_exploration_opportunity_summary_by_id',
+            lambda exp_id: dummy_opp_no_opp,
+        ):
+            self.post_json(
+                '%s/' % feconf.SUGGESTION_URL_PREFIX,
+                {
+                    'suggestion_type': (
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ),
+                    'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                    'target_id': 'exp_no_opp',
+                    'target_version_at_submission': 1,
+                    'change_cmd': {
+                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                        'state_name': 'Introduction',
+                        'content_id': 'content_0',
+                        'language_code': 'hi',
+                        'content_html': '<p>new content html</p>',
+                        'translation_html': '<p>new content html in Hindi</p>',
+                        'data_format': 'html',
+                    },
+                    'description': 'Adds translation for no opp',
+                },
+                csrf_token=csrf_token,
+            )
+
+        # 2. Setup 'exp_empty_topics' (opportunity but no topics / story).
+        self.save_new_valid_exploration(
+            'exp_empty_topics',
+            self.owner_id,
+            title='Exploration title empty topics',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_empty_topics')
+
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(
+            self.owner_id,
+            'exp_empty_topics',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>new content html</p>',
+                        },
+                    }
+                )
+            ],
+            'Add content',
+        )
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_empty_topics']}
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        allowed_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        dummy_opp_empty = opportunity_domain.ExplorationOpportunitySummary(
+            'exp_empty_topics',
+            self.TOPIC_ID,
+            'Topic',
+            self.STORY_ID,
+            'Story',
+            'Node',
+            1,
+            allowed_language_codes,
+            {},
+            [],
+            [],
+            {},
+        )
+        with self.swap(
+            opportunity_services,
+            'get_exploration_opportunity_summary_by_id',
+            lambda exp_id: dummy_opp_empty,
+        ):
+            self.post_json(
+                '%s/' % feconf.SUGGESTION_URL_PREFIX,
+                {
+                    'suggestion_type': (
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ),
+                    'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                    'target_id': 'exp_empty_topics',
+                    'target_version_at_submission': 1,
+                    'change_cmd': {
+                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                        'state_name': 'Introduction',
+                        'content_id': 'content_0',
+                        'language_code': 'hi',
+                        'content_html': '<p>new content html</p>',
+                        'translation_html': '<p>new content html in Hindi</p>',
+                        'data_format': 'html',
+                    },
+                    'description': 'Adds translation for empty topics',
+                },
+                csrf_token=csrf_token,
+            )
+
+        # 3. Setup 'exp_not_in_targets' (maps in topic summary but has no suggestions).
+        self.save_new_valid_exploration(
+            'exp_not_in_targets',
+            self.owner_id,
+            title='Exploration title not in targets',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_not_in_targets')
+
+        story_services.update_story(
+            self.owner_id,
+            self.STORY_ID,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_2',
+                        'title': 'Node2',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_2',
+                        'old_value': None,
+                        'new_value': 'exp_not_in_targets',
+                    }
+                ),
+            ],
+            'Add node 2',
+        )
+
+        # Re-generate topic summary with the new mapping.
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        # 4. Swaps to cover edge cases:
+        # - ts is None inside topic_summaries
+        # - t_id not in topic_summary_map (using a mock invalid topic ID)
+        # - story_node is None (swap get_node_with_corresponding_exp_id to return None)
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+
+        def mock_get_all_topic_summaries() -> (
+            List[Optional[topic_domain.TopicSummary]]
+        ):
+            return [None] + topic_summaries
+
+        orig_get_opps = (
+            opportunity_services.get_translation_opportunities_by_entity_ids
+        )
+
+        def mock_get_translation_opportunities_by_entity_ids(
+            entity_type: str, entity_ids: List[str]
+        ) -> Dict[str, Optional[opportunity_domain.TranslationOpportunity]]:
+            opps = orig_get_opps(entity_type, entity_ids)
+            opp = opps.get(self.EXP_ID)
+            if opp is not None:
+                opp.topic_ids = ['invalid_topic_id'] + opp.topic_ids
+            if 'exp_no_opp' in opps:
+                opps['exp_no_opp'] = None
+            return opps
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            mock_get_all_topic_summaries,
+        ), self.swap(
+            opportunity_services,
+            'get_translation_opportunities_by_entity_ids',
+            mock_get_translation_opportunities_by_entity_ids,
+        ), self.swap(
+            story_domain.StoryContents,
+            'get_node_with_corresponding_exp_id',
+            lambda *args, **kwargs: None,
+        ):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+
+        self.assertEqual(len(response['suggestions']), 3)
+
+        # 5. Swap get_all_topic_summaries to empty list to cover story_ids is empty branch.
+        def mock_get_all_topic_summaries_empty() -> (
+            List[topic_domain.TopicSummary]
+        ):
+            return []
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            mock_get_all_topic_summaries_empty,
+        ):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+        self.assertEqual(len(response['suggestions']), 3)
 
     def test_skill_handler_returns_data(self) -> None:
         self.login(self.AUTHOR_EMAIL)
@@ -3857,6 +4220,97 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_v2_feature_flag_enabled(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        # Save a new V2 translation opportunity model.
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        # The suggestions list contains 1 suggestion which was created in the setUp method.
+        self.assertEqual(len(response['suggestions']), 1)
+        suggestion_dict = response['suggestions'][0]
+        self.assertEqual(
+            suggestion_dict['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        )
+        self.assertEqual(
+            suggestion_dict['target_type'],
+            feconf.ENTITY_TYPE_EXPLORATION,
+        )
+        self.assertEqual(suggestion_dict['target_id'], self.EXP_ID)
+        self.assertEqual(suggestion_dict['change_cmd']['language_code'], 'hi')
+        self.assertEqual(
+            suggestion_dict['change_cmd']['translation_html'],
+            '<p>new content html in Hindi</p>',
+        )
+
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.EXP_ID]['entity_id'],
+            self.EXP_ID,
+        )
+
+    def test_skill_opportunity_dict_with_none_opportunity(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        class MockSkill:
+            def __init__(self, skill_id: str):
+                self.id = skill_id
+                self.rubrics: List[skill_domain.Rubric] = []
+
+        mock_skill = MockSkill(self.SKILL_ID)
+
+        # Swap skill_fetchers.get_multi_skills to return our mock skill.
+        swap_get_multi_skills = self.swap(
+            skill_fetchers,
+            'get_multi_skills',
+            lambda skill_ids, strict=True: [mock_skill],
+        )
+
+        # Swap opportunity_services.get_skill_opportunities_by_ids to return None for our skill.
+        swap_get_skill_opps = self.swap(
+            opportunity_services,
+            'get_skill_opportunities_by_ids',
+            lambda skill_ids: {self.SKILL_ID: None},
+        )
+
+        with swap_get_multi_skills, swap_get_skill_opps:
+            response = self.get_json(
+                '/getsubmittedsuggestions/skill/add_question',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.SKILL_ID], None
+        )
+
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ReviewableSuggestionsHandler."""
@@ -4116,6 +4570,44 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(response['next_offset'], 1)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_new_opportunity_models(
+        self,
+    ) -> None:
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: [self.EXP_ID]}
+        )
+
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content',
+            params={
+                'exploration_id': self.EXP_ID,
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        target_opp = response['target_id_to_opportunity_dict']['exp1']
+        self.assertEqual(target_opp['entity_id'], 'exp1')
+        self.assertEqual(
+            target_opp['entity_type'], feconf.ENTITY_TYPE_EXPLORATION
+        )
+        self.assertEqual(target_opp['topic_name'], 'topic')
+        self.assertEqual(target_opp['entity_description'], 'Node1')
+        self.assertEqual(target_opp['content_count'], 1)
+        self.assertEqual(target_opp['is_pinned'], False)
+        self.assertEqual(target_opp['currently_available_to_learners'], True)
+        self.assertEqual(target_opp['translation_counts'], {})
+        self.assertEqual(target_opp['translation_in_review_counts'], {'hi': 1})
+        self.assertIn('hi', target_opp['incomplete_translation_language_codes'])
 
     def test_topic_translate_handler_returns_no_data(self) -> None:
         response = self.get_json(

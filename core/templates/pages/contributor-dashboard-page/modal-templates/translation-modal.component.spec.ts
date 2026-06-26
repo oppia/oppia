@@ -55,6 +55,7 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -93,8 +94,19 @@ interface MockBeforeUnloadEvent {
   returnValue: string;
 }
 
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
@@ -138,6 +150,7 @@ describe('Translation Modal Component', () => {
   };
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     mockModalRef = new MockConfirmTranslationExitModal();
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -175,6 +188,10 @@ describe('Translation Modal Component', () => {
         {
           provide: ImageLocalStorageService,
           useClass: MockImageLocalStorageService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -1210,6 +1227,7 @@ describe('Translation Modal Component', () => {
       let translationLanguageService: TranslationLanguageService;
 
       beforeEach(() => {
+        mockPlatformFeatureService = new MockPlatformFeatureService();
         TestBed.resetTestingModule();
         mockWindow = {
           addEventListener: jasmine.createSpy('addEventListener'),
@@ -1301,6 +1319,10 @@ describe('Translation Modal Component', () => {
                 getEntityId: () => '1',
                 getImageSaveDestination: () => 'localStorage',
               },
+            },
+            {
+              provide: PlatformFeatureService,
+              useValue: mockPlatformFeatureService,
             },
           ],
           schemas: [NO_ERRORS_SCHEMA],
