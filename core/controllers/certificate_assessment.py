@@ -251,7 +251,7 @@ class CertificateAssessmentOfferingByIdHandler(
         ) as e:
             raise self.NotFoundException(str(e)) from e
         except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+            raise self.InvalidInputException(e) from e
         self.render_json(
             {'certificate_id': certificate_offering.certificate_id}
         )
