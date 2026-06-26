@@ -28,6 +28,7 @@ import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor, RTE_BUTTON_TITLES} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -46,6 +47,8 @@ const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const activeModalMathJaxSvgSelector = '.modal-dialog .MathJax_SVG svg';
+const activeModalMathJaxTextSelector = '.modal-dialog .MathJax_SVG text';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
@@ -7915,6 +7918,88 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectFeedbackPageTobeVisible(): Promise<void> {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Adds a math formula to the current card's content using the RTE toolbar.
+   * This opens the state content editor, inserts a math formula via the
+   * CKEditor math button, and saves the content.
+   * @param {string} latex - The LaTeX expression to insert.
+   * @param {string} [expectedText] - The text expected to be rendered inside the MathJax SVG text node.
+   */
+  async addMathFormulaToCardContent(
+    latex: string,
+    expectedText?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
+
+    // Insert mathematical formula via the RTE toolbar.
+    const rteEditor = new RTEEditor(this.page, this.page);
+    await rteEditor.clickOnRTEOptionWithTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.EN
+    );
+    await this.waitForNetworkIdle();
+    await rteEditor.typeMathExpression(latex);
+
+    if (expectedText) {
+      await this.expectMathJaxToRenderArabicTextInSvgTextNode(expectedText);
+    }
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Math formula added to card content successfully.');
+  }
+
+  /**
+   * Asserts that Arabic text in a MathJax-rendered formula is preserved as a
+   * single contiguous string inside a text element, rather than being
+   * split into disconnected SVG text nodes. This verifies that the
+   * mtextFontInherit configuration is working correctly (Fixes #26148).
+   * @param {string} expectedText - The Arabic text expected inside the
+   *   text node.
+   */
+  async expectMathJaxToRenderArabicTextInSvgTextNode(
+    expectedText: string
+  ): Promise<void> {
+    // Math interactions require heavy MathJax rendering and take significantly
+    // longer to load than other interactions.
+    await this.page.waitForSelector(activeModalMathJaxSvgSelector, {
+      timeout: 15000,
+    });
+
+    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(
+      (svgSelector, textSelector) => {
+        const svgElement = document.querySelector(svgSelector);
+        const textNodes = document.querySelectorAll(textSelector);
+        return {
+          arabicTextContent:
+            Array.from(textNodes)
+              .map(node => node.textContent?.trim() || '')
+              .filter(text => text !== '')
+              .join(' | ') || null,
+          rawSvgHtml: svgElement ? svgElement.textContent : null,
+        };
+      },
+      activeModalMathJaxSvgSelector,
+      activeModalMathJaxTextSelector
+    );
+
+    if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
+      throw new Error(
+        `Expected MathJax to render Arabic text "${expectedText}" inside an ` +
+          `SVG <text> element, but found: "${arabicTextContent}". ` +
+          `Raw SVG HTML for debugging: \n${rawSvgHtml}\n ` +
+          'This indicates that mtextFontInherit is not working correctly.'
+      );
+    }
+    showMessage(
+      'Arabic text rendered correctly inside text node: ' + arabicTextContent
+    );
   }
 
   /**
