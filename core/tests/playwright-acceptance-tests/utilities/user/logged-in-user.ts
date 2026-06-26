@@ -38,15 +38,16 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 
-const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
-const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
-const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
-const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+
+const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
+const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
+const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
+const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 
 const angularRootElementSelector = 'oppia-angular-root';
 const explorationCard = '.e2e-test-exploration-dashboard-card';

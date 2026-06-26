@@ -940,7 +940,7 @@ export class BaseUser {
 
   /**
    * Waits for an element to stabilize.
-   * @param {string} selector - The selector of the element.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
    * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
