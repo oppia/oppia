@@ -230,11 +230,12 @@
                             <i class="fas fa-pen" aria-hidden="true"></i>
                             Edit Arc
                           </button>
-                          <button type="button" class="btn btn-sm arc-remove-button"
-                                  (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
-                            <i class="far fa-trash-alt" aria-hidden="true"></i>
-                            Remove Arc Boundary
-                          </button>
+                           <button type="button" class="btn btn-sm arc-remove-button"
+                                   *ngIf="!isFirstArc(node.getId())"
+                                   (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
+                             <i class="far fa-trash-alt" aria-hidden="true"></i>
+                             Remove Arc Boundary
+                           </button>
                         </div>
                       </div>
                     </div>
@@ -476,6 +477,7 @@
                               <i class="fas fa-pen" aria-hidden="true"></i> Edit Arc
                             </button>
                             <button type="button" class="arc-action-btn arc-remove-btn"
+                                    *ngIf="!isFirstArc(node.getId())"
                                     (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
                               <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Arc Boundary
                             </button>

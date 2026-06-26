@@ -323,6 +323,11 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.removeArcBoundary(this.getArcIdForNode(nodeId));
   }
 
+  isFirstArc(nodeId: string): boolean {
+    const arcId = this.getArcIdForNode(nodeId);
+    return this.storyContents.getArcIndex(arcId) === 0;
+  }
+
   removeArcBoundary(arcId: string): void {
     const arcIndex = this.storyContents.getArcIndex(arcId);
     if (arcIndex === -1) {
