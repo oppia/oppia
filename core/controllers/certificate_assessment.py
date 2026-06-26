@@ -202,7 +202,9 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 certificate_id
             )
-        except utils.ValidationError as e:
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json(
             {
