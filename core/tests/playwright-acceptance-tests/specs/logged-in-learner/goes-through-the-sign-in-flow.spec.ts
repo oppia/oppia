@@ -19,6 +19,7 @@
  * LI.1. Sign up for an account
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -30,20 +31,22 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged In Learner', function () {
-  const loggedInUser: LoggedInUser & LoggedOutUser = Object.assign(
-    new LoggedInUser(),
-    new LoggedOutUser()
-  );
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged In Learner', function () {
+  let loggedInUser: LoggedInUser & LoggedOutUser;
   let releaseCoordinator: ReleaseCoordinator;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(600000);
+    loggedInUser = await UserFactory.createUserForSignup(browser);
     // Create release coordinator to enable redesigned learner dashboard.
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
     await releaseCoordinator.enableFeatureFlag(
@@ -54,6 +57,7 @@ describe('Logged In Learner', function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -84,11 +88,11 @@ describe('Logged In Learner', function () {
     await curriculumAdmin.addChapter('Chapter 1', explorationId);
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-  }, 600000);
+  });
 
-  it('should be able to login and see Learner Dashboard', async function () {
+  test('should be able to login and see Learner Dashboard', async function () {
     // Click on "Sign In" button and fill email.
-    await loggedInUser.openBrowser();
+
     await loggedInUser.navigateToSignUpPage();
 
     // Enter email to proceed to username page.
@@ -139,8 +143,8 @@ describe('Logged In Learner', function () {
     await loggedInUser.navigateToProgressSection();
     await loggedInUser.expectProgressSectionToBeEmptyInNewLD();
   });
-  afterAll(async function () {
+
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-    await loggedInUser.closeBrowser();
   });
 });
