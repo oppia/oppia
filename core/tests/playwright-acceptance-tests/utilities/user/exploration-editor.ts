@@ -41,6 +41,7 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
@@ -505,6 +506,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.page.$(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
+  }
+
+  /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
@@ -672,6 +688,34 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(toastMessage, false);
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Sets a state as a checkpoint in the exploration.
+   */
+  async setTheStateAsCheckpoint(): Promise<void> {
+    await this.page.waitForSelector(setAsCheckpointButton, {
+      state: 'visible',
+    });
+
+    let checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      await this.clickOnElementWithSelector(setAsCheckpointButton);
+    }
+
+    // Check checkbox value again and throw error if it's still not checked.
+    checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      throw new Error('Failed to set the state as a checkpoint.');
+    }
   }
 
   /**
