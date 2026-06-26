@@ -19,10 +19,6 @@
     {
       "name": "topicAndStoryEditor",
       "module": "core/tests/webdriverio_desktop/topicAndStoryEditor.js"
-    },
-    {
-      "name": "wipeout",
-      "module": "core/tests/webdriverio_desktop/wipeout.js"
     }
   ]
 }
