@@ -439,6 +439,87 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully validate a certificate assessment offering', fakeAsync(() => {
+    caos
+      .validateCertificateAssessmentOfferingAsync(['topic_1', 'topic_2'], 4)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual({
+      topic_ids: ['topic_1', 'topic_2'],
+      total_questions: 4,
+    });
+    req.flush({
+      is_valid: true,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      is_valid: true,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use backend error when validating and the error response has a nested message', fakeAsync(() => {
+    caos
+      .validateCertificateAssessmentOfferingAsync(['topic_1'], 2)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: {
+          error: 'Error occurred while validating offering.',
+        },
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith({
+      error: 'Error occurred while validating offering.',
+    });
+  }));
+
+  it('should fall back to the http error message when validating and the error response has no nested backend message', fakeAsync(() => {
+    caos
+      .validateCertificateAssessmentOfferingAsync(['topic_1'], 2)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {},
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      jasmine.stringMatching(
+        /^Http failure response for .*: 500 Internal Server Error$/
+      )
+    );
+  }));
+
   it('should use backend error if fetching fails with an error response body', fakeAsync(() => {
     caos
       .getCertificateAssessmentOfferingAsync('mock_certificate_id')

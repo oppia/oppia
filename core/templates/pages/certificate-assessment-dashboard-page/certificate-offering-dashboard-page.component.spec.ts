@@ -19,10 +19,10 @@
 import {
   ComponentFixture,
   TestBed,
-  CUSTOM_ELEMENTS_SCHEMA,
   fakeAsync,
   flushMicrotasks,
 } from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RouterTestingModule} from '@angular/router/testing';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
@@ -32,6 +32,14 @@ import {CertificateOfferingDashboardPageComponent} from './certificate-offering-
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 
+interface CertificateOfferingSummary {
+  certificateId: string;
+  title: string;
+  topicsLabel: string;
+  timeLabel: string;
+  status: string;
+}
+
 describe('CertificateOfferingDashboardPageComponent', () => {
   let component: CertificateOfferingDashboardPageComponent;
   let fixture: ComponentFixture<CertificateOfferingDashboardPageComponent>;
@@ -39,11 +47,22 @@ describe('CertificateOfferingDashboardPageComponent', () => {
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let ngbModal: NgbModal;
 
+  const makeOffering = (
+    id: string,
+    title = `Certificate ${id}`
+  ): CertificateOfferingSummary => ({
+    certificateId: id,
+    title,
+    topicsLabel: '1',
+    timeLabel: '10 min',
+    status: 'Available',
+  });
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [CertificateOfferingDashboardPageComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: AlertsService,
@@ -73,6 +92,12 @@ describe('CertificateOfferingDashboardPageComponent', () => {
     }).compileComponents();
   });
 
+  // NOTE: We intentionally do NOT call fixture.detectChanges() here.
+  // The component now performs a real async call inside ngOnInit(), so
+  // any spy that a test needs in place for that initial load must be
+  // set up BEFORE the first detectChanges() triggers ngOnInit(). Tests
+  // that don't care about the initial load can simply never call
+  // detectChanges() and interact with the component instance directly.
   beforeEach(() => {
     fixture = TestBed.createComponent(
       CertificateOfferingDashboardPageComponent
@@ -83,13 +108,23 @@ describe('CertificateOfferingDashboardPageComponent', () => {
       CertificateAssessmentOfferingBackendApiService
     );
     ngbModal = TestBed.inject(NgbModal);
-    fixture.detectChanges();
   });
 
-  it('should create the component instance', () => {
+  it('should create the component instance', fakeAsync(() => {
+    fixture.detectChanges();
+    flushMicrotasks();
+
     expect(component instanceof CertificateOfferingDashboardPageComponent).toBe(
       true
     );
+  }));
+
+  it('should set the create certificate offering route', () => {
+    expect(component.createCertificateOfferingRoute.startsWith('/')).toBe(true);
+  });
+
+  it('should be in a loading state before the offerings resolve', () => {
+    expect(component.isLoading).toBe(true);
   });
 
   it('should load real certificate offerings on init', fakeAsync(() => {
@@ -122,11 +157,79 @@ describe('CertificateOfferingDashboardPageComponent', () => {
       {
         certificateId: 'certificate_1',
         title: 'Algebra Certificate',
-        topicsLabel: '2 topics',
+        topicsLabel: '2',
         timeLabel: '40 min',
         status: 'Available',
       },
     ]);
+    expect(component.isLoading).toBe(false);
+  }));
+
+  it('should sort loaded certificate offerings alphabetically by title', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingsAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: 'cert_b',
+          title: 'Biology Certificate',
+          description: '',
+          classroom_id: 'science_classroom',
+          topic_data: {topic_1: 1},
+          demonstrates: [],
+          total_questions: 5,
+          time_limit_in_minutes: 20,
+          async_status: 'Available',
+          version: 1,
+        }),
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: 'cert_a',
+          title: 'Algebra Certificate',
+          description: '',
+          classroom_id: 'math_classroom',
+          topic_data: {topic_1: 1},
+          demonstrates: [],
+          total_questions: 5,
+          time_limit_in_minutes: 20,
+          async_status: 'Available',
+          version: 1,
+        }),
+      ])
+    );
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(
+      component.certificateOfferings.map(offering => offering.certificateId)
+    ).toEqual(['cert_a', 'cert_b']);
+  }));
+
+  it('should reset to page 1 after a successful load', fakeAsync(() => {
+    component.currentPage = 3;
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(component.currentPage).toBe(1);
+  }));
+
+  it('should warn and stop loading when fetching offerings fails', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingsAsync'
+    ).and.returnValue(Promise.reject('error'));
+    const warningSpy = spyOn(alertsService, 'addWarning');
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(warningSpy).toHaveBeenCalledWith(
+      'Failed to load certificate offerings.'
+    );
+    expect(component.certificateOfferings).toEqual([]);
+    expect(component.isLoading).toBe(false);
   }));
 
   it('should display not_ready as Not Ready', () => {
@@ -217,6 +320,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
   }));
 
   it('should delete certificate offering and remove it locally', fakeAsync(() => {
+    component.certificateOfferings = [makeOffering('dummy_id')];
     const deleteSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'deleteCertificateAssessmentOfferingAsync'
@@ -231,7 +335,27 @@ describe('CertificateOfferingDashboardPageComponent', () => {
     expect(alertsSpy).toHaveBeenCalledWith('Certificate deleted successfully.');
   }));
 
-  it('should show warning when certificate deletion fails', fakeAsync(() => {
+  it('should reset to the last page if deleting empties the current page', fakeAsync(() => {
+    component.certificateOfferings = Array.from({length: 6}, (_, i) =>
+      makeOffering(`cert_${i}`)
+    );
+    component.currentPage = 2;
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'deleteCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve());
+
+    component.deleteCertificateOffering('cert_5');
+    flushMicrotasks();
+
+    expect(component.certificateOfferings.length).toBe(5);
+    expect(component.totalPages).toBe(1);
+    expect(component.currentPage).toBe(1);
+  }));
+
+  it('should show warning when certificate deletion fails and keep existing offerings', fakeAsync(() => {
+    const initialOfferings = [makeOffering('dummy_id', 'Certificate Title')];
+    component.certificateOfferings = [...initialOfferings];
     const deleteSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'deleteCertificateAssessmentOfferingAsync'
@@ -242,15 +366,76 @@ describe('CertificateOfferingDashboardPageComponent', () => {
     flushMicrotasks();
 
     expect(deleteSpy).toHaveBeenCalledWith('dummy_id');
-    expect(component.certificateOfferings).toEqual([
-      {
-        certificateId: 'dummy_id',
-        title: 'Certificate Title',
-        topicsLabel: '-',
-        timeLabel: '-',
-        status: 'Draft',
-      },
-    ]);
+    expect(component.certificateOfferings).toEqual(initialOfferings);
     expect(warningSpy).toHaveBeenCalledWith('Failed to delete certificate.');
   }));
+
+  describe('pagination', () => {
+    beforeEach(() => {
+      component.certificateOfferings = Array.from({length: 7}, (_, i) =>
+        makeOffering(`cert_${i}`)
+      );
+    });
+
+    it('should compute total certificate offerings and total pages', () => {
+      expect(component.totalCertificateOfferings).toBe(7);
+      expect(component.totalPages).toBe(2);
+    });
+
+    it('should return 1 total page when there are no offerings', () => {
+      component.certificateOfferings = [];
+      expect(component.totalPages).toBe(1);
+    });
+
+    it('should paginate certificate offerings for the current page', () => {
+      component.currentPage = 1;
+      expect(component.paginatedCertificateOfferings.length).toBe(5);
+
+      component.currentPage = 2;
+      expect(component.paginatedCertificateOfferings.length).toBe(2);
+    });
+
+    it('should compute startIndex and endIndex for the current page', () => {
+      component.currentPage = 1;
+      expect(component.startIndex).toBe(1);
+      expect(component.endIndex).toBe(5);
+
+      component.currentPage = 2;
+      expect(component.startIndex).toBe(6);
+      expect(component.endIndex).toBe(7);
+    });
+
+    it('should return startIndex 0 when there are no offerings', () => {
+      component.certificateOfferings = [];
+      expect(component.startIndex).toBe(0);
+    });
+
+    it('should know whether it can go to the previous or next page', () => {
+      component.currentPage = 1;
+      expect(component.canGoToPreviousPage()).toBe(false);
+      expect(component.canGoToNextPage()).toBe(true);
+
+      component.currentPage = 2;
+      expect(component.canGoToPreviousPage()).toBe(true);
+      expect(component.canGoToNextPage()).toBe(false);
+    });
+
+    it('should go to the next page and stop at the last page', () => {
+      component.currentPage = 1;
+      component.goToNextPage();
+      expect(component.currentPage).toBe(2);
+
+      component.goToNextPage();
+      expect(component.currentPage).toBe(2);
+    });
+
+    it('should go to the previous page and stop at the first page', () => {
+      component.currentPage = 2;
+      component.goToPreviousPage();
+      expect(component.currentPage).toBe(1);
+
+      component.goToPreviousPage();
+      expect(component.currentPage).toBe(1);
+    });
+  });
 });
