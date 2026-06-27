@@ -262,20 +262,6 @@ describe('TopicLessonCardComponent', () => {
     expect(navigatedUrl).toContain('initialVoiceoverLanguageCode=es');
   });
 
-  it('should show fallback CTA when user selects different language even if preferred is available', () => {
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    component.availableTextLanguageCodes = ['en', 'es'];
-    component.availableVoiceoverLanguageCodes = ['en', 'es'];
-    component.ngOnInit();
-
-    expect(component.shouldShowFallbackCta()).toBe(true);
-
-    component.onSelectedTextLanguageCodeChange('es');
-
-    expect(component.shouldShowFallbackCta()).toBe(true);
-    expect(component.getStartButtonLabel()).toBe('Play Lesson in es 🌐');
-  });
-
   it('should persist session language even when preferred language is available', () => {
     i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
     component.availableTextLanguageCodes = ['en', 'es'];
@@ -287,26 +273,6 @@ describe('TopicLessonCardComponent', () => {
     expect(
       topicSessionFallbackLanguageService.saveFallbackSelection
     ).toHaveBeenCalledWith('es', null);
-  });
-
-  it('should return fallback CTA label in Portuguese when site language is Portuguese', () => {
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
-    component.ngOnInit();
-
-    component.onSelectedTextLanguageCodeChange('en');
-
-    expect(component.getStartButtonLabel()).toBe('Jogar Lição em en 🌐');
-  });
-
-  it('should return fallback CTA label in English when site language is English', () => {
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    component.availableTextLanguageCodes = ['en', 'es'];
-    component.availableVoiceoverLanguageCodes = ['en', 'es'];
-    component.ngOnInit();
-
-    component.onSelectedTextLanguageCodeChange('es');
-
-    expect(component.getStartButtonLabel()).toBe('Play Lesson in es 🌐');
   });
 
   it('should return helper text in site language when preferred language is unavailable', () => {
@@ -393,20 +359,6 @@ describe('TopicLessonCardComponent', () => {
     expect(component.selectedVoiceoverLanguageCode).toBe('fr');
   });
 
-  it('should return empty start button label when no text language is selected', () => {
-    component.selectedTextLanguageCode = null;
-    expect(component.getStartButtonLabel()).toBe('');
-  });
-
-  it('should return fallback start button label when preferred language is selected', () => {
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    component.availableTextLanguageCodes = ['en', 'es'];
-    component.availableVoiceoverLanguageCodes = ['en', 'es'];
-    component.ngOnInit();
-
-    expect(component.getStartButtonLabel()).toBe('Play Lesson in en 🌐');
-  });
-
   it('should return Portuguese helper text when preferred language is available and site language is Portuguese', () => {
     i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
     component.availableTextLanguageCodes = ['en', 'pt'];
@@ -447,31 +399,6 @@ describe('TopicLessonCardComponent', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.navigateTo('');
     expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
-  });
-
-  it('should use audio language description when content description is empty', () => {
-    languageUtilService.getContentLanguageDescription.and.returnValue('');
-    languageUtilService.getAudioLanguageDescription.and.returnValue(
-      'English (Audio)'
-    );
-    component.ngOnInit();
-    component.onSelectedTextLanguageCodeChange('en');
-
-    expect(component.getStartButtonLabel()).toBe(
-      'Jogar Lição em English (Audio) 🌐'
-    );
-  });
-
-  it('should use language code when both descriptions are empty', () => {
-    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
-    languageUtilService.getContentLanguageDescription.and.returnValue('');
-    languageUtilService.getAudioLanguageDescription.and.returnValue('');
-    component.availableTextLanguageCodes = ['en', 'es'];
-    component.availableVoiceoverLanguageCodes = ['en', 'es'];
-    component.ngOnInit();
-    component.onSelectedTextLanguageCodeChange('es');
-
-    expect(component.getStartButtonLabel()).toBe('Play Lesson in es 🌐');
   });
 
   it('should return false from isLessonUnavailableInPreferredLanguage when no text codes are available', () => {

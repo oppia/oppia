@@ -223,23 +223,6 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     );
   }
 
-  getStartButtonLabel(): string {
-    if (!this.shouldShowFallbackCta()) {
-      return '';
-    }
-
-    const languageDescription = this.getLanguageDescription(
-      this.selectedTextLanguageCode as string
-    );
-    if (this.getPreferredLanguageCode().startsWith('pt')) {
-      return (
-        'Jogar Li\u00e7\u00e3o em ' + languageDescription + ' \uD83C\uDF10'
-      );
-    }
-
-    return 'Play Lesson in ' + languageDescription + ' \uD83C\uDF10';
-  }
-
   shouldShowFallbackCta(): boolean {
     return !!this.selectedTextLanguageCode;
   }
