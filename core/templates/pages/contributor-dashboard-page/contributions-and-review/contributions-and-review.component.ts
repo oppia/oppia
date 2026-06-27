@@ -232,7 +232,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         subheading =
           ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
       } else {
-        subheading = details.skill_description;
+        subheading = details.skill_description ?? '';
       }
 
       const suggestionStatus = suggestion.status as

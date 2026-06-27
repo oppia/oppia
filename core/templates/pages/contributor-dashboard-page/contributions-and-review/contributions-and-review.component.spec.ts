@@ -34,7 +34,10 @@ import {
   Suggestion,
   SuggestionDetails,
 } from './contributions-and-review.component';
-import {ActiveContributionDict} from '../modal-templates/translation-suggestion-review-modal.component';
+import {
+  ActiveContributionDict,
+  ActiveSuggestionDict,
+} from '../modal-templates/translation-suggestion-review-modal.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {Skill} from 'domain/skill/skill.model';
@@ -3099,7 +3102,7 @@ describe('Contributions and review component', () => {
                 content_html: 'Content 1',
                 translation_html: 'Translation 1',
               },
-            } as unknown as Suggestion,
+            } as unknown as ActiveSuggestionDict,
             details: {
               topic_name: 'Topic',
               entity_description: 'Entity Description',
