@@ -28,10 +28,12 @@ import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor, RTE_BUTTON_TITLES} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
+const emptyCreatorDashboardMessageSelector = '.oppia-dashboard-empty-text p';
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
@@ -45,6 +47,8 @@ const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const activeModalMathJaxSvgSelector = '.modal-dialog .MathJax_SVG svg';
+const activeModalMathJaxTextSelector = '.modal-dialog .MathJax_SVG text';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
@@ -237,6 +241,13 @@ const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
+const explorationGridCardTitleSelector =
+  '.e2e-test-exploration-dashboard-card .e2e-test-exp-summary-tile-title';
+const explorationListRowTitleSelector = '.e2e-test-exp-summary-row-title';
+const explorationListItemSelector = '.exploration-list-item';
+const averageRatingsCardSelector = '.average-ratings';
+const totalPlaysCardSelector = '.total-plays';
+const openFeedbackCardSelector = '.total-open-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
@@ -244,9 +255,6 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const historyTabButton = '.e2e-test-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
-const totalPlaysSelector = '.e2e-test-oppia-total-plays';
-const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
-const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
@@ -466,6 +474,19 @@ const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
 const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
 const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
+
+const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
+
+const explorationGridSelector = '.e2e-test-exploration-dashboard-card';
+
+const explorationListSelector = '.oppia-dashboard-table';
+
+const explorationGridRatingSelector = '.e2e-test-exp-summary-tile-rating';
+
+const explorationGridFeedbackSelector =
+  '.e2e-test-exp-summary-tile-open-feedback';
+
+const explorationGridViewsSelector = '.e2e-test-exp-summary-tile-num-views';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -2508,7 +2529,20 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
+    await this.waitForCreatorDashboardToLoad();
     showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Waits for the creator dashboard content to finish loading.
+   */
+  async waitForCreatorDashboardToLoad(): Promise<void> {
+    await this.expectElementToBeVisible(
+      creatorDashboardContainerSelector,
+      true
+    );
+    await this.waitForPageToFullyLoad();
+    await this.waitForNetworkIdle({idleTime: 1000});
   }
 
   /**
@@ -3881,6 +3915,9 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToBeClickable(destinationCardSelector);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
+    await this.page.waitForSelector(addStateInput, {
+      visible: true,
+    });
     await this.typeInInputField(addStateInput, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
@@ -4008,6 +4045,16 @@ export class ExplorationEditor extends BaseUser {
           `Unable to navigate to the card ${cardName}.\n` + error.message;
         throw error;
       }
+    }
+
+    // On mobile the state-graph modal uses an NgBootstrap CSS fade-out animation.
+    // Wait for it to fully disappear before returning, otherwise the modal
+    // backdrop can obstruct the editor content (e.g., stateEditSelector)
+    // in the next call.
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        hidden: true,
+      });
     }
   }
 
@@ -5704,6 +5751,8 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < answerItems.length - 1; i++) {
       const option = answerItems[i];
 
+      // Re-query the list fresh after each drag so stale handles from
+      // Angular re-renders do not cause incorrect source/destination picks.
       const optionElements = await this.page.$$(dragAndDropItemSelector);
       const destinationElement = optionElements[i];
 
@@ -5721,6 +5770,10 @@ export class ExplorationEditor extends BaseUser {
 
       if (!sourceElement) {
         throw new Error(`Option "${option}" not found.`);
+      }
+
+      if (sourceElement === destinationElement) {
+        continue;
       }
 
       // Ensure that elements have stabilized before we start dragging.
@@ -5742,6 +5795,9 @@ export class ExplorationEditor extends BaseUser {
         destBox.x + destBox.width / 2,
         destBox.y + destBox.height / 2
       );
+
+      // Wait for the list to settle after the drag before the next iteration.
+      await this.page.waitForTimeout(500);
     }
 
     await this.clickOnSubmitAnswerButton();
@@ -5753,21 +5809,51 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedUsers - The expected count of users who submitted ratings.
    */
   async expectAverageRatingAndUsersToBe(
-    expectedRating: number,
+    expectedRating: number | string,
     expectedUsers: number
   ): Promise<void> {
-    await this.page.waitForSelector(avarageRatingSelector, {
-      visible: true,
-    });
-    const avarageRating = await this.page.$eval(
-      avarageRatingSelector,
-      element => parseFloat((element as HTMLElement).innerText.trim())
+    await this.expectElementToBeVisible(averageRatingsCardSelector, true);
+
+    const ratingElements = await this.page.$$(
+      `${averageRatingsCardSelector} .stat-value-with-rating, ` +
+        `${averageRatingsCardSelector} .stat-value-without-rating`
     );
-    if (avarageRating !== expectedRating) {
-      throw new Error(
-        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+    let ratingText = '';
+
+    for (const element of ratingElements) {
+      const rect = await element.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      ratingText = await this.page.evaluate(
+        el => (el as HTMLElement).innerText.trim() || '',
+        element
       );
+      break;
     }
+
+    // Handle "N/A" case.
+    if (expectedRating === 'N/A') {
+      if (ratingText !== 'N/A') {
+        throw new Error(
+          'Expected average rating to be "N/A", but found "' + ratingText + '".'
+        );
+      }
+    } else {
+      const ratingValue = parseFloat(ratingText);
+
+      if (ratingValue !== expectedRating) {
+        throw new Error(
+          'Expected average rating to be ' +
+            expectedRating +
+            ', but found ' +
+            ratingValue +
+            '.'
+        );
+      }
+    }
+
     const totalUsersText = await this.page.$eval(
       usersCountInRatingSelector,
       el => (el as HTMLElement).innerText.trim() || ''
@@ -5787,12 +5873,28 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of open feedback entries.
    */
   async expectOpenFeedbacksToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(openFeedbackCardSelector, true);
     const numberOfOpenFeedbacks = await this.page.$eval(
-      numberOfOpenFeedbacksSelector,
-      el => parseInt((el as HTMLElement).innerText.trim(), 10)
+      openFeedbackCardSelector,
+      card => {
+        const statValue = Array.from(
+          (card as HTMLElement).querySelectorAll(
+            '.stat-value-with-rating, .stat-value-without-rating'
+          )
+        ).find(element => {
+          const htmlElement = element as HTMLElement;
+          const style = window.getComputedStyle(htmlElement);
+          const rect = htmlElement.getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        }) as HTMLElement | undefined;
+
+        return parseInt(statValue?.innerText.trim() || '0', 10);
+      }
     );
     if (numberOfOpenFeedbacks !== number) {
       throw new Error(
@@ -5806,12 +5908,26 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected total play count.
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(totalPlaysSelector, {
-      visible: true,
-    });
-    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
-      parseInt((el as HTMLElement).innerText.trim(), 10)
+    await this.expectElementToBeVisible(totalPlaysCardSelector, true);
+    const totalPlaysElements = await this.page.$$(
+      `${totalPlaysCardSelector} .stat-value-with-rating, ` +
+        `${totalPlaysCardSelector} .stat-value-without-rating`
     );
+    let numberOfTotalPlays = 0;
+
+    for (const el of totalPlaysElements) {
+      const rect = await el.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      const text = await this.page.evaluate(
+        element => (element as HTMLElement).innerText.trim() || '0',
+        el
+      );
+      numberOfTotalPlays = parseInt(text, 10) || 0;
+      break;
+    }
     if (numberOfTotalPlays !== number) {
       throw new Error(
         `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
@@ -7713,7 +7829,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(creatorDashboardMenuLink);
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
-    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+    await this.waitForCreatorDashboardToLoad();
   }
 
   /**
@@ -7802,6 +7918,432 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectFeedbackPageTobeVisible(): Promise<void> {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Adds a math formula to the current card's content using the RTE toolbar.
+   * This opens the state content editor, inserts a math formula via the
+   * CKEditor math button, and saves the content.
+   * @param {string} latex - The LaTeX expression to insert.
+   * @param {string} [expectedText] - The text expected to be rendered inside the MathJax SVG text node.
+   */
+  async addMathFormulaToCardContent(
+    latex: string,
+    expectedText?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
+
+    // Insert mathematical formula via the RTE toolbar.
+    const rteEditor = new RTEEditor(this.page, this.page);
+    await rteEditor.clickOnRTEOptionWithTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.EN
+    );
+    await this.waitForNetworkIdle();
+    await rteEditor.typeMathExpression(latex);
+
+    if (expectedText) {
+      await this.expectMathJaxToRenderArabicTextInSvgTextNode(expectedText);
+    }
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Math formula added to card content successfully.');
+  }
+
+  /**
+   * Asserts that Arabic text in a MathJax-rendered formula is preserved as a
+   * single contiguous string inside a text element, rather than being
+   * split into disconnected SVG text nodes. This verifies that the
+   * mtextFontInherit configuration is working correctly (Fixes #26148).
+   * @param {string} expectedText - The Arabic text expected inside the
+   *   text node.
+   */
+  async expectMathJaxToRenderArabicTextInSvgTextNode(
+    expectedText: string
+  ): Promise<void> {
+    // Math interactions require heavy MathJax rendering and take significantly
+    // longer to load than other interactions.
+    await this.page.waitForSelector(activeModalMathJaxSvgSelector, {
+      timeout: 15000,
+    });
+
+    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(
+      (svgSelector, textSelector) => {
+        const svgElement = document.querySelector(svgSelector);
+        const textNodes = document.querySelectorAll(textSelector);
+        return {
+          arabicTextContent:
+            Array.from(textNodes)
+              .map(node => node.textContent?.trim() || '')
+              .filter(text => text !== '')
+              .join(' | ') || null,
+          rawSvgHtml: svgElement ? svgElement.textContent : null,
+        };
+      },
+      activeModalMathJaxSvgSelector,
+      activeModalMathJaxTextSelector
+    );
+
+    if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
+      throw new Error(
+        `Expected MathJax to render Arabic text "${expectedText}" inside an ` +
+          `SVG <text> element, but found: "${arabicTextContent}". ` +
+          `Raw SVG HTML for debugging: \n${rawSvgHtml}\n ` +
+          'This indicates that mtextFontInherit is not working correctly.'
+      );
+    }
+    showMessage(
+      'Arabic text rendered correctly inside text node: ' + arabicTextContent
+    );
+  }
+
+  /**
+   * Expects explorations displayed in the grid to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInGridInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationGridSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationGridCardTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects explorations displayed in the list to match the provided order.
+   * @param {string[]} expectedTitles - Ordered list of expected exploration titles.
+   */
+  async expectExplorationsInListInOrder(
+    expectedTitles: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationListSelector, true);
+
+    const titles = await this.page.$$eval(
+      explorationListRowTitleSelector,
+      elements => elements.map(el => (el as HTMLElement).innerText.trim())
+    );
+
+    if (titles.length !== expectedTitles.length) {
+      throw new Error(
+        `Expected ${expectedTitles.length} explorations, ` +
+          `but found ${titles.length}.`
+      );
+    }
+
+    for (let i = 0; i < expectedTitles.length; i++) {
+      if (titles[i] !== expectedTitles[i]) {
+        throw new Error(
+          `Expected exploration "${expectedTitles[i]}" ` +
+            `at position ${i}, but found "${titles[i]}".`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the grid to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenFeedback - The expected open feedback text.
+   * @param {string} expectedViews - The expected views text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectGridCardDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenFeedback: string,
+    expectedViews: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationGridCardTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationGridCardTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    const cardHandle = await titleElement.evaluateHandle(
+      (element, cardSelector) => element.closest(cardSelector),
+      explorationGridSelector
+    );
+    const card = cardHandle.asElement();
+
+    if (!card) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string,
+        expectedRatingText: string,
+        expectedFeedbackText: string,
+        expectedViewsText: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getStatisticText(ratingSelector) === expectedRatingText &&
+          getStatisticText(feedbackSelector) === expectedFeedbackText &&
+          getStatisticText(viewsSelector) === expectedViewsText
+        );
+      },
+      {},
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector,
+      expectedRating,
+      expectedOpenFeedback,
+      expectedViews
+    );
+
+    const cardDetails = await this.page.evaluate(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return {
+          rating: getStatisticText(ratingSelector),
+          feedback: getStatisticText(feedbackSelector),
+          views: getStatisticText(viewsSelector),
+        };
+      },
+      card,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector
+    );
+
+    if (cardDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${cardDetails.rating}".`
+      );
+    }
+
+    if (cardDetails.feedback !== expectedOpenFeedback) {
+      throw new Error(
+        `Expected open feedback "${expectedOpenFeedback}" but found "${cardDetails.feedback}".`
+      );
+    }
+
+    if (cardDetails.views !== expectedViews) {
+      throw new Error(
+        `Expected views "${expectedViews}" but found "${cardDetails.views}".`
+      );
+    }
+  }
+
+  /**
+   * Expects the details of the exploration card at the given index in the list to match the provided values.
+   * @param {number} index - The zero-based index of the card to check.
+   * @param {string} expectedRating - The expected rating text.
+   * @param {string} expectedOpenThreads - The expected open threads text.
+   * @param {string} expectedPlays - The expected plays text.
+   * @throws Will throw an error if the card at the given index is not found or if any of the details do not match the expected values.
+   */
+  async expectListDetailsToBe(
+    index: number,
+    expectedRating: string,
+    expectedOpenThreads: string,
+    expectedPlays: string
+  ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForSelector(explorationListRowTitleSelector, {
+      visible: true,
+    });
+
+    const titles = await this.page.$$(explorationListRowTitleSelector);
+    const titleElement = titles[index];
+
+    if (!titleElement) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+    const rowHandle = await titleElement.evaluateHandle(
+      (element, rowSelector) => element.closest(rowSelector),
+      explorationListItemSelector
+    );
+    const row = rowHandle.asElement();
+
+    if (!row) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
+
+    await this.page.waitForFunction(
+      (
+        rowElement: Element,
+        expectedRatingText: string,
+        expectedOpenThreadsText: string,
+        expectedPlaysText: string
+      ) => {
+        const getCellText = (cellSelector: string): string => {
+          return (
+            (
+              rowElement.querySelector(cellSelector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getCellText('td:nth-child(2)') === expectedRatingText &&
+          getCellText('td:nth-child(3)') === expectedPlaysText &&
+          getCellText('td:nth-child(4)') === expectedOpenThreadsText
+        );
+      },
+      {},
+      row,
+      expectedRating,
+      expectedOpenThreads,
+      expectedPlays
+    );
+
+    const rowDetails = await this.page.evaluate((rowElement: Element) => {
+      const getCellText = (cellSelector: string): string => {
+        return (
+          (
+            rowElement.querySelector(cellSelector) as HTMLElement | null
+          )?.textContent?.trim() || ''
+        );
+      };
+
+      return {
+        rating: getCellText('td:nth-child(2)'),
+        plays: getCellText('td:nth-child(3)'),
+        openThreads: getCellText('td:nth-child(4)'),
+      };
+    }, row);
+
+    if (rowDetails.rating !== expectedRating) {
+      throw new Error(
+        `Expected rating "${expectedRating}" but found "${rowDetails.rating}".`
+      );
+    }
+
+    if (rowDetails.openThreads !== expectedOpenThreads) {
+      throw new Error(
+        `Expected open threads "${expectedOpenThreads}" but found "${rowDetails.openThreads}".`
+      );
+    }
+
+    if (rowDetails.plays !== expectedPlays) {
+      throw new Error(
+        `Expected plays "${expectedPlays}" but found "${rowDetails.plays}".`
+      );
+    }
+  }
+
+  /**
+   * Switches the exploration editor to list view.
+   */
+  async switchToListView(): Promise<void> {
+    await this.expectElementToBeVisible(listViewButtonSelector, true);
+
+    // If list is already visible and grid is hidden, we can pass.
+    const listVisibleInitially = await this.isElementVisible(
+      explorationListSelector,
+      true,
+      500
+    );
+    const gridVisibleInitially = await this.isElementVisible(
+      explorationGridSelector,
+      true,
+      500
+    );
+
+    if (listVisibleInitially && !gridVisibleInitially) {
+      await this.waitForCreatorDashboardToLoad();
+      return;
+    }
+
+    await this.clickOnElementWithSelector(listViewButtonSelector);
+
+    // Wait until the list container is visible and the grid container is hidden.
+    await this.page.waitForFunction(
+      (listSel: string, gridSel: string) => {
+        const list = document.querySelector(listSel);
+        const grid = document.querySelector(gridSel);
+
+        const isVisible = (el: Element | null) => {
+          if (!el) {
+            return false;
+          }
+          const style = window.getComputedStyle(el as Element);
+          const rect = (el as HTMLElement).getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        };
+
+        return isVisible(list) && !isVisible(grid);
+      },
+      {},
+      explorationListSelector,
+      explorationGridSelector
+    );
+
+    await this.waitForCreatorDashboardToLoad();
+  }
+
+  /**
+   * Utility to verify the empty-dashboard message on the Creator Dashboard.
+   * @param expectedText - The expected message text.
+   */
+  async expectCreatorDashboardMessageToBe(expectedText: string): Promise<void> {
+    await this.expectTextContentToBe(
+      emptyCreatorDashboardMessageSelector,
+      expectedText
+    );
   }
 }
 

@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
@@ -29,6 +30,11 @@ import {
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
+import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
+import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
+
+const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
 import './edit-certificate-offering-page.component.css';
 
 @Component({
@@ -40,11 +46,13 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   certificateOfferingId: string = '';
   certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
+  isCertificateValid: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private alertsService: AlertsService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private ngbModal: NgbModal,
     private router: Router
   ) {}
 
@@ -103,19 +111,64 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   }
 
   async updateCertificateOffering(): Promise<void> {
-    const certificateId =
-      await this.certificateAssessmentOfferingBackendApiService.updateCertificateAssessmentOfferingAsync(
-        this.certificateOfferingId,
-        this.certificateAssessmentOffering
+    try {
+      const modalRef = this.ngbModal.open(
+        CertificateOfferingConfirmationModalComponent,
+        {backdrop: 'static'}
       );
+      modalRef.componentInstance.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
+      modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
-    if (certificateId) {
+      const action = await modalRef.result.catch(() => null);
+      if (
+        action !== CERTIFICATE_OFFERING_NOT_READY_ACTION &&
+        action !== CERTIFICATE_OFFERING_UPDATED_ACTION
+      ) {
+        return;
+      }
+
+      const certificateId =
+        await this.certificateAssessmentOfferingBackendApiService.updateCertificateAssessmentOfferingAsync(
+          this.certificateOfferingId,
+          this.certificateAssessmentOffering
+        );
+
+      if (!certificateId) {
+        return;
+      }
+
+      if (action === CERTIFICATE_OFFERING_NOT_READY_ACTION) {
+        this.alertsService.addSuccessMessage('Certificate saved as not ready.');
+        this.navigateToCertificateOfferingDashboard();
+        return;
+      }
+
       this.alertsService.addSuccessMessage('Certificate updated.');
-      this.router.navigate(['/certificate-offering-dashboard']);
+      const postModalRef = this.ngbModal.open(
+        PostCertificateOfferingResultModalComponent,
+        {
+          centered: true,
+          windowClass: 'oppia-certificate-result-modal',
+        }
+      );
+      postModalRef.componentInstance.action =
+        CERTIFICATE_OFFERING_UPDATED_ACTION;
+      await postModalRef.result.catch(() => null);
+      this.navigateToCertificateOfferingDashboard();
+    } catch (error: unknown) {
+      this.alertsService.addWarning(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Failed to update certificate.'
+      );
     }
   }
 
   navigateBackToDashboard(): void {
+    this.navigateToCertificateOfferingDashboard();
+  }
+
+  private navigateToCertificateOfferingDashboard(): void {
     this.router.navigate(['/certificate-offering-dashboard']);
   }
 }

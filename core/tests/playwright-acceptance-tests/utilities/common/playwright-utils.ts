@@ -17,14 +17,20 @@
  */
 
 import {ViewportSize} from '@playwright/test';
-import {Page, ElementHandle} from '@playwright/test';
+import test, {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import fs from 'fs';
+
+const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+
+const pagesWithDialogHandler = new WeakSet<Page>();
 
 const usernameInputSelector = 'input.e2e-test-username-input';
 const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
@@ -41,7 +47,10 @@ export class BaseUser {
   constructor(page: Page) {
     this.page = page;
     BaseUser.instances.push(this);
-    this.installPageDialogHandler();
+    if (!pagesWithDialogHandler.has(page)) {
+      pagesWithDialogHandler.add(page);
+      this.installPageDialogHandler();
+    }
   }
 
   /**
@@ -335,6 +344,31 @@ export class BaseUser {
   }
 
   /**
+   * Checks if element is clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string | ElementHandle<Element>,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    await this.page.waitForFunction(
+      ({element, clickable, clickableFn}) => {
+        const fn = new Function(
+          'element',
+          'clickable',
+          `return (${clickableFn})(element, clickable)`
+        );
+        return fn(element, clickable);
+      },
+      {element, clickable, clickableFn: isElementClickable.toString()},
+      {timeout: 30000}
+    );
+  }
+
+  /**
    * Waits for the given element to be visible, and then checks if the text
    * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
@@ -441,6 +475,74 @@ export class BaseUser {
       await this.page.click(toastMessageSelector);
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
+   * This function checks if the page URL contains the given URL.
+   * @param {string} url - The URL to check.
+   * @param {Page} context - The page on which the URL should be checked.
+   */
+  async expectPageURLToContain(
+    url: string,
+    context: Page = this.page
+  ): Promise<void> {
+    await context.waitForFunction((url: string) => {
+      return window.location.href.includes(url);
+    }, url);
+  }
+
+  /**
+   * This function compares the current page screenshot with a reference image.
+   * @param {string} imageName - The name for the image
+   * @param {Page|undefined} newPage - The page to take screenshot from. If not
+   *     specified, uses this.page instead.
+   * @param {Parameters<Page['screenshot']>[0]} options - Additional options for the screenshot comparison.
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    newPage: Page | undefined = undefined,
+    options: Parameters<Page['screenshot']>[0] = {}
+  ): Promise<void> {
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(-1, -1);
+    await currentPage.waitForTimeout(5000);
+
+    const snapshotPath = test
+      .info()
+      .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
+
+    if (
+      !fs.existsSync(snapshotPath) &&
+      process.env.UPDATE_SNAPSHOTS !== 'true'
+    ) {
+      throw new Error(
+        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
+          'Run with --update_snapshots to generate it.'
+      );
+    }
+
+    let failureTrigger = 0;
+
+    if (this.isViewportAtMobileWidth()) {
+      failureTrigger += 0.048;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      failureTrigger += 0.04;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
+
+    await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
+      maxDiffPixelRatio: failureTrigger,
+      ...options,
+    });
   }
 
   /**
@@ -645,11 +747,6 @@ export class BaseUser {
           },
           element
         );
-        await this.page.evaluate(({el, a, b}) => isElementClickable(el, a, b), {
-          el: element,
-          a: true,
-          b: true,
-        });
         const reasonsText =
           clickabilityDiagnostics.reasons.length > 0
             ? clickabilityDiagnostics.reasons
@@ -803,9 +900,61 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.page.waitForSelector(
+      `xpath=//mat-chip[contains(text(), '${textContent}')]`
+    );
+    if (!matChipElement) {
+      throw new Error(`Mat chip with text ${textContent} not found.`);
+    }
+    return matChipElement;
+  }
+
+  /**
+   * Selects the mat-option with the given value.
+   * @param value The value of the mat-option to select.
+   */
+  async selectMatOption(value: string): Promise<void> {
+    await this.page.waitForSelector('mat-option');
+    const matOptionElements = await this.page.$$('mat-option');
+    for (const matOptionElement of matOptionElements) {
+      if (
+        (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
+        value
+      ) {
+        await this.clickOnElement(matOptionElement);
+        break;
+      }
+    }
+
+    await this.page.waitForSelector('mat-option', {
+      state: 'hidden',
+    });
+  }
+
+  /**
+   * This function uploads a file using the given file path.
+   */
+  async uploadFile(filePath: string): Promise<void> {
+    const inputUploadHandle =
+      await this.page.waitForSelector('input[type=file]');
+    if (inputUploadHandle === null) {
+      throw new Error('No file input found while attempting to upload a file.');
+    }
+    let fileToUpload = filePath;
+    await inputUploadHandle.setInputFiles(fileToUpload);
+  }
+
+  /**
    * Waits for an element to stabilize.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   * @param {number} timeout - The timeout in milliseconds. Defaults to 5000.
+   * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
     selector: string | ElementHandle<Element>,
