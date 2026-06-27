@@ -15,7 +15,6 @@
     "@angular-eslint",
     "@angular-eslint/template"
   ],
-  "ignorePatterns": ["core/templates/pages/footer_js_libs.html"],
   "overrides": [
     {
       // We exclude test files from dependency injection format checks because
