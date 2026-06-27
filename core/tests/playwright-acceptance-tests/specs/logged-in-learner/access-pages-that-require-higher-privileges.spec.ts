@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,53 +19,54 @@
  * LI.OP Learner cannot access pages that require higher privileges
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-in Learner', function () {
+test.describe('Logged-in Learner', function () {
   let loggedInUser: LoggedInUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
-      'logged_in_user@example.com'
+      'logged_in_user@example.com',
+      browser
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
   // The logged-in user cannot access the moderator page.
-  it('should be restricted from accessing the moderator page', async function () {
+  test('should be restricted from accessing the moderator page', async function () {
     await loggedInUser.navigateToModeratorPage();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
 
   // The logged-in user cannot access the topics and skills dashboard.
-  it('should be restricted from accessing the topics and skills dashboard', async function () {
+  test('should be restricted from accessing the topics and skills dashboard', async function () {
     await loggedInUser.navigateToTopicsAndSkillsDashboardPage();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
 
   // The logged-in user cannot access the release coordinator page.
-  it('should be restricted from accessing the release coordinator page', async function () {
+  test('should be restricted from accessing the release coordinator page', async function () {
     await loggedInUser.navigateToReleaseCoordinatorPage();
     await loggedInUser.expectErrorPage(404); // Expect a 404 Not Found error.
   });
 
   // The logged-in user cannot access the contributor admin dashboard page.
-  it('should be restricted from accessing the contributor admin dashboard page', async function () {
+  test('should be restricted from accessing the contributor admin dashboard page', async function () {
     await loggedInUser.navigateToContributorAdminDashboardPage();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
 
   // The logged-in user cannot access the site admin page.
-  it('should be restricted from accessing the site admin page', async function () {
+  test('should be restricted from accessing the site admin page', async function () {
     await loggedInUser.navigateToSiteAdminPage();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

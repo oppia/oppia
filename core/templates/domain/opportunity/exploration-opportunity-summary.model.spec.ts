@@ -19,6 +19,7 @@
 import {
   ExplorationOpportunitySummary,
   ExplorationOpportunitySummaryBackendDict,
+  TranslationOpportunityCardInfoBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Exploration opportunity summary model', () => {
@@ -137,5 +138,68 @@ describe('Exploration opportunity summary model', () => {
         ).toEqual(0);
       }
     );
+
+    it('should create a correct opportunity summary using createFromBackendDictV2', () => {
+      const backendDictV2: TranslationOpportunityCardInfoBackendDict = {
+        topic_ids: ['topic_id'],
+        entity_id: 'exp_id',
+        content_count: 100,
+        incomplete_translation_language_codes: ['hi'],
+        translation_counts: {
+          hi: 15,
+        },
+        entity_type: 'exploration',
+        topic_name: 'Topic',
+        entity_description: 'Introduction',
+        is_pinned: false,
+        currently_available_to_learners: true,
+        translation_in_review_counts: {
+          hi: 20,
+        },
+      };
+
+      const summary =
+        ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
+      expect(summary.getExplorationId()).toEqual('exp_id');
+      expect(summary.getOpportunityHeading()).toEqual('Introduction');
+      expect(summary.getOpportunitySubheading()).toEqual('Exploration - Topic');
+      expect(summary.storyTitle).toEqual('');
+      expect(summary.languageCode).toEqual('en');
+      expect(summary.getReviewerOnlyContentCount()).toEqual(0);
+      expect(summary.getContentCount()).toEqual(100);
+      expect(summary.getTranslationsCount('hi')).toEqual(15);
+      expect(summary.getTranslationsInReviewCount('hi')).toEqual(20);
+      expect(summary.getTranslationProgressPercentage('hi')).toEqual(15);
+    });
+
+    it('should map optional V2 fields correctly if provided', () => {
+      const backendDictV2: TranslationOpportunityCardInfoBackendDict = {
+        topic_ids: ['topic_id'],
+        entity_id: 'exp_id',
+        content_count: 100,
+        incomplete_translation_language_codes: ['hi'],
+        translation_counts: {
+          hi: 15,
+        },
+        entity_type: 'exploration',
+        topic_name: 'Topic',
+        entity_description: 'Introduction',
+        is_pinned: false,
+        currently_available_to_learners: true,
+        translation_in_review_counts: {
+          hi: 20,
+        },
+        story_title: 'Story',
+        language_code: 'hi',
+        reviewer_only_content_count: 5,
+      };
+
+      const summary =
+        ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
+      expect(summary.getOpportunitySubheading()).toEqual('Exploration - Topic');
+      expect(summary.storyTitle).toEqual('Story');
+      expect(summary.languageCode).toEqual('hi');
+      expect(summary.getReviewerOnlyContentCount()).toEqual(5);
+    });
   });
 });
