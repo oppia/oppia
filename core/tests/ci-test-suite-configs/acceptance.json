@@ -462,8 +462,8 @@
     },
     {
       "name": "logged-in-learner/reaches-a-checkpoint-and-saves-their-progress",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/starts-from-beginning-after-completing-a-lesson",

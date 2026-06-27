@@ -340,6 +340,31 @@ export class BaseUser {
   }
 
   /**
+   * Checks if element is clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string | ElementHandle<Element>,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    await this.page.waitForFunction(
+      ({element, clickable, clickableFn}) => {
+        const fn = new Function(
+          'element',
+          'clickable',
+          `return (${clickableFn})(element, clickable)`
+        );
+        return fn(element, clickable);
+      },
+      {element, clickable, clickableFn: isElementClickable.toString()},
+      {timeout: 30000}
+    );
+  }
+
+  /**
    * Waits for the given element to be visible, and then checks if the text
    * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
