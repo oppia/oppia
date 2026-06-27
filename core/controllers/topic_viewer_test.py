@@ -464,6 +464,175 @@ class TopicPageDataHandlerTests(
         )
         self.logout()
 
+    def test_get_with_story_node_voiceover_skips_empty_voiceovers_mapping(
+        self,
+    ) -> None:
+        exploration_id = 'exp_id_empty_vo'
+        self.save_new_valid_exploration(
+            exploration_id, self.admin_id, end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, exploration_id)
+
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping={'en': {'en-US': True}}
+        )
+
+        # Entity voiceovers with an empty voiceovers_mapping should be skipped.
+        empty_entity_voiceovers = voiceover_domain.EntityVoiceovers(
+            entity_id=exploration_id,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=1,
+            language_accent_code='en-US',
+            voiceovers_mapping={},
+            automated_voiceovers_audio_offsets_msecs={},
+        )
+        voiceover_services.save_entity_voiceovers(empty_entity_voiceovers)
+
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Node 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': exploration_id,
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': 'node_1',
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.admin_id, self.story_id_1, change_list, 'Added node.'
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        )
+
+        canonical_stories = json_response['canonical_story_dicts']
+        story_with_nodes = [
+            s for s in canonical_stories if s['id'] == self.story_id_1
+        ]
+        self.assertEqual(len(story_with_nodes), 1)
+        node_dict = story_with_nodes[0]['all_node_dicts'][0]
+        self.assertEqual(node_dict['id'], 'node_1')
+        # Because voiceovers_mapping was empty, no accent code should appear.
+        self.assertEqual(node_dict['available_voiceover_language_codes'], [])
+        self.logout()
+
+    def test_get_with_story_node_voiceover_cross_language_accent_mapping(
+        self,
+    ) -> None:
+        exploration_id = 'exp_id_cross_accent'
+        self.save_new_valid_exploration(
+            exploration_id, self.admin_id, end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, exploration_id)
+
+        # The exploration's displayable language is 'en', so the root set will
+        # be {'en'}.  We register 'zh-Hans' as an accent supported under 'en'
+        # in the language_accent mapping so that it is reachable only through
+        # the fallback loop (its root code 'zh' is NOT in {'en'}).
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping={
+                'en': {'en-US': True, 'zh-Hans': True},
+            }
+        )
+
+        manual_voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename_cross.mp3',
+            'file_size_bytes': 2000,
+            'needs_update': False,
+            'duration_secs': 4.0,
+        }
+        # 'zh-Hans' accent has actual voiceovers; its root 'zh' != 'en' so the
+        # primary `if accent_root_code in displayable_language_roots` check
+        # fails and the fallback `for language_code` loop must handle it.
+        cross_accent_voiceovers = voiceover_domain.EntityVoiceovers(
+            entity_id=exploration_id,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=1,
+            language_accent_code='zh-Hans',
+            voiceovers_mapping={
+                'content_id_0': {
+                    'manual': state_domain.Voiceover.from_dict(
+                        manual_voiceover_dict
+                    ),
+                    'auto': None,
+                }
+            },
+            automated_voiceovers_audio_offsets_msecs={},
+        )
+        voiceover_services.save_entity_voiceovers(cross_accent_voiceovers)
+
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Node 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': exploration_id,
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': 'node_1',
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.admin_id, self.story_id_1, change_list, 'Added node.'
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        )
+
+        canonical_stories = json_response['canonical_story_dicts']
+        story_with_nodes = [
+            s for s in canonical_stories if s['id'] == self.story_id_1
+        ]
+        self.assertEqual(len(story_with_nodes), 1)
+        node_dict = story_with_nodes[0]['all_node_dicts'][0]
+        self.assertEqual(node_dict['id'], 'node_1')
+        # 'zh-Hans' was reached through the fallback language_code mapping loop.
+        self.assertIn(
+            'zh-Hans', node_dict['available_voiceover_language_codes']
+        )
+        self.logout()
+
     def test_get_with_meta_tag_content(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id,
