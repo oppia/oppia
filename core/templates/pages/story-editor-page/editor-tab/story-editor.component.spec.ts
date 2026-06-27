@@ -1404,4 +1404,23 @@ describe('Story Editor Component having three story nodes', () => {
 
     expect(component.removeArcBoundary).toHaveBeenCalledWith('arc_1');
   });
+
+  it('should return true from isFirstArc when node belongs to the first arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
+    );
+
+    expect(component.isFirstArc('node_1')).toBeTrue();
+  });
+
+  it('should return false from isFirstArc when node belongs to a later arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1'])
+    );
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_2'])
+    );
+
+    expect(component.isFirstArc('node_2')).toBeFalse();
+  });
 });

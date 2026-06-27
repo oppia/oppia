@@ -132,12 +132,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         this.story.getStoryContents().getNodes()[toIndex].getId()
       );
     }
-    if (fromIndex === 0) {
-      this.storyUpdateService.setInitialNodeId(
-        this.story,
-        this.story.getStoryContents().getNodes()[toIndex].getId()
-      );
-    }
     this.storyUpdateService.rearrangeNodeInStory(
       this.story,
       fromIndex,
