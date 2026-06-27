@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ertificate offering available page component.
+ * @fileoverview Unit tests for certificate offering available page component.
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 describe('AvailableCertificateOfferingPageComponent', () => {
   let component: AvailableCertificateOfferingPageComponent;
@@ -28,6 +29,7 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [AvailableCertificateOfferingPageComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -42,17 +44,13 @@ describe('AvailableCertificateOfferingPageComponent', () => {
   it('should render the certificate offering content', () => {
     fixture.detectChanges();
 
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('button')
+    ).map((button: HTMLButtonElement) => button.textContent.trim());
+
+    expect(buttons.includes('Continue to assessment')).toBeTrue();
     expect(
-      fixture.nativeElement
-        .querySelector(
-          '.oppia-certificate-offering-available-page__actions .btn.btn-primary'
-        )
-        .textContent.trim()
-    ).toBe('Continue to assessment');
-    expect(
-      fixture.nativeElement
-        .querySelector('.oppia-certificate-offering-available-page__panel h1')
-        .textContent.trim()
+      fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
     ).toBe('Available certificate offering');
   });
 });

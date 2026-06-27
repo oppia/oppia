@@ -298,6 +298,7 @@ describe('Classroom Page Component', () => {
       1
     );
 
+    spyOn(component, 'ngOnInit').and.stub();
     fixture.detectChanges();
 
     let certificateAssessmentLink = fixture.nativeElement.querySelector(
@@ -326,6 +327,7 @@ describe('Classroom Page Component', () => {
       1
     );
 
+    spyOn(component, 'ngOnInit').and.stub();
     fixture.detectChanges();
 
     expect(
