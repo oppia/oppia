@@ -1707,6 +1707,9 @@ def remove_user_role(user_id: str, role: str) -> None:
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Removing a default role is not allowed.')
 
+    if role not in user_settings.roles:
+        raise Exception('User does not have this role.')
+
     user_settings.roles.remove(role)
 
     role_services.log_role_query(
