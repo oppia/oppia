@@ -49,6 +49,7 @@ const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
 const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
 const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 
+const angularRootElementSelector = 'oppia-angular-root';
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -67,6 +68,21 @@ const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const progressSectionSelector = '.e2e-test-progress-section';
 const greetingSelector = '.e2e-learner-dashboard-greeting';
+const exportButtonSelector = '.e2e-test-export-account-button';
+
+// Preferences page selectors.
+const confirmUsernameField = '.e2e-test-confirm-username-field';
+const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
+const deleteAccountPage = '.e2e-test-delete-account';
+const deleteAccountButton = '.e2e-test-delete-account-button';
+const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
+const accountDeletionButtonInDeleteAccountPage =
+  '.e2e-test-delete-my-account-button';
+const preferencesContainerSelector = '.e2e-test-preferences-container';
+const preferencesMenuLink = '.e2e-test-preferences-link';
+const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
+  'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
+const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2 = 'Please do not leave this page.';
 
 const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
 const ratingStarSelector = '.e2e-test-rating-star';
@@ -316,6 +332,37 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Clicks the delete account button and waits for navigation.
+   */
+  async deleteAccount(): Promise<void> {
+    await this.clickAndWaitForNavigation(deleteAccountButton, true);
+
+    await this.page.waitForSelector(deleteAccountPage, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Clicks on the delete button in the page /delete-account to confirm account deletion, also, for confirmation username needs to be entered.
+   * @param {string} username - The username of the account.
+   */
+  async confirmAccountDeletion(username: string): Promise<void> {
+    await this.page.waitForSelector(accountDeletionButtonInDeleteAccountPage, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(
+      accountDeletionButtonInDeleteAccountPage
+    );
+    await this.typeInInputField(confirmUsernameField, username);
+    await this.clickAndWaitForNavigation(confirmAccountDeletionButton, true);
+
+    await this.page.waitForSelector(deleteMyAcccountButton, {
+      state: 'hidden',
+    });
+    showMessage(`Account deleted for ${username}.`);
+  }
+
+  /**
    * Function to enter email and proceed to the next page (username page).
    * This will click "Sign In" and verify the username field is visible.
    */
@@ -343,6 +390,63 @@ export class LoggedInUser extends BaseUser {
       await this.page.waitForSelector(signUpUsernameField, {
         state: 'visible',
       });
+    }
+  }
+
+  /**
+   * Verifies that the current page URL includes the expected page pathname.
+   */
+  async expectToBeOnPage(expectedPage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const url = this.page.url();
+
+    // Replace spaces in the expectedPage with hyphens.
+    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
+
+    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+      throw new Error(
+        `Expected to be on page ${expectedPage}, but found ${url}`
+      );
+    }
+  }
+
+  /**
+   * Exports the user's account data.
+   */
+  async exportAccount(): Promise<void> {
+    try {
+      await this.page.waitForSelector(exportButtonSelector);
+      const exportButton = await this.page.$(exportButtonSelector);
+
+      if (!exportButton) {
+        throw new Error('Export button not found');
+      }
+
+      await this.waitForPageToFullyLoad();
+      await exportButton.click();
+
+      const isTextPresent = await this.isTextPresentOnPage(
+        ACCOUNT_EXPORT_CONFIRMATION_MESSAGE
+      );
+
+      const isTextPresent2 = await this.isTextPresentOnPage(
+        ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2
+      );
+
+      if (!isTextPresent) {
+        throw new Error(
+          `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE}`
+        );
+      }
+      if (!isTextPresent2) {
+        throw new Error(
+          `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to export account: ${error}`);
+      newError.stack = (error as Error).stack;
+      throw newError;
     }
   }
 
@@ -423,6 +527,25 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToModeratorPage(): Promise<void> {
     await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Preferences Page Using Profile Dropdown Menu.
+   */
+  async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(preferencesMenuLink, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(preferencesMenuLink);
+
+    await this.page.waitForSelector(preferencesContainerSelector, {
+      state: 'visible',
+    });
   }
 
   /**
@@ -1194,6 +1317,32 @@ export class LoggedInUser extends BaseUser {
       newError.stack = (error as Error).stack;
       throw newError;
     }
+  }
+
+  /**
+   * Verifies if the page is displayed in Right-to-Left (RTL) mode.
+   */
+  async verifyPageIsRTL(): Promise<void> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+
+    if (pageDirection !== 'rtl') {
+      throw new Error('Page is not in RTL mode');
+    }
+
+    showMessage('Page is displayed in RTL mode.');
   }
 }
 

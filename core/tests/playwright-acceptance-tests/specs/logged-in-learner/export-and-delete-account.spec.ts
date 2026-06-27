@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,26 +19,30 @@
  * LI.PP. Learner Export or Delete the Account from preference page.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     loggedInLearner = await UserFactory.createNewUser(
       'loggedInLearner',
-      'logged_in_learner@example.com'
+      'logged_in_learner@example.com',
+      browser
     );
   });
 
-  it('should be able to export account', async function () {
+  test('should be able to export account', async function () {
     await loggedInLearner.navigateToPreferencesPageUsingProfileDropdown();
     await loggedInLearner.exportAccount();
   });
 
-  it('should be able to delete account', async function () {
+  test('should be able to delete account', async function () {
     // Delete Account.
     await loggedInLearner.deleteAccount();
     // Initiating account deletion from /preferences page redirects to /delete-account page.
@@ -49,7 +53,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectToBeOnPage('pending account deletion');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
