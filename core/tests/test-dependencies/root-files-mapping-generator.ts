@@ -81,6 +81,7 @@ const FILE_EXCLUSIONS_FOR_SEARCH = [
   'core/templates/tests',
   'core/templates/utility/hashes.ts',
   'angular-template-style-url-replacer.webpack-loader.js',
+  'core/tests/playwright-acceptance-tests',
 ];
 
 const FILE_EXTENSIONS_FOR_SEARCH = [

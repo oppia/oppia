@@ -13,7 +13,7 @@
       <span class="oppia-icon-accessibility-label">Share</span>
     </span>
   </li>
-  <li *ngIf="feedbackOptionIsShown"
+  <li *ngIf="feedbackOptionIsShown && !isWebFeedbackModalFeatureFlagEnabled()"
       placement="bottom-right"
       [ngbPopover]="popContent"
       triggers="manual"
@@ -29,6 +29,26 @@
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
     </div>
   </li>
+  <li class="nav-item"
+      *ngIf="isWebFeedbackModalFeatureFlagEnabled()">
+    <div tabindex="0"
+         class="nav-link e2e-test-report-exploration-button"
+         ngbTooltip="{{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}"
+         (click)="showReportAnIssueModal()"
+         (keydown.enter)="showReportAnIssueModal()"
+         placement="bottom">
+      <i class="fas fa-flag exploration-player-navbar-icons"></i>
+    </div>
+  </li>
+  <li *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
+      tabindex="0"
+      class="nav-link e2e-test-report-exploration-button"
+      ngbTooltip="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}"
+      (click)="showSendLessonFeedbackModal()"
+      (keydown.enter)="showSendLessonFeedbackModal()"
+      placement="bottom">
+    <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
+  </li>
   <li class="nav-item">
     <a *ngIf="canEdit" href="/create/{{explorationId}}"
        ngbTooltip="{{'I18N_PLAYER_EDIT_TOOLTIP' | translate}}" placement="bottom"
@@ -37,7 +57,8 @@
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_EDIT_TOOLTIP' | translate }}</span>
     </a>
   </li>
-  <li class="nav-item">
+  <li class="nav-item"
+      *ngIf="!isWebFeedbackModalFeatureFlagEnabled()">
     <div tabindex="0"
          *ngIf="username"
          class="nav-link e2e-test-report-exploration-button"
