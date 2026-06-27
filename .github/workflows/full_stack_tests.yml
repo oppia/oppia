@@ -214,9 +214,7 @@ jobs:
   acceptance_test:
     needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
-    if: ${{
-        ( fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 && github.event_name != 'merge_group' ) || ( fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 && github.event_name == 'merge_group' )
-      }}
+    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 }}
     strategy:
       # Fast fail only if it's a merge queue.
       fail-fast: ${{ github.event_name == 'merge_group' }}
