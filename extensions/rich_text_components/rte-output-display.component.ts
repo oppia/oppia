@@ -47,7 +47,29 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 
-type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
+type PortalTree = (TemplatePortal<object> | PortalTree)[];
+type TemplatePortalName =
+  | 'pTagPortal'
+  | 'h1TagPortal'
+  | 'spanTagPortal'
+  | 'olTagPortal'
+  | 'liTagPortal'
+  | 'ulTagPortal'
+  | 'preTagPortal'
+  | 'strongTagPortal'
+  | 'blockquoteTagPortal'
+  | 'emTagPortal'
+  | 'textTagPortal'
+  | 'collapsibleTagPortal'
+  | 'imageTagPortal'
+  | 'linkTagPortal'
+  | 'mathTagPortal'
+  | 'skillreviewTagPortal'
+  | 'svgdiagramTagPortal'
+  | 'tabsTagPortal'
+  | 'videoTagPortal'
+  | 'workedexampleTagPortal'
+  | 'brTagPortal';
 
 @Component({
   selector: 'oppia-rte-output-display',
@@ -56,29 +78,29 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 })
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal!: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal!: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal!: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal!: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal!: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal!: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal!: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal!: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal!: TemplateRef<object>;
+  @ViewChild('h1') h1TagPortal!: TemplateRef<object>;
+  @ViewChild('span') spanTagPortal!: TemplateRef<object>;
+  @ViewChild('ol') olTagPortal!: TemplateRef<object>;
+  @ViewChild('li') liTagPortal!: TemplateRef<object>;
+  @ViewChild('ul') ulTagPortal!: TemplateRef<object>;
+  @ViewChild('pre') preTagPortal!: TemplateRef<object>;
+  @ViewChild('strong') strongTagPortal!: TemplateRef<object>;
+  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<object>;
+  @ViewChild('em') emTagPortal!: TemplateRef<object>;
+  @ViewChild('text') textTagPortal!: TemplateRef<object>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal!: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal!: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal!: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
-  @ViewChild('br') brTagPortal!: TemplateRef<unknown>;
-  @Input() rteString!: string;
+  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<object>;
+  @ViewChild('image') imageTagPortal!: TemplateRef<object>;
+  @ViewChild('link') linkTagPortal!: TemplateRef<object>;
+  @ViewChild('math') mathTagPortal!: TemplateRef<object>;
+  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<object>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<object>;
+  @ViewChild('tabs') tabsTagPortal!: TemplateRef<object>;
+  @ViewChild('video') videoTagPortal!: TemplateRef<object>;
+  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<object>;
+  @ViewChild('br') brTagPortal!: TemplateRef<object>;
+  @Input() rteString: string = '';
   @Input() rteStringContext!: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
@@ -165,16 +187,23 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
       const encodedText = (node as Element).getAttribute('text-with-value');
-      const decodedText = this.decodeHtmlEntities(encodedText || '');
+      if (encodedText === null) {
+        return '';
+      }
+      const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
       const encodedMathContent = (node as Element).getAttribute(
         'math_content-with-value'
       );
-      const decodedMathContent = this.decodeHtmlEntities(
-        encodedMathContent || ''
-      );
+      if (encodedMathContent === null) {
+        return '';
+      }
+      const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
+      if (typeof latexText !== 'string') {
+        return '';
+      }
       return this.parseAndConvertLatex(latexText);
     } else if (node.nodeName === 'SPAN') {
       let text = '';
@@ -239,7 +268,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
-        let currentElementReplicaNodes: Node[] = [];
+        let currentElementReplicaNodes: HTMLElement[] = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
           tempElementNode.appendChild(child);
@@ -380,7 +409,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     this.highlightIdToSentenceText = {};
     this.previousHighlightedElementId = undefined;
 
-    let languageCode =
+    const languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode() ||
       AppConstants.DEFAULT_LANGUAGE_CODE;
 
@@ -390,6 +419,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     const punctuationsForCurrentLanguage =
       AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
         languageCode as keyof typeof AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS
+      ] ||
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
+        AppConstants.DEFAULT_LANGUAGE_CODE
       ];
 
     // The regex below is used to split sentences from the lesson content.
@@ -445,7 +477,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.getActiveContentId()
       );
       this.automaticVoiceoverHighlightService.languageCode =
-        this.localStorageService.getLastSelectedTranslationLanguageCode() ?? '';
+        this.localStorageService.getLastSelectedTranslationLanguageCode() ||
+        AppConstants.DEFAULT_LANGUAGE_CODE;
       this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
         this.highlightIdToSentenceText
       );
@@ -462,7 +495,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       throw e;
     }
     const dfs = (node: OppiaRteNode | TextNode) => {
-      node.portal = this._getTemplatePortal(node);
+      const portal = this._getTemplatePortal(node);
+      if (portal !== undefined) {
+        node.portal = portal;
+      }
       if (!('children' in node)) {
         return;
       }
@@ -562,7 +598,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   removePreviousHighlightedElement(): void {
-    if (!this.previousHighlightedElementId) {
+    if (this.previousHighlightedElementId === undefined) {
       return;
     }
     let previousHighlightedElements = document.getElementsByClassName(
@@ -615,7 +651,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
           this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
-            currentElementIdToHighlight as string
+            currentElementIdToHighlight || ''
           )
       ) {
         return;
@@ -647,13 +683,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   getElementMatchingClassAndTextContent(
     className: string | undefined
   ): HTMLElement | null {
-    if (!className) {
+    if (className === undefined) {
       return null;
     }
     let elements = document.getElementsByClassName(className);
     let textContent =
       this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
-        className as string
+        className
       );
     for (let i = 0; i < elements.length; i++) {
       let element = elements[i] as HTMLElement;
@@ -674,9 +710,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.pageContextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
-      return this.voiceoverPlayerService.getActiveContentId() as string;
+      return this.voiceoverPlayerService.getActiveContentId() || '';
     } else {
-      return this.translationTabActiveContentIdService.getActiveContentId() as string;
+      return (
+        this.translationTabActiveContentIdService.getActiveContentId() || ''
+      );
     }
   }
 
@@ -695,35 +733,53 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> {
+  ): TemplatePortal<object> | undefined {
+    const templatePortals: Record<TemplatePortalName, TemplateRef<object>> = {
+      pTagPortal: this.pTagPortal,
+      h1TagPortal: this.h1TagPortal,
+      spanTagPortal: this.spanTagPortal,
+      olTagPortal: this.olTagPortal,
+      liTagPortal: this.liTagPortal,
+      ulTagPortal: this.ulTagPortal,
+      preTagPortal: this.preTagPortal,
+      strongTagPortal: this.strongTagPortal,
+      blockquoteTagPortal: this.blockquoteTagPortal,
+      emTagPortal: this.emTagPortal,
+      textTagPortal: this.textTagPortal,
+      collapsibleTagPortal: this.collapsibleTagPortal,
+      imageTagPortal: this.imageTagPortal,
+      linkTagPortal: this.linkTagPortal,
+      mathTagPortal: this.mathTagPortal,
+      skillreviewTagPortal: this.skillreviewTagPortal,
+      svgdiagramTagPortal: this.svgdiagramTagPortal,
+      tabsTagPortal: this.tabsTagPortal,
+      videoTagPortal: this.videoTagPortal,
+      workedexampleTagPortal: this.workedexampleTagPortal,
+      brTagPortal: this.brTagPortal,
+    };
     if ('value' in node) {
       return new TemplatePortal(this.textTagPortal, this._viewContainerRef, {
         $implicit: node,
       });
     }
     if (node.nodeType === 'component') {
+      const portalName = (node.selector.split('oppia-noninteractive-')[1] +
+        'TagPortal') as TemplatePortalName;
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplateRef<unknown>>)[
-          node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'
-        ],
+        templatePortals[portalName],
         this._viewContainerRef,
         {$implicit: node.attrs}
       );
     }
-    if (
-      (this as unknown as Record<string, TemplateRef<unknown>>)[
-        node.selector + 'TagPortal'
-      ] !== undefined
-    ) {
+    const portalName = (node.selector + 'TagPortal') as TemplatePortalName;
+    if (templatePortals[portalName] !== undefined) {
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplateRef<unknown>>)[
-          node.selector + 'TagPortal'
-        ],
+        templatePortals[portalName],
         this._viewContainerRef,
         {$implicit: node}
       );
     }
-    return undefined as unknown as TemplatePortal<unknown>;
+    return undefined;
   }
 
   shouldHighlightContent(): boolean {

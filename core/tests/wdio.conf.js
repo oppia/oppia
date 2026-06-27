@@ -33,20 +33,12 @@ var suites = {
     './core/tests/webdriverio_desktop/collections.js'
   ],
 
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],
 
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
-  ],
-
-  navigation: [
-    './core/tests/webdriverio_desktop/navigation.js'
   ],
 
   skillEditor: [

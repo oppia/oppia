@@ -26,6 +26,8 @@ const toastMessageSelector = '.e2e-test-toast-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
+const pagesWithDialogHandler = new WeakSet<Page>();
+
 const usernameInputSelector = 'input.e2e-test-username-input';
 const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 const registerButtonSelector = 'button.e2e-test-register-user:not([disabled])';
@@ -41,7 +43,10 @@ export class BaseUser {
   constructor(page: Page) {
     this.page = page;
     BaseUser.instances.push(this);
-    this.installPageDialogHandler();
+    if (!pagesWithDialogHandler.has(page)) {
+      pagesWithDialogHandler.add(page);
+      this.installPageDialogHandler();
+    }
   }
 
   /**
@@ -332,6 +337,31 @@ export class BaseUser {
     await this.page.keyboard.press('A');
     await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
+  }
+
+  /**
+   * Checks if element is clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string | ElementHandle<Element>,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    await this.page.waitForFunction(
+      ({element, clickable, clickableFn}) => {
+        const fn = new Function(
+          'element',
+          'clickable',
+          `return (${clickableFn})(element, clickable)`
+        );
+        return fn(element, clickable);
+      },
+      {element, clickable, clickableFn: isElementClickable.toString()},
+      {timeout: 30000}
+    );
   }
 
   /**
@@ -645,11 +675,6 @@ export class BaseUser {
           },
           element
         );
-        await this.page.evaluate(({el, a, b}) => isElementClickable(el, a, b), {
-          el: element,
-          a: true,
-          b: true,
-        });
         const reasonsText =
           clickabilityDiagnostics.reasons.length > 0
             ? clickabilityDiagnostics.reasons
@@ -803,9 +828,61 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.page.waitForSelector(
+      `xpath=//mat-chip[contains(text(), '${textContent}')]`
+    );
+    if (!matChipElement) {
+      throw new Error(`Mat chip with text ${textContent} not found.`);
+    }
+    return matChipElement;
+  }
+
+  /**
+   * Selects the mat-option with the given value.
+   * @param value The value of the mat-option to select.
+   */
+  async selectMatOption(value: string): Promise<void> {
+    await this.page.waitForSelector('mat-option');
+    const matOptionElements = await this.page.$$('mat-option');
+    for (const matOptionElement of matOptionElements) {
+      if (
+        (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
+        value
+      ) {
+        await this.clickOnElement(matOptionElement);
+        break;
+      }
+    }
+
+    await this.page.waitForSelector('mat-option', {
+      state: 'hidden',
+    });
+  }
+
+  /**
+   * This function uploads a file using the given file path.
+   */
+  async uploadFile(filePath: string): Promise<void> {
+    const inputUploadHandle =
+      await this.page.waitForSelector('input[type=file]');
+    if (inputUploadHandle === null) {
+      throw new Error('No file input found while attempting to upload a file.');
+    }
+    let fileToUpload = filePath;
+    await inputUploadHandle.setInputFiles(fileToUpload);
+  }
+
+  /**
    * Waits for an element to stabilize.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   * @param {number} timeout - The timeout in milliseconds. Defaults to 5000.
+   * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
     selector: string | ElementHandle<Element>,
