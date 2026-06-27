@@ -22,14 +22,23 @@ import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 
+const aboutUrl = testConstants.URLs.About;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const homeUrl = testConstants.URLs.Home;
 
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
+const mobileNavbarButtonSelector = '.text-uppercase';
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
+const languageDropdown = '.e2e-test-language-dropdown';
+const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
+const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarOpenSelector = '.e2e-test-sidebar-menu-open';
+const mobileSidebarExpandAboutMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-about-menu';
+const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
@@ -59,12 +68,58 @@ const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 
 const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
 
+const lessonInfoButton = '.oppia-lesson-info';
+const lessonInfoCardSelector = '.oppia-lesson-info-card';
+const hintButtonSelector = '.e2e-test-view-hint';
+const gotItButtonSelector = '.e2e-test-learner-got-it-button';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Clears all text from the username input field.
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Function to change the site language to the given language code.
+   * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
+   */
+  async changeSiteLanguage(langCode: string): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      // This is required to ensure the language dropdown is visible in mobile view,
+      // if the earlier movements of the page have hidden it and since the inbuilt
+      // scrollIntoView function call of the clickOn function didn't work as expected.
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {state: 'visible'}
+    );
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
+    }
+    const initialLanguage = await this.page.$eval(
+      languageDropdown,
+      el => el.textContent
+    );
+    await this.clickOnElement(languageDropdownElement);
+    // Capture the navigation the language click triggers before reloading.
+    await this.clickAndWaitForNavigation(languageOption, true);
+    // Here we need to reload the page again to confirm the language change.
+    await this.page.reload();
+
+    await this.page.waitForFunction(
+      ({selector, textContent}: {selector: string; textContent: string}) => {
+        const element = document.querySelector(selector);
+        return element && element.textContent !== textContent;
+      },
+      {selector: languageOption, textContent: initialLanguage}
+    );
   }
 
   /**
@@ -100,6 +155,55 @@ export class LoggedOutUser extends BaseUser {
         `Invalid action: ${action}. Expected 'Restart' or 'Resume'.`
       );
     }
+  }
+
+  /**
+   * Function to click the About button in the About Menu on navbar
+   * and check if it opens the About page.
+   */
+  async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        state: 'visible',
+      });
+      await this.openMobileSidebar();
+
+      // Wait for Angular to be stable before clicking the expand button.
+      await this.waitForAngularStability();
+
+      // Use JavaScript click for sidebar menu items.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+
+      // Wait for the About submenu to expand and the About button to be visible.
+      await this.page.waitForSelector(mobileSidebarAboutButton, {
+        state: 'visible',
+      });
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarAboutButton,
+        aboutUrl
+      );
+    } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        state: 'visible',
+      });
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabAboutButton,
+        aboutUrl
+      );
+    }
+  }
+
+  /**
+   * Function to click a button and check if it opens the expected destination.
+   */
+  private async clickButtonToNavigateToNewPage(
+    button: string,
+    expectedDestinationPageUrl: string,
+    useSelector: boolean = true
+  ): Promise<void> {
+    await this.clickAndWaitForNavigation(button, useSelector);
+    await this.expectPageURLToContain(expectedDestinationPageUrl);
   }
 
   /**
@@ -188,6 +292,15 @@ export class LoggedOutUser extends BaseUser {
         element.click();
       }
     }, selector);
+  }
+
+  /**
+   * Function to close the hint modal.
+   */
+  async closeHintModal(): Promise<void> {
+    await this.page.waitForSelector(gotItButtonSelector, {state: 'visible'});
+    await this.clickOnElementWithSelector(gotItButtonSelector);
+    await this.page.waitForSelector(gotItButtonSelector, {state: 'hidden'});
   }
 
   /**
@@ -344,6 +457,25 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the home page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async navigateToHome(verifyURL: boolean = true): Promise<void> {
+    await this.goto(homeUrl, verifyURL);
+  }
+
+  /**
+   * Opens the lesson info modal.
+   */
+  async openLessonInfoModal(): Promise<void> {
+    await this.page.waitForSelector(lessonInfoButton, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(lessonInfoButton);
+    await this.page.waitForSelector(lessonInfoCardSelector, {state: 'visible'});
   }
 
   /**
@@ -505,6 +637,9 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(searchInputSelector, {
       state: 'visible',
     });
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.mouse.move(-1, -1); // Move mouse away to prevent hover effects from blocking the search input.
+    }
     await this.clickOnElementWithSelector(searchInputSelector);
     await this.typeInInputField(searchInputSelector, lessonName);
 
@@ -561,6 +696,21 @@ export class LoggedOutUser extends BaseUser {
       }
       throw error;
     }
+  }
+
+  /**
+   * Function to use a hint.
+   */
+  async viewHint(): Promise<void> {
+    await this.page.waitForSelector(hintButtonSelector, {
+      // Hint is shown after one minute.
+      timeout: 80000,
+    });
+    await this.clickOnElementWithSelector(hintButtonSelector);
+
+    await this.page.waitForSelector(gotItButtonSelector, {
+      state: 'visible',
+    });
   }
 }
 
