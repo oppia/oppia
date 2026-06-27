@@ -28,7 +28,7 @@ export interface CloudTaskRunBackendDict {
   current_retry_attempt: number;
   last_updated: Date;
   created_on: Date;
-  additional_contextual_information: AdditionalContextualInformation;
+  additional_contextual_information?: AdditionalContextualInformation;
 }
 
 export class MatIcon {
@@ -60,7 +60,7 @@ export class CloudTaskRun {
     currentRetryAttempt: number,
     lastUpdated: Date,
     createdOn: Date,
-    additionalContextualInformation: AdditionalContextualInformation
+    additionalContextualInformation?: AdditionalContextualInformation
   ) {
     this.id = taskRunId;
     this.cloudTaskName = cloudTaskName;
@@ -70,7 +70,8 @@ export class CloudTaskRun {
     this.currentRetryAttempt = currentRetryAttempt;
     this.lastUpdated = lastUpdated;
     this.createdOn = new Date(createdOn);
-    this.additionalContextualInformation = additionalContextualInformation;
+    this.additionalContextualInformation =
+      additionalContextualInformation || {};
 
     switch (this.latestJobState) {
       case 'RUNNING':
@@ -103,7 +104,7 @@ export class CloudTaskRun {
       backendDict.current_retry_attempt,
       backendDict.last_updated,
       backendDict.created_on,
-      backendDict.additional_contextual_information
+      backendDict.additional_contextual_information || {}
     );
   }
 
@@ -120,8 +121,10 @@ export class CloudTaskRun {
   }
 
   getEventName(): string {
+    const additionalContextualInformation =
+      this.additionalContextualInformation || {};
     const isAdditionalContextProvided =
-      Object.keys(this.additionalContextualInformation).length > 0;
+      Object.keys(additionalContextualInformation).length > 0;
 
     if (
       this.functionId === 'regenerate_voiceovers_on_exploration_update' &&
@@ -132,7 +135,7 @@ export class CloudTaskRun {
       this.functionId === 'regenerate_voiceovers_on_exploration_update' &&
       isAdditionalContextProvided
     ) {
-      return `Content updated for Exploration ("${this.additionalContextualInformation.exploration_title}")`;
+      return `Content updated for Exploration ("${additionalContextualInformation.exploration_title}")`;
     }
 
     if (
@@ -146,7 +149,7 @@ export class CloudTaskRun {
         'regenerate_voiceovers_on_exploration_added_to_topic' &&
       isAdditionalContextProvided
     ) {
-      return `Exploration ("${this.additionalContextualInformation.exploration_title}") added to topic ("${this.additionalContextualInformation.topic_name}")`;
+      return `Exploration ("${additionalContextualInformation.exploration_title}") added to topic ("${additionalContextualInformation.topic_name}")`;
     }
 
     if (
@@ -160,7 +163,7 @@ export class CloudTaskRun {
         'regenerate_voiceovers_of_exploration_for_given_language_accent' &&
       isAdditionalContextProvided
     ) {
-      return `Voiceover admin regenerated voiceovers for Exploration ("${this.additionalContextualInformation.exploration_title}") in ${this.additionalContextualInformation.language_accent} accent`;
+      return `Voiceover admin regenerated voiceovers for Exploration ("${additionalContextualInformation.exploration_title}") in ${additionalContextualInformation.language_accent} accent`;
     }
 
     if (
@@ -172,7 +175,7 @@ export class CloudTaskRun {
       this.functionId === 'regenerate_voiceovers_after_accepting_suggestion' &&
       isAdditionalContextProvided
     ) {
-      return `Translation suggestion accepted for Exploration ("${this.additionalContextualInformation.exploration_title}") for language ${this.additionalContextualInformation.language}`;
+      return `Translation suggestion accepted for Exploration ("${additionalContextualInformation.exploration_title}") for language ${additionalContextualInformation.language}`;
     }
     return '';
   }
