@@ -320,7 +320,7 @@ class TopicPageDataHandlerTests(
         self.publish_exploration(self.admin_id, no_translation_exploration_id)
 
         voiceover_services.save_language_accent_support(
-            language_codes_mapping={'en': {'en-US': True}}
+            language_codes_mapping={'en': {'en-US': True, 'en-UK': True}}
         )
 
         manual_voiceover_dict: state_domain.VoiceoverDict = {
@@ -345,6 +345,23 @@ class TopicPageDataHandlerTests(
             automated_voiceovers_audio_offsets_msecs={},
         )
         voiceover_services.save_entity_voiceovers(entity_voiceovers)
+
+        second_entity_voiceovers = voiceover_domain.EntityVoiceovers(
+            entity_id=exploration_id,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=1,
+            language_accent_code='en-UK',
+            voiceovers_mapping={
+                'content_id_0': {
+                    'manual': state_domain.Voiceover.from_dict(
+                        manual_voiceover_dict
+                    ),
+                    'auto': None,
+                }
+            },
+            automated_voiceovers_audio_offsets_msecs={},
+        )
+        voiceover_services.save_entity_voiceovers(second_entity_voiceovers)
 
         translation_models.EntityTranslationsModel.create_new(
             'exploration', exploration_id, 1, 'en', {}
@@ -424,8 +441,15 @@ class TopicPageDataHandlerTests(
         self.assertEqual(node_dict['exploration_id'], exploration_id)
         self.assertEqual(node_dict['available_text_language_codes'], ['en'])
         self.assertEqual(
-            node_dict['available_voiceover_language_codes'], ['en']
+            node_dict['available_voiceover_language_codes'],
+            ['en-US', 'en-UK'],
         )
+        accent_descriptions = node_dict[
+            'available_voiceover_language_accent_descriptions'
+        ]
+        self.assertEqual(set(accent_descriptions.keys()), {'en-US', 'en-UK'})
+        self.assertTrue(accent_descriptions['en-US'])
+        self.assertTrue(accent_descriptions['en-UK'])
 
         second_node_dict = story_dict['all_node_dicts'][1]
         self.assertEqual(second_node_dict['id'], 'node_2')

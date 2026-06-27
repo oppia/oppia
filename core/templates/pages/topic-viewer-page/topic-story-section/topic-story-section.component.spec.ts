@@ -199,6 +199,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -206,7 +207,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -235,6 +240,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -242,7 +248,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -272,6 +282,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -279,7 +290,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -306,6 +321,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -313,7 +329,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const mockSummary = new ChapterProgressSummary('exp_1', 5, 3, false);
     chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
@@ -347,6 +367,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -354,7 +375,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -430,6 +455,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -437,7 +463,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
     storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -466,6 +496,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -473,7 +504,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue(null);
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
     storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -606,6 +641,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -613,7 +649,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue(null);
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -637,6 +677,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -644,7 +685,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     chapterProgressLoaderService.loadChapterProgressForStory.and.rejectWith(
       new Error('Network error')
@@ -674,6 +719,7 @@ describe('TopicStorySectionComponent', () => {
       'getId',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
@@ -681,7 +727,11 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getExplorationId.and.returnValue(null);
     storyNodeSpy.getId.and.returnValue('node_1');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],

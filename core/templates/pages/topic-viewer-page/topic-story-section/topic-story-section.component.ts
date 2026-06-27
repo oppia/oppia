@@ -58,6 +58,7 @@ interface LessonCardData {
   visitedCheckpointsCount: number;
   availableTextLanguageCodes: string[];
   availableVoiceoverLanguageCodes: string[];
+  availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
 }
 
 interface PracticeCardData {
@@ -236,6 +237,8 @@ export class TopicStorySectionComponent
           availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
           availableVoiceoverLanguageCodes:
             node.getAvailableVoiceoverLanguageCodes(),
+          availableVoiceoverLanguageAccentDescriptions:
+            node.getAvailableVoiceoverLanguageAccentDescriptions(),
         };
       });
   }
@@ -271,6 +274,8 @@ export class TopicStorySectionComponent
           availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
           availableVoiceoverLanguageCodes:
             node.getAvailableVoiceoverLanguageCodes(),
+          availableVoiceoverLanguageAccentDescriptions:
+            node.getAvailableVoiceoverLanguageAccentDescriptions(),
         };
       });
 

@@ -212,6 +212,45 @@ describe('LanguageSelectorComponent', () => {
     expect(component.filteredVoiceoverLanguageCodes).toEqual(['ak', 'fat']);
   });
 
+  it('should include accent codes that use underscore separator', () => {
+    component.selectedTextLanguageCode = 'ar';
+    component.availableVoiceoverLanguageCodes = ['ar_iq', 'ar_jo', 'en'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'ar', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['ar_iq', 'ar_jo', 'en'],
+        true
+      ),
+    });
+
+    expect(component.filteredVoiceoverLanguageCodes).toEqual([
+      'ar_iq',
+      'ar_jo',
+    ]);
+  });
+
+  it('should ignore unknown accent codes in related language lookup without throwing', () => {
+    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.throwError(
+      'Unknown language code'
+    );
+    component.selectedTextLanguageCode = 'ar';
+    component.availableVoiceoverLanguageCodes = ['ar_iq', 'ar_jo'];
+    component.ngOnChanges({
+      selectedTextLanguageCode: new SimpleChange(null, 'ar', true),
+      availableVoiceoverLanguageCodes: new SimpleChange(
+        [],
+        ['ar_iq', 'ar_jo'],
+        true
+      ),
+    });
+
+    expect(component.filteredVoiceoverLanguageCodes).toEqual([
+      'ar_iq',
+      'ar_jo',
+    ]);
+  });
+
   it('should show validation error when showValidationError is true and no text language selected', () => {
     component.showValidationError = true;
     component.selectedTextLanguageCode = null;
@@ -286,6 +325,14 @@ describe('LanguageSelectorComponent', () => {
     ).toHaveBeenCalledWith('fr');
   });
 
+  it('should return backend accent description when available', () => {
+    component.voiceoverLanguageAccentDescriptions = {
+      'ar-IQ': 'Arabic (Iraq)',
+    };
+
+    expect(component.getLanguageDescription('ar-IQ')).toBe('Arabic (Iraq)');
+  });
+
   it('should fall back to audio language description when content description is missing', () => {
     languageUtilService.getContentLanguageDescription.and.returnValue('');
     languageUtilService.getAudioLanguageDescription.and.returnValue(
@@ -303,6 +350,15 @@ describe('LanguageSelectorComponent', () => {
     languageUtilService.getAudioLanguageDescription.and.returnValue('');
 
     expect(component.getLanguageDescription('xyz')).toBe('xyz');
+  });
+
+  it('should return language code when audio description lookup throws', () => {
+    languageUtilService.getContentLanguageDescription.and.returnValue('');
+    languageUtilService.getAudioLanguageDescription.and.throwError(
+      'Unknown language code'
+    );
+
+    expect(component.getLanguageDescription('ar_iq')).toBe('ar_iq');
   });
 
   it('should return description from getSelectedVoiceoverLanguageLabel when valid voiceover is selected', () => {

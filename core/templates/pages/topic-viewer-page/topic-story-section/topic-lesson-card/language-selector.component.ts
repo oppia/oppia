@@ -36,6 +36,8 @@ import './language-selector.component.css';
 export class LanguageSelectorComponent implements OnChanges {
   @Input() availableTextLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageCodes: string[] = [];
+  @Input() voiceoverLanguageAccentDescriptions: {[accentCode: string]: string} =
+    {};
   @Input() selectedTextLanguageCode: string | null = null;
   @Input() selectedVoiceoverLanguageCode: string | null = null;
   @Input() showValidationError: boolean = false;
@@ -93,9 +95,7 @@ export class LanguageSelectorComponent implements OnChanges {
         }
 
         const relatedCodes =
-          this.languageUtilService.getLanguageCodesRelatedToAudioLanguageCode(
-            voiceoverCode
-          );
+          this.getRelatedLanguageCodesForAudioCode(voiceoverCode);
         return (
           relatedCodes !== undefined && relatedCodes.includes(textRootCode)
         );
@@ -137,11 +137,42 @@ export class LanguageSelectorComponent implements OnChanges {
   }
 
   getLanguageDescription(languageCode: string): string {
-    return (
-      this.languageUtilService.getContentLanguageDescription(languageCode) ||
-      this.languageUtilService.getAudioLanguageDescription(languageCode) ||
-      languageCode
-    );
+    const voiceoverAccentDescription =
+      this.voiceoverLanguageAccentDescriptions[languageCode];
+    if (voiceoverAccentDescription) {
+      return voiceoverAccentDescription;
+    }
+
+    const contentLanguageDescription =
+      this.languageUtilService.getContentLanguageDescription(languageCode);
+    if (contentLanguageDescription) {
+      return contentLanguageDescription;
+    }
+
+    try {
+      const audioLanguageDescription =
+        this.languageUtilService.getAudioLanguageDescription(languageCode);
+      if (audioLanguageDescription) {
+        return audioLanguageDescription;
+      }
+    } catch {
+      // Some exploration-specific accent codes may not be in global constants.
+      // In those cases, fall back to showing the raw code.
+    }
+
+    return languageCode;
+  }
+
+  private getRelatedLanguageCodesForAudioCode(
+    audioLanguageCode: string
+  ): readonly string[] | undefined {
+    try {
+      return this.languageUtilService
+        .getLanguageCodesRelatedToAudioLanguageCode(audioLanguageCode)
+        .map(code => this.getLanguageRootCode(code));
+    } catch {
+      return undefined;
+    }
   }
 
   private clearSelectedVoiceoverLanguageIfInvalid(): void {
@@ -157,6 +188,6 @@ export class LanguageSelectorComponent implements OnChanges {
   }
 
   private getLanguageRootCode(languageCode: string): string {
-    return languageCode.split('-')[0].toLowerCase();
+    return languageCode.split(/[-_]/)[0].toLowerCase();
   }
 }

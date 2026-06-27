@@ -38,6 +38,9 @@ export interface StoryNodeBackendDict {
   unpublishing_reason: string | null;
   available_text_language_codes?: string[];
   available_voiceover_language_codes?: string[];
+  available_voiceover_language_accent_descriptions?: {
+    [accentCode: string]: string;
+  };
 }
 
 export class StoryNode {
@@ -59,6 +62,7 @@ export class StoryNode {
   _unpublishingReason: string | null;
   _availableTextLanguageCodes: string[];
   _availableVoiceoverLanguageCodes: string[];
+  _availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
 
   constructor(
     id: string,
@@ -78,7 +82,10 @@ export class StoryNode {
     firstPublicationDateMsecs: number | null,
     unpublishingReason: string | null,
     availableTextLanguageCodes: string[] = [],
-    availableVoiceoverLanguageCodes: string[] = []
+    availableVoiceoverLanguageCodes: string[] = [],
+    availableVoiceoverLanguageAccentDescriptions: {
+      [accentCode: string]: string;
+    } = {}
   ) {
     this._id = id;
     this._title = title;
@@ -98,6 +105,8 @@ export class StoryNode {
     this._unpublishingReason = unpublishingReason;
     this._availableTextLanguageCodes = availableTextLanguageCodes;
     this._availableVoiceoverLanguageCodes = availableVoiceoverLanguageCodes;
+    this._availableVoiceoverLanguageAccentDescriptions =
+      availableVoiceoverLanguageAccentDescriptions;
   }
 
   _checkValidNodeId(nodeId: string): boolean {
@@ -168,6 +177,12 @@ export class StoryNode {
 
   getAvailableVoiceoverLanguageCodes(): string[] {
     return this._availableVoiceoverLanguageCodes.slice();
+  }
+
+  getAvailableVoiceoverLanguageAccentDescriptions(): {
+    [accentCode: string]: string;
+  } {
+    return {...this._availableVoiceoverLanguageAccentDescriptions};
   }
 
   setStatus(status: string): void {
@@ -412,7 +427,9 @@ export class StoryNode {
       storyNodeBackendObject.first_publication_date_msecs,
       storyNodeBackendObject.unpublishing_reason,
       storyNodeBackendObject.available_text_language_codes || [],
-      storyNodeBackendObject.available_voiceover_language_codes || []
+      storyNodeBackendObject.available_voiceover_language_codes || [],
+      storyNodeBackendObject.available_voiceover_language_accent_descriptions ||
+        {}
     );
   }
 

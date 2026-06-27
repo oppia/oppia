@@ -65,6 +65,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
+
+        def _get_language_root_code(language_code: str) -> str:
+            return language_code.replace('_', '-').split('-')[0].lower()
+
         canonical_story_ids = topic.get_canonical_story_ids(
             include_only_published=True
         )
@@ -192,20 +196,50 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     unique_displayable_language_codes
                 )
 
+                language_accent_mapping = (
+                    voiceover_services.get_all_language_accent_codes_for_voiceovers()
+                )
+                displayable_language_roots = {
+                    _get_language_root_code(language_code)
+                    for language_code in unique_displayable_language_codes
+                }
+
                 voiceover_language_codes = []
-                for language_code in unique_displayable_language_codes:
-                    entity_voiceovers_list = voiceover_services.fetch_entity_voiceovers_by_language_code(
-                        exploration_id,
-                        feconf.TranslatableEntityType.EXPLORATION.value,
-                        exploration.version,
-                        language_code,
-                    )
-                    if entity_voiceovers_list:
-                        voiceover_language_codes.append(language_code)
+                entity_voiceovers_for_exp = voiceover_services.get_entity_voiceovers_for_given_exploration(
+                    exploration_id,
+                    feconf.TranslatableEntityType.EXPLORATION.value,
+                    exploration.version,
+                )
+
+                for entity_voiceovers in entity_voiceovers_for_exp:
+                    if not entity_voiceovers.voiceovers_mapping:
+                        continue
+
+                    accent_code = entity_voiceovers.language_accent_code
+                    accent_root_code = _get_language_root_code(accent_code)
+
+                    if accent_root_code in displayable_language_roots:
+                        voiceover_language_codes.append(accent_code)
+                        continue
+
+                    for language_code in unique_displayable_language_codes:
+                        if accent_code in language_accent_mapping.get(
+                            language_code, {}
+                        ):
+                            voiceover_language_codes.append(accent_code)
+                            break
+
+                voiceover_language_codes = list(
+                    dict.fromkeys(voiceover_language_codes)
+                )
 
                 exploration_id_to_available_voiceover_languages[
                     exploration_id
                 ] = voiceover_language_codes
+
+        language_accent_codes_to_descriptions = (
+            voiceover_services.get_language_accent_codes_to_descriptions()
+        )
 
         # Here we use type Any because the returned dict values have mixed types (str, list).
         def _create_node_dict(node: story_domain.StoryNode) -> Dict[str, Any]:
@@ -231,6 +265,12 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             node_dict['available_voiceover_language_codes'] = (
                 available_voiceover_language_codes
             )
+            node_dict['available_voiceover_language_accent_descriptions'] = {
+                accent_code: language_accent_codes_to_descriptions.get(
+                    accent_code, accent_code
+                )
+                for accent_code in available_voiceover_language_codes
+            }
             return node_dict
 
         for canonical_story_dict, canonical_nodes in zip(

@@ -55,6 +55,9 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() visitedCheckpointsCount: number = 0;
   @Input() availableTextLanguageCodes: string[] = [];
   @Input() availableVoiceoverLanguageCodes: string[] = [];
+  @Input() availableVoiceoverLanguageAccentDescriptions: {
+    [accentCode: string]: string;
+  } = {};
 
   resolvedThumbnailUrl: string = '';
   _checkpointStatuses: string[] = [];
