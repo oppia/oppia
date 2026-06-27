@@ -16,10 +16,15 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import {Page} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
+import isElementClickable from '../../functions/is-element-clickable';
+
+const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+
+const signUpUsernameInputField = 'input.e2e-test-username-input';
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 
@@ -33,6 +38,20 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 const stateConversationContent = '.e2e-test-conversation-content';
 
+const searchInputSelector = '.e2e-test-search-input';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+
+const resumeExplorationButton = '.resume-button';
+const restartExplorationButton = '.restart-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const submitResponseToInteractionInput = 'oppia-interaction-display input';
+
+const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
+const formErrorContainer = '.e2e-test-form-error-container';
+const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
+const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
+const progressRemainderModalSelector = '.oppia-progress-reminder-modal';
+
 const communityLibraryLinkInNavbarSelector =
   '.e2e-test-topnb-go-to-community-library-link';
 const communityLibraryContainerSelector = '.e2e-test-library-container';
@@ -41,6 +60,119 @@ const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
 
 export class LoggedOutUser extends BaseUser {
+  /**
+   * Clears all text from the username input field.
+   */
+  async clearUsernameInput(): Promise<void> {
+    await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Chooses an action in the progress remainder.
+   * @param {string} action - The action to choose. Can be 'Restart' or 'Resume'.
+   */
+  async chooseActionInProgressRemainder(
+    action: 'Restart' | 'Resume'
+  ): Promise<void> {
+    await this.page.waitForSelector(progressRemainderModalSelector, {
+      state: 'visible',
+    });
+    await this.page.waitForSelector(restartExplorationButton, {
+      state: 'visible',
+    });
+    await this.page.waitForSelector(resumeExplorationButton, {
+      state: 'visible',
+    });
+
+    if (action === 'Restart') {
+      await this.clickAndWaitForNavigation(restartExplorationButton, true);
+    } else if (action === 'Resume') {
+      await this.clickOnElementWithSelector(resumeExplorationButton);
+      // Closing checkpoint modal if appears.
+      const closeLessonInfoTooltipElement = await this.page.$(
+        closeLessonInfoTooltipSelector
+      );
+      if (closeLessonInfoTooltipElement) {
+        await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
+      }
+    } else {
+      throw new Error(
+        `Invalid action: ${action}. Expected 'Restart' or 'Resume'.`
+      );
+    }
+  }
+
+  /**
+   * Click on the submit answer button.
+   * @param skipVerification - If true, skips verification that the button is visible.
+   */
+  async clickOnSubmitAnswerButton(): Promise<void> {
+    const feedbackSelector = '.e2e-test-conversation-feedback-latest';
+
+    await this.expectElementToBeClickable(submitAnswerButton);
+
+    // Get current status of old and latest responses to use it later.
+    // Handle cases where elements might not exist.
+    const initialPreviousResponses = await this.page
+      .$eval(
+        previousConversationToggleSelector,
+        element => element?.textContent?.trim() || null
+      )
+      .catch(() => null);
+
+    const initialLatestResponse = await this.page
+      .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
+      .catch(() => null);
+
+    // Wait for 1s to ensure the selected answer is updated in Angular component.
+    await this.page.waitForTimeout(1000);
+    // Click on Submit Answer button.
+    await this.clickOnElementWithSelector(submitAnswerButton);
+
+    // Wait for either element to change content.
+    await this.page.waitForFunction(
+      ({
+        submitButtonSelector,
+        formErrorContainer,
+        selector1,
+        value1,
+        selector2,
+        value2,
+      }: {
+        submitButtonSelector: string;
+        formErrorContainer: string;
+        selector1: string;
+        value1: string | null;
+        selector2: string;
+        value2: string | null;
+      }) => {
+        const submitButton = document.querySelector(submitButtonSelector);
+        const element1 = document.querySelector(selector1);
+        const element2 = document.querySelector(selector2);
+
+        const currentValue1 = element1?.textContent?.trim() || null;
+        const currentValue2 = element2?.textContent?.trim() || null;
+
+        return (
+          (submitButton as HTMLButtonElement)?.disabled ||
+          document.querySelector(formErrorContainer)?.textContent?.trim() !==
+            null ||
+          currentValue1 !== value1 ||
+          currentValue2 !== value2
+        );
+      },
+      {
+        submitButtonSelector: submitAnswerButton,
+        formErrorContainer,
+        selector1: previousConversationToggleSelector,
+        value1: initialPreviousResponses,
+        selector2: feedbackSelector,
+        value2: initialLatestResponse,
+      },
+      {timeout: 10000}
+    );
+  }
+
   /**
    * Clicks an element using JavaScript's native click() method.
    * This ensures Angular properly handles the event in its change detection
@@ -91,6 +223,25 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if the current card's content matches the expected content.
+   * @param {string} expectedCardContent - The expected content of the card.
+   */
+  async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(`${stateConversationContent} p`, {
+      state: 'visible',
+    });
+    const element = await this.page.$(`${stateConversationContent} p`);
+    const cardContent = await this.page.evaluate(
+      element => element?.textContent || '',
+      element
+    );
+    expect(cardContent.trim()).toBe(expectedCardContent);
+    showMessage('Card content is as expected.');
+  }
+
+  /**
    * Function to verify if the exploration is completed via checking the toast message.
    * @param {string} message - The expected toast message.
    */
@@ -114,6 +265,40 @@ export class LoggedOutUser extends BaseUser {
       explorationCompletionToastMessage,
       false
     );
+  }
+
+  /**
+   * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
+   * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
+   */
+  async expectProgressReminder(shouldBeFound: boolean): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    try {
+      await this.page.waitForSelector(progressRemainderModalSelector, {
+        state: 'visible',
+      });
+      if (!shouldBeFound) {
+        throw new Error('Progress remainder is found, which is not expected.');
+      }
+      showMessage('Progress reminder modal found.');
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        // Closing checkpoint modal if appears.
+        const closeLessonInfoTooltipElement = await this.page.$(
+          closeLessonInfoTooltipSelector
+        );
+        if (closeLessonInfoTooltipElement) {
+          await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
+        }
+        if (shouldBeFound) {
+          throw new Error(
+            'Progress remainder is not found, which is not expected.'
+          );
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
   async expectToBeOnCommunityLibraryPage(): Promise<void> {
@@ -150,6 +335,15 @@ export class LoggedOutUser extends BaseUser {
     ) {
       throw new Error('Community Library container is not visible.');
     }
+  }
+
+  /**
+   * Navigates to the community library page.
+   */
+  async navigateToCommunityLibraryPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(communityLibraryUrl, verifyURL);
   }
 
   /**
@@ -225,11 +419,148 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Searches for a specific lesson in the search results and opens it.
+   * @param {string} lessonTitle - The title of the lesson to search for.
+   */
+  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
+      );
+
+      const lessonIndex = searchResults.indexOf(lessonTitle);
+      if (lessonIndex === -1) {
+        throw new Error(
+          `Lesson "${lessonTitle}" not found in search results.\nFound: ${searchResults.join(', ')}`
+        );
+      }
+
+      // TODO(#26453): The search page fires /searchhandler/data multiple
+      // times on load, causing Angular to re-render the search results list and
+      // detach ElementHandle references mid-operation. To avoid stale handles,
+      // we re-query the DOM by selector and index on each poll and at click time
+      // rather than holding an ElementHandle across async boundaries. Remove this
+      // workaround once the upstream re-rendering issue is fixed.
+      await this.page.waitForFunction(
+        ({selector, index, clickableFn}) => {
+          const element = document.querySelectorAll(selector)[index];
+          if (!element) {
+            return false;
+          }
+          const fn = new Function(
+            'element',
+            `return (${clickableFn})(element)`
+          );
+          return fn(element);
+        },
+        {
+          selector: lessonCardTitleSelector,
+          index: lessonIndex,
+          clickableFn: isElementClickable.toString(),
+        }
+      );
+
+      await this.page.evaluate(
+        ({selector, index}) => {
+          const element = document.querySelectorAll(selector)[
+            index
+          ] as HTMLElement;
+          element.click();
+        },
+        {selector: lessonCardTitleSelector, index: lessonIndex}
+      );
+      await this.waitForStaticAssetsToLoad();
+
+      await this.page.waitForSelector(lessonCardTitleSelector, {
+        state: 'hidden',
+      });
+      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      const newError = new Error(
+        `Failed to open lesson from search results: ${err.message}`
+      );
+      newError.stack = err.stack;
+      throw newError;
+    }
+  }
+
+  /**
    * Return to Learner Dashboard from exploration completion card.
    */
   async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.expectElementToBeVisible(returnToLibraryButtonSelector);
     await this.clickOnElementWithSelector(returnToLibraryButtonSelector);
+  }
+
+  /**
+   * Searches for a lesson in the search bar present in the community library.
+   * @param {string} lessonName - The name of the lesson to search for.
+   */
+  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(searchInputSelector, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(searchInputSelector);
+    await this.typeInInputField(searchInputSelector, lessonName);
+
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForNavigation({waitUntil: 'load'});
+  }
+
+  /**
+   * Function to submit an answer to a form input field.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitAnswer(answer: string): Promise<void> {
+    // Allow input elements to be rendered and ready for interaction.
+    await this.page.waitForTimeout(1000);
+    await this.waitForElementToBeClickable(submitResponseToInteractionInput);
+    await this.clearAllTextFrom(submitResponseToInteractionInput);
+    await this.typeInInputField(submitResponseToInteractionInput, answer);
+    await this.clickOnSubmitAnswerButton();
+  }
+
+  /**
+   * Types an invalid username in the username input field and blurs it.
+   * Blur is needed to trigger validation on the input field.
+   * @param {string} invalidUsername - The invalid username to type.
+   */
+  async typeInvalidUsernameInUsernameInput(
+    invalidUsername: string
+  ): Promise<void> {
+    await this.typeInInputField(signUpUsernameInputField, invalidUsername);
+    await this.page.evaluate(selector => {
+      (document.querySelector(selector) as HTMLElement)?.blur();
+    }, signUpUsernameInputField);
+  }
+
+  /*
+   * Function to verify if the checkpoint modal appears on the screen.
+   */
+  async verifyCheckpointModalAppears(): Promise<void> {
+    try {
+      await this.page.waitForSelector(checkpointModalSelector, {
+        state: 'visible',
+      });
+      showMessage('Checkpoint modal found.');
+      // Closing the checkpoint modal.
+      await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
+      await this.page.waitForSelector(checkpointModalSelector, {
+        state: 'hidden',
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        const newError = new Error('Checkpoint modal not found.');
+        newError.stack = error.stack;
+        throw newError;
+      }
+      throw error;
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * LI. Learner reaches a checkpoint and saves their progress
  */
 
-import testConstants from '../../utilities/common/test-constants';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -28,16 +28,15 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-
-describe('Logged-in User', function () {
+test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -100,11 +99,12 @@ describe('Logged-in User', function () {
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
-      'logged_in_user@example.com'
+      'logged_in_user@example.com',
+      browser
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it('should be able to track the checkpoint progress', async function () {
+  test('should be able to track the checkpoint progress', async function () {
     await loggedInUser.navigateToCommunityLibraryPage();
     await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
     await loggedInUser.playLessonFromSearchResults('Positive Numbers');
@@ -118,7 +118,7 @@ describe('Logged-in User', function () {
     await loggedInUser.verifyCheckpointModalAppears();
   });
 
-  it('should be able to resume the lesson from the last progress saved', async function () {
+  test('should be able to resume the lesson from the last progress saved', async function () {
     // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
     await loggedInUser.reloadPage();
     await loggedInUser.expectProgressReminder(true);
@@ -130,7 +130,7 @@ describe('Logged-in User', function () {
     );
   });
 
-  it('should be able to restart the lesson from the beginning', async function () {
+  test('should be able to restart the lesson from the beginning', async function () {
     // Reloading from the current progress.
     await loggedInUser.reloadPage();
 
@@ -143,7 +143,7 @@ describe('Logged-in User', function () {
     await loggedInUser.continueToNextCard();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 });

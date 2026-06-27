@@ -53,9 +53,9 @@ class AuthServicesTests(test_utils.GenericTestBase):
             'full_user_1',
             '12345',
             [constants.DEFAULT_LANGUAGE_CODE],
-            None,
-            None,
-            None,
+            'en',
+            'en',
+            'en',
             user_id=self.full_user_id,
         )
         self.modifiable_profile_user_data = [
@@ -63,17 +63,17 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 'profile_user_1',
                 '12345',
                 [constants.DEFAULT_LANGUAGE_CODE],
-                None,
-                None,
-                None,
+                'en',
+                'en',
+                'en',
             ),
             user_domain.ModifiableUserData(
                 'profile_user_2',
                 '12345',
                 [constants.DEFAULT_LANGUAGE_CODE],
-                None,
-                None,
-                None,
+                'en',
+                'en',
+                'en',
             ),
         ]
 
