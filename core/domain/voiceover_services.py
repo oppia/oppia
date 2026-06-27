@@ -976,7 +976,7 @@ def regenerate_voiceovers_for_given_contents(
     exploration_version: int,
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     task_run_id: str,
-    additional_contextual_information,
+    additional_contextual_information: Dict[str, str],
     specific_language_accent_code: Optional[str] = None,
 ) -> None:
     """Helper method to regenerate voiceovers for specified contents
@@ -1751,7 +1751,9 @@ def get_language_description_from_code(language_code: str) -> Optional[str]:
     """
     for language_map in constants.constants.SUPPORTED_CONTENT_LANGUAGES:
         if language_map['code'] == language_code:
-            return language_map['description']
+            description = language_map.get('description')
+            if isinstance(description, str):
+                return description
     return None
 
 
