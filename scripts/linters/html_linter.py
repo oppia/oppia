@@ -305,8 +305,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
             data: str. Contents of HTML file to be parsed.
         """
         data_lines = data.split('\n')
-        opening_block = tuple(['{% block', '{% macro', '{% if'])
-        ending_block = tuple(['{% end', '{%- end'])
+        opening_block = ('{% block', '{% macro', '{% if', '{% for')
+        ending_block = ('{% end', '{%- end')
 
         for data_line in data_lines:
             data_line = data_line.lstrip()

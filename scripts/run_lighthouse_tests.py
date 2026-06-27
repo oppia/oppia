@@ -289,19 +289,16 @@ def set_lighthouse_url_environment_variables(
             URLs.
     """
     pages_config: dict[str, str] = get_lighthouse_pages_config()
-    os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
-        get_lighthouse_urls_to_run(
-            list(pages_config.keys()), entities, pages_config
-        )
+    all_pages = list(pages_config.keys())
+    all_urls = get_lighthouse_urls_to_run(all_pages, entities, pages_config)
+    os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(all_urls)
+
+    pages_to_run = (
+        [page.strip() for page in pages.split(',')] if pages else all_pages
     )
-    if pages:
-        os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
-            get_lighthouse_urls_to_run(
-                [page.strip() for page in pages.split(',')],
-                entities,
-                pages_config,
-            )
-        )
+    os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
+        get_lighthouse_urls_to_run(pages_to_run, entities, pages_config)
+    )
 
 
 @contextlib.contextmanager

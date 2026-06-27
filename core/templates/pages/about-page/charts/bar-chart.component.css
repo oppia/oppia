@@ -20,8 +20,8 @@
 }
 
 .oppia-bar-chart .charts-css.bar tr {
-  margin-bottom: 10px;
-
+  border-collapse: separate;
+  border-spacing: 0 10px;
 }
 
 .oppia-bar-chart .charts-css.bar .data {

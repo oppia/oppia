@@ -48,14 +48,20 @@ export class GetStartedPageRootComponent implements OnInit, OnDestroy {
           AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
         );
 
-        this.meta.updateTag({
-          itemprop: 'name',
-          content: 'Personalized Online Learning from Oppia',
-        });
-        this.meta.updateTag({
-          itemprop: 'description',
-          content: 'Learn how to get started using Oppia.',
-        });
+        this.meta.updateTag(
+          {
+            itemprop: 'name',
+            content: 'Personalized Online Learning from Oppia',
+          },
+          'itemprop="name"'
+        );
+        this.meta.updateTag(
+          {
+            itemprop: 'description',
+            content: 'Learn how to get started using Oppia.',
+          },
+          'itemprop="description"'
+        );
 
         this.meta.updateTag({
           property: 'og:title',

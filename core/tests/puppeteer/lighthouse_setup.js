@@ -317,6 +317,8 @@ const getExplorationEditorUrl = async function (browser, page) {
 
       if (match) {
         match.closest('mat-option').click();
+      } else {
+        throw new Error('Could not find Algebra category option');
       }
     });
 
