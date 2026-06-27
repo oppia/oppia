@@ -26,6 +26,9 @@
       "app.constants": [
         "core/templates/app.constants"
       ],
+      "base-components/*": [
+        "core/templates/base-components/*"
+      ],
       "components/*": [
         "core/templates/components/*"
       ],
@@ -82,12 +85,12 @@
       "./node_modules/@types"
     ]
   },
+  "exclude": [
+    "core/tests/playwright-acceptance-tests"
+  ],
   "include": [
     "core",
     "extensions",
     "typings"
-  ],
-  "exclude": [
-    "core/tests/playwright-acceptance-tests"
   ]
 }
