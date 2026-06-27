@@ -22,10 +22,10 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseUrl = testConstants.URLs.BaseURL;
-const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const loginPageUrl = testConstants.URLs.Login;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
@@ -40,15 +40,16 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 
-const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
-const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
-const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
-const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+
+const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
+const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
+const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
+const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const matFormTextSelector = '.oppia-form-text';
 const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
 const audioLanguageSearchInputSelector =
@@ -68,6 +69,7 @@ const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 
 const angularRootElementSelector = 'oppia-angular-root';
+const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -119,7 +121,7 @@ const filledRatingStarSelector = '.fas.fa-star';
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
-const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
+
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
@@ -144,8 +146,6 @@ const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 
-const learnerGreetingsSelector = '.e2e-test-learner-greetings';
-
 // Common > Lesson Card.
 const commonLessonCardContainerSelector =
   '.e2e-test-redesigned-lesson-card-container';
@@ -154,6 +154,8 @@ const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
+
+const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 
 // Common > Remove modal selectors.
 const removeModalContainerSelector =
