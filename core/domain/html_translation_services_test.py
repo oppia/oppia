@@ -61,13 +61,13 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.protect_html_for_translation(
             source
         )
-        self.assertIn('data-oi-attr="text-with-value"', protected)
+        self.assertIn('data-temp-attr-name="text-with-value"', protected)
 
         restored = html_translation_services.postprocess_translated_html(
             protected
         )
         self.assertIn('text-with-value="Learn more"', restored)
-        self.assertNotIn('data-oi-id', restored)
+        self.assertNotIn('data-temp-comp-id', restored)
 
     def test_image_alt_and_caption_extracted_and_restored(self) -> None:
         source = (
@@ -93,7 +93,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.protect_html_for_translation(
             source
         )
-        self.assertIn('data-oi-encoded="true"', protected)
+        self.assertIn('data-temp-is-encoded="true"', protected)
 
         restored = html_translation_services.postprocess_translated_html(
             protected
@@ -170,38 +170,45 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         )
         result = html_translation_services.protect_html_for_translation(source)
         self.assertIn('translate="no"', result)
-        self.assertNotIn('data-oi-attr', result)
+        self.assertNotIn('data-temp-attr-name', result)
 
     def test_tabs_zero_count_produces_empty_json_array(self) -> None:
         # The tab-title-0 span populates tabs_data["0"], entering the
-        # reconstruction block. data-oi-tab-count="0" makes range(0) run
+        # reconstruction block. data-temp-tab-count="0" makes range(0) run
         # zero iterations, producing an empty JSON array.
         source = (
-            '<span data-oi-id="0" data-oi-attr="tab-title-0">T</span>'
-            '<oppia-noninteractive-tabs data-oi-id="0" '
-            'data-oi-tab-count="0" translate="no">'
+            '<span data-temp-comp-id="0" data-temp-attr-name="tab-title-0">'
+            'T</span>'
+            '<oppia-noninteractive-tabs data-temp-comp-id="0" '
+            'data-temp-tab-count="0" translate="no">'
             '</oppia-noninteractive-tabs>'
         )
         result = html_translation_services.postprocess_translated_html(source)
         self.assertIn('tab_contents-with-value="[]"', result)
-        self.assertNotIn('data-oi-tab-count', result)
+        self.assertNotIn('data-temp-tab-count', result)
 
     def test_orphaned_temp_tags_are_removed(self) -> None:
         source = (
-            '<span data-oi-id="99" data-oi-attr="text-with-value">'
+            '<span data-temp-comp-id="99" '
+            'data-temp-attr-name="text-with-value">'
             'Orphan</span>'
         )
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
 
-    def test_non_oppia_tag_with_data_oi_id_skipped_in_comp_map(self) -> None:
-        # The <p> has BOTH data-oi-id and data-oi-attr, so it appears in
-        # the temp-tag loop. At line 249-250 the comp_id_to_tag build
-        # skips it (not an oppia- tag), so component_tag resolves to None
-        # and the element is decomposed via the orphan branch.
-        source = '<p data-oi-id="0" data-oi-attr="text-with-value">Orphan</p>'
+    def test_non_oppia_tag_with_data_temp_comp_id_skipped_in_comp_map(
+        self,
+    ) -> None:
+        # The <p> has BOTH data-temp-comp-id and data-temp-attr-name, so it
+        # appears in the temp-tag loop. The comp_id_to_tag build skips it
+        # (not an oppia- tag), so component_tag resolves to None and the
+        # element is decomposed via the orphan branch.
+        source = (
+            '<p data-temp-comp-id="0" '
+            'data-temp-attr-name="text-with-value">Orphan</p>'
+        )
         result = html_translation_services.postprocess_translated_html(source)
-        self.assertNotIn('data-oi-id', result)
+        self.assertNotIn('data-temp-comp-id', result)
         self.assertNotIn('Orphan', result)
 
     def test_translatable_text_attr_with_none_value_is_skipped(self) -> None:
@@ -215,14 +222,17 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         protected = html_translation_services.protect_html_for_translation(
             source
         )
-        self.assertNotIn('data-oi-attr', protected)
+        self.assertNotIn('data-temp-attr-name', protected)
 
     def test_encoded_html_attr_with_none_value_is_skipped(self) -> None:
-        source = '<oppia-noninteractive-collapsible></oppia-noninteractive-collapsible>'
+        source = (
+            '<oppia-noninteractive-collapsible>'
+            '</oppia-noninteractive-collapsible>'
+        )
         protected = html_translation_services.protect_html_for_translation(
             source
         )
-        self.assertNotIn('data-oi-attr', protected)
+        self.assertNotIn('data-temp-attr-name', protected)
 
     def test_tabs_json_with_missing_title_or_content_is_handled(self) -> None:
         tabs = json.dumps(
@@ -253,14 +263,18 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         source = (
-            '<div data-oi-id="99" data-oi-attr="content-with-value" '
-            'data-oi-encoded="true">&lt;p&gt;Orphan&lt;/p&gt;</div>'
+            '<div data-temp-comp-id="99" '
+            'data-temp-attr-name="content-with-value" '
+            'data-temp-is-encoded="true">&lt;p&gt;Orphan&lt;/p&gt;</div>'
         )
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
 
     def test_postprocess_tabs_with_none_tag_skips_gracefully(self) -> None:
-        source = '<span data-oi-id="99" data-oi-attr="tab-title-0">Title</span>'
+        source = (
+            '<span data-temp-comp-id="99" '
+            'data-temp-attr-name="tab-title-0">Title</span>'
+        )
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
 

@@ -30,9 +30,8 @@ import bs4
 from typing import Dict, cast
 
 # TODO(#24933): Oppia-noninteractive-skillreview is excluded because
-# its displayed value is tied to backend mappings. Rohan is working on
-# a project to translate Exploration metadata that will eventually
-# cover these keywords. Once that project is complete, this component
+# its displayed value is tied to backend mappings.
+# Once that project is complete, this component
 # can be updated to support translation.
 # See: https://github.com/oppia/oppia/issues/24933
 #
@@ -63,20 +62,29 @@ _ENCODED_HTML_ATTRS = {
     'oppia-noninteractive-workedexample': ['answer-with-value'],
 }
 
-# Data attribute names used to link extraction elements back to their
-# parent component during post-processing.
-_DATA_COMP_ID = 'data-oi-id'
-_DATA_ATTR_NAME = 'data-oi-attr'
-_DATA_IS_ENCODED = 'data-oi-encoded'
-_DATA_TAB_COUNT = 'data-oi-tab-count'
+# Regex to identify all Oppia non-interactive components in the HTML.
+_OPPIA_COMPONENT_TAG_REGEX = re.compile(r'^oppia-noninteractive-')
+
+# Temporary data attributes injected into the HTML to track extracted strings.
+# This allows the post-processing engine to know exactly which Oppia component
+# and which specific attribute the translated text belongs to so it can be restored.
+
+# The unique ID linking this temporary element back to its parent component tag.
+_TEMP_DATA_COMP_ID = 'data-temp-comp-id'
+# The name of the original attribute where this text belongs (e.g., 'text-with-value').
+_TEMP_DATA_ATTR_NAME = 'data-temp-attr-name'
+# A flag indicating if the original HTML content was encoded and needs re-encoding.
+_TEMP_DATA_IS_ENCODED = 'data-temp-is-encoded'
+# The total number of tabs extracted, needed to reconstruct the original JSON array.
+_TEMP_DATA_TAB_COUNT = 'data-temp-tab-count'
 
 # Regexes to strip all helper attributes injected during pre-processing.
 _CLEANUP_PATTERNS = [
     re.compile(r'\s*translate=["\']no["\']', re.IGNORECASE),
-    re.compile(r'\s*data-oi-id=["\'][^"\']*["\']', re.IGNORECASE),
-    re.compile(r'\s*data-oi-attr=["\'][^"\']*["\']', re.IGNORECASE),
-    re.compile(r'\s*data-oi-encoded=["\'][^"\']*["\']', re.IGNORECASE),
-    re.compile(r'\s*data-oi-tab-count=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-temp-comp-id=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-temp-attr-name=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-temp-is-encoded=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-temp-tab-count=["\'][^"\']*["\']', re.IGNORECASE),
 ]
 
 
@@ -99,7 +107,7 @@ def protect_html_for_translation(source_html: str) -> str:
     - Tabs: the JSON tab_contents array is unpacked into individual temporary
       <span> (titles) and <div> (content) elements, one per tab.
 
-    Note: <a> tags are intentionally left untouched. The Azure API natively
+    Note: <a> tags are intentionally left untouched. The modern cloud translators natively
     translates anchor text while preserving the href attribute byte-for-byte
     when using textType="html".
 
@@ -121,7 +129,7 @@ def protect_html_for_translation(source_html: str) -> str:
         counter[0] += 1
         return comp_id
 
-    for tag in soup.find_all(re.compile(r'^oppia-noninteractive-')):
+    for tag in soup.find_all(_OPPIA_COMPONENT_TAG_REGEX):
         tag_name = tag.name
 
         if tag_name in _SKIP_COMPONENTS:
@@ -137,8 +145,8 @@ def protect_html_for_translation(source_html: str) -> str:
                 attr_val = tag.get(attr_name)
                 if attr_val is not None:
                     temp_span = soup.new_tag('span')
-                    temp_span[_DATA_COMP_ID] = comp_id
-                    temp_span[_DATA_ATTR_NAME] = attr_name
+                    temp_span[_TEMP_DATA_COMP_ID] = comp_id
+                    temp_span[_TEMP_DATA_ATTR_NAME] = attr_name
                     temp_span.string = attr_val
                     tag.insert_before(temp_span)
                     del tag[attr_name]
@@ -151,9 +159,9 @@ def protect_html_for_translation(source_html: str) -> str:
                     decoded = html_module.unescape(attr_val)
                     protected_inner = protect_html_for_translation(decoded)
                     temp_div = soup.new_tag('div')
-                    temp_div[_DATA_COMP_ID] = comp_id
-                    temp_div[_DATA_ATTR_NAME] = attr_name
-                    temp_div[_DATA_IS_ENCODED] = 'true'
+                    temp_div[_TEMP_DATA_COMP_ID] = comp_id
+                    temp_div[_TEMP_DATA_ATTR_NAME] = attr_name
+                    temp_div[_TEMP_DATA_IS_ENCODED] = 'true'
                     inner_soup = bs4.BeautifulSoup(
                         protected_inner, 'html.parser'
                     )
@@ -171,8 +179,8 @@ def protect_html_for_translation(source_html: str) -> str:
                     for i, tab in enumerate(tabs):
                         if 'title' in tab:
                             temp_span = soup.new_tag('span')
-                            temp_span[_DATA_COMP_ID] = comp_id
-                            temp_span[_DATA_ATTR_NAME] = 'tab-title-%d' % i
+                            temp_span[_TEMP_DATA_COMP_ID] = comp_id
+                            temp_span[_TEMP_DATA_ATTR_NAME] = 'tab-title-%d' % i
                             temp_span.string = tab['title']
                             tag.insert_before(temp_span)
                         if 'content' in tab:
@@ -181,16 +189,18 @@ def protect_html_for_translation(source_html: str) -> str:
                                 decoded
                             )
                             temp_div = soup.new_tag('div')
-                            temp_div[_DATA_COMP_ID] = comp_id
-                            temp_div[_DATA_ATTR_NAME] = 'tab-content-%d' % i
-                            temp_div[_DATA_IS_ENCODED] = 'true'
+                            temp_div[_TEMP_DATA_COMP_ID] = comp_id
+                            temp_div[_TEMP_DATA_ATTR_NAME] = (
+                                'tab-content-%d' % i
+                            )
+                            temp_div[_TEMP_DATA_IS_ENCODED] = 'true'
                             inner_soup = bs4.BeautifulSoup(
                                 protected_inner, 'html.parser'
                             )
                             for child in list(inner_soup.contents):
                                 temp_div.append(child)
                             tag.insert_before(temp_div)
-                    tag[_DATA_TAB_COUNT] = str(len(tabs))
+                    tag[_TEMP_DATA_TAB_COUNT] = str(len(tabs))
                     del tag['tab_contents-with-value']
                 except (json.JSONDecodeError, TypeError):
                     # If JSON parsing fails, protect the whole component.
@@ -198,7 +208,7 @@ def protect_html_for_translation(source_html: str) -> str:
                         tag['translate'] = 'no'
                     continue
 
-        tag[_DATA_COMP_ID] = comp_id
+        tag[_TEMP_DATA_COMP_ID] = comp_id
         if tag.get('translate') != 'no':
             tag['translate'] = 'no'
 
@@ -211,7 +221,7 @@ def postprocess_translated_html(translated_html: str) -> str:
     """Reverses protect_html_for_translation after the API call completes.
 
     Steps:
-    1. Finds every temporary <span>/<div> by its data-oi-id and data-oi-attr.
+    1. Finds every temporary <span>/<div> by its data-temp-comp-id and data-temp-attr-name.
     2. Restores plain text values directly to the component attribute.
     3. Re-encodes inner HTML and restores it to the component attribute.
     4. Reconstructs the tabs JSON from individual temp elements.
@@ -232,17 +242,17 @@ def postprocess_translated_html(translated_html: str) -> str:
 
     # Build a map from component ID to its tag for fast restoration lookup.
     comp_id_to_tag = {}
-    for tag in soup.find_all(attrs={_DATA_COMP_ID: True}):
+    for tag in soup.find_all(attrs={_TEMP_DATA_COMP_ID: True}):
         if tag.name and tag.name.startswith('oppia-noninteractive-'):
-            comp_id_to_tag[tag.get(_DATA_COMP_ID)] = tag
+            comp_id_to_tag[tag.get(_TEMP_DATA_COMP_ID)] = tag
 
     # Collect tabs data separately since reconstruction requires all tabs.
     tabs_data: Dict[str, Dict[str, str]] = {}
 
-    for temp_tag in list(soup.find_all(attrs={_DATA_ATTR_NAME: True})):
-        comp_id = temp_tag.get(_DATA_COMP_ID)
-        attr_name = temp_tag.get(_DATA_ATTR_NAME)
-        is_encoded = temp_tag.get(_DATA_IS_ENCODED) == 'true'
+    for temp_tag in list(soup.find_all(attrs={_TEMP_DATA_ATTR_NAME: True})):
+        comp_id = temp_tag.get(_TEMP_DATA_COMP_ID)
+        attr_name = temp_tag.get(_TEMP_DATA_ATTR_NAME)
+        is_encoded = temp_tag.get(_TEMP_DATA_IS_ENCODED) == 'true'
         component_tag = comp_id_to_tag.get(comp_id)
 
         if component_tag is None:
@@ -275,11 +285,14 @@ def postprocess_translated_html(translated_html: str) -> str:
 
         temp_tag.decompose()
 
-    # Reconstruct tabs JSON from collected data.
+    # Reconstruct the tabs JSON for each tabs component. For every tab index
+    # in range(tab_count), the previously collected title and content strings
+    # are assembled into a dict and appended to the tabs list, which is then
+    # serialised back into the tab_contents-with-value attribute.
     for comp_id, tab_attr_data in tabs_data.items():
         component_tag = comp_id_to_tag.get(comp_id)
         assert component_tag is not None
-        tab_count = int(component_tag.get(_DATA_TAB_COUNT, 0))
+        tab_count = int(component_tag.get(_TEMP_DATA_TAB_COUNT, 0))
         tabs = []
         for i in range(tab_count):
             tab = {}
@@ -293,13 +306,13 @@ def postprocess_translated_html(translated_html: str) -> str:
         component_tag['tab_contents-with-value'] = json.dumps(
             tabs, ensure_ascii=False
         )
-        if _DATA_TAB_COUNT in component_tag.attrs:
-            del component_tag[_DATA_TAB_COUNT]
+        if _TEMP_DATA_TAB_COUNT in component_tag.attrs:
+            del component_tag[_TEMP_DATA_TAB_COUNT]
 
-    # Remove the data-oi-id marker from all component tags.
-    for tag in soup.find_all(attrs={_DATA_COMP_ID: True}):
-        if _DATA_COMP_ID in tag.attrs:
-            del tag[_DATA_COMP_ID]
+    # Remove the data-temp-comp-id marker from all component tags.
+    for tag in soup.find_all(attrs={_TEMP_DATA_COMP_ID: True}):
+        if _TEMP_DATA_COMP_ID in tag.attrs:
+            del tag[_TEMP_DATA_COMP_ID]
 
     # Here we use cast because BeautifulSoup's decode_contents() returns Any
     # at the type-checking level, but we know it is always a string here.
