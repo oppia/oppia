@@ -33,19 +33,24 @@ import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
-import {ChangeDetectorRef, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Rule, RuleInputs, RuleInputTypes} from 'domain/exploration/rule.model';
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: number): string {
     return value;
   }
 }
 
 @Pipe({name: 'convertToPlainText'})
-class MockConvertToPlainTextPipe {
+class MockConvertToPlainTextPipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }

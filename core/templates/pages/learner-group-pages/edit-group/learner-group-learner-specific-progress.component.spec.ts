@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for learner group preferences tab.
  */
 
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -33,7 +33,7 @@ import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-bac
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTrunctePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {LessonPlayerSidebarComponent} from './lesson-player-sidebar.component';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {
@@ -49,7 +49,7 @@ import {ConversationFlowService} from '../../services/conversation-flow.service'
 import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncteAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

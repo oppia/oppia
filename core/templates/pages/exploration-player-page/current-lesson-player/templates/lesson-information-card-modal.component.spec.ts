@@ -50,7 +50,7 @@ import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncteAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

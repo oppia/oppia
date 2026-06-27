@@ -355,15 +355,6 @@ describe('Translation status service', () => {
     tss.refresh();
   });
 
-  it('should initialize service properly', () => {
-    tss.ngOnInit();
-
-    expect(tss.explorationVoiceoverContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentRequiredCount).toEqual(0);
-    expect(tss.explorationVoiceoverContentRequiredCount).toEqual(0);
-  });
-
   it(
     'should return a correct list of state names for which audio needs ' +
       'update',

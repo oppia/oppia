@@ -11,8 +11,11 @@
     "html",
     "unused-imports",
     "@typescript-eslint",
-    "oppia"
+    "oppia",
+    "@angular-eslint",
+    "@angular-eslint/template"
   ],
+  "ignorePatterns": ["core/templates/pages/footer_js_libs.html"],
   "overrides": [
     {
       // We exclude test files from dependency injection format checks because
@@ -148,6 +151,50 @@
       ],
       "rules": {
         "oppia/no-relative-import": "error"
+      }
+    },
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@angular-eslint/component-class-suffix": "warn",
+        "@angular-eslint/contextual-lifecycle": "error",
+        "@angular-eslint/directive-class-suffix": "error",
+        "@angular-eslint/no-conflicting-lifecycle": "error",
+        "@angular-eslint/no-empty-lifecycle-method": "warn",
+        "@angular-eslint/no-host-metadata-property": "error",
+        "@angular-eslint/no-input-rename": "error",
+        "@angular-eslint/no-inputs-metadata-property": "error",
+        "@angular-eslint/no-output-native": "warn",
+        "@angular-eslint/no-output-on-prefix": "warn",
+        "@angular-eslint/no-output-rename": "error",
+        "@angular-eslint/no-outputs-metadata-property": "error",
+        "@angular-eslint/use-lifecycle-interface": "warn",
+        "@angular-eslint/use-pipe-transform-interface": "error",
+        "@angular-eslint/component-selector": [
+          "warn",
+          {
+            "type": "element",
+            "prefix": "oppia",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/directive-selector": [
+          "warn",
+          {
+            "type": "attribute",
+            "prefix": "oppia",
+            "style": "camelCase"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["*.component.html"],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
+      "rules": {
+        "max-len": ["error", { "code": 140 }]
       }
     }
   ],

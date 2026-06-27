@@ -17,7 +17,7 @@
  * its components.
  */
 
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
@@ -38,7 +38,7 @@ interface AvailabilityStatus {
 @Injectable({
   providedIn: 'root',
 })
-export class TranslationStatusService implements OnInit {
+export class TranslationStatusService {
   AUDIO_NEEDS_UPDATE_MESSAGE: string[] = ['Audio needs update!'];
   TRANSLATION_NEEDS_UPDATE_MESSAGE: string[] = ['Translation needs update!'];
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
@@ -64,9 +64,7 @@ export class TranslationStatusService implements OnInit {
     private stateEditorService: StateEditorService,
     private platformFeatureService: PlatformFeatureService,
     private entityVoiceoversService: EntityVoiceoversService
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.stateNeedsUpdateWarnings = {};
     this.stateWiseStatusColor = {};

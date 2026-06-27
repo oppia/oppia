@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for learner group preferences tab.
  */
 
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -37,7 +37,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe {
+class MockTrunctePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
