@@ -35,6 +35,8 @@ const pagesWithDialogHandler = new WeakSet<Page>();
 const usernameInputSelector = 'input.e2e-test-username-input';
 const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 const registerButtonSelector = 'button.e2e-test-register-user:not([disabled])';
+const emailPreferencesRadioNoSelector =
+  'input.e2e-test-email-preferences-radio-no';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class BaseUser {
@@ -181,6 +183,10 @@ export class BaseUser {
     await this.signInWithEmail(email);
     await this.typeInInputField(usernameInputSelector, username);
     await this.clickOnElementWithSelector(agreeToTermsCheckboxSelector);
+    // The email preferences form is always shown during signup and requires a
+    // selection for new users, so we choose "do not send" to keep the default
+    // of not subscribing to email updates.
+    await this.clickOnElementWithSelector(emailPreferencesRadioNoSelector);
     await this.expectElementToBeVisible(registerButtonSelector);
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;

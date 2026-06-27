@@ -36,12 +36,13 @@ const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const loginPage = '.e2e-test-login-page';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
+const emailPreferencesRadioNo = 'input.e2e-test-email-preferences-radio-no';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const invalidEmailErrorContainer = '#mat-error-1';
-const invalidUsernameErrorContainer = '.oppia-warning-text';
+const invalidUsernameErrorContainer = '.e2e-test-username-warning';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
@@ -1245,6 +1246,10 @@ export class LoggedInUser extends BaseUser {
     );
     if (!invalidUsernameErrorContainerElement) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
+      // The email preferences form is always shown during signup and requires
+      // a selection for new users, so we choose "do not send" to keep the
+      // default of not subscribing to email updates.
+      await this.clickOnElementWithSelector(emailPreferencesRadioNo);
       await this.page.waitForSelector(registerNewUserButton);
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle'}),
