@@ -449,6 +449,12 @@ describe('Story node model', () => {
     expect(_sampleStoryNode.getAvailableVoiceoverLanguageCodes()).toEqual([]);
   });
 
+  it('should return available voiceover language accent descriptions', () => {
+    expect(
+      _sampleStoryNode.getAvailableVoiceoverLanguageAccentDescriptions()
+    ).toEqual({});
+  });
+
   it('should create node from backend dict with available language codes', () => {
     const backendDict: StoryNodeBackendDict = {
       id: 'node_2',
@@ -475,5 +481,64 @@ describe('Story node model', () => {
 
     expect(node.getAvailableTextLanguageCodes()).toEqual(['en', 'es']);
     expect(node.getAvailableVoiceoverLanguageCodes()).toEqual(['en']);
+  });
+
+  it('should create node from backend dict with voiceover accent descriptions', () => {
+    const backendDict: StoryNodeBackendDict = {
+      id: 'node_3',
+      thumbnail_filename: null,
+      title: 'Title 3',
+      description: 'Description 3',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [],
+      outline: '',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: null,
+      status: 'Draft',
+      planned_publication_date_msecs: null,
+      last_modified_msecs: null,
+      first_publication_date_msecs: null,
+      unpublishing_reason: null,
+      available_text_language_codes: ['en'],
+      available_voiceover_language_codes: ['en-US'],
+      available_voiceover_language_accent_descriptions: {
+        'en-US': 'English (US)',
+      },
+    };
+
+    const node = StoryNode.createFromBackendDict(backendDict);
+
+    expect(node.getAvailableVoiceoverLanguageAccentDescriptions()).toEqual({
+      'en-US': 'English (US)',
+    });
+  });
+
+  it('should create node from backend dict with missing optional fields', () => {
+    const backendDict: StoryNodeBackendDict = {
+      id: 'node_4',
+      thumbnail_filename: null,
+      title: 'Title 4',
+      description: 'Description 4',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [],
+      outline: '',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: null,
+      status: 'Draft',
+      planned_publication_date_msecs: null,
+      last_modified_msecs: null,
+      first_publication_date_msecs: null,
+      unpublishing_reason: null,
+    };
+
+    const node = StoryNode.createFromBackendDict(backendDict);
+
+    expect(node.getAvailableTextLanguageCodes()).toEqual([]);
+    expect(node.getAvailableVoiceoverLanguageCodes()).toEqual([]);
+    expect(node.getAvailableVoiceoverLanguageAccentDescriptions()).toEqual({});
   });
 });

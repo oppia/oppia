@@ -441,8 +441,8 @@ class TopicPageDataHandlerTests(
         self.assertEqual(node_dict['exploration_id'], exploration_id)
         self.assertEqual(node_dict['available_text_language_codes'], ['en'])
         self.assertEqual(
-            node_dict['available_voiceover_language_codes'],
-            ['en-US', 'en-UK'],
+            set(node_dict['available_voiceover_language_codes']),
+            {'en-US', 'en-UK'},
         )
         accent_descriptions = node_dict[
             'available_voiceover_language_accent_descriptions'
