@@ -16,7 +16,8 @@
  * @fileoverview Component for editing arc title and description.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -29,10 +30,17 @@ export class EditArcModalComponent {
   @Input() arcDescription = '';
   errorMessage: string | null = null;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {}
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef
+  ) {}
 
   cancel(): void {
-    this.ngbActiveModal.dismiss();
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.dismiss();
+    }
   }
 
   save(): void {
@@ -41,9 +49,16 @@ export class EditArcModalComponent {
       this.errorMessage = 'Arc title cannot be empty.';
       return;
     }
-    this.ngbActiveModal.close({
-      title: trimmedTitle,
-      description: this.arcDescription.trim(),
-    });
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss({
+        title: trimmedTitle,
+        description: this.arcDescription.trim(),
+      });
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.close({
+        title: trimmedTitle,
+        description: this.arcDescription.trim(),
+      });
+    }
   }
 }

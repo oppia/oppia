@@ -1048,6 +1048,17 @@ describe('Story Editor Component having three story nodes', () => {
     expect(() => component.getArcForNode('node_2')).toThrowError();
   });
 
+  it('should return the arc for a valid node from getArcForNode', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+
+    const result = component.getArcForNode('node_2');
+
+    expect(result.getId()).toBe('arc_1');
+    expect(result.getTitle()).toBe('Arc 1');
+  });
+
   it('should throw error from getArcSequenceNumber when arc index is invalid', () => {
     component.storyContents.addArc(
       ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
