@@ -51,9 +51,12 @@ import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import './top-navigation-bar.component.css';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
 interface LanguageInfo {
   id: string;
@@ -146,6 +149,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   profilePictureWebpDataUrl!: string;
   unreadThreadsCount: number = 0;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
+  isWebFeedbackModalEnabled: boolean = false;
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -205,6 +209,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
+    private ngbModal: NgbModal,
     private siteAnalyticsService: SiteAnalyticsService,
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
@@ -263,6 +268,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
+
+    this.isWebFeedbackModalEnabled =
+      this.isWebFeedbackModalFeatureFlagEnabled();
 
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
@@ -657,5 +665,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
     return this.platformFeatureService.status
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
+  }
+
+  isWebFeedbackModalFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.WebFeedbackModalEnabled.isEnabled;
+  }
+
+  openSiteFeedbackModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType = FeedbackModalType.SITE_ISSUE;
   }
 }
