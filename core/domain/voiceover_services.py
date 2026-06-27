@@ -992,6 +992,8 @@ def regenerate_voiceovers_for_given_contents(
             that require voiceover regeneration.
         task_run_id: str. The unique identifier for the voiceover
             regeneration task.
+        additional_contextual_information: dict. A dictionary containing additional
+            contextual information related to the voiceover regeneration process.
         specific_language_accent_code: Optional[str]. The specific language
             accent code to use for voiceover regeneration, if provided.
     """
