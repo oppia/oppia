@@ -62,6 +62,9 @@ class MockPlatformFeatureService {
     DiagnosticTest: {
       isEnabled: false,
     },
+    EnableCertificateAssessment: {
+      isEnabled: true,
+    },
   };
 }
 
@@ -303,6 +306,33 @@ describe('Classroom Page Component', () => {
     expect(certificateAssessmentLink.getAttribute('href')).toBe(
       '/learn/math/certificate-offering-available'
     );
+  });
+
+  it('should hide the classroom certificate assessment entry when disabled', () => {
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      false;
+    component.classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      true,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector(
+        '.e2e-test-take-certificate-assessment'
+      )
+    ).toBeNull();
   });
 
   it(

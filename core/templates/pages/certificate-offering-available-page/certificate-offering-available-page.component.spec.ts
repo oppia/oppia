@@ -27,13 +27,13 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     expect(
       fixture.nativeElement
         .querySelector(
-          '.oppia-certificate-offering-available-page__exit-button'
+          '.oppia-certificate-offering-available-page__actions .btn.btn-primary'
         )
         .textContent.trim()
-    ).toBe('Exit to classroom');
+    ).toBe('Continue to assessment');
     expect(
       fixture.nativeElement
-        .querySelector('.oppia-certificate-offering-available-page__panel h2')
+        .querySelector('.oppia-certificate-offering-available-page__panel h1')
         .textContent.trim()
     ).toBe('Available certificate offering');
   });

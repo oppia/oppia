@@ -18,12 +18,14 @@
 
 import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
+import {CertificateOfferingAvailablePageAuthGuard} from './certificate-offering-available-page-auth.guard';
 import {AvailableCertificateOfferingPageRootComponent} from './certificate-offering-available-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
     component: AvailableCertificateOfferingPageRootComponent,
+    canActivate: [CertificateOfferingAvailablePageAuthGuard],
   },
 ];
 

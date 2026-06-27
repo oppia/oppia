@@ -87,6 +87,11 @@ export class ClassroomPageComponent implements OnDestroy {
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platformFeatureService.status.EnableCertificateAssessment
+      .isEnabled;
+  }
+
   setClassroomMedia(classroomData: ClassroomData): void {
     const classroomId = classroomData.getClassroomId();
     const thumbnailFilename = classroomData.getThumbnailData().filename;
