@@ -132,7 +132,7 @@ export class CloudTaskRun {
       this.functionId === 'regenerate_voiceovers_on_exploration_update' &&
       isAdditionalContextProvided
     ) {
-      return `Content updated for Exploration (${this.additionalContextualInformation.exploration_title})`;
+      return `Content updated for Exploration ("${this.additionalContextualInformation.exploration_title}")`;
     }
 
     if (
@@ -146,7 +146,7 @@ export class CloudTaskRun {
         'regenerate_voiceovers_on_exploration_added_to_topic' &&
       isAdditionalContextProvided
     ) {
-      return `Exploration (${this.additionalContextualInformation.exploration_title}) added to topic (${this.additionalContextualInformation.topic_name})`;
+      return `Exploration ("${this.additionalContextualInformation.exploration_title}") added to topic ("${this.additionalContextualInformation.topic_name}")`;
     }
 
     if (
@@ -160,7 +160,7 @@ export class CloudTaskRun {
         'regenerate_voiceovers_of_exploration_for_given_language_accent' &&
       isAdditionalContextProvided
     ) {
-      return `Voiceover admin regenerated voiceovers for Exploration (${this.additionalContextualInformation.exploration_title}) in ${this.additionalContextualInformation.language_accent} accent`;
+      return `Voiceover admin regenerated voiceovers for Exploration ("${this.additionalContextualInformation.exploration_title}") in ${this.additionalContextualInformation.language_accent} accent`;
     }
 
     if (
@@ -172,7 +172,7 @@ export class CloudTaskRun {
       this.functionId === 'regenerate_voiceovers_after_accepting_suggestion' &&
       isAdditionalContextProvided
     ) {
-      return `Translation suggestion accepted for Exploration (${this.additionalContextualInformation.exploration_title}) for language (${this.additionalContextualInformation.language})`;
+      return `Translation suggestion accepted for Exploration ("${this.additionalContextualInformation.exploration_title}") for language ${this.additionalContextualInformation.language}`;
     }
     return '';
   }
