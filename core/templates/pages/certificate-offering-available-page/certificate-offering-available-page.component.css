@@ -7,7 +7,7 @@
 
 .oppia-certificate-offering-available-page__hero-card {
   align-items: flex-start;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #dce3ea;
   border-radius: 20px;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
@@ -73,8 +73,8 @@
 .oppia-certificate-offering-available-page__tile-top {
   align-items: flex-start;
   display: flex;
-  justify-content: space-between;
   gap: 16px;
+  justify-content: space-between;
 }
 
 .oppia-certificate-offering-available-page__tile h3,
