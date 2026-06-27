@@ -46,9 +46,9 @@ describe('AvailableCertificateOfferingPageComponent', () => {
 
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
-    ).map((button: HTMLButtonElement) => button.textContent.trim());
+    ).map(button => (button as HTMLButtonElement).textContent?.trim() || '');
 
-    expect(buttons.includes('Continue to assessment')).toBeTrue();
+    expect(buttons.includes('Continue to assessment')).toBe(true);
     expect(
       fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
     ).toBe('Available certificate offering');
