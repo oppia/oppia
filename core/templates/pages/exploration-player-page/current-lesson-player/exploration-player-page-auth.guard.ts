@@ -44,7 +44,7 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve, reject) => {
       const version = route.queryParams.v || null;
       let explorationId = route.paramMap.get('exploration_id') || '';
       const entityIdRegex = new RegExp(AppConstants.ENTITY_ID_REGEX);
@@ -57,7 +57,7 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
             .then(() => {
               this.location.replaceState(state.url);
               resolve(false);
-            });
+            }, reject);
         } else {
           this.router
             .navigate([
@@ -66,7 +66,7 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
             .then(() => {
               this.location.replaceState(state.url);
               resolve(false);
-            });
+            }, reject);
         }
         return;
       }
@@ -112,7 +112,7 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
               .then(() => {
                 this.location.replaceState(state.url);
                 resolve(false);
-              });
+              }, reject);
           }
         });
     });

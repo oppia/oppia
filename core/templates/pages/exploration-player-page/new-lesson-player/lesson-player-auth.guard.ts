@@ -44,7 +44,7 @@ export class LessonPlayerPageAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve, reject) => {
       const version = route.queryParams.v || null;
       let explorationId = route.paramMap.get('exploration_id') || '';
       // Validate the exploration ID before making any backend requests.
@@ -60,7 +60,7 @@ export class LessonPlayerPageAuthGuard implements CanActivate {
             .then(() => {
               this.location.replaceState(state.url);
               resolve(false);
-            });
+            }, reject);
         } else {
           this.router
             .navigate([
@@ -69,7 +69,7 @@ export class LessonPlayerPageAuthGuard implements CanActivate {
             .then(() => {
               this.location.replaceState(state.url);
               resolve(false);
-            });
+            }, reject);
         }
         return;
       }

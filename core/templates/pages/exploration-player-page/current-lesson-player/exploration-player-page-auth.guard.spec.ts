@@ -273,4 +273,20 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       done();
     });
   });
+
+  it('should reject if router.navigate fails for invalid exploration ID', done => {
+    spyOn(router, 'navigate').and.returnValue(Promise.reject('nav error'));
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'learning!&url'}),
+      queryParams: {},
+    } as ActivatedRouteSnapshot;
+
+    const state = createMockState('/explore/learning!&url');
+
+    guard.canActivate(route, state).catch(err => {
+      expect(err).toBe('nav error');
+      done();
+    });
+  });
 });
