@@ -22,11 +22,11 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseUrl = testConstants.URLs.BaseURL;
-const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
-const loginPageUrl = testConstants.URLs.Login;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
+const loginPageUrl = testConstants.URLs.Login;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const signUpEmailField = testConstants.SignInDetails.inputField;
@@ -40,15 +40,16 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 
-const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
-const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
-const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
-const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+
+const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
+const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
+const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
+const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const matFormTextSelector = '.oppia-form-text';
 const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
 const audioLanguageSearchInputSelector =
@@ -93,10 +94,6 @@ const editProfilePictureButton = '.e2e-test-photo-clickable';
 const bioTextareaSelector = '.e2e-test-user-bio';
 const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
 
-const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
-const ratingStarSelector = '.e2e-test-rating-star';
-const filledRatingStarSelector = '.fas.fa-star';
-
 // Preferences page selectors.
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
@@ -116,6 +113,10 @@ const preferencesMenuLink = '.e2e-test-preferences-link';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2 = 'Please do not leave this page.';
+
+const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
+const ratingStarSelector = '.e2e-test-rating-star';
+const filledRatingStarSelector = '.fas.fa-star';
 
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
@@ -1165,7 +1166,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnElementWithSelector(mobileCommunityLessonSectionButton);
     } else {
       await this.expectElementToBeVisible(progressSectionSelector);
-      await this.page.click(communityLessonsSectionButton);
+      await this.clickOnElementWithSelector(communityLessonsSectionButton);
     }
 
     await this.expectElementToBeVisible(
