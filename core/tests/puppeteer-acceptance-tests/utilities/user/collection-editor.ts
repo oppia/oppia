@@ -33,8 +33,6 @@ const collectionCategoryDropdownSelector =
   '.e2e-test-collection-editor-category-dropdown';
 const collectionSaveChangesButtonSelector =
   '.e2e-test-collection-save-changes-button';
-const collectionEditorCardsSelector =
-  '.e2e-test-collection-editor-cards-container';
 const createNewExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const creationModalSelector = '.e2e-test-creation-modal';
