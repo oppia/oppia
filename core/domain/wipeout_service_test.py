@@ -280,9 +280,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': self.user_1_id,
         }
         new_user_data_dict: user_domain.RawUserDataDict = {
@@ -290,9 +290,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias3',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -5465,9 +5465,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': self.user_1_id,
         }
         new_user_data_dict: user_domain.RawUserDataDict = {
@@ -5475,9 +5475,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias3',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -5864,9 +5864,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': self.user_1_id,
         }
         new_user_data_dict: user_domain.RawUserDataDict = {
@@ -5874,9 +5874,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias3',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_user_data = (

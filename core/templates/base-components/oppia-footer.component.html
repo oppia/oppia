@@ -93,6 +93,16 @@
               {{ 'I18N_FOOTER_CONTACT_US' | translate }}
             </a>
           </li>
+          <li>
+            <a role="button"
+               tabindex="0"
+               *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
+               class="e2e-test-report-website-issue-link"
+               (click)="openSiteFeedbackModal()"
+               (keydown.enter)="openSiteFeedbackModal()">
+              {{ 'I18N_FOOTER_REPORT_WEBSITE_ISSUE' | translate }}
+            </a>
+          </li>
         </ul>
       </div>
       <div class="oppia-flex-break"></div>

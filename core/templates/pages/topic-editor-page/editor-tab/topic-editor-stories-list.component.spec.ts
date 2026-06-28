@@ -25,19 +25,14 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStoriesListComponent} from './topic-editor-stories-list.component';
+import {Topic} from 'domain/topic/topic-object.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
-
-class MockNgbModalRef {
-  componentInstance: {
-    body: 'xyz';
-  };
-}
 
 class MockPlatformFeatureService {
   status = {
@@ -50,11 +45,15 @@ class MockPlatformFeatureService {
 describe('topicEditorStoriesList', () => {
   let component: TopicEditorStoriesListComponent;
   let fixture: ComponentFixture<TopicEditorStoriesListComponent>;
-  let storySummaries;
+  let storySummaries: StorySummary[];
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let topicUpdateService: TopicUpdateService;
   let undoRedoService: UndoRedoService;
   let ngbModal: NgbModal;
+  let modalRef: {
+    componentInstance: Record<string, string>;
+    result: Promise<void>;
+  };
   let windowRef: WindowRef;
 
   beforeEach(async(() => {
@@ -77,6 +76,10 @@ describe('topicEditorStoriesList', () => {
     topicUpdateService = TestBed.inject(TopicUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     ngbModal = TestBed.inject(NgbModal);
+    modalRef = {
+      componentInstance: {},
+      result: Promise.resolve(),
+    };
 
     storySummaries = [
       StorySummary.createFromBackendDict({
@@ -127,12 +130,78 @@ describe('topicEditorStoriesList', () => {
   it('should change list order properly', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory').and.stub();
 
-    component.storySummaries = [null, null, null];
-    component.topic = null;
-    component.drop({
+    component.storySummaries = [
+      StorySummary.createFromBackendDict({
+        id: 'id1',
+        title: '',
+        node_titles: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: false,
+        completed_node_titles: [],
+        url_fragment: '',
+        all_node_dicts: [],
+      }),
+      StorySummary.createFromBackendDict({
+        id: 'id2',
+        title: '',
+        node_titles: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: false,
+        completed_node_titles: [],
+        url_fragment: '',
+        all_node_dicts: [],
+      }),
+      StorySummary.createFromBackendDict({
+        id: 'id3',
+        title: '',
+        node_titles: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: false,
+        completed_node_titles: [],
+        url_fragment: '',
+        all_node_dicts: [],
+      }),
+    ];
+    component.topic = new Topic(
+      '',
+      '',
+      '',
+      '',
+      '',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      '',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
+    );
+    const dropEvent: CdkDragDrop<StorySummary[]> = {
       previousIndex: 1,
       currentIndex: 2,
-    } as CdkDragDrop<StorySummary[]>);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
+    component.drop(dropEvent);
 
     expect(topicUpdateService.rearrangeCanonicalStory).toHaveBeenCalled();
   });
@@ -159,9 +228,7 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should delete story when user deletes story', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve(),
-    } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
     spyOn(topicUpdateService, 'removeCanonicalStory');
     component.storySummaries = storySummaries;
 
@@ -177,9 +244,8 @@ describe('topicEditorStoriesList', () => {
   }));
 
   it('should close modal when user click cancel button', () => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.reject(),
-    } as NgbModalRef);
+    modalRef.result = Promise.reject();
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
     component.deleteCanonicalStory('storyId');
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -198,12 +264,8 @@ describe('topicEditorStoriesList', () => {
     'should open save changes modal when user tries to open story editor' +
       ' without saving changes',
     () => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      });
+      modalRef.componentInstance = {body: 'xyz'};
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       component.openStoryEditor('storyId');
@@ -215,12 +277,9 @@ describe('topicEditorStoriesList', () => {
   it(
     'should close save changes modal when closes the saves changes' + ' modal',
     () => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      });
+      modalRef.componentInstance = {body: 'xyz'};
+      modalRef.result = Promise.reject();
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       component.openStoryEditor('storyId');

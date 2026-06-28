@@ -28,7 +28,6 @@ from core.domain import (
     exp_services,
     fs_services,
     html_validation_service,
-    opportunity_services,
     platform_parameter_list,
     question_domain,
     question_services,
@@ -134,33 +133,21 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
                 conversion_fn
             )
 
-    def test_set_suggestion_status_to_accepted(self) -> None:
-        self.base_suggestion.set_suggestion_status_to_accepted()
-        self.assertEqual(
-            self.base_suggestion.status, suggestion_models.STATUS_ACCEPTED
-        )
+    def test_get_author_name_with_deleted_user(self) -> None:
+        self.base_suggestion.author_id = 'deleted_id'
+        with self.swap(
+            user_services, 'get_usernames', lambda *args, **kwargs: [None]
+        ):
+            self.assertEqual(
+                self.base_suggestion.get_author_name(), '[Deleted User]'
+            )
 
-    def test_set_suggestion_status_to_in_review(self) -> None:
-        self.base_suggestion.set_suggestion_status_to_in_review()
-        self.assertEqual(
-            self.base_suggestion.status, suggestion_models.STATUS_IN_REVIEW
-        )
-
-    def test_set_suggestion_status_to_rejected(self) -> None:
-        self.base_suggestion.set_suggestion_status_to_rejected()
-        self.assertEqual(
-            self.base_suggestion.status, suggestion_models.STATUS_REJECTED
-        )
-
-    def test_set_final_reviewer_id(self) -> None:
-        self.base_suggestion.set_final_reviewer_id('reviewer_123')
-        self.assertEqual(self.base_suggestion.final_reviewer_id, 'reviewer_123')
-
-    def test_is_handled(self) -> None:
-        self.base_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        self.assertTrue(self.base_suggestion.is_handled)
-        self.base_suggestion.status = suggestion_models.STATUS_IN_REVIEW
-        self.assertFalse(self.base_suggestion.is_handled)
+    def test_get_author_name_with_valid_user(self) -> None:
+        self.base_suggestion.author_id = 'valid_id'
+        with self.swap(
+            user_services, 'get_usernames', lambda *args, **kwargs: ['username']
+        ):
+            self.assertEqual(self.base_suggestion.get_author_name(), 'username')
 
 
 class SuggestionEditStateContentDict(TypedDict):
@@ -2098,14 +2085,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date,
         )
 
-        with self.swap(
-            opportunity_services,
-            'update_translation_opportunity_with_accepted_suggestion',
-            lambda *args: None,
-        ):
-            suggestion.accept(
-                'Accepted suggestion by translator: Add translation change.'
-            )
+        suggestion.accept(
+            'Accepted suggestion by translator: Add translation change.'
+        )
 
         old_version_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
