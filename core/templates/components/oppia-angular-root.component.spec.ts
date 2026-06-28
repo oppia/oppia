@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, async} from '@angular/core/testing';
+import {Direction} from '@angular/cdk/bidi';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {CookieModule} from 'ngx-cookie';
@@ -128,7 +129,7 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should detect change in direction', () => {
-    let newDirection = 'rtl';
+    const newDirection: Direction = 'rtl';
 
     component.ngOnInit();
     i18nService.directionChangeEventEmitter.emit(newDirection);

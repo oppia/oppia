@@ -87,6 +87,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
+  @Input() isCertificateValid: boolean = true;
   @Input() useStubData: boolean = false;
 
   // These two inputs will be wired from the real validation API response.

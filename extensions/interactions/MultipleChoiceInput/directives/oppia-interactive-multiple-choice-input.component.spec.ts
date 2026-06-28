@@ -19,14 +19,19 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
-import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {
+  CurrentInteractionService,
+  SubmitAnswerFn,
+  ValidityCheckFn,
+  InteractionRulesService,
+} from 'pages/exploration-player-page/services/current-interaction.service';
 import {InteractiveMultipleChoiceInputComponent} from './oppia-interactive-multiple-choice-input.component';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
@@ -36,7 +41,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
+    ) {
       return {
         showChoicesInShuffledOrder: {
           value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue),
@@ -49,7 +57,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {
+    onSubmit(answer: InteractionAnswer, rulesService: InteractionRulesService) {
       expect(answer).toBe(1);
     }
 
@@ -59,7 +67,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
     updateCurrentAnswer(answer: InteractionAnswer): void {}
 
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    registerCurrentInteraction(
+      submitAnswerFn: SubmitAnswerFn,
+      validateExpressionFn: ValidityCheckFn
+    ) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -98,14 +109,12 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
-    let recordedVoiceovers = new RecordedVoiceovers({});
     displayedCard = new StateCard(
       'test_name',
       'content',
       'interaction',
       interaction,
       [],
-      recordedVoiceovers,
       contentId
     );
 
@@ -205,7 +214,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   it('should update selected answer when user selects an option', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
     component.errorMessageI18nKey = 'Some error';
-    spyOn(currentInteractionService, 'updateCurrentAnswer');
+    const updateCurrentAnswerSpy = spyOn(
+      currentInteractionService,
+      'updateCurrentAnswer'
+    );
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected')
       .and.returnValue({
@@ -215,7 +227,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         // this error because typescript expects more
         // properties than just one add and remove.
         // We need only add and remove for testing purposes.
-        // @ts-expect-error
         classList: {
           add: () => {
             return;
@@ -224,7 +235,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
             return;
           },
         },
-      });
+      } as HTMLElement);
     spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
       classList: {
         add: () => {
@@ -238,9 +249,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.selectAnswer(dummyMouseEvent, '1');
 
     expect(component.answer).toBe(1);
-    expect(
-      currentInteractionService.updateCurrentAnswer
-    ).toHaveBeenCalledOnceWith(1);
+    expect(updateCurrentAnswerSpy).toHaveBeenCalledWith(1);
     expect(component.errorMessageI18nKey).toEqual('');
   });
 
@@ -259,7 +268,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     () => {
       let dummyMouseEvent = new MouseEvent('Mouse');
       component.errorMessageI18nKey = 'Some error';
-      spyOn(currentInteractionService, 'updateCurrentAnswer');
+      const updateCurrentAnswerSpy = spyOn(
+        currentInteractionService,
+        'updateCurrentAnswer'
+      );
       spyOn(document, 'querySelectorAll')
         .withArgs('button.multiple-choice-option.selected')
         .and.returnValue([
@@ -270,7 +282,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
             // this error because typescript expects around more
             // properties than just one add and remove.
             // We need only add and remove for testing purposes.
-            // @ts-expect-error
             classList: {
               add: () => {
                 return;
@@ -279,7 +290,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
                 return;
               },
             },
-          },
+          } as HTMLElement,
         ]);
       spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue({
         classList: {
@@ -296,9 +307,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       component.selectAnswer(dummyMouseEvent, '1');
 
       expect(component.submitAnswer).not.toHaveBeenCalled();
-      expect(
-        currentInteractionService.updateCurrentAnswer
-      ).toHaveBeenCalledOnceWith(1);
+      expect(updateCurrentAnswerSpy).toHaveBeenCalledWith(1);
       expect(component.errorMessageI18nKey).toEqual('');
     }
   );

@@ -156,6 +156,36 @@ describe('InsertScriptService', () => {
     expect(result).toBe(false);
   });
 
+  it('should load TURNSTILE script correctly', (done: DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
+    const result = insertScriptService.loadScript(
+      KNOWN_SCRIPTS.TURNSTILE,
+      () => {
+        expect(mockScriptElement.src).toContain(
+          'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+        );
+        done();
+      }
+    );
+
+    expect(result).toBe(true);
+  });
+
   it('should load MATHJAX script correctly', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,

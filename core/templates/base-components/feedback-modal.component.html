@@ -1,0 +1,190 @@
+<ng-container *ngIf="isLessonFeedbackMode && !isUserLoggedIn">
+
+  <div class="oppia-guest-feedback">
+    <div class="modal-header
+             oppia-lesson-feedback-header
+             border-bottom-0">
+      {{ 'I18N_LESSON_FEEDBACK_GUEST_TITLE' | translate }}
+      <p class="oppia-lesson-feedback-text">
+        {{
+        'I18N_LESSON_FEEDBACK_GUEST_SUBTITLE'
+        | translate
+        }}
+      </p>
+      <div class="oppia-guest-feedback-body">
+        <button class="oppia-guest-signup-btn" (click)="signIn()">
+          {{
+          'I18N_LESSON_FEEDBACK_SIGN_IN_BUTTON'
+          | translate
+          }}
+        </button>
+        <button class="oppia-guest-continue-btn" (click)="closeModal()">
+          {{
+          'I18N_LESSON_FEEDBACK_CONTINUE_AS_GUEST_BUTTON'
+          | translate
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</ng-container>
+
+<ng-container *ngIf="!isLessonFeedbackMode || isUserLoggedIn">
+  <div class="oppia-feedback-modal">
+    <div class="modal-header oppia-flag-lesson-header">
+      <div class="oppia-flag-lesson-header-left">
+        <div class="oppia-flag-lesson-header-icon">
+          <mat-icon aria-hidden="true">
+            {{
+            isLessonFeedbackMode
+            ? 'forum'
+            : 'flag'
+            }}
+          </mat-icon>
+        </div>
+        <div>
+          <h3>{{ title | translate }}</h3>
+          <p>{{ subTitle | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-body oppia-feedback-body">
+
+      <p *ngIf="isLessonFeedbackMode" class="oppia-lesson-feedback-microcopy">
+        {{
+        'I18N_LESSON_FEEDBACK_MODAL_SAFETY_NOTICE'
+        | translate
+        }}
+      </p>
+
+      <ng-container *ngIf="shouldShowCategorySelector">
+        <div class="oppia-feedback-label">
+          {{
+          'I18N_REPORT_LESSON_BUG_ISSUE_TYPE_LABEL'
+          | translate
+          }}
+          <span class="oppia-feedback-label-optional">
+            {{ 'I18N_REPORT_LESSON_BUG_OPTIONAL_LABEL' | translate }}
+          </span>
+        </div>
+
+        <div class="oppia-flag-category-chips" aria-label="Issue category">
+          <button type="button"
+                  class="oppia-flag-category-chip"
+                  [class.selected]="category === 'typo'"
+                  (click)="selectCategory('typo')">
+            <mat-icon aria-hidden="true">spellcheck</mat-icon>
+            {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_TYPO' | translate }}
+          </button>
+          <button type="button"
+                  class="oppia-flag-category-chip"
+                  [class.selected]="category === 'broken_layout_or_image'"
+                  (click)="selectCategory('broken_layout_or_image')">
+            <mat-icon aria-hidden="true">broken_image</mat-icon>
+            {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_BROKEN_LAYOUT' | translate }}
+          </button>
+          <button type="button"
+                  class="oppia-flag-category-chip"
+                  [class.selected]="category === 'confusing_or_incorrect_answer'"
+                  (click)="selectCategory('confusing_or_incorrect_answer')">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_CONFUSING' | translate }}
+          </button>
+          <button type="button"
+                  class="oppia-flag-category-chip"
+                  [class.selected]="category === 'other_or_not_sure'"
+                  (click)="selectCategory('other_or_not_sure')">
+            <mat-icon aria-hidden="true">help_outline</mat-icon>
+            {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_OTHER' | translate }}
+          </button>
+        </div>
+      </ng-container>
+
+      <label class="oppia-flag-lesson-label" *ngIf="!isLessonFeedbackMode">
+        {{
+        'I18N_REPORT_LESSON_BUG_DESCRIPTION_LABEL'
+        | translate
+        }}
+      </label>
+      <textarea rows="5"
+                [(ngModel)]="feedbackText"
+                (ngModelChange)="clearFormError()"
+                [ngModelOptions]="{standalone: true}"
+                [placeholder]="textarePlaceholder | translate"
+                class="oppia-feedback-textarea">
+      </textarea>
+      <div *ngIf="formError" class="oppia-feedback-error-text">
+        {{ formError }}
+      </div>
+      <div class="oppia-flag-character-count">
+        {{ feedbackText.length }}
+        /
+        {{ MAX_REPORT_MESSAGE_LENGTH }}
+      </div>
+      <div class="oppia-feedback-section" *ngIf="shouldShowScreenshotUpload">
+        <div class="oppia-feedback-label">
+          {{ 'I18N_REPORT_LESSON_BUG_SCREENSHOT_LABEL' | translate }}
+          <span class="oppia-feedback-label-optional">
+            {{ 'I18N_REPORT_LESSON_BUG_OPTIONAL_LABEL' | translate }}
+          </span>
+        </div>
+        <div class="oppia-feedback-screenshot">
+          <div *ngIf="!screenshotPreviewDataUrl">
+            <oppia-image-receiver [allowedImageFormats]="allowedScreenshotImageFormats"
+                                  [maxImageSizeInKB]="maxScreenshotSizeInKB" (fileChanged)="onScreenshotFileReceived($event)">
+            </oppia-image-receiver>
+          </div>
+        </div>
+        <div *ngIf="screenshotPreviewDataUrl" class="oppia-feedback-screenshot-preview">
+          <button type="button"
+                  class="oppia-feedback-screenshot-remove-button" aria-label="Remove screenshot"
+                  (click)="removeScreenshot()">
+            <mat-icon aria-hidden="true">close</mat-icon>
+          </button>
+          <img [src]="screenshotPreviewDataUrl" alt="Feedback screenshot preview">
+        </div>
+        <div *ngIf="screenshotFileError" class="oppia-feedback-error-text">
+          {{ screenshotFileError | translate }}
+        </div>
+        <div *ngIf="isUploadingScreenshot" class="oppia-feedback-upload-text">
+          {{ 'I18N_REPORT_LESSON_BUG_UPLOADING_SCREENSHOT' | translate }}
+        </div>
+      </div>
+      <label *ngIf="shouldShowTechnicalLogs" class="oppia-flag-technical-logs-checkbox">
+        <input type="checkbox" [(ngModel)]="includeTechnicalLogs" [ngModelOptions]="{standalone: true}">
+        <span>
+          {{
+          'I18N_TECHNICAL_ERROR_LOG_CHECKBOX_TEXT'
+          | translate
+          }}
+        </span>
+      </label>
+      <div class="oppia-feedback-captcha-section" *ngIf="!isLessonFeedbackMode && !isUserLoggedIn">
+        <div #turnstileContainer class="oppia-feedback-turnstile-container">
+        </div>
+        <div *ngIf="captchaLoadError" class="oppia-feedback-error-text">
+          {{ captchaLoadError }}
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">
+        {{
+        'I18N_MODAL_CANCEL_BUTTON'
+        | translate
+        }}
+      </button>
+      <button class="btn btn-success" (click)="submit()">
+        {{
+        'I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT'
+        | translate
+        }}
+      </button>
+    </div>
+
+  </div>
+</ng-container>

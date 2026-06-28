@@ -1,7 +1,11 @@
 # This workflow is used to run the acceptance tests multiple times.
 # It's not used in the CI, but is used to test the flakiness of an acceptance test.
+#
+# When update_snapshots is true, the suite is run with --update_snapshots for
+# both viewports and the regenerated prod-{viewport}-screenshots folders are
+# uploaded as artifacts for review.
 
-name: Stress Test (Acceptance Test)
+name: Stress Test / Update Snapshots (Acceptance Test)
 
 permissions: read-all
 on:
@@ -11,7 +15,7 @@ on:
         # Maximum 256 jobs can be generated using matrix. We also use matrix from mobile and desktop
         # viewport. So, maximum number of times a test-suite can be run is 128.
         # Ref: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstrategymatrix
-        description: 'Number of times to run the acceptance tests (Max: 128).'
+        description: 'Number of times to run the acceptance tests (Max: 128). Ignored when update_snapshots is true.'
         required: true
         default: '10'
         type: choice
@@ -28,6 +32,14 @@ on:
         description: 'Name of acceptance test suite to run (e.g. "interested-donor/make-a-donation").'
         required: true
         type: string
+      update_snapshots:
+        description: >
+          Regenerate Playwright screenshot baselines instead of stress-testing.
+          Forces num_runs to 1 and uploads prod-{viewport}-screenshots for both
+          viewports as artifacts for review.
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -51,7 +63,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     env:
-      NUM_RUNS: ${{ inputs.num_runs }}
+      NUM_RUNS: ${{ inputs.update_snapshots && '1' || inputs.num_runs }}
     steps:
       - name: Generate Matrix
         id: set-matrix
@@ -108,10 +120,23 @@ jobs:
         run: |
           SUITE_NAME=$TEST_SUITE-${{ matrix.run }}-${{ matrix.viewport-type }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+          # The screenshots folder lives at the spec-file-directory level
+          # (e.g. specs/logged-in-learner/prod-desktop-screenshots/), not
+          # nested under the full suite name. Strip everything after the first
+          # "/" to get just the directory component.
+          echo "SPEC_DIR=${TEST_SUITE%%/*}" >> $GITHUB_OUTPUT
       - name: Run ${{ matrix.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
           test-suite: ${{ inputs.test_suite }}
           viewport-type: ${{ matrix.viewport-type }}
-          enable-screen-recording: true
+          update-snapshots: ${{ inputs.update_snapshots }}
+          enable-screen-recording: ${{ !inputs.update_snapshots }}
           modified-suite-name-for-uploads: ${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
+      - name: Upload all snapshots in the prod-${{ matrix.viewport-type }}-screenshots folder for review
+        if: ${{ !cancelled() && inputs.update_snapshots}}
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-snapshots_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
+          path: /home/runner/work/oppia/oppia/core/tests/playwright-acceptance-tests/specs/${{ steps.generate_suite_name_for_artifacts.outputs.SPEC_DIR }}/prod-${{ matrix.viewport-type }}-screenshots/
+          if-no-files-found: warn

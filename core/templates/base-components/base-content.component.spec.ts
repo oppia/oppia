@@ -41,9 +41,6 @@ class MockPlatformFeatureService {
     NewLessonPlayer: {
       isEnabled: false,
     },
-    WebGeneralFeedbackModalEnabled: {
-      isEnabled: false,
-    },
   };
 }
 
@@ -210,15 +207,6 @@ describe('Base Content Component', () => {
     expect(result).toBe(true);
   });
 
-  it('should return true for isWebGeneralFeedbackModalEnabled when feature is enabled', () => {
-    const preResult = componentInstance.isWebGeneralFeedbackModalEnabled();
-    expect(preResult).toBe(false);
-    mockPlatformFeatureService.status.WebGeneralFeedbackModalEnabled.isEnabled =
-      true;
-    const result = componentInstance.isWebGeneralFeedbackModalEnabled();
-    expect(result).toBe(true);
-  });
-
   it('should get sidebar status', () => {
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValue(false);
     expect(componentInstance.isSidebarShown()).toBe(false);
@@ -265,15 +253,6 @@ describe('Base Content Component', () => {
     expect(componentInstance.skipToMainContent).toThrowError(
       'Variable mainContentElement is null.'
     );
-  });
-
-  it('should dismiss the Feedback floater', () => {
-    componentInstance.dismissFeedbackFloater();
-    expect(componentInstance.isFeedbackFloaterDismissed).toBe(true);
-  });
-
-  it('should open the Feedback modal', () => {
-    expect(() => componentInstance.openFeedbackModal()).not.toThrowError();
   });
 
   it('should show the cookie banner if there is no cookie set', () => {

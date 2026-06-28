@@ -19,6 +19,7 @@
  * LI.DG. Learner sets goals on the Learner Dashboard
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -30,86 +31,88 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedOutUser & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId1: string;
   let explorationId2: string;
 
-  beforeAll(
-    async function () {
-      // Create users.
-      loggedInLearner = await UserFactory.createNewUser(
-        'loggedInLearner',
-        'logged_in_learner@example.com'
-      );
-      curriculumAdmin = await UserFactory.createNewUser(
-        'curriculumAdm',
-        'curriculumAdmin@example.com',
-        [ROLES.CURRICULUM_ADMIN]
-      );
-      releaseCoordinator = await UserFactory.createNewUser(
-        'releaseCoordinator',
-        'releaseCoordinator@example.com',
-        [ROLES.RELEASE_COORDINATOR]
-      );
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(600000); // Test takes longer than default timeout.
+    // Create users.
+    loggedInLearner = await UserFactory.createNewUser(
+      'loggedInLearner',
+      'logged_in_learner@example.com',
+      browser
+    );
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      browser,
+      [ROLES.CURRICULUM_ADMIN]
+    );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      browser,
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
-      // Enable redesigned learner dashboard.
-      await releaseCoordinator.enableFeatureFlag(
-        'show_redesigned_learner_dashboard'
-      );
+    // Enable redesigned learner dashboard.
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
 
-      // Reload the page to ensure redesigned learner dashboard is shown.
-      await loggedInLearner.reloadPage();
+    // Reload the page to ensure redesigned learner dashboard is shown.
+    await loggedInLearner.reloadPage();
 
-      // Create explorations.
-      explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Negative Numbers'
-        );
-
-      explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Positive Numbers',
-          'Algebra',
-          false
-        );
-
-      // Create topic, classroom and add explorations to the topic.
-      await curriculumAdmin.createAndPublishTopic(
-        'Algebra I',
-        'Negative Numbers',
+    // Create explorations.
+    explorationId1 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
       );
 
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        'Algebra I'
+    explorationId2 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Positive Numbers',
+        'Algebra',
+        false
       );
 
-      await curriculumAdmin.addStoryToTopic(
-        'Test Story 1',
-        'test-story-one',
-        'Algebra I'
-      );
-      await curriculumAdmin.addChapter(
-        'Test Chapter 1',
-        explorationId1 as string
-      );
-      await curriculumAdmin.addChapter(
-        'Test Chapter 2',
-        explorationId2 as string
-      );
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
-    },
-    // Test takes longer than default timeout.
-    600000
-  );
+    // Create topic, classroom and add explorations to the topic.
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
 
-  it('should be able to see goals section', async function () {
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
+
+    await curriculumAdmin.addStoryToTopic(
+      'Test Story 1',
+      'test-story-one',
+      'Algebra I'
+    );
+    await curriculumAdmin.addChapter(
+      'Test Chapter 1',
+      explorationId1 as string
+    );
+    await curriculumAdmin.addChapter(
+      'Test Chapter 2',
+      explorationId2 as string
+    );
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
+  });
+
+  test('should be able to see goals section', async function () {
     // Navigate to the goals section.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.navigateToGoalsSection();
@@ -121,7 +124,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectAddGoalsButtonInRedesignedDashboardToBePresent();
   });
 
-  it('should be able to add a goal', async function () {
+  test('should be able to add a goal', async function () {
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
     await loggedInLearner.expectRedesignedGoalsSectionToContainHeading(
       'In Progress'
@@ -131,7 +134,7 @@ describe('Logged-In Learner', function () {
     );
   });
 
-  it('should be able to remove a goal', async function () {
+  test('should be able to remove a goal', async function () {
     await loggedInLearner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
     await loggedInLearner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
       'Algebra I',
@@ -150,7 +153,7 @@ describe('Logged-In Learner', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
