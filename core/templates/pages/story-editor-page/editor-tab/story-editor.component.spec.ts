@@ -976,16 +976,16 @@ describe('Story Editor Component having three story nodes', () => {
   }));
 
   it('should check if story editor arcs feature flag is enabled', () => {
-    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBeFalse();
+    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(false);
 
     mockPlatformFeatureService.status.StoryEditorArcs = {
       isEnabled: true,
     };
-    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBeTrue();
+    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(true);
   });
 
   it('should return true when node index is zero for isSameArc', () => {
-    expect(component.isSameArc(0)).toBeTrue();
+    expect(component.isSameArc(0)).toBe(true);
   });
 
   it('should return true when previous and current nodes are in the same arc', () => {
@@ -997,7 +997,7 @@ describe('Story Editor Component having three story nodes', () => {
     );
     component.linearNodesList = story.getStoryContents().getNodes();
 
-    expect(component.isSameArc(1)).toBeTrue();
+    expect(component.isSameArc(1)).toBe(true);
   });
 
   it('should return false when previous and current nodes are in different arcs', () => {
@@ -1009,7 +1009,7 @@ describe('Story Editor Component having three story nodes', () => {
     );
     component.linearNodesList = story.getStoryContents().getNodes();
 
-    expect(component.isSameArc(1)).toBeFalse();
+    expect(component.isSameArc(1)).toBe(false);
   });
 
   it('should call StoryUpdate to update story description when changed', () => {
@@ -1039,9 +1039,10 @@ describe('Story Editor Component having three story nodes', () => {
   it('should not call setThumbnailFilename when filename is unchanged', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setThumbnailFilename');
 
-    component.updateStoryThumbnailFilename(
-      component.story.getThumbnailFilename()
-    );
+    const thumbnailFilename = component.story.getThumbnailFilename();
+    if (thumbnailFilename !== null) {
+      component.updateStoryThumbnailFilename(thumbnailFilename);
+    }
 
     expect(storyUpdateSpy).not.toHaveBeenCalled();
   });
@@ -1049,9 +1050,10 @@ describe('Story Editor Component having three story nodes', () => {
   it('should not call setThumbnailBgColor when color is unchanged', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setThumbnailBgColor');
 
-    component.updateStoryThumbnailBgColor(
-      component.story.getThumbnailBgColor()
-    );
+    const thumbnailBgColor = component.story.getThumbnailBgColor();
+    if (thumbnailBgColor !== null) {
+      component.updateStoryThumbnailBgColor(thumbnailBgColor);
+    }
 
     expect(storyUpdateSpy).not.toHaveBeenCalled();
   });
@@ -1314,7 +1316,7 @@ describe('Story Editor Component having three story nodes', () => {
 
     component.ngOnInit();
 
-    expect(component.chaptersListIsShown).toBeTrue();
+    expect(component.chaptersListIsShown).toBe(true);
   });
 
   it('should not toggle chapters list when window is not narrow', () => {
@@ -1325,7 +1327,7 @@ describe('Story Editor Component having three story nodes', () => {
 
     component.toggleChapterLists();
 
-    expect(component.chaptersListIsShown).toBeTrue();
+    expect(component.chaptersListIsShown).toBe(true);
   });
 
   it('should not toggle story editor card when window is not narrow', () => {
@@ -1336,7 +1338,7 @@ describe('Story Editor Component having three story nodes', () => {
 
     component.toggleStoryEditorCard();
 
-    expect(component.mainStoryCardIsShown).toBeTrue();
+    expect(component.mainStoryCardIsShown).toBe(true);
   });
 
   it('should handle updatePublishUptoChapterSelection with first node not published', () => {
@@ -1364,6 +1366,9 @@ describe('Story Editor Component having three story nodes', () => {
       version: 1,
       corresponding_topic_id: 'topic_id',
       url_fragment: 'story_title',
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      meta_tag_content: '',
       story_contents: {
         initial_node_id: 'node_1',
         nodes: [],
@@ -1388,9 +1393,9 @@ describe('Story Editor Component having three story nodes', () => {
 
     component._initEditor();
 
-    expect(component.chapterIsPublishable[0]).toBeTrue();
-    expect(component.chapterIsPublishable[1]).toBeFalse();
-    expect(component.chapterIsPublishable[2]).toBeFalse();
+    expect(component.chapterIsPublishable[0]).toBe(true);
+    expect(component.chapterIsPublishable[1]).toBe(false);
+    expect(component.chapterIsPublishable[2]).toBe(false);
   });
 
   it('should disable new chapter publication when first chapter is not publishable', () => {
@@ -1454,7 +1459,7 @@ describe('Story Editor Component having three story nodes', () => {
       ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
     );
 
-    expect(component.isFirstArc('node_1')).toBeTrue();
+    expect(component.isFirstArc('node_1')).toBe(true);
   });
 
   it('should return false from isFirstArc when node belongs to a later arc', () => {
@@ -1465,6 +1470,6 @@ describe('Story Editor Component having three story nodes', () => {
       ArcModel.createNew('arc_2', 'Arc 2', '', ['node_2'])
     );
 
-    expect(component.isFirstArc('node_2')).toBeFalse();
+    expect(component.isFirstArc('node_2')).toBe(false);
   });
 });
