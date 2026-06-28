@@ -334,8 +334,13 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         )
 
         learner_completed_story = len(completed_node_ids) == len(ordered_nodes)
-        learner_at_review_point_in_story = len(exp_summaries) != 0 and (
-            len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
+        # Every N completed chapters should trigger a review test, not a
+        # bitwise check (3 & 3 == 3, so chapter 3 never matched).
+        learner_at_review_point_in_story = (
+            len(exp_summaries) != 0
+            and len(completed_node_ids) > 0
+            and len(completed_node_ids)
+            % constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
             == 0
         )
 
