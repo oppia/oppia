@@ -271,7 +271,6 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertIn(user_models.IncompleteActivitiesModel, classes)
         self.assertIn(user_models.ExpUserLastPlaythroughModel, classes)
         self.assertIn(user_models.LearnerGoalsModel, classes)
-        self.assertIn(user_models.LearnerPlaylistModel, classes)
         self.assertIn(user_models.UserContributionsModel, classes)
         self.assertIn(user_models.UserEmailPreferencesModel, classes)
         self.assertIn(user_models.UserSubscriptionsModel, classes)

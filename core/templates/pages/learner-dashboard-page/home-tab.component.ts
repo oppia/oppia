@@ -50,10 +50,6 @@ export class HomeTabComponent {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
   @Input() redesignFeatureFlag!: boolean;
-  @Input() totalLessonsInPlaylists!: (
-    | LearnerExplorationSummary
-    | CollectionSummary
-  )[];
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
@@ -154,8 +150,6 @@ export class HomeTabComponent {
     ) {
       this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
     }
-
-    this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(

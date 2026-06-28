@@ -49,7 +49,7 @@ class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
-            learner_progress_domain.LearnerProgressInCollections([], [], [], [])
+            learner_progress_domain.LearnerProgressInCollections([], [], [])
         )
 
         self.assertEqual(
@@ -59,7 +59,7 @@ class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
             user_learner_progress.completed_collection_summaries, []
         )
         self.assertEqual(
-            user_learner_progress.collection_playlist_summaries, []
+            user_learner_progress.completed_collection_summaries, []
         )
 
 
@@ -69,14 +69,11 @@ class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
-            learner_progress_domain.LearnerProgressInExplorations([], [], [])
+            learner_progress_domain.LearnerProgressInExplorations([], [])
         )
 
         self.assertEqual(user_learner_progress.incomplete_exp_summaries, [])
         self.assertEqual(user_learner_progress.completed_exp_summaries, [])
-        self.assertEqual(
-            user_learner_progress.exploration_playlist_summaries, []
-        )
 
 
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
@@ -93,8 +90,6 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
         topic_ids_to_learn = ['8']
         all_topic_ids = ['9']
         untracked_topic_ids = ['10']
-        exploration_playlist_ids = ['11']
-        collection_playlist_ids = ['12']
 
         observed_activity_ids_in_learner_dashboard = (
             learner_progress_domain.ActivityIdsInLearnerDashboard(
@@ -108,8 +103,6 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
                 topic_ids_to_learn,
                 all_topic_ids,
                 untracked_topic_ids,
-                exploration_playlist_ids,
-                collection_playlist_ids,
             )
         )
         to_dict_result = observed_activity_ids_in_learner_dashboard.to_dict()
@@ -140,10 +133,4 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
         self.assertEqual(to_dict_result['all_topic_ids'], all_topic_ids)
         self.assertEqual(
             to_dict_result['untracked_topic_ids'], untracked_topic_ids
-        )
-        self.assertEqual(
-            to_dict_result['exploration_playlist_ids'], exploration_playlist_ids
-        )
-        self.assertEqual(
-            to_dict_result['collection_playlist_ids'], collection_playlist_ids
         )

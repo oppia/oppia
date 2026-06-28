@@ -5456,9 +5456,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerGoalsModel(
             id=self.user_2_id, topic_ids_to_learn=[]
         ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
-        ).put()
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
@@ -5514,9 +5511,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerGoalsModel(
             id=self.profile_user_id, topic_ids_to_learn=[]
         ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
-        ).put()
 
     def test_delete_user_for_profile_user_is_successful(self) -> None:
         wipeout_service.pre_delete_user(self.profile_user_id)
@@ -5540,9 +5534,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNotNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
-        )
-        self.assertIsNotNone(
             user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
         )
 
@@ -5557,9 +5548,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel.get_by_id(
                 self.profile_user_id
             )
-        )
-        self.assertIsNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
         )
         self.assertIsNone(
             user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
@@ -5593,9 +5581,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
         )
         self.assertIsNotNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
-        )
-        self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id)
         )
 
@@ -5616,9 +5601,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(
             user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
-        )
-        self.assertIsNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
         )
         self.assertIsNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id)
@@ -5788,9 +5770,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             user_models.LearnerGoalsModel.get_by_id(self.user_2_id)
         )
-        self.assertIsNotNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.user_2_id)
-        )
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id)
@@ -5807,9 +5786,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(
             user_models.LearnerGoalsModel.get_by_id(self.user_2_id)
-        )
-        self.assertIsNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.user_2_id)
         )
 
     def test_after_deletion_user_and_its_profiles_cannot_do_anything(
@@ -5949,9 +5925,6 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerGoalsModel(
             id=self.user_2_id, topic_ids_to_learn=[]
         ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
-        ).put()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_2_id))
 
@@ -5988,9 +5961,6 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         ).put()
         user_models.LearnerGoalsModel(
             id=self.profile_user_id, topic_ids_to_learn=[]
-        ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
         ).put()
 
         self.assertFalse(
@@ -6547,9 +6517,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         user_models.LearnerGoalsModel(
             id=self.user_1_id, topic_ids_to_learn=[]
         ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
-        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
 
         self.email_subjects: List[str] = []
@@ -6644,9 +6611,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.LearnerGoalsModel.get_by_id(self.user_1_id)
         )
-        self.assertIsNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.user_1_id)
-        )
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
@@ -6682,9 +6646,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         ).put()
         user_models.LearnerGoalsModel(
             id=self.user_1_id, topic_ids_to_learn=[]
-        ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
 

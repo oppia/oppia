@@ -269,10 +269,6 @@ MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 
-# The maximum number of activities allowed in the playlist of the learner. This
-# limit applies to both the explorations playlist and the collections playlist.
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
-
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
 
@@ -1001,7 +997,6 @@ LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
 )
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
-LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'

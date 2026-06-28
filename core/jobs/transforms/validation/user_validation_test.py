@@ -258,20 +258,6 @@ class RelationshipsOfTests(test_utils.TestBase):
             ['ExplorationModel'],
         )
 
-    def test_learner_playlist_model_relationships(self) -> None:
-        self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'LearnerPlaylistModel', 'exploration_ids'
-            ),
-            ['ExplorationModel'],
-        )
-        self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references(
-                'LearnerPlaylistModel', 'collection_ids'
-            ),
-            ['CollectionModel'],
-        )
-
     def test_user_contributions_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(

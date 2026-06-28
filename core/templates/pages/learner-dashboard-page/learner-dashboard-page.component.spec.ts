@@ -257,9 +257,7 @@ describe('Learner dashboard page', () => {
     number_of_nonexistent_collections: {
       incomplete_collections: 0,
       completed_collections: 0,
-      collection_playlist: 0,
     },
-    collection_playlist: [],
   };
 
   let learnerDashboardExplorationsData = {
@@ -269,9 +267,7 @@ describe('Learner dashboard page', () => {
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
       completed_explorations: 0,
-      exploration_playlist: 0,
     },
-    exploration_playlist: [],
   };
 
   let userInfo = {
@@ -393,7 +389,7 @@ describe('Learner dashboard page', () => {
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async () => {
         return Promise.resolve('sample-csrf-token');
       });
-      // Generate completed explorations and exploration playlist.
+      // Generate completed explorations.
       for (let i = 0; i < 10; i++) {
         learnerDashboardExplorationsData.completed_explorations_list[i] =
           Exploration.createFromBackendDict(
@@ -405,12 +401,9 @@ describe('Learner dashboard page', () => {
             loggerService,
             urlInterpolationService
           );
-        learnerDashboardExplorationsData.exploration_playlist[i] = {
-          id: Number(i + 1).toString(),
-        };
       }
 
-      // Generate incomplete explorations and incomplete exploration playlist.
+      // Generate incomplete explorations.
       for (let i = 0; i < 12; i++) {
         learnerDashboardExplorationsData.incomplete_explorations_list[i] =
           Exploration.createFromBackendDict(
@@ -426,7 +419,7 @@ describe('Learner dashboard page', () => {
           );
       }
 
-      // Generate completed collections and collection playlist.
+      // Generate completed collections.
       for (let i = 0; i < 8; i++) {
         learnerDashboardCollectionsData.completed_collections_list[i] =
           // TODO(#10875): Fix type mismatch.
@@ -436,9 +429,6 @@ describe('Learner dashboard page', () => {
               category: categoryList[i],
             }) as CollectionBackendDict
           );
-        learnerDashboardCollectionsData.collection_playlist[i] = {
-          id: Number(i + 1).toString(),
-        };
       }
 
       // Generate incomplete collections.
@@ -532,11 +522,6 @@ describe('Learner dashboard page', () => {
               collectionSummary =>
                 CollectionSummary.createFromBackendDict(collectionSummary)
             ),
-          collectionPlaylist:
-            learnerDashboardCollectionsData.collection_playlist.map(
-              collectionSummary =>
-                CollectionSummary.createFromBackendDict(collectionSummary)
-            ),
           completedToIncompleteCollections:
             learnerDashboardCollectionsData.completed_to_incomplete_collections,
           numberOfNonexistentCollections:
@@ -558,11 +543,6 @@ describe('Learner dashboard page', () => {
             ),
           incompleteExplorationsList:
             learnerDashboardExplorationsData.incomplete_explorations_list.map(
-              expSummary =>
-                LearnerExplorationSummary.createFromBackendDict(expSummary)
-            ),
-          explorationPlaylist:
-            learnerDashboardExplorationsData.exploration_playlist.map(
               expSummary =>
                 LearnerExplorationSummary.createFromBackendDict(expSummary)
             ),
@@ -1247,11 +1227,6 @@ describe('Learner dashboard page', () => {
                 collectionSummary =>
                   CollectionSummary.createFromBackendDict(collectionSummary)
               ),
-            collectionPlaylist:
-              learnerDashboardCollectionsData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
             completedToIncompleteCollections:
               learnerDashboardCollectionsData.completed_to_incomplete_collections,
             numberOfNonexistentCollections:
@@ -1273,11 +1248,6 @@ describe('Learner dashboard page', () => {
               ),
             incompleteExplorationsList:
               learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            explorationPlaylist:
-              learnerDashboardExplorationsData.exploration_playlist.map(
                 expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
               ),
@@ -1373,11 +1343,6 @@ describe('Learner dashboard page', () => {
                 collectionSummary =>
                   CollectionSummary.createFromBackendDict(collectionSummary)
               ),
-            collectionPlaylist:
-              learnerDashboardCollectionsData.collection_playlist.map(
-                collectionSummary =>
-                  CollectionSummary.createFromBackendDict(collectionSummary)
-              ),
             completedToIncompleteCollections:
               learnerDashboardCollectionsData.completed_to_incomplete_collections,
             numberOfNonexistentCollections:
@@ -1399,11 +1364,6 @@ describe('Learner dashboard page', () => {
               ),
             incompleteExplorationsList:
               learnerDashboardExplorationsData.incomplete_explorations_list.map(
-                expSummary =>
-                  LearnerExplorationSummary.createFromBackendDict(expSummary)
-              ),
-            explorationPlaylist:
-              learnerDashboardExplorationsData.exploration_playlist.map(
                 expSummary =>
                   LearnerExplorationSummary.createFromBackendDict(expSummary)
               ),
@@ -1460,12 +1420,12 @@ describe('Learner dashboard page', () => {
       );
     });
 
-    it('should return default greeting when current tab is not valid', () => {
-      component.activeSection = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    it('should return default message when current tab is unknown', () => {
+      component.activeSection = 'INVALID_SECTION';
       fixture.detectChanges();
 
       expect(component.getDashboardTabHeading()).toBe(
-        'No valid I18N key for heading of I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION'
+        'No valid I18N key for heading of INVALID_SECTION'
       );
     });
 

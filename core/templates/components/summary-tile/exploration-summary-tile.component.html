@@ -1,15 +1,6 @@
 <div *ngIf="!mobileCardToBeShown && !isInNewLessonPlayer()" class="e2e-test-lesson-card">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                 [activityType]="activityType"
-                                 [activityId]="explorationId"
-                                 [activityTitle]="explorationTitle"
-                                 [isContainerNarrow]="isContainerNarrow"
-                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                 class="e2e-test-lesson-playlist-icon">
-  </oppia-learner-dashboard-icons>
-
   <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"
-            [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
+            [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge}"
             *ngIf="!isRefresherExploration"
             tabindex="0"
             [style.padding]="0"
@@ -116,14 +107,6 @@
 </div>
 
 <div *ngIf="mobileCardToBeShown && !isInNewLessonPlayer()">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                 [activityType]="activityType"
-                                 [activityId]="explorationId"
-                                 [activityTitle]="explorationTitle"
-                                 [isContainerNarrow]="isContainerNarrow"
-                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                 class="e2e-test-lesson-playlist-icon">
-  </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="mobile-exploration-card-image-container" [ngStyle]="{'background-color': thumbnailBgColor}">

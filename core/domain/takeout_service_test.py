@@ -218,13 +218,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             id=self.PROFILE_ID_1, topic_ids_to_learn=self.TOPIC_IDS
         ).put()
 
-        # Setup for LearnerPlaylistModel.
-        user_models.LearnerPlaylistModel(
-            id=self.PROFILE_ID_1,
-            exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS,
-        ).put()
-
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS[0]),
@@ -628,18 +621,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.LearnerGoalsModel(
             id=self.PROFILE_ID_1, topic_ids_to_learn=self.TOPIC_IDS_2
-        ).put()
-
-        # Setup for LearnerPlaylistModel.
-        user_models.LearnerPlaylistModel(
-            id=self.USER_ID_1,
-            exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS,
-        ).put()
-        user_models.LearnerPlaylistModel(
-            id=self.PROFILE_ID_1,
-            exploration_ids=self.EXPLORATION_IDS_2,
-            collection_ids=self.COLLECTION_IDS_2,
         ).put()
 
         # Setup for CollectionProgressModel.
@@ -1240,7 +1221,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         general_suggestion_data: Dict[str, Dict[str, Union[int, str]]] = {}
         last_playthrough_data: Dict[str, Dict[str, Union[int, str]]] = {}
         learner_goals_data: Dict[str, List[str]] = {}
-        learner_playlist_data: Dict[str, List[str]] = {}
         incomplete_activities_data: Dict[str, List[str]] = {}
         user_settings_data: Dict[str, Union[List[str], Optional[str], int]] = {
             'email': 'user1@example.com',
@@ -1379,7 +1359,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'incomplete_activities': incomplete_activities_data,
             'exp_user_last_playthrough': last_playthrough_data,
             'learner_goals': learner_goals_data,
-            'learner_playlist': learner_playlist_data,
             'learner_group': expected_learner_group_model_data,
             'learner_groups_user': expected_learner_grp_user_model_data,
             'exploration_stats_task_entry': task_entry_data,
@@ -1773,10 +1752,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_learner_goals_data = {'topic_ids_to_learn': self.TOPIC_IDS}
-        expected_learner_playlist_data = {
-            'playlist_exploration_ids': self.EXPLORATION_IDS,
-            'playlist_collection_ids': self.COLLECTION_IDS,
-        }
         expected_collection_progress_data = {
             self.COLLECTION_IDS[0]: self.EXPLORATION_IDS
         }
@@ -2377,7 +2352,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'incomplete_activities': expected_incomplete_activities_data,
             'exp_user_last_playthrough': expected_last_playthrough_data,
             'learner_goals': expected_learner_goals_data,
-            'learner_playlist': expected_learner_playlist_data,
             'learner_group': expected_learner_group_data,
             'learner_groups_user': expected_learner_groups_user_data,
             'exploration_stats_task_entry': expected_task_entry_data,
@@ -2513,10 +2487,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         incomplete_activities_data: Dict[str, List[str]] = {}
         last_playthrough_data: Dict[str, Dict[str, Union[str, int]]] = {}
         learner_goals_data: Dict[str, List[str]] = {}
-        learner_playlist_data = {
-            'playlist_exploration_ids': self.EXPLORATION_IDS_2,
-            'playlist_collection_ids': self.COLLECTION_IDS_2,
-        }
         collection_progress_data = {
             self.COLLECTION_IDS_2[0]: self.EXPLORATION_IDS_2
         }
@@ -2528,7 +2498,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'incomplete_activities': incomplete_activities_data,
             'exp_user_last_playthrough': last_playthrough_data,
             'learner_goals': learner_goals_data,
-            'learner_playlist': learner_playlist_data,
             'collection_progress': collection_progress_data,
             'story_progress': story_progress_data,
         }

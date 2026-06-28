@@ -60,7 +60,6 @@ interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   subscriptionList: ProfileSummary[];
-  explorationPlaylist: LearnerExplorationSummary[];
 }
 
 @Component({
@@ -161,8 +160,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
   numberOfUnreadThreads!: number;
-  explorationPlaylist!: LearnerExplorationSummary[];
-  collectionPlaylist!: CollectionSummary[];
   activeSection!: string;
   activeSubsection!: string;
 
@@ -182,8 +179,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
-  totalLessonsInPlaylists: (LearnerExplorationSummary | CollectionSummary)[] =
-    [];
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
   curatedExplorationIds = new Set<string>();
 
@@ -238,7 +233,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptionsList = responseData.subscriptionList;
-    this.explorationPlaylist = responseData.explorationPlaylist;
   }
 
   ngOnInit(): void {
@@ -318,7 +312,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.incompleteCollectionsList = responseData.incompleteCollectionsList;
         this.completedToIncompleteCollections =
           responseData.completedToIncompleteCollections;
-        this.collectionPlaylist = responseData.collectionPlaylist;
       },
       errorResponseStatus => {
         if (
@@ -358,10 +351,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       learnerGroupFeatureIsEnabledPromise,
     ])
       .then(() => {
-        this.totalLessonsInPlaylists = [
-          ...this.explorationPlaylist,
-          ...this.collectionPlaylist,
-        ];
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
           // So that focus is applied after the loading screen has dissapeared.
@@ -428,7 +417,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
             responseData.incompleteCollectionsList;
           this.completedToIncompleteCollections =
             responseData.completedToIncompleteCollections;
-          this.collectionPlaylist = responseData.collectionPlaylist;
         },
         errorResponseStatus => {
           if (
@@ -492,7 +480,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
             responseData.incompleteCollectionsList;
           this.completedToIncompleteCollections =
             responseData.completedToIncompleteCollections;
-          this.collectionPlaylist = responseData.collectionPlaylist;
         },
         errorResponseStatus => {
           if (

@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- *  CL.4. Select an exploration to “play later” from the community library
+ *  CL.4. Select an exploration from the community library
  * CL.6. Resume Community library lessons from Redesigned Learner Dashboard Tabs
  */
 
@@ -28,8 +28,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {showMessage} from '../../utilities/common/show-message';
-
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -96,43 +94,6 @@ describe('Logged-In Learner', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-
-  it('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
-    await loggedInLearner.expectToBeOnCommunityLibraryPage();
-
-    await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
-    await loggedInLearner.addLessonToPlayLater('Explore Title 2', true);
-    await loggedInLearner.expectToastMessage(
-      "Successfully added to your 'Play Later' list."
-    );
-
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
-      __dirname
-    );
-    await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Continue where you left off', 'Learn Something New'],
-      'tabSection'
-    );
-    await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Lessons in progress', 'Lesson you saved for later'],
-      'cardDisplay'
-    );
-
-    await loggedInLearner.navigateToLessonByCard(
-      'Lesson you saved for later',
-      'Explore Title 2'
-    );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
-    );
-    showMessage('Completed final test');
-  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
