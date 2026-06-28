@@ -47,6 +47,29 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
     return new Promise<boolean>(resolve => {
       const version = route.queryParams.v || null;
       let explorationId = route.paramMap.get('exploration_id') || '';
+      const entityIdRegex = new RegExp(AppConstants.ENTITY_ID_REGEX);
+      if (!entityIdRegex.test(explorationId)) {
+        if (state.url.includes('embed')) {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            });
+        } else {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/400`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            });
+        }
+        return;
+      }
       this.accessValidationBackendApiService
         .validateAccessToExplorationPlayerPage(explorationId, version)
         .then(() => {
