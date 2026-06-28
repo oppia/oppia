@@ -129,6 +129,23 @@ describe('Lesson Creator', function () {
 
       await explorationEditor.navigateToEditorTab();
       await explorationEditor.viewOppiaResponses();
+
+      // Write feedback, save it, and verify it displays under
+      // "Oppia tells the learner".
+      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Great job!'
+      );
+      await explorationEditor.expectOutcomeFeedbackToBe('Great job!');
+
+      // Edit the feedback to "New Response" and verify the update displays.
+      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+        'New Response'
+      );
+      await explorationEditor.expectOutcomeFeedbackToBe('New Response');
+
+      // Set the destination to a new card, and verify it displays both in
+      // the destination box and as a new node in the Exploration Overview
+      // graph.
       await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND);
       await explorationEditor.expectCurrentOutcomeDestinationToBe(
         CARD_NAMES.SECOND
