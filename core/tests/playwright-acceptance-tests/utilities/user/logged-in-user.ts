@@ -25,6 +25,8 @@ const baseUrl = testConstants.URLs.BaseURL;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
+const loginPageUrl = testConstants.URLs.Login;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const signUpEmailField = testConstants.SignInDetails.inputField;
@@ -48,6 +50,23 @@ const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
 const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
 const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
 const submittedMessageSelector = '.e2e-test-rating-submitted-message';
+const matFormTextSelector = '.oppia-form-text';
+const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
+const audioLanguageSearchInputSelector =
+  'input.mat-select-search-input:not(.mat-select-search-hidden)';
+const explorationLanguageInputSelector =
+  '.e2e-test-preferred-exploration-language-input';
+const optionText = '.mat-option-text';
+const checkboxesSelector = '.checkbox';
+const saveChangesButtonSelector = '.e2e-test-save-changes-button';
+const goToProfilePageButton = '.e2e-test-go-to-profile-page';
+const profilePictureSelector = '.e2e-test-profile-user-photo';
+const defaultProfilePicture =
+  '/assets/images/avatar/user_blue_150px.png?2983.800000011921';
+const bioSelector = '.oppia-user-bio-text';
+const subjectInterestSelector = '.e2e-test-profile-interest';
+const subscribeButton = 'button.oppia-subscription-button';
+const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 
 const angularRootElementSelector = 'oppia-angular-root';
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
@@ -70,12 +89,23 @@ const progressSectionSelector = '.e2e-test-progress-section';
 const greetingSelector = '.e2e-learner-dashboard-greeting';
 const exportButtonSelector = '.e2e-test-export-account-button';
 
+const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const editProfilePictureButton = '.e2e-test-photo-clickable';
+const bioTextareaSelector = '.e2e-test-user-bio';
+const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
+
 // Preferences page selectors.
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const deleteAccountPage = '.e2e-test-delete-account';
 const deleteAccountButton = '.e2e-test-delete-account-button';
 const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
+const photoUploadErrorMessage = '.e2e-test-upload-error';
+const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
+const subjectInterestTagsInPreferencesPage = '.e2e-test-subject-interest-chip';
+const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
+const explorationLanguagePerferenceChipsSelector =
+  '.e2e-test-exploration-language-preference-chips';
 const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const preferencesContainerSelector = '.e2e-test-preferences-container';
@@ -150,6 +180,9 @@ const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 // Community Library.
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const closeModalButton = '.e2e-test-close-modal-btn';
+const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
+const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
+const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
 
 // Exploration player selectors.
 const explorationSuccessfullyFlaggedMessage =
@@ -332,6 +365,14 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function for clicking on the profile dropdown.
+   */
+  async clickOnProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdownToggleSelector);
+    await this.clickOnElementWithSelector(profileDropdownToggleSelector);
+  }
+
+  /**
    * Clicks the delete account button and waits for navigation.
    */
   async deleteAccount(): Promise<void> {
@@ -391,6 +432,116 @@ export class LoggedInUser extends BaseUser {
         state: 'visible',
       });
     }
+  }
+
+  /**
+   * Expects the user's bio to match a certain text.
+   * @param {string} expectedBio - The expected bio text.
+   */
+  async expectBioToBe(expectedBio: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(bioSelector);
+      const bioElement = await this.page.$(bioSelector);
+
+      if (!bioElement) {
+        throw new Error('Bio not found');
+      }
+
+      const actualBio = await this.page.evaluate(
+        el => el.textContent,
+        bioElement
+      );
+      if (actualBio.trim() !== expectedBio) {
+        throw new Error(
+          `Bio does not match. Expected: ${expectedBio}, but got: ${actualBio}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check bio: ${error}`);
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if the profile dropdown contains the given element.
+   * @param item The element to check for.
+   * @param visible - Whether the element should be visible or not.
+   */
+  async expectProfileDropdownToContainElementWithContent(
+    item: string,
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdownContainerSelector);
+
+    const elementsContents = await this.page.$$eval(
+      profileDropdownAnchorSelector,
+      elements =>
+        elements.map(el => (el as HTMLAnchorElement).textContent?.trim())
+    );
+
+    if (visible) {
+      expect(elementsContents).toContain(item);
+    } else {
+      expect(elementsContents).not.toContain(item);
+    }
+  }
+
+  /**
+   * Checks if profile photo doesn't work.
+   */
+  async expectProfilePhotoDoNotUpdate(picturePath: string): Promise<void> {
+    await this.page.waitForSelector(editProfilePictureButton, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+
+    await this.expectElementToBeClickable(addProfilePictureButton, false);
+    await this.page.waitForSelector(photoUploadErrorMessage, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(cancelProfileUploadButtonSelector);
+    await this.page.waitForSelector(addProfilePictureButton, {
+      state: 'hidden',
+    });
+  }
+
+  /**
+   * Expects the user's subject interests to match a certain list.
+   * @param {string[]} expectedInterests - The expected list of interests.
+   */
+  async expectSubjectInterestsToBe(expectedInterests: string[]): Promise<void> {
+    try {
+      await this.page.waitForSelector(subjectInterestSelector);
+      const interestElements = await this.page.$$(subjectInterestSelector);
+      const actualInterests = await Promise.all(
+        interestElements.map(el =>
+          this.page.evaluate(el => el.textContent.trim(), el)
+        )
+      );
+
+      // Check if the actual interests match the expected interests.
+      for (const interest of expectedInterests) {
+        if (!actualInterests.includes(interest)) {
+          throw new Error(`Interest not found: ${interest}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check interests: ${error}`);
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Function to verify if the learner dashboard is opened using URL.
+   */
+  async expectToBeOnLearnerDashboard(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => document.URL.includes(url),
+      testConstants.URLs.LearnerDashboard
+    );
   }
 
   /**
@@ -965,6 +1116,53 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
+  }
+
+  /**
+   * Function for navigating to the profile page for a given username.
+   */
+  async navigateToProfilePage(
+    username: string,
+    verifyURL: boolean = true
+  ): Promise<void> {
+    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
+    if (this.page.url() === profilePageUrl) {
+      return;
+    }
+    await this.goto(profilePageUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the Profile tab from the Preferences page.
+   */
+  async navigateToProfilePageFromPreferencePage(): Promise<void> {
+    try {
+      await this.page.waitForSelector(goToProfilePageButton);
+      const profileTab = await this.page.$(goToProfilePageButton);
+
+      if (!profileTab) {
+        throw new Error('Profile tab not found');
+      }
+
+      await this.clickAndWaitForNavigation(goToProfilePageButton, true);
+      await this.waitForPageToFullyLoad();
+      if (!this.page.url().includes('/profile')) {
+        throw new Error('Failed to navigate to Profile tab');
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to navigate to Profile tab from Preferences page: ${error}`
+      );
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+  }
+
+  /**
    * Navigates to the progress section of the learner dashboard.
    */
   async navigateToProgressSection(): Promise<void> {
@@ -1001,6 +1199,20 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
       state: 'visible',
     });
+  }
+
+  /**
+   * Navigates to the splash page.
+   * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
+   */
+  async navigateToSplashPage(
+    expectedURL: string = learnerDashboardUrl
+  ): Promise<void> {
+    // We explicitly check for expected URL instead of verifying it through
+    // BaseUser.goto as /splash redirects user to a different page.
+    await this.goto(splashPageUrl, false);
+
+    expect(this.page.url()).toBe(expectedURL);
   }
 
   /**
@@ -1220,6 +1432,32 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Saves the changes made in the preferences page.
+   */
+  async saveChangesInPreferencesPage(): Promise<void> {
+    await this.page.waitForLoadState('networkidle');
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(saveChangesButtonSelector, {
+      state: 'visible',
+    });
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
+    // Wait for the button to re-appear in the reloaded DOM before querying it.
+    await this.page.waitForSelector(`button${saveChangesButtonSelector}`, {
+      state: 'visible',
+    });
+    const isDisabled = await this.page.$eval(
+      `button${saveChangesButtonSelector}`,
+      btn => (btn as HTMLButtonElement).disabled
+    );
+    if (!isDisabled) {
+      throw new Error(
+        'Save Changes button is not disabled after saving changes'
+      );
+    }
+    showMessage('Changes saved successfully in preferences page.');
+  }
+
+  /**
    * Enters the provided username into the sign up username field and sign in if the username is correct.
    * @param {string} username - The username to enter.
    * @param {boolean} verifyLogin - Whether to verify the login after entering the username.
@@ -1275,6 +1513,281 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
       state: 'hidden',
     });
+  }
+
+  /**
+   * Function to subscribe to a creator with the given username.
+   * @param {string} username - The username of the creator to subscribe to.
+   *     If not provided, the function will subscribe to the creator of the
+   *     current page.
+   */
+  async subscribeToCreator(username?: string): Promise<void> {
+    // Navigate to user's profile if username is given.
+    if (username) {
+      await this.navigateToProfilePage(username);
+    }
+
+    await this.clickOnElementWithSelector(subscribeButton);
+    await this.expectElementToBeVisible(unsubscribeLabel);
+    showMessage(
+      `Subscribed to the creator${username ? ` (${username})` : ''}.`
+    );
+  }
+
+  /**
+   * Updates the user's bio in preference page.
+   * @param {string} bio - The new bio to set for the user.
+   */
+  async updateBio(bio: string): Promise<void> {
+    await this.page.waitForSelector(bioTextareaSelector, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(bioTextareaSelector);
+    await this.typeInInputField(bioTextareaSelector, bio);
+
+    const updatedValue = await this.page.$eval(
+      bioTextareaSelector,
+      el => (el as HTMLTextAreaElement).value
+    );
+    if (updatedValue !== bio) {
+      throw new Error('Bio update failed');
+    }
+  }
+
+  /**
+   * Updates the user's email preferences from the preferences page.
+   * @param {string[]} preferences - The new email preferences to set for the user.
+   */
+  async updateEmailPreferences(preferences: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    try {
+      await this.page.waitForSelector(checkboxesSelector);
+      const checkboxes = await this.page.$$(checkboxesSelector);
+
+      for (const preference of preferences) {
+        let found = false;
+
+        for (const checkbox of checkboxes) {
+          const label = await checkbox.evaluate(el => el.textContent?.trim());
+          if (label === preference) {
+            await this.waitForElementToBeClickable(checkbox);
+            await checkbox.click();
+            // Check if the checkbox is checked after clicking.
+            const isChecked = await checkbox.evaluate(el => {
+              const input = el.querySelector(
+                'input[type="checkbox"]'
+              ) as HTMLInputElement | null;
+              return input?.checked;
+            });
+            if (!isChecked) {
+              throw new Error(
+                `Checkbox for "${preference}" was not checked after click.`
+              );
+            }
+
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          throw new Error(`Preference not found: ${preference}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to update email preferences: ${error}`
+      );
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Updates the user's preferred audio language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredAudioLanguage(language: string): Promise<void> {
+    const select = await this.page.waitForSelector(audioLanguageInputSelector, {
+      state: 'visible',
+    });
+    await select.click();
+
+    const searchInput = await this.page.waitForSelector(
+      audioLanguageSearchInputSelector,
+      {state: 'visible'}
+    );
+    await this.typeInInputField(searchInput, language);
+
+    const targetOption = await this.page.waitForSelector(
+      `mat-option:has-text("${language}")`,
+      {state: 'visible'}
+    );
+    await targetOption.scrollIntoViewIfNeeded();
+    await targetOption.click();
+
+    // Post-check: Ensure the audio language is properly selected.
+    await this.page.waitForSelector(audioLanguageValueSelector);
+    const audioLanguageValueElement = await this.page.$(
+      audioLanguageValueSelector
+    );
+    const selectedAudioLanguage = await this.page.evaluate(
+      el => el?.textContent?.trim() || '',
+      audioLanguageValueElement
+    );
+    if (selectedAudioLanguage !== language) {
+      throw new Error(
+        `Preferred Audio Language ${language} not selected. Found Audio Language: ${selectedAudioLanguage}`
+      );
+    }
+    showMessage(
+      `Preferred Audio Language updated to: ${selectedAudioLanguage}`
+    );
+  }
+
+  /**
+   * Updates the user's preferred dashboard in preference page.
+   * @param {string} dashboard - The new dashboard to set for the user. Can be one of 'Learner Dashboard', 'Creator Dashboard', or 'Contributor Dashboard'.
+   */
+  async updatePreferredDashboard(dashboard: string): Promise<void> {
+    const allowedDashboards = [
+      'Learner Dashboard',
+      'Creator Dashboard',
+      'Contributor Dashboard',
+    ];
+
+    if (!allowedDashboards.includes(dashboard)) {
+      throw new Error(
+        `Invalid dashboard: ${dashboard}. Must be one of ${allowedDashboards.join(', ')}.`
+      );
+    }
+
+    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector.
+    const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
+    const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
+
+    await this.clickOnElementWithSelector(dashboardSelector);
+
+    const isChecked = await this.page.$eval(
+      dashboardSelector,
+      el => (el as HTMLInputElement).checked
+    );
+    if (!isChecked) {
+      throw new Error(`Failed to select ${dashboard} radio button`);
+    }
+  }
+
+  /**
+   * Updates the user's preferred exploration language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredExplorationLanguage(language: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.clickOnElementWithSelector(explorationLanguageInputSelector);
+
+    await this.page.waitForSelector(optionText);
+    const options = await this.page.$$(optionText);
+    for (const option of options) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
+      );
+      if (optionText === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    const foundExplorationLanguages = await this.page.$$eval(
+      explorationLanguagePerferenceChipsSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    showMessage(`Found Languages: ${foundExplorationLanguages.join(', ')}`);
+    if (!foundExplorationLanguages.some(lng => lng === language)) {
+      throw new Error(
+        `Preferred Language ${language} not added. Found Languages: ${foundExplorationLanguages.join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Updates the profile picture in preference page.
+   * @param {string} picturePath - The path of the picture to upload.
+   */
+  async updateProfilePicture(picturePath: string): Promise<void> {
+    await this.page.waitForSelector(editProfilePictureButton, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+    await this.clickOnElementWithSelector(addProfilePictureButton);
+
+    await this.page.waitForSelector(addProfilePictureButton, {
+      state: 'hidden',
+    });
+  }
+
+  /**
+   * Updates the user's subject interests in the preferences page
+   * when the input field loses focus.
+   *
+   * @param {string[]} interests - The new interests to set for the user when the input field is blurred (i.e., focus is moved away).
+   */
+  async updateSubjectInterestsWhenBlurringField(
+    interests: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(subjectInterestsInputSelector, {
+      state: 'visible',
+    });
+    for (const interest of interests) {
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
+      await this.page.click(matFormTextSelector);
+    }
+
+    // Post-check: ensure all interests are present as tags.
+    for (const interest of interests) {
+      const foundTexts = await this.page.$$eval(
+        subjectInterestTagsInPreferencesPage,
+        elements => elements.map(el => el.textContent?.trim() || '')
+      );
+
+      const found = foundTexts.some(text => text === interest);
+
+      if (!found) {
+        throw new Error(
+          `Subject interest ${interests} not added. Actual chip texts found: ${foundTexts.join(', ')}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Updates the user's subject interests in preference page.
+   * @param {string[]} interests - The new interests to set for the user after each interest is entered in the input field, followed by pressing the Enter key.
+   */
+  async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
+    for (const interest of interests) {
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
+      await this.page.keyboard.press('Enter');
+    }
+
+    // Post-check: ensure all interests are present as tags.
+    const foundTexts = await this.page.$$eval(
+      subjectInterestTagsInPreferencesPage,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    for (const interest of interests) {
+      const found = foundTexts.some(text => text === interest);
+
+      if (!found) {
+        throw new Error(
+          `Subject interest ${interests} not added. Actual chip texts found: ${foundTexts.join(', ')}`
+        );
+      }
+    }
+    showMessage(`Subject interests updated to ${foundTexts.join(', ')}`);
   }
 
   /**
@@ -1343,6 +1856,35 @@ export class LoggedInUser extends BaseUser {
     }
 
     showMessage('Page is displayed in RTL mode.');
+  }
+
+  /**
+   * Expects the profile picture to not match a certain image.
+   */
+  async verifyProfilePicUpdate(): Promise<void> {
+    try {
+      await this.page.waitForSelector(profilePictureSelector);
+      const profilePicture = await this.page.$(profilePictureSelector);
+
+      if (!profilePicture) {
+        throw new Error('Profile picture not found');
+      }
+      const actualImageUrl = await this.page.evaluate(
+        img => (img as HTMLImageElement).src,
+        profilePicture
+      );
+
+      if (actualImageUrl === defaultProfilePicture) {
+        throw new Error(
+          `Profile picture does not match. Expected image source to be different from: ${defaultProfilePicture}`
+        );
+      }
+      showMessage('Profile picture is different from the default one.');
+    } catch (error) {
+      const newError = new Error(`Failed to check profile picture: ${error}`);
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
   }
 }
 

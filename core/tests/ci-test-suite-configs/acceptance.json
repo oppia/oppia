@@ -492,8 +492,8 @@
     },
     {
       "name": "logged-in-learner/edit-the-profile",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/edit-the-profile.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/edit-the-profile.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/export-and-delete-account",
