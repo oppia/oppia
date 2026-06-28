@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,25 +19,30 @@
  * PP. Learner edits the profile
  */
 
+import {test} from '@playwright/test';
 import {FILEPATHS} from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     loggedInLearner = await UserFactory.createNewUser(
       'learner',
-      'learner@example.com'
+      'learner@example.com',
+      browser
     );
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.createAndPublishExplorationWithCards(
@@ -48,7 +53,7 @@ describe('Logged-In Learner', function () {
     );
   });
 
-  it('should be able to find the preferences page', async function () {
+  test('should be able to find the preferences page', async function () {
     await loggedInLearner.navigateToLoginPage();
     await loggedInLearner.expectToBeOnLearnerDashboard();
 
@@ -81,7 +86,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToPreferencesPageUsingProfileDropdown();
   });
 
-  it('should be able to change the profile photo', async function () {
+  test('should be able to change the profile photo', async function () {
     // Should be able to update profile photo with all supported formats.
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_SVG);
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_PNG);
@@ -100,15 +105,15 @@ describe('Logged-In Learner', function () {
     );
   });
 
-  it('should be able to edit bio', async function () {
+  test('should be able to edit bio', async function () {
     await loggedInLearner.updateBio('This is my new bio.');
   });
 
-  it('should be able to change the preferred dashboard', async function () {
+  test('should be able to change the preferred dashboard', async function () {
     await loggedInLearner.updatePreferredDashboard('Creator Dashboard');
   });
 
-  it('should be able to edit subject interests', async function () {
+  test('should be able to edit subject interests', async function () {
     await loggedInLearner.updateSubjectInterestsWithEnterKey([
       'math',
       'science',
@@ -119,32 +124,32 @@ describe('Logged-In Learner', function () {
     ]);
   });
 
-  it('should be able to add preferred audio language', async function () {
+  test('should be able to add preferred audio language', async function () {
     await loggedInLearner.updatePreferredAudioLanguage(
       'Bahasa Indonesia (Indonesian)'
     );
   });
 
-  it('should be able to change preferred exploration language', async function () {
+  test('should be able to change preferred exploration language', async function () {
     await loggedInLearner.updatePreferredExplorationLanguage('Hinglish');
   });
 
-  it('should be able to change email preferences', async function () {
+  test('should be able to change email preferences', async function () {
     await loggedInLearner.updateEmailPreferences([
       'Receive news and updates about the site',
     ]);
   });
 
-  it('should be able to save all the information edited', async function () {
+  test('should be able to save all the information edited', async function () {
     await loggedInLearner.saveChangesInPreferencesPage();
 
-    await loggedInLearner.waitForNetworkIdle();
+    await loggedInLearner.page.waitForLoadState('networkidle');
     await loggedInLearner.navigateToSplashPage(
       'http://localhost:8181/creator-dashboard'
     );
   });
 
-  it('should be able to go to their profile by clicking on their username', async function () {
+  test('should be able to go to their profile by clicking on their username', async function () {
     await loggedInLearner.navigateToPreferencesPageUsingProfileDropdown();
     await loggedInLearner.navigateToProfilePageFromPreferencePage();
     await loggedInLearner.verifyProfilePicUpdate();
@@ -157,7 +162,7 @@ describe('Logged-In Learner', function () {
     ]);
   });
 
-  it('should be able to subscribe creators', async function () {
+  test('should be able to subscribe creators', async function () {
     await loggedInLearner.navigateToCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar(
       'Solving problems without calculator'
@@ -172,7 +177,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.subscribeToCreator('explorationEditor');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
