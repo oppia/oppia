@@ -479,6 +479,18 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         )
         self.assertIn('Could not find the resource', response['error'])
 
+    def test_get_fails_with_invalid_skill_ids_shape(self) -> None:
+        response = self.get_json(
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
+            params={'skill_ids': '[1, 2]'},
+            expected_status_int=400,
+        )
+        self.assertIn(
+            'Invalid skill IDs',
+            response['error'],
+        )
+
     def test_get_with_valid_skill_ids_and_study_guides(self) -> None:
         skill_id_one = 'skill_id_one'
         self.save_new_skill(

@@ -19,7 +19,6 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
-    skill_services,
     topic_domain,
     topic_services,
     user_services,
@@ -103,6 +102,13 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
+
+    def test_get_fails_when_both_params_absent(self) -> None:
+        self.get_json(
+            '%s/staging/%s'
+            % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
+            expected_status_int=400,
+        )
 
     def test_get_fails_when_skill_ids_dont_exist(self) -> None:
         topic = topic_domain.Topic.create_default_topic(

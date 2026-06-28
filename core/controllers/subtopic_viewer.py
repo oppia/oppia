@@ -116,6 +116,10 @@ class SubtopicPageDataHandler(
         assert self.normalized_request is not None
         skill_ids = self.normalized_request.get('skill_ids')
         if skill_ids is not None:
+            if not isinstance(skill_ids, list) or not all(
+                isinstance(skill_id, str) for skill_id in skill_ids
+            ):
+                raise self.InvalidInputException('Invalid skill IDs')
             try:
                 skill_fetchers.get_multi_skills(skill_ids)
             except Exception as e:

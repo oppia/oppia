@@ -80,6 +80,11 @@ class PracticeSessionsPageDataHandler(
         )
         skill_ids = self.normalized_request.get('skill_ids')
 
+        if skill_ids is None and selected_subtopic_ids is None:
+            raise self.InvalidInputException(
+                'Expected skill_ids or selected_subtopic_ids'
+            )
+
         selected_skill_ids: List[str] = []
         if skill_ids is not None:
             selected_skill_ids = skill_ids

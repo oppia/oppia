@@ -30,6 +30,7 @@ from core.domain import (
     learner_group_fetchers,
     learner_group_services,
     rights_manager,
+    question_services,
     skill_services,
     story_domain,
     story_services,
@@ -1779,9 +1780,14 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        topic_services.publish_story(
-            self.topic_id, self.story_id_1, self.admin_id
-        )
+        with self.swap_to_always_return(
+            question_services,
+            'get_total_question_count_for_skill_ids',
+            10,
+        ):
+            topic_services.publish_story(
+                self.topic_id, self.story_id_1, self.admin_id
+            )
 
         self.login(self.VIEWER_EMAIL)
 

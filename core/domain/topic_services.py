@@ -1627,6 +1627,8 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
         )
 
     story = story_fetchers.get_story_by_id(story_id, strict=False)
+    if story is None:
+        raise Exception('A story with the given ID doesn\'t exist')
 
     all_acquired_skill_ids = set()
     for node in story.story_contents.nodes:
@@ -1642,8 +1644,6 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
                 'story node must have at least 10 questions before '
                 'publishing.' % (skill_id, question_count)
             )
-    if story is None:
-        raise Exception('A story with the given ID doesn\'t exist')
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])

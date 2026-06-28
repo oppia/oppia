@@ -50,7 +50,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1539,7 +1539,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                     ),
                     'node_id': node_id,
-                    'old_value': [],
+                    'old_value': cast(List[str], []),
                     'new_value': [skill_id],
                 }
             ),
@@ -1582,7 +1582,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                     ),
                     'node_id': node_id,
-                    'old_value': [],
+                    'old_value': cast(List[str], []),
                     'new_value': [skill_id],
                 }
             ),

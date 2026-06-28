@@ -29,7 +29,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, Optional, TypedDict
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
