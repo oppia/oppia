@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 import core.storage.base_model.gae_models as base_models
 from core import feconf, utils
 from core.constants import constants
@@ -274,3 +276,265 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
         )
 
         return offering_instance
+
+
+class CertificateAssessmentAttemptModel(base_models.BaseModel):
+    """Storage model for a certificate assessment attempt.
+
+    The ID of instances of this class are in form of random hash of 12 chars.
+    """
+
+    # The ID of the learner who made this attempt.
+    learner_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The total score achieved by the learner in this attempt.
+    total_score = datastore_services.FloatProperty(required=True, indexed=True)
+    # The index of this attempt for the given learner (1-based, increasing
+    # with every new attempt made by the same learner).
+    attempt_index = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
+    # Dict mapping topic_id to a dict containing
+    # 'total_related_questions' and 'total_correct_questions' for that
+    # topic, e.g.
+    # {
+    #     'topic_id_1': {
+    #         'total_related_questions': 5,
+    #         'total_correct_questions': 3
+    #     }
+    # }
+    attempt_data = datastore_services.JsonProperty(required=True)
+    # Dict capturing the exact versions of the certificate offering,
+    # topics, questions, and question-topic-links that were used while
+    # generating this attempt, e.g.
+    # {
+    #     'certificate_id': 'cert_abc123',
+    #     'certificate_version': 1,
+    #     'topic_versions': {'topic_id_1': 2},
+    #     'question_versions': {'question_id_1': 1},
+    #     'question_topic_links': {'question_id_1': ['topic_id_1']}
+    # }
+    version_data = datastore_services.JsonProperty(required=True)
+    # The time at which the learner started this attempt.
+    started_at = datastore_services.DateTimeProperty(
+        required=True, indexed=False
+    )
+    # The time at which the learner finished this attempt. Is None until
+    # the attempt has been finished.
+    finished_at = datastore_services.DateTimeProperty(
+        required=False, indexed=False
+    )
+    # Whether the learner has submitted this attempt.
+    is_submitted = datastore_services.BooleanProperty(
+        required=True, default=False, indexed=True
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user that must be deleted."""
+        return base_models.DELETION_POLICY.DELETE_AT_END
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Multiple attempt instances may be stored per learner."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'learner_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'total_score': base_models.EXPORT_POLICY.EXPORTED,
+                'attempt_index': base_models.EXPORT_POLICY.EXPORTED,
+                'attempt_data': base_models.EXPORT_POLICY.EXPORTED,
+                'version_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'started_at': base_models.EXPORT_POLICY.EXPORTED,
+                'finished_at': base_models.EXPORT_POLICY.EXPORTED,
+                'is_submitted': base_models.EXPORT_POLICY.EXPORTED,
+            },
+        )
+
+    @classmethod
+    def _get_new_id(cls) -> str:
+        """Generates a unique ID in the form of a random hash of 12 chars.
+
+        Returns:
+            str. ID of the new CertificateAssessmentAttemptModel instance.
+
+        Raises:
+            Exception. The ID generator is producing too many collisions.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = utils.convert_to_hash(
+                str(utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH,
+            )
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception(
+            'The id generator for CertificateAssessmentAttemptModel '
+            'is producing too many collisions.'
+        )
+
+    @classmethod
+    def create(
+        cls,
+        learner_id: str,
+        total_score: float,
+        attempt_index: int,
+        attempt_data: Dict[str, Dict[str, int]],
+        version_data: Dict[str, object],
+        started_at: datetime.datetime,
+        finished_at: Optional[datetime.datetime],
+        is_submitted: bool,
+    ) -> CertificateAssessmentAttemptModel:
+        """Creates a new certificate assessment attempt instance.
+
+        Args:
+            learner_id: str. The ID of the learner making the attempt.
+            total_score: float. The total score achieved in this attempt.
+            attempt_index: int. The index of this attempt for the learner.
+            attempt_data: dict. Per-topic stats about questions answered.
+            version_data: dict. Versions of the certificate, topics,
+                questions, and question-topic-links used for this attempt.
+            started_at: datetime.datetime. When the attempt was started.
+            finished_at: datetime.datetime|None. When the attempt was
+                finished, or None if not yet finished.
+            is_submitted: bool. Whether the attempt has been submitted.
+
+        Returns:
+            CertificateAssessmentAttemptModel. Instance of the new entry.
+        """
+        instance_id = cls._get_new_id()
+        attempt_instance = cls(
+            id=instance_id,
+            learner_id=learner_id,
+            total_score=total_score,
+            attempt_index=attempt_index,
+            attempt_data=attempt_data,
+            version_data=version_data,
+            started_at=started_at,
+            finished_at=finished_at,
+            is_submitted=is_submitted,
+        )
+        attempt_instance.update_timestamps()
+        attempt_instance.put()
+
+        return attempt_instance
+
+
+class CertificateAssessmentResponseModel(base_models.BaseModel):
+    """Storage model for a single response submitted by a learner during
+    a certificate assessment attempt.
+
+    The ID of instances of this class are in form of random hash of 12 chars.
+    """
+
+    # The ID of the CertificateAssessmentAttemptModel this response
+    # belongs to.
+    attempt_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The ID of the question that was answered.
+    question_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The version of the question that was answered.
+    question_version = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    # The answer selected by the learner.
+    selected_answer = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    # Whether the selected answer was correct.
+    is_correct = datastore_services.BooleanProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not directly correspond to a user; it is linked to a
+        learner only indirectly, through the parent
+        CertificateAssessmentAttemptModel.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't
+        exported directly since the model is not directly tied to a user.
+        """
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'attempt_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'question_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'selected_answer': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'is_correct': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def _get_new_id(cls) -> str:
+        """Generates a unique ID in the form of a random hash of 12 chars.
+
+        Returns:
+            str. ID of the new CertificateAssessmentResponseModel instance.
+
+        Raises:
+            Exception. The ID generator is producing too many collisions.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = utils.convert_to_hash(
+                str(utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH,
+            )
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception(
+            'The id generator for CertificateAssessmentResponseModel '
+            'is producing too many collisions.'
+        )
+
+    @classmethod
+    def create(
+        cls,
+        attempt_id: str,
+        question_id: str,
+        question_version: int,
+        selected_answer: str,
+        is_correct: bool,
+    ) -> CertificateAssessmentResponseModel:
+        """Creates a new certificate assessment response instance.
+
+        Args:
+            attempt_id: str. The ID of the attempt this response belongs to.
+            question_id: str. The ID of the question being answered.
+            question_version: int. The version of the question answered.
+            selected_answer: str. The answer selected by the learner.
+            is_correct: bool. Whether the selected answer was correct.
+
+        Returns:
+            CertificateAssessmentResponseModel. Instance of the new entry.
+        """
+        instance_id = cls._get_new_id()
+        response_instance = cls(
+            id=instance_id,
+            attempt_id=attempt_id,
+            question_id=question_id,
+            question_version=question_version,
+            selected_answer=selected_answer,
+            is_correct=is_correct,
+        )
+        response_instance.update_timestamps()
+        response_instance.put()
+
+        return response_instance

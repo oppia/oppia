@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for certificate assessment offering models."""
+"""Tests for certificate assessment offering, attempt and response models."""
 
 from __future__ import annotations
+
+import datetime
 
 from core import feconf, utils
 from core.platform import models
@@ -188,3 +190,187 @@ class CertificateAssessmentOfferingCommitLogEntryModelUnitTest(
         self.assertIsNotNone(log_entry)
         self.assertEqual(log_entry.offering_id, offering.id)
         self.assertEqual(log_entry.commit_type, 'create')
+
+
+class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
+    """Test the CertificateAssessmentAttemptModel class."""
+
+    def _get_sample_attempt_data(self):
+        """Returns sample attempt_data for use in tests."""
+        return {
+            'topic_id_101': {
+                'total_related_questions': 5,
+                'total_correct_questions': 3,
+            }
+        }
+
+    def _get_sample_version_data(self):
+        """Returns sample version_data for use in tests."""
+        return {
+            'certificate_id': 'cert_abc123',
+            'certificate_version': 1,
+            'topic_versions': {'topic_id_101': 2},
+            'question_versions': {'question_id_1': 1},
+            'question_topic_links': {'question_id_1': ['topic_id_101']},
+        }
+
+    def test_get_deletion_policy_is_delete_at_end(self) -> None:
+        self.assertEqual(
+            certificate_models.CertificateAssessmentAttemptModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE_AT_END,
+        )
+
+    def test_get_model_association_to_user_is_multiple_instances(
+        self,
+    ) -> None:
+        self.assertEqual(
+            certificate_models.CertificateAssessmentAttemptModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER,
+        )
+
+    def test_create_and_retrieve_lifecycle(self) -> None:
+        started_at = datetime.datetime.utcnow()
+        attempt = certificate_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_id_1',
+            total_score=60.0,
+            attempt_index=1,
+            attempt_data=self._get_sample_attempt_data(),
+            version_data=self._get_sample_version_data(),
+            started_at=started_at,
+            finished_at=None,
+            is_submitted=False,
+        )
+        attempt_id = attempt.id
+
+        self.assertEqual(len(attempt_id), 12)
+
+        fetched_model = (
+            certificate_models.CertificateAssessmentAttemptModel.get_by_id(
+                attempt_id
+            )
+        )
+        self.assertIsNotNone(fetched_model)
+        self.assertEqual(fetched_model.learner_id, 'learner_id_1')
+        self.assertEqual(fetched_model.total_score, 60.0)
+        self.assertEqual(fetched_model.attempt_index, 1)
+        self.assertEqual(
+            fetched_model.attempt_data, self._get_sample_attempt_data()
+        )
+        self.assertEqual(
+            fetched_model.version_data, self._get_sample_version_data()
+        )
+        self.assertIsNone(fetched_model.finished_at)
+        self.assertFalse(fetched_model.is_submitted)
+
+        finished_at = started_at + datetime.timedelta(minutes=10)
+        fetched_model.finished_at = finished_at
+        fetched_model.is_submitted = True
+        fetched_model.update_timestamps()
+        fetched_model.put()
+
+        updated_model = (
+            certificate_models.CertificateAssessmentAttemptModel.get_by_id(
+                attempt_id
+            )
+        )
+        self.assertEqual(updated_model.finished_at, finished_at)
+        self.assertTrue(updated_model.is_submitted)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
+        """Ensures the ID generator raises after exhausting retries."""
+        get_by_id_swap = self.swap(
+            certificate_models.CertificateAssessmentAttemptModel,
+            'get_by_id',
+            lambda *args, **kwargs: True,
+        )
+        convert_to_hash_swap = self.swap(
+            utils, 'convert_to_hash', lambda *args, **kwargs: 'duplicate-id'
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            (
+                'The id generator for CertificateAssessmentAttemptModel '
+                'is producing too many collisions.'
+            ),
+        ):
+            with get_by_id_swap, convert_to_hash_swap:
+                certificate_models.CertificateAssessmentAttemptModel.create(
+                    learner_id='learner_id_1',
+                    total_score=0.0,
+                    attempt_index=1,
+                    attempt_data=self._get_sample_attempt_data(),
+                    version_data=self._get_sample_version_data(),
+                    started_at=datetime.datetime.utcnow(),
+                    finished_at=None,
+                    is_submitted=False,
+                )
+
+
+class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
+    """Test the CertificateAssessmentResponseModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self) -> None:
+        self.assertEqual(
+            certificate_models.CertificateAssessmentResponseModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user_is_not_corresponding_to_user(
+        self,
+    ) -> None:
+        self.assertEqual(
+            certificate_models.CertificateAssessmentResponseModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_create_and_retrieve_lifecycle(self) -> None:
+        response = certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_id='attempt_id_1',
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
+        )
+        response_id = response.id
+
+        self.assertEqual(len(response_id), 12)
+
+        fetched_model = (
+            certificate_models.CertificateAssessmentResponseModel.get_by_id(
+                response_id
+            )
+        )
+        self.assertIsNotNone(fetched_model)
+        self.assertEqual(fetched_model.attempt_id, 'attempt_id_1')
+        self.assertEqual(fetched_model.question_id, 'question_id_1')
+        self.assertEqual(fetched_model.question_version, 1)
+        self.assertEqual(fetched_model.selected_answer, 'Option A')
+        self.assertTrue(fetched_model.is_correct)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
+        """Ensures the ID generator raises after exhausting retries."""
+        get_by_id_swap = self.swap(
+            certificate_models.CertificateAssessmentResponseModel,
+            'get_by_id',
+            lambda *args, **kwargs: True,
+        )
+        convert_to_hash_swap = self.swap(
+            utils, 'convert_to_hash', lambda *args, **kwargs: 'duplicate-id'
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            (
+                'The id generator for CertificateAssessmentResponseModel '
+                'is producing too many collisions.'
+            ),
+        ):
+            with get_by_id_swap, convert_to_hash_swap:
+                certificate_models.CertificateAssessmentResponseModel.create(
+                    attempt_id='attempt_id_1',
+                    question_id='question_id_1',
+                    question_version=1,
+                    selected_answer='Option A',
+                    is_correct=False,
+                )
