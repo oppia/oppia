@@ -1539,6 +1539,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                     ),
                     'node_id': node_id,
+                    # Here we use cast because mypy expects List[str] but [] is List[<nothing>].
                     'old_value': cast(List[str], []),
                     'new_value': [skill_id],
                 }
@@ -1582,6 +1583,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                     ),
                     'node_id': node_id,
+                    # Here we use cast because mypy expects List[str] but [] is List[<nothing>].
                     'old_value': cast(List[str], []),
                     'new_value': [skill_id],
                 }
