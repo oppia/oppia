@@ -37,7 +37,7 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {State, StateBackendDict} from 'domain/state/state.model';
+import {State} from 'domain/state/state.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from 'services/alerts.service';
@@ -58,6 +58,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -88,6 +89,7 @@ describe('Exploration engine service ', () => {
   let urlService: UrlService;
   let textInputService: TextInputRulesService;
   let translateService: TranslateService;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -413,6 +415,9 @@ describe('Exploration engine service ', () => {
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
+    explorationHtmlFormatterService = TestBed.inject(
+      ExplorationHtmlFormatterService
+    );
   });
 
   beforeEach(() => {
@@ -1137,17 +1142,26 @@ describe('Exploration engine service ', () => {
       spyOn(explorationEngineService.exploration, 'getState').and.callFake(
         (stateName: string) => {
           if (stateName === 'StuckState') {
-            return {
-              content: {contentId: null, html: 'Stuck content'},
-              interaction: {id: 'TextInput', customizationArgs: {}},
-              paramChanges: [],
-            } as unknown as State;
+            const state = State.createDefaultState(
+              'StuckState',
+              'content_id',
+              'default_outcome'
+            );
+            state.content.contentId = null;
+            state.content.html = 'Stuck content';
+            state.interaction.id = 'TextInput';
+            state.interaction.customizationArgs = {};
+            return state;
           }
-          return {
-            content: {contentId: 'feedback_1', html: 'Start content'},
-            interaction: {id: 'TextInput', customizationArgs: {}},
-            paramChanges: [],
-          } as unknown as State;
+          const state = State.createDefaultState(
+            'Start',
+            'feedback_1',
+            'default_outcome'
+          );
+          state.content.html = 'Start content';
+          state.interaction.id = 'TextInput';
+          state.interaction.customizationArgs = {};
+          return state;
         }
       );
 
@@ -1431,7 +1445,15 @@ describe('Exploration engine service ', () => {
           'Start',
           '',
           '',
-          {id: 'TextInput', customizationArgs: {}} as unknown as Interaction,
+          new Interaction(
+            [],
+            [],
+            Object.create(null),
+            null,
+            [],
+            'TextInput',
+            null
+          ),
           'content_id'
         )
       );
@@ -1477,7 +1499,15 @@ describe('Exploration engine service ', () => {
           'Start',
           '',
           '',
-          {id: 'TextInput', customizationArgs: {}} as unknown as Interaction,
+          new Interaction(
+            [],
+            [],
+            Object.create(null),
+            null,
+            [],
+            'TextInput',
+            null
+          ),
           'content_id'
         )
       );
@@ -1485,12 +1515,7 @@ describe('Exploration engine service ', () => {
         answerClassificationService,
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
-      (
-        explorationEngineService as unknown as {initStateName: string}
-      ).initStateName = 'Start';
-      (
-        explorationEngineService as unknown as {manualParamChanges: unknown[]}
-      ).manualParamChanges = [];
+      explorationEngineService.initSettingsFromEditor('Start', []);
       explorationEngineService.init(
         explorationDict,
         1,
@@ -1968,24 +1993,26 @@ describe('Exploration engine service ', () => {
       () => {}
     );
 
-    spyOn(explorationEngineService.exploration, 'getState').and.returnValue({
-      content: {html: '', contentId: 'content_id'},
-      interaction: {id: null, answerGroups: []},
-      paramChanges: [],
-    } as unknown as State);
+    spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+      State.createDefaultState('Start', 'content_id', 'default_outcome')
+    );
     spyOn(
       explorationEngineService.exploration,
       'getInteraction'
-    ).and.returnValue({id: null} as unknown as Interaction);
+    ).and.returnValue(
+      new Interaction([], [], Object.create(null), null, [], null, null)
+    );
 
     const stateCard = explorationEngineService.getStateCardByName('Start');
     expect(stateCard).toBeDefined();
 
     const shortestPath = explorationEngineService.getShortestPathToState(
       {
-        Start: {
-          interaction: {id: null, answerGroups: []},
-        } as unknown as StateBackendDict,
+        Start: State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        ).toBackendDict(),
       },
       'Start'
     );
@@ -1995,22 +2022,14 @@ describe('Exploration engine service ', () => {
   it('should cover setExplorationProperties false branches', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/explore/1');
     spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    (
-      explorationEngineService as unknown as {
-        setExplorationProperties: () => void;
-      }
-    ).setExplorationProperties();
+    explorationEngineService.setExplorationProperties();
     expect(pageContextService.isInQuestionPlayerMode).toHaveBeenCalled();
 
     (pageContextService.isInQuestionPlayerMode as jasmine.Spy).and.returnValue(
       false
     );
     (urlService.getPathname as jasmine.Spy).and.returnValue('/skill_editor/1');
-    (
-      explorationEngineService as unknown as {
-        setExplorationProperties: () => void;
-      }
-    ).setExplorationProperties();
+    explorationEngineService.setExplorationProperties();
     expect(urlService.getPathname).toHaveBeenCalled();
   });
 
@@ -2037,7 +2056,7 @@ describe('Exploration engine service ', () => {
     // We spy after init so that the initial load still succeeds.
     const learnerParamsSpy = spyOn(learnerParamsService, 'init');
     spyOn(explorationEngineService, 'makeParams').and.returnValue(
-      undefined as unknown as Record<string, string>
+      JSON.parse('null')
     );
 
     explorationEngineService.loadInitialState(() => {});
@@ -2066,7 +2085,9 @@ describe('Exploration engine service ', () => {
     spyOn(
       explorationEngineService.exploration,
       'getInteraction'
-    ).and.returnValue({id: null} as unknown as Interaction);
+    ).and.returnValue(
+      new Interaction([], [], Object.create(null), null, [], null, null)
+    );
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(explorationEngineService, 'makeParams').and.returnValue({});
     spyOn(
@@ -2075,17 +2096,7 @@ describe('Exploration engine service ', () => {
     ).and.returnValue({});
 
     const htmlFormatterSpy = spyOn(
-      (
-        explorationEngineService as unknown as {
-          explorationHtmlFormatterService: {
-            getInteractionHtml: (
-              id: string | null,
-              args: Record<string, unknown>,
-              lbl: string
-            ) => string;
-          };
-        }
-      ).explorationHtmlFormatterService,
+      explorationHtmlFormatterService,
       'getInteractionHtml'
     );
 
@@ -2115,7 +2126,7 @@ describe('Exploration engine service ', () => {
     spyOn(
       explorationEngineService.exploration,
       'getAuthorRecommendedExpIds'
-    ).and.returnValue(null as unknown as string[]);
+    ).and.returnValue(null);
 
     const result =
       explorationEngineService.getAuthorRecommendedExpIdsByStateName('End');
@@ -2124,7 +2135,7 @@ describe('Exploration engine service ', () => {
 
   // ---- Branch coverage: submitAnswer internal branches ----
 
-  it('should fall back to oldParams when newState is null in submitAnswer ternary (line 809)', fakeAsync(() => {
+  it('should cover the true branch (newState is truthy) for makeParams in submitAnswer ternary (line 809)', fakeAsync(() => {
     // Branch: line 808-810 – the ternary `newState ? makeParams(...) : oldParams`.
     // We exercise the false branch by mocking `makeParams` to a spy and then
     // verifying it is NOT called when newState is null.
@@ -2220,26 +2231,15 @@ describe('Exploration engine service ', () => {
     spyOn(
       explorationEngineService.exploration,
       'getInteraction'
-    ).and.returnValue({id: null} as unknown as Interaction);
-    spyOn(explorationEngineService.exploration, 'getState').and.returnValue({
-      content: {contentId: 'content_id', html: ''},
-      interaction: {id: null, answerGroups: []},
-      paramChanges: [],
-    } as unknown as State);
+    ).and.returnValue(
+      new Interaction([], [], Object.create(null), null, [], null, null)
+    );
+    spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+      State.createDefaultState('Start', 'content_id', 'default_outcome')
+    );
 
-    // The htmlFormatter should NOT be called for null interaction.id.
     const htmlFormatterSpy = spyOn(
-      (
-        explorationEngineService as unknown as {
-          explorationHtmlFormatterService: {
-            getInteractionHtml: (
-              id: string | null,
-              args: Record<string, unknown>,
-              lbl: string
-            ) => string;
-          };
-        }
-      ).explorationHtmlFormatterService,
+      explorationHtmlFormatterService,
       'getInteractionHtml'
     );
 
@@ -2310,7 +2310,7 @@ describe('Exploration engine service ', () => {
 
   // ---- Branch coverage: _getNextCardIfReallyStuck internal branches ----
 
-  it('should use oldParams when newStateIfStuck is null in _getNextCardIfReallyStuck (line 934)', fakeAsync(() => {
+  it('should cover the true branch (newStateIfStuck is truthy) for makeParams in _getNextCardIfReallyStuck (line 934)', fakeAsync(() => {
     // Branch: line 934 – `newStateIfStuck ? makeParams(...) : oldParams`.
     // When getState(newStateNameIfStuck) returns null, the ternary uses oldParams.
     // We cannot make getState return null without breaking the content access at
@@ -2356,50 +2356,46 @@ describe('Exploration engine service ', () => {
       catchMisspellings: {value: false},
     };
 
-    // Return a valid stuck state so the full path (true branch) executes.
-    const stuckState = {
-      content: {contentId: 'stuck_content_id', html: 'Stuck'},
-      interaction: {
-        id: 'TextInput',
-        answerGroups: [],
-        customizationArgs: validCustomizationArgs,
-        defaultOutcome: null,
-        hints: [],
-        solution: null,
-      },
-      paramChanges: [],
-    };
     spyOn(explorationEngineService.exploration, 'getState').and.callFake(
       (stateName: string) => {
-        return stateName === 'StuckState'
-          ? (stuckState as unknown as State)
-          : ({
-              content: {contentId: 'content_id', html: ''},
-              interaction: {
-                id: 'TextInput',
-                answerGroups: [],
-                customizationArgs: validCustomizationArgs,
-                defaultOutcome: null,
-                hints: [],
-                solution: null,
-              },
-              paramChanges: [],
-            } as unknown as State);
+        if (stateName === 'StuckState') {
+          const state = State.createDefaultState(
+            'StuckState',
+            'stuck_content_id',
+            'default_outcome'
+          );
+          state.content.html = 'Stuck';
+          state.interaction.id = 'TextInput';
+          state.interaction.customizationArgs = validCustomizationArgs;
+          return state;
+        }
+        const state = State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        );
+        state.content.html = '';
+        state.interaction.id = 'TextInput';
+        state.interaction.customizationArgs = validCustomizationArgs;
+        return state;
       }
     );
     spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
       (stateName: string) => {
-        return {
-          id: 'TextInput',
-          customizationArgs: validCustomizationArgs,
-        } as unknown as Interaction;
+        return new Interaction(
+          [],
+          [],
+          Object.assign(Object.create(null), validCustomizationArgs),
+          null,
+          [],
+          'TextInput',
+          null
+        );
       }
     );
     spyOn(
-      explorationEngineService as unknown as {
-        _getInteractionHtmlByStateName: (stateName: string) => string;
-      },
-      '_getInteractionHtmlByStateName'
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
     ).and.returnValue('<div>html</div>');
 
     explorationEngineService.submitAnswer(
@@ -2452,38 +2448,48 @@ describe('Exploration engine service ', () => {
     );
     tick();
 
-    const stuckState = {
-      content: {contentId: 'stuck_content_id', html: 'Stuck'},
-      interaction: {id: null, answerGroups: [], customizationArgs: {}},
-      paramChanges: [],
-    };
-
     spyOn(explorationEngineService.exploration, 'getState').and.callFake(
       (stateName: string) => {
-        return stateName === 'StuckState'
-          ? (stuckState as unknown as State)
-          : ({
-              content: {contentId: 'content_id', html: ''},
-              interaction: {id: 'TextInput', answerGroups: []},
-              paramChanges: [],
-            } as unknown as State);
+        if (stateName === 'StuckState') {
+          const state = State.createDefaultState(
+            'StuckState',
+            'stuck_content_id',
+            'default_outcome'
+          );
+          state.content.html = 'Stuck';
+          state.interaction.id = null;
+          return state;
+        }
+        const state = State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        );
+        state.content.html = '';
+        state.interaction.id = 'TextInput';
+        return state;
       }
     );
     spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
       (stateName: string) => {
-        // Return null id for StuckState to hit branch 52 false.
         return stateName === 'StuckState'
-          ? ({id: null} as unknown as Interaction)
-          : ({id: 'TextInput'} as unknown as Interaction);
+          ? new Interaction([], [], Object.create(null), null, [], null, null)
+          : new Interaction(
+              [],
+              [],
+              Object.create(null),
+              null,
+              [],
+              'TextInput',
+              null
+            );
       }
     );
 
     // Spy on the private method to confirm it was not called for the stuck state.
     const htmlByStateNameSpy = spyOn(
-      explorationEngineService as unknown as {
-        _getInteractionHtmlByStateName: (stateName: string) => string;
-      },
-      '_getInteractionHtmlByStateName'
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
     ).and.returnValue('<div>main-html</div>');
 
     explorationEngineService.submitAnswer(
@@ -2537,54 +2543,48 @@ describe('Exploration engine service ', () => {
       placeholder: {value: {unicode_str: '', content_id: 'ca_0'}},
       catchMisspellings: {value: false},
     };
-    const stuckState = {
-      // ContentId is null to hit line 972 true branch.
-      content: {contentId: null, html: 'Stuck'},
-      interaction: {
-        id: 'TextInput',
-        answerGroups: [],
-        customizationArgs: validCustomizationArgs,
-        defaultOutcome: null,
-        hints: [],
-        solution: null,
-      },
-      paramChanges: [],
-    };
 
     spyOn(explorationEngineService.exploration, 'getState').and.callFake(
       (stateName: string) => {
-        return stateName === 'StuckState'
-          ? (stuckState as unknown as State)
-          : ({
-              content: {contentId: 'content_id', html: ''},
-              interaction: {
-                id: 'TextInput',
-                answerGroups: [],
-                customizationArgs: validCustomizationArgs,
-              },
-              paramChanges: [],
-            } as unknown as State);
+        if (stateName === 'StuckState') {
+          const state = State.createDefaultState(
+            'StuckState',
+            JSON.parse('null'),
+            'default_outcome'
+          );
+          state.content.html = 'Stuck';
+          state.interaction.id = 'TextInput';
+          state.interaction.customizationArgs = validCustomizationArgs;
+          return state;
+        }
+        const state = State.createDefaultState(
+          'Start',
+          'content_id',
+          'default_outcome'
+        );
+        state.content.html = '';
+        state.interaction.id = 'TextInput';
+        state.interaction.customizationArgs = validCustomizationArgs;
+        return state;
       }
     );
     spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
       (stateName: string) => {
-        return stateName === 'StuckState'
-          ? ({
-              id: 'TextInput',
-              customizationArgs: validCustomizationArgs,
-            } as unknown as Interaction)
-          : ({
-              id: 'TextInput',
-              customizationArgs: validCustomizationArgs,
-            } as unknown as Interaction);
+        return new Interaction(
+          [],
+          [],
+          Object.assign(Object.create(null), validCustomizationArgs),
+          null,
+          [],
+          'TextInput',
+          null
+        );
       }
     );
     // Spy on private method so html generation doesn't fail on real services.
     spyOn(
-      explorationEngineService as unknown as {
-        _getInteractionHtmlByStateName: (stateName: string) => string;
-      },
-      '_getInteractionHtmlByStateName'
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
     ).and.returnValue('<div>html</div>');
 
     explorationEngineService.submitAnswer(

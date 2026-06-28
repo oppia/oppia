@@ -82,16 +82,16 @@ export class ConversationSkinComponent {
 
   isLoggedIn: boolean = false;
   voiceoversAreLoaded: boolean = false;
-  collectionTitle: string | null = null;
+  collectionTitle!: string | null;
   explorationId!: string;
   isIframed!: boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary: string | null = null;
+  collectionSummary!: LearnerExplorationSummary | string;
   moveToExploration: boolean = false;
 
-  pidInUrl: string | null = null;
+  pidInUrl!: string | null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
@@ -152,8 +152,6 @@ export class ConversationSkinComponent {
         .then(collection => {
           this.collectionTitle = collection.getTitle();
         });
-    } else {
-      this.collectionTitle = null;
     }
 
     this.explorationId = this.pageContextService.getExplorationId();
@@ -319,15 +317,15 @@ export class ConversationSkinComponent {
           answer: InteractionAnswer,
           interactionRulesService: Parameters<OnSubmitFn>[1]
         ) => {
+          let submittedAnswer =
+            typeof answer === 'string' ? answer : String(answer);
           this.conversationFlowService.submitAnswer(
-            answer as string,
+            submittedAnswer,
             interactionRulesService as InteractionRulesService
           );
         }
       );
       this.initializePage();
-
-      this.collectionSummary = null;
 
       if (collectionId) {
         this.collectionPlayerBackendApiService
@@ -495,9 +493,10 @@ export class ConversationSkinComponent {
     this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
     const nextStateCard = this.conversationFlowService.getNextCardIfStuck();
-    if (nextStateCard) {
-      this.conversationFlowService.setNextStateCard(nextStateCard);
+    if (!nextStateCard) {
+      return;
     }
+    this.conversationFlowService.setNextStateCard(nextStateCard);
     this.showInteraction = false;
     this.conversationFlowService.showPendingCard();
   }

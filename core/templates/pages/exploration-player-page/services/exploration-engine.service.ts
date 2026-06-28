@@ -198,7 +198,7 @@ export class ExplorationEngineService {
     oldStateCard: StateCard,
     outcome: Outcome,
     envs: Record<string, string>[]
-  ): string {
+  ): string | null {
     const oldInteractionId = oldStateCard.getInteractionId();
     const oldInteractionArgs =
       oldStateCard.getInteractionCustomizationArgs() as TextInputCustomizationArgs;
@@ -418,12 +418,18 @@ export class ExplorationEngineService {
       );
     }
 
+    let contentId = initialState.content.contentId;
+    if (contentId === null) {
+      this.alertsService.addWarning('Content id cannot be null.');
+      return;
+    }
+
     let initialCard = StateCard.createNewCard(
       this.currentStateName,
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId as string
+      contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -791,12 +797,17 @@ export class ExplorationEngineService {
     // Compute the data for the next state.
     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
     oldParams.answer = answer;
-    let feedbackHtml: string = this._getFeedback(
+    let feedbackHtml: string | null = this._getFeedback(
       answer,
       oldStateCard,
       classificationResult.outcome,
       [oldParams]
     );
+    if (feedbackHtml === null) {
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning('Expression parsing error.');
+      return false;
+    }
     let newParams = newState
       ? this.makeParams(oldParams, newState.paramChanges, [oldParams])
       : oldParams;
@@ -881,11 +892,8 @@ export class ExplorationEngineService {
       refreshInteraction,
       feedbackHtml,
       refresherExplorationId,
-      missingPrerequisiteSkillId as string,
+      missingPrerequisiteSkillId ?? '',
       onSameCard,
-      // The external callback defined in conversation-flow.service.ts expects
-      // a strict 'string'. We pass an empty string instead of null to maintain
-      // strict typing compliance.
       '',
       oldStateName === this.exploration.initStateName,
       isFirstHit,
@@ -1088,6 +1096,10 @@ export class ExplorationEngineService {
           pathsQueue.push(dest);
         }
       }
+    }
+
+    if (!visitedNodes[destStateName]) {
+      return [];
     }
 
     // Reconstruct the shortest path from node to parent map.

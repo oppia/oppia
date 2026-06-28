@@ -91,7 +91,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {AuthService} from 'services/auth.service';
 import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {CollectionPlaythrough} from '../../../../domain/collection/collection-playthrough.model';
-import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
+
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -712,7 +712,7 @@ describe('Conversation skin component', () => {
     mockOnPlayerStateChange.emit(newStateName);
     tick(100);
 
-    expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
+    expect(componentInstance.continueToReviseStateButtonIsVisible).toBe(true);
     conversationFlowService.setRedirectToRefresherExplorationConfirmed(true);
 
     spyOn(alertsService, 'addWarning');
@@ -1232,8 +1232,8 @@ describe('Conversation skin component', () => {
       true
     );
 
-    expect(componentInstance.isSubmitButtonDisabled()).toBeTrue();
-    expect(componentInstance.isSubmitButtonDisabled()).toBeFalse();
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(true);
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(false);
   });
 
   it(
@@ -1304,7 +1304,7 @@ describe('Conversation skin component', () => {
         'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'
       );
 
-      expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
+      expect(componentInstance.continueToReviseStateButtonIsVisible).toBe(true);
       flush();
     })
   );
@@ -1421,10 +1421,20 @@ describe('Conversation skin component', () => {
           new UserInfo([], false, false, false, false, false, '', '', '', true)
         )
       );
-      spyOn(playerPositionService, 'init').and.callFake(callb => {
+      spyOn(playerPositionService, 'init').and.callFake((callb: () => void) => {
         callb();
       });
-      componentInstance.questionPlayerConfig = {} as QuestionPlayerConfig;
+      componentInstance.questionPlayerConfig = {
+        resultActionButtons: [],
+        skillList: [],
+        skillDescriptions: [],
+        questionCount: 0,
+        questionsSortedByDifficulty: false,
+        questionPlayerMode: {
+          modeType: 'PASS_FAIL',
+          passCutoff: 0.75,
+        },
+      };
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
       spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
@@ -1440,7 +1450,11 @@ describe('Conversation skin component', () => {
         'pq'
       );
       spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
-        (config, callb, questionAreAvailable) => {
+        (
+          config: unknown,
+          callb: (card: StateCard, label: string) => void,
+          questionAreAvailable: () => void
+        ) => {
           callb(displayedCard, 'label');
         }
       );
@@ -1471,7 +1485,7 @@ describe('Conversation skin component', () => {
       );
 
       spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
-        stateName => {
+        (stateName: string) => {
           if (stateName === 'Mid') {
             return {
               cardIsCheckpoint: true,
@@ -1740,8 +1754,8 @@ describe('Conversation skin component', () => {
       'getCanAskLearnerForAnswerInfo'
     ).and.returnValues(true, false);
 
-    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBeTrue();
-    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBeFalse();
+    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBe(true);
+    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBe(false);
   });
 
   it('should get displayedCard', () => {
@@ -1760,7 +1774,7 @@ describe('Conversation skin component', () => {
       'hasLearnerJustSubmittedAnAnswer'
     ).and.returnValue(true);
 
-    expect(componentInstance.isCorrectnessFooterEnabled()).toBeTrue();
+    expect(componentInstance.isCorrectnessFooterEnabled()).toBe(true);
   });
 
   it('should get static image url', () => {
@@ -1784,7 +1798,7 @@ describe('Conversation skin component', () => {
       )
     );
 
-    expect(componentInstance.isOnTerminalCard()).toBeTrue();
+    expect(componentInstance.isOnTerminalCard()).toBe(true);
   });
 
   it('should return to exploration after concept card is compeleted', () => {
@@ -1797,9 +1811,9 @@ describe('Conversation skin component', () => {
 
     expect(playerTranscriptService.addPreviousCard).toHaveBeenCalled();
     expect(playerTranscriptService.getNumCards).toHaveBeenCalled();
-    expect(
-      playerPositionService.setDisplayedCardIndex
-    ).toHaveBeenCalledOnceWith(numCards - 1);
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
+      numCards - 1
+    );
   });
 
   it('should tell if current is at end of transcript', () => {
@@ -1809,7 +1823,7 @@ describe('Conversation skin component', () => {
       index
     );
 
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeTrue();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(true);
     expect(playerTranscriptService.isLastCard).toHaveBeenCalledWith(index);
   });
 
@@ -1829,7 +1843,7 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'initializeDirectiveComponents'
     ).and.callFake(() => {});
-    spyOn(playerPositionService, 'init').and.callFake(callb => {
+    spyOn(playerPositionService, 'init').and.callFake((callb: () => void) => {
       callb();
     });
     spyOn(urlService, 'getUrlParams').and.returnValues(
@@ -1851,12 +1865,26 @@ describe('Conversation skin component', () => {
         new UserInfo([], false, false, false, false, false, '', '', '', true)
       )
     );
-    componentInstance.questionPlayerConfig = {} as QuestionPlayerConfig;
+    componentInstance.questionPlayerConfig = {
+      resultActionButtons: [],
+      skillList: [],
+      skillDescriptions: [],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 0.75,
+      },
+    };
     spyOn(conversationFlowService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
-      (config, callb, questionAreAvailable) => {
+      (
+        config: unknown,
+        callb: (card: StateCard, label: string) => void,
+        questionAreAvailable: () => void
+      ) => {
         callb(displayedCard, 'label');
       }
     );
@@ -1881,7 +1909,7 @@ describe('Conversation skin component', () => {
     spyOn(autogeneratedAudioPlayerService, 'cancel');
     spyOn(playerTranscriptService, 'isLastCard').and.returnValues(true, false);
     spyOn(explorationInitializationService, 'initializePlayer').and.callFake(
-      callb => {
+      (callb: (card: StateCard, label: string) => void) => {
         callb(displayedCard, 'label');
       }
     );
@@ -1918,7 +1946,7 @@ describe('Conversation skin component', () => {
     componentInstance.submitAnswerFromProgressNav();
 
     expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
-    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledWith(true);
   });
 
   it('should invoke conversationFlowService.submitAnswer when the setOnSubmitFn callback is triggered', fakeAsync(() => {
@@ -1952,9 +1980,14 @@ describe('Conversation skin component', () => {
     const cardAnimationService = TestBed.inject(CardAnimationService);
     spyOn(cardAnimationService, 'adjustPageHeightOnresize');
 
-    let onSubmitCb: Function = () => {};
+    let onSubmitCb: (
+      answer: unknown,
+      rulesService: InteractionRulesService
+    ) => void = () => {};
     spyOn(currentInteractionService, 'setOnSubmitFn').and.callFake(
-      (cb: Function) => {
+      (
+        cb: (answer: unknown, rulesService: InteractionRulesService) => void
+      ) => {
         onSubmitCb = cb;
       }
     );
@@ -1965,15 +1998,7 @@ describe('Conversation skin component', () => {
     spyOn(
       readOnlyExplorationBackendApiService,
       'loadLatestExplorationAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        version: 1,
-        exploration: {
-          init_state_name: 'init',
-        },
-        most_recently_reached_checkpoint_state_name: 'init',
-      } as FetchExplorationBackendResponse)
-    );
+    ).and.returnValue(Promise.resolve(sampleExpResponse));
 
     spyOn(conversationFlowService, 'submitAnswer');
 
@@ -1982,10 +2007,11 @@ describe('Conversation skin component', () => {
     flush();
 
     expect(currentInteractionService.setOnSubmitFn).toHaveBeenCalled();
-    onSubmitCb('answer', {} as InteractionRulesService);
+    const mockRulesService: InteractionRulesService = {};
+    onSubmitCb('answer', mockRulesService);
     expect(conversationFlowService.submitAnswer).toHaveBeenCalledWith(
       'answer',
-      {} as InteractionRulesService
+      mockRulesService
     );
   }));
 
@@ -1996,8 +2022,8 @@ describe('Conversation skin component', () => {
       'isSupplementalCardNonempty'
     ).and.returnValues(true, false);
 
-    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBeTrue();
-    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBeFalse();
+    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBe(true);
+    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBe(false);
   });
 
   it('should tell if supplemental nav is shown', () => {
@@ -2005,14 +2031,20 @@ describe('Conversation skin component', () => {
       '',
       '',
       '',
-      new Interaction([], [], {}, null, [], 'NumberWithUnits', null),
+      new Interaction(
+        [],
+        [],
+        Object.create(null),
+        null,
+        [],
+        'NumberWithUnits',
+        null
+      ),
       [],
       ''
     );
-    // This throws "Type 'null' is not assignable to type 'string'.". We need
-    // to suppress this error because the test requires a null state name.
-    // @ts-expect-error
-    card._stateName = null;
+    Object.defineProperty(card, '_stateName', {value: null});
+
     conversationFlowService.setDisplayedCard(card);
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,
@@ -2021,8 +2053,8 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true
     );
-    expect(componentInstance.isSupplementalNavShown()).toBeFalse();
-    expect(componentInstance.isSupplementalNavShown()).toBeTrue();
+    expect(componentInstance.isSupplementalNavShown()).toBe(false);
+    expect(componentInstance.isSupplementalNavShown()).toBe(true);
   });
 
   it('should return false for supplemental nav if interaction id is missing', () => {
@@ -2035,7 +2067,7 @@ describe('Conversation skin component', () => {
       ''
     );
     conversationFlowService.setDisplayedCard(card);
-    expect(componentInstance.isSupplementalNavShown()).toBeFalse();
+    expect(componentInstance.isSupplementalNavShown()).toBe(false);
   });
 
   it('should call changeDetectorRef.detectChanges if submitButtonIsDisabled changes in ngAfterViewChecked', () => {
@@ -2065,26 +2097,26 @@ describe('Conversation skin component', () => {
     spyOn(conversationFlowService, 'getAnswerIsBeingProcessed').and.returnValue(
       true
     );
-    expect(componentInstance.getAnswerIsBeingProcessed()).toBeTrue();
+    expect(componentInstance.getAnswerIsBeingProcessed()).toBe(true);
   });
 
   it('should get is in story mode', () => {
     spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
-    expect(componentInstance.getIsInStoryMode()).toBeTrue();
+    expect(componentInstance.getIsInStoryMode()).toBe(true);
   });
 
   it('should get is animating to two cards', () => {
     spyOn(cardAnimationService, 'getIsAnimatingToTwoCards').and.returnValue(
       true
     );
-    expect(componentInstance.getIsAnimatingToTwoCards()).toBeTrue();
+    expect(componentInstance.getIsAnimatingToTwoCards()).toBe(true);
   });
 
   it('should get is animating to one card', () => {
     spyOn(cardAnimationService, 'getIsAnimatingToOneCard').and.returnValue(
       true
     );
-    expect(componentInstance.getIsAnimatingToOneCard()).toBeTrue();
+    expect(componentInstance.getIsAnimatingToOneCard()).toBe(true);
   });
 
   it('should get exploration link', () => {
@@ -2132,17 +2164,17 @@ describe('Conversation skin component', () => {
 
   it('should get has fully loaded', () => {
     spyOn(conversationFlowService, 'getHasFullyLoaded').and.returnValue(true);
-    expect(componentInstance.getHasFullyLoaded()).toBeTrue();
+    expect(componentInstance.getHasFullyLoaded()).toBe(true);
   });
 
   it('should return true if window can show two cards', () => {
     const widthSpy = spyOn(windowDimensionsService, 'getWidth').and.returnValue(
       2000
     );
-    expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(true);
 
     widthSpy.and.returnValue(500);
-    expect(componentInstance.canWindowShowTwoCards()).toBeFalse();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(false);
   });
 
   it('should show progress clearance message if service returns true', () => {
@@ -2150,7 +2182,7 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'getShowProgressClearanceMessage'
     ).and.returnValue(true);
-    expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
+    expect(componentInstance.isProgressClearanceMessageShown()).toBe(true);
   });
 
   it('should check if displayed card was completed in previous session', () => {
@@ -2166,9 +2198,9 @@ describe('Conversation skin component', () => {
     spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
       displayedCardMock
     );
-    expect(
-      componentInstance.isDisplayedCardCompletedInPrevSession()
-    ).toBeTrue();
+    expect(componentInstance.isDisplayedCardCompletedInPrevSession()).toBe(
+      true
+    );
   });
 
   it('should get recommended exp title translation key', () => {
@@ -2195,14 +2227,14 @@ describe('Conversation skin component', () => {
       i18nLanguageCodeService,
       'isCurrentLanguageEnglish'
     ).and.returnValue(false);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeTrue();
+    expect(componentInstance.isHackyExpTitleTranslationDisplayed('expId')).toBe(
+      true
+    );
 
     currentLangSpy.and.returnValue(true);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeFalse();
+    expect(componentInstance.isHackyExpTitleTranslationDisplayed('expId')).toBe(
+      false
+    );
   });
 
   it('should call skipCurrentQuestion and update next card', () => {
@@ -2210,7 +2242,7 @@ describe('Conversation skin component', () => {
     spyOn(
       diagnosticTestPlayerEngineService,
       'skipCurrentQuestion'
-    ).and.callFake(cb => cb(nextCard));
+    ).and.callFake((cb: (card: {}) => void) => cb(nextCard));
     spyOn(conversationFlowService, 'setNextStateCard');
     spyOn(conversationFlowService, 'showPendingCard');
     componentInstance.skipCurrentQuestion();
@@ -2235,7 +2267,7 @@ describe('Conversation skin component', () => {
     expect(conversationFlowService.setNextStateCard).toHaveBeenCalledWith(
       nextCard
     );
-    expect(componentInstance.showInteraction).toBeFalse();
+    expect(componentInstance.showInteraction).toBe(false);
     expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
   });
 
@@ -2244,10 +2276,10 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'isLearnAgainButton'
     ).and.returnValue(true);
-    expect(componentInstance.isLearnAgainButton()).toBeTrue();
+    expect(componentInstance.isLearnAgainButton()).toBe(true);
 
     spy.and.returnValue(false);
-    expect(componentInstance.isLearnAgainButton()).toBeFalse();
+    expect(componentInstance.isLearnAgainButton()).toBe(false);
   });
 
   it('should get recommended summaries when exploration in story chapter mode', fakeAsync(() => {
@@ -2283,10 +2315,16 @@ describe('Conversation skin component', () => {
     spyOn(
       explorationRecommendationsService,
       'getRecommendedSummaryDicts'
-    ).and.callFake((ids, recommendations, callb) => {
-      const mockSummaries = [{id: 'exp1'}, {id: 'exp2'}];
-      callb(mockSummaries);
-    });
+    ).and.callFake(
+      (
+        ids: string[],
+        recommendations: string[],
+        callb: (summaries: {id: string}[]) => void
+      ) => {
+        const mockSummaries = [{id: 'exp1'}, {id: 'exp2'}];
+        callb(mockSummaries);
+      }
+    );
 
     spyOn(document, 'querySelector')
       .withArgs('.oppia-exploration-checkpoints-message')
@@ -2409,7 +2447,7 @@ describe('Conversation skin component', () => {
 
       // Case 1: Redirect confirmed -> should return false (allow unload).
       getRedirectSpy.and.returnValue(true);
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
 
       // Case 2: Redirect not confirmed, Interacted, Valid state -> should return true (prevent unload).
       getRedirectSpy.and.returnValue(false);
@@ -2420,22 +2458,22 @@ describe('Conversation skin component', () => {
       getDisplayedCardSpy.and.returnValue(mockStateCard);
       isInQuestionModeSpy.and.returnValue(false);
 
-      expect(capturedCallback()).toBeTrue();
+      expect(capturedCallback()).toBe(true);
       expect(recordEventSpy).toHaveBeenCalled();
 
       // Case 3: Editor preview mode -> should return false.
       componentInstance._editorPreviewMode = true;
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
 
       // Case 4: Terminal state -> should return false.
       componentInstance._editorPreviewMode = false;
       mockStateCard.isTerminal.and.returnValue(true);
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
 
       // Case 5: Question mode -> should return false.
       mockStateCard.isTerminal.and.returnValue(false);
       isInQuestionModeSpy.and.returnValue(true);
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
     }));
   });
 });

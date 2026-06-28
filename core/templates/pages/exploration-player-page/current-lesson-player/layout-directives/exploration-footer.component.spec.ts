@@ -103,6 +103,13 @@ class MockWindowRef {
 }
 
 class MockNgbModalRef {
+  static explorationTitle: string = '';
+  static checkpointCount: number = 0;
+  static completedCheckpointsCount: number = 0;
+  static contributorNames: string[] = [];
+  static expInfo: LearnerExplorationSummaryBackendDict | null = null;
+  static userIsLoggedIn: boolean = false;
+
   componentInstance = {
     skillId: null,
     explorationId: null,
@@ -1410,6 +1417,7 @@ describe('ExplorationFooterComponent', () => {
     fixture.detectChanges();
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.completedCheckpointsCount).toEqual(1);
+    expect(MockNgbModalRef.explorationTitle).toEqual('');
   }));
 
   it('should handle null state.name and terminal state in openInformationCardModal', fakeAsync(() => {
@@ -1443,6 +1451,9 @@ describe('ExplorationFooterComponent', () => {
     fixture.detectChanges();
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.completedCheckpointsCount).toEqual(0);
+    expect(MockNgbModalRef.expInfo).toEqual(
+      {} as LearnerExplorationSummaryBackendDict
+    );
   }));
 
   it('should handle lastCheckpointWasCompleted in openInformationCardModal', fakeAsync(() => {

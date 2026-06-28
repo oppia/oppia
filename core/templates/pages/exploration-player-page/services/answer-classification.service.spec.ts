@@ -28,6 +28,7 @@ import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/ca
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {InteractionSpecsService} from '../../../services/interaction-specs.service';
 import {Outcome} from '../../../domain/exploration/outcome.model';
+import {TextInputRuleInputs} from '../../../../../extensions/interactions/rule-input-defs';
 import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
@@ -49,9 +50,29 @@ describe('Answer Classification Service', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     interactionSpecsService = TestBed.inject(InteractionSpecsService);
-    // This throws "Type 'TextInputRulesService' is not assignable to type 'InteractionRulesService'.". We need to suppress this error because TextInputRulesService doesn't completely match InteractionRulesService.
-    // @ts-expect-error
-    textInputRulesService = TestBed.inject(TextInputRulesService);
+    const injectedTextInputRulesService = TestBed.inject(TextInputRulesService);
+    textInputRulesService = {
+      Equals: (answer, inputs) =>
+        injectedTextInputRulesService.Equals(
+          answer as string,
+          inputs as TextInputRuleInputs
+        ),
+      FuzzyEquals: (answer, inputs) =>
+        injectedTextInputRulesService.FuzzyEquals(
+          answer as string,
+          inputs as TextInputRuleInputs
+        ),
+      StartsWith: (answer, inputs) =>
+        injectedTextInputRulesService.StartsWith(
+          answer as string,
+          inputs as TextInputRuleInputs
+        ),
+      Contains: (answer, inputs) =>
+        injectedTextInputRulesService.Contains(
+          answer as string,
+          inputs as TextInputRuleInputs
+        ),
+    };
   });
 
   describe('with string classifier disabled', () => {
