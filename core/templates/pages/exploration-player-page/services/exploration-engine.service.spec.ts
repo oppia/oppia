@@ -59,6 +59,7 @@ import {ContentTranslationManagerService} from './content-translation-manager.se
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 class MockPlatformFeatureService {
   status = {
@@ -542,6 +543,33 @@ describe('Exploration engine service ', () => {
       expect(initSuccessCb).toHaveBeenCalled();
     }
   );
+
+  it('should alert if contentId is null in initial state when calling init', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(alertsService, 'addWarning');
+
+    const clonedExplorationDict = cloneDeep(explorationDict);
+    clonedExplorationDict.states.Start.content.content_id = null;
+
+    explorationEngineService.init(
+      clonedExplorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      initSuccessCb
+    );
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Content id cannot be null.'
+    );
+    expect(initSuccessCb).not.toHaveBeenCalled();
+  });
 
   it("should throw an error if initial state name is null when calling 'init'", () => {
     const mockExploration = {
@@ -1981,6 +2009,30 @@ describe('Exploration engine service ', () => {
       expect(shortestPathToState).toEqual(['Start', 'Mid']);
     }
   );
+
+  it('should return an empty array if the destination state is unreachable in getShortestPathToState', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      initSuccessCb
+    );
+
+    let shortestPathToState = explorationEngineService.getShortestPathToState(
+      explorationDict.states,
+      'NonExistentState'
+    );
+
+    expect(shortestPathToState).toEqual([]);
+  });
 
   it('should handle interaction with null id in getStateCardByName and getShortestPathToState', () => {
     explorationEngineService.init(
