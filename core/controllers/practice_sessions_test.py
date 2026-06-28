@@ -18,7 +18,12 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import topic_domain, topic_services, user_services
+from core.domain import (
+    skill_services,
+    topic_domain,
+    topic_services,
+    user_services,
+)
 from core.tests import test_utils
 
 
@@ -191,3 +196,53 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Extra data: line 1 column 2 (char 1)'
         )
         self.assertEqual(response['error'], error_msg)
+
+    def test_get_succeeds_with_valid_skill_ids(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s?skill_ids=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '["skill_id_1","skill_id_2"]',
+            )
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 2)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map']['skill_id_1'],
+            'Skill 1',
+        )
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map']['skill_id_2'],
+            'Skill 2',
+        )
+
+    def test_get_fails_with_nonexistent_skill_ids(self) -> None:
+        self.get_json(
+            '%s/staging/%s?skill_ids=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '["nonexistent_skill"]',
+            ),
+            expected_status_int=404,
+        )
+
+    def test_get_uses_skill_ids_over_subtopic_ids(self) -> None:
+        skill_id_3 = 'skill_id_3'
+        self.save_new_skill(skill_id_3, self.admin_id, description='Skill 3')
+        json_response = self.get_json(
+            '%s/staging/%s?skill_ids=%s&selected_subtopic_ids=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '["skill_id_3"]',
+                '[1]',
+            )
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'][skill_id_3],
+            'Skill 3',
+        )

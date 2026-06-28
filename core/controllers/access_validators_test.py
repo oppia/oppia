@@ -311,6 +311,38 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=302,
         )
 
+    def test_get_succeeds_with_valid_skill_ids(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'skill_ids': '["skill_id_1","skill_id_2"]'},
+            expected_status_int=200,
+        )
+
+    def test_get_fails_with_invalid_skill_ids_format(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'skill_ids': '["invalid_skill_id"'},
+            expected_status_int=400,
+        )
+
+    def test_get_fails_with_nonexistent_skill_ids(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'skill_ids': '["nonexistent_skill"]'},
+            expected_status_int=404,
+        )
+
+    def test_get_fails_when_skill_ids_contains_non_string_values(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'skill_ids': '[1,2]'},
+            expected_status_int=400,
+        )
+
 
 class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 

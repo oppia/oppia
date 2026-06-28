@@ -21,7 +21,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import skill_fetchers, topic_fetchers
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
@@ -29,7 +29,8 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    selected_subtopic_ids: List[int]
+    selected_subtopic_ids: Optional[List[int]]
+    skill_ids: Optional[List[str]]
 
 
 class PracticeSessionsPageDataHandler(
@@ -47,8 +48,16 @@ class PracticeSessionsPageDataHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_subtopic_ids': {
-                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
-            }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'},
+                'default_value': None,
+            },
+            'skill_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString',
+                },
+                'default_value': None,
+            },
         }
     }
 
@@ -66,16 +75,18 @@ class PracticeSessionsPageDataHandler(
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        selected_subtopic_ids = self.normalized_request['selected_subtopic_ids']
+        selected_subtopic_ids = self.normalized_request.get(
+            'selected_subtopic_ids'
+        )
+        skill_ids = self.normalized_request.get('skill_ids')
 
-        selected_skill_ids = []
-        for subtopic in topic.subtopics:
-            # An error is not thrown here, since it's fine to just ignore the
-            # passed in subtopic IDs, if they don't exist, which would be the
-            # case if the creator deletes subtopics after the learner has
-            # loaded the topic viewer page.
-            if subtopic.id in selected_subtopic_ids:
-                selected_skill_ids.extend(subtopic.skill_ids)
+        selected_skill_ids: List[str] = []
+        if skill_ids is not None:
+            selected_skill_ids = skill_ids
+        elif selected_subtopic_ids is not None:
+            for subtopic in topic.subtopics:
+                if subtopic.id in selected_subtopic_ids:
+                    selected_skill_ids.extend(subtopic.skill_ids)
         try:
             skills = skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:

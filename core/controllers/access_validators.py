@@ -29,7 +29,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
@@ -319,8 +319,19 @@ class PracticeSessionAccessValidationPage(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_subtopic_ids': {
-                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
-            }
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString',
+                },
+                'default_value': None,
+            },
+            'skill_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString',
+                },
+                'default_value': None,
+            },
         }
     }
 
@@ -330,6 +341,18 @@ class PracticeSessionAccessValidationPage(
 
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
+        skill_ids = self.normalized_request.get('skill_ids')
+
+        if skill_ids is not None:
+            if not isinstance(skill_ids, list) or not all(
+                isinstance(s, str) for s in skill_ids
+            ):
+                raise self.InvalidInputException('Invalid skill IDs')
+            try:
+                skill_fetchers.get_multi_skills(skill_ids)
+            except Exception as e:
+                raise self.NotFoundException(e)
+            return
 
         if not isinstance(subtopics, list) or not all(
             isinstance(s, int) for s in subtopics
