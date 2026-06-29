@@ -37,6 +37,7 @@ describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
+  let explorationId1: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -56,13 +57,16 @@ describe('Logged-In Learner', function () {
     );
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
-    for (let i = 0; i < 2; i++) {
-      await curriculumAdmin.createAndPublishExplorationWithCards(
-        `Explore Title ${i + 1}`,
-        'Algebra',
-        3
-      );
-    }
+    explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Explore Title 1',
+      'Algebra',
+      3
+    );
+    await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Explore Title 2',
+      'Algebra',
+      3
+    );
     await UserFactory.closeBrowserForUser(curriculumAdmin);
 
     loggedInLearner = await UserFactory.createNewUser(
@@ -79,8 +83,7 @@ describe('Logged-In Learner', function () {
       await loggedInLearner.navigateToCommunityLibraryOnNavbar();
       await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-      await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
-      await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
+      await loggedInLearner.playExploration(explorationId1);
 
       await loggedInLearner.continueToNextCard();
       await loggedInLearner.navigateToLearnerDashboard();
@@ -102,7 +105,6 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToCommunityLibraryOnNavbar();
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-    await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
     await loggedInLearner.addLessonToPlayLater('Explore Title 2', true);
     await loggedInLearner.expectToastMessage(
       "Successfully added to your 'Play Later' list."

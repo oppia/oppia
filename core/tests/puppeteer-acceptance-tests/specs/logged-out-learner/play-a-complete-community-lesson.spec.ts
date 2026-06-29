@@ -115,37 +115,8 @@ describe('Logged-Out Learner', function () {
   }, 900000); // Setup takes loner than default timeout.
 
   it('should use all RTE components in the exploration', async function () {
-    // Navigate to community library page and expect it to contain 3
-    // different explorations.
-    // LO.4 - First step of the test is to verify that the community library page
-    // does not have any translation ids, both before and after filtering by language.
-    await loggedOutLearner.navigateToCommunityLibraryPage();
-    // Expect page has no translation ids.
-    await loggedOutLearner.expectPageHasNoTranslationIds();
-
-    // Select language and verify no translation ids.
-    await loggedOutLearner.filterLessonsByLanguage(['español']);
-    await loggedOutLearner.expectPageHasNoTranslationIds();
-
-    await loggedOutLearner.filterLessonsByLanguage(['English'], 'español');
-    await loggedOutLearner.expectSearchResultsToContain([
-      'What are the place values?',
-      'Dummy Exploration 1',
-      'Dummy Exploration 2',
-    ]);
-
-    await loggedOutLearner.navigateToCommunityLibraryPage();
-    // Search and play the exploration "What are the place values?".
-    // Expect to be on the exploration player page and there is "Lesson info" text.
-    await loggedOutLearner.searchForLessonInSearchBar(
-      'What are the place values?'
-    );
-    await loggedOutLearner.playLessonFromSearchResults(
-      'What are the place values?'
-    );
-    await loggedOutLearner.expectToBeOnPage(
-      `http://localhost:8181/explore/${explorationId}`
-    );
+    // Navigate to the exploration directly and verify the page loads.
+    await loggedOutLearner.playExploration(explorationId);
     await loggedOutLearner.waitForPageToFullyLoad();
 
     await loggedOutLearner.expectLessonInfoTextToBe('Lesson Info');

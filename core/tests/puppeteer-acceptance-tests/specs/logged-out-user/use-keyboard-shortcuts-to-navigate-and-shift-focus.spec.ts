@@ -42,6 +42,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.*401.*Unauthorized.*/]);
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -78,7 +79,7 @@ describe('Logged-out User', function () {
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -114,17 +115,10 @@ describe('Logged-out User', function () {
       await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
       await loggedOutUser.expectToBeOnPage('community library');
 
-      // Expects the focus to be on Search bar in the Community Library page.
-      await loggedOutUser.verifyFocusAfterShortcut('/');
-
       // Skips to the main content.
       await loggedOutUser.verifyFocusAfterShortcut('s');
 
-      // Expects the focus to be on category dropdown in the Community Library page.
-      await loggedOutUser.verifyFocusAfterShortcut('c');
-
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
-      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
+      await loggedOutUser.playExploration(explorationId);
 
       // Skips to the main content.
       await loggedOutUser.verifyFocusAfterShortcut('s');

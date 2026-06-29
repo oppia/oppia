@@ -46,6 +46,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -104,7 +105,7 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -116,9 +117,7 @@ describe('Logged-out User', function () {
   it(
     'should be able to play the exploration without signing in, sign in at any point, save progress, and clear progress',
     async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
-      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
+      await loggedOutUser.playExploration(explorationId);
       await loggedOutUser.continueToNextCard();
 
       // Make some progress in the exploration.

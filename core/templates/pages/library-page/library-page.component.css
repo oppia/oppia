@@ -255,16 +255,6 @@ oppia-library-page .oppia-exploration-summary-header {
   margin-right: auto;
   max-width: 856px;
 }
-oppia-library-page .oppia-search-bar-container {
-  display: flex;
-  justify-content: center;
-  margin: 0 auto 0 auto;
-  width: 100%;
-}
-oppia-library-page .oppia-search-results-bar-container {
-  margin-bottom: 20px;
-}
-
 oppia-library-page .classroom-cards-wrapper {
   align-items: center;
   background-color: #eef5fb;
@@ -629,12 +619,6 @@ oppia-library-page .community-library-breadcrumbs-container {
     font-size: 1.2em;
     margin-left: 7%;
     width: 80%;
-  }
-  oppia-library-page .oppia-search-bar-container {
-    margin-bottom: 90px;
-  }
-  oppia-library-page .oppia-search-results-bar-container {
-    margin-bottom: 100px;
   }
   .oppia-library-group {
     border-top: 3px solid white;

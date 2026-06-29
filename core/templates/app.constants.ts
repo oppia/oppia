@@ -25,10 +25,6 @@ export const AppConstants = {
     I18N_LIBRARY_LOADING: 'Loading',
     I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
     I18N_SIGNUP_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Oppia',
-    I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
-    I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
-    I18N_LIBRARY_LANGUAGES_EN: 'English',
-    I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
     I18N_TOPNAV_SIGN_IN: 'Sign in',
     I18N_SPLASH_PAGE_TITLE_FRAGMENT_FOR_WEB:
       'Oppia | Free, Online and Interactive Lessons for Anyone',

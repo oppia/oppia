@@ -20,8 +20,6 @@ import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
-import isElementClickable from '../../functions/is-element-clickable';
-
 const aboutUrl = testConstants.URLs.About;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
@@ -46,9 +44,6 @@ const nextCardArrowButton = '.e2e-test-next-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 const stateConversationContent = '.e2e-test-conversation-content';
-
-const searchInputSelector = '.e2e-test-search-input';
-const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 
 const resumeExplorationButton = '.resume-button';
 const restartExplorationButton = '.restart-button';
@@ -569,100 +564,11 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Searches for a specific lesson in the search results and opens it.
-   * @param {string} lessonTitle - The title of the lesson to search for.
-   */
-  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(lessonCardTitleSelector);
-      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
-      const searchResults = await Promise.all(
-        searchResultsElements.map(result =>
-          this.page.evaluate(el => el.textContent.trim(), result)
-        )
-      );
-
-      const lessonIndex = searchResults.indexOf(lessonTitle);
-      if (lessonIndex === -1) {
-        throw new Error(
-          `Lesson "${lessonTitle}" not found in search results.\nFound: ${searchResults.join(', ')}`
-        );
-      }
-
-      // TODO(#26453): The search page fires /searchhandler/data multiple
-      // times on load, causing Angular to re-render the search results list and
-      // detach ElementHandle references mid-operation. To avoid stale handles,
-      // we re-query the DOM by selector and index on each poll and at click time
-      // rather than holding an ElementHandle across async boundaries. Remove this
-      // workaround once the upstream re-rendering issue is fixed.
-      await this.page.waitForFunction(
-        ({selector, index, clickableFn}) => {
-          const element = document.querySelectorAll(selector)[index];
-          if (!element) {
-            return false;
-          }
-          const fn = new Function(
-            'element',
-            `return (${clickableFn})(element)`
-          );
-          return fn(element);
-        },
-        {
-          selector: lessonCardTitleSelector,
-          index: lessonIndex,
-          clickableFn: isElementClickable.toString(),
-        }
-      );
-
-      await this.page.evaluate(
-        ({selector, index}) => {
-          const element = document.querySelectorAll(selector)[
-            index
-          ] as HTMLElement;
-          element.click();
-        },
-        {selector: lessonCardTitleSelector, index: lessonIndex}
-      );
-      await this.waitForStaticAssetsToLoad();
-
-      await this.page.waitForSelector(lessonCardTitleSelector, {
-        state: 'hidden',
-      });
-      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      const newError = new Error(
-        `Failed to open lesson from search results: ${err.message}`
-      );
-      newError.stack = err.stack;
-      throw newError;
-    }
-  }
-
-  /**
    * Return to Learner Dashboard from exploration completion card.
    */
   async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.expectElementToBeVisible(returnToLibraryButtonSelector);
     await this.clickOnElementWithSelector(returnToLibraryButtonSelector);
-  }
-
-  /**
-   * Searches for a lesson in the search bar present in the community library.
-   * @param {string} lessonName - The name of the lesson to search for.
-   */
-  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
-    await this.page.waitForSelector(searchInputSelector, {
-      state: 'visible',
-    });
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.mouse.move(-1, -1); // Move mouse away to prevent hover effects from blocking the search input.
-    }
-    await this.clickOnElementWithSelector(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, lessonName);
-
-    await this.page.keyboard.press('Enter');
-    await this.page.waitForNavigation({waitUntil: 'load'});
   }
 
   /**

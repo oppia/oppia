@@ -7387,24 +7387,6 @@ export default {
         }
       ]
     },
-    "LIBRARY_SEARCH": {
-      "ROUTE": "search/find",
-      "TITLE": "Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
-        }
-      ]
-    },
     "PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/session",
       "TITLE": "Practice Session Page",

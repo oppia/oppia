@@ -149,13 +149,8 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should be able to play an exploration and interact with pop-ups, modals and buttons', async function () {
-    // Navigate to community library.
-    await loggedInUser1.navigateToCommunityLibraryPage();
-    await loggedInUser1.verifyPageIsRTL();
-
     // Check lesson player.
-    await loggedInUser1.searchForLessonInSearchBar('What is a Fraction?');
-    await loggedInUser1.playLessonFromSearchResults('What is a Fraction?');
+    await loggedInUser1.playExploration(explorationId);
     await loggedInUser1.verifyPageIsRTL();
 
     // Check hints and lesson info are displayed in RTL.

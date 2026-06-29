@@ -70,7 +70,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/learner-dashboard-page/old-progress-tab.component.spec.ts',
     'core/templates/pages/library-page/classroom-card/classroom-card.component.spec.ts',
     'core/templates/pages/library-page/library-page.component.spec.ts',
-    'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts',
     'core/templates/pages/login-page/login-page.component.spec.ts',
     'core/templates/pages/moderator-page/moderator-page.component.spec.ts',
     'core/templates/pages/oppia-root/app-error-handler.ts',

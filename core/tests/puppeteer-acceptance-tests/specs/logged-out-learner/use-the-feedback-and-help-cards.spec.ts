@@ -37,6 +37,7 @@ enum CARD_NAME {
 describe('Logged-Out Learner', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutLearner: LoggedOutUser;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -106,7 +107,7 @@ describe('Logged-Out Learner', function () {
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'What are the Place Values?',
       'Learn basic Mathematics including Place Values',
       'Mathematics'
@@ -115,13 +116,7 @@ describe('Logged-Out Learner', function () {
 
   it('should be able to see the first card', async function () {
     // Navigate to Lesson Player.
-    await loggedOutLearner.navigateToCommunityLibraryPage();
-    await loggedOutLearner.searchForLessonInSearchBar(
-      'What are the Place Values?'
-    );
-    await loggedOutLearner.playLessonFromSearchResults(
-      'What are the Place Values?'
-    );
+    await loggedOutLearner.playExploration(explorationId);
     await loggedOutLearner.expectCardContentToMatch(
       'Welcome, to the Place Values Exploration.'
     );

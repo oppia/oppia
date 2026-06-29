@@ -16,96 +16,12 @@
 
 from __future__ import annotations
 
-import logging
-
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
-from core.domain import (
-    collection_services,
-    exp_services,
-    summary_services,
-    user_services,
-)
+from core.domain import summary_services, user_services
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
-
-UnionSummaryDictType = Union[
-    summary_services.DisplayableExplorationSummaryDict,
-    summary_services.DisplayableCollectionSummaryDict,
-]
-
-
-def get_matching_activity_dicts(
-    query_string: str,
-    categories: List[str],
-    language_codes: List[str],
-    search_offset: Optional[int],
-) -> Tuple[Sequence[UnionSummaryDictType], Optional[int]]:
-    """Given the details of a query and a search offset, returns a list of
-    activity dicts that satisfy the query.
-
-    Args:
-        query_string: str. The search query string (this is what the user
-            enters).
-        categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
-            of these categories.
-        language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results. If
-            it is not empty, then a result is considered valid if it matches at
-            least one of these language codes.
-        search_offset: int or None. Offset indicating where, in the list of
-            exploration search results, to start the search from. If None,
-            collection search results are returned first before the
-            explorations.
-
-    Returns:
-        tuple. A tuple consisting of two elements:
-            - list(dict). Each element in this list is a collection or
-                exploration summary dict, representing a search result.
-            - int. The exploration index offset from which to start the
-                next search.
-    """
-    # We only populate collections in the initial load, since the current
-    # frontend search infrastructure is set up to only deal with one search
-    # offset at a time.
-    # TODO(sll): Remove this special casing.
-    collection_ids: List[str] = []
-    if not search_offset:
-        collection_ids, _ = (
-            collection_services.get_collection_ids_matching_query(
-                query_string, categories, language_codes
-            )
-        )
-
-    exp_ids, new_search_offset = (
-        exp_services.get_exploration_ids_matching_query(
-            query_string, categories, language_codes, offset=search_offset
-        )
-    )
-    activity_list: List[UnionSummaryDictType] = []
-    for (
-        collection_summary_dict
-    ) in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
-        collection_ids
-    ):
-        activity_list.append(collection_summary_dict)
-    for (
-        exp_summary_dict
-    ) in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
-        exp_ids
-    ):
-        activity_list.append(exp_summary_dict)
-
-    if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
-        logging.exception(
-            '%s activities were fetched to load the library page. '
-            'You may be running up against the default query limits.'
-            % feconf.DEFAULT_QUERY_LIMIT
-        )
-    return activity_list, new_search_offset
+from typing import Dict, List, Optional, TypedDict
 
 
 class OldLibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -266,96 +182,6 @@ class LibraryGroupIndexHandler(
                 'preferred_language_codes': preferred_language_codes,
             }
         )
-        self.render_json(self.values)
-
-
-class SearchHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of SearchHandler's
-    normalized_request dictionary.
-    """
-
-    q: str
-    category: str
-    language_code: str
-    offset: Optional[int]
-
-
-class SearchHandler(
-    base.BaseHandler[Dict[str, str], SearchHandlerNormalizedRequestDict]
-):
-    """Provides data for activity search results."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'q': {'schema': {'type': 'basestring'}, 'default_value': ''},
-            'category': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [
-                        {'id': 'is_search_query_string'},
-                        {
-                            'id': 'is_regex_matched',
-                            'regex_pattern': '[\\-\\w+()"\\s]*',
-                        },
-                    ],
-                },
-                'default_value': '',
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [
-                        {'id': 'is_search_query_string'},
-                        {
-                            'id': 'is_regex_matched',
-                            'regex_pattern': '[\\-\\w+()"\\s]*',
-                        },
-                    ],
-                },
-                'default_value': '',
-            },
-            'offset': {'schema': {'type': 'int'}, 'default_value': None},
-        }
-    }
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        assert self.normalized_request is not None
-        query_string = utils.get_formatted_query_string(
-            self.normalized_request['q']
-        )
-
-        # If there is a category parameter, it should be in the following form:
-        #     category=("Algebra" OR "Math")
-        category_string = self.normalized_request['category']
-        categories = utils.convert_filter_parameter_string_into_list(
-            category_string
-        )
-
-        # If there is a language code parameter, it should be in the following
-        # form:
-        #     language_code=("en" OR "hi")
-        language_code_string = self.normalized_request['language_code']
-        language_codes = utils.convert_filter_parameter_string_into_list(
-            language_code_string
-        )
-
-        search_offset = self.normalized_request.get('offset')
-
-        activity_list, new_search_offset = get_matching_activity_dicts(
-            query_string, categories, language_codes, search_offset
-        )
-
-        self.values.update(
-            {
-                'activity_list': activity_list,
-                'search_cursor': new_search_offset,
-            }
-        )
-
         self.render_json(self.values)
 
 

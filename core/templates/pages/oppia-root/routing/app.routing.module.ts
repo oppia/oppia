@@ -332,14 +332,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_SEARCH.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/library-page/library-page.module').then(
-        m => m.LibraryPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
       .ROUTE,
     pathMatch: 'full',

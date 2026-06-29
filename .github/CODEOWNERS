@@ -420,8 +420,6 @@
 /core/domain/search_services*.py @oppia/lace-backend-reviewers
 /core/templates/pages/library-page/ @oppia/lace-frontend-reviewers
 /core/templates/services/construct-translation-ids.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/search-backend-api.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/search.service*.ts @oppia/lace-frontend-reviewers
 
 
 # Navigation bar project.

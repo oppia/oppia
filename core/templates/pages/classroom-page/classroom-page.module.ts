@@ -27,7 +27,6 @@ import {ClassroomPageComponent} from './classroom-page.component';
 import {ClassroomPageRootComponent} from './classroom-page-root.component';
 import {ClassroomPageRoutingModule} from './classroom-page-routing.module';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
-import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {SummaryTilesModule} from 'components/summary-tile/summary-tile.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
@@ -40,7 +39,6 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
     ClassroomPageRoutingModule,
     FormsModule,
     RichTextComponentsModule,
-    SearchBarModule,
     StringUtilityPipesModule,
     SummaryTilesModule,
     TranslateModule,

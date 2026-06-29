@@ -31,6 +31,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
+  let explorationId: string | null;
 
   test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
@@ -90,7 +91,7 @@ test.describe('Logged-in User', function () {
     await explorationEditor.navigateToCard('Introduction');
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra',
@@ -105,9 +106,7 @@ test.describe('Logged-in User', function () {
   });
 
   test('should be able to track the checkpoint progress', async function () {
-    await loggedInUser.navigateToCommunityLibraryPage();
-    await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
-    await loggedInUser.playLessonFromSearchResults('Positive Numbers');
+    await loggedInUser.playExploration(explorationId);
 
     // Continue to the next card and submit an answer.
     await loggedInUser.continueToNextCard();

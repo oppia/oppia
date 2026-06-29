@@ -38,6 +38,7 @@ enum CARD_NAME {
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -75,7 +76,7 @@ describe('Logged-out User', function () {
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -103,8 +104,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.expectPageLanguageToMatch('hi');
 
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
-      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
+      await loggedOutUser.playExploration(explorationId);
       await loggedOutUser.continueToNextCard();
 
       // Check if the content of the card is in the original language (en).

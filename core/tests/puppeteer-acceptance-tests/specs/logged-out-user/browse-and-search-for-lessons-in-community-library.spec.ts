@@ -65,27 +65,8 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to browse and search for lessons and see the rating of lessons in the community library',
+    'should be able to browse lessons and see the rating of lessons in the community library',
     async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
-
-      await loggedOutUser.searchForLessonInSearchBar('Algebra II');
-      await loggedOutUser.expectSearchResultsToContain([
-        'Algebra I',
-        'Algebra II',
-      ]);
-
-      await loggedOutUser.filterLessonsByCategories(['Algorithms']);
-      await loggedOutUser.expectSearchResultsToContain(['Algebra II']);
-      await loggedOutUser.expectSearchResultsToContain(['Algebra I'], false);
-
-      await loggedOutUser.filterLessonsByLanguage(['Ákán']);
-      // No lessons are created in the Ákán language.
-      await loggedOutUser.expectSearchResultsToContain(
-        ['Algebra I', 'Algebra II'],
-        false
-      );
-
       // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
       await loggedOutUser.navigateToTopRatedLessonsPage();
       await loggedOutUser.expectLessonsInOrder(['Algebra I', 'Algebra II']);

@@ -17,27 +17,11 @@
  */
 
 import {Component} from '@angular/core';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {LibraryPageConstants} from '../library-page.constants';
-
-type LibraryPathToModesKeys =
-  keyof typeof LibraryPageConstants.LIBRARY_PATHS_TO_MODES;
 
 @Component({
   selector: 'oppia-library-footer',
   templateUrl: './library-footer.component.html',
 })
 export class LibraryFooterComponent {
-  footerIsDisplayed: boolean = false;
-
-  constructor(private windowRef: WindowRef) {}
-
-  ngOnInit(): void {
-    let pageMode =
-      LibraryPageConstants.LIBRARY_PATHS_TO_MODES[
-        this.windowRef.nativeWindow.location.pathname as LibraryPathToModesKeys
-      ];
-    this.footerIsDisplayed =
-      pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
-  }
+  footerIsDisplayed: boolean = true;
 }

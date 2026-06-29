@@ -31,6 +31,7 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let explorationEditor: ExplorationEditor;
+  let explorationId: string | null;
 
   test.beforeAll(async function ({browser}) {
     loggedInLearner = await UserFactory.createNewUser(
@@ -45,12 +46,13 @@ test.describe('Logged-In Learner', function () {
       browser
     );
 
-    await explorationEditor.createAndPublishExplorationWithCards(
-      'Solving problems without calculator',
-      'Algebra',
-      2,
-      true
-    );
+    explorationId =
+      await explorationEditor.createAndPublishExplorationWithCards(
+        'Solving problems without calculator',
+        'Algebra',
+        2,
+        true
+      );
   });
 
   test('should be able to find the preferences page', async function () {
@@ -163,13 +165,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should be able to subscribe creators', async function () {
-    await loggedInLearner.navigateToCommunityLibraryPage();
-    await loggedInLearner.searchForLessonInSearchBar(
-      'Solving problems without calculator'
-    );
-    await loggedInLearner.playLessonFromSearchResults(
-      'Solving problems without calculator'
-    );
+    await loggedInLearner.playExploration(explorationId);
     await loggedInLearner.continueToNextCard();
 
     await loggedInLearner.openLessonInfoModal();

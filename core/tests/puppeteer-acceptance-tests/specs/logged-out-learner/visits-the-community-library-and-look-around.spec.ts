@@ -62,17 +62,6 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectCommunityLibraryGroupHeaderToContain([
       'Mathematics & Statistics',
     ]);
-
-    await loggedOutLearner.expectSearchResultsToContain([
-      'Fractions',
-      'Algebra',
-    ]);
-    await loggedOutLearner.filterLessonsByCategories(['Science']);
-    await loggedOutLearner.expectSearchResultsToContain(
-      ['Fractions', 'Algebra'],
-      false
-    );
-    await loggedOutLearner.expectSearchResultsToContain(['Laws of Motion']);
   });
 
   afterAll(async function () {

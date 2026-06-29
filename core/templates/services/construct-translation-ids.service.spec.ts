@@ -26,14 +26,6 @@ describe('Construct Translation Ids Service', () => {
     ctis = TestBed.inject(ConstructTranslationIdsService);
   });
 
-  it('should get library id', () => {
-    expect(ctis.getLibraryId('categories', 'Algorithms')).toBe(
-      'I18N_LIBRARY_CATEGORIES_ALGORITHMS'
-    );
-
-    expect(ctis.getLibraryId('', '')).toBe('I18N_LIBRARY__');
-  });
-
   it('should get classroom title id', () => {
     expect(ctis.getClassroomTitleId('math')).toBe('I18N_CLASSROOM_MATH_NAME');
 

@@ -62,24 +62,9 @@
             "reason": "Syllabus title keys are constructed using I18N_SYLLABUS_${name.toUpperCase()}_TITLE."
         },
         {
-            "pattern": "I18N_LIBRARY_CATEGORIES_*",
-            "code_reference": "core/templates/services/construct-translation-ids.service.ts :: getLibraryId()",
-            "reason": "Library category keys are constructed using I18N_LIBRARY_${prefix}_${name} with prefix='CATEGORIES'."
-        },
-        {
             "pattern": "I18N_LIBRARY_GROUPS_*",
-            "code_reference": "core/templates/services/construct-translation-ids.service.ts :: getLibraryId()",
-            "reason": "Library groups keys are constructed using I18N_LIBRARY_${prefix}_${name} with prefix='GROUPS'."
-        },
-        {
-            "pattern": "I18N_LIBRARY_N_*",
-            "code_reference": "core/templates/pages/library-page/search-bar/search-bar.component.ts :: updateSelectionDetails()",
-            "reason": "Library count keys are constructed using 'I18N_LIBRARY_N_' + itemsName.toUpperCase() (e.g. I18N_LIBRARY_N_CATEGORIES, I18N_LIBRARY_N_LANGUAGES)."
-        },
-        {
-            "pattern": "I18N_LIBRARY_ALL_*_SELECTED",
-            "code_reference": "core/templates/pages/library-page/search-bar/search-bar.component.ts :: updateSelectionDetails()",
-            "reason": "Library selection keys are constructed using 'I18N_LIBRARY_ALL_' + itemsName + '_SELECTED'."
+            "code_reference": "core/domain/summary_services.py",
+            "reason": "Library groups keys are constructed from header_i18n_id in summary_services.py (e.g. I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS)."
         },
         {
             "pattern": "I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_*",

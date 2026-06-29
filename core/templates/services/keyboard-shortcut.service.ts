@@ -95,39 +95,7 @@ export class KeyboardShortcutService {
     });
   }
 
-  bindLibraryPageShortcuts(): void {
-    Mousetrap.bind('/', () => {
-      var searchBar = document.querySelector(
-        '.oppia-search-bar-text-input'
-      ) as HTMLElement;
-      if (searchBar !== null) {
-        searchBar.focus();
-      }
-      return false;
-    });
-
-    Mousetrap.bind('c', () => {
-      var categoryBar = document.querySelector(
-        '.oppia-search-bar-dropdown-toggle'
-      ) as HTMLElement;
-      if (categoryBar !== null) {
-        categoryBar.focus();
-      }
-    });
-
-    Mousetrap.bind('s', () => {
-      var skipButton = document.querySelector(
-        '.oppia-skip-to-content'
-      ) as HTMLElement;
-      if (skipButton !== null) {
-        skipButton.click();
-      }
-    });
-
-    Mousetrap.bind('?', () => {
-      this.openQuickReference();
-    });
-  }
+  bindLibraryPageShortcuts(): void {}
 
   bindNavigationShortcuts(): void {
     Mousetrap.bind('ctrl+6', () => {

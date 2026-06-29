@@ -28,6 +28,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
+  let rationalExplorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -35,9 +36,10 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-      'Rational Numbers'
-    );
+    rationalExplorationId =
+      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+        'Rational Numbers'
+      );
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
       'Real Numbers',
       'Algebra',
@@ -61,9 +63,7 @@ describe('Exploration Editor', function () {
   it(
     'should display created explorations and their statistics on the creator dashboard after creating, playing, and rating as a logged-in user',
     async function () {
-      await loggedInUser.navigateToCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Rational Numbers');
-      await loggedInUser.playLessonFromSearchResults('Rational Numbers');
+      await loggedInUser.playExploration(rationalExplorationId);
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );

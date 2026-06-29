@@ -45,9 +45,6 @@ const userRoleDescriptionSelector = '.oppia-user-role-description';
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
-// Community Library.
-const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
-
 // Exploration.
 const explorationTileSelector = '.e2e-test-exploration-dashboard-card';
 const generateExplorationButton = '.oppia-generate-exploration-text';
@@ -542,11 +539,6 @@ export class SuperAdmin extends BaseUser {
    */
   async expectActivityToBePresent(activityName: string): Promise<void> {
     try {
-      await this.page.waitForSelector(searchFieldCommunityLibrary, {
-        visible: true,
-      });
-      await this.typeInInputField(searchFieldCommunityLibrary, activityName);
-
       const isActivityPresent = await this.isTextPresentOnPage(activityName);
       if (!isActivityPresent) {
         throw new Error(`Activity "${activityName}" is not present`);
