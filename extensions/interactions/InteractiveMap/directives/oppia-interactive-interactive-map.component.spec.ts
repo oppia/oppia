@@ -18,7 +18,7 @@
 
 import {EventEmitter} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractiveMapAnswer} from 'interactions/answer-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {icon, LatLng, LeafletMouseEvent, tileLayer} from 'leaflet';
@@ -65,7 +65,7 @@ describe('InteractiveInteractiveMapComponent', () => {
     ) => {},
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveInteractiveMapComponent],
       providers: [

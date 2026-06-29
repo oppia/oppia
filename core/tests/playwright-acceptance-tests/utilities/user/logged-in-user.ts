@@ -22,10 +22,10 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseUrl = testConstants.URLs.BaseURL;
-const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const loginPageUrl = testConstants.URLs.Login;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
@@ -40,15 +40,16 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 
-const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
-const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
-const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
-const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+
+const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
+const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
+const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
+const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const matFormTextSelector = '.oppia-form-text';
 const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
 const audioLanguageSearchInputSelector =
@@ -68,6 +69,7 @@ const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 
 const angularRootElementSelector = 'oppia-angular-root';
+const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -92,10 +94,6 @@ const editProfilePictureButton = '.e2e-test-photo-clickable';
 const bioTextareaSelector = '.e2e-test-user-bio';
 const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
 
-const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
-const ratingStarSelector = '.e2e-test-rating-star';
-const filledRatingStarSelector = '.fas.fa-star';
-
 // Preferences page selectors.
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
@@ -116,10 +114,13 @@ const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2 = 'Please do not leave this page.';
 
+const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
+const ratingStarSelector = '.e2e-test-rating-star';
+const filledRatingStarSelector = '.fas.fa-star';
+
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
-const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
@@ -142,11 +143,8 @@ const goalCheckboxInRedesignedLearnerDashboard =
 // Learner Dashboard > Home Tab Selectors.
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
-const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
-  '.e2e-test-continue-where-you-left-off';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
-const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -178,8 +176,9 @@ const tabSelectorMap: Record<string, string> = {
   Goals: '.e2e-test-goals-section',
   Progress: '.e2e-test-progress-section',
 };
-
-const learnerGreetingsSelector = '.e2e-test-learner-greetings';
+const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
+  '.e2e-test-continue-where-you-left-off';
+const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 
 // Common > Lesson Card.
 const commonLessonCardContainerSelector =
@@ -189,6 +188,8 @@ const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
+
+const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 
 // Common > Remove modal selectors.
 const removeModalContainerSelector =
@@ -914,27 +915,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the learner dashboard using profile dropdown in the navbar.
-   */
-  async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(profileDropdown, {
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(profileDropdown);
-
-    await this.page.waitForSelector(learnerDashboardMenuLink, {
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(learnerDashboardMenuLink);
-
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-      state: 'attached',
-    });
-  }
-
-  /**
    * Navigates to lesson using lesson card.
    * @param {string} criteria - Subsection title value to match.
    * @param {string} lessonTitle - Lesson card title expected.
@@ -969,112 +949,6 @@ export class LoggedInUser extends BaseUser {
         `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
       );
     }
-  }
-
-  /**
-   * Navigates to the goals section of the learner dashboard.
-   */
-  async navigateToGoalsSection(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(goalsSectionSelector);
-      await this.clickOnElementWithSelector(goalsSectionSelector);
-
-      try {
-        await this.page.waitForSelector(currentGoalsSectionSelector, {
-          timeout: 5000,
-        });
-      } catch (error) {
-        if (error instanceof Error && error.message.includes('Timeout')) {
-          // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(goalsSectionSelector);
-        } else {
-          throw error;
-        }
-      }
-
-      await this.expectElementToBeVisible(goalsSectionContainerSelector);
-    } else {
-      await this.page.waitForSelector(goalsSectionSelector);
-      const goalSectionElement = await this.page.$(goalsSectionSelector);
-      if (!goalSectionElement) {
-        throw new Error('Progress section not found.');
-      }
-      await goalSectionElement.click();
-    }
-
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(goalsSectionContainerSelector);
-  }
-
-  /**
-   * Navigates to the Contributor Admin Dashboard page.
-   */
-  async navigateToContributorAdminDashboardPage(): Promise<void> {
-    await this.goto(contributorDashboardAdminUrl);
-  }
-
-  /**
-   * Navigates to the Moderator page.
-   */
-  async navigateToModeratorPage(): Promise<void> {
-    await this.goto(moderatorPageUrl);
-  }
-
-  /**
-   * Navigates to the Preferences Page Using Profile Dropdown Menu.
-   */
-  async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(profileDropdown);
-
-    await this.page.waitForSelector(preferencesMenuLink, {
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(preferencesMenuLink);
-
-    await this.page.waitForSelector(preferencesContainerSelector, {
-      state: 'visible',
-    });
-  }
-
-  /**
-   * Navigates to the Release Coordinator page.
-   */
-  async navigateToReleaseCoordinatorPage(): Promise<void> {
-    await this.goto(releaseCoordinatorPageUrl);
-  }
-
-  /**
-   * Navigates to the sign up page by going to splash page (home), then clicking 'Sign in' button.
-   * If the user hasn't accepted cookies, it clicks 'OK' to accept them.
-   */
-  async navigateToSignUpPage(): Promise<void> {
-    await this.goto(splashPageUrl, false);
-    if (!this.userHasAcceptedCookies) {
-      await this.clickOnElementWithText('OK');
-      this.userHasAcceptedCookies = true;
-    }
-    await this.clickOnElementWithText('Sign in');
-
-    await this.page.waitForSelector(loginPage, {
-      state: 'visible',
-    });
-  }
-
-  /**
-   * Navigates to the Admin page.
-   */
-  async navigateToSiteAdminPage(): Promise<void> {
-    await this.goto(siteAdminPageUrl);
-  }
-
-  /**
-   * Navigates to the Topics and Skills Dashboard page.
-   */
-  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
-    await this.goto(topicsAndSkillsDashboardUrl);
   }
 
   /**
@@ -1330,6 +1204,133 @@ export class LoggedInUser extends BaseUser {
     if (!titleFound) {
       throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
     }
+  }
+
+  /**
+   * Navigates to the learner dashboard using profile dropdown in the navbar.
+   */
+  async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(profileDropdown, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(learnerDashboardMenuLink, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(learnerDashboardMenuLink);
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Navigates to the goals section of the learner dashboard.
+   */
+  async navigateToGoalsSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(goalsSectionSelector);
+      await this.clickOnElementWithSelector(goalsSectionSelector);
+
+      try {
+        await this.page.waitForSelector(currentGoalsSectionSelector, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Timeout')) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOnElementWithSelector(goalsSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+
+      await this.expectElementToBeVisible(goalsSectionContainerSelector);
+    } else {
+      await this.page.waitForSelector(goalsSectionSelector);
+      const goalSectionElement = await this.page.$(goalsSectionSelector);
+      if (!goalSectionElement) {
+        throw new Error('Progress section not found.');
+      }
+      await goalSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(goalsSectionContainerSelector);
+  }
+
+  /**
+   * Navigates to the Contributor Admin Dashboard page.
+   */
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Preferences Page Using Profile Dropdown Menu.
+   */
+  async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(preferencesMenuLink, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(preferencesMenuLink);
+
+    await this.page.waitForSelector(preferencesContainerSelector, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
+   * Navigates to the sign up page by going to splash page (home), then clicking 'Sign in' button.
+   * If the user hasn't accepted cookies, it clicks 'OK' to accept them.
+   */
+  async navigateToSignUpPage(): Promise<void> {
+    await this.goto(splashPageUrl, false);
+    if (!this.userHasAcceptedCookies) {
+      await this.clickOnElementWithText('OK');
+      this.userHasAcceptedCookies = true;
+    }
+    await this.clickOnElementWithText('Sign in');
+
+    await this.page.waitForSelector(loginPage, {
+      state: 'visible',
+    });
+  }
+
+  /**
+   * Navigates to the Admin page.
+   */
+  async navigateToSiteAdminPage(): Promise<void> {
+    await this.goto(siteAdminPageUrl);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
   }
 
   /**

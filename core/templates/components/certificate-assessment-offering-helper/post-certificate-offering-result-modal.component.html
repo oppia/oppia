@@ -1,0 +1,23 @@
+<div class="modal-body p-0" tabindex="0">
+  <div class="d-flex flex-column align-items-center">
+
+    <img [src]="getOppiaLargeAvatarUrl()" alt="Oppia Avatar" class="oppia-certificate-avatar">
+    <div class="oppia-certificate-card">
+      <p class="oppia-certificate-message">
+        Your certificate <strong>{{ certificateName }}</strong>
+        {{ certificateActionMessage }}
+      </p>
+
+      <p class="oppia-certificate-link-row">
+        <strong>Your certificate link:</strong>
+        <a [href]="certificateUrl" target="_blank" rel="noopener">{{ certificateUrl }}</a>
+        &nbsp;
+        <button type="button" class="oppia-copy-link-button" (click)="copyCertificateUrl()" aria-label="Copy link"
+        >
+          <i class="far fa-copy" aria-hidden="true"></i>
+        </button>
+      </p>
+    </div>
+
+  </div>
+</div>
