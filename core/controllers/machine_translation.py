@@ -53,7 +53,7 @@ class MachineTranslationGenerateHandler(
             feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         if not translation_services.is_automatic_translation_enabled():
             raise self.InvalidInputException(
@@ -75,7 +75,7 @@ class MachineTranslationGenerateHandler(
                 )
             )
         except Exception as e:
-            raise self.InternalServerErrorException(str(e))
+            raise self.InternalErrorException(str(e))
 
         if translation_result is None:
             raise self.InvalidInputException(
@@ -122,7 +122,7 @@ class TranslationProviderMappingHandler(
             feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         # TODO(#24714): In Milestone 2 (PR 2.1), replace open_access with strict
         # role-based access control to verify the user is a Translation Admin.
@@ -141,7 +141,7 @@ class TranslationProviderMappingHandler(
             feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
             self.user_id,
         ):
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         # TODO(#24714): In Milestone 2 (PR 2.1), replace open_access with strict
         # role-based access control to verify the user is a Translation Admin.
@@ -149,12 +149,12 @@ class TranslationProviderMappingHandler(
         new_mapping = self.payload.get('provider_mapping')
 
         try:
-            machine_translation_services.update_translation_provider_mapping(
+            machine_translation_services.save_translation_provider_mapping(
                 new_mapping
             )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
         except Exception as e:
-            raise self.InternalServerErrorException(str(e))
+            raise self.InternalErrorException(str(e))
 
         self.render_json({'status': 'success'})

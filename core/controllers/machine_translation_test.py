@@ -27,8 +27,11 @@ from core.tests import test_utils
 from typing import Any, Dict
 
 
-class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
+class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
     """Tests for the MachineTranslationGenerateHandler."""
+
+    CONTRIBUTOR_EMAIL = 'contributor@example.com'
+    CONTRIBUTOR_USERNAME = 'contributor'
 
     def setUp(self) -> None:
         super().setUp()
@@ -43,7 +46,6 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             'target_language_code': 'hi',
         }
 
-        # Swap the official feature flag service to return True
         self.feature_flag_swap = self.swap(
             feature_flag_services,
             'is_feature_flag_enabled',
@@ -59,7 +61,6 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
     def test_post_fails_if_feature_flag_disabled(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # For this test, swap the flag to return False
         flag_swap = self.swap(
             feature_flag_services,
             'is_feature_flag_enabled',
@@ -147,13 +148,15 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
         self.logout()
 
 
-class TranslationProviderMappingHandlerTests(test_utils.ControllerTestBase):
+class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
     """Tests for the TranslationProviderMappingHandler."""
+
+    ADMIN_EMAIL = 'admin@example.com'
+    ADMIN_USERNAME = 'admin'
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
 
         self.valid_payload = {
             'provider_mapping': {'hi': 'azure', 'es': 'google'}

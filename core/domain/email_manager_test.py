@@ -9412,26 +9412,26 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Bulk Subject')
 
+    def test_send_machine_translation_failure_email(self) -> None:
+        """Tests the send_machine_translation_failure_email function."""
+        email_messages: List[Tuple[str, str]] = []
 
-def test_send_machine_translation_failure_email(self) -> None:
-    """Tests the send_machine_translation_failure_email function."""
-    email_messages = []
+        def mock_send_mail_to_admin(subject: str, body: str) -> None:
+            email_messages.append((subject, body))
 
-    def mock_send_mail_to_admin(subject: str, body: str) -> None:
-        email_messages.append((subject, body))
-
-    swap_send_mail = self.swap(
-        email_manager, 'send_mail_to_admin', mock_send_mail_to_admin
-    )
-
-    with swap_send_mail:
-        email_manager.send_machine_translation_failure_email(
-            'azure', 'Timeout Exception 504'
+        swap_send_mail = self.swap(
+            email_manager, 'send_mail_to_admin', mock_send_mail_to_admin
         )
 
-    self.assertEqual(len(email_messages), 1)
+        with swap_send_mail:
+            email_manager.send_machine_translation_failure_email(
+                'azure', 'Timeout Exception 504'
+            )
 
-    self.assertEqual(email_messages, 'Machine Translation API Failure: Azure')
+        self.assertEqual(len(email_messages), 1)
 
-    self.assertIn('provider "azure" has failed.', email_messages)
-    self.assertIn('Timeout Exception 504', email_messages)
+        subject, body = email_messages[0]
+
+        self.assertEqual(subject, 'Machine Translation API Failure: Azure')
+        self.assertIn('provider "azure" has failed.', body)
+        self.assertIn('Timeout Exception 504', body)

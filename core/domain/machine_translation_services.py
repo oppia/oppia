@@ -162,3 +162,21 @@ def generate_and_cache_translation(
     )
 
     return (clean_translated_html, provider_id)
+
+
+def get_translation_provider_mapping() -> Dict[str, str]:
+    """Gets the current language-to-provider mapping.
+
+    Returns:
+        dict. The language to translation provider mapping.
+    """
+    return translation_services.get_machine_translation_provider_mapping()
+
+
+def save_translation_provider_mapping(new_mapping: Dict[str, str]) -> None:
+    """Updates the language-to-provider mapping.
+
+    Args:
+        new_mapping: dict. The new mapping to save.
+    """
+    translation_services.save_machine_translation_provider_mapping(new_mapping)

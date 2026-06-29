@@ -127,7 +127,9 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
         )
 
         class MockProvider:
-            def generate_translation(self, src, tgt, text: str) -> str:
+            def generate_translation(
+                self, src: str, tgt: str, text: str
+            ) -> str:
                 return 'api_translated_text'
 
         provider_instance_swap = self.swap(
@@ -155,7 +157,9 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
 
     def test_api_failure_sends_email_and_raises_exception(self) -> None:
         class MockFailingProvider:
-            def generate_translation(self, src, tgt, text: str) -> str:
+            def generate_translation(
+                self, src: str, tgt: str, text: str
+            ) -> str:
                 raise Exception('Azure Timeout')
 
         provider_instance_swap = self.swap(
