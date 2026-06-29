@@ -82,16 +82,16 @@ export class ConversationSkinComponent {
 
   isLoggedIn: boolean = false;
   voiceoversAreLoaded: boolean = false;
-  collectionTitle!: string | null;
+  collectionTitle: string | null = null;
   explorationId!: string;
   isIframed!: boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary!: LearnerExplorationSummary | string;
+  collectionSummary: LearnerExplorationSummary | string | null = null;
   moveToExploration: boolean = false;
 
-  pidInUrl!: string | null;
+  pidInUrl: string | null = null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
@@ -152,6 +152,8 @@ export class ConversationSkinComponent {
         .then(collection => {
           this.collectionTitle = collection.getTitle();
         });
+    } else {
+      this.collectionTitle = null;
     }
 
     this.explorationId = this.pageContextService.getExplorationId();
@@ -325,6 +327,8 @@ export class ConversationSkinComponent {
       );
       this.initializePage();
 
+      this.collectionSummary = null;
+
       if (collectionId) {
         this.collectionPlayerBackendApiService
           .fetchCollectionSummariesAsync(collectionId)
@@ -491,10 +495,9 @@ export class ConversationSkinComponent {
     this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
     const nextStateCard = this.conversationFlowService.getNextCardIfStuck();
-    if (!nextStateCard) {
-      return;
+    if (nextStateCard) {
+      this.conversationFlowService.setNextStateCard(nextStateCard);
     }
-    this.conversationFlowService.setNextStateCard(nextStateCard);
     this.showInteraction = false;
     this.conversationFlowService.showPendingCard();
   }

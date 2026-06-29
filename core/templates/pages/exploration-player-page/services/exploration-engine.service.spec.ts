@@ -2601,9 +2601,10 @@ describe('Exploration engine service ', () => {
         if (stateName === 'StuckState') {
           const state = State.createDefaultState(
             'StuckState',
-            JSON.parse('null'),
+            'dummy_content_id',
             'default_outcome'
           );
+          state.content.contentId = null;
           state.content.html = 'Stuck';
           state.interaction.id = 'TextInput';
           state.interaction.customizationArgs = validCustomizationArgs;

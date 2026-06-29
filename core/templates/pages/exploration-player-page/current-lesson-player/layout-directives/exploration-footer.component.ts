@@ -71,7 +71,7 @@ export class ExplorationFooterComponent {
   // Used to update the number of checkpoints completed
   // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
-  expInfo!: LearnerExplorationSummaryBackendDict | null;
+  expInfo: LearnerExplorationSummaryBackendDict | null = null;
   expStates!: StateObjectsBackendDict;
   completedCheckpointsCount: number = 0;
   lastCheckpointWasCompleted: boolean = false;
@@ -80,7 +80,7 @@ export class ExplorationFooterComponent {
   footerIsInQuestionPlayerMode: boolean = false;
 
   conceptCardForStateExists: boolean = true;
-  linkedSkillId!: string | null;
+  linkedSkillId: string | null = null;
   @ViewChild('lessonInfoButton') lessonInfoButton!: ElementRef;
 
   constructor(

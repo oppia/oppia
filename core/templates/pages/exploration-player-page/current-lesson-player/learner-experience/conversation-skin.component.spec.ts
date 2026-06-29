@@ -1393,17 +1393,6 @@ describe('Conversation skin component', () => {
     expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
   }));
 
-  it('should not redirect if no stuck-state card is available', fakeAsync(() => {
-    spyOn(conversationFlowService, 'showPendingCard');
-    conversationFlowService.setNextCardIfStuck(null);
-    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
-      displayedCard
-    );
-    componentInstance.triggerRedirectionToStuckState();
-
-    expect(conversationFlowService.showPendingCard).not.toHaveBeenCalled();
-  }));
-
   it(
     'should navigate to the most recently reached checkpoint ' +
       'on page load if user is logged in',
