@@ -37,11 +37,36 @@ from core.domain import (
 )
 
 from typing import (  # pylint: disable=wrong-import-position
-    Any,
     Dict,
     List,
+    Optional,
     Sequence,
+    TypedDict,
+    cast,
 )
+
+
+class StoryNodeResponseDict(story_domain.StoryNodeDict):
+    """TypedDict for the StoryNode dict enriched with voiceover metadata."""
+
+    available_text_language_codes: List[str]
+    available_voiceover_language_codes: List[str]
+    available_voiceover_language_accent_descriptions: Dict[str, str]
+
+
+class StoryResponseDict(TypedDict):
+    """TypedDict for the canonical/additional story data in the API response."""
+
+    id: str
+    title: str
+    description: str
+    node_titles: List[str]
+    thumbnail_bg_color: Optional[str]
+    thumbnail_filename: Optional[str]
+    url_fragment: str
+    story_is_published: bool
+    completed_node_titles: List[str]
+    all_node_dicts: List[StoryNodeResponseDict]
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -85,8 +110,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
-        # Here we use type Any because the dict values have mixed types (str, list, bool).
-        canonical_story_dicts: List[Dict[str, Any]] = []
+        canonical_story_dicts: List[StoryResponseDict] = []
         canonical_story_nodes: List[Sequence[story_domain.StoryNode]] = []
         exploration_ids: set[str] = set()
 
@@ -115,8 +139,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 story_summary.node_titles, pending_node_titles
             )
             story_summary_dict = story_summary.to_human_readable_dict()
-            # Here we use type Any because the dict values have mixed types (str, list, bool).
-            canonical_story_dict: Dict[str, Any] = {
+            canonical_story_dict: StoryResponseDict = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
@@ -126,12 +149,12 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
+                'all_node_dicts': [],
             }
             canonical_story_dicts.append(canonical_story_dict)
             canonical_story_nodes.append(filtered_nodes)
 
-        # Here we use type Any because the dict values have mixed types (str, list, bool).
-        additional_story_dicts: List[Dict[str, Any]] = []
+        additional_story_dicts: List[StoryResponseDict] = []
         additional_story_nodes: List[Sequence[story_domain.StoryNode]] = []
         for story_summary in additional_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
@@ -147,8 +170,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             additional_story_nodes.append(all_nodes)
             story_summary_dict = story_summary.to_human_readable_dict()
-            # Here we use type Any because the dict values have mixed types (str, list, bool).
-            additional_story_dict: Dict[str, Any] = {
+            additional_story_dict: StoryResponseDict = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
@@ -158,6 +180,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
+                'all_node_dicts': [],
             }
             additional_story_dicts.append(additional_story_dict)
 
@@ -241,8 +264,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             voiceover_services.get_language_accent_codes_to_descriptions()
         )
 
-        # Here we use type Any because the returned dict values have mixed types (str, list).
-        def _create_node_dict(node: story_domain.StoryNode) -> Dict[str, Any]:
+        def _create_node_dict(
+            node: story_domain.StoryNode,
+        ) -> StoryNodeResponseDict:
             available_text_language_codes: List[str] = []
             available_voiceover_language_codes: List[str] = []
 
@@ -258,20 +282,26 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     )
                 )
 
-            node_dict = dict(node.to_dict())
-            node_dict['available_text_language_codes'] = (
-                available_text_language_codes
+            return cast(
+                StoryNodeResponseDict,
+                {
+                    **node.to_dict(),
+                    'available_text_language_codes': (
+                        available_text_language_codes
+                    ),
+                    'available_voiceover_language_codes': (
+                        available_voiceover_language_codes
+                    ),
+                    'available_voiceover_language_accent_descriptions': {
+                        accent_code: (
+                            language_accent_codes_to_descriptions.get(
+                                accent_code, accent_code
+                            )
+                        )
+                        for accent_code in available_voiceover_language_codes
+                    },
+                },
             )
-            node_dict['available_voiceover_language_codes'] = (
-                available_voiceover_language_codes
-            )
-            node_dict['available_voiceover_language_accent_descriptions'] = {
-                accent_code: language_accent_codes_to_descriptions.get(
-                    accent_code, accent_code
-                )
-                for accent_code in available_voiceover_language_codes
-            }
-            return node_dict
 
         for canonical_story_dict, canonical_nodes in zip(
             canonical_story_dicts, canonical_story_nodes

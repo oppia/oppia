@@ -39,6 +39,9 @@ describe('Story node model', () => {
       last_modified_msecs: 10,
       first_publication_date_msecs: 20,
       unpublishing_reason: null,
+      available_text_language_codes: [],
+      available_voiceover_language_codes: [],
+      available_voiceover_language_accent_descriptions: {},
     };
     _sampleStoryNode = StoryNode.createFromBackendDict(
       sampleStoryNodeBackendDict
@@ -103,6 +106,9 @@ describe('Story node model', () => {
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
         unpublishing_reason: null,
+        available_text_language_codes: [],
+        available_voiceover_language_codes: [],
+        available_voiceover_language_accent_descriptions: {},
       };
       const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
       const expectedErrorMessage =
@@ -134,6 +140,9 @@ describe('Story node model', () => {
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
         unpublishing_reason: null,
+        available_text_language_codes: [],
+        available_voiceover_language_codes: [],
+        available_voiceover_language_accent_descriptions: {},
       };
       const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
       const expectedErrorMessage =
@@ -165,6 +174,9 @@ describe('Story node model', () => {
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
         unpublishing_reason: null,
+        available_text_language_codes: [],
+        available_voiceover_language_codes: [],
+        available_voiceover_language_accent_descriptions: {},
       };
       const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
       const expectedErrorMessage =
@@ -197,6 +209,9 @@ describe('Story node model', () => {
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
         unpublishing_reason: null,
+        available_text_language_codes: [],
+        available_voiceover_language_codes: [],
+        available_voiceover_language_accent_descriptions: {},
       };
       const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
 
@@ -227,6 +242,9 @@ describe('Story node model', () => {
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
         unpublishing_reason: null,
+        available_text_language_codes: [],
+        available_voiceover_language_codes: [],
+        available_voiceover_language_accent_descriptions: {},
       };
       const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
       const expectedErrorMessage =
@@ -475,6 +493,7 @@ describe('Story node model', () => {
       unpublishing_reason: null,
       available_text_language_codes: ['en', 'es'],
       available_voiceover_language_codes: ['en'],
+      available_voiceover_language_accent_descriptions: {},
     };
 
     const node = StoryNode.createFromBackendDict(backendDict);
@@ -503,6 +522,7 @@ describe('Story node model', () => {
       unpublishing_reason: null,
       available_text_language_codes: ['en'],
       available_voiceover_language_codes: ['en-US', 'en-GB'],
+      available_voiceover_language_accent_descriptions: {},
     };
 
     const node = StoryNode.createFromBackendDict(backendDict);
@@ -567,6 +587,7 @@ describe('Story node model', () => {
       unpublishing_reason: null,
       available_text_language_codes: ['en', 'es'],
       available_voiceover_language_codes: ['en'],
+      available_voiceover_language_accent_descriptions: {},
     };
 
     const node = StoryNode.createFromBackendDict(backendDict);
@@ -605,32 +626,5 @@ describe('Story node model', () => {
     expect(node.getAvailableVoiceoverLanguageAccentDescriptions()).toEqual({
       'en-US': 'English (US)',
     });
-  });
-
-  it('should create node from backend dict with missing optional fields', () => {
-    const backendDict: StoryNodeBackendDict = {
-      id: 'node_4',
-      thumbnail_filename: null,
-      title: 'Title 4',
-      description: 'Description 4',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: '',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: null,
-      status: 'Draft',
-      planned_publication_date_msecs: null,
-      last_modified_msecs: null,
-      first_publication_date_msecs: null,
-      unpublishing_reason: null,
-    };
-
-    const node = StoryNode.createFromBackendDict(backendDict);
-
-    expect(node.getAvailableTextLanguageCodes()).toEqual([]);
-    expect(node.getAvailableVoiceoverLanguageCodes()).toEqual([]);
-    expect(node.getAvailableVoiceoverLanguageAccentDescriptions()).toEqual({});
   });
 });

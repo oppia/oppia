@@ -24,6 +24,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {LanguageSelectorComponent} from './language-selector.component';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -46,7 +47,7 @@ describe('LanguageSelectorComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [LanguageSelectorComponent],
+      declarations: [LanguageSelectorComponent, MockTranslatePipe],
       providers: [
         {
           provide: LanguageUtilService,
