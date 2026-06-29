@@ -36,9 +36,9 @@ export interface StoryNodeBackendDict {
   last_modified_msecs: number | null;
   first_publication_date_msecs: number | null;
   unpublishing_reason: string | null;
-  available_text_language_codes: string[];
-  available_voiceover_language_codes: string[];
-  available_voiceover_language_accent_descriptions: {
+  available_text_language_codes?: string[];
+  available_voiceover_language_codes?: string[];
+  available_voiceover_language_accent_descriptions?: {
     [accentCode: string]: string;
   };
 }
