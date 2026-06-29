@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormControl} from '@angular/forms';
 import {RealEditorComponent} from './real-editor.component';
 
@@ -26,7 +26,7 @@ describe('RealEditorComponent', () => {
   let component: RealEditorComponent;
   let fixture: ComponentFixture<RealEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [RealEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

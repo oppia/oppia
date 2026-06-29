@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BackgroundMaskService} from '../../../../../services/stateful/background-mask.service';
 import {ExplorationHtmlFormatterService} from '../../../../../services/exploration-html-formatter.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -62,7 +62,7 @@ describe('NewInputResponsePairComponent', () => {
   let numberConversionService: NumberConversionService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, NgbModule, BrowserAnimationsModule],
       declarations: [NewInputResponsePairComponent, MockTranslatePipe],

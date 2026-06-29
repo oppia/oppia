@@ -19,7 +19,7 @@
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -56,7 +56,7 @@ describe('topicEditorStoriesList', () => {
   };
   let windowRef: WindowRef;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TopicEditorStoriesListComponent],
       imports: [HttpClientTestingModule],
