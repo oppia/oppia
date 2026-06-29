@@ -31,7 +31,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
-  let explorationId: string | null;
+  let explorationId: string;
 
   test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
@@ -91,12 +91,16 @@ test.describe('Logged-in User', function () {
     await explorationEditor.navigateToCard('Introduction');
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Positive Numbers',
-      'Learn positive numbers.',
-      'Algebra',
-      'growth'
-    );
+    explorationId =
+      (await explorationEditor.publishExplorationWithMetadata(
+        'Positive Numbers',
+        'Learn positive numbers.',
+        'Algebra',
+        'growth'
+      )) ?? '';
+    if (explorationId === '') {
+      throw new Error('Error publishing exploration successfully.');
+    }
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',

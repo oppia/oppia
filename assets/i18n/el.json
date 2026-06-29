@@ -190,8 +190,6 @@
   "I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING": "Δεν ξέρεις από πού να ξεκινήσεις;",
   "I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT": "Ξεκίνησε από τα βασικά με το πρώτο μας θέμα, <[firstTopic]>.",
   "I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON": "Κάνε το κουίζ",
-  "I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Εξερευνήστε μαθήματα που φτιάχτηκαν από την κοινότητα",
-  "I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "Αναζητήστε μέσω της βιβλιοθήκης της κοινότητας",
   "I18N_CLASSROOM_PAGE_TOPICS_COVERED": "Θέματα που καλύπτονται",
   "I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT": "Αίθουσες διδασκαλίας",
   "I18N_COLLECTION_EDITOR_PAGE_TITLE": "<[collectionTitle]> - Επεξεργαστής Oppia",

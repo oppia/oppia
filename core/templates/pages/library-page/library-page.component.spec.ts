@@ -570,6 +570,11 @@ describe('Library Page Component', () => {
     expect(windowRef.nativeWindow.location.href).toEqual(fullResultsUrl);
   });
 
+  it('should not navigate when full results url is falsy', () => {
+    componentInstance.showFullResultsPage('');
+    expect(windowRef.nativeWindow.location.href).not.toEqual('');
+  });
+
   it('should increment and decrement carousel', () => {
     componentInstance.libraryGroups = [
       {

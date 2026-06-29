@@ -46,7 +46,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
-  let explorationId: string | null;
+  let explorationId: string;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -105,11 +105,15 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Positive Numbers',
-      'Learn positive numbers.',
-      'Algebra'
-    );
+    explorationId =
+      (await explorationEditor.publishExplorationWithMetadata(
+        'Positive Numbers',
+        'Learn positive numbers.',
+        'Algebra'
+      )) ?? '';
+    if (explorationId === '') {
+      throw new Error('Error publishing exploration successfully.');
+    }
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);

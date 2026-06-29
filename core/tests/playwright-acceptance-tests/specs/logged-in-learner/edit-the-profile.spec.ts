@@ -31,7 +31,7 @@ test.describe.configure({mode: 'serial'});
 test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let explorationEditor: ExplorationEditor;
-  let explorationId: string | null;
+  let explorationId: string;
 
   test.beforeAll(async function ({browser}) {
     loggedInLearner = await UserFactory.createNewUser(
@@ -47,12 +47,15 @@ test.describe('Logged-In Learner', function () {
     );
 
     explorationId =
-      await explorationEditor.createAndPublishExplorationWithCards(
+      (await explorationEditor.createAndPublishExplorationWithCards(
         'Solving problems without calculator',
         'Algebra',
         2,
         true
-      );
+      )) ?? '';
+    if (explorationId === '') {
+      throw new Error('Error publishing exploration successfully.');
+    }
   });
 
   test('should be able to find the preferences page', async function () {

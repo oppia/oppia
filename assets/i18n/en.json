@@ -266,8 +266,6 @@
     "I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING": "Don’t know where to start?",
     "I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT": "Start from the basics with our first topic, <[firstTopic]>.",
     "I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON": "Take quiz",
-    "I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Explore More Lessons Made by the Community",
-    "I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "Search through our Community Library",
     "I18N_CLASSROOM_PAGE_TOPICS_COVERED": "Topics Covered",
     "I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT": "Classrooms",
     "I18N_COLLECTION_EDITOR_PAGE_TITLE": "<[collectionTitle]> - Oppia Editor",

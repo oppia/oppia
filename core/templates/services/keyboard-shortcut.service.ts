@@ -95,7 +95,20 @@ export class KeyboardShortcutService {
     });
   }
 
-  bindLibraryPageShortcuts(): void {}
+  bindLibraryPageShortcuts(): void {
+    Mousetrap.bind('s', () => {
+      var skipButton = document.querySelector(
+        '.oppia-skip-to-content'
+      ) as HTMLElement;
+      if (skipButton !== null) {
+        skipButton.click();
+      }
+    });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
+    });
+  }
 
   bindNavigationShortcuts(): void {
     Mousetrap.bind('ctrl+6', () => {
