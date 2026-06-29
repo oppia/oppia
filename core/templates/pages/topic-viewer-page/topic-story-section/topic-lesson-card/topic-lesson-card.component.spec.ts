@@ -58,6 +58,7 @@ describe('TopicLessonCardComponent', () => {
     const languageUtilServiceSpy = jasmine.createSpyObj('LanguageUtilService', [
       'getContentLanguageDescription',
       'getAudioLanguageDescription',
+      'getLanguageCodesRelatedToAudioLanguageCode',
     ]);
     const topicSessionFallbackLanguageServiceSpy = jasmine.createSpyObj(
       'TopicSessionFallbackLanguageService',
@@ -114,6 +115,9 @@ describe('TopicLessonCardComponent', () => {
     );
     languageUtilService.getAudioLanguageDescription.and.callFake(
       (languageCode: string) => languageCode
+    );
+    languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.callFake(
+      (code: string) => [code]
     );
     topicSessionFallbackLanguageService.getFallbackSelection.and.returnValue(
       null
@@ -682,6 +686,58 @@ describe('TopicLessonCardComponent', () => {
       component.lessonProgressStatus = 'not_started';
       component.totalCheckpointsCount = 0;
       expect(component.showCheckpointBar).toBe(false);
+    });
+  });
+
+  describe('isVoiceoverCompatibleWithTextLanguage', () => {
+    it('should match voiceover when related language codes include the text language root', () => {
+      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+
+      languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.callFake(
+        (code: string) => {
+          if (code === 'fat') {
+            return ['ak', 'fat'];
+          }
+          return [code];
+        }
+      );
+
+      component.availableTextLanguageCodes = ['ak'];
+      component.availableVoiceoverLanguageCodes = ['fat'];
+      component.ngOnInit();
+
+      expect(component.selectedTextLanguageCode).toBe('ak');
+      expect(component.selectedVoiceoverLanguageCode).toBe('fat');
+    });
+
+    it('should not match voiceover when related language codes do not include the text root', () => {
+      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+
+      languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.callFake(
+        (code: string) => [code]
+      );
+
+      component.availableTextLanguageCodes = ['ak'];
+      component.availableVoiceoverLanguageCodes = ['en'];
+      component.ngOnInit();
+
+      expect(component.selectedTextLanguageCode).toBe('ak');
+      expect(component.selectedVoiceoverLanguageCode).toBe('en');
+    });
+
+    it('should gracefully handle errors from getLanguageCodesRelatedToAudioLanguageCode', () => {
+      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+
+      languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.throwError(
+        'Unknown language code'
+      );
+
+      component.availableTextLanguageCodes = ['ak'];
+      component.availableVoiceoverLanguageCodes = ['en'];
+      component.ngOnInit();
+
+      expect(component.selectedTextLanguageCode).toBe('ak');
+      expect(component.selectedVoiceoverLanguageCode).toBe('en');
     });
   });
 });

@@ -282,6 +282,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     )
                 )
 
+            # Here we use cast because the dict returned from node.to_dict()
+            # has a different type than StoryNodeResponseDict and we need to
+            # override the type for the caller.
             return cast(
                 StoryNodeResponseDict,
                 {
