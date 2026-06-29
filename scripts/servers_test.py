@@ -1382,10 +1382,12 @@ class ManagedProcessTests(test_utils.TestBase):
         program_args = popen_calls[0].program_args
         self.assertIn('some/module', program_args)
         self.assertIn('--headed', program_args)
+        self.assertNotIn('--update-snapshots', program_args)
         env = popen_calls[0].kwargs['env']
         self.assertEqual(env['MOBILE'], 'false')
         self.assertEqual(env['PROD_ENV'], 'false')
         self.assertEqual(env['SPEC_NAME'], 'testSuite')
+        self.assertEqual(env['UPDATE_SNAPSHOTS'], 'false')
 
     def test_managed_acceptance_test_server_playwright_headless(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1440,6 +1442,36 @@ class ManagedProcessTests(test_utils.TestBase):
         env = popen_calls[0].kwargs['env']
         self.assertEqual(env['MOBILE'], 'true')
         self.assertEqual(env['SPEC_NAME'], 'testSuite')
+
+    def test_managed_acceptance_test_server_playwright_update_snapshots(
+        self,
+    ) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite',
+                    update_snapshots=True,
+                    stdout=subprocess.PIPE,
+                )
+            )
+            self.exit_stack.close()
+
+        program_args = popen_calls[0].program_args
+        self.assertIn('--update-snapshots', program_args)
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['UPDATE_SNAPSHOTS'], 'true')
 
     def test_managed_acceptance_test_server_with_invalid_framework(
         self,
