@@ -17,12 +17,11 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
   tick,
-  waitForAsync,
 } from '@angular/core/testing';
 import {InteractiveNumberWithUnitsComponent} from './oppia-interactive-number-with-units.component';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -61,7 +60,7 @@ describe('Number with units interaction component', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveNumberWithUnitsComponent],
       imports: [
@@ -112,7 +111,7 @@ describe('Number with units interaction component', () => {
 
     // PreChecks.
     expect(component.errorMessageI18nKey).toBe('Unit "xyz" not found');
-    expect(component.isValid).toBeFalse();
+    expect(component.isValid).toBe(false);
 
     // Test: Correct answer.
     component.answer = '24 km';
@@ -123,10 +122,13 @@ describe('Number with units interaction component', () => {
     // PostChecks: The format of the answer '24 km' is correct,
     // Therefore we verify that the value of errorMessage is ''.
     expect(component.errorMessageI18nKey).toBe('');
-    expect(component.isValid).toBeTrue();
-    expect(
-      currentInteractionService.updateCurrentAnswer
-    ).toHaveBeenCalledOnceWith('24 km');
+    expect(component.isValid).toBe(true);
+    expect(currentInteractionService.updateCurrentAnswer).toHaveBeenCalledWith(
+      '24 km'
+    );
+    expect(currentInteractionService.updateCurrentAnswer).toHaveBeenCalledTimes(
+      1
+    );
   }));
 
   it("should close help modal when user clicks the 'close' button", () => {
@@ -153,7 +155,7 @@ describe('Number with units interaction component', () => {
     component.answer = '';
     component.isValid = false;
 
-    expect(component.isAnswerValid()).toBeFalse();
+    expect(component.isAnswerValid()).toBe(false);
   });
 
   it('should save solution when user saves solution', () => {
@@ -251,12 +253,12 @@ describe('Number with units interaction component', () => {
   it('should unsubscribe when component is destroyed', function () {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();
 
-    expect(component.componentSubscriptions.closed).toBeFalse();
+    expect(component.componentSubscriptions.closed).toBe(false);
 
     component.ngOnDestroy();
 
     expect(component.componentSubscriptions.unsubscribe).toHaveBeenCalled();
-    expect(component.componentSubscriptions.closed).toBeTrue();
+    expect(component.componentSubscriptions.closed).toBe(true);
   });
 
   it('should correctly parse number with comma as decimal separator', () => {

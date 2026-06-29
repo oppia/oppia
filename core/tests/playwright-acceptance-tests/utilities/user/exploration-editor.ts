@@ -33,6 +33,14 @@ const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 
 const addInteractionModalSelector = 'customize-interaction-body-container';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
+const solutionInputTextArea =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -166,6 +174,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to add a hint for a state card.
+   * @param {string} hint - The hint to be added for the current card.
+   */
+  async addHintToState(hint: string): Promise<void> {
+    await this.page.waitForSelector(addHintButton, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(addHintButton);
+    await this.typeInInputField(stateContentInputField, hint);
+    await this.clickOnElementWithSelector(saveHintButton);
+    await this.page.waitForSelector(saveHintButton, {
+      state: 'hidden',
+    });
+  }
+
+  /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
@@ -290,6 +314,47 @@ export class ExplorationEditor extends BaseUser {
       responseIsCorrect,
       isLastResponse
     );
+  }
+
+  /**
+   * Function to add a solution for a state interaction.
+   * @param {string} answer - The solution of the current state card.
+   * @param {string} answerExplanation - The explanation for this state card's solution.
+   * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
+   */
+  async addSolutionToState(
+    answer: string,
+    answerExplanation: string,
+    isSolutionNumericInput: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
+
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
+    await this.page.waitForSelector(solutionSelector, {state: 'visible'});
+    await this.typeInInputField(solutionSelector, answer);
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.typeInInputField(stateContentInputField, answerExplanation);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitSolutionButton);
+
+    await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
+   * Adds a solution explanation to the current state card and saves it.
+   * @param explanation - The solution explanation to add to the state card.
+   */
+  async addSolutionExplanationAndSave(explanation: string): Promise<void> {
+    await this.typeInInputField(stateContentInputField, explanation);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitSolutionButton);
+    await this.page.waitForSelector(submitSolutionButton, {
+      state: 'hidden',
+    });
   }
 
   /**
