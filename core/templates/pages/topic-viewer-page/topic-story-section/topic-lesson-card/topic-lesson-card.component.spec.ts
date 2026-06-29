@@ -395,6 +395,16 @@ describe('TopicLessonCardComponent', () => {
     expect(component.selectedVoiceoverLanguageCode).toBe('en');
   });
 
+  it('should prefer a compatible accent voiceover over English fallback', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
+    component.availableTextLanguageCodes = ['pt'];
+    component.availableVoiceoverLanguageCodes = ['pt-br', 'en'];
+    component.ngOnInit();
+
+    expect(component.selectedTextLanguageCode).toBe('pt');
+    expect(component.selectedVoiceoverLanguageCode).toBe('pt-br');
+  });
+
   it('should handle navigateTo with empty url', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.navigateTo('');

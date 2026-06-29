@@ -4,18 +4,17 @@
        aria-hidden="true">
     </i>
     <div class="topic-lesson-language-selector-text-block">
-      <span class="topic-lesson-language-selector-chip-label">Text</span>
+      <span class="topic-lesson-language-selector-chip-label">{{ 'I18N_LANGUAGE_SELECTOR_TEXT_LABEL' | translate }}</span>
       <span class="topic-lesson-language-selector-selected-value">
-        {{ selectedTextLanguageCode ? getLanguageDescription(selectedTextLanguageCode) : 'Select' }}
+        {{ selectedTextLanguageCode ? getLanguageDescription(selectedTextLanguageCode) : ('I18N_LANGUAGE_SELECTOR_SELECT' | translate) }}
       </span>
     </div>
 
     <select
-            id="topic-lesson-text-language"
             class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
             [ngModel]="selectedTextLanguageCode"
             (ngModelChange)="onTextLanguageChange($event)"
-            aria-label="Text language selector"
+            [attr.aria-label]="'I18N_LANGUAGE_SELECTOR_TEXT_ARIA_LABEL' | translate"
             required>
       <option *ngFor="let textLanguageCode of availableTextLanguageCodes"
               [value]="textLanguageCode">
@@ -33,18 +32,17 @@
        aria-hidden="true">
     </i>
     <div class="topic-lesson-language-selector-text-block">
-      <span class="topic-lesson-language-selector-chip-label">Audio</span>
+      <span class="topic-lesson-language-selector-chip-label">{{ 'I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate }}</span>
       <span class="topic-lesson-language-selector-selected-value">
         {{ getSelectedVoiceoverLanguageLabel() }}
       </span>
     </div>
 
     <select
-            id="topic-lesson-voiceover-language"
             class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
             [ngModel]="getValidSelectedVoiceoverLanguageCode()"
             (ngModelChange)="onVoiceoverLanguageChange($event)"
-            aria-label="Voiceover language selector"
+            [attr.aria-label]="'I18N_LANGUAGE_SELECTOR_VOICEOVER_ARIA_LABEL' | translate"
             [disabled]="!hasVoiceoverLanguageOptions()">
       <option
               *ngFor="let voiceoverLanguageCode of filteredVoiceoverLanguageCodes"
@@ -63,13 +61,12 @@
    class="topic-lesson-language-selector-note"
    *ngIf="shouldShowNoAccentsMessage()"
    aria-live="polite">
-  No accents available for selected text language.
+  {{ 'I18N_LANGUAGE_SELECTOR_NO_ACCENTS_MESSAGE' | translate }}
 </p>
 
 <p
    class="topic-lesson-language-selector-error"
    *ngIf="shouldShowTextLanguageValidationError()"
-   id="topic-lesson-text-language-error"
    aria-live="assertive">
-  Choose a text language to continue.
+  {{ 'I18N_LANGUAGE_SELECTOR_CHOOSE_TEXT_LANGUAGE' | translate }}
 </p>

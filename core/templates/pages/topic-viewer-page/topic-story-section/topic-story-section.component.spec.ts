@@ -40,7 +40,10 @@ describe('TopicStorySectionComponent', () => {
   let urlService: jasmine.SpyObj<UrlService>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let i18nLanguageCodeService: {
+    isCurrentLanguageRTL: jasmine.Spy;
+    onI18nLanguageCodeChange: EventEmitter<string>;
+  };
   let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
   let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
 
@@ -62,7 +65,7 @@ describe('TopicStorySectionComponent', () => {
     i18nLanguageCodeService = {
       isCurrentLanguageRTL: jasmine.createSpy('isCurrentLanguageRTL'),
       onI18nLanguageCodeChange: new EventEmitter<string>(),
-    } as unknown as I18nLanguageCodeService;
+    };
     chapterProgressLoaderService = jasmine.createSpyObj(
       'ChapterProgressLoaderService',
       [
@@ -545,13 +548,19 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should clear fallback selection when language changes', () => {
-    component.ngOnInit();
+    topicSessionFallbackLanguageService.clearSelection.calls.reset();
 
     i18nLanguageCodeService.onI18nLanguageCodeChange.emit('es');
 
     expect(
       topicSessionFallbackLanguageService.clearSelection
-    ).toHaveBeenCalled();
+    ).toHaveBeenCalledTimes(1);
+
+    component.ngOnDestroy();
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit('fr');
+    expect(
+      topicSessionFallbackLanguageService.clearSelection
+    ).toHaveBeenCalledTimes(1);
   });
 
   it('should correctly singularize lesson and practice counts', () => {

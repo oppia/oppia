@@ -171,6 +171,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 list(exploration_ids), strict=False
             )
 
+            language_accent_mapping = (
+                voiceover_services.get_all_language_accent_codes_for_voiceovers()
+            )
+
             for exploration_id, exploration in explorations_by_id.items():
                 displayable_language_codes = (
                     translation_services.get_displayable_translation_languages(
@@ -194,10 +198,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
                 exploration_id_to_available_text_languages[exploration_id] = (
                     unique_displayable_language_codes
-                )
-
-                language_accent_mapping = (
-                    voiceover_services.get_all_language_accent_codes_for_voiceovers()
                 )
                 displayable_language_roots = {
                     _get_language_root_code(language_code)

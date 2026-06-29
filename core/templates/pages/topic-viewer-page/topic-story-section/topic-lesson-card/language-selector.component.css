@@ -107,10 +107,13 @@
   cursor: pointer;
   font-size: 14px;
   height: 100%;
-  outline: none;
   padding: 0 36px 0 36px;
   width: 100%;
   z-index: 1;
+}
+
+.topic-lesson-language-selector-select-container:focus-within {
+  box-shadow: 0 0 0 2px #006f67;
 }
 
 .topic-lesson-language-selector-select option {

@@ -24,6 +24,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 import './language-selector.component.css';
@@ -49,7 +50,10 @@ export class LanguageSelectorComponent implements OnChanges {
 
   filteredVoiceoverLanguageCodes: string[] = [];
 
-  constructor(private languageUtilService: LanguageUtilService) {}
+  constructor(
+    private languageUtilService: LanguageUtilService,
+    private translateService: TranslateService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -124,8 +128,10 @@ export class LanguageSelectorComponent implements OnChanges {
     }
 
     return this.hasVoiceoverLanguageOptions()
-      ? 'Select'
-      : 'No accents available';
+      ? this.translateService.instant('I18N_LANGUAGE_SELECTOR_SELECT')
+      : this.translateService.instant(
+          'I18N_LANGUAGE_SELECTOR_NO_ACCENTS_MESSAGE'
+        );
   }
 
   shouldShowNoAccentsMessage(): boolean {

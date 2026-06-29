@@ -447,9 +447,18 @@ class TopicPageDataHandlerTests(
         accent_descriptions = node_dict[
             'available_voiceover_language_accent_descriptions'
         ]
+        language_accent_codes_to_descriptions = (
+            voiceover_services.get_language_accent_codes_to_descriptions()
+        )
         self.assertEqual(set(accent_descriptions.keys()), {'en-US', 'en-UK'})
-        self.assertTrue(accent_descriptions['en-US'])
-        self.assertTrue(accent_descriptions['en-UK'])
+        self.assertEqual(
+            accent_descriptions['en-US'],
+            language_accent_codes_to_descriptions['en-US'],
+        )
+        self.assertEqual(
+            accent_descriptions['en-UK'],
+            language_accent_codes_to_descriptions.get('en-UK', 'en-UK'),
+        )
 
         second_node_dict = story_dict['all_node_dicts'][1]
         self.assertEqual(second_node_dict['id'], 'node_2')

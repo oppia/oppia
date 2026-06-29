@@ -16,12 +16,21 @@
  * @fileoverview Unit tests for LanguageSelectorComponent.
  */
 
+import {EventEmitter} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {SimpleChange} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
 import {LanguageSelectorComponent} from './language-selector.component';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('LanguageSelectorComponent', () => {
   let component: LanguageSelectorComponent;
@@ -42,6 +51,10 @@ describe('LanguageSelectorComponent', () => {
         {
           provide: LanguageUtilService,
           useValue: languageUtilServiceSpy,
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
         },
       ],
     }).compileComponents();
@@ -128,7 +141,7 @@ describe('LanguageSelectorComponent', () => {
     });
 
     expect(component.getSelectedVoiceoverLanguageLabel()).toBe(
-      'No accents available'
+      'I18N_LANGUAGE_SELECTOR_NO_ACCENTS_MESSAGE'
     );
     expect(component.shouldShowNoAccentsMessage()).toBeTrue();
   });
@@ -393,7 +406,9 @@ describe('LanguageSelectorComponent', () => {
       ),
     });
 
-    expect(component.getSelectedVoiceoverLanguageLabel()).toBe('Select');
+    expect(component.getSelectedVoiceoverLanguageLabel()).toBe(
+      'I18N_LANGUAGE_SELECTOR_SELECT'
+    );
   });
 
   it('should not clear voiceover on text language change when voiceover still matches filtered list', () => {

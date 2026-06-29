@@ -202,12 +202,14 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {
     this.selectedTextLanguageCode = newLanguageCode;
-    if (
-      !this.selectedVoiceoverLanguageCode &&
-      newLanguageCode &&
-      this.availableVoiceoverLanguageCodes.includes(newLanguageCode)
-    ) {
-      this.selectedVoiceoverLanguageCode = newLanguageCode;
+    if (!this.selectedVoiceoverLanguageCode && newLanguageCode) {
+      const compatibleVoiceover = this.availableVoiceoverLanguageCodes.find(
+        code =>
+          this.isVoiceoverCompatibleWithTextLanguage(code, newLanguageCode)
+      );
+      if (compatibleVoiceover) {
+        this.selectedVoiceoverLanguageCode = compatibleVoiceover;
+      }
     }
     this.saveSessionFallbackLanguageSelection();
   }
@@ -332,11 +334,17 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       return sessionFallbackVoiceoverLanguageCode;
     }
 
-    if (
-      selectedTextLanguageCode &&
-      this.availableVoiceoverLanguageCodes.includes(selectedTextLanguageCode)
-    ) {
-      return selectedTextLanguageCode;
+    if (selectedTextLanguageCode) {
+      const compatibleVoiceover = this.availableVoiceoverLanguageCodes.find(
+        code =>
+          this.isVoiceoverCompatibleWithTextLanguage(
+            code,
+            selectedTextLanguageCode
+          )
+      );
+      if (compatibleVoiceover) {
+        return compatibleVoiceover;
+      }
     }
 
     if (this.availableVoiceoverLanguageCodes.includes('en')) {
@@ -344,6 +352,27 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     }
 
     return this.availableVoiceoverLanguageCodes[0];
+  }
+
+  private isVoiceoverCompatibleWithTextLanguage(
+    voiceoverCode: string,
+    textLanguageCode: string
+  ): boolean {
+    const textRootCode = textLanguageCode.split(/[-_]/)[0].toLowerCase();
+    const voiceoverRootCode = voiceoverCode.split(/[-_]/)[0].toLowerCase();
+
+    if (voiceoverRootCode === textRootCode) {
+      return true;
+    }
+
+    try {
+      const relatedCodes = this.languageUtilService
+        .getLanguageCodesRelatedToAudioLanguageCode(voiceoverCode)
+        .map(code => code.split(/[-_]/)[0].toLowerCase());
+      return relatedCodes.includes(textRootCode);
+    } catch {
+      return false;
+    }
   }
 
   private saveSessionFallbackLanguageSelection(): void {
