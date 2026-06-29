@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {SimpleChanges} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveWorkedexample} from './oppia-noninteractive-workedexample.component';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
@@ -33,7 +33,7 @@ describe('NoninteractiveWorkedexample', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgbAccordionModule],
       declarations: [NoninteractiveWorkedexample],
