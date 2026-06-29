@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for for Collection node editor component.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CollectionNodeEditorComponent} from './collection-node-editor.component';
 import {CollectionLinearizerService} from '../services/collection-linearizer.service';
 import {AlertsService} from 'services/alerts.service';
@@ -42,7 +42,7 @@ describe('Collection node editor component ', () => {
   let sampleCollection: Collection;
   let learnerExplorationSummaryBackendDict: LearnerExplorationSummaryBackendDict;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,

@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -43,7 +43,7 @@ describe('Promo Bar Component', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PromoBarComponent],
       providers: [
