@@ -41,20 +41,19 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Dict, List, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
-        certificate_assessment_models,
+        certificate_assessment_offering_models,
         datastore_services,
         question_models,
         topic_models,
     )
 
 (
-    certificate_assessment_models,
+    certificate_assessment_offering_models,
     question_models,
     topic_models,
 ) = models.Registry.import_models(

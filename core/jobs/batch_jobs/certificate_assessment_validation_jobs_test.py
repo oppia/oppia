@@ -29,13 +29,13 @@ from typing import List, Type
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
-        certificate_assessment_models,
+        certificate_assessment_offering_models,
         question_models,
         topic_models,
     )
 
 (
-    certificate_assessment_models,
+    certificate_assessment_offering_models,
     question_models,
     topic_models,
 ) = models.Registry.import_models(
@@ -56,6 +56,7 @@ def _create_topic_model(
 ) -> topic_models.TopicModel:
     """Helper to build a minimal valid TopicModel for these tests, with all
     of its subtopic skill_ids placed into a single default subtopic."""
+
     subtopics = []
     if subtopic_skill_ids:
         subtopics = [
@@ -101,6 +102,7 @@ def _create_question_skill_link_model(
     skill_difficulty: float = 0.3,
 ) -> question_models.QuestionSkillLinkModel:
     """Helper to build a QuestionSkillLinkModel for these tests."""
+
     return self.create_model(
         question_models.QuestionSkillLinkModel,
         id=question_models.QuestionSkillLinkModel.get_model_id(
@@ -121,6 +123,7 @@ def _create_offering_model(
 ) -> certificate_assessment_models.CertificateAssessmentOfferingModel:
     """Helper to build a CertificateAssessmentOfferingModel for these
     tests."""
+
     return self.create_model(
         certificate_assessment_models.CertificateAssessmentOfferingModel,
         id=offering_id,
@@ -148,6 +151,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_empty_storage(self) -> None:
         """Test that the job runs successfully with empty storage."""
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -162,6 +166,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     ) -> None:
         """An offering whose topic has enough linked questions should stay
         Available."""
+
         topic_model = _create_topic_model(
             self,
             topic_id='topic_sufficient',
@@ -202,6 +207,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_blocks_offering_with_insufficient_question_pool(self) -> None:
         """An offering whose topic does not have enough linked questions
         should be blocked."""
+
         topic_model = _create_topic_model(
             self,
             topic_id='topic_insufficient',
@@ -244,6 +250,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_blocks_offering_with_nonexistent_topic(self) -> None:
         """An offering referencing a topic that no longer exists (e.g. it
         was deleted) should be blocked."""
+
         offering_model = _create_offering_model(
             self,
             offering_id='offering_missing_topic',
@@ -274,6 +281,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_includes_skills_from_subtopics_and_uncategorized(self) -> None:
         """Questions reachable through a subtopic skill should count toward
         the topic's available question pool, same as uncategorized skills."""
+
         topic_model = _create_topic_model(
             self,
             topic_id='topic_mixed',
@@ -311,6 +319,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_skips_offering_already_blocked(self) -> None:
         """An offering already in Blocked status should not be
         re-validated or re-logged."""
+
         already_blocked_offering = _create_offering_model(
             self,
             offering_id='already_blocked_offering',
@@ -340,6 +349,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     ) -> None:
         """An offering in Not_Ready status should never be validated or
         touched, even if its question pool would otherwise fail."""
+
         not_ready_offering = _create_offering_model(
             self,
             offering_id='offering_not_ready',
@@ -370,6 +380,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         """A question linked to a skill that's shared across topics (via the
         skill belonging to both topics) should be counted toward each
         topic's pool independently."""
+
         topic_a = _create_topic_model(
             self,
             topic_id='topic_a',
@@ -437,6 +448,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
     def test_audit_job_does_not_update_models(self) -> None:
         """Test that the audit job logs but does not write the blocked
         status to the datastore."""
+
         offering_model = _create_offering_model(
             self,
             offering_id='audit_offering_missing_topic',
@@ -469,6 +481,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
     ) -> None:
         """An offering in Not_Ready status should never be validated or
         touched, even if its question pool would otherwise fail."""
+
         not_ready_offering = _create_offering_model(
             self,
             offering_id='offering_not_ready',
@@ -496,6 +509,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
     def test_skips_offering_already_blocked(self) -> None:
         """An offering already in Blocked status should not be
         re-validated or re-logged."""
+
         already_blocked_offering = _create_offering_model(
             self,
             offering_id='already_blocked_offering',

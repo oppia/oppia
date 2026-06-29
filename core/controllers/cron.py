@@ -33,8 +33,8 @@ from core.domain import (
     user_services,
 )
 from core.jobs.batch_jobs import (
-    certificate_assessment_validation_jobs,
     blog_post_search_indexing_jobs,
+    certificate_assessment_validation_jobs,
     cloud_task_run_migration_jobs,
     exp_recommendation_computation_jobs,
     exp_search_indexing_jobs,
