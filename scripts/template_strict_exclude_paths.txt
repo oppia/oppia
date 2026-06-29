@@ -3,16 +3,6 @@
 # This list must be kept up-to-date manually and only shrink over time.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add new files to this list.
-core/templates/components/button-directives/create-activity-button.component.ts
-core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.ts
-core/templates/components/filter-fields/multi-selection-field/multi-selection-field.component.ts
-core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.ts
-core/templates/components/forms/custom-forms-directives/image-uploader-modal.component.ts
-core/templates/components/forms/schema-based-editors/schema-based-custom-editor.component.ts
-core/templates/components/forms/schema-based-editors/schema-based-dict-editor.component.ts
-core/templates/components/forms/schema-based-editors/schema-based-editor.component.ts
-core/templates/components/forms/schema-based-editors/schema-based-float-editor.component.ts
-core/templates/components/forms/schema-based-editors/schema-based-html-editor.component.ts
 core/templates/components/forms/schema-based-editors/schema-based-list-editor.component.ts
 core/templates/components/forms/schema-based-editors/schema-based-unicode-editor.component.ts
 core/templates/components/question-difficulty-selector/question-difficulty-selector.component.ts
