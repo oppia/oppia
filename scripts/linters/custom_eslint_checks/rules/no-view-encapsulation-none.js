@@ -21,6 +21,7 @@
 
 var path = require('path');
 
+// TODO(#26612): Remove or justify each file in this allowlist.
 // Legacy allowlist of files that use ViewEncapsulation.None without
 // a justification comment. New files should not be added here; instead,
 // add a comment immediately above the usage explaining why it is needed.
@@ -34,13 +35,8 @@ var LEGACY_ALLOWLIST = [
   'core/templates/pages/story-viewer-page/story-viewer-page-root.component.ts',
 ];
 
-var normalizeToRepoRelativePath = function (filePath) {
-  var normalized = filePath.split(path.sep).join('/');
-  var oppiaIndex = normalized.lastIndexOf('oppia/');
-  if (oppiaIndex !== -1) {
-    normalized = normalized.substring(oppiaIndex + 'oppia/'.length);
-  }
-  return normalized;
+var normalizePathSeparators = function (filePath) {
+  return filePath.split(path.sep).join('/');
 };
 
 var hasJustificationComment = function (comment) {
@@ -84,9 +80,13 @@ module.exports = {
         }
 
         var filename = context.getFilename();
-        var normalizedPath = normalizeToRepoRelativePath(filename);
+        var normalizedPath = normalizePathSeparators(filename);
 
-        if (LEGACY_ALLOWLIST.includes(normalizedPath)) {
+        if (
+          LEGACY_ALLOWLIST.some(function (allowedPath) {
+            return normalizedPath.endsWith(allowedPath);
+          })
+        ) {
           return;
         }
 
