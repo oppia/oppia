@@ -839,6 +839,36 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the learner dashboard.
+   */
+  async navigateToLearnerDashboard(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeAttachedInDOM(homeTabSectionInLearnerDashboard);
+  }
+
+  /**
+   * Navigates to the learner dashboard using profile dropdown in the navbar.
+   */
+  async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(profileDropdown, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.page.waitForSelector(learnerDashboardMenuLink, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(learnerDashboardMenuLink);
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+      state: 'attached',
+    });
+  }
+
+  /**
    * Gets subsection element based on title. We need to differentiate parent elements
    * in progress tab because the subsections are titled the same.
    * @param {string} criteria - Subsection title value to match.
