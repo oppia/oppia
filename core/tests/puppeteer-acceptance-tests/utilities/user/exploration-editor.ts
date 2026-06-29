@@ -8910,6 +8910,69 @@ export class ExplorationEditor extends BaseUser {
       expectedText
     );
   }
+
+  /**
+   * Verifies that the multiple-choice option with the given text is
+   * rendered with the expected font style and/or font weight in preview.
+   * @param {string} optionText - The visible text of the option to check.
+   * @param {{fontStyle?: string; fontWeight?: string}} expectedStyle - The
+   *   expected computed style values to verify.
+   */
+  async expectMultipleChoiceOptionStyleToBe(
+    optionText: string,
+    expectedStyle: {fontStyle?: string; fontWeight?: string}
+  ): Promise<void> {
+    await this.page.waitForSelector(multipleChoiceOptionSelector, {
+      visible: true,
+    });
+
+    const actualStyle = await this.page.$$eval(
+      multipleChoiceOptionSelector,
+      (elements, text) => {
+        const target = elements.find(el => el.textContent?.trim() === text);
+        if (!target) {
+          return null;
+        }
+        const computed = window.getComputedStyle(target);
+        return {
+          fontStyle: computed.fontStyle,
+          fontWeight: computed.fontWeight,
+        };
+      },
+      optionText
+    );
+
+    if (!actualStyle) {
+      throw new Error(
+        `Multiple-choice option with text "${optionText}" not found.`
+      );
+    }
+
+    if (
+      expectedStyle.fontStyle &&
+      actualStyle.fontStyle !== expectedStyle.fontStyle
+    ) {
+      throw new Error(
+        `Expected option "${optionText}" to have font-style ` +
+          `"${expectedStyle.fontStyle}", but found "${actualStyle.fontStyle}".`
+      );
+    }
+
+    if (
+      expectedStyle.fontWeight &&
+      actualStyle.fontWeight !== expectedStyle.fontWeight
+    ) {
+      throw new Error(
+        `Expected option "${optionText}" to have font-weight ` +
+          `"${expectedStyle.fontWeight}", but found "${actualStyle.fontWeight}".`
+      );
+    }
+
+    showMessage(
+      `Multiple-choice option "${optionText}" has expected style: ` +
+        `${JSON.stringify(actualStyle)}`
+    );
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

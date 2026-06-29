@@ -171,6 +171,8 @@ describe('Lesson Creator', function () {
       await explorationEditor.continueToNextCard(true);
 
       await explorationEditor.navigateToEditorTab();
+      // Verify the feedback set earlier persisted correctly.
+      await explorationEditor.expectOutcomeFeedbackToBe('New Response');
       await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
       await explorationEditor.expectStateNameToBe(CARD_NAMES.SECOND);
       await explorationEditor.navigateToPreviewTab();
@@ -243,6 +245,13 @@ describe('Lesson Creator', function () {
         'Italic text',
         'Bold text',
       ]);
+      await explorationEditor.expectMultipleChoiceOptionStyleToBe(
+        'Italic text',
+        {fontStyle: 'italic'}
+      );
+      await explorationEditor.expectMultipleChoiceOptionStyleToBe('Bold text', {
+        fontWeight: '700',
+      });
 
       await explorationEditor.selectMultipleChoiceOption('Italic text');
       await explorationEditor.expectResponseFeedbackToBe('Try again.');
