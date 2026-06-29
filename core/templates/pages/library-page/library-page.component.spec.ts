@@ -571,8 +571,9 @@ describe('Library Page Component', () => {
   });
 
   it('should not navigate when full results url is falsy', () => {
+    windowRef.nativeWindow.location.href = 'initial-page';
     componentInstance.showFullResultsPage('');
-    expect(windowRef.nativeWindow.location.href).not.toEqual('');
+    expect(windowRef.nativeWindow.location.href).toEqual('initial-page');
   });
 
   it('should increment and decrement carousel', () => {

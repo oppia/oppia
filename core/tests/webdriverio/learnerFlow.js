@@ -18,23 +18,21 @@
 
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 var LearnerDashboardPage = require('../webdriverio_utils/LearnerDashboardPage.js');
-var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var collectionEditorPage = null;
   var explorationEditorPage = null;
-  var libraryPage = null;
 
   beforeAll(function () {
     adminPage = new AdminPage.AdminPage();
-    libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     // The editor and player page objects are only required for desktop testing.
     if (!browser.isMobile) {
@@ -80,6 +78,9 @@ describe('Learner dashboard functionality', function () {
       await collectionEditorPage.setCategory('Algebra');
       await collectionEditorPage.saveChanges();
     }
+    var url = await browser.getUrl();
+    var pathname = url.split('/');
+    var collectionId = pathname[5];
     // This change helps debugging issue
     // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
@@ -91,9 +92,8 @@ describe('Learner dashboard functionality', function () {
       'collectionPlayerDesktopAndMobile@learnerFlow.com',
       PLAYER_USERNAME
     );
-    await libraryPage.get();
-    await libraryPage.findCollection('Introduction to Collections in Oppia');
-    await libraryPage.playCollection('Introduction to Collections in Oppia');
+    await browser.url('/collection/' + collectionId);
+    await waitFor.pageToFullyLoad();
   });
 
   afterEach(async function () {

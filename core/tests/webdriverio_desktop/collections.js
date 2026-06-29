@@ -22,7 +22,6 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
-var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Collections', function () {
   var creatorDashboardPage = null;
@@ -32,15 +31,14 @@ describe('Collections', function () {
   var secondExplorationId = null;
   var thirdExplorationId = null;
   var fourthExplorationId = null;
-  var libraryPage = null;
   var lazyExplorationId = null;
   var linearExplorationId = null;
   var testExplorationId = null;
+  var testCollectionId = null;
 
   beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
-    libraryPage = new LibraryPage.LibraryPage();
     var EDITOR_USERNAME = 'aliceCollections';
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
@@ -164,14 +162,16 @@ describe('Collections', function () {
     await collectionEditorPage.setObjective('This is a test collection.');
     await collectionEditorPage.setCategory('Algebra');
     await collectionEditorPage.saveChanges();
+    var url = await browser.getUrl();
+    var pathname = url.split('/');
+    testCollectionId = pathname[5];
     await users.logout();
   });
 
   it('should visit the collection player', async function () {
     await users.login('alice@collections.com');
-    await libraryPage.get();
-    await libraryPage.findCollection('Test Collection');
-    await libraryPage.playCollection('Test Collection');
+    await browser.url('/collection/' + testCollectionId);
+    await waitFor.pageToFullyLoad();
     await users.logout();
   });
 

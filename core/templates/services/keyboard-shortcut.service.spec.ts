@@ -132,6 +132,26 @@ describe('Keyboard Shortcuts', () => {
     }
   );
 
+  it('should bind library page shortcuts for skip and quick reference', () => {
+    openQuickReferenceSpy = spyOn(
+      keyboardShortcutService,
+      'openQuickReference'
+    ).and.callThrough();
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'dismissAll');
+    spyOn(appRef, 'tick');
+
+    let skipClickSpy = spyOn(skipButton, 'click').and.callThrough();
+
+    keyboardShortcutService.bindLibraryPageShortcuts();
+
+    Mousetrap.trigger('s');
+    expect(skipClickSpy).toHaveBeenCalled();
+
+    Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
+  });
+
   it(
     'should move the focus to the corresponding element' +
       ' when the action key is pressed',

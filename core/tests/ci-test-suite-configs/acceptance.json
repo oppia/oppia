@@ -376,11 +376,6 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-out-learner/search-for-a-specific-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts",
-      "framework": "puppeteer"
-    },
-    {
       "name": "logged-out-learner/visits-the-community-library-and-look-around",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts",
       "framework": "puppeteer"
