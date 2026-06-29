@@ -317,10 +317,8 @@ export class ConversationSkinComponent {
           answer: InteractionAnswer,
           interactionRulesService: Parameters<OnSubmitFn>[1]
         ) => {
-          let submittedAnswer =
-            typeof answer === 'string' ? answer : String(answer);
           this.conversationFlowService.submitAnswer(
-            submittedAnswer,
+            answer as InteractionAnswer & string,
             interactionRulesService as InteractionRulesService
           );
         }
