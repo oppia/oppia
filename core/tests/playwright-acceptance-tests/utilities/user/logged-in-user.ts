@@ -839,15 +839,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the learner dashboard.
-   */
-  async navigateToLearnerDashboard(): Promise<void> {
-    await this.goto(learnerDashboardUrl);
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeAttachedInDOM(homeTabSectionInLearnerDashboard);
-  }
-
-  /**
    * Navigates to the learner dashboard using profile dropdown in the navbar.
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
@@ -1234,27 +1225,6 @@ export class LoggedInUser extends BaseUser {
     if (!titleFound) {
       throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
     }
-  }
-
-  /**
-   * Navigates to the learner dashboard using profile dropdown in the navbar.
-   */
-  async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(profileDropdown, {
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(profileDropdown);
-
-    await this.page.waitForSelector(learnerDashboardMenuLink, {
-      state: 'visible',
-    });
-    await this.clickOnElementWithSelector(learnerDashboardMenuLink);
-
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-      state: 'visible',
-    });
   }
 
   /**
