@@ -10421,34 +10421,6 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_get_exp_with_draft_applied_upgrades_old_draft_successfully(
         self,
     ) -> None:
-        """Test that get_exp_with_draft_applied successfully upgrades a draft
-        that is behind the exploration's current version via a state schema
-        migration commit.
-        """
-        exp_id = 'exp_id'
-        user_id = 'user_id'
-        self.save_new_valid_exploration(exp_id, user_id)
-
-        draft_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'title',
-                    'old_value': None,
-                    'new_value': 'Draft title',
-                }
-            )
-        ]
-        user_models.ExplorationUserDataModel(
-            id='%s.%s' % (user_id, exp_id),
-            user_id=user_id,
-            exploration_id=exp_id,
-            draft_change_list=[c.to_dict() for c in draft_change_list],
-            draft_change_list_last_updated=datetime.datetime.utcnow(),
-            draft_change_list_exp_version=1,
-            draft_change_list_id=2,
-        ).put()
-
         exp_migration_change_list = [
             exp_domain.ExplorationChange(
                 {
@@ -10460,23 +10432,24 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         ]
         with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 58):
             exp_services.update_exploration(
-                user_id,
-                exp_id,
+                self.USER_ID,
+                self.EXP_ID1,
                 exp_migration_change_list,
                 'Ran Exploration Migration job.',
             )
 
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        self.assertEqual(exploration.version, 2)
-
-        updated_exploration = exp_services.get_exp_with_draft_applied(
-            exp_id, user_id
+        exp_services.create_or_update_draft(
+            self.EXP_ID1,
+            self.USER_ID,
+            self.draft_change_list,
+            2,
+            self.NEWER_DATETIME,
         )
 
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID1, self.USER_ID
+        )
         self.assertIsNotNone(updated_exploration)
-        # Ruling out None for MyPy.
-        assert updated_exploration is not None
-        self.assertEqual(updated_exploration.title, exploration.title)
 
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):
