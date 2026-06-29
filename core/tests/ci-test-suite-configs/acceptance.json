@@ -397,8 +397,8 @@
     },
     {
       "name": "logged-in-learner/manage-classroom-progress-in-home-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-classroom-progress-in-home-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-classroom-progress-in-home-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/manage-community-lesson-progress-in-home-learner-dashboard",
