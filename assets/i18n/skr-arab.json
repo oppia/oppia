@@ -441,6 +441,8 @@
 	"I18N_PROGRESS_REMINDER_CONTINUE_TEXT": "بھلا تساں جاری رکھݨ چاہندے ہو؟",
 	"I18N_QUESTION_PLAYER_MY_DASHBOARD": "میݙا ڈیش بورڈ",
 	"I18N_QUESTION_PLAYER_NEW_SESSION": "ولدا چلاؤ",
+	"I18N_REPORT_LESSON_BUG_OPTIONAL_LABEL": "(اختیاری)",
+	"I18N_REPORT_LESSON_BUG_SCREENSHOT_LABEL": "سکرین شاٹ",
 	"I18N_RESET_CODE": "کوڈ ولدا ٹھیک کرو",
 	"I18N_RESTART_EXPLORATION_BUTTON": "سبق ولدا شروع کرو",
 	"I18N_RTE_DISMISS_WARNING": "مکاؤ",
