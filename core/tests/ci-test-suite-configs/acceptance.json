@@ -437,8 +437,8 @@
     },
     {
       "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
