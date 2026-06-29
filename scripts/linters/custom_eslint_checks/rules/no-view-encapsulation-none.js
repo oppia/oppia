@@ -21,7 +21,7 @@
 
 var path = require('path');
 
-// TODO(#26612): Remove or justify each file in this allowlist.
+// TODO(#26615): Remove or justify each file in this allowlist.
 // Legacy allowlist of files that use ViewEncapsulation.None without
 // a justification comment. New files should not be added here; instead,
 // add a comment immediately above the usage explaining why it is needed.
