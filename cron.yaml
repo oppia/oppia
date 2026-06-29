@@ -41,3 +41,6 @@ cron:
 - description: weekly job to mark stale voiceover regeneration content as failed
   url: /cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed
   schedule: every 48 hours
+- description: cron job to validate certificate question pools against latest topic/skill data and block invalid certificate offerings
+  url: /cron/certificate_assessment_question_pool_sync_check
+  schedule: every thursday 9:00

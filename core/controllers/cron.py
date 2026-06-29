@@ -33,6 +33,7 @@ from core.domain import (
     user_services,
 )
 from core.jobs.batch_jobs import (
+    certificate_assessment_validation_jobs,
     blog_post_search_indexing_jobs,
     cloud_task_run_migration_jobs,
     exp_recommendation_computation_jobs,
@@ -452,4 +453,25 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandler(
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=cloud_task_run_migration_jobs.MarkStaleVoiceoverRegenerationJobModelsAsFailedJob
+        )
+
+
+class CronCertificateAssessmentQuestionPoolSyncCheckHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for validating certificate assessment question pools against
+    the latest topic/skill data, and blocking offerings whose pools are no
+    longer sufficient."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Handles GET requests."""
+        beam_job_services.run_beam_job(
+            job_class=(
+                certificate_assessment_validation_jobs.BlockInvalidCertificateAssessmentOfferingsJob
+            )
         )

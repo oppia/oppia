@@ -41,6 +41,7 @@ from core.domain import (
 )
 from core.jobs.batch_jobs import (
     blog_post_search_indexing_jobs,
+    certificate_assessment_validation_jobs,
     cloud_task_run_migration_jobs,
     exp_recommendation_computation_jobs,
     exp_search_indexing_jobs,
@@ -1470,4 +1471,34 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandlerTests(
         with swap_with_checks, testapp_swap:
             self.get_html_response(
                 '/cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed'
+            )
+
+
+class CronCertificateAssessmentQuestionPoolSyncCheckHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Tests for CronCertificateAssessmentQuestionPoolSyncCheckHandler."""
+
+    def test_cron_certificate_assessment_question_pool_sync_check_handler(
+        self,
+    ) -> None:
+        testapp_swap = self.swap(
+            self, 'testapp', webtest.TestApp(main.app_without_context)
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services,
+            'run_beam_job',
+            lambda **_: None,
+            expected_kwargs=[
+                {
+                    'job_class': (
+                        certificate_assessment_validation_jobs.BlockInvalidCertificateAssessmentOfferingsJob
+                    ),
+                }
+            ],
+        )
+        with swap_with_checks, testapp_swap:
+            self.get_html_response(
+                '/cron/certificate_assessment_question_pool_sync_check'
             )

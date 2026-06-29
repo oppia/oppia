@@ -1601,6 +1601,10 @@ URLS.extend(
             r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
             cron.CronMailReviewerNewSuggestionsHandler,
         ),
+        get_redirect_route(
+            r'/cron/certificate_assessment_question_pool_sync_check',
+            cron.CronCertificateAssessmentQuestionPoolSyncCheckHandler,
+        ),
     )
 )
 

@@ -52,6 +52,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     cloud_task_run_migration_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
+    certificate_assessment_validation_jobs,
     delete_duplicate_content_ids_jobs,
     dummy_jobs,
     email_deletion_jobs,
