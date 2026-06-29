@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * LI.DM Learner chooses new lessons to play from their Learner Dashboard
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -30,86 +31,88 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedOutUser & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId1: string;
   let explorationId2: string;
 
-  beforeAll(
-    async function () {
-      // Create users.
-      loggedInLearner = await UserFactory.createNewUser(
-        'loggedInLearner',
-        'logged_in_learner@example.com'
-      );
-      curriculumAdmin = await UserFactory.createNewUser(
-        'curriculumAdm',
-        'curriculumAdmin@example.com',
-        [ROLES.CURRICULUM_ADMIN]
-      );
-      releaseCoordinator = await UserFactory.createNewUser(
-        'releaseCoordinator',
-        'releaseCoordinator@example.com',
-        [ROLES.RELEASE_COORDINATOR]
-      );
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000);
+    // Create users.
+    loggedInLearner = await UserFactory.createNewUser(
+      'loggedInLearner',
+      'logged_in_learner@example.com',
+      browser
+    );
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      browser,
+      [ROLES.CURRICULUM_ADMIN]
+    );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      browser,
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
-      // Enable redesigned learner dashboard.
-      await releaseCoordinator.enableFeatureFlag(
-        'show_redesigned_learner_dashboard'
-      );
+    // Enable redesigned learner dashboard.
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
 
-      // Reload page to get latest changes.
-      await loggedInLearner.reloadPage();
+    // Reload page to get latest changes.
+    await loggedInLearner.reloadPage();
 
-      // Create explorations.
-      explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Negative Numbers'
-        );
-
-      explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Positive Numbers',
-          'Algebra',
-          false
-        );
-
-      // Create topic, classroom and add explorations to the topic.
-      await curriculumAdmin.createAndPublishTopic(
-        'Algebra I',
-        'Negative Numbers',
+    // Create explorations.
+    explorationId1 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
       );
 
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        'Algebra I'
+    explorationId2 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Positive Numbers',
+        'Algebra',
+        false
       );
 
-      await curriculumAdmin.addStoryToTopic(
-        'The Broken Calculator',
-        'the-broken-calculator',
-        'Algebra I'
-      );
-      await curriculumAdmin.addChapter(
-        'Test Chapter 1',
-        explorationId1 as string
-      );
-      await curriculumAdmin.addChapter(
-        'Test Chapter 2',
-        explorationId2 as string
-      );
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
-    },
-    // Test takes longer than default timeout.
-    900000
-  );
+    // Create topic, classroom and add explorations to the topic.
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
 
-  it('should be able add a goal', async function () {
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
+
+    await curriculumAdmin.addStoryToTopic(
+      'The Broken Calculator',
+      'the-broken-calculator',
+      'Algebra I'
+    );
+    await curriculumAdmin.addChapter(
+      'Test Chapter 1',
+      explorationId1 as string
+    );
+    await curriculumAdmin.addChapter(
+      'Test Chapter 2',
+      explorationId2 as string
+    );
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
+  });
+
+  test('should be able add a goal', async function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
     await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
@@ -124,7 +127,7 @@ describe('Logged-In Learner', function () {
     );
   });
 
-  it('should be able to open learner dashboard', async function () {
+  test('should be able to open learner dashboard', async function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent(
       false
@@ -136,7 +139,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.startGoalFromGoalsSectionInRedesignedDashboard(
       'Algebra I: The Broken Calculator'
     );
-    await loggedInLearner.waitForNetworkIdle();
+    await loggedInLearner.page.waitForLoadState('networkidle');
 
     await loggedInLearner.navigateToLearnerDashboard();
     // TODO(#20869): A flaky behaviour is observed due to issue in the backend.
@@ -160,7 +163,7 @@ describe('Logged-In Learner', function () {
     // );
   });
 
-  it('should be able to check updated goals', async function () {
+  test('should be able to check updated goals', async function () {
     // TODO(#20869): A flaky behaviour is observed due to issue in the backend.
     // Even after completing the lesson, the node isn't marked as completed.
     // Once fixed, uncomment the below code.
@@ -170,7 +173,7 @@ describe('Logged-In Learner', function () {
     // );
   });
 
-  it('should be able to check updated progress', async function () {
+  test('should be able to check updated progress', async function () {
     // TODO(#20869): A flaky behaviour is observed due to issue in the backend.
     // Even after completing the lesson, the node isn't marked as completed.
     // Once fixed, uncomment the below code.
@@ -183,7 +186,7 @@ describe('Logged-In Learner', function () {
     // ]);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
