@@ -47,10 +47,15 @@ describe('Select Skill Modal', () => {
     skill_model_created_on: 2,
     skill_model_last_updated: 3,
   };
-  let shortSkillSummary: SkillSummaryBackendDict = skillSummaryBackendDict;
+  let shortSkillSummary: ShortSkillSummary =
+    ShortSkillSummary.createFromBackendDict({
+      skill_id: '3',
+      skill_description: 'description3',
+    });
   let categorizedSkills: CategorizedSkills = {
     'Dummy Topic': {
       Subtopic1: [shortSkillSummary],
+      uncategorized: [],
     },
   };
   let untriagedSkillSummaries: SkillSummaryBackendDict[] = [
@@ -89,7 +94,7 @@ describe('Select Skill Modal', () => {
   it('should close modal on confirm', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedSkillId = '2';
-    let totalSkills: SkillSummaryBackendDict[] = [];
+    let totalSkills: (SkillSummaryBackendDict | ShortSkillSummary)[] = [];
     if (componentInstance.skillSummaries) {
       totalSkills = [...componentInstance.skillSummaries];
     }

@@ -43,6 +43,12 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
+
+interface MisconceptionOutcome {
+  feedback: SubtitledHtmlBackendDict;
+  labelledAsCorrect: boolean;
+}
 
 interface TaggedMisconception {
   skillId: string | null;
@@ -102,8 +108,21 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.onSaveAnswerGroupCorrectnessLabel.emit(event);
   }
 
-  sendOnSaveAnswerGroupFeedback(event: Outcome): void {
-    this.onSaveAnswerGroupFeedback.emit(event);
+  get misconceptionOutcome(): MisconceptionOutcome {
+    return {
+      feedback: this.outcome.feedback.toBackendDict(),
+      labelledAsCorrect: this.outcome.labelledAsCorrect,
+    };
+  }
+
+  sendOnSaveAnswerGroupFeedback(event: Outcome | MisconceptionOutcome): void {
+    if ('getContentIdToHtml' in event) {
+      this.onSaveAnswerGroupFeedback.emit(event);
+    } else {
+      const outcome = cloneDeep(this.outcome);
+      outcome.feedback.html = event.feedback.html;
+      this.onSaveAnswerGroupFeedback.emit(outcome);
+    }
   }
 
   sendOnSaveAnswerGroupDest(event: Outcome): void {

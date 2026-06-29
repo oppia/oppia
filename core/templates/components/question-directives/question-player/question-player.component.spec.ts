@@ -275,7 +275,7 @@ describe('Question Player Component', () => {
     tick();
     tick();
 
-    expect(component.testIsPassed).toBeTrue();
+    expect(component.testIsPassed).toBe(true);
     expect(component.calculateScores).toHaveBeenCalled();
     expect(component.userIsLoggedIn).toBe(true);
   }));
@@ -335,6 +335,7 @@ describe('Question Player Component', () => {
     component.performAction({
       type: 'REVIEW_LOWEST_SCORED_SKILL',
       url: '',
+      i18nId: 'id',
     });
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -346,6 +347,7 @@ describe('Question Player Component', () => {
     component.performAction({
       url: '/url',
       type: '',
+      i18nId: 'id',
     });
 
     expect(windowRef.nativeWindow.location.href).toBe('/url');
@@ -353,7 +355,11 @@ describe('Question Player Component', () => {
 
   it('should check if action buttons footer is to be shown or not', () => {
     component.questionPlayerConfig = {
-      resultActionButtons: ['first'],
+      resultActionButtons: [{type: 'first', i18nId: 'id'}],
+      skillList: [],
+      skillDescriptions: [],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
     } as QuestionPlayerConfig;
 
     expect(component.showActionButtonsFooter()).toBe(true);
@@ -366,7 +372,9 @@ describe('Question Player Component', () => {
       },
       skillDescriptions: [],
       skillList: [],
-    };
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
+    } as QuestionPlayerConfig;
     expect(component.showActionButtonsFooter()).toBe(false);
   });
 
@@ -456,6 +464,8 @@ describe('Question Player Component', () => {
       },
       skillList: ['skillId1'],
       skillDescriptions: ['description1'],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
     } as QuestionPlayerConfig;
     component.totalScore = 0.0;
 
@@ -506,6 +516,8 @@ describe('Question Player Component', () => {
       },
       skillList: ['skillId1'],
       skillDescriptions: ['description1'],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
     } as QuestionPlayerConfig;
     component.totalScore = 0.0;
 
@@ -752,7 +764,7 @@ describe('Question Player Component', () => {
 
     let mockEmitter = new EventEmitter();
     spyOn(component, 'openConceptCardModal').and.stub();
-    spyOn(ngbModal, 'open').and.callFake(options => {
+    spyOn(ngbModal, 'open').and.callFake((options?: Object) => {
       return {
         componentInstance: {
           skills: null,

@@ -65,8 +65,7 @@
                                        *ngIf="isInQuestionMode() || tagMisconceptionsFeatureFlagIsEnabled"
                                        (saveTaggedMisconception)="sendOnSaveTaggedMisconception($event)"
                                        (saveAnswerGroupFeedback)="sendOnSaveAnswerGroupFeedback($event)"
-                                       [outcome]="outcome"
-                                       [rules]="rules"
+                                       [outcome]="misconceptionOutcome"
                                        [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
   </oppia-question-misconception-editor>
 </div>
