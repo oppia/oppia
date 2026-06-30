@@ -27,6 +27,7 @@ export interface CertificateAssessmentOfferingBackendDict {
   description: string;
   classroom_id: string;
   topic_data: CertificateAssessmentOfferingTopicData;
+  demonstrates: string[];
   total_questions: number;
   time_limit_in_minutes: number;
   async_status: string;
@@ -163,7 +164,7 @@ export class CertificateAssessmentOfferingData {
       certificateAssessmentOfferingBackendDict.topic_data,
       certificateAssessmentOfferingBackendDict.total_questions,
       certificateAssessmentOfferingBackendDict.time_limit_in_minutes,
-      [],
+      certificateAssessmentOfferingBackendDict.demonstrates,
       certificateAssessmentOfferingBackendDict.async_status,
       certificateAssessmentOfferingBackendDict.version
     );

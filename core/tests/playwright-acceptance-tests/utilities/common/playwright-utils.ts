@@ -369,6 +369,19 @@ export class BaseUser {
   }
 
   /**
+   * Function to verify the number of elements matching a selector.
+   * @param {string} selector - The selector to match elements.
+   * @param {number} count - The expected number of elements.
+   */
+  async expectNumberOfElementsToBe(
+    selector: string,
+    count: number
+  ): Promise<void> {
+    const elements = await this.page.$$(selector);
+    expect(elements.length).toBe(count);
+  }
+
+  /**
    * Waits for the given element to be visible, and then checks if the text
    * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
@@ -543,6 +556,44 @@ export class BaseUser {
       maxDiffPixelRatio: failureTrigger,
       ...options,
     });
+  }
+
+  /**
+   * Finds child element in parent by matching text values.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {Record<string, string>} selectors - Relevant selectors.
+   * @param {string} criteria - Title value to match.
+   */
+  async findChildElementInParent(
+    parentElement: Page | ElementHandle | undefined,
+    selectors: Record<string, string>,
+    criteria: string
+  ): Promise<ElementHandle | undefined> {
+    let targetElement;
+    let lastHeadingText: string | undefined;
+
+    const allElements = await parentElement?.$$(selectors.content);
+    for (const h of allElements || []) {
+      const targetHeadingElement = await h.$(selectors.heading);
+      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
+        ele.textContent?.trim()
+      );
+      lastHeadingText = targetHeadingText || undefined;
+      showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
+      if (targetHeadingText === criteria) {
+        targetElement = h;
+        break;
+      }
+    }
+
+    if (!targetElement) {
+      throw new Error(
+        `Element with selectors: ${JSON.stringify(
+          selectors
+        )} and criteria: ${criteria} is not found. Last heading seen: ${lastHeadingText}`
+      );
+    }
+    return targetElement;
   }
 
   /**
