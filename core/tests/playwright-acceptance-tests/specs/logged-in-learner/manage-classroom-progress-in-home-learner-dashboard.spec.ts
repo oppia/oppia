@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
  * L1.10  Start Lessons from the Home tab in redesigned Learner Dashboard
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -32,24 +33,28 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   const chapterIds: string[] = [];
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(6000000); // Setup taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseAdm',
       'releaseAdm@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -114,78 +119,58 @@ describe('Logged-In Learner', function () {
 
     loggedInLearner = await UserFactory.createNewUser(
       'loggedInLearner1',
-      'logged_in_learner1@example.com'
+      'logged_in_learner1@example.com',
+      browser
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 6000000); // Setup taking longer than default timeout.
+  });
 
-  it(
-    'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
-        'Home'
-      );
+  test('should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button', async function () {
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+      'Home'
+    );
 
-      await loggedInLearner.expectLearnerGreetingsToBe(
-        'Welcome, loggedInLearner1!'
-      );
+    await loggedInLearner.expectLearnerGreetingsToBe(
+      'Welcome, loggedInLearner1!'
+    );
 
-      await loggedInLearner.expectElementsToBePresentInRLD(
-        ['Learn Something New'],
-        'tabSection'
-      );
-      await loggedInLearner.expectElementsToBePresentInRLD(
-        ["Topics available in Oppia's Classroom"],
-        'cardDisplay'
-      );
-      await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
-        true
-      );
+    await loggedInLearner.expectElementsToBePresentInRLD(
+      ['Learn Something New'],
+      'tabSection'
+    );
+    await loggedInLearner.expectElementsToBePresentInRLD(
+      ["Topics available in Oppia's Classroom"],
+      'cardDisplay'
+    );
+    await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+      true
+    );
 
-      await loggedInLearner.expectNumberOfElementsToBe(
-        '.e2e-test-learer-topic-summary-tile',
-        2
-      );
+    await loggedInLearner.expectNumberOfElementsToBe(
+      '.e2e-test-learer-topic-summary-tile',
+      2
+    );
 
-      await loggedInLearner.expectScreenshotToMatch(
-        'learnerDashboardHomeTab',
-        __dirname
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await loggedInLearner.expectScreenshotToMatch('learnerDashboardHomeTab');
+  });
 
-  it(
-    'should navigate directly to math classroom',
-    async function () {
-      await loggedInLearner.navigateToClassroomFromLearnerDashboard('math');
-      await loggedInLearner.expectToBeOnPage('learn/math');
-      await loggedInLearner.expectScreenshotToMatch(
-        'mathClassroomPage',
-        __dirname
-      );
-      showMessage('Navigated to math classroom from learner dashboard.');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should navigate directly to math classroom', async function () {
+    await loggedInLearner.navigateToClassroomFromLearnerDashboard('math');
+    await loggedInLearner.expectToBeOnPage('learn/math');
+    await loggedInLearner.expectScreenshotToMatch('mathClassroomPage');
+    showMessage('Navigated to math classroom from learner dashboard.');
+  });
 
-  it(
-    'should navigate directly to the Place Values topic in the math classroom',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.navigateToTopicPageByCard('Place Values');
-      await loggedInLearner.expectToBeOnPage('learn/math/place-values');
-      await loggedInLearner.expectScreenshotToMatch(
-        'placeValuesTopicPage',
-        __dirname
-      );
-      showMessage('Navigated to Place Values topic from learner dashboard.');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should navigate directly to the Place Values topic in the math classroom', async function () {
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToTopicPageByCard('Place Values');
+    await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+    await loggedInLearner.expectScreenshotToMatch('placeValuesTopicPage');
+    showMessage('Navigated to Place Values topic from learner dashboard.');
+  });
 
-  it('should display in-progress and recommended lessons after starting a lesson', async function () {
+  test('should display in-progress and recommended lessons after starting a lesson', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToTopicPageByCard('Place Values');
     await loggedInLearner.expectToBeOnPage('learn/math/place-values');
@@ -201,8 +186,7 @@ describe('Logged-In Learner', function () {
       'tabSection'
     );
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter1AndRecommendedForYouChapter2',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgresschapter1AndRecommendedForYouChapter2'
     );
     await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
@@ -225,13 +209,11 @@ describe('Logged-In Learner', function () {
       'Chapter 1: What are the Place Values',
       chapterIds[0]
     );
-    await loggedInLearner.expectScreenshotToMatch(
-      'lessonPageOfChapter1',
-      __dirname
-    );
+    await loggedInLearner.expectScreenshotToMatch('lessonPageOfChapter1');
   });
 
-  it('should not recommend any lessons if currently on last lesson', async function () {
+  test('should not recommend any lessons if currently on last lesson', async function () {
+    test.setTimeout(480000); // Takes longer than default timeout.
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
@@ -245,8 +227,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter2AndRecommendedForYouChapter3',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgresschapter2AndRecommendedForYouChapter3'
     );
     await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
@@ -271,8 +252,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter3AndRecommendedForYouChapter4',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgresschapter3AndRecommendedForYouChapter4'
     );
 
     await loggedInLearner.expectLessonCardProgressToBe(
@@ -298,8 +278,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter4AndRecommendedForYouChapter5',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgresschapter4AndRecommendedForYouChapter5'
     );
 
     await loggedInLearner.expectLessonCardProgressToBe(
@@ -324,8 +303,7 @@ describe('Logged-In Learner', function () {
     );
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6'
     );
 
     await loggedInLearner.expectLessonCardProgressToBe(
@@ -345,8 +323,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter6AndNoRecommendedForYouChapter',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgresschapter6AndNoRecommendedForYouChapter'
     );
 
     await loggedInLearner.expectLessonCardProgressToBe(
@@ -359,9 +336,9 @@ describe('Logged-In Learner', function () {
       ['Recommended for you'],
       'cardDisplay'
     );
-  }, 480000); // Takes longer than default timeout.
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
