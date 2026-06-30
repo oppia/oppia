@@ -798,7 +798,18 @@ export class CurriculumAdmin extends TopicManager {
    */
   async createTopic(name: string, urlFragment: string): Promise<string> {
     await this.navigateToTopicAndSkillsDashboardPage();
-    const TopicSelectorElement = await this.page.$(desktopTopicSelector);
+    let TopicSelectorElement = null;
+    try {
+      TopicSelectorElement = await this.page.waitForSelector(
+        desktopTopicSelector,
+        {
+          state: 'attached',
+          timeout: 10000,
+        }
+      );
+    } catch {
+      // Element didn't appear in 10 seconds — treat as not present.
+    }
 
     if (!TopicSelectorElement || !this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(createNewTopicButton);
