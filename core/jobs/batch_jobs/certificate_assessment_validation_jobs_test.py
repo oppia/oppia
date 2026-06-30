@@ -24,7 +24,7 @@ from core.jobs.batch_jobs import certificate_assessment_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import List, Type
+from typing import List, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -55,7 +55,8 @@ def _create_topic_model(
     subtopic_skill_ids: List[str],
 ) -> topic_models.TopicModel:
     """Helper to build a minimal valid TopicModel for these tests, with all
-    of its subtopic skill_ids placed into a single default subtopic."""
+    of its subtopic skill_ids placed into a single default subtopic.
+    """
 
     subtopics = []
     if subtopic_skill_ids:
@@ -120,12 +121,13 @@ def _create_offering_model(
     topic_ids: List[str],
     total_questions: int,
     async_status: str = 'Available',
-) -> certificate_assessment_models.CertificateAssessmentOfferingModel:
+) -> certificate_assessment_offering_models.CertificateAssessmentOfferingModel:
     """Helper to build a CertificateAssessmentOfferingModel for these
-    tests."""
+    tests.
+    """
 
     return self.create_model(
-        certificate_assessment_models.CertificateAssessmentOfferingModel,
+        certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
         id=offering_id,
         title='Certificate for %s' % offering_id,
         description='Description for %s.' % offering_id,
@@ -165,7 +167,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self,
     ) -> None:
         """An offering whose topic has enough linked questions should stay
-        Available."""
+        Available.
+        """
 
         topic_model = _create_topic_model(
             self,
@@ -185,9 +188,15 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             topic_ids=['topic_sufficient'],
             total_questions=3,
         )
-        self.put_multi(
-            [topic_model, offering_model] + question_skill_link_models
-        )
+        models_to_put: List[
+            Union[
+                topic_models.TopicModel,
+                certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
+                question_models.QuestionSkillLinkModel,
+            ]
+        ] = [topic_model, offering_model]
+        models_to_put.extend(question_skill_link_models)
+        self.put_multi(models_to_put)
 
         self.assert_job_output_is(
             [
@@ -197,8 +206,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
                 )
             ]
         )
-
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_sufficient'
         )
         assert updated_model is not None
@@ -206,7 +214,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_blocks_offering_with_insufficient_question_pool(self) -> None:
         """An offering whose topic does not have enough linked questions
-        should be blocked."""
+        should be blocked.
+        """
 
         topic_model = _create_topic_model(
             self,
@@ -224,9 +233,15 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             topic_ids=['topic_insufficient'],
             total_questions=5,
         )
-        self.put_multi(
-            [topic_model, offering_model] + question_skill_link_models
-        )
+        models_to_put: List[
+            Union[
+                topic_models.TopicModel,
+                certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
+                question_models.QuestionSkillLinkModel,
+            ]
+        ] = [topic_model, offering_model]
+        models_to_put.extend(question_skill_link_models)
+        self.put_multi(models_to_put)
 
         self.assert_job_output_is(
             [
@@ -241,7 +256,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_insufficient'
         )
         assert updated_model is not None
@@ -249,7 +264,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_blocks_offering_with_nonexistent_topic(self) -> None:
         """An offering referencing a topic that no longer exists (e.g. it
-        was deleted) should be blocked."""
+        was deleted) should be blocked.
+        """
 
         offering_model = _create_offering_model(
             self,
@@ -272,7 +288,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_missing_topic'
         )
         assert updated_model is not None
@@ -280,7 +296,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_includes_skills_from_subtopics_and_uncategorized(self) -> None:
         """Questions reachable through a subtopic skill should count toward
-        the topic's available question pool, same as uncategorized skills."""
+        the topic's available question pool, same as uncategorized skills.
+        """
 
         topic_model = _create_topic_model(
             self,
@@ -303,9 +320,15 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             topic_ids=['topic_mixed'],
             total_questions=2,
         )
-        self.put_multi(
-            [topic_model, offering_model] + question_skill_link_models
-        )
+        models_to_put: List[
+            Union[
+                topic_models.TopicModel,
+                certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
+                question_models.QuestionSkillLinkModel,
+            ]
+        ] = [topic_model, offering_model]
+        models_to_put.extend(question_skill_link_models)
+        self.put_multi(models_to_put)
 
         self.assert_job_output_is(
             [
@@ -318,7 +341,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_skips_offering_already_blocked(self) -> None:
         """An offering already in Blocked status should not be
-        re-validated or re-logged."""
+        re-validated or re-logged.
+        """
 
         already_blocked_offering = _create_offering_model(
             self,
@@ -338,7 +362,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'already_blocked_offering'
         )
         assert updated_model is not None
@@ -348,7 +372,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self,
     ) -> None:
         """An offering in Not_Ready status should never be validated or
-        touched, even if its question pool would otherwise fail."""
+        touched, even if its question pool would otherwise fail.
+        """
 
         not_ready_offering = _create_offering_model(
             self,
@@ -368,7 +393,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_not_ready'
         )
         assert updated_model is not None
@@ -379,7 +404,8 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     ) -> None:
         """A question linked to a skill that's shared across topics (via the
         skill belonging to both topics) should be counted toward each
-        topic's pool independently."""
+        topic's pool independently.
+        """
 
         topic_a = _create_topic_model(
             self,
@@ -406,9 +432,15 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             topic_ids=['topic_a', 'topic_b'],
             total_questions=2,
         )
-        self.put_multi(
-            [topic_a, topic_b, offering_model] + question_skill_link_models
-        )
+        models_to_put: List[
+            Union[
+                topic_models.TopicModel,
+                certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
+                question_models.QuestionSkillLinkModel,
+            ]
+        ] = [topic_a, topic_b, offering_model]
+        models_to_put.extend(question_skill_link_models)
+        self.put_multi(models_to_put)
 
         # Each topic gets 1 required question (2 total / 2 topics), and
         # each topic has access to the same 1 shared question, so the
@@ -436,6 +468,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
 
     def test_empty_storage(self) -> None:
         """Test that the audit job runs successfully with empty storage."""
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -447,7 +480,8 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
 
     def test_audit_job_does_not_update_models(self) -> None:
         """Test that the audit job logs but does not write the blocked
-        status to the datastore."""
+        status to the datastore.
+        """
 
         offering_model = _create_offering_model(
             self,
@@ -470,7 +504,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'audit_offering_missing_topic'
         )
         assert updated_model is not None
@@ -480,7 +514,8 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         self,
     ) -> None:
         """An offering in Not_Ready status should never be validated or
-        touched, even if its question pool would otherwise fail."""
+        touched, even if its question pool would otherwise fail.
+        """
 
         not_ready_offering = _create_offering_model(
             self,
@@ -500,7 +535,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_not_ready'
         )
         assert updated_model is not None
@@ -508,7 +543,8 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
 
     def test_skips_offering_already_blocked(self) -> None:
         """An offering already in Blocked status should not be
-        re-validated or re-logged."""
+        re-validated or re-logged.
+        """
 
         already_blocked_offering = _create_offering_model(
             self,
@@ -528,7 +564,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
             ]
         )
 
-        updated_model = certificate_assessment_models.CertificateAssessmentOfferingModel.get(
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'already_blocked_offering'
         )
         assert updated_model is not None

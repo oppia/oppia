@@ -47,7 +47,6 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
         certificate_assessment_offering_models,
-        datastore_services,
         question_models,
         topic_models,
     )
@@ -95,7 +94,7 @@ class ValidationResultDict(TypedDict):
 
 
 ModelAndValidationResultTuple = Tuple[
-    certificate_assessment_models.CertificateAssessmentOfferingModel,
+    certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
     ValidationResultDict,
 ]
 
@@ -321,7 +320,7 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
     def get_validation_result_for_model(
         self,
         certificate_assessment_offering_model: (
-            certificate_assessment_models.CertificateAssessmentOfferingModel
+            certificate_assessment_offering_models.CertificateAssessmentOfferingModel
         ),
         topic_id_to_info: Dict[str, TopicSkillInfoDict],
         skill_id_to_question_ids: Dict[str, List[str]],
@@ -355,7 +354,9 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
     def mark_model_as_blocked(
         self,
         model_and_validation_result: ModelAndValidationResultTuple,
-    ) -> certificate_assessment_models.CertificateAssessmentOfferingModel:
+    ) -> (
+        certificate_assessment_offering_models.CertificateAssessmentOfferingModel
+    ):
         """Marks the given offering's async_status as 'Blocked'.
 
         Args:
@@ -394,7 +395,7 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             self.pipeline
             | 'Get CertificateAssessmentOfferingModels from the datastore'
             >> ndb_io.GetModels(
-                certificate_assessment_models.CertificateAssessmentOfferingModel.get_all()
+                certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get_all()
             )
         )
 
