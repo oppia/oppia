@@ -80,6 +80,8 @@ const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
 const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const loginPromptContainer = '.story-viewer-login-container';
+const topicNameSelector = '.e2e-test-topic-name';
+const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -667,6 +669,40 @@ export class LoggedOutUser extends BaseUser {
 
     await this.page.keyboard.press('Enter');
     await this.page.waitForNavigation({waitUntil: 'load'});
+  }
+
+  /**
+   * Selects and opens a topic by its name.
+   * @param {string} topicName - The name of the topic to select and open.
+   */
+  async selectAndOpenTopic(topicName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(topicNameSelector);
+      const topicNames = await this.page.$$(topicNameSelector);
+      for (const name of topicNames) {
+        const nameText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          name
+        );
+        if (nameText === topicName.trim()) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: 'networkidle'}),
+            this.waitForElementToBeClickable(name),
+            name.click(),
+          ]);
+
+          await this.expectElementToBeVisible(topicViewerContainerSelector);
+          showMessage(`Topic ${topicName} is opened successfully.`);
+          return;
+        }
+      }
+
+      throw new Error(`Topic "${topicName}" not found in topic names.`);
+    } catch (error) {
+      const newError = new Error(`Failed to select and open topic: ${error}`);
+      newError.stack = error instanceof Error ? error.stack : newError.stack;
+      throw newError;
+    }
   }
 
   /**
