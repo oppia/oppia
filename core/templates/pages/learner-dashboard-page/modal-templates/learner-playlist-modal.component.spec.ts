@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   flushMicrotasks,
@@ -49,7 +49,7 @@ describe('Learner Playlist Modal Component', function () {
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [LearnerPlaylistModalComponent, MockTranslatePipe],
       providers: [
