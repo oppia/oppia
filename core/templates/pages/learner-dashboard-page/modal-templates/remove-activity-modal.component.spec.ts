@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   flushMicrotasks,
@@ -50,7 +50,7 @@ describe('Remove Activity Modal Component', function () {
   let fixture: ComponentFixture<RemoveActivityModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [RemoveActivityModalComponent, MockTranslatePipe],
       providers: [

@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -66,7 +66,7 @@ describe('Learner groups tab Component', () => {
     ['story1', 'story2']
   );
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [

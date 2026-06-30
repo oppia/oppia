@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   fakeAsync,
   flushMicrotasks,
   TestBed,
@@ -48,7 +48,7 @@ describe('Learner Dashboard Activity Backend Api Service', () => {
   let csrfService: CsrfTokenService;
   let ngbModal: NgbModal;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });

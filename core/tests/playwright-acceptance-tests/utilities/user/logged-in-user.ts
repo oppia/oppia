@@ -162,11 +162,20 @@ const reportExplorationTextAreaSelector =
 const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 
+const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
+const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
+const currentGoalsContainerSelector = '.e2e-test-current-goals-section';
+const goalContainerSelector = 'oppia-goal-list';
+const goalTitleSelector = '.e2e-test-goal-title';
+const startGoalButtonSelector = '.e2e-test-start-lesson-button';
+
 // Community Library.
 const closeModalButton = '.e2e-test-close-modal-btn';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
+const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 // Exploration player selectors.
 const explorationSuccessfullyFlaggedMessage =
@@ -518,7 +527,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(homeTabSectionInLearnerDashboard);
+    await this.expectElementToBeAttachedInDOM(homeTabSectionInLearnerDashboard);
   }
 
   /**
@@ -538,7 +547,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-      state: 'visible',
+      state: 'attached',
     });
   }
 
@@ -754,6 +763,59 @@ export class LoggedInUser extends BaseUser {
       continueFromWhereLeftOffSectionInRedesignedDashboardSelector,
       visible
     );
+  }
+
+  /**
+   * Checks if the continue from where you left off section in Learner Dashboard is present.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectContinueWhereYouLeftOffSectionInLDToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      `${continueWhereYouLeftOffSection}${nonEmptySectionSelector}`,
+      visible
+    );
+  }
+
+  /**
+   * Function to verify the goal in the current goals section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to check for.
+   */
+  async expectCurrentGoalsInRedesignedDashboardToContain(
+    goal: string
+  ): Promise<void> {
+    await this.page.waitForSelector(currentGoalsContainerSelector, {
+      state: 'visible',
+    });
+    const currentGoalsSection = await this.page.$(
+      currentGoalsContainerSelector
+    );
+    if (!currentGoalsSection) {
+      throw new Error('Current goals section not found.');
+    }
+    await this.expectGoalToBePresent(goal, currentGoalsSection);
+  }
+
+  /**
+   * Function to verify the goal in the given context.
+   * @param {string} goal - The goal to check for.
+   * @param {ElementHandle<Element> | Page} context - The context of the page.
+   */
+  async expectGoalToBePresent(
+    goal: string,
+    context: ElementHandle<Element> | Page
+  ): Promise<void> {
+    await context.waitForSelector(goalContainerSelector, {
+      state: 'visible',
+    });
+
+    const goalTitles = await context.$$eval(goalTitleSelector, elements =>
+      elements.map(el => el.textContent?.trim())
+    );
+
+    expect(goalTitles).toContain(goal);
   }
 
   /**
@@ -1271,6 +1333,36 @@ export class LoggedInUser extends BaseUser {
         'Invalid username. Please enter a valid username and try again.'
       );
     }
+  }
+
+  /**
+   * Function to start a goal from the goal section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to start.
+   */
+  async startGoalFromGoalsSectionInRedesignedDashboard(
+    goal: string
+  ): Promise<void> {
+    await this.page.waitForSelector(goalContainerSelector);
+    const goalContainers = await this.page.$$(goalContainerSelector);
+
+    for (const goalContainer of goalContainers) {
+      const goalTitle = await goalContainer.$eval(goalTitleSelector, el =>
+        el.textContent?.trim()
+      );
+
+      if (goalTitle === goal) {
+        const startGoalButton = await goalContainer.$(startGoalButtonSelector);
+        await startGoalButton?.click();
+
+        await this.page.waitForSelector(startGoalButtonSelector, {
+          state: 'hidden',
+        });
+        return;
+      }
+    }
+
+    throw new Error(`Goal not found: ${goal}`);
   }
 
   /**
