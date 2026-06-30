@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NumberWithUnitsEditorComponent} from './number-with-units-editor.component';
@@ -27,7 +27,7 @@ describe('NumberWithUnitsEditorComponent', () => {
   let component: NumberWithUnitsEditorComponent;
   let fixture: ComponentFixture<NumberWithUnitsEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, NumberWithUnitsEditorComponent],
       providers: [NumberConversionService, I18nLanguageCodeService],
