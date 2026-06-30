@@ -800,4 +800,40 @@ describe('Question Player Component', () => {
       );
     }
   );
+
+  it('should return sort by difficulty as false by default', () => {
+    component.questionPlayerConfig = {
+      questionsSortedByDifficulty: undefined,
+    } as unknown as QuestionPlayerConfig;
+
+    expect(component.isSortByDifficulty()).toBe(false);
+  });
+
+  it('should return false when pass or fail mode is absent', () => {
+    component.questionPlayerConfig = {
+      resultActionButtons: [],
+      skillList: [],
+      skillDescriptions: [],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
+    };
+
+    expect(component.isInPassOrFailMode()).toBe(false);
+  });
+
+  it('should create empty score and mastery mappings when skill list is absent', () => {
+    component.questionPlayerConfig = {
+      resultActionButtons: [],
+      skillList: [],
+      skillDescriptions: [],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
+    };
+
+    component.createScorePerSkillMapping();
+    component.createMasteryPerSkillMapping();
+
+    expect(component.scorePerSkillMapping).toEqual({});
+    expect(component.masteryPerSkillMapping).toEqual({});
+  });
 });

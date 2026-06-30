@@ -150,4 +150,24 @@ describe('Select Skill Modal', () => {
     componentInstance.selectedSkillId = 'skillId3';
     expect(componentInstance.isDoneButtonDisabled()).toBe(false);
   });
+
+  it('should get empty grouped skill summaries', () => {
+    expect(componentInstance.groupedSkillSummaries).toEqual({
+      current: [],
+      others: [],
+    });
+  });
+
+  it('should get empty untriaged skill summaries for selector when absent', () => {
+    componentInstance.untriagedSkillSummaries =
+      undefined as unknown as SkillSummaryBackendDict[];
+
+    expect(componentInstance.untriagedSkillSummariesForSelector).toEqual([]);
+  });
+
+  it('should map untriaged skill summaries for selector', () => {
+    expect(componentInstance.untriagedSkillSummariesForSelector[0].id).toBe(
+      '3'
+    );
+  });
 });

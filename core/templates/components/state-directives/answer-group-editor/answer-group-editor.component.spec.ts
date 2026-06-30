@@ -142,6 +142,7 @@ describe('Answer Group Editor Component', () => {
     'should save rules when current rule is valid and user' +
       ' triggers an external save',
     fakeAsync(() => {
+      const outcome = Outcome.createNew(null, 'feedback_1', 'Feedback', []);
       let externalSaveEmitter = new EventEmitter();
       spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
         externalSaveEmitter
@@ -154,15 +155,8 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       component.sendOnSaveTaggedMisconception(null);
-      // The 'unknown' type is used here to bypass type checking for testing
-      // purposes, allowing us to pass 'undefined' to a method that expects
-      // an 'Outcome' object to test error handling or default behavior.
-      component.sendOnSaveAnswerGroupCorrectnessLabel(
-        undefined as unknown as Outcome
-      );
-      // The 'unknown' type is used here to bypass type checking for testing
-      // purposes.
-      component.sendOnSaveAnswerGroupFeedback(undefined as unknown as Outcome);
+      component.sendOnSaveAnswerGroupCorrectnessLabel(outcome);
+      component.sendOnSaveAnswerGroupFeedback(outcome);
 
       externalSaveEmitter.emit();
       tick();
@@ -579,5 +573,48 @@ describe('Answer Group Editor Component', () => {
 
     expect(component.rulesMemento).toEqual([rule1]);
     expect(component.changeActiveRuleIndex).toHaveBeenCalled();
+  });
+
+  it('should get misconception outcome from current outcome', () => {
+    component.outcome = Outcome.createNew(
+      null,
+      'feedback_1',
+      'Feedback text',
+      []
+    );
+
+    expect(component.misconceptionOutcome).toEqual({
+      feedback: {
+        content_id: 'feedback_1',
+        html: 'Feedback text',
+      },
+      labelledAsCorrect: false,
+    });
+  });
+
+  it('should save answer group feedback for misconception outcome', () => {
+    component.outcome = Outcome.createNew(
+      null,
+      'feedback_1',
+      'Old feedback',
+      []
+    );
+    spyOn(component.onSaveAnswerGroupFeedback, 'emit');
+
+    component.sendOnSaveAnswerGroupFeedback({
+      feedback: {
+        content_id: 'feedback_1',
+        html: 'New feedback',
+      },
+      labelledAsCorrect: false,
+    });
+
+    expect(component.onSaveAnswerGroupFeedback.emit).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        feedback: jasmine.objectContaining({
+          html: 'New feedback',
+        }),
+      })
+    );
   });
 });
