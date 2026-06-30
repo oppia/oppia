@@ -1,12 +1,80 @@
-<div class="oppia-certificate-offering-add-topic-items">
-  <h2>Add Topics</h2>
-  <!--
-    Real topic search, available topics list, and selected topics list are
-    added with the topic-selection implementation.
-  -->
+<div class="oppia-certificate-offering-page">
+  <div class="oppia-certificate-offering-card">
 
-  <div class="oppia-certificate-offering-add-topic-items-actions">
-    <button (click)="onBackClicked()">Back</button>
-    <button (click)="onNextClicked()">Next</button>
+    <p class="oppia-certificate-offering-hint">
+      Add topics that need to be covered in the certificate.
+    </p>
+
+    <div class="oppia-certificate-offering-selected-topics">
+      <ng-container *ngIf="selectedTopics.length > 0; else noSelectedTopics">
+        <div *ngFor="let topic of selectedTopics"
+             class="oppia-certificate-offering-selected-topic-card">
+          <div class="oppia-certificate-offering-topic-thumbnail"
+               [style.background-color]="topic.thumbnailBgColor || '#dbeafe'">
+          </div>
+          <div class="oppia-certificate-offering-selected-topic-info">
+            <div class="oppia-certificate-offering-topic-meta">
+              <div class="oppia-certificate-offering-topic-title">{{ topic.title }}</div>
+            </div>
+          </div>
+          <button type="button" class="oppia-certificate-offering-remove-topic" aria-label="Remove topic"
+                  (click)="removeSelectedTopic(topic.id)">
+            &times;
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #noSelectedTopics>
+        <div class="oppia-certificate-offering-empty-selected-topics">
+          You have not added any topic. Start by adding one!
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="oppia-certificate-offering-search">
+      <input class="oppia-certificate-offering-search-input" type="text" placeholder="Search for topics e.g. Fractions, Geometry"
+             [(ngModel)]="searchQuery" aria-label="Search topics">
+    </div>
+
+    <div class="oppia-certificate-offering-topic-list-wrap">
+      <p *ngIf="classroomName" class="oppia-certificate-offering-classroom-label">
+        Classroom: {{ classroomName }}
+      </p>
+
+      <div class="oppia-certificate-offering-topic-list">
+        <ng-container *ngIf="filteredTopics.length > 0; else noTopics">
+          <div *ngFor="let topic of filteredTopics" class="oppia-certificate-offering-topic-row">
+            <div class="oppia-certificate-offering-topic-row-left">
+              <div class="oppia-certificate-offering-topic-thumbnail"
+                   [style.background-color]="topic.thumbnailBgColor || '#dbeafe'">
+              </div>
+              <div class="oppia-certificate-offering-topic-meta">
+                <div class="oppia-certificate-offering-topic-title">{{ topic.title }}</div>
+              </div>
+            </div>
+            <button type="button" class="oppia-certificate-offering-topic-toggle"
+                    [class.oppia-certificate-offering-topic-toggle--added]="selectedTopicIds.has(topic.id)"
+                    (click)="toggleTopic(topic)">
+              {{ selectedTopicIds.has(topic.id) ? 'Added' : 'Add' }}
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-template #noTopics>
+          <p class="oppia-certificate-offering-no-results">No topics found.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="oppia-certificate-offering-actions">
+      <button type="button" class="oppia-certificate-offering-secondary-button" (click)="onBackClicked()">
+        &lt; Back
+      </button>
+      <button type="button" class="oppia-certificate-offering-primary-button" [disabled]="selectedTopics.length === 0"
+              [attr.aria-disabled]="selectedTopics.length === 0" (click)="onNextClicked()">
+        Next
+      </button>
+    </div>
+
   </div>
 </div>

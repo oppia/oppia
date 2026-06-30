@@ -17,10 +17,11 @@
  */
 
 import {ViewportSize} from '@playwright/test';
-import {expect, Page, ElementHandle} from '@playwright/test';
+import test, {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import fs from 'fs';
 
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
@@ -29,19 +30,12 @@ const toastMessageSelector = '.e2e-test-toast-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
-const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-
 const pagesWithDialogHandler = new WeakSet<Page>();
-
-declare global {
-  interface Window {
-    __isElementClickable: typeof isElementClickable;
-  }
-}
 
 const usernameInputSelector = 'input.e2e-test-username-input';
 const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
 const registerButtonSelector = 'button.e2e-test-register-user:not([disabled])';
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class BaseUser {
   readonly page: Page;
@@ -57,9 +51,6 @@ export class BaseUser {
       pagesWithDialogHandler.add(page);
       this.installPageDialogHandler();
     }
-    this.page.addInitScript(
-      `window.__isElementClickable = ${isElementClickable.toString()}`
-    );
   }
 
   /**
@@ -364,9 +355,16 @@ export class BaseUser {
         ? await this.page.waitForSelector(selector)
         : selector;
     await this.page.waitForFunction(
-      ({element, clickable}: {element: Element; clickable: boolean}) =>
-        window.__isElementClickable(element, clickable),
-      {element, clickable}
+      ({element, clickable, clickableFn}) => {
+        const fn = new Function(
+          'element',
+          'clickable',
+          `return (${clickableFn})(element, clickable)`
+        );
+        return fn(element, clickable);
+      },
+      {element, clickable, clickableFn: isElementClickable.toString()},
+      {timeout: 30000}
     );
   }
 
@@ -521,6 +519,20 @@ export class BaseUser {
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(-1, -1);
     await currentPage.waitForTimeout(5000);
+
+    const snapshotPath = test
+      .info()
+      .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
+
+    if (
+      !fs.existsSync(snapshotPath) &&
+      process.env.UPDATE_SNAPSHOTS !== 'true'
+    ) {
+      throw new Error(
+        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
+          'Run with --update_snapshots to generate it.'
+      );
+    }
 
     let failureTrigger = 0;
 
@@ -993,7 +1005,7 @@ export class BaseUser {
   /**
    * Waits for an element to stabilize.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   * @param {number} timeout - The timeout in milliseconds. Defaults to 5000.
+   * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
     selector: string | ElementHandle<Element>,

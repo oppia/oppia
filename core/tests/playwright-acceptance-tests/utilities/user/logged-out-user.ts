@@ -20,6 +20,7 @@ import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
+import isElementClickable from '../../functions/is-element-clickable';
 
 const aboutUrl = testConstants.URLs.About;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
@@ -428,13 +429,6 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
-  async expectToBeOnCommunityLibraryPage(): Promise<void> {
-    await this.page.waitForFunction(
-      (url: string) => window.location.href.includes(url),
-      testConstants.URLs.CommunityLibrary
-    );
-  }
-
   /**
    * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
    * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
@@ -467,6 +461,13 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
+  }
+
+  async expectToBeOnCommunityLibraryPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => window.location.href.includes(url),
+      testConstants.URLs.CommunityLibrary
+    );
   }
 
   /**
@@ -619,23 +620,29 @@ export class LoggedOutUser extends BaseUser {
         );
       }
 
+      // TODO(#26453): The search page fires /searchhandler/data multiple
+      // times on load, causing Angular to re-render the search results list and
+      // detach ElementHandle references mid-operation. To avoid stale handles,
+      // we re-query the DOM by selector and index on each poll and at click time
+      // rather than holding an ElementHandle across async boundaries. Remove this
+      // workaround once the upstream re-rendering issue is fixed.
       await this.page.waitForFunction(
-        ({
-          selector,
-          index,
-          clickable,
-        }: {
-          selector: string;
-          index: number;
-          clickable: boolean;
-        }) => {
+        ({selector, index, clickableFn}) => {
           const element = document.querySelectorAll(selector)[index];
           if (!element) {
             return false;
           }
-          return window.__isElementClickable(element, clickable);
+          const fn = new Function(
+            'element',
+            `return (${clickableFn})(element)`
+          );
+          return fn(element);
         },
-        {selector: lessonCardTitleSelector, index: lessonIndex, clickable: true}
+        {
+          selector: lessonCardTitleSelector,
+          index: lessonIndex,
+          clickableFn: isElementClickable.toString(),
+        }
       );
 
       await this.page.evaluate(

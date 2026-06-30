@@ -131,6 +131,22 @@ describe('Opportunities List Item Component', () => {
         });
       }
     );
+
+    describe('when progress percentage is zero', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.progressPercentage = 0;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should initialize progressPercentage to 0%', () => {
+        expect(component.progressPercentage).toBe('0%');
+        expect(component.progressBarStyle).toEqual({
+          width: '0%',
+        });
+      });
+    });
   });
 
   describe('when a translation opportunity is provided', () => {

@@ -31,6 +31,8 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
+test.describe.configure({mode: 'serial'});
+
 test.describe('Logged In Learner', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let releaseCoordinator: ReleaseCoordinator;
