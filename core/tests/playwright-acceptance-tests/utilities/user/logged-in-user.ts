@@ -197,8 +197,6 @@ const reportExplorationTextAreaSelector =
 const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 
-const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
-const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 const currentGoalsContainerSelector = '.e2e-test-current-goals-section';
 const goalContainerSelector = 'oppia-goal-list';
 const goalTitleSelector = '.e2e-test-goal-title';
