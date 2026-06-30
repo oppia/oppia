@@ -280,16 +280,20 @@ export class CertificateDownloadModalComponent {
           {
             text:
               "for their dedication and time in translating Oppia's " +
-              'basic maths lessons to ' +
-              info.language,
+              'basic maths, science,',
             linePosition: linePosition,
           },
           {
             text:
-              'which will help our ' +
+              'and financial literacy lessons to ' +
               info.language +
-              '-speaking ' +
-              'learners better understand the lessons.',
+              ' which will help our ' +
+              info.language +
+              '-speaking',
+            linePosition: (linePosition += 40),
+          },
+          {
+            text: 'learners better understand the lessons.',
             linePosition: (linePosition += 40),
           },
           {
@@ -350,11 +354,32 @@ export class CertificateDownloadModalComponent {
       ctx.font = '24px Brush Script MT';
       ctx.fillStyle = '#000000';
       linePosition += 100;
-      ctx.fillText(
-        info.team_lead,
-        this.SIGNATURE_BASE_COORDINATE,
-        linePosition
-      );
+
+      // For translation certificates, shift the cursive name UP by 25
+      // pixels to make room for the title between the name and divider line.
+      // For question certificates, draw the name at the standard position.
+      const signatureY =
+        this.suggestionType === 'translate_content'
+          ? linePosition - 25
+          : linePosition;
+      ctx.fillText(info.team_lead, this.SIGNATURE_BASE_COORDINATE, signatureY);
+
+      // Only show the coordinator title on translation certificates.
+      if (this.suggestionType === 'translate_content') {
+        // Save the canvas state so the smaller grey font doesn't leak
+        // into the Date text and divider lines that follow.
+        ctx.save();
+
+        ctx.font = '16px Roboto';
+        ctx.fillStyle = '#8F9899';
+        ctx.fillText(
+          'Translations Coordinator',
+          this.SIGNATURE_BASE_COORDINATE,
+          linePosition - 5
+        );
+
+        ctx.restore();
+      }
 
       ctx.font = '24px Roboto';
       ctx.fillText(
