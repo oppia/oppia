@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
  * Start a Goal and see the changes in the Goals Tab as we progress in a story
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -29,24 +30,28 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Logged-in Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-in Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(6000000); // Setup taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -104,46 +109,36 @@ describe('Logged-in Learner', function () {
 
     loggedInLearner = await UserFactory.createNewUser(
       'loggedInLearner1',
-      'logged_in_learner1@example.com'
+      'logged_in_learner1@example.com',
+      browser
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 6000000); // Setup taking longer than default timeout.
+  });
 
-  it(
-    'should display empty progress message when no lessons are in progress',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
-        'Home'
-      );
-      await loggedInLearner.navigateToProgressSection();
-      await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
-        'Progress'
-      );
-      await loggedInLearner.expectProgressSectionToBeEmptyInNewLD();
-      await loggedInLearner.expectScreenshotToMatch(
-        'emptyProgressSection',
-        __dirname
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should display empty progress message when no lessons are in progress', async function () {
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+      'Home'
+    );
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+      'Progress'
+    );
+    await loggedInLearner.expectProgressSectionToBeEmptyInNewLD();
+    await loggedInLearner.expectScreenshotToMatch('emptyProgressSection');
+  });
 
-  it(
-    'should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.navigateToProgressSection();
-      await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
-        true
-      );
-      await loggedInLearner.navigateThroughClassroomButtonOnRLD();
-      await loggedInLearner.expectToBeOnPage('/learn/math');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math', async function () {
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+      true
+    );
+    await loggedInLearner.navigateThroughClassroomButtonOnRLD();
+    await loggedInLearner.expectToBeOnPage('/learn/math');
+  });
 
-  it('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
+  test('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
     await loggedInLearner.selectAndOpenTopic('Place Values');
     await loggedInLearner.selectChapterWithinStoryToLearn(
       "Jamie's Adventures in the Arcade",
@@ -155,8 +150,7 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectScreenshotToMatch(
-      'ProgressSectionInProgressWithOnlyChapter01',
-      __dirname
+      'ProgressSectionInProgressWithOnlyChapter01'
     );
     await loggedInLearner.expectElementsToBePresentInRLD(
       ['In Progress'],
@@ -186,12 +180,11 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToProgressSection();
     await loggedInLearner.expectScreenshotToMatch(
-      'ProgressSectionInProgressWithOnlyChapter02',
-      __dirname
+      'ProgressSectionInProgressWithOnlyChapter02'
     );
   });
 
-  it("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
+  test("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToProgressSection();
 
@@ -235,8 +228,7 @@ describe('Logged-in Learner', function () {
     await loggedInLearner.navigateToProgressSection();
 
     await loggedInLearner.expectScreenshotToMatch(
-      'inProgressTabCompletedSection',
-      __dirname
+      'inProgressTabCompletedSection'
     );
     await loggedInLearner.expectElementsToBePresentInRLD(
       ['Completed'],
@@ -255,7 +247,7 @@ describe('Logged-in Learner', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
