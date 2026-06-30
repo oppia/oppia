@@ -19,7 +19,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Rubric} from 'domain/skill/rubric.model';
 import {Skill} from 'domain/skill/skill.model.ts';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {Subscription} from 'rxjs';
+import {
+  CategorizedSkills,
+  TopicsAndSkillsDashboardBackendApiService,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {
   GroupedSkillSummaries,
   SkillEditorStateService,
@@ -37,8 +42,13 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   groupedSkillSummaries!: GroupedSkillSummaries;
   skillIdToRubricsObject: Record<string, Rubric[]> = {};
   difficultyCount!: number;
+  skillsCategorizedByTopics: CategorizedSkills = {};
+  untriagedSkillSummaries: SkillSummary[] = [];
 
-  constructor(private skillEditorStateService: SkillEditorStateService) {}
+  constructor(
+    private skillEditorStateService: SkillEditorStateService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService
+  ) {}
 
   directiveSubscriptions = new Subscription();
   _init(): void {
@@ -47,6 +57,16 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
       this.skillEditorStateService.getGroupedSkillSummaries();
     this.skillIdToRubricsObject = {};
     this.skillIdToRubricsObject[this.skill.getId()] = this.skill.getRubrics();
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchDashboardDataAsync()
+      .then(response => {
+        this.skillsCategorizedByTopics = response.categorizedSkillsDict;
+        this.untriagedSkillSummaries = response.untriagedSkillSummaries;
+      })
+      .catch(() => {
+        this.skillsCategorizedByTopics = {};
+        this.untriagedSkillSummaries = [];
+      });
   }
 
   ngOnInit(): void {
