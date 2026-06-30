@@ -21,6 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.domain import (
     certificate_assessment_domain,
+    classroom_config_services,
     question_services,
     skill_fetchers,
     topic_fetchers,
@@ -28,6 +29,9 @@ from core.domain import (
 from core.storage.certificate_assessment import gae_models
 
 from typing import Dict, List, TypedDict, cast
+
+# Number of questions required per topic (one each of easy, medium, hard).
+QUESTIONS_PER_TOPIC = 3
 
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
@@ -53,13 +57,12 @@ def _get_topic_name_to_question_ids_map(
             skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
             if skill is None:
                 continue
-            question_skill_links = (
-                question_services.get_question_skill_links_of_skill(
+            question_ids.update(
+                link.question_id
+                for link in question_services.get_question_skill_links_of_skill(
                     skill_id, skill.description
                 )
             )
-            for question_skill_link in question_skill_links:
-                question_ids.add(question_skill_link.question_id)
 
         topic_id_to_question_ids[topic_id] = sorted(question_ids)
     return topic_id_to_question_ids
@@ -126,6 +129,19 @@ def validate_certificate_assessment_offering(
     validation_errors: Dict[str, Dict[str, Dict[str, int]]] = {}
     message_parts: List[str] = []
     is_valid = True
+
+    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    if total_questions < expected_total_questions:
+        is_valid = False
+        message_parts.append(
+            'total_questions must be greater than or equal to %d '
+            '(%d per topic: easy, medium, hard) for %d topic(s).'
+            % (
+                expected_total_questions,
+                QUESTIONS_PER_TOPIC,
+                len(topic_ids),
+            )
+        )
 
     for index, topic_id in enumerate(topic_ids):
         required_questions = base_questions_per_topic + (
@@ -211,26 +227,7 @@ def create_certificate_assessment_offering(
     Returns:
         CertificateAssessmentOffering. The created certificate assessment
         offering.
-
-    Raises:
-        ValidationError. The provided offering data is invalid.
     """
-    # TODO(#24717-M1.14): Re-enable classroom and topic existence checks once the
-    # frontend create flow sends real classroom/topic selections instead of
-    # temporary hardcoded stub values.
-
-    # Classroom = classroom_config_services.get_classroom_by_id(classroom_id)
-    # if classroom is None:
-    #     raise Exception('classroom_id must correspond to an existing classroom.')
-
-    # For topic_id in topic_ids:
-    #     topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-    #     if topic is None:
-    #         raise Exception('topic_ids must refer to existing topics.')
-    #     if topic_id not in classroom.get_topic_ids():
-    #         raise Exception(
-    #             'topic_ids must belong to the specified classroom.'
-    #         )
 
     certificate_assessment_offering = (
         certificate_assessment_domain.CertificateAssessmentOffering(

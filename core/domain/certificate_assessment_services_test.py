@@ -147,3 +147,111 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             certificate_assessment_services.get_certificate_assessment_offering(
                 created_offering.certificate_id
             )
+
+
+class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
+    """Tests for validate_certificate_assessment_offering."""
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.classroom_id = 'math_classroom_01'
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_topic(self.topic_id, owner_id)
+        classroom = classroom_config_domain.Classroom(
+            self.classroom_id,
+            name='Math',
+            url_fragment='math',
+            course_details='Course details',
+            teaser_text='Teaser text',
+            topic_list_intro='Topic intro',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg',
+                'red',
+                1,
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.svg',
+                'blue',
+                1,
+            ),
+            index=0,
+        )
+        classroom_config_services.create_new_classroom(classroom)
+
+    def test_raises_for_empty_topic_ids(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'topic_ids must contain at least one topic.',
+        ):
+            certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=[],
+                total_questions=3,
+            )
+
+    def test_raises_for_non_positive_total_questions(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'total_questions must be a positive integer.',
+        ):
+            certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=[self.topic_id],
+                total_questions=0,
+            )
+
+    def test_raises_for_nonexistent_topic(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic missing_topic_id does not exist.',
+        ):
+            certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=['missing_topic_id'],
+                total_questions=3,
+            )
+
+    def test_is_invalid_when_total_questions_below_required_minimum(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=[self.topic_id],
+            total_questions=1,
+        )
+        self.assertFalse(result['is_valid'])
+        self.assertIn(
+            'total_questions must be greater than or equal to 3 '
+            '(3 per topic: easy, medium, hard) for 1 topic(s).',
+            result['validation_message'],
+        )
+
+    def test_is_invalid_when_topic_has_insufficient_questions(self) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=[self.topic_id],
+            total_questions=3,
+        )
+        self.assertFalse(result['is_valid'])
+        self.assertIn(self.topic_id, result['validation_errors'])
+        self.assertIn(
+            'needs 3 unique questions but only 0 are available.',
+            result['validation_message'],
+        )
+
+    def test_validation_errors_contain_per_topic_difficulty_breakdown(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=[self.topic_id],
+            total_questions=3,
+        )
+        topic_errors = result['validation_errors'][self.topic_id]
+        self.assertEqual(topic_errors['easy']['required'], 1)
+        self.assertEqual(topic_errors['medium']['required'], 1)
+        self.assertEqual(topic_errors['hard']['required'], 1)
+        self.assertEqual(topic_errors['easy']['available'], 0)
+        self.assertEqual(topic_errors['medium']['available'], 0)
+        self.assertEqual(topic_errors['hard']['available'], 0)
