@@ -141,7 +141,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            utils.ValidationError,
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException,
             'Certificate assessment offering .* does not exist.',
         ):
             certificate_assessment_services.get_certificate_assessment_offering(

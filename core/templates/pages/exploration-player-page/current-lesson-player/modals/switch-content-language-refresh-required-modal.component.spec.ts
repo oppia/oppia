@@ -17,7 +17,7 @@
  * SwitchContentLanguageRefreshRequiredModalComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {
@@ -52,7 +52,7 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function () {
   let ngbActiveModal: NgbActiveModal;
   let windowRef: WindowRef;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     const mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [SwitchContentLanguageRefreshRequiredModalComponent],

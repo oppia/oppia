@@ -50,6 +50,20 @@ describe('Edit Certificate Offering Page Component', () => {
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let ngbModal: NgbModal;
   let router: Router;
+  const alertsServiceMock = {
+    addWarning: () => {},
+    addSuccessMessage: () => {},
+  } as Pick<AlertsService, 'addWarning' | 'addSuccessMessage'>;
+  const certificateAssessmentOfferingBackendApiServiceMock = {
+    getCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
+    updateCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve('certificate_offering_id'),
+  } as Pick<
+    CertificateAssessmentOfferingBackendApiService,
+    | 'getCertificateAssessmentOfferingAsync'
+    | 'updateCertificateAssessmentOfferingAsync'
+  >;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -67,19 +81,11 @@ describe('Edit Certificate Offering Page Component', () => {
         },
         {
           provide: AlertsService,
-          useValue: {
-            addWarning: () => {},
-            addSuccessMessage: () => {},
-          },
+          useValue: alertsServiceMock,
         },
         {
           provide: CertificateAssessmentOfferingBackendApiService,
-          useValue: {
-            getCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
-            updateCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve('certificate_offering_id'),
-          },
+          useValue: certificateAssessmentOfferingBackendApiServiceMock,
         },
         {
           provide: NgbModal,

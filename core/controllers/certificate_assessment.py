@@ -241,7 +241,9 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 certificate_id
             )
-        except utils.ValidationError as e:
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json(
             {
@@ -283,10 +285,12 @@ class CertificateAssessmentOfferingByIdHandler(
                 demonstrates=demonstrates,
                 async_status=self.normalized_payload['async_status'],
             )
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
+            raise self.NotFoundException(str(e)) from e
         except utils.ValidationError as e:
-            if 'does not exist.' in str(e):
-                raise self.NotFoundException(str(e)) from e
-            raise self.InvalidInputException(e)
+            raise self.InvalidInputException(e) from e
         self.render_json(
             {'certificate_id': certificate_offering.certificate_id}
         )
@@ -302,6 +306,8 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_assessment_services.delete_certificate_assessment_offering(
                 certificate_id
             )
-        except utils.ValidationError as e:
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json({})

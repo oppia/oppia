@@ -157,6 +157,12 @@ def validate_certificate_assessment_offering(
     }
 
 
+class CertificateAssessmentOfferingNotFoundException(Exception):
+    """Exception raised when a certificate assessment offering is missing."""
+
+    pass
+
+
 def _model_to_domain(
     certificate_assessment_offering_model: gae_models.CertificateAssessmentOfferingModel,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
@@ -273,13 +279,14 @@ def get_certificate_assessment_offering(
         with the given ID.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist.
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
     )
     if certificate_assessment_offering_model is None:
-        raise utils.ValidationError(
+        raise CertificateAssessmentOfferingNotFoundException(
             'Certificate assessment offering %s does not exist.'
             % certificate_id
         )
@@ -319,14 +326,15 @@ def update_certificate_assessment_offering(
         offering.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist.
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
         ValidationError. The provided offering data is invalid.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
     )
     if certificate_assessment_offering_model is None:
-        raise utils.ValidationError(
+        raise CertificateAssessmentOfferingNotFoundException(
             'Certificate assessment offering %s does not exist.'
             % certificate_id
         )
@@ -378,13 +386,14 @@ def delete_certificate_assessment_offering(certificate_id: str) -> None:
         certificate_id: str. The ID of the certificate assessment offering.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist.
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
     )
     if certificate_assessment_offering_model is None:
-        raise utils.ValidationError(
+        raise CertificateAssessmentOfferingNotFoundException(
             'Certificate assessment offering %s does not exist.'
             % certificate_id
         )
