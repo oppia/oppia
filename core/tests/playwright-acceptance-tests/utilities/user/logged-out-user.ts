@@ -446,40 +446,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
-   * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
-   */
-  async expectProgressReminder(shouldBeFound: boolean): Promise<void> {
-    await this.waitForPageToFullyLoad();
-    try {
-      await this.page.waitForSelector(progressRemainderModalSelector, {
-        state: 'visible',
-      });
-      if (!shouldBeFound) {
-        throw new Error('Progress remainder is found, which is not expected.');
-      }
-      showMessage('Progress reminder modal found.');
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('Timeout')) {
-        // Closing checkpoint modal if appears.
-        const closeLessonInfoTooltipElement = await this.page.$(
-          closeLessonInfoTooltipSelector
-        );
-        if (closeLessonInfoTooltipElement) {
-          await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
-        }
-        if (shouldBeFound) {
-          throw new Error(
-            'Progress remainder is not found, which is not expected.'
-          );
-        }
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  /**
    * Navigates to the community library page using the navbar.
    */
   async navigateToCommunityLibraryOnNavbar(): Promise<void> {
