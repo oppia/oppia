@@ -26,10 +26,9 @@ import {
 } from 'services/image-local-storage.service';
 import {
   FeedbackCaptchaConfigResponse,
-  FeedbackListResponse,
-  FeedbackSubmitPayload,
+  SendALessonFeedbackModel,
+  IssueReportModel,
   FeedbackSubmitResponse,
-  FeedbackThreadDetail,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
@@ -41,11 +40,9 @@ interface FeedbackScreenshotSubmissionData {
   providedIn: 'root',
 })
 export class FeedbackBackendApiService {
-  private submitFeedbackUrl = '/give_general_feedback';
+  private lessonFeedbackUrl = '/feedback';
+  private reportUrl = '/report';
   private captchaConfigUrl = '/feedback_captcha_config_handler';
-  private creatorFeedbackListUrl = '/creator_feedback_handler/<exploration_id>';
-  private creatorFeedbackDetailUrl =
-    '/creator_feedback_handler/<exploration_id>/<thread_id>';
 
   constructor(
     private http: HttpClient,
@@ -95,14 +92,17 @@ export class FeedbackBackendApiService {
     };
   }
 
-  // Feedback-submission-modal.
-
-  async submitFeedbackAsync(
-    payload: FeedbackSubmitPayload
+  async submitLessonFeedbackAsync(
+    payload: SendALessonFeedbackModel,
+    captchaToken: string | null
   ): Promise<FeedbackSubmitResponse> {
+    const requestPayload = {
+      ...payload.toBackendDict(),
+      ...(captchaToken ? {captcha_token: captchaToken} : {}),
+    };
     try {
       return await this.http
-        .post<FeedbackSubmitResponse>(this.submitFeedbackUrl, payload)
+        .post<FeedbackSubmitResponse>(this.lessonFeedbackUrl, requestPayload)
         .toPromise();
       // We use unknown type because we are unsure of the type of error
       // that was thrown. Since the catch block cannot identify the
@@ -116,77 +116,31 @@ export class FeedbackBackendApiService {
     }
   }
 
-  // Creator-feedback-tab.
-
-  async fetchCreatorFeedbackListAsync(
-    explorationId: string,
-    cursor: string | null,
-    status: string | null,
-    dateFromMsecs: number | null,
-    dateToMsecs: number | null
-  ): Promise<FeedbackListResponse> {
-    const params: {[key: string]: string} = {};
-    if (cursor) {
-      params.cursor = cursor;
-    }
-    if (status) {
-      params.status = status;
-    }
-    if (dateFromMsecs !== null) {
-      params.date_from_msecs = String(dateFromMsecs);
-    }
-    if (dateToMsecs !== null) {
-      params.date_to_msecs = String(dateToMsecs);
-    }
-    const url = this.creatorFeedbackListUrl.replace(
-      '<exploration_id>',
-      explorationId
-    );
-    return this.http.get<FeedbackListResponse>(url, {params}).toPromise();
-  }
-
-  async fetchCreatorFeedbackDetailAsync(
-    explorationId: string,
-    threadId: string
-  ): Promise<FeedbackThreadDetail> {
-    const url = this.creatorFeedbackDetailUrl
-      .replace('<exploration_id>', explorationId)
-      .replace('<thread_id>', threadId);
-    return this.http.get<FeedbackThreadDetail>(url).toPromise();
-  }
-
-  async addCreatorMessageAsync(
-    explorationId: string,
-    threadId: string,
-    message: string | null = null,
-    status: string | null = null,
-    screenshot: {
-      filename: string | null;
-      files?: Record<string, string> | null;
-    } | null = null
-  ): Promise<void> {
-    if (message === null && status === null && screenshot === null) {
-      throw new Error(
-        'At least one of message, status or screenshot must be provided.'
+  async submitSiteAndLessonIssueReportAsync(
+    payload: IssueReportModel,
+    captchaToken: string | null
+  ): Promise<FeedbackSubmitResponse> {
+    try {
+      const screenshotData = await this.getStagedScreenshotSubmissionDataAsync(
+        payload.screenshotFilename
       );
+      return await this.http
+        .post<FeedbackSubmitResponse>(this.reportUrl, {
+          ...payload.toBackendDict(),
+          screenshot_file: screenshotData.screenshotFile,
+          ...(captchaToken ? {captcha_token: captchaToken} : {}),
+        })
+        .toPromise();
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse) {
+        return Promise.reject(error);
+      } else {
+        throw error;
+      }
     }
-    const url = this.creatorFeedbackDetailUrl
-      .replace('<exploration_id>', explorationId)
-      .replace('<thread_id>', threadId);
-    await this.http
-      .put<void>(url, {
-        action: status,
-        message,
-        screenshotFilename: screenshot?.filename ?? null,
-        files: screenshot?.files ?? null,
-      })
-      .toPromise();
   }
-
-  // Feedback-admin dashboard.
-  // Not part of Milestone-1, will be added in Milestone-2.
-  // 1->fetchFeedbackAdminListAsync.
-  // 2->fetchFeedbackAdminDetailAsync.
-  // 3->addFeedbackAdminMessageAsync.
-  // 4->deleteFeedbackAsync.
 }

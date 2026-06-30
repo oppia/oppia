@@ -25,7 +25,7 @@ import {InteractiveMultipleChoiceInputComponent} from './directives/oppia-intera
 import {ResponseMultipleChoiceInputComponent} from './directives/oppia-response-multiple-choice-input.component';
 import {ShortResponseMultipleChoiceInputComponent} from './directives/oppia-short-response-multiple-choice-input.component';
 import {TranslateModule} from '@ngx-translate/core';
-import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RichTextComponentsModule} from '../../rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
