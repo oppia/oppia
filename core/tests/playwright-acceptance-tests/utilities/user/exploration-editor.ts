@@ -700,6 +700,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to exploration editor.
+   */
+  async navigateToExplorationEditorPage(): Promise<void> {
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+  }
+
+  /**
    * Function to add content to a card.
    * @param {string} content - The content to be added to the card.
    */

@@ -20,6 +20,7 @@ import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
+import isElementClickable from '../../functions/is-element-clickable';
 
 const aboutUrl = testConstants.URLs.About;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
@@ -403,6 +404,40 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
+   * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
+   */
+  async expectProgressReminder(shouldBeFound: boolean): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    try {
+      await this.page.waitForSelector(progressRemainderModalSelector, {
+        state: 'visible',
+      });
+      if (!shouldBeFound) {
+        throw new Error('Progress remainder is found, which is not expected.');
+      }
+      showMessage('Progress reminder modal found.');
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        // Closing checkpoint modal if appears.
+        const closeLessonInfoTooltipElement = await this.page.$(
+          closeLessonInfoTooltipSelector
+        );
+        if (closeLessonInfoTooltipElement) {
+          await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
+        }
+        if (shouldBeFound) {
+          throw new Error(
+            'Progress remainder is not found, which is not expected.'
+          );
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+
   async expectToBeOnCommunityLibraryPage(): Promise<void> {
     await this.page.waitForFunction(
       (url: string) => window.location.href.includes(url),
@@ -594,23 +629,29 @@ export class LoggedOutUser extends BaseUser {
         );
       }
 
+      // TODO(#26453): The search page fires /searchhandler/data multiple
+      // times on load, causing Angular to re-render the search results list and
+      // detach ElementHandle references mid-operation. To avoid stale handles,
+      // we re-query the DOM by selector and index on each poll and at click time
+      // rather than holding an ElementHandle across async boundaries. Remove this
+      // workaround once the upstream re-rendering issue is fixed.
       await this.page.waitForFunction(
-        ({
-          selector,
-          index,
-          clickable,
-        }: {
-          selector: string;
-          index: number;
-          clickable: boolean;
-        }) => {
+        ({selector, index, clickableFn}) => {
           const element = document.querySelectorAll(selector)[index];
           if (!element) {
             return false;
           }
-          return window.__isElementClickable(element, clickable);
+          const fn = new Function(
+            'element',
+            `return (${clickableFn})(element)`
+          );
+          return fn(element);
         },
-        {selector: lessonCardTitleSelector, index: lessonIndex, clickable: true}
+        {
+          selector: lessonCardTitleSelector,
+          index: lessonIndex,
+          clickableFn: isElementClickable.toString(),
+        }
       );
 
       await this.page.evaluate(
