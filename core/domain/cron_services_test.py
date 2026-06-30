@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     from mypy_imports import job_models, user_models
 
 job_models, user_models = models.Registry.import_models(
