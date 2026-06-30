@@ -18,16 +18,10 @@
  * and edit flows.
  */
 
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 
 import './certificate-offering-review-and-availability.component.css';
@@ -77,79 +71,99 @@ export interface ReadinessErrorMessage {
   isZero: boolean;
 }
 
+export interface ValidationResponse {
+  is_valid: boolean;
+  validation_errors: ValidationErrors;
+  validation_message: string;
+}
+
 @Component({
   selector: 'oppia-certificate-offering-review-and-availability',
   templateUrl: './certificate-offering-review-and-availability.component.html',
 })
 export class CertificateOfferingReviewAndAvailabilityComponent
-  implements OnInit, OnChanges
+  implements OnInit
 {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
   @Input() isCertificateValid: boolean = true;
-  @Input() useStubData: boolean = false;
-
-  // These two inputs will be wired from the real validation API response.
-  // TODO(##24717 - M1.13): Replace the stub path below with the backend contract once the
-  // validation endpoint is implemented.
-  @Input() isValid: boolean = true;
-  @Input() validationErrors: ValidationErrors = {};
-
-  // Map of topic_id to human-readable topic name.
-  // Wired from real data.
-  @Input() topicNameMap: {[topicId: string]: string} = {};
 
   @Output() saveCertificateOffering = new EventEmitter<void>();
   @Output() navigateToAddTopicsSection = new EventEmitter<void>();
+  @Output() isCertificateValidChange = new EventEmitter<boolean>();
 
   // Derived display data - rebuilt whenever inputs change.
+  isValid: boolean = true;
+  validationErrors: ValidationErrors = {};
+  topicNameMap: {[topicId: string]: string} = {};
+  validationMessage: string = '';
   topicReadinessRows: TopicReadinessRow[] = [];
   errorMessages: ReadinessErrorMessage[] = [];
 
-  // Stub data.
-  // Mirrors the exact shape the validation API returns.
-  // Replaced by real @Input() values.
-  private readonly STUB_TOPIC_NAME_MAP: {
-    [topicId: string]: string;
-  } = {
-    topic_adding_numbers: 'Adding Numbers',
-    topic_fractions: 'Fractions',
-    topic_percentages: 'Percentages',
-  };
+  constructor(
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+  ) {}
 
-  private readonly STUB_IS_VALID: boolean = false;
-
-  private readonly STUB_VALIDATION_ERRORS: ValidationErrors = {
-    topic_adding_numbers: {
-      easy: {required: 5, available: 5},
-      medium: {required: 5, available: 8},
-      hard: {required: 3, available: 4},
-    },
-    topic_fractions: {
-      easy: {required: 5, available: 6},
-      medium: {required: 10, available: 3},
-      hard: {required: 3, available: 0},
-    },
-    topic_percentages: {
-      easy: {required: 5, available: 4},
-      medium: {required: 5, available: 5},
-      hard: {required: 3, available: 2},
-    },
-  };
-
-  ngOnInit(): void {
-    if (this.useStubData) {
-      this.validationErrors = this.STUB_VALIDATION_ERRORS;
-      this.isValid = this.STUB_IS_VALID;
-      this.topicNameMap = this.STUB_TOPIC_NAME_MAP;
+  async ngOnInit(): Promise<void> {
+    if (
+      Object.keys(this.validationErrors).length > 0 ||
+      Object.keys(this.topicNameMap).length > 0
+    ) {
+      this._buildDisplayData();
+      return;
     }
-    this._buildDisplayData();
+
+    await this._loadValidationState();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.validationErrors || changes.topicNameMap) {
+  private async _loadValidationState(): Promise<void> {
+    try {
+      const classroomSummaries =
+        await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
+      const selectedClassroom = classroomSummaries.find(
+        classroom =>
+          classroom.classroom_id ===
+          this.certificateAssessmentOffering.classroomId
+      );
+      if (!selectedClassroom) {
+        throw new Error('Selected classroom could not be found.');
+      }
+      const classroomData =
+        await this.classroomBackendApiService.fetchClassroomDataAsync(
+          selectedClassroom.url_fragment
+        );
+      const topicNameById: {[topicId: string]: string} = {};
+      classroomData.getTopicSummaries().forEach(topic => {
+        topicNameById[topic.getId()] = topic.getName();
+      });
+      this.topicNameMap = topicNameById;
+
+      const topicIds = Object.keys(
+        this.certificateAssessmentOffering.topicData || {}
+      );
+      const totalQuestions =
+        this.certificateAssessmentOffering.totalQuestions || 0;
+      const validationResponse =
+        await this.certificateAssessmentOfferingBackendApiService.validateCertificateAssessmentOfferingAsync(
+          topicIds,
+          totalQuestions
+        );
+      this.validationErrors = validationResponse.validation_errors;
+      this.isValid = validationResponse.is_valid;
+      this.validationMessage = validationResponse.validation_message;
       this._buildDisplayData();
+      this.isCertificateValidChange.emit(this.isValid);
+    } catch (error: unknown) {
+      this.isValid = false;
+      this.validationErrors = {};
+      this.validationMessage =
+        error instanceof Error && error.message
+          ? error.message
+          : 'Unable to validate this certificate.';
+      this._buildDisplayData();
+      this.isCertificateValidChange.emit(this.isValid);
     }
   }
 

@@ -18,10 +18,193 @@
 
 from __future__ import annotations
 
-from core.domain import certificate_assessment_domain
+from core import feconf, utils
+from core.domain import (
+    certificate_assessment_domain,
+    question_services,
+    skill_fetchers,
+    topic_fetchers,
+)
 from core.storage.certificate_assessment import gae_models
 
-from typing import List, cast
+from typing import Dict, List, TypedDict, cast
+
+# Number of questions required per topic (one each of easy, medium, hard).
+QUESTIONS_PER_TOPIC = 3
+
+
+class CertificateAssessmentOfferingValidationResultDict(TypedDict):
+    """Dict representation of certificate offering validation results."""
+
+    is_valid: bool
+    validation_errors: Dict[str, Dict[str, Dict[str, int]]]
+    validation_message: str
+
+
+def _get_topic_name_to_question_ids_map(
+    topic_ids: List[str],
+) -> Dict[str, List[str]]:
+    """Returns a mapping from topic ID to unique question IDs for its skills."""
+    topic_id_to_question_ids: Dict[str, List[str]] = {}
+    for topic_id in topic_ids:
+        try:
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
+        except Exception as e:
+            raise utils.ValidationError(
+                'Topic %s does not exist.' % topic_id
+            ) from e
+
+        question_ids: set[str] = set()
+        for skill_id in topic.get_all_skill_ids():
+            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            if skill is None:
+                continue
+            question_ids.update(
+                link.question_id
+                for link in question_services.get_question_skill_links_of_skill(
+                    skill_id, skill.description
+                )
+            )
+
+        topic_id_to_question_ids[topic_id] = sorted(question_ids)
+    return topic_id_to_question_ids
+
+
+def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
+    """Distributes questions over medium, easy and hard in a repeating cycle."""
+    counts = {'easy': 0, 'medium': 0, 'hard': 0}
+    # Keep this order stable. We intentionally start with medium, then easy,
+    # then hard so the extra questions are biased toward the core mastery
+    # evidence and discrimination buckets instead of over-allocating easy
+    # questions.
+    cycle = ['medium', 'easy', 'hard']
+    for index in range(total_questions):
+        counts[cycle[index % len(cycle)]] += 1
+    return counts
+
+
+def _get_topic_validation_result(
+    available_questions: int, required_questions: int
+) -> Dict[str, Dict[str, int]]:
+    """Returns the required/available breakdown for one topic."""
+    required = _get_difficulty_counts(required_questions)
+    available = _get_difficulty_counts(available_questions)
+    return {
+        'easy': {
+            'required': required['easy'],
+            'available': available['easy'],
+        },
+        'medium': {
+            'required': required['medium'],
+            'available': available['medium'],
+        },
+        'hard': {
+            'required': required['hard'],
+            'available': available['hard'],
+        },
+    }
+
+
+def _get_distinct_question_ids(
+    topic_name_to_question_ids_map: Dict[str, List[str]],
+    topic_ids: List[str],
+) -> set[str]:
+    """Returns all distinct question IDs reachable from the selected topics."""
+    distinct_question_ids: set[str] = set()
+    for topic_id in topic_ids:
+        distinct_question_ids.update(topic_name_to_question_ids_map[topic_id])
+    return distinct_question_ids
+
+
+def validate_certificate_assessment_offering(
+    topic_ids: List[str], total_questions: int
+) -> CertificateAssessmentOfferingValidationResultDict:
+    """Pre-validates whether a certificate offering can be created.
+
+    Args:
+        topic_ids: list(str). The selected topic IDs for the certificate.
+        total_questions: int. The total number of questions requested.
+
+    Returns:
+        dict. Contains is_valid, validation_errors and validation_message.
+    """
+    if not topic_ids:
+        raise utils.ValidationError(
+            'topic_ids must contain at least one topic.'
+        )
+    if total_questions < 1:
+        raise utils.ValidationError(
+            'total_questions must be a positive integer.'
+        )
+
+    topic_name_to_question_ids_map = _get_topic_name_to_question_ids_map(
+        topic_ids
+    )
+    base_questions_per_topic = total_questions // len(topic_ids)
+    remainder = total_questions % len(topic_ids)
+
+    validation_errors: Dict[str, Dict[str, Dict[str, int]]] = {}
+    message_parts: List[str] = []
+    is_valid = True
+
+    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    if total_questions < expected_total_questions:
+        is_valid = False
+        message_parts.append(
+            'total_questions must be greater than or equal to %d '
+            '(%d per topic: easy, medium, hard) for %d topic(s).'
+            % (
+                expected_total_questions,
+                QUESTIONS_PER_TOPIC,
+                len(topic_ids),
+            )
+        )
+
+    distinct_question_ids = _get_distinct_question_ids(
+        topic_name_to_question_ids_map, topic_ids
+    )
+    if len(distinct_question_ids) < total_questions:
+        is_valid = False
+        message_parts.append(
+            'Only %d unique question(s) are available across the selected '
+            'topics, but %d are required without reusing questions.'
+            % (len(distinct_question_ids), total_questions)
+        )
+
+    for index, topic_id in enumerate(topic_ids):
+        required_questions = base_questions_per_topic + (
+            1 if index < remainder else 0
+        )
+        available_questions = len(topic_name_to_question_ids_map[topic_id])
+        validation_result = _get_topic_validation_result(
+            available_questions, required_questions
+        )
+        validation_errors[topic_id] = validation_result
+        if available_questions < required_questions:
+            is_valid = False
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+            topic_name = topic.name if topic is not None else topic_id
+            message_parts.append(
+                '%s needs %d unique questions but only %d are available.'
+                % (topic_name, required_questions, available_questions)
+            )
+
+    validation_message = (
+        'Certificate assessment is valid.'
+        if is_valid
+        else ' '.join(message_parts)
+    )
+    return {
+        'is_valid': is_valid,
+        'validation_errors': validation_errors,
+        'validation_message': validation_message,
+    }
+
+
+class CertificateAssessmentOfferingNotFoundException(Exception):
+    """Exception raised when a certificate assessment offering is missing."""
+
+    pass
 
 
 def _model_to_domain(
@@ -54,23 +237,25 @@ def create_certificate_assessment_offering(
     demonstrates: list[str],
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
-    """Creates and stores a certificate assessment offering."""
-    # TODO(#24717-M1.14): Re-enable classroom and topic existence checks once the
-    # frontend create flow sends real classroom/topic selections instead of
-    # temporary hardcoded stub values.
+    """Creates and stores a certificate assessment offering.
 
-    # Classroom = classroom_config_services.get_classroom_by_id(classroom_id)
-    # if classroom is None:
-    #     raise Exception('classroom_id must correspond to an existing classroom.')
+    Args:
+        title: str. The title of the certificate assessment offering.
+        description: str. The description of the certificate assessment
+            offering.
+        classroom_id: str. The classroom ID associated with the offering.
+        topic_ids: list(str). The topic IDs associated with the offering.
+        total_questions: int. The total number of questions in the offering.
+        time_limit_in_minutes: int. The time limit for the offering in
+            minutes.
+        demonstrates: list(str). The list of skills demonstrated by the
+            offering.
+        async_status: str. The availability status of the offering.
 
-    # For topic_id in topic_ids:
-    #     topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-    #     if topic is None:
-    #         raise Exception('topic_ids must refer to existing topics.')
-    #     if topic_id not in classroom.get_topic_ids():
-    #         raise Exception(
-    #             'topic_ids must belong to the specified classroom.'
-    #         )
+    Returns:
+        CertificateAssessmentOffering. The created certificate assessment
+        offering.
+    """
 
     certificate_assessment_offering = (
         certificate_assessment_domain.CertificateAssessmentOffering(
@@ -106,10 +291,154 @@ def create_certificate_assessment_offering(
     return certificate_assessment_offering
 
 
+def get_certificate_assessment_offering(
+    certificate_id: str,
+) -> certificate_assessment_domain.CertificateAssessmentOffering:
+    """Returns a single certificate assessment offering from datastore.
+
+    Args:
+        certificate_id: str. The ID of the certificate assessment offering.
+
+    Returns:
+        CertificateAssessmentOffering. The certificate assessment offering
+        with the given ID.
+
+    Raises:
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
+    """
+    certificate_assessment_offering_model = (
+        gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
+    )
+    if certificate_assessment_offering_model is None:
+        raise CertificateAssessmentOfferingNotFoundException(
+            'Certificate assessment offering %s does not exist.'
+            % certificate_id
+        )
+
+    return _model_to_domain(certificate_assessment_offering_model)
+
+
+def update_certificate_assessment_offering(
+    certificate_id: str,
+    title: str,
+    description: str,
+    classroom_id: str,
+    topic_ids: list[str],
+    total_questions: int,
+    time_limit_in_minutes: int,
+    demonstrates: list[str],
+    async_status: str,
+) -> certificate_assessment_domain.CertificateAssessmentOffering:
+    """Updates an existing certificate assessment offering.
+
+    Args:
+        certificate_id: str. The ID of the certificate assessment offering.
+        title: str. The title of the certificate assessment offering.
+        description: str. The description of the certificate assessment
+            offering.
+        classroom_id: str. The classroom ID associated with the offering.
+        topic_ids: list(str). The topic IDs associated with the offering.
+        total_questions: int. The total number of questions in the offering.
+        time_limit_in_minutes: int. The time limit for the offering in
+            minutes.
+        demonstrates: list(str). The list of skills demonstrated by the
+            offering.
+        async_status: str. The availability status of the offering.
+
+    Returns:
+        CertificateAssessmentOffering. The updated certificate assessment
+        offering.
+
+    Raises:
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
+        ValidationError. The provided offering data is invalid.
+    """
+    certificate_assessment_offering_model = (
+        gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
+    )
+    if certificate_assessment_offering_model is None:
+        raise CertificateAssessmentOfferingNotFoundException(
+            'Certificate assessment offering %s does not exist.'
+            % certificate_id
+        )
+
+    certificate_assessment_offering_model.title = title
+    certificate_assessment_offering_model.description = description
+    certificate_assessment_offering_model.classroom_id = classroom_id
+    certificate_assessment_offering_model.topic_ids = topic_ids
+    certificate_assessment_offering_model.total_questions = total_questions
+    certificate_assessment_offering_model.time_limit_in_minutes = (
+        time_limit_in_minutes
+    )
+    certificate_assessment_offering_model.demonstrates = demonstrates
+    certificate_assessment_offering_model.async_status = async_status
+
+    certificate_assessment_offering = _model_to_domain(
+        certificate_assessment_offering_model
+    )
+    certificate_assessment_offering.validate()
+
+    certificate_assessment_offering_model.commit(
+        feconf.SYSTEM_COMMITTER_ID,
+        'Certificate assessment offering updated.',
+        [
+            {'cmd': 'update_title', 'new_title': title},
+            {'cmd': 'update_description', 'new_description': description},
+            {'cmd': 'update_classroom_id', 'new_classroom_id': classroom_id},
+            {'cmd': 'update_topic_ids', 'new_topic_ids': topic_ids},
+            {
+                'cmd': 'update_total_questions',
+                'new_total_questions': total_questions,
+            },
+            {
+                'cmd': 'update_time_limit_in_minutes',
+                'new_time_limit_in_minutes': time_limit_in_minutes,
+            },
+            {'cmd': 'update_demonstrates', 'new_demonstrates': demonstrates},
+            {'cmd': 'update_async_status', 'new_async_status': async_status},
+        ],
+    )
+
+    return _model_to_domain(certificate_assessment_offering_model)
+
+
+def delete_certificate_assessment_offering(certificate_id: str) -> None:
+    """Deletes a certificate assessment offering from datastore.
+
+    Args:
+        certificate_id: str. The ID of the certificate assessment offering.
+
+    Raises:
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
+    """
+    certificate_assessment_offering_model = (
+        gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
+    )
+    if certificate_assessment_offering_model is None:
+        raise CertificateAssessmentOfferingNotFoundException(
+            'Certificate assessment offering %s does not exist.'
+            % certificate_id
+        )
+
+    certificate_assessment_offering_model.delete(
+        feconf.SYSTEM_COMMITTER_ID,
+        'Certificate assessment offering deleted.',
+        force_deletion=True,
+    )
+
+
 def get_certificate_assessment_offerings() -> (
     List[certificate_assessment_domain.CertificateAssessmentOffering]
 ):
-    """Returns all certificate assessment offerings from datastore."""
+    """Returns all certificate assessment offerings from datastore.
+
+    Returns:
+        list(CertificateAssessmentOffering). A list of all certificate
+        assessment offerings.
+    """
     certificate_assessment_offering_models: List[
         gae_models.CertificateAssessmentOfferingModel
         # Here we use cast because the datastore fetch returns a generic sequence and

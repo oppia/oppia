@@ -83,6 +83,9 @@
     <h3 class="oppia-certificate-review-section-heading">
       Overall Status
     </h3>
+    <p *ngIf="validationMessage" class="oppia-certificate-review-overall-desc">
+      {{ validationMessage }}
+    </p>
     <ng-container *ngIf="!isValid">
       <p class="oppia-certificate-review-overall-status
                 oppia-certificate-review-overall-status--fail">
