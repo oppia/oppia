@@ -43,8 +43,41 @@ class TranslationProviderRegistry:
 
     def __init__(self) -> None:
         """Initializes the TranslationProviderRegistry."""
+
+        # assets/auto_trans_provider_mapping.json is the developer-controlled
+        # whitelist defining which translation providers technically support
+        # which language codes. It controls what the system is CAPABLE of
+        # translating, not what is actively enabled at runtime. Runtime
+        # enablement is managed separately via MachineTranslationPolicyModel
+        # in the translation admin UI.
+        #
+        # Criteria for adding a language:
+        #   1. The language must be supported by the listed provider.
+        #      Verify against the provider's official supported languages
+        #      docs (e.g. Azure: https://learn.microsoft.com/en-us/azure/
+        #      ai-services/translator/language-support, GCP:
+        #      https://cloud.google.com/translate/docs/languages). For any
+        #      new provider, link its equivalent page here.
+        #   2. There must be an active contributor base for that language
+        #      on Oppia's Contributor Dashboard.
+        #   3. A PR must be raised to add the entry; changes do not take
+        #      effect until merged and deployed.
+        #
+        # Criteria for removing a language:
+        #   1. All listed providers have deprecated support for the
+        #      language, OR
+        #   2. The language is being moved to a different provider entirely.
+        #
+        # Adding a new provider:
+        #   1. Add the provider's supported languages to this file.
+        #   2. Link its supported languages doc above in this comment.
+        #
+        # Maintenance: when any provider updates its supported languages,
+        # verify against the links above and raise a PR to keep this file
+        # in sync.
+
         self._provider_whitelist: Dict[str, list[str]] = json.loads(
-            utils.get_file_contents('assets/machine_translation_providers.json')
+            utils.get_file_contents('assets/auto_trans_provider_mapping.json')
         )
 
         self._providers: Dict[

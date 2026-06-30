@@ -19,9 +19,11 @@
 from __future__ import annotations
 
 from core import utils
-from core.domain import feature_flag_services
-from core.domain import machine_translation_services
-from core.domain import translation_services
+from core.domain import (
+    feature_flag_services,
+    machine_translation_services,
+    translation_services,
+)
 from core.tests import test_utils
 
 from typing import Any, Dict

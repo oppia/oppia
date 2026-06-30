@@ -18,25 +18,28 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import feature_flag_list
-from core import utils
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import feature_flag_services
-from core.domain import machine_translation_services
-from core.domain import translation_services
+from core import feature_flag_list, feconf, utils
+from core.controllers import acl_decorators, base
+from core.domain import (
+    feature_flag_services,
+    machine_translation_services,
+    translation_services,
+)
 
 from typing import Any, Dict
 
 
 class MachineTranslationGenerateHandler(
+    # Here we use type Any because the JSON response
+    # payload contains dynamic, heterogeneous data.
     base.BaseHandler[Dict[str, str], Dict[str, Any]]
 ):
     """Handler for generating AI translation suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    # Here we use type Any because the schema dictionary accepts
+    # variable nested types for validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
         'POST': {
             'source_text': {'schema': {'type': 'unicode'}},
@@ -94,6 +97,8 @@ class MachineTranslationGenerateHandler(
 
 
 class TranslationProviderMappingHandler(
+    # Here we use type Any because the request and response
+    # payloads handle dynamic translation provider mappings.
     base.BaseHandler[Dict[str, Any], Dict[str, Any]]
 ):
     """Handler for fetching and updating the translation provider mapping."""
@@ -101,6 +106,8 @@ class TranslationProviderMappingHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
+    # Here we use type Any because the schema dictionary accepts variable
+    # nested types for validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
         'GET': {},
         'PUT': {

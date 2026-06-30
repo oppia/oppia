@@ -1134,7 +1134,7 @@ class MachineTranslationProviderMapping:
                 'language_to_provider_mapping must be a dictionary.'
             )
         machine_translation_providers = json.loads(
-            utils.get_file_contents('assets/machine_translation_providers.json')
+            utils.get_file_contents('auto_trans_provider_mapping.json')
         )
 
         for (
