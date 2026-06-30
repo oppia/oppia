@@ -346,13 +346,38 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 },
                 'topic_ids': ['topic_1', 'topic_2'],
                 'total_questions': 6,
-                'expected_is_valid': True,
+                'expected_is_valid': False,
                 'expected_message_substrings': [
-                    'Certificate assessment is valid.'
+                    'Only 4 unique question(s) are available across the selected '
+                    'topics, but 6 are required without reusing questions.',
                 ],
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
                     'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                },
+            },
+            {
+                'name': 'shared questions are rejected when total unique pool is too small',
+                'topic_skill_to_question_ids': {
+                    'topic_1': {
+                        's1': ['q1', 'q2'],
+                        's2': ['q3', 'q4'],
+                    },
+                    'topic_2': {
+                        's1': ['q1', 'q2'],
+                        's2': ['q3', 'q4'],
+                    },
+                },
+                'topic_ids': ['topic_1', 'topic_2'],
+                'total_questions': 8,
+                'expected_is_valid': False,
+                'expected_message_substrings': [
+                    'Only 4 unique question(s) are available across the selected '
+                    'topics, but 8 are required without reusing questions.',
+                ],
+                'expected_validation_errors': {
+                    'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
+                    'topic_2': {'easy': 1, 'medium': 2, 'hard': 1},
                 },
             },
             {
@@ -378,6 +403,28 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
                     'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                },
+            },
+            {
+                'name': 'too many questions for distinct pool',
+                'topic_skill_to_question_ids': {
+                    'topic_1': {
+                        's1': ['q1', 'q2'],
+                    },
+                    'topic_2': {
+                        's2': ['q3', 'q4'],
+                    },
+                },
+                'topic_ids': ['topic_1', 'topic_2'],
+                'total_questions': 5,
+                'expected_is_valid': False,
+                'expected_message_substrings': [
+                    'Only 4 unique question(s) are available across the selected '
+                    'topics, but 5 are required without reusing questions.',
+                ],
+                'expected_validation_errors': {
+                    'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
+                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 0},
                 },
             },
             {
@@ -528,6 +575,31 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertEqual(
             result['validation_errors'][topic_2]['hard']['required'],
             0,
+        )
+
+    def test_validation_rejects_overlapping_pools_without_enough_unique_questions(
+        self,
+    ) -> None:
+        result = self._run_validation_with_mocked_topics(
+            {
+                'topic_1': {
+                    's1': ['q1', 'q2'],
+                    's2': ['q3', 'q4'],
+                },
+                'topic_2': {
+                    's1': ['q1', 'q2'],
+                    's2': ['q3', 'q4'],
+                },
+            },
+            ['topic_1', 'topic_2'],
+            8,
+        )
+
+        self.assertFalse(result['is_valid'])
+        self.assertIn(
+            'Only 4 unique question(s) are available across the selected '
+            'topics, but 8 are required without reusing questions.',
+            result['validation_message'],
         )
 
     def test_validation_errors_contain_per_topic_difficulty_breakdown(

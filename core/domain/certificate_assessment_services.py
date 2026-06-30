@@ -105,6 +105,17 @@ def _get_topic_validation_result(
     }
 
 
+def _get_distinct_question_ids(
+    topic_name_to_question_ids_map: Dict[str, List[str]],
+    topic_ids: List[str],
+) -> set[str]:
+    """Returns all distinct question IDs reachable from the selected topics."""
+    distinct_question_ids: set[str] = set()
+    for topic_id in topic_ids:
+        distinct_question_ids.update(topic_name_to_question_ids_map[topic_id])
+    return distinct_question_ids
+
+
 def validate_certificate_assessment_offering(
     topic_ids: List[str], total_questions: int
 ) -> CertificateAssessmentOfferingValidationResultDict:
@@ -147,6 +158,17 @@ def validate_certificate_assessment_offering(
                 QUESTIONS_PER_TOPIC,
                 len(topic_ids),
             )
+        )
+
+    distinct_question_ids = _get_distinct_question_ids(
+        topic_name_to_question_ids_map, topic_ids
+    )
+    if len(distinct_question_ids) < total_questions:
+        is_valid = False
+        message_parts.append(
+            'Only %d unique question(s) are available across the selected '
+            'topics, but %d are required without reusing questions.'
+            % (len(distinct_question_ids), total_questions)
         )
 
     for index, topic_id in enumerate(topic_ids):
