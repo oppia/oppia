@@ -21,7 +21,6 @@ from __future__ import annotations
 from core import feconf, utils
 from core.domain import (
     certificate_assessment_domain,
-    classroom_config_services,
     question_services,
     skill_fetchers,
     topic_fetchers,
@@ -48,11 +47,14 @@ def _get_topic_name_to_question_ids_map(
     """Returns a mapping from topic ID to unique question IDs for its skills."""
     topic_id_to_question_ids: Dict[str, List[str]] = {}
     for topic_id in topic_ids:
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise utils.ValidationError('Topic %s does not exist.' % topic_id)
+        try:
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
+        except Exception as e:
+            raise utils.ValidationError(
+                'Topic %s does not exist.' % topic_id
+            ) from e
 
-        question_ids = set()
+        question_ids: set[str] = set()
         for skill_id in topic.get_all_skill_ids():
             skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
             if skill is None:
@@ -71,6 +73,10 @@ def _get_topic_name_to_question_ids_map(
 def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     """Distributes questions over medium, easy and hard in a repeating cycle."""
     counts = {'easy': 0, 'medium': 0, 'hard': 0}
+    # Keep this order stable. We intentionally start with medium, then easy,
+    # then hard so the extra questions are biased toward the core mastery
+    # evidence and discrimination buckets instead of over-allocating easy
+    # questions.
     cycle = ['medium', 'easy', 'hard']
     for index in range(total_questions):
         counts[cycle[index % len(cycle)]] += 1

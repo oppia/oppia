@@ -18,14 +18,41 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core import utils
 from core.domain import (
     certificate_assessment_services,
     classroom_config_domain,
     classroom_config_services,
+    question_services,
+    skill_fetchers,
     topic_fetchers,
 )
 from core.tests import test_utils
+
+from typing import TypedDict
+
+
+class ValidationSamplingTestCase(TypedDict):
+    """Typed definition of a validation sampling test case."""
+
+    name: str
+    topic_skill_to_question_ids: dict[str, dict[str, list[str]]]
+    topic_ids: list[str]
+    total_questions: int
+    expected_is_valid: bool
+    expected_message_substrings: list[str]
+    expected_validation_errors: dict[str, dict[str, int]]
+
+
+class InvalidInputTestCase(TypedDict):
+    """Typed definition of an invalid input test case."""
+
+    name: str
+    topic_ids: list[str]
+    total_questions: int
+    message: str
 
 
 class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
@@ -185,6 +212,70 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         )
         classroom_config_services.create_new_classroom(classroom)
 
+    def _run_validation_with_mocked_topics(
+        self,
+        topic_skill_to_question_ids: dict[str, dict[str, list[str]]],
+        topic_ids: list[str],
+        total_questions: int,
+    ) -> (
+        certificate_assessment_services.CertificateAssessmentOfferingValidationResultDict
+    ):
+        """Builds a mocked validation scenario from topic and skill mappings."""
+        topic_objects: dict[str, mock.Mock] = {}
+        skill_objects: dict[str, mock.Mock] = {}
+        question_link_map: dict[str, list[mock.Mock]] = {}
+
+        for (
+            topic_id,
+            skill_to_question_ids,
+        ) in topic_skill_to_question_ids.items():
+            topic = mock.Mock()
+            topic.name = topic_id.replace('_', ' ').title()
+            topic.get_all_skill_ids.return_value = list(skill_to_question_ids)
+            topic_objects[topic_id] = topic
+            for skill_id, question_ids in skill_to_question_ids.items():
+                skill = mock.Mock()
+                skill.description = '%s description' % skill_id
+                skill_objects[skill_id] = skill
+                question_link_map[skill_id] = [
+                    mock.Mock(question_id=question_id)
+                    for question_id in question_ids
+                ]
+
+        def _get_topic(topic_id: str, strict: bool = True) -> mock.Mock:
+            del strict
+            return topic_objects[topic_id]
+
+        def _get_skill(skill_id: str, strict: bool = False) -> mock.Mock | None:
+            del strict
+            return skill_objects.get(skill_id)
+
+        def _get_links(
+            skill_id: str, skill_description: str
+        ) -> list[mock.Mock]:
+            self.assertEqual(
+                skill_description, skill_objects[skill_id].description
+            )
+            return question_link_map[skill_id]
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            side_effect=_get_topic,
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_by_id',
+            side_effect=_get_skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            side_effect=_get_links,
+        ):
+            return certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=topic_ids,
+                total_questions=total_questions,
+            )
+
     def test_raises_for_empty_topic_ids(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -215,30 +306,228 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
-    def test_is_invalid_when_total_questions_below_required_minimum(
-        self,
-    ) -> None:
-        result = certificate_assessment_services.validate_certificate_assessment_offering(
-            topic_ids=[self.topic_id],
-            total_questions=1,
-        )
+    def test_validation_distribution_sampling_cases(self) -> None:
+        test_cases: list[ValidationSamplingTestCase] = [
+            {
+                'name': 'disjoint skills between two topics',
+                'topic_skill_to_question_ids': {
+                    'topic_1': {
+                        's1': ['q1'],
+                        's2': ['q2'],
+                    },
+                    'topic_2': {
+                        's3': ['q3'],
+                        's4': ['q4'],
+                    },
+                },
+                'topic_ids': ['topic_1', 'topic_2'],
+                'total_questions': 6,
+                'expected_is_valid': False,
+                'expected_message_substrings': [
+                    'Topic 1 needs 3 unique questions but only 2 are available.',
+                    'Topic 2 needs 3 unique questions but only 2 are available.',
+                ],
+                'expected_validation_errors': {
+                    'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
+                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                },
+            },
+            {
+                'name': 'some skills shared between topics',
+                'topic_skill_to_question_ids': {
+                    'topic_1': {
+                        's1': ['q1', 'q2'],
+                        's2': ['q3'],
+                    },
+                    'topic_2': {
+                        's1': ['q1', 'q2'],
+                        's3': ['q4'],
+                    },
+                },
+                'topic_ids': ['topic_1', 'topic_2'],
+                'total_questions': 6,
+                'expected_is_valid': True,
+                'expected_message_substrings': [
+                    'Certificate assessment is valid.'
+                ],
+                'expected_validation_errors': {
+                    'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
+                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                },
+            },
+            {
+                'name': 'superset skills in first topic',
+                'topic_skill_to_question_ids': {
+                    'topic_1': {
+                        's1': ['q1'],
+                        's2': ['q2'],
+                        's3': ['q3'],
+                        's4': ['q4'],
+                    },
+                    'topic_2': {
+                        's2': ['q2'],
+                        's3': ['q3'],
+                    },
+                },
+                'topic_ids': ['topic_1', 'topic_2'],
+                'total_questions': 7,
+                'expected_is_valid': False,
+                'expected_message_substrings': [
+                    'Topic 2 needs 3 unique questions but only 2 are available.',
+                ],
+                'expected_validation_errors': {
+                    'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
+                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                },
+            },
+            {
+                'name': 'too few questions',
+                'topic_skill_to_question_ids': {
+                    'topic_1': {
+                        's1': ['q1'],
+                        's2': ['q2'],
+                    },
+                },
+                'topic_ids': ['topic_1'],
+                'total_questions': 1,
+                'expected_is_valid': False,
+                'expected_message_substrings': [
+                    'total_questions must be greater than or equal to 3 '
+                    '(3 per topic: easy, medium, hard) for 1 topic(s).',
+                ],
+                'expected_validation_errors': {
+                    'topic_1': {'easy': 0, 'medium': 1, 'hard': 0},
+                },
+            },
+        ]
+
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case['name']):
+                result = self._run_validation_with_mocked_topics(
+                    test_case['topic_skill_to_question_ids'],
+                    test_case['topic_ids'],
+                    test_case['total_questions'],
+                )
+
+                self.assertEqual(
+                    result['is_valid'], test_case['expected_is_valid']
+                )
+                for substring in test_case['expected_message_substrings']:
+                    self.assertIn(substring, result['validation_message'])
+                for topic_id, expected_counts in test_case[
+                    'expected_validation_errors'
+                ].items():
+                    for (
+                        difficulty,
+                        expected_required,
+                    ) in expected_counts.items():
+                        self.assertEqual(
+                            result['validation_errors'][topic_id][difficulty][
+                                'required'
+                            ],
+                            expected_required,
+                        )
+
+    def test_invalid_inputs_raise_validation_error(self) -> None:
+        test_cases: list[InvalidInputTestCase] = [
+            {
+                'name': 'empty topic ids',
+                'topic_ids': [],
+                'total_questions': 3,
+                'message': 'topic_ids must contain at least one topic.',
+            },
+            {
+                'name': 'non-positive total questions',
+                'topic_ids': [self.topic_id],
+                'total_questions': 0,
+                'message': 'total_questions must be a positive integer.',
+            },
+        ]
+
+        for test_case in test_cases:
+            with self.subTest(test_case=test_case['name']):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    test_case['message'],
+                ):
+                    certificate_assessment_services.validate_certificate_assessment_offering(
+                        topic_ids=test_case['topic_ids'],
+                        total_questions=test_case['total_questions'],
+                    )
+
+    def test_validation_uses_skill_questions_for_available_counts(self) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1', 'skill_2']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            return_value=topic,
+        ) as get_topic_by_id, mock.patch.object(
+            skill_fetchers,
+            'get_skill_by_id',
+            side_effect=[skill, None],
+        ) as get_skill_by_id, mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[mock.Mock(question_id='question_1')],
+        ) as get_links:
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=['topic_1'],
+                total_questions=3,
+            )
+
+        get_topic_by_id.assert_any_call('topic_1', strict=True)
+        get_topic_by_id.assert_any_call('topic_1', strict=False)
+        get_skill_by_id.assert_any_call('skill_1', strict=False)
+        get_links.assert_called_once_with('skill_1', 'Skill description')
         self.assertFalse(result['is_valid'])
         self.assertIn(
-            'total_questions must be greater than or equal to 3 '
-            '(3 per topic: easy, medium, hard) for 1 topic(s).',
+            'Mock Topic needs 3 unique questions but only 1 are available.',
             result['validation_message'],
         )
 
-    def test_is_invalid_when_topic_has_insufficient_questions(self) -> None:
-        result = certificate_assessment_services.validate_certificate_assessment_offering(
-            topic_ids=[self.topic_id],
-            total_questions=3,
+    def test_validation_distributes_remainder_to_earlier_topics(self) -> None:
+        topic_2 = topic_fetchers.get_new_topic_id()
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_topic(
+            topic_2,
+            owner_id,
+            name='topic-2',
+            url_fragment='topic-two',
         )
+        result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=[self.topic_id, topic_2],
+            total_questions=5,
+        )
+
         self.assertFalse(result['is_valid'])
-        self.assertIn(self.topic_id, result['validation_errors'])
-        self.assertIn(
-            'needs 3 unique questions but only 0 are available.',
-            result['validation_message'],
+        self.assertEqual(
+            result['validation_errors'][self.topic_id]['medium']['required'],
+            1,
+        )
+        self.assertEqual(
+            result['validation_errors'][self.topic_id]['easy']['required'],
+            1,
+        )
+        self.assertEqual(
+            result['validation_errors'][self.topic_id]['hard']['required'],
+            1,
+        )
+        self.assertEqual(
+            result['validation_errors'][topic_2]['medium']['required'],
+            1,
+        )
+        self.assertEqual(
+            result['validation_errors'][topic_2]['easy']['required'],
+            1,
+        )
+        self.assertEqual(
+            result['validation_errors'][topic_2]['hard']['required'],
+            0,
         )
 
     def test_validation_errors_contain_per_topic_difficulty_breakdown(

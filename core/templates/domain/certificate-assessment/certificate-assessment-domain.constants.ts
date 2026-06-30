@@ -54,3 +54,13 @@ export const CERTIFICATE_OFFERING_SAVE_STATUSES = {
 
 export type CertificateOfferingSaveStatus =
   (typeof CERTIFICATE_OFFERING_SAVE_STATUSES)[keyof typeof CERTIFICATE_OFFERING_SAVE_STATUSES];
+
+// Async statuses are used when persisting the certificate offering payload to
+// match the backend's expected availability state values.
+export const CERTIFICATE_OFFERING_ASYNC_STATUSES = {
+  AVAILABLE: 'Available',
+  NOT_READY: 'Not_Ready',
+} as const;
+
+export type CertificateOfferingAsyncStatus =
+  (typeof CERTIFICATE_OFFERING_ASYNC_STATUSES)[keyof typeof CERTIFICATE_OFFERING_ASYNC_STATUSES];

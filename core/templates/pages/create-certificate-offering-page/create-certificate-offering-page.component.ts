@@ -30,6 +30,7 @@ import {
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {
+  CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
@@ -131,8 +132,8 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
             this.certificateAssessmentOffering.timeLimitInMinutes,
           async_status:
             action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
-              ? 'Not_Ready'
-              : 'Available',
+              ? CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY
+              : CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE,
           version: this.certificateAssessmentOffering.version,
         });
 

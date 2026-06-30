@@ -94,15 +94,23 @@ class ValidateCertificateAssessmentOfferingHandler(
     @acl_decorators.can_access_certificate_dashboard
     def post(self) -> None:
         """Validates the selected topics and total question count."""
-        assert self.normalized_payload is not None
-        topic_ids = self.normalized_payload['topic_ids']
-        total_questions = self.normalized_payload['total_questions']
+        payload = self._get_validation_payload()
+        topic_ids = payload['topic_ids']
+        total_questions = payload['total_questions']
 
         validation_result = certificate_assessment_services.validate_certificate_assessment_offering(
             topic_ids=topic_ids,
             total_questions=total_questions,
         )
         self.render_json(validation_result)
+
+    def _get_validation_payload(
+        self,
+    ) -> ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict:
+        """Returns a fully populated validation payload for graceful fallback."""
+        if self.normalized_payload is None:
+            return {'topic_ids': [], 'total_questions': 0}
+        return self.normalized_payload
 
 
 class CertificateAssessmentOfferingHandler(
