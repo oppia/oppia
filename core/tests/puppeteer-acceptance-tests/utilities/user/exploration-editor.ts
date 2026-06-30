@@ -4302,6 +4302,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
     await this.clickOnElementWithSelector(stateContentInputField);
+    await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(
       stateContentInputField,
       defaultResponseFeedback
