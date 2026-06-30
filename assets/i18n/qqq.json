@@ -1040,7 +1040,6 @@
   "I18N_LIBRARY_GROUPS_SCIENCE": "Title of a group of explorations - This text is shown on top of a group of explorations regarding the same topic.\n{{Identical|Science}}",
   "I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE": "Title of a group of explorations - This text is shown on top of a group of explorations regarding the same topic.",
   "I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS": "Title of a group of explorations - This text is shown on top of a group of explorations. It makes reference to explorations with higher score given by the users.",
-  "I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON": "Text that appears on hovering over the incomplete icon that appears on top of the activity cards. It indicates to the user that he/she is currently completing the activity.",
   "I18N_LIBRARY_LAST_UPDATED": "Text displayed when hovered over the clock icon inside an exploration tile in card view of creator dashboard.\n{{Identical|Last updated}}",
   "I18N_LIBRARY_LOADING": "Text displayed in the middle of the page while the content is being loaded.\n{{Identical|Loading}}",
   "I18N_LIBRARY_MAIN_HEADER": "Main title of the library page. - The library page shows all the explorations and collections available. It should be a single phrase and fit in one line.",
