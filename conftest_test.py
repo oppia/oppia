@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import unittest
@@ -132,3 +133,30 @@ class EnvironmentSetupTests(unittest.TestCase):
         # because conftest.py was imported at test collection time.
         curr_dir = os.path.abspath(os.getcwd())
         assert curr_dir in sys.path, 'CURR_DIR not found in sys.path'
+
+
+class ColoredFormatterHandlerTests(unittest.TestCase):
+    """Tests that pytest_configure installs a ColoredFormatter on the root
+    logger."""
+
+    def test_pytest_configure_sets_colored_formatter_on_root_logger(
+        self,
+    ) -> None:
+        """Test that pytest_configure installs a StreamHandler whose formatter
+        is an instance of utils.ColoredFormatter."""
+        from core import utils  # pylint: disable=import-outside-toplevel
+
+        mock_config = mock.MagicMock()
+        original_handlers = logging.getLogger().handlers[:]
+
+        try:
+            conftest.pytest_configure(mock_config)
+
+            root_handlers = logging.getLogger().handlers
+            self.assertEqual(len(root_handlers), 1)
+            self.assertIsInstance(root_handlers[0], logging.StreamHandler)
+            self.assertIsInstance(
+                root_handlers[0].formatter, utils.ColoredFormatter
+            )
+        finally:
+            logging.getLogger().handlers = original_handlers

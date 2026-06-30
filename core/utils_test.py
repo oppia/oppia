@@ -21,6 +21,7 @@ from __future__ import annotations
 import base64
 import copy
 import datetime
+import logging
 import os
 import time
 import urllib
@@ -30,6 +31,123 @@ from core.constants import constants
 from core.tests import test_utils
 
 from typing import Dict, List, Tuple, Union
+
+
+class ColoredFormatterTests(test_utils.GenericTestBase):
+    """Tests for the ColoredFormatter logging formatter."""
+
+    def test_warning_message_is_wrapped_in_yellow(self) -> None:
+        """Test that WARNING level records are wrapped in yellow ANSI codes."""
+        formatter = utils.ColoredFormatter()
+        record = logging.LogRecord(
+            name='test',
+            level=logging.WARNING,
+            pathname='',
+            lineno=0,
+            msg='watch out',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertTrue(result.startswith(utils._ANSI_YELLOW))
+        self.assertTrue(result.endswith(utils._ANSI_RESET))
+        self.assertIn('watch out', result)
+
+    def test_error_message_is_wrapped_in_red(self) -> None:
+        """Test that ERROR level records are wrapped in red ANSI codes."""
+        formatter = utils.ColoredFormatter()
+        record = logging.LogRecord(
+            name='test',
+            level=logging.ERROR,
+            pathname='',
+            lineno=0,
+            msg='something broke',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertTrue(result.startswith(utils._ANSI_RED))
+        self.assertTrue(result.endswith(utils._ANSI_RESET))
+
+    def test_critical_message_is_wrapped_in_red(self) -> None:
+        """Test that CRITICAL level records are wrapped in red ANSI codes."""
+        formatter = utils.ColoredFormatter()
+        record = logging.LogRecord(
+            name='test',
+            level=logging.CRITICAL,
+            pathname='',
+            lineno=0,
+            msg='fatal',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertTrue(result.startswith(utils._ANSI_RED))
+        self.assertTrue(result.endswith(utils._ANSI_RESET))
+
+    def test_info_message_has_no_color_codes(self) -> None:
+        """Test that INFO level records are not wrapped in ANSI codes."""
+        formatter = utils.ColoredFormatter()
+        record = logging.LogRecord(
+            name='test',
+            level=logging.INFO,
+            pathname='',
+            lineno=0,
+            msg='all good',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertNotIn(utils._ANSI_YELLOW, result)
+        self.assertNotIn(utils._ANSI_RED, result)
+        self.assertIn('all good', result)
+
+    def test_debug_message_has_no_color_codes(self) -> None:
+        """Test that DEBUG level records are not wrapped in ANSI codes."""
+        formatter = utils.ColoredFormatter()
+        record = logging.LogRecord(
+            name='test',
+            level=logging.DEBUG,
+            pathname='',
+            lineno=0,
+            msg='verbose info',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertNotIn(utils._ANSI_YELLOW, result)
+        self.assertNotIn(utils._ANSI_RED, result)
+
+    def test_custom_format_string_is_applied(self) -> None:
+        """Test that a custom format string is used when provided."""
+        formatter = utils.ColoredFormatter(fmt='%(levelname)s: %(message)s')
+        record = logging.LogRecord(
+            name='test',
+            level=logging.INFO,
+            pathname='',
+            lineno=0,
+            msg='hello',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertEqual(result, 'INFO: hello')
+
+    def test_default_format_string_is_used_when_none_provided(self) -> None:
+        """Test that the default format includes levelname and message."""
+        formatter = utils.ColoredFormatter()
+        record = logging.LogRecord(
+            name='test',
+            level=logging.INFO,
+            pathname='',
+            lineno=0,
+            msg='default fmt',
+            args=(),
+            exc_info=None,
+        )
+        result = formatter.format(record)
+        self.assertIn('INFO', result)
+        self.assertIn('default fmt', result)
 
 
 class UtilsTests(test_utils.GenericTestBase):

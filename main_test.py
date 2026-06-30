@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib
+import logging
 import sys
 from unittest import mock
 
@@ -170,3 +171,76 @@ class MainModuleDevModeTests(test_utils.GenericTestBase):
         finally:
             if added_fake_pytest:
                 sys.modules.pop('pytest', None)
+
+
+class ColoredFormatterInMainTests(test_utils.GenericTestBase):
+    """Tests that main.py installs ColoredFormatter when EMULATOR_MODE is on."""
+
+    def test_colored_formatter_installed_when_emulator_mode_is_true(
+        self,
+    ) -> None:
+        """Test that reloading main in EMULATOR_MODE installs a root logger
+        handler whose formatter is a ColoredFormatter instance."""
+        from core import (
+            utils as core_utils,
+        )  # pylint: disable=import-outside-toplevel
+
+        original_handlers = logging.getLogger().handlers[:]
+        try:
+            with self.swap(constants, 'EMULATOR_MODE', True):
+                importlib.reload(main)
+
+            root_handlers = logging.getLogger().handlers
+            self.assertGreater(len(root_handlers), 0)
+            formatters = [
+                h.formatter
+                for h in root_handlers
+                if isinstance(h.formatter, core_utils.ColoredFormatter)
+            ]
+            self.assertGreater(
+                len(formatters),
+                0,
+                msg='Expected at least one ColoredFormatter on the root logger',
+            )
+        finally:
+            logging.getLogger().handlers = original_handlers
+            importlib.reload(main)
+
+    def test_colored_formatter_not_installed_when_emulator_mode_is_false(
+        self,
+    ) -> None:
+        """Test that reloading main outside EMULATOR_MODE does NOT install a
+        ColoredFormatter (cloud logging is used instead)."""
+        from core import (
+            utils as core_utils,
+        )  # pylint: disable=import-outside-toplevel
+
+        class MockClient:
+            """Mock for google.cloud.logging.Client."""
+
+            def setup_logging(self) -> None:
+                """No-op mock for setup_logging."""
+
+        original_handlers = logging.getLogger().handlers[:]
+        try:
+            emulator_swap = self.swap(constants, 'EMULATOR_MODE', False)
+            client_swap = self.swap_with_checks(
+                google.cloud.logging, 'Client', MockClient
+            )
+            with emulator_swap, client_swap:
+                importlib.reload(main)
+
+            root_handlers = logging.getLogger().handlers
+            colored_formatters = [
+                h.formatter
+                for h in root_handlers
+                if isinstance(h.formatter, core_utils.ColoredFormatter)
+            ]
+            self.assertEqual(
+                len(colored_formatters),
+                0,
+                msg='ColoredFormatter should not be installed outside EMULATOR_MODE',
+            )
+        finally:
+            logging.getLogger().handlers = original_handlers
+            importlib.reload(main)

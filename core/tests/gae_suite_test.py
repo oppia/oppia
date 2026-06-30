@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import logging
 import unittest
 
 from core.tests import gae_suite, test_utils
@@ -92,3 +93,29 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
         with create_test_suites_swap, assert_raises_regexp_context_manager:
             gae_suite.main(args=[])
+
+    def test_main_installs_colored_formatter_on_root_logger(self) -> None:
+        """Tests that main() replaces the root logger handler with one
+        that uses ColoredFormatter."""
+        from core import utils  # pylint: disable=import-outside-toplevel
+
+        def _mock_create_test_suites(**_: str) -> List[unittest.TestSuite]:
+            """Returns a trivially passing empty test suite."""
+            return [unittest.TestSuite()]
+
+        create_test_suites_swap = self.swap(
+            gae_suite, 'create_test_suites', _mock_create_test_suites
+        )
+
+        original_handlers = logging.getLogger().handlers[:]
+        try:
+            with create_test_suites_swap:
+                gae_suite.main(args=[])
+
+            root_handlers = logging.getLogger().handlers
+            self.assertEqual(len(root_handlers), 1)
+            self.assertIsInstance(
+                root_handlers[0].formatter, utils.ColoredFormatter
+            )
+        finally:
+            logging.getLogger().handlers = original_handlers
