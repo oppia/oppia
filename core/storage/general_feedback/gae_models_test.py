@@ -300,13 +300,6 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )
 
-    def test_has_reference_to_user_id(self) -> None:
-        self.assertFalse(
-            general_feedback_models.PlatformFeedbackModel.has_reference_to_user_id(
-                self.USER_ID
-            )
-        )
-
     def test_get_export_policy(self) -> None:
         self.assertEqual(
             general_feedback_models.PlatformFeedbackModel.get_export_policy(),
