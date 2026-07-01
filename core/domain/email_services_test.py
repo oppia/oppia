@@ -168,6 +168,26 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'html',
             )
 
+        # Case when the sender email token is not wrapped in angle brackets
+        # when calling send_mail.
+        malformed_sender_emails = [
+            'Name malformed_email>',
+            'Name <malformed_email',
+        ]
+        for malformed_sender_email in malformed_sender_emails:
+            email_exception = self.assertRaisesRegex(
+                ValueError,
+                'Malformed sender email address: %s' % malformed_sender_email,
+            )
+            with email_exception:
+                email_services.send_mail(
+                    malformed_sender_email,
+                    'recipient@example.com',
+                    'subject',
+                    'body',
+                    'html',
+                )
+
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
