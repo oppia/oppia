@@ -18,7 +18,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -72,7 +72,7 @@ describe('InteractiveRatioExpressionInput', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         InteractiveRatioExpressionInputComponent,

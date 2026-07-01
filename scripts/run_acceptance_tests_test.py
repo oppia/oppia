@@ -369,6 +369,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     }
                 ],
@@ -446,6 +447,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     }
                 ],
@@ -532,6 +534,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     },
                 ],
@@ -548,6 +551,64 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 json_load_swap
             ):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+    def test_start_tests_with_update_snapshots_flag(self) -> None:
+        mock_config = {
+            'suites': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'puppeteer',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
+        self.exit_stack.enter_context(self.build_js_files_swap)
+        self.exit_stack.enter_context(self.managed_redis_server_swap)
+        self.exit_stack.enter_context(
+            self.managed_elasticsearch_dev_server_swap
+        )
+        self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
+        self.exit_stack.enter_context(self.managed_dev_appserver_swap)
+        self.exit_stack.enter_context(self.managed_portserver_swap)
+        self.exit_stack.enter_context(
+            self.managed_cloud_datastore_emulator_swap
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers,
+                'managed_acceptance_tests_server',
+                mock_managed_process,
+                expected_kwargs=[
+                    {
+                        'suite_name': 'testSuite',
+                        'headless': False,
+                        'mobile': False,
+                        'prod_env': False,
+                        'update_snapshots': True,
+                        'stdout': subprocess.PIPE,
+                    },
+                ],
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
+
+        with self.swap_mock_set_constants_to_default:
+            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
+                json_load_swap
+            ):
+                run_acceptance_tests.main(
+                    args=['--suite', 'testSuite', '--update_snapshots']
+                )
 
     def test_work_with_non_ascii_chars(self) -> None:
         mock_config = {
@@ -599,6 +660,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     },
                 ],
@@ -676,6 +738,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     },
                 ],
@@ -732,6 +795,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     },
                 ],
@@ -786,6 +850,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                         'headless': False,
                         'mobile': False,
                         'prod_env': False,
+                        'update_snapshots': False,
                         'stdout': subprocess.PIPE,
                     },
                 ],

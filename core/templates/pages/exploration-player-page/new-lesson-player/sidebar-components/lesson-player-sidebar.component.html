@@ -37,6 +37,7 @@
         </span>
       </button>
       <button class="player-sidebar-button" aria-label="Give feedback" (click)="showFeedbackModal()"
+          *ngIf="!isWebFeedbackModalFeatureFlagEnabled()"
           matTooltip="{{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}"
           matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
@@ -46,13 +47,33 @@
         </span>
       </button>
       <button class="player-sidebar-button" aria-label="Report content" (click)="showFlagExplorationModal()"
-          *ngIf="isUserLoggedIn()"
+          *ngIf="isUserLoggedIn() && !isWebFeedbackModalFeatureFlagEnabled()"
           matTooltip="{{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}"
           matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
+        </span>
+      </button>
+      <button class="player-sidebar-button" aria-label="Report an issue" (click)="showReportAnIssueModal()"
+          *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
+          matTooltip="{{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}"
+          matTooltipPosition="above">
+        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
+        <span *ngIf="sidebarIsExpanded">
+          <i class="fa fa-lg fa-flag"></i>
+            {{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}
+        </span>
+      </button>
+      <button class="player-sidebar-button" aria-label="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}" (click)="showSendLessonFeedbackModal()"
+          *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
+          matTooltip="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}"
+          matTooltipPosition="above">
+        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
+        <span *ngIf="sidebarIsExpanded">
+          <i class="fa fa-lg fa-comments"></i>
+            {{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}
         </span>
       </button>
     </div>
@@ -71,11 +92,23 @@
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
         </button>
-        <button (click)="showFeedbackModal()">
+        <button (click)="showReportAnIssueModal()"
+                *ngIf="isWebFeedbackModalFeatureFlagEnabled()">
+          <i class="fa fa-lg fa-flag"></i>
+          {{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}
+        </button>
+        <button (click)="showSendLessonFeedbackModal()"
+                *ngIf="isWebFeedbackModalFeatureFlagEnabled()">
+          <i class="fa fa-lg fa-comments"></i>
+          {{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}
+        </button>
+        <button (click)="showFeedbackModal()"
+                *ngIf="!isWebFeedbackModalFeatureFlagEnabled()">
           <i class="fa fa-lg fa-comments"></i>
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </button>
-        <button (click)="showFlagExplorationModal()">
+        <button (click)="showFlagExplorationModal()"
+                *ngIf="!isWebFeedbackModalFeatureFlagEnabled()">
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
         </button>

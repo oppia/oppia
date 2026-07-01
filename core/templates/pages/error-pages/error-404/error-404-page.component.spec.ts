@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for error page.
  */
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, TestBed, ComponentFixture} from '@angular/core/testing';
+import {waitForAsync, TestBed, ComponentFixture} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 
 import {Error404PageComponent} from './error-404-page.component';
@@ -50,7 +50,7 @@ describe('Error page', () => {
   let pageTitleService: PageTitleService;
   let translateService: TranslateService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [Error404PageComponent, MockTranslatePipe],
       providers: [
