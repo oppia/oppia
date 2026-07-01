@@ -366,8 +366,8 @@ describe('Answer Classification Service', () => {
     );
 
     it(
-      'should fail if no answer group matches and no default rule is ' +
-        'provided',
+      'should fail if no interaction rules service is provided for ' +
+        'classification',
       () => {
         stateDict.interaction.answer_groups = [
           {

@@ -2187,14 +2187,10 @@ describe('Exploration engine service ', () => {
 
   // ---- Branch coverage: submitAnswer internal branches ----
 
-  it('should cover the true branch (newState is truthy) for makeParams in submitAnswer ternary (line 809)', fakeAsync(() => {
+  it('should skip makeParams when newState is falsy in submitAnswer ternary (line 809)', fakeAsync(() => {
     // Branch: line 808-810 – the ternary `newState ? makeParams(...) : oldParams`.
-    // We exercise the false branch by mocking `makeParams` to a spy and then
-    // verifying it is NOT called when newState is null.
-    // We also mock `getState` to return null ONLY for the new-state lookup while
-    // keeping a valid old state, but we need `getState(nextStateName).content`
-    // to still work at line 865, so we return a valid object for ALL calls.
-    // The branch is: newState falsy → use oldParams as newParams.
+    // Return null only for the first lookup of the destination state so the
+    // ternary takes the falsy branch, then return a valid state for later calls.
     const submitCb = jasmine.createSpy('success');
     answerClassificationResult.outcome.dest = 'Mid';
 
@@ -2227,23 +2223,32 @@ describe('Exploration engine service ', () => {
     );
     tick();
 
-    // Spy on makeParams AFTER init so init still works.
-    // The `newState ? makeParams(...) : oldParams` ternary:
-    // When newState is truthy (normal case), makeParams is called.
-    // We verify the ternary takes the correct path by confirming makeParams
-    // is called for normal cases, then change outcome to a non-existent state
-    // to exercise the false branch.
+    let midLookupCount = 0;
+    spyOn(explorationEngineService.exploration, 'getState').and.callFake(
+      (stateName: string) => {
+        if (stateName === 'Mid' && midLookupCount++ === 0) {
+          return null;
+        }
+        return State.createDefaultState(
+          stateName,
+          'content_id',
+          'default_outcome'
+        );
+      }
+    );
+    spyOn(explorationEngineService, 'makeQuestion').and.returnValue('Question');
     const makeParamsSpy = spyOn(
       explorationEngineService,
       'makeParams'
     ).and.callThrough();
+
     explorationEngineService.submitAnswer(
       'answer',
       textInputService as InteractionRulesService & TextInputRulesService,
       submitCb
     );
-    // When newState is truthy, makeParams is called (true branch covered).
-    expect(makeParamsSpy).toHaveBeenCalled();
+
+    expect(makeParamsSpy).not.toHaveBeenCalled();
   }));
 
   it('should skip interaction html when interaction.id is null in submitAnswer (line 852 false branch)', fakeAsync(() => {
@@ -2362,13 +2367,10 @@ describe('Exploration engine service ', () => {
 
   // ---- Branch coverage: _getNextCardIfReallyStuck internal branches ----
 
-  it('should cover the true branch (newStateIfStuck is truthy) for makeParams in _getNextCardIfReallyStuck (line 934)', fakeAsync(() => {
+  it('should skip makeParams when newStateIfStuck is falsy in _getNextCardIfReallyStuck (line 934)', fakeAsync(() => {
     // Branch: line 934 – `newStateIfStuck ? makeParams(...) : oldParams`.
-    // When getState(newStateNameIfStuck) returns null, the ternary uses oldParams.
-    // We cannot make getState return null without breaking the content access at
-    // line 970, so we test the logically equivalent path: getState returns a
-    // valid state (truthy), exercising the true branch. Then we separately
-    // verify that when stuck card succeeds, callArgs[10] is a StateCard.
+    // Return null only for the first stuck-state lookup so the ternary takes
+    // the falsy branch, then return a valid state for later content access.
     const submitCb = jasmine.createSpy('success');
     answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
     answerClassificationResult.answerGroupIndex = 0;
@@ -2408,9 +2410,13 @@ describe('Exploration engine service ', () => {
       catchMisspellings: {value: false},
     };
 
+    let stuckStateLookupCount = 0;
     spyOn(explorationEngineService.exploration, 'getState').and.callFake(
       (stateName: string) => {
         if (stateName === 'StuckState') {
+          if (stuckStateLookupCount++ === 0) {
+            return null;
+          }
           const state = State.createDefaultState(
             'StuckState',
             'stuck_content_id',
@@ -2432,6 +2438,18 @@ describe('Exploration engine service ', () => {
         return state;
       }
     );
+    spyOn(explorationEngineService, 'makeQuestion').and.callFake(
+      (newState: State | null) => {
+        if (newState === null) {
+          return 'Stuck';
+        }
+        return newState.content.html;
+      }
+    );
+    const makeParamsSpy = spyOn(
+      explorationEngineService,
+      'makeParams'
+    ).and.callThrough();
     spyOn(explorationEngineService.exploration, 'getInteraction').and.callFake(
       (stateName: string) => {
         return new Interaction(
@@ -2450,6 +2468,7 @@ describe('Exploration engine service ', () => {
       'getInteractionHtml'
     ).and.returnValue('<div>html</div>');
 
+    const makeParamsCallCountBeforeSubmit = makeParamsSpy.calls.count();
     explorationEngineService.submitAnswer(
       'test answer',
       textInputService as InteractionRulesService & TextInputRulesService,
@@ -2460,6 +2479,9 @@ describe('Exploration engine service ', () => {
     expect(submitCb).toHaveBeenCalled();
     const callArgs = submitCb.calls.mostRecent().args;
     expect(callArgs[10]).not.toBeNull();
+    expect(makeParamsSpy.calls.count() - makeParamsCallCountBeforeSubmit).toBe(
+      1
+    );
   }));
 
   it('should skip stuck-state html generation when interaction.id is null (line 959)', fakeAsync(() => {
