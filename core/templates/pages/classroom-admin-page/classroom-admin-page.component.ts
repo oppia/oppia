@@ -64,12 +64,26 @@ export class ClassroomAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
-    public classroomAdminDataService: ClassroomAdminDataService,
+    private classroomAdminDataService: ClassroomAdminDataService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
     private pageContextService: PageContextService,
     private editableTopicBackendApiService: EditableTopicBackendApiService
   ) {}
+
+  get topicsGraphValidationError(): string {
+    return this.classroomAdminDataService.topicsGraphValidationError;
+  }
+
+  validateClassroom(
+    tempClassroomData: ExistingClassroomData,
+    classroomData: ExistingClassroomData
+  ): void {
+    this.classroomAdminDataService.validateClassroom(
+      tempClassroomData,
+      classroomData
+    );
+  }
 
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 

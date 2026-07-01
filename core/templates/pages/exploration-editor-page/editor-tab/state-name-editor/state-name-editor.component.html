@@ -1,8 +1,8 @@
 <div>
   <span class="e2e-test-state-name-container">
     <span *ngIf="editabilityService.isEditable()">
-      <span *ngIf="!stateNameService.isStateNameEditorShown()" (click)="openStateNameEditor()" class="oppia-editable-section">
-        <strong tabindex="0" [attr.aria-label]="'State name: ' + stateEditorService.getActiveStateName()" class="oppia-state-name-text e2e-test-state-name-text">{{stateEditorService.getActiveStateName()}}</strong>
+      <span *ngIf="!isStateNameEditorShown()" (click)="openStateNameEditor()" class="oppia-editable-section">
+        <strong tabindex="0" [attr.aria-label]="'State name: ' + activeStateName" class="oppia-state-name-text e2e-test-state-name-text">{{activeStateName}}</strong>
         <button *ngIf="editabilityService.isEditable()" class="fas fa-pen oppia-editor-edit-icon oppia-autofocus"
                 (keydown.enter)="openStateNameEditor()"
                 aria-label="Edit State Name"
@@ -10,7 +10,7 @@
         </button>
       </span>
 
-      <span *ngIf="stateNameService.isStateNameEditorShown()">
+      <span *ngIf="isStateNameEditorShown()">
         <form class="row mb-3" role="form" #f="ngForm" (ngSubmit)="saveStateNameAndRefresh(tmpStateName)">
           <input type="text" name="tmpStateName" aria-label="State name" [(ngModel)]="tmpStateName" [maxlength]="maxLen" autofocus class="e2e-test-state-name-input">
           <button type="submit" class="btn btn-success btn-sm e2e-test-state-name-submit">Save</button>
@@ -19,7 +19,7 @@
     </span>
 
     <span *ngIf="!editabilityService.isEditable()">
-      <strong>{{stateEditorService.getActiveStateName()}}</strong>
+      <strong>{{activeStateName}}</strong>
     </span>
   </span>
 </div>
