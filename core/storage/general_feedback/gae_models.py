@@ -347,11 +347,6 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         )
 
     @classmethod
-    def has_reference_to_user_id(cls, _user_id: str) -> bool:
-        """Returns whether this model has a reference to the given user ID."""
-        return False
-
-    @classmethod
     def _validate_create_args(
         cls,
         source: str,
