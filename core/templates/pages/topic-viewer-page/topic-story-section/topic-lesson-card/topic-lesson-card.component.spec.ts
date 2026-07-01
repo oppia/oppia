@@ -331,6 +331,28 @@ describe('TopicLessonCardComponent', () => {
     expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
   });
 
+  describe('shouldShowInfoIcon', () => {
+    it('should return false when only English is available', () => {
+      component.availableTextLanguageCodes = ['en'];
+      expect(component.shouldShowInfoIcon).toBeFalse();
+    });
+
+    it('should return true when non-English languages are available', () => {
+      component.availableTextLanguageCodes = ['en', 'es'];
+      expect(component.shouldShowInfoIcon).toBeTrue();
+    });
+
+    it('should return true when only non-English languages are available', () => {
+      component.availableTextLanguageCodes = ['pt', 'fr'];
+      expect(component.shouldShowInfoIcon).toBeTrue();
+    });
+
+    it('should return false when no languages are available', () => {
+      component.availableTextLanguageCodes = [];
+      expect(component.shouldShowInfoIcon).toBeFalse();
+    });
+  });
+
   it('should handle onStartButtonClick when startUrl is empty', () => {
     component.startUrl = '';
     spyOn(windowRef.nativeWindow.location, 'assign');

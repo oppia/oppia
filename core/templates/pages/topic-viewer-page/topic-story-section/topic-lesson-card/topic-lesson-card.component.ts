@@ -228,6 +228,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     );
   }
 
+  get shouldShowInfoIcon(): boolean {
+    return this.availableTextLanguageCodes.some(code => code !== 'en');
+  }
+
   shouldShowFallbackCta(): boolean {
     return !!this.selectedTextLanguageCode;
   }

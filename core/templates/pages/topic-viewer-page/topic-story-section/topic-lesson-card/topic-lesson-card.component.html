@@ -21,6 +21,7 @@
 
     <div class="topic-lesson-card-actions">
       <span class="topic-lesson-card-info-icon"
+            *ngIf="shouldShowInfoIcon"
             [ngbTooltip]="getFallbackInfoTooltipText()"
             placement="top"
             container="body"
