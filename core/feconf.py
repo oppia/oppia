@@ -1877,3 +1877,76 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
         'regenerate_voiceovers_for_batch_contents'
     ),
 }
+
+# Allowed feedback thread statuses.
+STATUS_CHOICES_OPEN: Final = 'open'
+STATUS_CHOICES_FIXED: Final = 'fixed'
+STATUS_CHOICES_IGNORED: Final = 'ignored'
+STATUS_CHOICES_COMPLIMENT: Final = 'compliment'
+STATUS_CHOICES_NOT_ACTIONABLE: Final = 'not_actionable'
+STATUS_CHOICES: Final = [
+    STATUS_CHOICES_OPEN,
+    STATUS_CHOICES_FIXED,
+    STATUS_CHOICES_IGNORED,
+    STATUS_CHOICES_COMPLIMENT,
+    STATUS_CHOICES_NOT_ACTIONABLE,
+]
+
+# Allowed Report category choices.
+CATEGORY_TYPO: Final = 'typo'
+CATEGORY_BROKEN_LAYOUT_OR_IMAGE: Final = 'broken_layout_or_image'
+CATEGORY_CONFUSING_OR_INCORRECT_ANSWER: Final = 'confusing_or_incorrect_answer'
+CATEGORY_OTHER_OR_NOT_SURE: Final = 'other_or_not_sure'
+CATEGORY_CHOICES: Final = [
+    CATEGORY_TYPO,
+    CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+    CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
+    CATEGORY_OTHER_OR_NOT_SURE,
+]
+
+# Categories that route to the Creator Dashboard.
+CREATOR_DASHBOARD_CATEGORIES: Final = frozenset(
+    [
+        CATEGORY_TYPO,
+        CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
+    ]
+)
+
+# Report source choices.
+SOURCE_LESSON: Final = 'lesson'
+SOURCE_APP: Final = 'app'
+SOURCE_CHOICES: Final = [SOURCE_LESSON, SOURCE_APP]
+
+# Platform choices.
+PLATFORM_WEB: Final = 'web'
+PLATFORM_ANDROID: Final = 'android'
+PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
+
+# Destination choices.
+DESTINATION_CREATOR: Final = 'creator'
+DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
+DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
+DESTINATION_CHOICES: Final = [
+    DESTINATION_CREATOR,
+    DESTINATION_TECHNICAL_LEAP_TEAM,
+    DESTINATION_TECHNICAL_CORE_TEAM,
+]
+
+LEAP_DASHBOARD_PATHS = frozenset(
+    [
+        'about',
+        'community-library',
+        'contact',
+        'explore',
+        'learn',
+        'learner-dashboard',
+        'lesson',
+        'profile',
+        'partnerships',
+        'preferences',
+        'volunteer',
+        'teach',
+        'blog',
+        'donate',
+    ]
+)

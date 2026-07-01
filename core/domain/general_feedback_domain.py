@@ -63,8 +63,7 @@ class LessonFeedbackDict(TypedDict):
     lesson_metadata: LessonMetadataDict
     parent_feedback_id: Optional[str]
     response_list: List[LessonFeedbackResponseDict]
-    response_count: int
-    seen_response_count: int
+    unread_response_count: int
     created_on_msecs: float
 
 
@@ -129,8 +128,7 @@ class LessonFeedback:
         response_list: List[LessonFeedbackResponseDict]. Ordered list of
             creator responses. Each entry exposes only response_text and
             responded_on (responded_by is stored internally and never exported).
-        response_count: int. Total number of creator responses.
-        seen_response_count: int. Number of responses the learner has seen.
+        unread_response_count: int. Total number of creator responses that have not yet been marked as read by the learner.
         created_on_msecs: float. Creation timestamp in milliseconds.
     """
 
@@ -142,8 +140,7 @@ class LessonFeedback:
         status: str,
         lesson_metadata: LessonMetadataDict,
         response_list: List[LessonFeedbackResponseDict],
-        response_count: int,
-        seen_response_count: int,
+        unread_response_count: int,
         created_on_msecs: float,
         parent_feedback_id: Optional[str] = None,
     ) -> None:
@@ -154,8 +151,7 @@ class LessonFeedback:
         self.lesson_metadata = lesson_metadata
         self.parent_feedback_id = parent_feedback_id
         self.response_list = response_list
-        self.response_count = response_count
-        self.seen_response_count = seen_response_count
+        self.unread_response_count = unread_response_count
         self.created_on_msecs = created_on_msecs
 
     def to_dict(self) -> LessonFeedbackDict:
@@ -172,8 +168,7 @@ class LessonFeedback:
             'lesson_metadata': self.lesson_metadata,
             'parent_feedback_id': self.parent_feedback_id,
             'response_list': self.response_list,
-            'response_count': self.response_count,
-            'seen_response_count': self.seen_response_count,
+            'unread_response_count': self.unread_response_count,
             'created_on_msecs': self.created_on_msecs,
         }
 

@@ -16,7 +16,9 @@
 
 from __future__ import annotations
 
-from core import utils
+import urllib.parse
+
+from core import feconf, utils
 from core.domain import general_feedback_domain
 from core.platform import models
 
@@ -29,8 +31,6 @@ if MYPY:  # pragma: no cover
 (general_feedback_models,) = models.Registry.import_models(
     [models.Names.GENERAL_FEEDBACK]
 )
-
-_PLATFORM_WEB: str = general_feedback_models.PLATFORM_WEB
 
 
 def _lesson_feedback_model_to_domain(
@@ -79,8 +79,7 @@ def _lesson_feedback_model_to_domain(
         lesson_metadata=lesson_metadata,
         parent_feedback_id=model.parent_feedback_id,
         response_list=sanitized_responses,
-        response_count=model.response_count,
-        seen_response_count=model.seen_response_count,
+        unread_response_count=model.unread_response_count,
         created_on_msecs=utils.get_time_in_millisecs(model.created_on),
     )
 
@@ -122,6 +121,38 @@ def _platform_feedback_model_to_domain(
         screenshot_entity_id=model.screenshot_entity_id,
         created_on_msecs=utils.get_time_in_millisecs(model.created_on),
     )
+
+
+def _determine_destination_dashboard(
+    page_url: str, category: Optional[str]
+) -> str:
+    """Determines the destination dashboard based on page_url, source and category.
+
+    Routing rules:
+        - All site (app) reports → technical (depends on the team that owns the page URL.)
+        - typo → creator
+        - confusing_or_incorrect_answer → creator
+        - broken_layout_or_image → technical (depends on the team that owns the page URL.)
+        - other_or_not_sure → technical (depends on the team that owns the page URL.)
+
+    Args:
+        page_url: str. The page URL where the report was submitted.
+        category: Optional[str]. The report category; None for site reports.
+
+    Returns:
+        str. The destination dashboard ("creator" | "LEAP" | "CORE).
+    """
+    if category in feconf.CREATOR_DASHBOARD_CATEGORIES:
+        return feconf.DESTINATION_CREATOR
+    else:
+        parsed_url = urllib.parse.urlparse(page_url)
+        path = parsed_url.path.strip('/')
+        first_path_segement = path.split('/', 1)[0]
+
+        if first_path_segement in feconf.LEAP_DASHBOARD_PATHS:
+            return feconf.DESTINATION_TECHNICAL_LEAP_TEAM
+        else:
+            return feconf.DESTINATION_TECHNICAL_CORE_TEAM
 
 
 def create_lesson_feedback(
@@ -205,16 +236,20 @@ def create_platform_report(
     """
     # Map the handler-facing "site" source value to the model constant.
     model_source = (
-        general_feedback_models.SOURCE_APP
-        if source == 'site'
-        else general_feedback_models.SOURCE_LESSON
+        feconf.SOURCE_APP if source == 'site' else feconf.SOURCE_LESSON
+    )
+
+    destination_dashboard = _determine_destination_dashboard(
+        category=category,
+        page_url=page_url,
     )
 
     report_id = general_feedback_models.PlatformFeedbackModel.create(
         feedback_text=feedback_text,
         source=model_source,
-        platform=_PLATFORM_WEB,
+        platform=feconf.PLATFORM_WEB,
         category=category,
+        destination_dashboard=destination_dashboard,
         # Here we use cast because lesson_metadata_json is a TypedDict, while
         # the storage model create() method expects a Dict.
         lesson_metadata_json=cast(

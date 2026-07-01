@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import urllib.parse
 
 from core import feconf, utils
 from core.platform import models
@@ -33,207 +32,8 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-# Allowed feedback thread statuses.
-STATUS_CHOICES_OPEN: Final = 'open'
-STATUS_CHOICES_FIXED: Final = 'fixed'
-STATUS_CHOICES_IGNORED: Final = 'ignored'
-STATUS_CHOICES_COMPLIMENT: Final = 'compliment'
-STATUS_CHOICES_NOT_ACTIONABLE: Final = 'not_actionable'
-STATUS_CHOICES: Final = [
-    STATUS_CHOICES_OPEN,
-    STATUS_CHOICES_FIXED,
-    STATUS_CHOICES_IGNORED,
-    STATUS_CHOICES_COMPLIMENT,
-    STATUS_CHOICES_NOT_ACTIONABLE,
-]
 
-# Allowed Report category choices.
-CATEGORY_TYPO: Final = 'typo'
-CATEGORY_BROKEN_LAYOUT_OR_IMAGE: Final = 'broken_layout_or_image'
-CATEGORY_CONFUSING_OR_INCORRECT_ANSWER: Final = 'confusing_or_incorrect_answer'
-CATEGORY_OTHER_OR_NOT_SURE: Final = 'other_or_not_sure'
-CATEGORY_CHOICES: Final = [
-    CATEGORY_TYPO,
-    CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
-    CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
-    CATEGORY_OTHER_OR_NOT_SURE,
-]
-
-# Categories that route to the Creator Dashboard.
-_CREATOR_DASHBOARD_CATEGORIES: Final = frozenset(
-    [
-        CATEGORY_TYPO,
-        CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
-    ]
-)
-
-# Report source choices.
-SOURCE_LESSON: Final = 'lesson'
-SOURCE_APP: Final = 'app'
-SOURCE_CHOICES: Final = [SOURCE_LESSON, SOURCE_APP]
-
-# Platform choices.
-PLATFORM_WEB: Final = 'web'
-PLATFORM_ANDROID: Final = 'android'
-PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
-
-DESTINATION_CREATOR: Final = 'creator'
-DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
-DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
-DESTINATION_CHOICES: Final = [
-    DESTINATION_CREATOR,
-    DESTINATION_TECHNICAL_LEAP_TEAM,
-    DESTINATION_TECHNICAL_CORE_TEAM,
-]
-
-_LEAP_DASHBOARD_PATHS = frozenset(
-    [
-        'about',
-        'community-library',
-        'contact',
-        'explore',
-        'learn',
-        'learner-dashboard',
-        'lesson',
-        'profile',
-        'partnerships',
-        'preferences',
-        'volunteer',
-        'teach',
-        'blog',
-        'donate',
-    ]
-)
-
-# Constants used for generating new ids.
-_MAX_RETRIES: Final = 10
-_RAND_RANGE: Final = 127 * 127
-
-
-class BaseFeedbackModel(base_models.BaseModel):
-    """Abstract base model shared by LessonFeedbackModel and PlatformFeedbackModel.
-
-    Subclasses MUST implement:
-        get_deletion_policy()
-        get_model_association_to_user()
-        get_export_policy()
-        has_reference_to_user_id()
-        export_data()
-
-    Fields:
-        author_id: Optional[str]. User ID of the submitter, or None for
-            reports.
-        feedback_text: str. The main text body submitted by the learner.
-        status: str. Current moderation status of the feedback entry
-            (open | closed | ignored | not_actionable).
-        lesson_metadata_schema_version: Optional[int]. Schema version for the
-            lesson_metadata_json blob. Allows future migrations.
-        lesson_metadata_json: Optional[Dict]. Lesson Metadata at
-            submission time. Contains:
-                exploration_id (str),
-                exploration_version (int),
-                state_name (str),
-                state_index (int),
-                learner_current_answer (str | None).
-            None for site-level (non-lesson) submissions.
-        created_on: datetime. Timestamp of creation (set by BaseModel).
-        last_updated: datetime. Timestamp of last update (set by BaseModel).
-        deleted: bool. Soft-delete flag (set by BaseModel).
-    """
-
-    # Subclasses must set this if the model id doubles as a takeout key.
-    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
-
-    author_id = datastore_services.StringProperty(
-        required=False,
-        indexed=True,
-    )
-    feedback_text = datastore_services.TextProperty(required=True)
-    status = datastore_services.StringProperty(
-        required=True,
-        indexed=True,
-        choices=STATUS_CHOICES,
-    )
-    lesson_metadata_schema_version = datastore_services.IntegerProperty(
-        required=False,
-        indexed=True,
-    )
-    lesson_metadata_json = datastore_services.JsonProperty(
-        required=False,
-        indexed=False,
-    )
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Subclasses must override this."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
-        """Subclasses must override this."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Merges base export policy with the shared fields defined here."""
-        return dict(
-            super().get_export_policy(),
-            **{
-                # author_id is pseudonymized, not exported directly.
-                'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'feedback_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'lesson_metadata_schema_version': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                ),
-                'lesson_metadata_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            },
-        )
-
-    # Subclasses must override this with their own prefix string, e.g.
-    # 'feedback.lesson' or 'feedback.platform'. The generated ID will have
-    # the form '<ID_PREFIX>.<timestamp_b64><random_b64>'.
-    ID_PREFIX: str = ''
-
-    @classmethod
-    def _generate_new_id(cls) -> str:
-        """Generates a unique prefixed model ID.
-
-        The ID has the form:
-            <ID_PREFIX>.<timestamp_base64><random_base64>
-
-        e.g. 'feedback.lesson.MTczNzAwMDAwMDAwMGFi'
-
-        Returns:
-            str. A globally unique ID containing the model's type prefix.
-
-        Raises:
-            Exception. Raised when too many collisions occur while generating
-                a new ID.
-        """
-        if not cls.ID_PREFIX:
-            raise Exception(
-                'Subclasses of BaseFeedbackModel must define a non-empty '
-                'ID_PREFIX. Got empty string for %s.' % cls.__name__
-            )
-        for _ in range(_MAX_RETRIES):
-            new_id = '%s.%s%s' % (
-                cls.ID_PREFIX,
-                utils.base64_from_int(
-                    int(utils.get_current_time_in_millisecs())
-                ),
-                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)),
-            )
-            if not cls.get_by_id(new_id):
-                return new_id
-        raise Exception(
-            '%s ID generator is producing too many collisions.' % cls.__name__
-        )
-
-
-class LessonFeedbackModel(BaseFeedbackModel):
+class LessonFeedbackModel(base_models.BaseFeedbackModel):
     """Primary datastore model for learner lesson feedback submissions.
 
     Each learner submission creates exactly one LessonFeedbackModel.
@@ -256,9 +56,7 @@ class LessonFeedbackModel(BaseFeedbackModel):
                 response_text (str),
                 responded_by (str),
                 responded_on (float, milliseconds since epoch).
-        response_count: int. Total number of creator responses.
-        seen_response_count: int. Number of responses the learner has
-            already seen.
+        unread_response_count: int. Number of Learner's unread responses.
     """
 
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
@@ -276,12 +74,7 @@ class LessonFeedbackModel(BaseFeedbackModel):
         required=True,
         indexed=False,
     )
-    response_count = datastore_services.IntegerProperty(
-        required=True,
-        default=0,
-        indexed=False,
-    )
-    seen_response_count = datastore_services.IntegerProperty(
+    unread_response_count = datastore_services.IntegerProperty(
         required=True,
         default=0,
         indexed=False,
@@ -313,8 +106,7 @@ class LessonFeedbackModel(BaseFeedbackModel):
                 # but export_data strips it, emitting only response_text
                 # and responded_on to the takeout output.
                 'response_list': base_models.EXPORT_POLICY.EXPORTED,
-                'response_count': base_models.EXPORT_POLICY.EXPORTED,
-                'seen_response_count': base_models.EXPORT_POLICY.EXPORTED,
+                'unread_response_count': base_models.EXPORT_POLICY.EXPORTED,
                 'created_on': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.EXPORTED,
                 # author_id is pseudonymized, not exported directly.
@@ -394,8 +186,7 @@ class LessonFeedbackModel(BaseFeedbackModel):
                 'lesson_metadata_json': feedback_model.lesson_metadata_json,
                 'parent_feedback_id': feedback_model.parent_feedback_id,
                 'response_list': sanitized_response_list,
-                'response_count': feedback_model.response_count,
-                'seen_response_count': feedback_model.seen_response_count,
+                'unread_response_count': feedback_model.unread_response_count,
                 'created_on_msec': utils.get_time_in_millisecs(
                     feedback_model.created_on
                 ),
@@ -434,21 +225,20 @@ class LessonFeedbackModel(BaseFeedbackModel):
             id=feedback_id,
             author_id=author_id,
             feedback_text=feedback_text,
-            status=STATUS_CHOICES_OPEN,
+            status=feconf.STATUS_CHOICES_OPEN,
             lesson_metadata_schema_version=feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION,
             lesson_metadata_json=lesson_metadata_json,
             parent_feedback_id=parent_feedback_id,
             response_list_schema_version=feconf.CURRENT_RESPONSE_LIST_SCHEMA_VERSION,
             response_list=[],
-            response_count=0,
-            seen_response_count=0,
+            unread_response_count=0,
         )
         feedback_model.update_timestamps()
         feedback_model.put()
         return feedback_id
 
 
-class PlatformFeedbackModel(BaseFeedbackModel):
+class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     """Primary datastore model for lesson issue reports and site issue reports.
 
     Each report submission creates exactly one PlatformFeedbackModel. The
@@ -485,22 +275,22 @@ class PlatformFeedbackModel(BaseFeedbackModel):
     source = datastore_services.StringProperty(
         required=True,
         indexed=True,
-        choices=SOURCE_CHOICES,
+        choices=feconf.SOURCE_CHOICES,
     )
     platform = datastore_services.StringProperty(
         required=True,
         indexed=True,
-        choices=PLATFORM_CHOICES,
+        choices=feconf.PLATFORM_CHOICES,
     )
     destination_dashboard = datastore_services.StringProperty(
         required=True,
         indexed=True,
-        choices=DESTINATION_CHOICES,
+        choices=feconf.DESTINATION_CHOICES,
     )
     category = datastore_services.StringProperty(
         required=False,
         indexed=True,
-        choices=CATEGORY_CHOICES,
+        choices=feconf.CATEGORY_CHOICES,
     )
     include_technical_logs = datastore_services.BooleanProperty(
         required=True,
@@ -519,7 +309,7 @@ class PlatformFeedbackModel(BaseFeedbackModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model is not directly associated with users."""
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user() -> (
@@ -557,41 +347,45 @@ class PlatformFeedbackModel(BaseFeedbackModel):
         )
 
     @classmethod
-    def _determine_destination_dashboard(
-        cls, page_url: str, category: Optional[str]
-    ) -> str:
-        """Determines the destination dashboard based on page_url, source and category.
-
-        Routing rules:
-            - All site (app) reports → technical (depends on the team that owns the page URL.)
-            - typo → creator
-            - confusing_or_incorrect_answer → creator
-            - broken_layout_or_image → technical (depends on the team that owns the page URL.)
-            - other_or_not_sure → technical (depends on the team that owns the page URL.)
-
-        Args:
-            page_url: str. The page URL where the report was submitted.
-            category: Optional[str]. The report category; None for site reports.
-
-        Returns:
-            str. The destination dashboard ("creator" | "LEAP" | "CORE).
-        """
-        if category in _CREATOR_DASHBOARD_CATEGORIES:
-            return DESTINATION_CREATOR
-        else:
-            parsed_url = urllib.parse.urlparse(page_url)
-            path = parsed_url.path.strip('/')
-            first_path_segement = path.split('/', 1)[0]
-
-            if first_path_segement in _LEAP_DASHBOARD_PATHS:
-                return DESTINATION_TECHNICAL_LEAP_TEAM
-            else:
-                return DESTINATION_TECHNICAL_CORE_TEAM
+    def has_reference_to_user_id(cls, _user_id: str) -> bool:
+        """Returns whether this model has a reference to the given user ID."""
+        return False
 
     @classmethod
-    def has_reference_to_user_id(cls, _user_id: str) -> bool:
-        """Returns whether t adhis model has a reference to the given user ID."""
-        return False
+    def _validate_create_args(
+        cls,
+        source,
+        category,
+        lesson_metadata_json,
+        screenshot_filename,
+        screenshot_entity_id,
+    ) -> None:
+        """Validates arguments passed to create()."""
+
+        if source == feconf.SOURCE_LESSON:
+            if not lesson_metadata_json:
+                raise ValueError(
+                    'Lesson feedback must include lesson metadata.'
+                )
+        elif source == feconf.SOURCE_APP:
+            if category:
+                raise ValueError('App feedback must not include a category.')
+            if lesson_metadata_json:
+                raise ValueError(
+                    'App feedback must not include lesson metadata.'
+                )
+        else:
+            raise ValueError('Invalid source: %s' % source)
+
+        screenshot_provided = (
+            screenshot_filename is not None,
+            screenshot_entity_id is not None,
+        )
+        if screenshot_provided[0] != screenshot_provided[1]:
+            raise ValueError(
+                'screenshot_filename and screenshot_entity_id must both be '
+                'provided or both be None.'
+            )
 
     @classmethod
     def create(
@@ -600,6 +394,7 @@ class PlatformFeedbackModel(BaseFeedbackModel):
         source: str,
         platform: str,
         page_url: str,
+        destination_dashboard: str,
         category: Optional[str],
         lesson_metadata_json: Optional[Dict[str, Union[str, int, None]]],
         include_technical_logs: bool,
@@ -614,6 +409,7 @@ class PlatformFeedbackModel(BaseFeedbackModel):
             platform: str. Platform of the report ("web" | "android").
             category: Optional[str]. Report category; can be for lesson
                 reports, must be None for site (app) reports.
+            destination_dashboard: str. Routing target ("creator" | "LEAP" | "CORE).
             lesson_metadata_json: Optional[Dict]. Lesson metadata at
                 submission time;
                 required for lesson reports, must be None for site reports.
@@ -637,41 +433,21 @@ class PlatformFeedbackModel(BaseFeedbackModel):
             ValueError. If exactly one of screenshot_filename and
                 screenshot_entity_id is provided.
         """
-        if source == SOURCE_LESSON:
-            if not lesson_metadata_json:
-                raise ValueError(
-                    'Lesson feedback must include lesson metadata.'
-                )
-        elif source == SOURCE_APP:
-            if category:
-                raise ValueError('App feedback must not include a category.')
-            if lesson_metadata_json:
-                raise ValueError(
-                    'App feedback must not include lesson metadata.'
-                )
-        else:
-            raise ValueError('Invalid source: %s' % source)
-
-        screenshot_provided = (
-            screenshot_filename is not None,
-            screenshot_entity_id is not None,
+        cls._validate_create_args(
+            source=source,
+            category=category,
+            lesson_metadata_json=lesson_metadata_json,
+            screenshot_filename=screenshot_filename,
+            screenshot_entity_id=screenshot_entity_id,
         )
-        if screenshot_provided[0] != screenshot_provided[1]:
-            raise ValueError(
-                'screenshot_filename and screenshot_entity_id must both be '
-                'provided or both be None.'
-            )
 
-        destination_dashboard = cls._determine_destination_dashboard(
-            page_url, category
-        )
         report_id = cls._generate_new_id()
 
         platform_feedback_model = cls(
             id=report_id,
             author_id=None,
             feedback_text=feedback_text,
-            status=STATUS_CHOICES_OPEN,
+            status=feconf.STATUS_CHOICES_OPEN,
             lesson_metadata_schema_version=(
                 feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
                 if lesson_metadata_json is not None

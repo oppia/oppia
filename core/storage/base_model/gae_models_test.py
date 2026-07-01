@@ -1154,3 +1154,98 @@ class BaseModelTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].description, 'Version 1 content')
         self.assertEqual(results[1].description, 'Version 1 content')
         self.assertEqual(results[2].description, 'Version 2 content')
+
+
+class BaseFeedbackModelTests(test_utils.GenericTestBase):
+    """Tests for BaseFeedbackModel."""
+
+    def test_get_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseModel.get_deletion_policy()
+
+    def test_apply_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The apply_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseModel.apply_deletion_policy('test_user_id')
+
+    def test_has_reference_to_user_id(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The has_reference_to_user_id() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseModel.has_reference_to_user_id('user_id')
+
+    def test_error_cases_for_get_method(self) -> None:
+        with self.assertRaisesRegex(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class BaseModel with id Invalid id not found',
+        ):
+            base_models.BaseModel.get('Invalid id')
+        with self.assertRaisesRegex(
+            base_models.BaseModel.EntityNotFoundError,
+            'Entity for class BaseModel with id Invalid id not found',
+        ):
+            base_models.BaseModel.get('Invalid id', strict=True)
+
+        self.assertIsNone(base_models.BaseModel.get('Invalid id', strict=False))
+
+    def test_base_model_export_data_raises_not_implemented_error(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The export_data() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseModel.export_data('')
+
+    def test_get_model_association_to_user_raises_not_implemented_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeedbackModel.get_model_association_to_user()
+
+    def test_export_data(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The export_data() method is missing from the derived '
+                'class. It should be implemented in the derived class.'
+            ),
+        ):
+            base_models.BaseFeedbackModel.export_data('user_id')
+
+    def test_generate_new_id_raises_error_when_id_prefix_is_empty(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Subclasses of BaseFeedbackModel must define a non-empty '
+            'ID_PREFIX',
+        ):
+            base_models.BaseFeedbackModel._generate_new_id()  # pylint: disable=protected-access
