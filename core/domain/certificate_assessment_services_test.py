@@ -308,6 +308,78 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
+    def test_format_list_formats_short_lists(self) -> None:
+        self.assertEqual(
+            certificate_assessment_services._format_list(['one']),
+            'one',
+        )
+        self.assertEqual(
+            certificate_assessment_services._format_list(['one', 'two']),
+            'one and two',
+        )
+        self.assertEqual(
+            certificate_assessment_services._format_list(
+                ['one', 'two', 'three']
+            ),
+            'one, two, and three',
+        )
+
+    def test_has_valid_distinct_assignment(self) -> None:
+        topic_id_to_question_ids_by_difficulty = {
+            'topic_1': {'easy': {'q1'}, 'medium': {'q2'}, 'hard': {'q3'}},
+            'topic_2': {'easy': {'q4'}, 'medium': {'q5'}, 'hard': {'q6'}},
+        }
+        required_questions_by_topic = {
+            'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
+            'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+        }
+
+        self.assertTrue(
+            certificate_assessment_services._has_valid_distinct_assignment(
+                topic_id_to_question_ids_by_difficulty,
+                ['topic_1', 'topic_2'],
+                required_questions_by_topic,
+                'easy',
+            )
+        )
+        self.assertTrue(
+            certificate_assessment_services._has_valid_distinct_assignment(
+                topic_id_to_question_ids_by_difficulty,
+                ['topic_1', 'topic_2'],
+                required_questions_by_topic,
+                'medium',
+            )
+        )
+        self.assertTrue(
+            certificate_assessment_services._has_valid_distinct_assignment(
+                topic_id_to_question_ids_by_difficulty,
+                ['topic_1', 'topic_2'],
+                required_questions_by_topic,
+                'hard',
+            )
+        )
+
+    def test_has_valid_distinct_assignment_rejects_insufficient_overlap(
+        self,
+    ) -> None:
+        topic_id_to_question_ids_by_difficulty = {
+            'topic_1': {'easy': {'q1'}, 'medium': {'q2'}, 'hard': {'q3'}},
+            'topic_2': {'easy': {'q1'}, 'medium': {'q2'}, 'hard': {'q3'}},
+        }
+        required_questions_by_topic = {
+            'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
+            'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+        }
+
+        self.assertFalse(
+            certificate_assessment_services._has_valid_distinct_assignment(
+                topic_id_to_question_ids_by_difficulty,
+                ['topic_1', 'topic_2'],
+                required_questions_by_topic,
+                'easy',
+            )
+        )
+
     def test_validation_distribution_sampling_cases(self) -> None:
         test_cases: list[ValidationSamplingTestCase] = [
             {
@@ -352,8 +424,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'total_questions': 6,
                 'expected_is_valid': False,
                 'expected_message_substrings': [
-                    'Only 4 unique question(s) are available across the selected '
-                    'topics, but 6 are required without reusing questions.',
+                    'Selected topics Topic 1 and Topic 2 do not have enough '
+                    'distinct easy, medium, and hard questions to satisfy '
+                    'the requested certificate without reusing questions '
+                    'across topics.',
                     'Topic 1 does not have enough questions in every '
                     'difficulty bucket.',
                     'Topic 2 does not have enough questions in every '
@@ -380,8 +454,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'total_questions': 8,
                 'expected_is_valid': False,
                 'expected_message_substrings': [
-                    'Only 4 unique question(s) are available across the selected '
-                    'topics, but 8 are required without reusing questions.',
+                    'Selected topics Topic 1 and Topic 2 do not have enough '
+                    'distinct easy, medium, and hard questions to satisfy '
+                    'the requested certificate without reusing questions '
+                    'across topics.',
                     'Topic 1 does not have enough questions in every '
                     'difficulty bucket.',
                     'Topic 2 does not have enough questions in every '
@@ -434,8 +510,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'total_questions': 5,
                 'expected_is_valid': False,
                 'expected_message_substrings': [
-                    'Only 4 unique question(s) are available across the selected '
-                    'topics, but 5 are required without reusing questions.',
+                    'Selected topics Topic 1 and Topic 2 do not have enough '
+                    'distinct easy, medium, and hard questions to satisfy '
+                    'the requested certificate without reusing questions '
+                    'across topics.',
                 ],
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
@@ -549,8 +627,9 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         get_links.assert_any_call('skill_1', 'Skill description')
         self.assertFalse(result['is_valid'])
         self.assertIn(
-            'Only 1 unique question(s) are available across the selected '
-            'topics, but 3 are required without reusing questions.',
+            'Selected topics Mock Topic do not have enough distinct easy, '
+            'medium, and hard questions to satisfy the requested '
+            'certificate without reusing questions across topics.',
             result['validation_message'],
         )
         self.assertIn(
@@ -619,8 +698,9 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         self.assertFalse(result['is_valid'])
         self.assertIn(
-            'Only 4 unique question(s) are available across the selected '
-            'topics, but 8 are required without reusing questions.',
+            'Selected topics Topic 1 and Topic 2 do not have enough '
+            'distinct easy, medium, and hard questions to satisfy the '
+            'requested certificate without reusing questions across topics.',
             result['validation_message'],
         )
 
