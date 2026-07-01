@@ -354,11 +354,11 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     @classmethod
     def _validate_create_args(
         cls,
-        source,
-        category,
-        lesson_metadata_json,
-        screenshot_filename,
-        screenshot_entity_id,
+        source: str,
+        category: Optional[str],
+        lesson_metadata_json: Optional[Dict[str, Union[str, int, None]]],
+        screenshot_filename: Optional[str],
+        screenshot_entity_id: Optional[str],
     ) -> None:
         """Validates arguments passed to create()."""
 
