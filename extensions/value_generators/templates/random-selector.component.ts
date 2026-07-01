@@ -17,6 +17,16 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
+import {
+  SchemaDefaultValue,
+  ListSchema,
+} from 'services/schema-default-value.service';
+
+interface ListSchemaWithUiConfig extends ListSchema {
+  ui_config?: {
+    add_element_text: string;
+  };
+}
 
 @Component({
   selector: 'random-selector',
@@ -27,14 +37,14 @@ export class RandomSelectorComponent implements OnInit {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() generatorId!: string;
-  @Input() initArgs!: string;
+  @Input() initArgs!: SchemaDefaultValue;
   @Input() objType!: string;
   @Input() customizationArgs!: {
     value: string;
     list_of_values: string[];
   };
 
-  SCHEMA = {
+  SCHEMA: ListSchemaWithUiConfig = {
     type: 'list',
     items: {
       type: 'unicode',

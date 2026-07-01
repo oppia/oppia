@@ -17,6 +17,7 @@
  */
 
 import {Component, Input} from '@angular/core';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'copier',
@@ -27,7 +28,7 @@ export class CopierComponent {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() generatorId!: string;
-  @Input() initArgs!: string;
+  @Input() initArgs!: SchemaDefaultValue;
   @Input() objType!: string;
   @Input() customizationArgs!: {
     value: string;

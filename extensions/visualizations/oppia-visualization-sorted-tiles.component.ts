@@ -22,6 +22,7 @@ import {AnswerContentModalComponent} from 'components/common-layout-directives/c
 import {sum} from 'd3-array';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {UtilsService} from 'services/utils.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 import './oppia-visualization-sorted-tiles.component.css';
 
@@ -45,6 +46,10 @@ export class VisualizationSortedTilesComponent implements OnInit {
 
   isSelected!: boolean[];
   percentages!: number[];
+
+  getAnswerAsString(item: InteractionAnswer): string {
+    return typeof item === 'string' ? item : JSON.stringify(item);
+  }
 
   constructor(
     private utilsService: UtilsService,

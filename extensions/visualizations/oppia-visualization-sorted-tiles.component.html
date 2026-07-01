@@ -12,7 +12,7 @@
       <div class="oppia-visualization-sorted-tile-answer answer-{{ index }}"
            #oppiaVisualizationSortedTileAnswer>
         <oppia-interaction-display class="oppia-visualization-sorted-tile-answer-content"
-                                   [htmlData]="datum.answer">
+                                   [htmlData]="getAnswerAsString(datum.answer)">
         </oppia-interaction-display>
         <div class="more"
              *ngIf="isAnswerTooLong(oppiaVisualizationSortedTileAnswer)">
