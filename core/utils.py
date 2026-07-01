@@ -592,8 +592,13 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     if datetime_obj.tzinfo is None:
-        # Naive datetime from datastore. Treat it as UTC.
+        # Naive datetime (no tzinfo). Treated as UTC. This can come from
+        # NDB model fields (e.g. created_on, last_updated) which store
+        # naive UTC in the datastore.
         datetime_obj = datetime_obj.replace(tzinfo=datetime.timezone.utc)
+    else:
+        # Aware datetime. Normalize to UTC before converting.
+        datetime_obj = datetime_obj.astimezone(datetime.timezone.utc)
     return datetime_obj.timestamp() * 1000.0
 
 

@@ -787,6 +787,32 @@ class UtilsTests(test_utils.GenericTestBase):
             ).replace(tzinfo=None),
         )
 
+    def test_get_time_in_millisecs_with_utc_aware_datetime(self) -> None:
+        dt = datetime.datetime(2020, 6, 15, tzinfo=datetime.timezone.utc)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(
+                msecs / 1000.0, datetime.timezone.utc
+            ),
+        )
+
+    def test_get_time_in_millisecs_with_non_utc_aware_datetime(self) -> None:
+        # A non-UTC aware datetime should be normalized to UTC correctly,
+        # not have tzinfo blindly stripped, which would corrupt the time.
+        ist = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
+        dt_ist = datetime.datetime(2020, 6, 15, 5, 30, 0, tzinfo=ist)
+        dt_utc = datetime.datetime(
+            2020, 6, 15, 0, 0, 0, tzinfo=datetime.timezone.utc
+        )
+        msecs = utils.get_time_in_millisecs(dt_ist)
+        self.assertEqual(
+            dt_utc,
+            datetime.datetime.fromtimestamp(
+                msecs / 1000.0, datetime.timezone.utc
+            ),
+        )
+
     def test_convert_millisecs_time_to_datetime_object(self) -> None:
         msecs = 1690761600000
         dt = utils.convert_millisecs_time_to_datetime_object(msecs)
