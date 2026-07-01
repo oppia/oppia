@@ -635,6 +635,9 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'is_pinned': True,
             'currently_available_to_learners': True,
             'translation_in_review_counts': {},
+            'story_title': None,
+            'language_code': None,
+            'reviewer_only_content_count': None,
         }
 
         self.assertEqual(card_info.to_dict(), expected_dict)
