@@ -55,6 +55,7 @@ from core.domain import (
     skill_fetchers,
     skill_services,
     state_domain,
+    stats_domain,
     stats_services,
     story_domain,
     story_fetchers,
@@ -238,6 +239,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     num_dummy_question_suggestions_generate: Optional[int]
     skill_id: Optional[str]
     num_dummy_translation_opportunities_to_generate: Optional[int]
+    num_dummy_state_answers_to_generate: Optional[int]
     data: Optional[str]
     num_dummy_stories_to_generate: Optional[int]
     num_dummy_chapters_to_generate: Optional[int]
@@ -269,6 +271,7 @@ class AdminHandler(
                         'reload_collection',
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
+                        'generate_dummy_state_answers',
                         'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
@@ -317,6 +320,10 @@ class AdminHandler(
                 'default_value': None,
             },
             'num_dummy_translation_opportunities_to_generate': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'num_dummy_state_answers_to_generate': {
                 'schema': {'type': 'int'},
                 'default_value': None,
             },
@@ -447,6 +454,10 @@ class AdminHandler(
             Exception. The num_dummy_translation_opportunities_to_generate
                 must be provided when the action is
                 generate_dummy_translation_opportunities.
+            Exception. The exploration_id must be provided when the action
+                is generate_dummy_state_answers.
+            Exception. The num_dummy_state_answers_to_generate must be
+                provided when the action is generate_dummy_state_answers.
             InvalidInputException. Generate count cannot be less than publish
                 count.
             Exception. The data must be provided when the action is
@@ -538,6 +549,27 @@ class AdminHandler(
 
                 self._generate_dummy_translation_opportunities(
                     num_dummy_translation_opportunities_to_generate
+                )
+            elif action == 'generate_dummy_state_answers':
+                exploration_id = self.normalized_payload.get('exploration_id')
+                if exploration_id is None:
+                    raise Exception(
+                        'The \'exploration_id\' must be provided when the '
+                        'action is generate_dummy_state_answers.'
+                    )
+                num_dummy_state_answers_to_generate = (
+                    self.normalized_payload.get(
+                        'num_dummy_state_answers_to_generate'
+                    )
+                )
+                if num_dummy_state_answers_to_generate is None:
+                    raise Exception(
+                        'The \'num_dummy_state_answers_to_generate\' must be '
+                        'provided when the action is '
+                        'generate_dummy_state_answers.'
+                    )
+                self._generate_dummy_state_answers(
+                    exploration_id, num_dummy_state_answers_to_generate
                 )
             elif action == 'generate_dummy_blog_post':
                 blog_post_title = self.normalized_payload.get('blog_post_title')
@@ -1303,6 +1335,70 @@ class AdminHandler(
             )
         else:
             raise Exception('Cannot generate dummy explorations in production.')
+
+    def _generate_dummy_state_answers(
+        self, exploration_id: str, num_dummy_state_answers_to_generate: int
+    ) -> None:
+        """Generates dummy submitted answers for the initial exploration state.
+
+        Args:
+            exploration_id: str. The exploration ID.
+            num_dummy_state_answers_to_generate: int. Count of dummy answers to
+                generate.
+
+        Raises:
+            Exception. Environment is not DEVMODE.
+            Exception. Exploration does not exist.
+            Exception. Initial state has no interaction.
+            Exception. Initial state interaction is not supported.
+        """
+        if not constants.DEV_MODE:
+            raise Exception('Cannot generate dummy answers in production.')
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False
+        )
+        if exploration is None:
+            raise Exception(
+                'Exploration with id %s does not exist.' % exploration_id
+            )
+
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+        interaction_id = initial_state.interaction.id
+        if interaction_id is None:
+            raise Exception(
+                'Initial state of exploration %s has no interaction.'
+                % exploration_id
+            )
+        if interaction_id != 'TextInput':
+            raise Exception(
+                'Unsupported interaction id %s. Currently only TextInput '
+                'is supported.' % interaction_id
+            )
+
+        submitted_answer_list: List[stats_domain.SubmittedAnswer] = []
+        for i in range(num_dummy_state_answers_to_generate):
+            submitted_answer_list.append(
+                stats_domain.SubmittedAnswer(
+                    'dummy answer %s' % i,
+                    interaction_id,
+                    0,
+                    0,
+                    exp_domain.EXPLICIT_CLASSIFICATION,
+                    {},
+                    'dummy_session_%s' % i,
+                    1.0,
+                )
+            )
+
+        stats_services.record_answers(
+            exploration.id,
+            exploration.version,
+            state_name,
+            interaction_id,
+            submitted_answer_list,
+        )
 
     def _generate_dummy_translation_opportunities(
         self, num_dummy_translation_opportunities_to_generate: int

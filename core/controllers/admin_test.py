@@ -2458,6 +2458,85 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_without_exploration_id_generate_dummy_state_answers_fails(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'exploration_id\' must be provided when the action is '
+            'generate_dummy_state_answers.',
+        )
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_state_answers',
+                    'exploration_id': None,
+                    'num_dummy_state_answers_to_generate': 2,
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_without_num_dummy_state_answers_to_generate_fails(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_state_answers_to_generate\' must be provided '
+            'when the action is generate_dummy_state_answers.',
+        )
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_state_answers',
+                    'exploration_id': '0',
+                    'num_dummy_state_answers_to_generate': None,
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_admins_can_generate_dummy_state_answers(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        exploration_id = 'dummy_state_answers_exp'
+        curriculum_admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+        exploration = self.save_new_valid_exploration(
+            exploration_id, curriculum_admin_id, end_state_name='End'
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_state_answers',
+                'exploration_id': exploration_id,
+                'num_dummy_state_answers_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        state_answers = stats_services.get_state_answers(
+            exploration_id, exploration.version, exploration.init_state_name
+        )
+        assert state_answers is not None
+        self.assertEqual(
+            len(state_answers.get_submitted_answer_dict_list()),
+            3,
+        )
+
+        self.logout()
+
     def test_generator_works_when_skill_with_same_description_but_different_id_exists(
         self,
     ) -> None:

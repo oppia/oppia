@@ -79,6 +79,34 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
+      <h3>Generate dummy state answers</h3>
+      <p>
+        Use this form to generate submitted answers for the initial state of an
+        exploration (TextInput interactions only).
+      </p>
+      <span class="row">
+        <label for="label-target-exploration-id-for-dummy-answers" class="form-label">Exploration ID</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+               [(ngModel)]="targetExplorationIdForDummyAnswers"
+               placeholder="Exploration ID" type="text"
+               id="label-target-exploration-id-for-dummy-answers">
+        <label for="label-target-state-answers-to-generate" class="form-label">Number of answers to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
+               [(ngModel)]="numDummyStateAnswersToGenerate"
+               placeholder="Answers to generate" type="number" min="0"
+               id="label-target-state-answers-to-generate">
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text"
+                (click)="generateDummyStateAnswers()"
+                [disabled]="!targetExplorationIdForDummyAnswers || !numDummyStateAnswersToGenerate">
+          Generate Dummy Answers
+        </button>
+      </span>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ms-0">
       <h3>Reload a single collection</h3>
       <div *ngFor="let collection of DEMO_COLLECTIONS"

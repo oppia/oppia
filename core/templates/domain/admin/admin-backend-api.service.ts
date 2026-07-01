@@ -664,6 +664,17 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyStateAnswersAsync(
+    explorationId: string,
+    numDummyStateAnswersToGenerate: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_state_answers',
+      exploration_id: explorationId,
+      num_dummy_state_answers_to_generate: numDummyStateAnswersToGenerate,
+    });
+  }
+
   async reloadExplorationAsync(explorationId: string): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',

@@ -47,6 +47,8 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   selectedTopicForStory: string = '';
   selectedStoryForChapter: string = '';
   numDummyTranslationOpportunitiesToGenerate: number = 0;
+  numDummyStateAnswersToGenerate: number = 0;
+  targetExplorationIdForDummyAnswers: string = '';
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
   DUMMY_BLOG_POST_TITLES = [
@@ -194,6 +196,31 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         },
         errorResponse => {
           this.setStatusMessage.emit(`Server error: ${errorResponse}`);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateDummyStateAnswers(): void {
+    if (!this.targetExplorationIdForDummyAnswers) {
+      this.setStatusMessage.emit('Please provide an exploration ID.');
+      return;
+    }
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummyStateAnswersAsync(
+        this.targetExplorationIdForDummyAnswers,
+        this.numDummyStateAnswersToGenerate
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit(
+            'Dummy state answers generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
         }
       );
     this.adminTaskManagerService.finishTask();
