@@ -27,7 +27,9 @@ from core.domain import (
     classroom_config_services,
     question_services,
     skill_fetchers,
+    topic_domain,
     topic_fetchers,
+    translation_domain,
 )
 from core.tests import test_utils
 
@@ -324,8 +326,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'total_questions': 6,
                 'expected_is_valid': False,
                 'expected_message_substrings': [
-                    'Topic 1 needs 3 unique questions but only 2 are available.',
-                    'Topic 2 needs 3 unique questions but only 2 are available.',
+                    'Topic 1 does not have enough questions in every '
+                    'difficulty bucket.',
+                    'Topic 2 does not have enough questions in every '
+                    'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
@@ -350,6 +354,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'expected_message_substrings': [
                     'Only 4 unique question(s) are available across the selected '
                     'topics, but 6 are required without reusing questions.',
+                    'Topic 1 does not have enough questions in every '
+                    'difficulty bucket.',
+                    'Topic 2 does not have enough questions in every '
+                    'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
@@ -374,6 +382,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'expected_message_substrings': [
                     'Only 4 unique question(s) are available across the selected '
                     'topics, but 8 are required without reusing questions.',
+                    'Topic 1 does not have enough questions in every '
+                    'difficulty bucket.',
+                    'Topic 2 does not have enough questions in every '
+                    'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
@@ -398,7 +410,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 'total_questions': 7,
                 'expected_is_valid': False,
                 'expected_message_substrings': [
-                    'Topic 2 needs 3 unique questions but only 2 are available.',
+                    'Topic 1 does not have enough questions in every '
+                    'difficulty bucket.',
+                    'Topic 2 does not have enough questions in every '
+                    'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
                     'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
@@ -516,8 +531,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         ) as get_topic_by_id, mock.patch.object(
             skill_fetchers,
             'get_skill_by_id',
-            side_effect=[skill, None],
-        ) as get_skill_by_id, mock.patch.object(
+            side_effect=lambda skill_id, strict=False: (
+                skill if skill_id == 'skill_1' else None
+            ),
+        ), mock.patch.object(
             question_services,
             'get_question_skill_links_of_skill',
             return_value=[mock.Mock(question_id='question_1')],
@@ -528,12 +545,17 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             )
 
         get_topic_by_id.assert_any_call('topic_1', strict=True)
-        get_topic_by_id.assert_any_call('topic_1', strict=False)
-        get_skill_by_id.assert_any_call('skill_1', strict=False)
-        get_links.assert_called_once_with('skill_1', 'Skill description')
+        self.assertEqual(get_links.call_count, 2)
+        get_links.assert_any_call('skill_1', 'Skill description')
         self.assertFalse(result['is_valid'])
         self.assertIn(
-            'Mock Topic needs 3 unique questions but only 1 are available.',
+            'Only 1 unique question(s) are available across the selected '
+            'topics, but 3 are required without reusing questions.',
+            result['validation_message'],
+        )
+        self.assertIn(
+            'Mock Topic does not have enough questions in every difficulty '
+            'bucket.',
             result['validation_message'],
         )
 
@@ -616,3 +638,82 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertEqual(topic_errors['easy']['available'], 0)
         self.assertEqual(topic_errors['medium']['available'], 0)
         self.assertEqual(topic_errors['hard']['available'], 0)
+
+    def test_validation_requires_each_difficulty_bucket(self) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+
+        question_links = [
+            mock.Mock(question_id='easy_1', skill_difficulty=0.3),
+            mock.Mock(question_id='easy_2', skill_difficulty=0.3),
+            mock.Mock(question_id='hard_1', skill_difficulty=0.9),
+        ]
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            side_effect=[topic, topic],
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_by_id',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=question_links,
+        ):
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=[self.topic_id],
+                total_questions=3,
+            )
+
+        self.assertFalse(result['is_valid'])
+        topic_errors = result['validation_errors'][self.topic_id]
+        self.assertEqual(topic_errors['easy']['available'], 2)
+        self.assertEqual(topic_errors['medium']['available'], 0)
+        self.assertEqual(topic_errors['hard']['available'], 1)
+
+    def test_validation_counts_easy_linked_question_as_available(self) -> None:
+        skill_id = 'skill_1'
+        topic_id = topic_fetchers.get_new_topic_id()
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.save_new_skill(skill_id, owner_id, description='Skill 1')
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic 1', 'subtopic-one'
+        )
+        subtopic.skill_ids = [skill_id]
+        self.save_new_topic(
+            topic_id,
+            owner_id,
+            name='Place Values',
+            abbreviated_name='place values',
+            url_fragment='place-values',
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+
+        self.save_new_question(
+            question_id,
+            owner_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            owner_id, question_id, skill_id, 0.3
+        )
+
+        result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=[topic_id],
+            total_questions=3,
+        )
+
+        topic_errors = result['validation_errors'][topic_id]
+        self.assertEqual(topic_errors['easy']['available'], 1)
+        self.assertEqual(topic_errors['easy']['required'], 1)
