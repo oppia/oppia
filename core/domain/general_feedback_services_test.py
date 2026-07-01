@@ -25,16 +25,10 @@ from typing import Dict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        base_models,
-        general_feedback_models,
-    )
+    from mypy_imports import general_feedback_models
 
-(
-    base_models,
-    general_feedback_models,
-) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.GENERAL_FEEDBACK]
+(general_feedback_models,) = models.Registry.import_models(
+    [models.Names.GENERAL_FEEDBACK]
 )
 
 
