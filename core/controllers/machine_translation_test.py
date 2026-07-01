@@ -70,8 +70,12 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         )
 
         with flag_swap, self.admin_toggle_swap:
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
-                '/generate-translation', self.payload, expected_status_int=404
+                '/generate-translation',
+                self.payload,
+                csrf_token=csrf_token,
+                expected_status_int=404,
             )
         self.logout()
 
@@ -85,8 +89,12 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.feature_flag_swap, admin_toggle_swap:
+            csrf_token = self.get_new_csrf_token()
             response = self.post_json(
-                '/generate-translation', self.payload, expected_status_int=400
+                '/generate-translation',
+                self.payload,
+                csrf_token=csrf_token,
+                expected_status_int=400,
             )
             self.assertEqual(
                 response['error'],
@@ -104,8 +112,12 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
+            csrf_token = self.get_new_csrf_token()
             response = self.post_json(
-                '/generate-translation', self.payload, expected_status_int=400
+                '/generate-translation',
+                self.payload,
+                csrf_token=csrf_token,
+                expected_status_int=400,
             )
             self.assertEqual(
                 response['error'],
@@ -116,6 +128,8 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
     def test_post_fails_gracefully_on_api_exception(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
+        # Here we use type Any because this is a mock function that ignores
+        # all inputs and simply exists to raise an exception.
         def mock_generate(*args: Any, **kwargs: Any) -> None:
             raise Exception('Azure Quota Exceeded')
 
@@ -126,8 +140,12 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
+            csrf_token = self.get_new_csrf_token()
             response = self.post_json(
-                '/generate-translation', self.payload, expected_status_int=500
+                '/generate-translation',
+                self.payload,
+                csrf_token=csrf_token,
+                expected_status_int=500,
             )
             self.assertEqual(response['error'], 'Azure Quota Exceeded')
         self.logout()
@@ -142,7 +160,10 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
-            response = self.post_json('/generate-translation', self.payload)
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                '/generate-translation', self.payload, csrf_token=csrf_token
+            )
 
             self.assertEqual(response['translated_text'], 'नमस्ते दुनिया')
             self.assertEqual(response['translation_provider'], 'azure')
@@ -154,7 +175,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
     """Tests for the TranslationProviderMappingHandler."""
 
     ADMIN_EMAIL = 'admin@example.com'
-    ADMIN_USERNAME = 'admin'
+    ADMIN_USERNAME = 'configuser'
 
     def setUp(self) -> None:
         super().setUp()
@@ -216,8 +237,11 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.feature_flag_swap, domain_swap:
+            csrf_token = self.get_new_csrf_token()
             response = self.put_json(
-                '/translation-provider-mapping', self.valid_payload
+                '/translation-provider-mapping',
+                self.valid_payload,
+                csrf_token=csrf_token,
             )
 
         self.assertEqual(response['status'], 'success')
@@ -237,9 +261,11 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.feature_flag_swap, domain_swap:
+            csrf_token = self.get_new_csrf_token()
             response = self.put_json(
                 '/translation-provider-mapping',
                 self.valid_payload,
+                csrf_token=csrf_token,
                 expected_status_int=400,
             )
 
@@ -256,9 +282,11 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         )
 
         with flag_swap:
+            csrf_token = self.get_new_csrf_token()
             self.put_json(
                 '/translation-provider-mapping',
                 self.valid_payload,
+                csrf_token=csrf_token,
                 expected_status_int=404,
             )
 

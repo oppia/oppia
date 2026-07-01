@@ -18,9 +18,11 @@
 
 from __future__ import annotations
 
-from core.domain import email_manager
-from core.domain import machine_translation_services
-from core.domain import translation_services
+from core.domain import (
+    email_manager,
+    machine_translation_services,
+    translation_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -128,8 +130,9 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
 
         class MockProvider:
             def generate_translation(
-                self, src: str, tgt: str, text: str
+                self, _src: str, _tgt: str, _text: str
             ) -> str:
+                """Mocks a successful translation generation."""
                 return 'api_translated_text'
 
         provider_instance_swap = self.swap(
@@ -158,8 +161,9 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
     def test_api_failure_sends_email_and_raises_exception(self) -> None:
         class MockFailingProvider:
             def generate_translation(
-                self, src: str, tgt: str, text: str
+                self, _src: str, _tgt: str, _text: str
             ) -> str:
+                """Mocks a failed translation generation."""
                 raise Exception('Azure Timeout')
 
         provider_instance_swap = self.swap(
@@ -188,5 +192,5 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
                 )
 
         self.assertEqual(len(email_messages), 1)
-        self.assertEqual(email_messages, 'azure')
-        self.assertIn('Azure Timeout', email_messages)
+        self.assertEqual(email_messages[0][0], 'azure')
+        self.assertEqual(email_messages[0][1], 'Azure Timeout')

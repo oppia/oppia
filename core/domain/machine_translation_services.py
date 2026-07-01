@@ -23,13 +23,17 @@ import logging
 
 from core import utils
 from core.constants import constants
-from core.domain import email_manager
-from core.domain import html_translation_services
-from core.domain import translation_services
+from core.domain import (
+    email_manager,
+    html_translation_services,
+    translation_services,
+)
 from core.platform import models
-from core.platform.translate import azure_translate_services
-from core.platform.translate import base_translate_services
-from core.platform.translate import translate_emulator
+from core.platform.translate import (
+    azure_translate_services,
+    base_translate_services,
+    translate_emulator,
+)
 
 from typing import Dict, Optional, Tuple
 
@@ -141,10 +145,12 @@ def generate_and_cache_translation(
         target_language_code: str. The language code to translate into.
         source_text: str. The untranslated HTML/text.
 
+    Raises:
+        Exception. Failed to generate translation.
+
     Returns:
-        tuple(str, str)|None. A tuple containing:
-            - The sanitized, translated HTML string.
-            - The name of the provider used (e.g., 'azure').
+        tuple(str, str)|None. A tuple containing the sanitized, translated
+        HTML string and the name of the provider used (e.g., 'azure').
         Returns None if no provider is configured or supported.
     """
 

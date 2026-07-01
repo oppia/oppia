@@ -423,6 +423,9 @@
 /core/templates/services/search-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/search.service*.ts @oppia/lace-frontend-reviewers
 
+# Machine Translation project.
+/core/controllers/machine_translation*.py @oppia/lace-backend-reviewers
+/core/domain/machine_translation*.py @oppia/lace-backend-reviewers
 
 # Navigation bar project.
 /core/templates/components/button-directives/create-activity-button.component.ts @oppia/lace-frontend-reviewers
