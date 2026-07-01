@@ -37,6 +37,7 @@ import {BehaviorSubject} from 'rxjs';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {PageContextService} from '../../../../services/page-context.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
@@ -45,6 +46,7 @@ import {ShareLessonModalComponent} from './share-lesson-modal.component';
 import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -53,11 +55,20 @@ class MockTruncteAndCapitalizePipe {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    WebFeedbackModalEnabled: {
+      isEnabled: false,
+    },
+  };
+}
+
 describe('LessonPlayerSidebarComponent', () => {
   let component: LessonPlayerSidebarComponent;
   let fixture: ComponentFixture<LessonPlayerSidebarComponent>;
   let mockMobileMenuService: Partial<MobileMenuService>;
   let pageContextService: PageContextService;
+  let platformFeatureService: MockPlatformFeatureService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let urlService: UrlService;
@@ -103,6 +114,10 @@ describe('LessonPlayerSidebarComponent', () => {
           useValue: mockMobileMenuService,
         },
         {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+        {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
@@ -127,6 +142,7 @@ describe('LessonPlayerSidebarComponent', () => {
     fixture = TestBed.createComponent(LessonPlayerSidebarComponent);
     component = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -231,6 +247,37 @@ describe('LessonPlayerSidebarComponent', () => {
     hackyExpDescTranslationIsDisplayed =
       component.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
+  });
+
+  it('should check WebfeedbackModal feature flag is enabled', () => {
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = true;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
+
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = false;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(false);
+  });
+
+  it('should open report an issue modal', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['close']);
+    mockModalRef.componentInstance = {};
+    mockNgbModal.open.and.returnValue(mockModalRef);
+
+    component.showReportAnIssueModal();
+
+    expect(mockNgbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+  });
+
+  it('should open send a lesson feedback modal', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['close']);
+    mockModalRef.componentInstance = {};
+    mockNgbModal.open.and.returnValue(mockModalRef);
+
+    component.showSendLessonFeedbackModal();
+    expect(mockNgbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
   });
 
   it('should show share lesson modal on mobile', () => {

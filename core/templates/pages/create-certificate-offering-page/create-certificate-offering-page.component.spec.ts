@@ -31,6 +31,7 @@ import {CreateCertificateOfferingPageComponent} from './create-certificate-offer
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 import {
+  CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
@@ -201,7 +202,7 @@ describe('Create Certificate Offering Page Component', () => {
     );
     expect(apiSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
-        asyncStatus: 'Not_Ready',
+        asyncStatus: CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY,
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
@@ -239,7 +240,7 @@ describe('Create Certificate Offering Page Component', () => {
     expect(modalSpy).toHaveBeenCalledTimes(2);
     expect(apiSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
-        asyncStatus: 'Available',
+        asyncStatus: CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE,
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate created.');

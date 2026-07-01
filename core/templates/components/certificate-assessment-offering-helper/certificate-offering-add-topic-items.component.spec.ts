@@ -125,19 +125,18 @@ describe('Certificate Offering Add Topic Items Component', () => {
         {
           provide: ClassroomBackendApiService,
           useValue: {
-            getAllClassroomsSummaryAsync: async () =>
-              Promise.resolve([
-                {
-                  classroom_id: 'math_classroom_id',
-                  name: 'Math',
-                  url_fragment: 'math',
-                  teaser_text: '',
-                  is_published: true,
-                  thumbnail_filename: '',
-                  thumbnail_bg_color: '',
-                },
-              ]),
-            fetchClassroomDataAsync: async () => Promise.resolve(classroomData),
+            getAllClassroomsSummaryAsync: async () => [
+              {
+                classroom_id: 'math_classroom_id',
+                name: 'Math',
+                url_fragment: 'math',
+                teaser_text: '',
+                is_published: true,
+                thumbnail_filename: '',
+                thumbnail_bg_color: '',
+              },
+            ],
+            fetchClassroomDataAsync: async () => classroomData,
           },
         },
       ],

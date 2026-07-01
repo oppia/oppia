@@ -29,6 +29,9 @@ from core.storage.certificate_assessment import gae_models
 
 from typing import Dict, List, TypedDict, cast
 
+# Number of questions required per topic (one each of easy, medium, hard).
+QUESTIONS_PER_TOPIC = 3
+
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     """Dict representation of certificate offering validation results."""
@@ -42,24 +45,28 @@ def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
 ) -> Dict[str, List[str]]:
     """Returns a mapping from topic ID to unique question IDs for its skills."""
+    # Build a deduplicated pool of question IDs per topic so we can detect
+    # both per-topic shortages and cross-topic overlap later in validation.
     topic_id_to_question_ids: Dict[str, List[str]] = {}
     for topic_id in topic_ids:
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise utils.ValidationError('Topic %s does not exist.' % topic_id)
+        try:
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
+        except Exception as e:
+            raise utils.ValidationError(
+                'Topic %s does not exist.' % topic_id
+            ) from e
 
-        question_ids = set()
+        question_ids: set[str] = set()
         for skill_id in topic.get_all_skill_ids():
-            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            skill = skill_fetchers.get_skill_by_id(skill_id)
             if skill is None:
                 continue
-            question_skill_links = (
-                question_services.get_question_skill_links_of_skill(
+            question_ids.update(
+                link.question_id
+                for link in question_services.get_question_skill_links_of_skill(
                     skill_id, skill.description
                 )
             )
-            for question_skill_link in question_skill_links:
-                question_ids.add(question_skill_link.question_id)
 
         topic_id_to_question_ids[topic_id] = sorted(question_ids)
     return topic_id_to_question_ids
@@ -67,33 +74,62 @@ def _get_topic_name_to_question_ids_map(
 
 def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     """Distributes questions over medium, easy and hard in a repeating cycle."""
+    # Spread required questions across difficulty buckets in a stable order so
+    # the validator can compare each bucket against the available pool.
     counts = {'easy': 0, 'medium': 0, 'hard': 0}
+    # Keep this order stable. We intentionally start with medium, then easy,
+    # then hard so the extra questions are biased toward the core mastery
+    # evidence and discrimination buckets instead of over-allocating easy
+    # questions.
     cycle = ['medium', 'easy', 'hard']
     for index in range(total_questions):
         counts[cycle[index % len(cycle)]] += 1
     return counts
 
 
+def _get_difficulty_label(skill_difficulty: float) -> str | None:
+    """Returns the certificate difficulty label for a linked skill difficulty."""
+    # Map persisted skill difficulty values into certificate buckets so the
+    # validator can count available questions per difficulty.
+    if skill_difficulty == 0.3:
+        return 'easy'
+    if skill_difficulty == 0.6:
+        return 'medium'
+    if skill_difficulty == 0.9:
+        return 'hard'
+    return None
+
+
 def _get_topic_validation_result(
-    available_questions: int, required_questions: int
+    available_questions_by_difficulty: Dict[str, int], required_questions: int
 ) -> Dict[str, Dict[str, int]]:
     """Returns the required/available breakdown for one topic."""
     required = _get_difficulty_counts(required_questions)
-    available = _get_difficulty_counts(available_questions)
     return {
         'easy': {
             'required': required['easy'],
-            'available': available['easy'],
+            'available': available_questions_by_difficulty['easy'],
         },
         'medium': {
             'required': required['medium'],
-            'available': available['medium'],
+            'available': available_questions_by_difficulty['medium'],
         },
         'hard': {
             'required': required['hard'],
-            'available': available['hard'],
+            'available': available_questions_by_difficulty['hard'],
         },
     }
+
+
+def _get_distinct_question_ids(
+    topic_name_to_question_ids_map: Dict[str, List[str]],
+    topic_ids: List[str],
+) -> set[str]:
+    """Returns all distinct question IDs reachable from the selected topics."""
+    distinct_question_ids: set[str] = set()
+    for topic_id in topic_ids:
+        distinct_question_ids.update(topic_name_to_question_ids_map[topic_id])
+    return distinct_question_ids
 
 
 def validate_certificate_assessment_offering(
@@ -127,22 +163,80 @@ def validate_certificate_assessment_offering(
     message_parts: List[str] = []
     is_valid = True
 
+    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    if total_questions < expected_total_questions:
+        is_valid = False
+        message_parts.append(
+            'total_questions must be greater than or equal to %d '
+            '(%d per topic: easy, medium, hard) for %d topic(s).'
+            % (
+                expected_total_questions,
+                QUESTIONS_PER_TOPIC,
+                len(topic_ids),
+            )
+        )
+
+    distinct_question_ids = _get_distinct_question_ids(
+        topic_name_to_question_ids_map, topic_ids
+    )
+    if len(distinct_question_ids) < total_questions:
+        is_valid = False
+        message_parts.append(
+            'Only %d unique question(s) are available across the selected '
+            'topics, but %d are required without reusing questions.'
+            % (len(distinct_question_ids), total_questions)
+        )
+
     for index, topic_id in enumerate(topic_ids):
         required_questions = base_questions_per_topic + (
             1 if index < remainder else 0
         )
-        available_questions = len(topic_name_to_question_ids_map[topic_id])
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        available_question_ids_by_difficulty: Dict[str, set[str]] = {
+            'easy': set(),
+            'medium': set(),
+            'hard': set(),
+        }
+        if topic is not None:
+            for skill_id in topic.get_all_skill_ids():
+                skill = skill_fetchers.get_skill_by_id(skill_id)
+                if skill is None:
+                    continue
+                for (
+                    question_skill_link
+                ) in question_services.get_question_skill_links_of_skill(
+                    skill_id, skill.description
+                ):
+                    difficulty_label = _get_difficulty_label(
+                        question_skill_link.skill_difficulty
+                    )
+                    if difficulty_label is None:
+                        continue
+                    available_question_ids_by_difficulty[difficulty_label].add(
+                        question_skill_link.question_id
+                    )
+
+        available_questions_by_difficulty = {
+            difficulty: len(question_ids)
+            for difficulty, question_ids in available_question_ids_by_difficulty.items()
+        }
         validation_result = _get_topic_validation_result(
-            available_questions, required_questions
+            available_questions_by_difficulty, required_questions
         )
         validation_errors[topic_id] = validation_result
-        if available_questions < required_questions:
+        if not (
+            available_questions_by_difficulty['easy']
+            >= validation_result['easy']['required']
+            and available_questions_by_difficulty['medium']
+            >= validation_result['medium']['required']
+            and available_questions_by_difficulty['hard']
+            >= validation_result['hard']['required']
+        ):
             is_valid = False
-            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
             topic_name = topic.name if topic is not None else topic_id
             message_parts.append(
-                '%s needs %d unique questions but only %d are available.'
-                % (topic_name, required_questions, available_questions)
+                '%s does not have enough questions in every difficulty bucket.'
+                % topic_name
             )
 
     validation_message = (
@@ -155,6 +249,12 @@ def validate_certificate_assessment_offering(
         'validation_errors': validation_errors,
         'validation_message': validation_message,
     }
+
+
+class CertificateAssessmentOfferingNotFoundException(Exception):
+    """Exception raised when a certificate assessment offering is missing."""
+
+    pass
 
 
 def _model_to_domain(
@@ -205,26 +305,7 @@ def create_certificate_assessment_offering(
     Returns:
         CertificateAssessmentOffering. The created certificate assessment
         offering.
-
-    Raises:
-        ValidationError. The provided offering data is invalid.
     """
-    # TODO(#24717-M1.14): Re-enable classroom and topic existence checks once the
-    # frontend create flow sends real classroom/topic selections instead of
-    # temporary hardcoded stub values.
-
-    # Classroom = classroom_config_services.get_classroom_by_id(classroom_id)
-    # if classroom is None:
-    #     raise Exception('classroom_id must correspond to an existing classroom.')
-
-    # For topic_id in topic_ids:
-    #     topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-    #     if topic is None:
-    #         raise Exception('topic_ids must refer to existing topics.')
-    #     if topic_id not in classroom.get_topic_ids():
-    #         raise Exception(
-    #             'topic_ids must belong to the specified classroom.'
-    #         )
 
     certificate_assessment_offering = (
         certificate_assessment_domain.CertificateAssessmentOffering(
@@ -273,13 +354,14 @@ def get_certificate_assessment_offering(
         with the given ID.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist.
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
     )
     if certificate_assessment_offering_model is None:
-        raise utils.ValidationError(
+        raise CertificateAssessmentOfferingNotFoundException(
             'Certificate assessment offering %s does not exist.'
             % certificate_id
         )
@@ -319,14 +401,15 @@ def update_certificate_assessment_offering(
         offering.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist.
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
         ValidationError. The provided offering data is invalid.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
     )
     if certificate_assessment_offering_model is None:
-        raise utils.ValidationError(
+        raise CertificateAssessmentOfferingNotFoundException(
             'Certificate assessment offering %s does not exist.'
             % certificate_id
         )
@@ -378,13 +461,14 @@ def delete_certificate_assessment_offering(certificate_id: str) -> None:
         certificate_id: str. The ID of the certificate assessment offering.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist.
+        CertificateAssessmentOfferingNotFoundException. The certificate
+            assessment offering does not exist.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
     )
     if certificate_assessment_offering_model is None:
-        raise utils.ValidationError(
+        raise CertificateAssessmentOfferingNotFoundException(
             'Certificate assessment offering %s does not exist.'
             % certificate_id
         )

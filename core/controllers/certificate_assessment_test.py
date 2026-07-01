@@ -19,7 +19,7 @@ from __future__ import annotations
 from unittest import mock
 
 from core import feconf, utils
-from core.domain import certificate_assessment_services
+from core.domain import certificate_assessment_services, topic_fetchers
 from core.tests import test_utils
 
 
@@ -298,16 +298,14 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
-
         response = self.delete_json(
             feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
                 '<certificate_id>', created_offering.certificate_id
             )
         )
-
         self.assertEqual(response, {})
         with self.assertRaisesRegex(
-            utils.ValidationError,
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException,
             'Certificate assessment offering .* does not exist.',
         ):
             certificate_assessment_services.get_certificate_assessment_offering(
@@ -321,3 +319,44 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             ),
             expected_status_int=404,
         )
+
+
+class ValidateCertificateAssessmentOfferingHandlerTest(
+    test_utils.GenericTestBase
+):
+    """Tests class for ValidateCertificateAssessmentOfferingHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, 'Place Values', abbreviated_name='place_values'
+        )
+
+    def test_post_returns_validation_result_for_valid_offering(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            {
+                'topic_ids': [self.topic_id],
+                'total_questions': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertIn('is_valid', response)
+        self.assertIn('validation_errors', response)
+        self.assertIn('validation_message', response)
+
+    def test_post_returns_invalid_result_for_insufficient_questions(
+        self,
+    ) -> None:
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            {
+                'topic_ids': [self.topic_id],
+                'total_questions': 1,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertFalse(response['is_valid'])

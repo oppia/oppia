@@ -17,6 +17,7 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
+import {Direction} from '@angular/cdk/bidi';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {TranslateCacheService} from 'ngx-translate-cache';
@@ -36,8 +37,8 @@ import {LanguageBannerService} from 'components/language-banner/language-banner.
   providedIn: 'root',
 })
 export class I18nService {
-  private _directionChangeEventEmitter: EventEmitter<string> =
-    new EventEmitter<string>();
+  private _directionChangeEventEmitter: EventEmitter<Direction> =
+    new EventEmitter<Direction>();
 
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   url!: URL;
@@ -62,7 +63,7 @@ export class I18nService {
         [languageInfo.id]: languageInfo.direction,
       })
     )
-  );
+  ) as Record<string, Direction>;
 
   constructor(
     private documentAttributeCustomizationService: DocumentAttributeCustomizationService,
@@ -92,21 +93,24 @@ export class I18nService {
       const cookieSetDateMsecs = this.cookieService.get(
         this.COOKIE_NAME_COOKIES_ACKNOWLEDGED
       );
-      const langDirection = this.i18nLanguageCodeService.isLanguageRTL(code)
-        ? 'rtl'
-        : 'ltr';
-      let prevLangDirection = this.i18nLanguageCodeService.isLanguageRTL(
-        this.i18nLanguageCodeService.prevLangCode
-      )
-        ? 'rtl'
-        : 'ltr';
+      const langDirection: Direction =
+        this.i18nLanguageCodeService.isLanguageRTL(code) ? 'rtl' : 'ltr';
+      let prevLangDirection: Direction =
+        this.i18nLanguageCodeService.isLanguageRTL(
+          this.i18nLanguageCodeService.prevLangCode
+        )
+          ? 'rtl'
+          : 'ltr';
       this.translateService.use(code);
       this.documentAttributeCustomizationService.addAttribute('lang', code);
       if (
         !!cookieSetDateMsecs &&
         +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
       ) {
-        prevLangDirection = this.cookieService.get('dir') || prevLangDirection;
+        const cookieDirection = this.cookieService.get('dir');
+        if (cookieDirection === 'ltr' || cookieDirection === 'rtl') {
+          prevLangDirection = cookieDirection;
+        }
         this.cookieService.put('dir', langDirection);
         this.cookieService.put('lang', code);
         if (prevLangDirection !== langDirection) {
@@ -225,11 +229,11 @@ export class I18nService {
     this.languageBannerService.markLanguageBannerAsDismissed();
   }
 
-  private _updateDirection(newDirection: string): void {
+  private _updateDirection(newDirection: Direction): void {
     this._directionChangeEventEmitter.emit(newDirection);
   }
 
-  get directionChangeEventEmitter(): EventEmitter<string> {
+  get directionChangeEventEmitter(): EventEmitter<Direction> {
     return this._directionChangeEventEmitter;
   }
 }

@@ -50,6 +50,20 @@ describe('Edit Certificate Offering Page Component', () => {
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let ngbModal: NgbModal;
   let router: Router;
+  const alertsServiceMock = {
+    addWarning: () => {},
+    addSuccessMessage: () => {},
+  } as Pick<AlertsService, 'addWarning' | 'addSuccessMessage'>;
+  const certificateAssessmentOfferingBackendApiServiceMock = {
+    getCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
+    updateCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve('certificate_offering_id'),
+  } as Pick<
+    CertificateAssessmentOfferingBackendApiService,
+    | 'getCertificateAssessmentOfferingAsync'
+    | 'updateCertificateAssessmentOfferingAsync'
+  >;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -67,19 +81,11 @@ describe('Edit Certificate Offering Page Component', () => {
         },
         {
           provide: AlertsService,
-          useValue: {
-            addWarning: () => {},
-            addSuccessMessage: () => {},
-          },
+          useValue: alertsServiceMock,
         },
         {
           provide: CertificateAssessmentOfferingBackendApiService,
-          useValue: {
-            getCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
-            updateCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve('certificate_offering_id'),
-          },
+          useValue: certificateAssessmentOfferingBackendApiServiceMock,
         },
         {
           provide: NgbModal,
@@ -129,9 +135,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'getCertificateAssessmentOfferingAsync'
-    ).and.returnValue(
-      Promise.resolve(CertificateAssessmentOfferingData.createEmpty())
-    );
+    ).and.resolveTo(CertificateAssessmentOfferingData.createEmpty());
 
     component.populateCertificateAssessmentOfferingFromId();
     flushMicrotasks();
@@ -158,7 +162,7 @@ describe('Edit Certificate Offering Page Component', () => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'getCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve(fetchedOffering));
+    ).and.resolveTo(fetchedOffering);
 
     component.populateCertificateAssessmentOfferingFromId();
     flushMicrotasks();
@@ -258,7 +262,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
@@ -297,7 +301,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
     const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
@@ -326,7 +330,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
     spyOn(ngbModal, 'open').and.returnValue({

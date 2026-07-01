@@ -34,9 +34,9 @@
       <thead>
         <tr>
           <th scope="col">Topic Name</th>
-          <th scope="col">Easy</th>
-          <th scope="col">Medium</th>
-          <th scope="col">Hard</th>
+          <th scope="col">Easy Available / Required</th>
+          <th scope="col">Medium Available / Required</th>
+          <th scope="col">Hard Available / Required</th>
           <th scope="col">Total Questions</th>
           <th scope="col">Status</th>
         </tr>
@@ -47,17 +47,16 @@
 
           <td>{{ row.topicName }}</td>
 
-          <td [class.oppia-certificate-review-cell--fail]="
-              !row.easySufficient">
-            {{ row.easy }}
+          <td [class.oppia-certificate-review-cell--fail]="!row.easySufficient">
+            {{ row.easyAvailable }} / {{ row.easyRequired }}
           </td>
 
           <td [class.oppia-certificate-review-cell--fail]="!row.mediumSufficient">
-            {{ row.medium }}
+            {{ row.mediumAvailable }} / {{ row.mediumRequired }}
           </td>
 
           <td [class.oppia-certificate-review-cell--fail]="!row.hardSufficient">
-            {{ row.hard }}
+            {{ row.hardAvailable }} / {{ row.hardRequired }}
           </td>
 
           <td>{{ row.totalQuestions }}</td>

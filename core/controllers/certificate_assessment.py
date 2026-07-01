@@ -30,7 +30,22 @@ class CertificateAssessmentOfferingTopicDict(TypedDict):
 
 
 class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of CertificateAssessmentOfferingHandler payload."""
+    """Dict representation of CertificateAssessmentOfferingHandler payload.
+
+    Attributes:
+        title: Title of the certificate assessment offering.
+        description: Description of the certificate assessment offering.
+        classroom_id: ID of the classroom the assessment offering belongs to.
+        topics: List of topics covered in the assessment offering.
+        total_questions: Total number of questions in the assessment.
+        time_limit_in_minutes: Time limit for completing the assessment, in
+            minutes.
+        demonstrates: List of plain-text strings describing what the
+            certificate demonstrates (e.g. skills or competencies earned
+            upon completion).
+        async_status: Availability status of the assessment offering,
+            indicating whether it is available, blocked, or not yet ready.
+    """
 
     title: str
     description: str
@@ -79,12 +94,23 @@ class ValidateCertificateAssessmentOfferingHandler(
     @acl_decorators.can_access_certificate_dashboard
     def post(self) -> None:
         """Validates the selected topics and total question count."""
-        assert self.normalized_payload is not None
+        payload = self._get_validation_payload()
+        topic_ids = payload['topic_ids']
+        total_questions = payload['total_questions']
+
         validation_result = certificate_assessment_services.validate_certificate_assessment_offering(
-            topic_ids=self.normalized_payload['topic_ids'],
-            total_questions=self.normalized_payload['total_questions'],
+            topic_ids=topic_ids,
+            total_questions=total_questions,
         )
         self.render_json(validation_result)
+
+    def _get_validation_payload(
+        self,
+    ) -> ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict:
+        """Returns a fully populated validation payload for graceful fallback."""
+        if self.normalized_payload is None:
+            return {'topic_ids': [], 'total_questions': 0}
+        return self.normalized_payload
 
 
 class CertificateAssessmentOfferingHandler(
@@ -159,6 +185,7 @@ class CertificateAssessmentOfferingHandler(
             topic['topic_id'] for topic in self.normalized_payload['topics']
         ]
         total_questions = int(self.normalized_payload['total_questions'])
+
         time_limit_in_minutes = int(
             self.normalized_payload['time_limit_in_minutes']
         )
@@ -241,7 +268,9 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 certificate_id
             )
-        except utils.ValidationError as e:
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json(
             {
@@ -267,6 +296,7 @@ class CertificateAssessmentOfferingByIdHandler(
             topic['topic_id'] for topic in self.normalized_payload['topics']
         ]
         total_questions = int(self.normalized_payload['total_questions'])
+
         time_limit_in_minutes = int(
             self.normalized_payload['time_limit_in_minutes']
         )
@@ -283,10 +313,12 @@ class CertificateAssessmentOfferingByIdHandler(
                 demonstrates=demonstrates,
                 async_status=self.normalized_payload['async_status'],
             )
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
+            raise self.NotFoundException(str(e)) from e
         except utils.ValidationError as e:
-            if 'does not exist.' in str(e):
-                raise self.NotFoundException(str(e)) from e
-            raise self.InvalidInputException(e)
+            raise self.InvalidInputException(e) from e
         self.render_json(
             {'certificate_id': certificate_offering.certificate_id}
         )
@@ -302,6 +334,8 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_assessment_services.delete_certificate_assessment_offering(
                 certificate_id
             )
-        except utils.ValidationError as e:
+        except (
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
+        ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json({})

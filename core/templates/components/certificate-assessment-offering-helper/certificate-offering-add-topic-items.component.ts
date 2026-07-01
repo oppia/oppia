@@ -71,12 +71,12 @@ export class CertificateOfferingAddTopicItemsComponent
   ) {}
 
   ngOnInit(): void {
-    void this.loadTopicsForClassroom();
+    this.loadTopicsForClassroom();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.classroomId && !changes.classroomId.firstChange) {
-      void this.loadTopicsForClassroom();
+      this.loadTopicsForClassroom();
     }
     if (changes.certificateAssessmentOffering) {
       this.syncSelectedFromOffering();
