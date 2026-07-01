@@ -76,6 +76,12 @@ const gotItButtonSelector = '.e2e-test-learner-got-it-button';
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
 const profileContainerSelector = '.e2e-test-profile-container';
+const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
+const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
+const chapterTitleSelector = '.e2e-test-chapter-title';
+const loginPromptContainer = '.story-viewer-login-container';
+const topicNameSelector = '.e2e-test-topic-name';
+const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -663,6 +669,121 @@ export class LoggedOutUser extends BaseUser {
 
     await this.page.keyboard.press('Enter');
     await this.page.waitForNavigation({waitUntil: 'load'});
+  }
+
+  /**
+   * Selects and opens a topic by its name.
+   * @param {string} topicName - The name of the topic to select and open.
+   */
+  async selectAndOpenTopic(topicName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(topicNameSelector);
+      const topicNames = await this.page.$$(topicNameSelector);
+      for (const name of topicNames) {
+        const nameText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          name
+        );
+        if (nameText === topicName.trim()) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: 'networkidle'}),
+            this.waitForElementToBeClickable(name),
+            name.click(),
+          ]);
+
+          await this.expectElementToBeVisible(topicViewerContainerSelector);
+          showMessage(`Topic ${topicName} is opened successfully.`);
+          return;
+        }
+      }
+
+      throw new Error(`Topic "${topicName}" not found in topic names.`);
+    } catch (error) {
+      const newError = new Error(`Failed to select and open topic: ${error}`);
+      newError.stack = error instanceof Error ? error.stack : newError.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and opens a chapter within a story to learn.
+   * @param {string} storyName - The name of the story containing the chapter.
+   * @param {string} chapterName - The name of the chapter to select and open.
+   */
+  async selectChapterWithinStoryToLearn(
+    storyName: string,
+    chapterName: string
+  ): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const storyTitleSelector = isMobileViewport
+      ? mobileStoryTitleSelector
+      : desktopStoryTitleSelector;
+
+    try {
+      await this.page.waitForSelector(storyTitleSelector);
+      const storyTitles = await this.page.$$(storyTitleSelector);
+      for (const title of storyTitles) {
+        const titleText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          title
+        );
+        if (titleText.trim() === storyName.trim()) {
+          await this.waitForElementToBeClickable(title);
+          await title.click();
+          await this.page.waitForSelector(chapterTitleSelector);
+
+          await this.skipLoginPrompt();
+
+          await this.page.waitForSelector(chapterTitleSelector);
+          const chapterTitles = await this.page.$$(chapterTitleSelector);
+          for (const chapter of chapterTitles) {
+            const chapterText = await this.page.evaluate(
+              el => el.textContent.trim(),
+              chapter
+            );
+            if (chapterText.trim().includes(chapterName.trim())) {
+              await this.waitForElementToBeClickable(chapter);
+              await chapter.click();
+
+              await this.expectPageURLToContain(
+                testConstants.URLs.ExplorationPlayer
+              );
+              showMessage(`Chapter ${chapterName} is opened successfully.`);
+              return;
+            }
+          }
+
+          throw new Error(
+            `Chapter "${chapterName}" not found in story "${storyName}".`
+          );
+        }
+      }
+
+      throw new Error(`Story "${storyName}" not found in story titles.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to select and open chapter within story: ${error}`
+      );
+      newError.stack = error instanceof Error ? error.stack : newError.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Function to skip the login prompt that appears while surfing being logged out.
+   */
+  async skipLoginPrompt(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+
+    const isLoginPromptContainerPresent =
+      await this.page.$(loginPromptContainer);
+    if (isLoginPromptContainerPresent) {
+      await this.clickOnElementWithText('SKIP');
+    }
+
+    await this.page.waitForSelector(loginPromptContainer, {
+      state: 'hidden',
+    });
   }
 
   /**

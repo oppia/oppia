@@ -99,3 +99,50 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             offerings[0].certificate_id, created_offering.certificate_id
         )
         self.assertEqual(offerings[0].title, 'Geography Essentials')
+
+    def test_get_update_and_delete_certificate_assessment_offering(
+        self,
+    ) -> None:
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Biology Basics',
+            description='Covers cells and ecosystems.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=6,
+            time_limit_in_minutes=30,
+            demonstrates=['Living systems'],
+            async_status='Available',
+        )
+
+        fetched_offering = (
+            certificate_assessment_services.get_certificate_assessment_offering(
+                created_offering.certificate_id
+            )
+        )
+        self.assertEqual(fetched_offering.title, 'Biology Basics')
+
+        updated_offering = certificate_assessment_services.update_certificate_assessment_offering(
+            certificate_id=created_offering.certificate_id,
+            title='Biology Advanced',
+            description='Covers cells, ecosystems and genetics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=8,
+            time_limit_in_minutes=40,
+            demonstrates=['Living systems'],
+            async_status='Blocked',
+        )
+        self.assertEqual(updated_offering.title, 'Biology Advanced')
+        self.assertEqual(updated_offering.version, 2)
+
+        certificate_assessment_services.delete_certificate_assessment_offering(
+            created_offering.certificate_id
+        )
+
+        with self.assertRaisesRegex(
+            certificate_assessment_services.CertificateAssessmentOfferingNotFoundException,
+            'Certificate assessment offering .* does not exist.',
+        ):
+            certificate_assessment_services.get_certificate_assessment_offering(
+                created_offering.certificate_id
+            )
