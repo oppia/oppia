@@ -18,11 +18,10 @@
 
 from __future__ import annotations
 
-
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Final, List, Literal, Optional, Sequence, Union
+from typing import Dict, List, Literal, Optional, Sequence, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
