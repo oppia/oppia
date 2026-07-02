@@ -928,17 +928,19 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
     def test_save_machine_translation_provider_mapping_creates_new_model(
         self,
     ) -> None:
-        new_mapping = {'es': 'gcp'}
+        new_translation_provider_mapping = {'es': 'gcp'}
         with self.swap_get_file_contents:
             translation_services.save_machine_translation_provider_mapping(
-                new_mapping
+                new_translation_provider_mapping
             )
 
         model = translation_models.MachineTranslationPolicyModel.get(
             self.POLICY_ID
         )
         self.assertFalse(model.automatic_translation_is_enabled)
-        self.assertEqual(model.language_to_provider_mapping, new_mapping)
+        self.assertEqual(
+            model.language_to_provider_mapping, new_translation_provider_mapping
+        )
 
     def test_save_machine_translation_provider_mapping_updates_existing(
         self,
@@ -949,17 +951,19 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
             language_to_provider_mapping={'hi': 'azure'},
         ).put()
 
-        new_mapping = {'hi': 'azure', 'es': 'gcp'}
+        new_translation_provider_mapping = {'hi': 'azure', 'es': 'gcp'}
         with self.swap_get_file_contents:
             translation_services.save_machine_translation_provider_mapping(
-                new_mapping
+                new_translation_provider_mapping
             )
 
         model = translation_models.MachineTranslationPolicyModel.get(
             self.POLICY_ID
         )
         self.assertTrue(model.automatic_translation_is_enabled)
-        self.assertEqual(model.language_to_provider_mapping, new_mapping)
+        self.assertEqual(
+            model.language_to_provider_mapping, new_translation_provider_mapping
+        )
 
     def test_save_machine_translation_provider_mapping_raises_error(
         self,

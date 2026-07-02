@@ -597,6 +597,8 @@ SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
+# The email address for the translation technical support group.
+TRANSLATION_TECH_SUPPORT_EMAIL = 'translations-tech-support@oppia.org'
 CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).

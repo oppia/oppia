@@ -48,7 +48,7 @@ class TranslationProviderRegistry:
     def __init__(self) -> None:
         """Initializes the TranslationProviderRegistry."""
 
-        # assets/auto_trans_provider_mapping.json is the developer-controlled
+        # assets/auto_translation_provider_mapping.json is the developer-controlled
         # whitelist defining which translation providers technically support
         # which language codes. It controls what the system is CAPABLE of
         # translating, not what is actively enabled at runtime. Runtime
@@ -81,7 +81,9 @@ class TranslationProviderRegistry:
         # in sync.
 
         self._provider_whitelist: Dict[str, list[str]] = json.loads(
-            utils.get_file_contents('assets/auto_trans_provider_mapping.json')
+            utils.get_file_contents(
+                'assets/auto_translation_provider_mapping.json'
+            )
         )
 
         self._providers: Dict[
@@ -169,7 +171,7 @@ def generate_and_cache_translation(
     if not provider_instance:
         return None
 
-    protected_html = html_translation_services.protect_html_for_translation(
+    protected_html = html_translation_services.preprocess_html_for_translation(
         source_text
     )
 

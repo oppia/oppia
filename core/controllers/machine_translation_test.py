@@ -232,7 +232,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
 
         domain_swap = self.swap(
             machine_translation_services,
-            'update_translation_provider_mapping',
+            'save_translation_provider_mapping',
             mock_update_mapping,
         )
 
@@ -256,7 +256,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
 
         domain_swap = self.swap(
             machine_translation_services,
-            'update_translation_provider_mapping',
+            'save_translation_provider_mapping',
             mock_update_mapping_fails,
         )
 

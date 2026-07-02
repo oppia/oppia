@@ -3413,8 +3413,8 @@ def send_emails_to_voiceover_tech_leads(
 def send_machine_translation_failure_email(
     provider_id: str, error_message: str
 ) -> None:
-    """Sends an email to the admin when the machine translation
-    API fails (e.g., due to quota exhaustion or timeouts).
+    """Sends an email to the translation tech support team when the machine
+    translation API fails (e.g., due to quota exhaustion or timeouts).
 
     Args:
         provider_id: str. The ID of the provider that failed (e.g., 'azure').
@@ -3426,9 +3426,18 @@ def send_machine_translation_failure_email(
 
     email_body = (
         'The machine translation API for provider "%s" has failed.\n\n'
-        'Error Details:\n%s\n\n'
-        'Please check the translation service quotas and API status.'
-        % (provider_id, error_message)
-    )
+        'How to resolve this:\n'
+        '- Check the cloud console to ensure quotas have not been exhausted.\n'
+        '- Verify that the billing account is active and in good standing.\n'
+        '- If the above steps do not resolve the issue, please forward this '
+        'email to the engineering team for technical support.\n\n'
+        'Error Details for Engineering:\n'
+        '%s\n'
+    ) % (provider_id, error_message)
 
-    send_mail_to_admin(email_subject, email_body)
+    email_services.send_mail(
+        feconf.SYSTEM_EMAIL_ADDRESS,
+        feconf.TRANSLATION_TECH_SUPPORT_EMAIL,
+        email_subject,
+        email_body,
+    )

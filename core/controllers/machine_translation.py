@@ -48,7 +48,7 @@ class MachineTranslationGenerateHandler(
         }
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_admin_page
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
 
@@ -67,9 +67,13 @@ class MachineTranslationGenerateHandler(
         # to verify the user holds the new "translation submitter" role before
         # allowing them to trigger paid Azure API calls.
 
-        source_text = self.payload.get('source_text')
-        source_language_code = self.payload.get('source_language_code')
-        target_language_code = self.payload.get('target_language_code')
+        source_text = self.normalized_payload.get('source_text')
+        source_language_code = self.normalized_payload.get(
+            'source_language_code'
+        )
+        target_language_code = self.normalized_payload.get(
+            'target_language_code'
+        )
 
         try:
             translation_result = (
@@ -97,8 +101,8 @@ class MachineTranslationGenerateHandler(
 
 
 class TranslationProviderMappingHandler(
-    # Here we use type Any because the request and response
-    # payloads handle dynamic translation provider mappings.
+    # Here we use type Any because the request and response payloads
+    # handle dynamic translation provider mappings.
     base.BaseHandler[Dict[str, Any], Dict[str, Any]]
 ):
     """Handler for fetching and updating the translation provider mapping."""
@@ -110,18 +114,10 @@ class TranslationProviderMappingHandler(
     # nested types for validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
         'GET': {},
-        'PUT': {
-            'provider_mapping': {
-                'schema': {
-                    'type': 'dict',
-                    'keys': {'type': 'unicode'},
-                    'values': {'type': 'unicode'},
-                }
-            }
-        },
+        'PUT': {'provider_mapping': {'schema': {'type': 'object_dict'}}},
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Handles GET requests to fetch the current language-to-provider mapping."""
 
@@ -131,7 +127,7 @@ class TranslationProviderMappingHandler(
         ):
             raise self.NotFoundException()
 
-        # TODO(#24714): In Milestone 2 (PR 2.1), replace open_access with strict
+        # TODO(#24714): In Milestone 2 (PR 2.1), replace can_access_admin_page with strict
         # role-based access control to verify the user is a Translation Admin.
 
         mapping = (
@@ -140,7 +136,7 @@ class TranslationProviderMappingHandler(
 
         self.render_json({'provider_mapping': mapping})
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_admin_page
     def put(self) -> None:
         """Handles PUT requests to update the language-to-provider mapping."""
 
@@ -150,14 +146,16 @@ class TranslationProviderMappingHandler(
         ):
             raise self.NotFoundException()
 
-        # TODO(#24714): In Milestone 2 (PR 2.1), replace open_access with strict
+        # TODO(#24714): In Milestone 2 (PR 2.1), replace can_access_admin_page with strict
         # role-based access control to verify the user is a Translation Admin.
 
-        new_mapping = self.payload.get('provider_mapping')
+        new_translation_provider_mapping = self.normalized_payload.get(
+            'provider_mapping'
+        )
 
         try:
             machine_translation_services.save_translation_provider_mapping(
-                new_mapping
+                new_translation_provider_mapping
             )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
