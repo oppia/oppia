@@ -249,7 +249,7 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
 class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether created_on and last_updated timestamps are valid."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: base_models.BaseModel
     ) -> Iterator[  # pylint: disable=arguments-differ
         Union[
@@ -404,7 +404,7 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
             'class. It should be implemented in the derived class.'
         )
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: ModelInstanceType
     ) -> Iterator[  # pylint: disable=arguments-differ
         Union[
