@@ -31,7 +31,7 @@ export class CopierComponent {
   @Input() initArgs!: SchemaDefaultValue;
   @Input() objType!: string;
   @Input() customizationArgs!: {
-    value: string;
+    value: SchemaDefaultValue;
     list_of_values: string[];
   };
 

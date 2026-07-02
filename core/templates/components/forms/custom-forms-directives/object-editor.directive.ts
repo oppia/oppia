@@ -147,7 +147,7 @@ interface AngularJSFormController {
 }
 
 interface ObjectEditor<T = SchemaDefaultValue> {
-  alwaysEditable?: string;
+  alwaysEditable?: boolean;
   initArgs?: SchemaDefaultValue;
   isEditable?: string;
   modalId?: symbol;
@@ -184,7 +184,7 @@ export class ObjectEditorComponent
     Validator
 {
   private _value!: SchemaDefaultValue;
-  @Input() alwaysEditable!: string;
+  @Input() alwaysEditable!: boolean;
   @Input() initArgs!: SchemaDefaultValue;
   @Input() isEditable!: string;
   @Input() modalId!: symbol;
