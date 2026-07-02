@@ -267,7 +267,7 @@ export class FeedbackModalComponent implements OnInit {
       !this.captchaToken
     ) {
       this.captchaSubmitError = this.translateService.instant(
-        'I18N_LESSON_FEEDBACK_CAPTCHA_REQUIRED'
+        'I18N_FEEDBACK_CAPTCHA_REQUIRED'
       );
       return false;
     }

@@ -1139,7 +1139,7 @@ describe('FeedbackModalComponent', () => {
     component.submit();
     tick();
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_LESSON_FEEDBACK_CAPTCHA_REQUIRED'
+      'I18N_FEEDBACK_CAPTCHA_REQUIRED'
     );
     expect(alertService.addSuccessMessage).not.toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();
