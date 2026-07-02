@@ -96,7 +96,7 @@ test.describe('Logged-In Learner', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
