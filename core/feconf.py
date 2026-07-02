@@ -1703,7 +1703,7 @@ CONTRIBUTION_SUBTYPE_COORDINATE: Final = 'coordinate'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
-TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
+TRANSLATION_TEAM_LEAD = 'Aanuoluwapo Adeoti'
 QUESTION_TEAM_LEAD = 'Ryan Hsiao'
 
 # Suggestion fields that can be queried.

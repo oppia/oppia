@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import re
 
@@ -103,6 +104,7 @@ EXCLUDED_PATHS: Final = (
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
     'core/tests/puppeteer-acceptance-tests/data/*',
+    'core/tests/playwright-acceptance-tests/data/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
 )
 
@@ -712,6 +714,95 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    def check_modal_component_patterns(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that modal components follow the standardized pattern.
+
+        This ensures:
+        1. Files using NgbActiveModal must also use MatBottomSheetRef to
+           provide a mobile-friendly bottom sheet view.
+        2. Calls to ngbModal.open() must include backdrop: 'static'
+           to prevent closing the modal when clicking outside.
+        """
+        name = 'Modal component pattern'
+        error_messages: List[str] = []
+        failed = False
+
+        # Load allowlist once before the loop.
+        allowlist_path = os.path.join(
+            os.path.dirname(__file__), 'modal_allowlist.json'
+        )
+        with open(allowlist_path, 'r', encoding='utf-8') as f:
+            allowlist = json.load(f)
+
+        for filepath in self.all_filepaths:
+            if not filepath.endswith('.ts'):
+                continue
+            # Skip test/spec files since they mock modal behavior.
+            if filepath.endswith('.spec.ts'):
+                continue
+
+            if filepath in allowlist:
+                continue
+
+            file_content = self.file_cache.read(filepath)
+
+            # Remove comments to avoid false positives.
+            file_content_without_comments = re.sub(
+                r'//.*?\n|/\*.*?\*/', '', file_content, flags=re.DOTALL
+            )
+
+            # Check 1: Modal Components (inject NgbActiveModal)
+            if bool(
+                re.search(r'\bNgbActiveModal\b', file_content_without_comments)
+            ) and not bool(
+                re.search(
+                    r'\bMatBottomSheetRef\b', file_content_without_comments
+                )
+            ):
+                failed = True
+                error_messages.append(
+                    '%s --> Modal components using NgbActiveModal must also '
+                    'use MatBottomSheetRef to provide a mobile-friendly '
+                    'bottom sheet view.' % filepath
+                )
+
+            # Check 2: Opener Components (call ngbModal.open)
+            modal_open_matches = re.findall(
+                r'\bngbModal\.open\b', file_content_without_comments
+            )
+            if modal_open_matches:
+                if not bool(
+                    re.search(
+                        r'\bMatBottomSheet\b', file_content_without_comments
+                    )
+                ):
+                    failed = True
+                    error_messages.append(
+                        '%s --> Components opening modals with ngbModal.open '
+                        'must also use MatBottomSheet to support mobile '
+                        'views.' % filepath
+                    )
+
+                # Check 3: Backdrop static.
+                num_static_backdrops = len(
+                    re.findall(
+                        r'backdrop\s*:\s*[\'"]static[\'"]',
+                        file_content_without_comments,
+                    )
+                )
+                if len(modal_open_matches) > num_static_backdrops:
+                    failed = True
+                    error_messages.append(
+                        '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
+                        'to prevent closing on outside clicks.' % filepath
+                    )
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages
+        )
+
     def check_rte_component_config_ids(
         self,
     ) -> concurrent_task_utils.TaskResult:
@@ -812,6 +903,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             self.check_extra_js_files(),
             self.check_disallowed_flags(),
             self.check_rte_component_config_ids(),
+            self.check_modal_component_patterns(),
         ]
         return task_results
 

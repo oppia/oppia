@@ -250,6 +250,33 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should fetch skill opportunities with a search query', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchSkillOpportunitiesAsync('cursor', 'algebra')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/opportunitiessummaryhandler/<opportunityType>',
+        {opportunityType: 'skill'}
+      ) + '?cursor=cursor&search_query=algebra'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(skillOpportunityResponse);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      opportunities: sampleSkillOpportunitiesResponse,
+      nextCursor: skillOpportunityResponse.next_cursor,
+      more: skillOpportunityResponse.more,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it(
     'should fail to fetch the skill opportunities data ' +
       'given invalid cursor ' +
