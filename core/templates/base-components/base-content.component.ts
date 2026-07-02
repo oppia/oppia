@@ -46,6 +46,7 @@ export class BaseContentComponent {
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
   directiveSubscriptions = new Subscription();
+  isRtl: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -98,6 +99,12 @@ export class BaseContentComponent {
     this.windowRef.nativeWindow.document.addEventListener('click', () => {
       this.sidebarStatusService.onDocumentClick();
     });
+    this.isRtl = this.i18nLanguageCodeService.isCurrentLanguageRTL();
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.isRtl = this.i18nLanguageCodeService.isCurrentLanguageRTL();
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -105,7 +112,7 @@ export class BaseContentComponent {
   }
 
   isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+    return this.isRtl;
   }
 
   getHeaderText(): string {
