@@ -73,7 +73,7 @@ class MockAuditsExisting(validation_decorators.AuditsExisting):
 class DoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, unused_item: None
     ) -> None:  # pylint: disable=arguments-differ
         """Does nothing."""
@@ -87,7 +87,7 @@ class DoFn(beam.DoFn):  # type: ignore[misc]
 class UnrelatedDoFn(beam.DoFn):  # type: ignore[misc]
     """Simple DoFn that does nothing."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, unused_item: None
     ) -> None:  # pylint: disable=arguments-differ
         """Does nothing."""
