@@ -356,8 +356,13 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
         )
         handler.normalized_payload = None
 
+        # This directly exercises the fallback branch that is only reachable
+        # through the handler helper itself.
+        validation_payload = (
+            handler._get_validation_payload()  # pylint: disable=protected-access
+        )
         self.assertEqual(
-            handler._get_validation_payload(),
+            validation_payload,
             {
                 'topic_ids': [],
                 'total_questions': 0,
