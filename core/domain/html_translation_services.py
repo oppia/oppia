@@ -88,7 +88,7 @@ _CLEANUP_PATTERNS = [
 ]
 
 
-def protect_html_for_translation(source_html: str) -> str:
+def preprocess_html_for_translation(source_html: str) -> str:
     """Pre-processes HTML to protect Oppia components from the translation
     engine while exposing translatable attribute values as inline elements.
 
@@ -157,7 +157,7 @@ def protect_html_for_translation(source_html: str) -> str:
                 attr_val = tag.get(attr_name)
                 if attr_val is not None:
                     decoded = html_module.unescape(attr_val)
-                    protected_inner = protect_html_for_translation(decoded)
+                    protected_inner = preprocess_html_for_translation(decoded)
                     temp_div = soup.new_tag('div')
                     temp_div[_TEMP_DATA_COMP_ID] = comp_id
                     temp_div[_TEMP_DATA_ATTR_NAME] = attr_name
@@ -185,7 +185,7 @@ def protect_html_for_translation(source_html: str) -> str:
                             tag.insert_before(temp_span)
                         if 'content' in tab:
                             decoded = html_module.unescape(tab['content'])
-                            protected_inner = protect_html_for_translation(
+                            protected_inner = preprocess_html_for_translation(
                                 decoded
                             )
                             temp_div = soup.new_tag('div')
@@ -218,7 +218,7 @@ def protect_html_for_translation(source_html: str) -> str:
 
 
 def postprocess_translated_html(translated_html: str) -> str:
-    """Reverses protect_html_for_translation after the API call completes.
+    """Reverses preprocess_html_for_translation after the API call completes.
 
     Steps:
     1. Finds every temporary <span>/<div> by its data-temp-comp-id and data-temp-attr-name.
@@ -325,7 +325,7 @@ def postprocess_translated_html(translated_html: str) -> str:
     # html_cleaner.clean() reparses and serializes HTML, which causes
     # entities inside the tab_contents-with-value JSON attribute to be
     # double-escaped. Nested tab content has already been recursively
-    # postprocessed and cleaned, so return the result directly when tabs
+    # postprocessed and cleaned, so return result directly when tabs
     # are present.
     if 'tab_contents-with-value' in result:
         return result

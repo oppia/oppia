@@ -29,7 +29,7 @@ import bs4
 class HtmlTranslationServicesTests(test_utils.GenericTestBase):
     """Tests for HTML translation services."""
 
-    def test_empty_and_whitespace_strings(self) -> None:
+    def test_protect_html_with_empty_string_returns_empty_string(self) -> None:
         self.assertEqual(
             html_translation_services.protect_html_for_translation(''), ''
         )
@@ -40,7 +40,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             html_translation_services.postprocess_translated_html(''), ''
         )
 
-    def test_skip_components_receive_translate_no(self) -> None:
+    def test_protect_html_with_skip_components_adds_translate_no_attribute(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-math math_content-with-value="x²">'
             '</oppia-noninteractive-math>'
@@ -53,7 +55,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         result = html_translation_services.protect_html_for_translation(source)
         self.assertEqual(result.count('translate="no"'), 4)
 
-    def test_translatable_text_attrs_extracted_and_restored(self) -> None:
+    def test_process_html_with_translatable_text_attributes_extracts_and_restores_values(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-link url-with-value="https://oppia.org" '
             'text-with-value="Learn more"></oppia-noninteractive-link>'
@@ -69,7 +73,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('text-with-value="Learn more"', restored)
         self.assertNotIn('data-temp-comp-id', restored)
 
-    def test_image_alt_and_caption_extracted_and_restored(self) -> None:
+    def test_process_html_with_image_alt_and_caption_extracts_and_restores_values(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-image filepath-with-value="img.png" '
             'alt-with-value="A red car" caption-with-value="Figure 1">'
@@ -84,7 +90,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('alt-with-value="A red car"', restored)
         self.assertIn('caption-with-value="Figure 1"', restored)
 
-    def test_encoded_html_attrs_extracted_and_restored(self) -> None:
+    def test_process_html_with_encoded_html_attributes_extracts_and_restores_values(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-collapsible heading-with-value="Show" '
             'content-with-value="&lt;p&gt;Step 1&lt;/p&gt;">'
@@ -102,7 +110,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             'content-with-value="&lt;p&gt;Step 1&lt;/p&gt;"', restored
         )
 
-    def test_workedexample_extracted_and_restored(self) -> None:
+    def test_process_html_with_workedexample_extracts_and_restores_values(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-workedexample question-with-value="Q1" '
             'answer-with-value="&lt;p&gt;A1&lt;/p&gt;">'
@@ -117,7 +127,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('question-with-value="Q1"', restored)
         self.assertIn('answer-with-value="&lt;p&gt;A1&lt;/p&gt;"', restored)
 
-    def test_tabs_json_extracted_and_restored(self) -> None:
+    def test_process_html_with_tabs_json_extracts_and_restores_values(
+        self,
+    ) -> None:
         tabs = json.dumps(
             [
                 {'title': 'Hint', 'content': '&lt;p&gt;Try&lt;/p&gt;'},
@@ -142,7 +154,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('&lt;p&gt;Try&lt;/p&gt;', restored)
         self.assertIn('Hint 2', restored)
 
-    def test_tabs_with_invalid_json_is_skipped(self) -> None:
+    def test_protect_html_with_invalid_tabs_json_skips_processing(self) -> None:
         source = (
             '<oppia-noninteractive-tabs tab_contents-with-value="invalid">'
             '</oppia-noninteractive-tabs>'
@@ -161,7 +173,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         )
         self.assertIn('translate="no"', protected2)
 
-    def test_tabs_json_null_value_protects_whole_component(self) -> None:
+    def test_protect_html_with_tabs_json_null_value_adds_translate_no_attribute(
+        self,
+    ) -> None:
         # JSON null parses fine but raises TypeError when iterated over,
         # hitting the TypeError branch of the except clause.
         source = (
@@ -172,7 +186,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('translate="no"', result)
         self.assertNotIn('data-temp-attr-name', result)
 
-    def test_tabs_zero_count_produces_empty_json_array(self) -> None:
+    def test_postprocess_html_with_zero_tab_count_produces_empty_json_array(
+        self,
+    ) -> None:
         # The tab-title-0 span populates tabs_data["0"], entering the
         # reconstruction block. data-temp-tab-count="0" makes range(0) run
         # zero iterations, producing an empty JSON array.
@@ -187,7 +203,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('tab_contents-with-value="[]"', result)
         self.assertNotIn('data-temp-tab-count', result)
 
-    def test_orphaned_temp_tags_are_removed(self) -> None:
+    def test_postprocess_html_with_orphaned_temp_tags_removes_them(
+        self,
+    ) -> None:
         source = (
             '<span data-temp-comp-id="99" '
             'data-temp-attr-name="text-with-value">'
@@ -196,7 +214,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
 
-    def test_non_oppia_tag_with_data_temp_comp_id_skipped_in_comp_map(
+    def test_postprocess_html_with_non_oppia_tag_skips_processing(
         self,
     ) -> None:
         # The <p> has BOTH data-temp-comp-id and data-temp-attr-name, so it
@@ -211,7 +229,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertNotIn('data-temp-comp-id', result)
         self.assertNotIn('Orphan', result)
 
-    def test_translatable_text_attr_with_none_value_is_skipped(self) -> None:
+    def test_protect_html_with_none_value_translatable_text_attr_skips_processing(
+        self,
+    ) -> None:
         soup = bs4.BeautifulSoup(
             '<oppia-noninteractive-link></oppia-noninteractive-link>',
             'html.parser',
@@ -224,7 +244,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('data-temp-attr-name', protected)
 
-    def test_encoded_html_attr_with_none_value_is_skipped(self) -> None:
+    def test_protect_html_with_none_value_encoded_html_attr_skips_processing(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-collapsible>'
             '</oppia-noninteractive-collapsible>'
@@ -234,7 +256,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('data-temp-attr-name', protected)
 
-    def test_tabs_json_with_missing_title_or_content_is_handled(self) -> None:
+    def test_process_html_with_missing_tab_title_or_content_handles_gracefully(
+        self,
+    ) -> None:
         tabs = json.dumps(
             [
                 {'content': '&lt;p&gt;No Title&lt;/p&gt;'},
@@ -259,7 +283,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertIn('No Title', restored)
         self.assertIn('No Content', restored)
 
-    def test_postprocess_encoded_attr_with_none_tag_skips_gracefully(
+    def test_postprocess_html_with_none_tag_encoded_attr_skips_gracefully(
         self,
     ) -> None:
         source = (
@@ -270,7 +294,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
 
-    def test_postprocess_tabs_with_none_tag_skips_gracefully(self) -> None:
+    def test_postprocess_html_with_none_tag_tabs_skips_gracefully(self) -> None:
         source = (
             '<span data-temp-comp-id="99" '
             'data-temp-attr-name="tab-title-0">Title</span>'
@@ -278,7 +302,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
 
-    def test_tabs_with_json_type_error_is_skipped(self) -> None:
+    def test_protect_html_with_tabs_json_type_error_skips_processing(
+        self,
+    ) -> None:
         source = (
             '<oppia-noninteractive-tabs tab_contents-with-value="123">'
             '</oppia-noninteractive-tabs>'
