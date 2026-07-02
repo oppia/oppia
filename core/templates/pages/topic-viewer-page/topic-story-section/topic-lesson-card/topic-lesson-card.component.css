@@ -28,7 +28,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 16px;
   min-width: 0;
   padding: 24px 22px 18px;
 }
@@ -59,6 +59,13 @@
 .topic-lesson-card-progress {
   height: 24px;
   width: 296px;
+}
+
+.topic-lesson-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
 }
 
 .topic-lesson-card-progress oppia-checkpoint-bar {
@@ -94,6 +101,27 @@
   gap: 12px;
   justify-content: flex-start;
   width: 100%;
+}
+
+.topic-lesson-card-fallback-info-icon {
+  align-items: center;
+  color: #3d3d3d;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 22px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.topic-lesson-card-fallback-info-icon .material-icons {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.topic-lesson-language-selector {
+  flex: 0 1 auto;
 }
 
 .topic-lesson-card-info-icon {
@@ -161,6 +189,10 @@
     height: 24px;
     max-width: 296px;
     width: 100%;
+  }
+
+  .topic-lesson-card-footer {
+    gap: 10px;
   }
 
   .topic-lesson-card-start-button {
@@ -244,6 +276,10 @@
     align-items: stretch;
     flex-direction: column;
     justify-content: stretch;
+  }
+
+  .topic-lesson-card-fallback-info-icon {
+    align-self: flex-start;
   }
 
   .topic-lesson-language-selector-wrapper {

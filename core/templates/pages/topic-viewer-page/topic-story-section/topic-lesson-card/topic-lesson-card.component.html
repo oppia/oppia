@@ -10,38 +10,40 @@
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
     </div>
-    <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
-      <oppia-checkpoint-bar
-        [totalCheckpointsCount]="totalCheckpointsCount"
-        [visitedCheckpointsCount]="visitedCheckpointsCount"
-        [isReadOnly]="true">
-      </oppia-checkpoint-bar>
-    </div>
-    <oppia-language-selector
-      class="topic-lesson-language-selector"
-      *ngIf="shouldShowInfoIcon"
-      [availableTextLanguageCodes]="availableTextLanguageCodes"
-      [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
-      [availableVoiceoverLanguageAccentDescriptions]="availableVoiceoverLanguageAccentDescriptions"
-      [selectedTextLanguageCode]="selectedTextLanguageCode"
-      [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
-      (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
-      (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
-    </oppia-language-selector>
-    <div class="topic-lesson-card-actions">
-      <button class="topic-lesson-card-start-button"
-              type="button"
-              [disabled]="!startUrl"
-              (click)="onStartButtonClick()">
-        {{ 'I18N_TOPIC_VIEWER_START' | translate }}
-      </button>
-      <span
-        class="topic-lesson-card-fallback-info-icon"
-        *ngIf="shouldShowFallbackCta()"
-        [oppiaTooltip]="getFallbackInfoTooltipText()"
-        tabindex="0">
-        <i class="material-icons">info</i>
-      </span>
+    <div class="topic-lesson-card-footer">
+      <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
+        <oppia-checkpoint-bar
+          [totalCheckpointsCount]="totalCheckpointsCount"
+          [visitedCheckpointsCount]="visitedCheckpointsCount"
+          [isReadOnly]="true">
+        </oppia-checkpoint-bar>
+      </div>
+      <div class="topic-lesson-card-actions">
+        <span
+          class="topic-lesson-card-fallback-info-icon"
+          *ngIf="shouldShowFallbackCta()"
+          [matTooltip]="getFallbackInfoTooltipText()"
+          tabindex="0">
+          <i class="material-icons">info</i>
+        </span>
+        <topic-lesson-language-selector
+          class="topic-lesson-language-selector"
+          *ngIf="shouldShowInfoIcon"
+          [availableTextLanguageCodes]="availableTextLanguageCodes"
+          [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
+          [voiceoverLanguageAccentDescriptions]="availableVoiceoverLanguageAccentDescriptions"
+          [selectedTextLanguageCode]="selectedTextLanguageCode"
+          [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
+          (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
+          (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
+        </topic-lesson-language-selector>
+        <button class="topic-lesson-card-start-button"
+                type="button"
+                [disabled]="!startUrl"
+                (click)="onStartButtonClick()">
+          {{ 'I18N_TOPIC_VIEWER_START' | translate }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

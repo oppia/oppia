@@ -17,7 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -38,6 +38,23 @@ class MockWindowRef {
 
 describe('TopicLessonCardComponent', () => {
   let component: TopicLessonCardComponent;
+  let componentRef: {
+    isVoiceoverCompatibleWithTextLanguage: (
+      voiceoverCode: string,
+      textLanguageCode: string
+    ) => boolean;
+    getInitialVoiceoverLanguageCode: (
+      sessionFallbackVoiceoverLanguageCode: string | null,
+      selectedTextLanguageCode: string | null
+    ) => string | null;
+    getFallbackTextLanguageCode: () => string;
+    saveSessionFallbackLanguageSelection: () => void;
+    getLanguageDescription: (languageCode: string) => string;
+    getLessonStartUrlWithLanguageSelection: (
+      textLanguageCode: string,
+      voiceoverLanguageCode: string | null
+    ) => string;
+  };
   let fixture: ComponentFixture<TopicLessonCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
@@ -93,6 +110,7 @@ describe('TopicLessonCardComponent', () => {
 
     fixture = TestBed.createComponent(TopicLessonCardComponent);
     component = fixture.componentInstance;
+    componentRef = component as unknown as typeof componentRef;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
     ) as jasmine.SpyObj<UrlInterpolationService>;
@@ -533,7 +551,11 @@ describe('TopicLessonCardComponent', () => {
       i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('fr');
 
       component.ngOnChanges({
-        availableTextLanguageCodes: {} as any,
+        availableTextLanguageCodes: new SimpleChange(
+          ['en'],
+          ['fr', 'en'],
+          false
+        ),
       });
 
       expect(component.selectedTextLanguageCode).toBe('fr');
@@ -543,10 +565,10 @@ describe('TopicLessonCardComponent', () => {
   describe('isVoiceoverCompatibleWithTextLanguage', () => {
     it('should return true when root codes match', () => {
       expect(
-        (component as any).isVoiceoverCompatibleWithTextLanguage('fr', 'fr')
+        componentRef.isVoiceoverCompatibleWithTextLanguage('fr', 'fr')
       ).toBeTrue();
       expect(
-        (component as any).isVoiceoverCompatibleWithTextLanguage('fr-CA', 'fr')
+        componentRef.isVoiceoverCompatibleWithTextLanguage('fr-CA', 'fr')
       ).toBeTrue();
     });
 
@@ -557,7 +579,7 @@ describe('TopicLessonCardComponent', () => {
         .and.returnValue(['pt']);
 
       expect(
-        (component as any).isVoiceoverCompatibleWithTextLanguage('es', 'pt')
+        componentRef.isVoiceoverCompatibleWithTextLanguage('es', 'pt')
       ).toBeTrue();
     });
 
@@ -567,7 +589,7 @@ describe('TopicLessonCardComponent', () => {
         .and.returnValue([]);
 
       expect(
-        (component as any).isVoiceoverCompatibleWithTextLanguage('es', 'de')
+        componentRef.isVoiceoverCompatibleWithTextLanguage('es', 'de')
       ).toBeFalse();
     });
   });
@@ -577,40 +599,40 @@ describe('TopicLessonCardComponent', () => {
       component.availableVoiceoverLanguageCodes = [];
 
       expect(
-        (component as any).getInitialVoiceoverLanguageCode(null, 'en')
+        componentRef.getInitialVoiceoverLanguageCode(null, 'en')
       ).toBeNull();
     });
 
     it('should use session fallback voiceover when available', () => {
       component.availableVoiceoverLanguageCodes = ['fr', 'es'];
 
-      expect(
-        (component as any).getInitialVoiceoverLanguageCode('fr', null)
-      ).toBe('fr');
+      expect(componentRef.getInitialVoiceoverLanguageCode('fr', null)).toBe(
+        'fr'
+      );
     });
 
     it('should use compatible voiceover matching text language', () => {
       component.availableVoiceoverLanguageCodes = ['fr', 'es'];
 
-      expect(
-        (component as any).getInitialVoiceoverLanguageCode(null, 'fr')
-      ).toBe('fr');
+      expect(componentRef.getInitialVoiceoverLanguageCode(null, 'fr')).toBe(
+        'fr'
+      );
     });
 
     it('should fall back to English voiceover', () => {
       component.availableVoiceoverLanguageCodes = ['en', 'es'];
 
-      expect(
-        (component as any).getInitialVoiceoverLanguageCode(null, 'fr')
-      ).toBe('en');
+      expect(componentRef.getInitialVoiceoverLanguageCode(null, 'fr')).toBe(
+        'en'
+      );
     });
 
     it('should fall back to first available voiceover', () => {
       component.availableVoiceoverLanguageCodes = ['fr'];
 
-      expect(
-        (component as any).getInitialVoiceoverLanguageCode(null, 'de')
-      ).toBe('fr');
+      expect(componentRef.getInitialVoiceoverLanguageCode(null, 'de')).toBe(
+        'fr'
+      );
     });
   });
 
@@ -618,13 +640,13 @@ describe('TopicLessonCardComponent', () => {
     it('should return English when available', () => {
       component.availableTextLanguageCodes = ['fr', 'en'];
 
-      expect((component as any).getFallbackTextLanguageCode()).toBe('en');
+      expect(componentRef.getFallbackTextLanguageCode()).toBe('en');
     });
 
     it('should return first available language when English not available', () => {
       component.availableTextLanguageCodes = ['fr', 'es'];
 
-      expect((component as any).getFallbackTextLanguageCode()).toBe('fr');
+      expect(componentRef.getFallbackTextLanguageCode()).toBe('fr');
     });
   });
 
@@ -632,7 +654,7 @@ describe('TopicLessonCardComponent', () => {
     it('should not save when selected text language is null', () => {
       component.selectedTextLanguageCode = null;
 
-      (component as any).saveSessionFallbackLanguageSelection();
+      componentRef.saveSessionFallbackLanguageSelection();
 
       expect(
         topicSessionFallbackLanguageService.saveFallbackSelection
@@ -643,7 +665,7 @@ describe('TopicLessonCardComponent', () => {
       component.selectedTextLanguageCode = 'fr';
       component.selectedVoiceoverLanguageCode = 'fr-CA';
 
-      (component as any).saveSessionFallbackLanguageSelection();
+      componentRef.saveSessionFallbackLanguageSelection();
 
       expect(
         topicSessionFallbackLanguageService.saveFallbackSelection
@@ -657,7 +679,7 @@ describe('TopicLessonCardComponent', () => {
         .withArgs('fr')
         .and.returnValue('French');
 
-      expect((component as any).getLanguageDescription('fr')).toBe('French');
+      expect(componentRef.getLanguageDescription('fr')).toBe('French');
     });
 
     it('should return audio language description as fallback', () => {
@@ -668,9 +690,7 @@ describe('TopicLessonCardComponent', () => {
         .withArgs('fr')
         .and.returnValue('French (Audio)');
 
-      expect((component as any).getLanguageDescription('fr')).toBe(
-        'French (Audio)'
-      );
+      expect(componentRef.getLanguageDescription('fr')).toBe('French (Audio)');
     });
 
     it('should return the language code as last resort', () => {
@@ -681,7 +701,7 @@ describe('TopicLessonCardComponent', () => {
         .withArgs('fr')
         .and.returnValue(null);
 
-      expect((component as any).getLanguageDescription('fr')).toBe('fr');
+      expect(componentRef.getLanguageDescription('fr')).toBe('fr');
     });
   });
 
@@ -689,7 +709,7 @@ describe('TopicLessonCardComponent', () => {
     it('should create URL with content language code param', () => {
       component.startUrl = '/explore/123';
 
-      const result = (component as any).getLessonStartUrlWithLanguageSelection(
+      const result = componentRef.getLessonStartUrlWithLanguageSelection(
         'fr',
         null
       );
@@ -702,7 +722,7 @@ describe('TopicLessonCardComponent', () => {
     it('should create URL with both language code params', () => {
       component.startUrl = '/explore/123';
 
-      const result = (component as any).getLessonStartUrlWithLanguageSelection(
+      const result = componentRef.getLessonStartUrlWithLanguageSelection(
         'fr',
         'fr-CA'
       );
