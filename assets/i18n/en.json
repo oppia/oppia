@@ -643,6 +643,7 @@
     "I18N_EXPLORATION_zW39GLG_BdN2_TITLE": "Comparing Fractions",
     "I18N_EXPLORE_OPPIA_CLASSROOM": "Explore Oppia Classrooms",
     "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Facilitator Dashboard | Oppia",
+    "I18N_LESSON_FEEDBACK_CAPTCHA_REQUIRED": "Captcha is required to submit feedback.",
     "I18N_FEEDBACK_CAPTCHA_LOAD_FAILED": "Captcha failed to load.",
     "I18N_FEEDBACK_CAPTCHA_UNAVAILABLE": "Captcha is currently unavailable. Please log in to submit feedback.",
     "I18N_FEEDBACK_CREATE_THREAD_HEADER": "Start New Feedback Thread",

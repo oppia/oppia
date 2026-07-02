@@ -43,7 +43,7 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping, Optional
+from typing import Dict, Mapping
 
 
 def validate_suggestion_change(

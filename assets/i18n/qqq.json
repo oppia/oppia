@@ -643,6 +643,7 @@
   "I18N_EXPLORATION_zW39GLG_BdN2_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
   "I18N_EXPLORE_OPPIA_CLASSROOM": "Text of button which redirects user to classrooms page present in splash page.",
   "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Title of the Facilitator Dashboard page.",
+  "I18N_LESSON_FEEDBACK_CAPTCHA_REQUIRED": "Captcha error message shown when the captcha is required to submit feedback.",
   "I18N_FEEDBACK_CAPTCHA_LOAD_FAILED": "Captcha error message shown when the captcha fails to load.",
   "I18N_FEEDBACK_CAPTCHA_UNAVAILABLE": "Captcha error message shown when the captcha is unavailable and asks the user to log in to submit feedback.",
     "I18N_FEEDBACK_CREATE_THREAD_HEADER": "Heading text shown at the top of the create-feedback-thread modal.",

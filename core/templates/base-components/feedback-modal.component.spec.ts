@@ -914,6 +914,7 @@ describe('FeedbackModalComponent', () => {
   it('should call submitSiteAndLessonIssueReportAsync with session info when includeTechnicalLogs is true', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Lesson issue report';
     component.category = 'typo';
     component.includeTechnicalLogs = true;
@@ -950,6 +951,7 @@ describe('FeedbackModalComponent', () => {
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
     component.feedbackText = 'Lesson issue';
     component.includeTechnicalLogs = false;
+    component.isUserLoggedIn = true;
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
@@ -977,6 +979,7 @@ describe('FeedbackModalComponent', () => {
   it('should close modal after successful lesson issue submission', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Issue';
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -1008,6 +1011,7 @@ describe('FeedbackModalComponent', () => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
     component.feedbackText = 'Issue';
+    component.isUserLoggedIn = true;
     component.includeTechnicalLogs = false;
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -1066,6 +1070,7 @@ describe('FeedbackModalComponent', () => {
   it('should call submitSiteAndLessonIssueReportAsync for site issue', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue report';
 
     const submitSpy = spyOn(
@@ -1086,6 +1091,7 @@ describe('FeedbackModalComponent', () => {
   it('should include session info when includeTechnicalLogs is true for site issue', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = true;
     feedbackSessionInfoService.getSessionInfo.calls.reset();
@@ -1118,9 +1124,31 @@ describe('FeedbackModalComponent', () => {
     expect(feedbackSessionInfoService.getSessionInfo).not.toHaveBeenCalled();
   }));
 
+  it('should not close modal after un-successful site issue submission', fakeAsync(() => {
+    createComponent();
+    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.feedbackText = 'Site issue';
+
+    spyOn(
+      feedbackBackendApiService,
+      'submitSiteAndLessonIssueReportAsync'
+    ).and.returnValue(Promise.resolve());
+
+    const closeSpy = spyOn(component, 'closeModal').and.callThrough();
+
+    component.submit();
+    tick();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_LESSON_FEEDBACK_CAPTCHA_REQUIRED'
+    );
+    expect(alertService.addSuccessMessage).not.toHaveBeenCalled();
+    expect(closeSpy).not.toHaveBeenCalled();
+  }));
+
   it('should close modal after successful site issue submission', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
 
     spyOn(
@@ -1142,6 +1170,7 @@ describe('FeedbackModalComponent', () => {
   it('should log error and not close modal when site issue submission fails', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = false;
 
