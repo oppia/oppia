@@ -128,7 +128,7 @@ export class BaseUser {
   }
 
   /**
-   * * This function types the text in the input field using its CSS selector or ElementHandle.
+   * This function types the text in the input field using its CSS selector or ElementHandle.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the input field.
    * @param {string} text - The text to type.
    */
@@ -208,6 +208,30 @@ export class BaseUser {
   }
 
   /**
+   * Finds and clicks an element matching the given selector whose text content
+   * equals the given text.
+   * @param {string} selector - The CSS selector to query elements.
+   * @param {string} text - The exact text content to match.
+   */
+  async clickOnElementWithSelectorAndText(
+    selector: string,
+    text: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const elements = await this.page.$$(selector);
+    for (const element of elements) {
+      const elementText = await element.evaluate(el => el.textContent?.trim());
+      if (elementText === text) {
+        await this.clickOnElement(element);
+        return;
+      }
+    }
+    throw new Error(
+      `Cannot find element with selector "${selector}" and text "${text}".`
+    );
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {
@@ -272,19 +296,14 @@ export class BaseUser {
    * Waits for the given element to be attached in the DOM.
    * @param {string} selector - The selector of the element to wait for.
    * @param {Page} context - The page on which the selector should be verified.
-   * @param {number} timeout - The maximum time to wait in milliseconds.
-   * If not provided, Playwright's default timeout is used (30 seconds).
+   * @param {number} timeout - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
    */
   async expectElementToBeAttachedInDOM(
     selector: string,
     context: Page = this.page,
-    timeout?: number
+    timeout: number = 30000
   ): Promise<void> {
-    const options: {state: 'attached'; timeout?: number} = {
-      state: 'attached',
-      ...(timeout !== undefined && {timeout}),
-    };
-    await context.waitForSelector(selector, options);
+    await context.waitForSelector(selector, {state: 'attached', timeout});
     showMessage(`Element ${selector} is attached in DOM.`);
   }
 
@@ -293,21 +312,20 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to verify.
    * @param {boolean} visibility - Whether the element should be visible or not.
    * @param {Page} context - The page on which the selector should be verified.
-   * @param {number} timeout - The maximum time to wait in milliseconds.
-   * If not provided, Playwright's default timeout is used (30 seconds).
+   * @param {number} timeout - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
    */
   async expectElementToBeVisible(
     selector: string,
     visibility: boolean = true,
     context: Page = this.page,
-    timeout?: number
-  ): Promise<void> {
-    const options: {state: 'visible' | 'hidden'; timeout?: number} = {
+    timeout: number = 30000
+  ): Promise<ElementHandle<Element> | undefined> {
+    const element = await context.waitForSelector(selector, {
       state: visibility ? 'visible' : 'hidden',
-      ...(timeout !== undefined && {timeout}),
-    };
-    await context.waitForSelector(selector, options);
+      timeout,
+    });
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
+    return (element ?? undefined) as ElementHandle<Element> | undefined;
   }
 
   /**
@@ -333,7 +351,7 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Clicking three times on a line of text selects all the text.
+    // Using Control+A to select all text, then Backspace to delete it.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
     await element.click();
@@ -345,6 +363,8 @@ export class BaseUser {
 
   /**
    * Checks if element is clickable or not.
+   * @param {string | ElementHandle<Element>} selector - The selector or ElementHandle of the element to check.
+   * @param {boolean} clickable - Whether the element should be clickable or not.
    */
   async expectElementToBeClickable(
     selector: string | ElementHandle<Element>,
@@ -470,12 +490,10 @@ export class BaseUser {
     // The toast message disappears after a few seconds, so we need to process
     // the toastMessageElement as soon as we receive it. Otherwise, the text
     // within it may no longer be showing at the time of evaluation.
-    const toastMessageElement = await this.page.waitForSelector(
-      toastMessageSelector,
-      {state: 'visible'}
-    );
+    const toastMessageElement =
+      await this.expectElementToBeVisible(toastMessageSelector);
     const toastMessage = await this.page.evaluate(
-      el => el.textContent?.trim() || '',
+      el => el?.textContent?.trim() || '',
       toastMessageElement
     );
 
@@ -485,7 +503,7 @@ export class BaseUser {
       );
     }
     if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
+      await this.clickOnElementWithSelector(toastMessageSelector);
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
   }
@@ -560,7 +578,7 @@ export class BaseUser {
 
   /**
    * Finds child element in parent by matching text values.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {Page | ElementHandle | undefined} parentElement - Element we're searching through.
    * @param {Record<string, string>} selectors - Relevant selectors.
    * @param {string} criteria - Title value to match.
    */
@@ -868,6 +886,34 @@ export class BaseUser {
   }
 
   /**
+   * Waits for the network to become idle on the given page.
+   *
+   * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
+   * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
+   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
+   * almost all cases and for the page to fully load.
+   *
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   * @param {Page} context - The page on which to wait for network idle. Default is this.page.
+   */
+  async waitForNetworkIdle(
+    timeout: number = 30000,
+    context: Page = this.page
+  ): Promise<void> {
+    try {
+      await context.waitForLoadState('networkidle', {timeout});
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        showMessage(
+          'Network did not become idle within the specified timeout, but we can continue.'
+        );
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
    * Gets a human-readable description of an element for logging purposes.
    * If a string selector is provided, returns it directly.
    * If an ElementHandle is provided, extracts tag name and key attributes.
@@ -958,13 +1004,10 @@ export class BaseUser {
   async expectMatChipToBeVisible(
     textContent: string
   ): Promise<ElementHandle<Element>> {
-    const matChipElement = await this.page.waitForSelector(
+    const matChipElement = await this.expectElementToBeVisible(
       `xpath=//mat-chip[contains(text(), '${textContent}')]`
     );
-    if (!matChipElement) {
-      throw new Error(`Mat chip with text ${textContent} not found.`);
-    }
-    return matChipElement;
+    return matChipElement as ElementHandle<Element>;
   }
 
   /**
@@ -972,21 +1015,8 @@ export class BaseUser {
    * @param value The value of the mat-option to select.
    */
   async selectMatOption(value: string): Promise<void> {
-    await this.page.waitForSelector('mat-option');
-    const matOptionElements = await this.page.$$('mat-option');
-    for (const matOptionElement of matOptionElements) {
-      if (
-        (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
-        value
-      ) {
-        await this.clickOnElement(matOptionElement);
-        break;
-      }
-    }
-
-    await this.page.waitForSelector('mat-option', {
-      state: 'hidden',
-    });
+    await this.clickOnElementWithSelectorAndText('mat-option', value);
+    await this.expectElementToBeVisible('mat-option', false);
   }
 
   /**
@@ -994,12 +1024,11 @@ export class BaseUser {
    */
   async uploadFile(filePath: string): Promise<void> {
     const inputUploadHandle =
-      await this.page.waitForSelector('input[type=file]');
-    if (inputUploadHandle === null) {
+      await this.expectElementToBeVisible('input[type=file]');
+    if (!inputUploadHandle) {
       throw new Error('No file input found while attempting to upload a file.');
     }
-    let fileToUpload = filePath;
-    await inputUploadHandle.setInputFiles(fileToUpload);
+    await inputUploadHandle.setInputFiles(filePath);
   }
 
   /**
