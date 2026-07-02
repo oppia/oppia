@@ -31,10 +31,11 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
 
     def test_protect_html_with_empty_string_returns_empty_string(self) -> None:
         self.assertEqual(
-            html_translation_services.protect_html_for_translation(''), ''
+            html_translation_services.preprocess_html_for_translation(''), ''
         )
         self.assertEqual(
-            html_translation_services.protect_html_for_translation('   '), '   '
+            html_translation_services.preprocess_html_for_translation('   '),
+            '   ',
         )
         self.assertEqual(
             html_translation_services.postprocess_translated_html(''), ''
@@ -52,7 +53,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-skillreview>'
             '<oppia-noninteractive-math translate="no"></oppia-noninteractive-math>'
         )
-        result = html_translation_services.protect_html_for_translation(source)
+        result = html_translation_services.preprocess_html_for_translation(
+            source
+        )
         self.assertEqual(result.count('translate="no"'), 4)
 
     def test_process_html_with_translatable_text_attributes_extracts_and_restores_values(
@@ -62,7 +65,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-link url-with-value="https://oppia.org" '
             'text-with-value="Learn more"></oppia-noninteractive-link>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertIn('data-temp-attr-name="text-with-value"', protected)
@@ -81,7 +84,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             'alt-with-value="A red car" caption-with-value="Figure 1">'
             '</oppia-noninteractive-image>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         restored = html_translation_services.postprocess_translated_html(
@@ -98,7 +101,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             'content-with-value="&lt;p&gt;Step 1&lt;/p&gt;">'
             '</oppia-noninteractive-collapsible>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertIn('data-temp-is-encoded="true"', protected)
@@ -118,7 +121,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             'answer-with-value="&lt;p&gt;A1&lt;/p&gt;">'
             '</oppia-noninteractive-workedexample>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         restored = html_translation_services.postprocess_translated_html(
@@ -140,7 +143,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value=\'%s\'>'
             '</oppia-noninteractive-tabs>' % tabs
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertIn('tab-title-0', protected)
@@ -159,7 +162,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value="invalid">'
             '</oppia-noninteractive-tabs>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertIn('translate="no"', protected)
@@ -168,7 +171,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value="invalid" '
             'translate="no"></oppia-noninteractive-tabs>'
         )
-        protected2 = html_translation_services.protect_html_for_translation(
+        protected2 = html_translation_services.preprocess_html_for_translation(
             source_with_no
         )
         self.assertIn('translate="no"', protected2)
@@ -182,7 +185,9 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value="null">'
             '</oppia-noninteractive-tabs>'
         )
-        result = html_translation_services.protect_html_for_translation(source)
+        result = html_translation_services.preprocess_html_for_translation(
+            source
+        )
         self.assertIn('translate="no"', result)
         self.assertNotIn('data-temp-attr-name', result)
 
@@ -239,7 +244,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         tag = soup.find('oppia-noninteractive-link')
         self.assertIsNone(tag.get('text-with-value'))
         source = '<oppia-noninteractive-link></oppia-noninteractive-link>'
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertNotIn('data-temp-attr-name', protected)
@@ -251,7 +256,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-collapsible>'
             '</oppia-noninteractive-collapsible>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertNotIn('data-temp-attr-name', protected)
@@ -269,7 +274,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value=\'%s\'>'
             '</oppia-noninteractive-tabs>' % tabs
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertIn('tab-content-0', protected)
@@ -309,7 +314,7 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs tab_contents-with-value="123">'
             '</oppia-noninteractive-tabs>'
         )
-        protected = html_translation_services.protect_html_for_translation(
+        protected = html_translation_services.preprocess_html_for_translation(
             source
         )
         self.assertIn('translate="no"', protected)
