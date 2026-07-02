@@ -136,14 +136,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
-    loadChildren: () =>
-      import('pages/email-dashboard-pages/email-dashboard-page.module').then(
-        m => m.EmailDashboardPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
       .ROUTE,
     loadChildren: () =>
