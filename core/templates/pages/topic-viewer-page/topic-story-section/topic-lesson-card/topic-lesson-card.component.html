@@ -20,14 +20,13 @@
       </div>
       <div class="topic-lesson-card-actions">
         <span
-          class="topic-lesson-card-fallback-info-icon"
-          *ngIf="shouldShowFallbackCta()"
-          [matTooltip]="getFallbackInfoTooltipText()"
-          tabindex="0">
+              class="topic-lesson-card-fallback-info-icon"
+              *ngIf="shouldShowFallbackCta()"
+              [matTooltip]="getFallbackInfoTooltipText()"
+              tabindex="0">
           <i class="material-icons">info</i>
         </span>
-        <topic-lesson-language-selector
-          class="topic-lesson-language-selector"
+        <topic-lesson-language-selector class="topic-lesson-language-selector"
           *ngIf="shouldShowInfoIcon"
           [availableTextLanguageCodes]="availableTextLanguageCodes"
           [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
