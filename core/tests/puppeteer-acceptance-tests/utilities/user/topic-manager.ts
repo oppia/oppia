@@ -325,6 +325,13 @@ const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
 const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
+const linkAnotherSkillToQuestionButton = '.e2e-test-link-another-skill-button';
+const questionDifficultyHeaderSelector = '.e2e-test-question-difficulty-header';
+const successToastSelector = '.toast-success';
+const skillLinkageItemSelector = '.e2e-test-skill-linkage-item';
+const skillLinkageDescriptionSelector = '.e2e-test-skill-linkage-description';
+const skillLinkageRemoveButtonSelector =
+  '.e2e-test-remove-skill-linkage-button';
 
 // Preview tab of the topic editor.
 const previewSubtabClass = 'e2e-test-preview-subtab';
@@ -922,6 +929,134 @@ export class TopicManager extends BaseUser {
   async saveQuestion(): Promise<void> {
     await this.clickOnElementWithSelector(saveQuestionButton);
     await this.expectElementToBeVisible(saveQuestionButton, false);
+  }
+
+  /**
+   * Save the question and expect the commit modal to appear.
+   * @param {string} commitMessage - The commit message for the question edit.
+   */
+  async saveQuestionAndExpectCommitModal(commitMessage: string): Promise<void> {
+    await this.clickOnElementWithSelector(saveQuestionButton);
+
+    await this.expectElementToBeVisible(commitMessageInputSelector);
+    await this.typeInInputField(commitMessageInputSelector, commitMessage);
+    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+
+    await this.expectElementToBeVisible(saveQuestionButton, false);
+    await this.expectElementToBeVisible(successToastSelector);
+
+    // Wait for the editor to close and the question list to appear.
+    // After saving, the question list is refreshed asynchronously.
+    await this.expectElementToBeVisible(questionContainerSelector);
+  }
+
+  /**
+   * Save the question and expect the commit modal NOT to appear.
+   */
+  async saveQuestionAndExpectNoCommitModal(): Promise<void> {
+    await this.clickOnElementWithSelector(saveQuestionButton);
+    await this.expectElementToBeVisible(saveQuestionButton, false);
+    await this.expectElementToBeVisible(successToastSelector);
+
+    // Ensure the commit modal is hidden.
+    await this.expectElementToBeVisible(commitMessageInputSelector, false);
+  }
+
+  /**
+   * Verify that the save question button is disabled.
+   * This happens when skill linkage is edited without content changes,
+   * since linkage changes are auto-saved.
+   */
+  async expectSaveQuestionButtonDisabled(): Promise<void> {
+    // Poll until the save button is disabled.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const btn = document.querySelector(
+          selector
+        ) as HTMLButtonElement | null;
+        return btn && btn.disabled;
+      },
+      {},
+      saveQuestionButton
+    );
+  }
+
+  /**
+   * Links another skill to the currently open question.
+   * @param {string} skillName - Name of the skill to be linked.
+   */
+  async linkAnotherSkillToQuestion(skillName: string): Promise<void> {
+    // Wait for the question editor to fully load (including async difficultyCount).
+    // The difficulty header only appears when difficultyCount is set.
+    await this.expectElementToBeVisible(questionDifficultyHeaderSelector);
+
+    // Now wait for and click the "Link Another Skill" button.
+    await this.expectElementToBeVisible(linkAnotherSkillToQuestionButton);
+    await this.clickOnElementWithSelector(linkAnotherSkillToQuestionButton);
+    await this.fillSkillNameInSkillSelectionModal(skillName);
+    await this.selectSkillAndClickOnDoneInSkillSelectionModal(skillName);
+    // Wait for the success toast to appear as linkage changes are auto-saved.
+    await this.expectElementToBeVisible(successToastSelector);
+    // Wait for the skill to be added to the linked skills list.
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).some(
+          el => el.textContent?.trim() === expectedText
+        );
+      },
+      {},
+      skillLinkageDescriptionSelector,
+      skillName
+    );
+  }
+
+  /**
+   * Removes a skill link from the currently open question.
+   * Note: The UI blocks removal of the last remaining skill link with an
+   * info message, so this method should only be used when there are
+   * multiple skills linked to the question.
+   * @param {string} skillDescription - Description of the skill to be unlinked.
+   */
+  async removeSkillLinkFromQuestion(skillDescription: string): Promise<void> {
+    await this.page.waitForSelector(skillLinkageItemSelector);
+    const linkageItems = await this.page.$$(skillLinkageItemSelector);
+
+    for (const item of linkageItems) {
+      const descriptionElement = await item.$(skillLinkageDescriptionSelector);
+      if (!descriptionElement) {
+        continue;
+      }
+      const text = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        descriptionElement
+      );
+
+      if (text === skillDescription) {
+        const removeButton = await item.$(skillLinkageRemoveButtonSelector);
+        if (removeButton) {
+          await this.clickOnElement(removeButton);
+
+          // Unlinking a non-last skill triggers an auto-save API call.
+          // Wait for the success toast to confirm the save completed.
+          await this.expectElementToBeVisible(successToastSelector);
+          // Wait for the skill to be removed from the linked skills list.
+          await this.page.waitForFunction(
+            (selector: string, text: string) => {
+              const elements = document.querySelectorAll(selector);
+              return Array.from(elements).every(
+                el => el.textContent?.trim() !== text
+              );
+            },
+            {},
+            skillLinkageDescriptionSelector,
+            skillDescription
+          );
+          return;
+        }
+      }
+    }
+    throw new Error(`Skill link for "${skillDescription}" not found.`);
   }
 
   /**
@@ -2715,13 +2850,9 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(saveOrPublishSkillSelector);
     }
 
-    await this.page.waitForSelector(commitMessageInputSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(commitMessageInputSelector);
     await this.typeInInputField(commitMessageInputSelector, updateMessage);
-    await this.page.waitForSelector(closeSaveModalButtonSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(closeSaveModalButtonSelector);
     await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
     await this.expectToastMessageToBe('Changes Saved.');
     showMessage('Skill updated successful');
@@ -4837,7 +4968,20 @@ export class TopicManager extends BaseUser {
   async expectQuestionToBeVisible(
     question: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(questionTextSelector);
+    // Poll until the expected question text appears in the list.
+    // This handles the case where the question list is refreshed
+    // asynchronously after saving a question.
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).some(
+          el => el.textContent?.trim() === expectedText
+        );
+      },
+      {},
+      questionTextSelector,
+      question
+    );
 
     const questionElements = await this.page.$$(questionTextSelector);
     let requiredQuestionElement: ElementHandle<Element> | null = null;
@@ -4859,12 +5003,31 @@ export class TopicManager extends BaseUser {
     return requiredQuestionElement;
   }
 
+  /**
+   * Checks that the question is NOT visible in the questions tab.
+   * @param {string} question - The question text to check for absence.
+   */
+  async expectQuestionToNotBeVisible(question: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, text: string) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).every(
+          el => el.textContent?.trim() !== text
+        );
+      },
+      {},
+      questionTextSelector,
+      question
+    );
+  }
+
   async openQuestionEditor(question: string): Promise<void> {
     const questionElement = await this.expectQuestionToBeVisible(question);
 
     await this.waitForElementToStabilize(questionElement);
     await questionElement.click();
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
+    await this.expectElementToBeVisible(questionDifficultyHeaderSelector);
   }
 
   /**

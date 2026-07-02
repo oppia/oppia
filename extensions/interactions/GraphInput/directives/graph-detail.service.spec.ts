@@ -16,7 +16,7 @@
  * @fileoverview Unit test for Detail service for the interaction.
  */
 
-import {async, TestBed} from '@angular/core/testing';
+import {waitForAsync, TestBed} from '@angular/core/testing';
 import {GraphAnswer} from 'interactions/answer-defs';
 import {GraphDetailService} from './graph-detail.service';
 
@@ -24,7 +24,7 @@ describe('GraphDetailService', () => {
   let graphDetailService: GraphDetailService;
   let graph: GraphAnswer;
   let index = 0;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [GraphDetailService],
     });

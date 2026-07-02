@@ -17,7 +17,7 @@
  */
 
 import {EventEmitter} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {Story} from 'domain/story/story.model';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {StoryEditorNavbarBreadcrumbComponent} from './story-editor-navbar-breadcrumb.component';
@@ -42,7 +42,7 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   let undoRedoService: UndoRedoService;
   let windowRef: WindowRef;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StoryEditorNavbarBreadcrumbComponent],
