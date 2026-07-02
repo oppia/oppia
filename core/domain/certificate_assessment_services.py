@@ -18,6 +18,9 @@
 
 from __future__ import annotations
 
+import collections
+import sys
+
 from core import feconf, utils
 from core.domain import (
     certificate_assessment_domain,
@@ -45,6 +48,8 @@ def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
 ) -> Dict[str, List[str]]:
     """Returns a mapping from topic ID to unique question IDs for its skills."""
+    # Build a deduplicated pool of question IDs per topic so we can detect
+    # both per-topic shortages and cross-topic overlap later in validation.
     topic_id_to_question_ids: Dict[str, List[str]] = {}
     for topic_id in topic_ids:
         try:
@@ -56,7 +61,7 @@ def _get_topic_name_to_question_ids_map(
 
         question_ids: set[str] = set()
         for skill_id in topic.get_all_skill_ids():
-            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            skill = skill_fetchers.get_skill_by_id(skill_id)
             if skill is None:
                 continue
             question_ids.update(
@@ -72,6 +77,8 @@ def _get_topic_name_to_question_ids_map(
 
 def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     """Distributes questions over medium, easy and hard in a repeating cycle."""
+    # Spread required questions across difficulty buckets in a stable order so
+    # the validator can compare each bucket against the available pool.
     counts = {'easy': 0, 'medium': 0, 'hard': 0}
     # Keep this order stable. We intentionally start with medium, then easy,
     # then hard so the extra questions are biased toward the core mastery
@@ -83,24 +90,36 @@ def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     return counts
 
 
+def _get_difficulty_label(skill_difficulty: float) -> str | None:
+    """Returns the certificate difficulty label for a linked skill difficulty."""
+    # Map persisted skill difficulty values into certificate buckets so the
+    # validator can count available questions per difficulty.
+    if skill_difficulty == 0.3:
+        return 'easy'
+    if skill_difficulty == 0.6:
+        return 'medium'
+    if skill_difficulty == 0.9:
+        return 'hard'
+    return None
+
+
 def _get_topic_validation_result(
-    available_questions: int, required_questions: int
+    available_questions_by_difficulty: Dict[str, int], required_questions: int
 ) -> Dict[str, Dict[str, int]]:
     """Returns the required/available breakdown for one topic."""
     required = _get_difficulty_counts(required_questions)
-    available = _get_difficulty_counts(available_questions)
     return {
         'easy': {
             'required': required['easy'],
-            'available': available['easy'],
+            'available': available_questions_by_difficulty['easy'],
         },
         'medium': {
             'required': required['medium'],
-            'available': available['medium'],
+            'available': available_questions_by_difficulty['medium'],
         },
         'hard': {
             'required': required['hard'],
-            'available': available['hard'],
+            'available': available_questions_by_difficulty['hard'],
         },
     }
 
@@ -114,6 +133,92 @@ def _get_distinct_question_ids(
     for topic_id in topic_ids:
         distinct_question_ids.update(topic_name_to_question_ids_map[topic_id])
     return distinct_question_ids
+
+
+def _format_list(items: List[str]) -> str:
+    """Formats a short human-readable list."""
+    if len(items) == 1:
+        return items[0]
+    if len(items) == 2:
+        return '%s and %s' % (items[0], items[1])
+    return '%s, and %s' % (', '.join(items[:-1]), items[-1])
+
+
+def _has_valid_distinct_assignment(
+    topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, set[str]]],
+    topic_ids: List[str],
+    required_questions_by_topic: Dict[str, Dict[str, int]],
+    difficulty: str,
+) -> bool:
+    """Checks whether questions can be assigned distinctly for one difficulty."""
+    source = 'source'
+    sink = 'sink'
+    capacity_graph: Dict[str, Dict[str, int]] = {
+        source: {},
+        sink: {},
+    }
+
+    total_required = 0
+    for topic_id in topic_ids:
+        required = required_questions_by_topic[topic_id][difficulty]
+        if required == 0:
+            continue
+        topic_node = 'topic:%s' % topic_id
+        total_required += required
+        capacity_graph.setdefault(source, {})[topic_node] = required
+        capacity_graph.setdefault(topic_node, {})
+
+        for question_id in topic_id_to_question_ids_by_difficulty[topic_id][
+            difficulty
+        ]:
+            question_node = 'question:%s' % question_id
+            capacity_graph.setdefault(topic_node, {})[question_node] = 1
+            capacity_graph.setdefault(question_node, {})
+            capacity_graph[question_node][sink] = 1
+
+    if total_required == 0:
+        return True
+
+    flow = 0
+    while True:
+        parent: Dict[str, str | None] = {source: None}
+        queue: collections.deque[str] = collections.deque([source])
+        while queue and sink not in parent:
+            node = queue.popleft()
+            for neighbor, remaining_capacity in capacity_graph.get(
+                node, {}
+            ).items():
+                if remaining_capacity <= 0 or neighbor in parent:
+                    continue
+                parent[neighbor] = node
+                queue.append(neighbor)
+
+        if sink not in parent:
+            break
+
+        path_capacity = sys.maxsize
+        node = sink
+        while parent[node] is not None:
+            previous = parent[node]
+            assert previous is not None
+            path_capacity = min(path_capacity, capacity_graph[previous][node])
+            node = previous
+
+        node = sink
+        while parent[node] is not None:
+            previous = parent[node]
+            assert previous is not None
+            capacity_graph[previous][node] -= path_capacity
+            capacity_graph[node][previous] = (
+                capacity_graph.get(node, {}).get(previous, 0) + path_capacity
+            )
+            node = previous
+
+        flow += path_capacity
+        if flow == total_required:
+            return True
+
+    return False
 
 
 def validate_certificate_assessment_offering(
@@ -146,6 +251,9 @@ def validate_certificate_assessment_offering(
     validation_errors: Dict[str, Dict[str, Dict[str, int]]] = {}
     message_parts: List[str] = []
     is_valid = True
+    required_questions_by_topic: Dict[str, Dict[str, int]] = {}
+    topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, set[str]]] = {}
+    topic_id_to_name: Dict[str, str] = {}
 
     expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
     if total_questions < expected_total_questions:
@@ -175,19 +283,86 @@ def validate_certificate_assessment_offering(
         required_questions = base_questions_per_topic + (
             1 if index < remainder else 0
         )
-        available_questions = len(topic_name_to_question_ids_map[topic_id])
+        required_questions_by_topic[topic_id] = _get_difficulty_counts(
+            required_questions
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        topic_id_to_name[topic_id] = (
+            topic.name if topic is not None else topic_id
+        )
+        available_question_ids_by_difficulty: Dict[str, set[str]] = {
+            'easy': set(),
+            'medium': set(),
+            'hard': set(),
+        }
+        if topic is not None:
+            for skill_id in topic.get_all_skill_ids():
+                skill = skill_fetchers.get_skill_by_id(skill_id)
+                if skill is None:
+                    continue
+                for (
+                    question_skill_link
+                ) in question_services.get_question_skill_links_of_skill(
+                    skill_id, skill.description
+                ):
+                    difficulty_label = _get_difficulty_label(
+                        question_skill_link.skill_difficulty
+                    )
+                    if difficulty_label is None:
+                        continue
+                    available_question_ids_by_difficulty[difficulty_label].add(
+                        question_skill_link.question_id
+                    )
+        topic_id_to_question_ids_by_difficulty[topic_id] = (
+            available_question_ids_by_difficulty
+        )
+
+        available_questions_by_difficulty = {
+            difficulty: len(question_ids)
+            for difficulty, question_ids in available_question_ids_by_difficulty.items()
+        }
         validation_result = _get_topic_validation_result(
-            available_questions, required_questions
+            available_questions_by_difficulty, required_questions
         )
         validation_errors[topic_id] = validation_result
-        if available_questions < required_questions:
+        if not (
+            available_questions_by_difficulty['easy']
+            >= validation_result['easy']['required']
+            and available_questions_by_difficulty['medium']
+            >= validation_result['medium']['required']
+            and available_questions_by_difficulty['hard']
+            >= validation_result['hard']['required']
+        ):
             is_valid = False
-            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-            topic_name = topic.name if topic is not None else topic_id
             message_parts.append(
-                '%s needs %d unique questions but only %d are available.'
-                % (topic_name, required_questions, available_questions)
+                '%s does not have enough questions in every difficulty bucket.'
+                % topic_id_to_name[topic_id]
             )
+
+    missing_distinct_difficulties: List[str] = []
+    for difficulty in ('easy', 'medium', 'hard'):
+        if not _has_valid_distinct_assignment(
+            topic_id_to_question_ids_by_difficulty,
+            topic_ids,
+            required_questions_by_topic,
+            difficulty,
+        ):
+            is_valid = False
+            missing_distinct_difficulties.append(difficulty)
+
+    if missing_distinct_difficulties:
+        is_valid = False
+        message_parts.append(
+            'Selected topics %s do not have enough distinct %s questions '
+            'to satisfy the requested certificate without reusing '
+            'questions across topics.'
+            % (
+                _format_list(
+                    [topic_id_to_name[topic_id] for topic_id in topic_ids]
+                ),
+                _format_list(missing_distinct_difficulties),
+            )
+        )
 
     validation_message = (
         'Certificate assessment is valid.'

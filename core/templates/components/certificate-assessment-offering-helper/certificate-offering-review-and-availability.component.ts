@@ -49,9 +49,12 @@ export interface ValidationErrors {
 export interface TopicReadinessRow {
   topicId: string;
   topicName: string;
-  easy: number;
-  medium: number;
-  hard: number;
+  easyAvailable: number;
+  mediumAvailable: number;
+  hardAvailable: number;
+  easyRequired: number;
+  mediumRequired: number;
+  hardRequired: number;
   totalQuestions: number;
   isReady: boolean;
   easySufficient: boolean;
@@ -187,9 +190,12 @@ export class CertificateOfferingReviewAndAvailabilityComponent
       this.topicReadinessRows.push({
         topicId,
         topicName,
-        easy: result.easy.available,
-        medium: result.medium.available,
-        hard: result.hard.available,
+        easyAvailable: result.easy.available,
+        mediumAvailable: result.medium.available,
+        hardAvailable: result.hard.available,
+        easyRequired: result.easy.required,
+        mediumRequired: result.medium.required,
+        hardRequired: result.hard.required,
         totalQuestions,
         isReady,
         easySufficient,
