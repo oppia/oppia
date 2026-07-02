@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
+import collections
 import sys
-from collections import deque
 
 from core import feconf, utils
 from core.domain import (
@@ -182,7 +182,7 @@ def _has_valid_distinct_assignment(
     flow = 0
     while True:
         parent: Dict[str, str | None] = {source: None}
-        queue: deque[str] = deque([source])
+        queue: collections.deque[str] = collections.deque([source])
         while queue and sink not in parent:
             node = queue.popleft()
             for neighbor, remaining_capacity in capacity_graph.get(
@@ -199,13 +199,15 @@ def _has_valid_distinct_assignment(
         path_capacity = sys.maxsize
         node = sink
         while parent[node] is not None:
-            previous = cast(str, parent[node])
+            previous = parent[node]
+            assert previous is not None
             path_capacity = min(path_capacity, capacity_graph[previous][node])
             node = previous
 
         node = sink
         while parent[node] is not None:
-            previous = cast(str, parent[node])
+            previous = parent[node]
+            assert previous is not None
             capacity_graph[previous][node] -= path_capacity
             capacity_graph[node][previous] = (
                 capacity_graph.get(node, {}).get(previous, 0) + path_capacity
