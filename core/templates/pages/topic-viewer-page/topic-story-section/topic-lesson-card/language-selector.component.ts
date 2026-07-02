@@ -164,6 +164,10 @@ export class LanguageSelectorComponent implements OnChanges {
     } catch {
       // Some exploration-specific accent codes may not be in global constants.
       // In those cases, fall back to showing the raw code.
+      console.warn(
+        'Failed to get audio language description for:',
+        languageCode
+      );
     }
 
     return languageCode;

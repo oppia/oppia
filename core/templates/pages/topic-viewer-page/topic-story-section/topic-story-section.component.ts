@@ -93,7 +93,7 @@ export class TopicStorySectionComponent
   lessonCards: LessonCardData[] = [];
   practiceCard!: PracticeCardData;
   isPracticeCardVisible: boolean = false;
-  private languageCodeChangeSubscription: Subscription | null = null;
+  private directiveSubscriptions: Subscription = new Subscription();
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -107,14 +107,15 @@ export class TopicStorySectionComponent
   ngOnInit(): void {
     this.populateFromInputs();
     void this.loadChapterProgress();
-    this.languageCodeChangeSubscription =
+    this.directiveSubscriptions.add(
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         this.topicSessionFallbackLanguageService.clearSelection();
-      });
+      })
+    );
   }
 
   ngOnDestroy(): void {
-    this.languageCodeChangeSubscription?.unsubscribe();
+    this.directiveSubscriptions.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

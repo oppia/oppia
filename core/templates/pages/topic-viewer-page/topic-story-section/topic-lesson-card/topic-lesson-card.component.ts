@@ -32,9 +32,9 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import './topic-lesson-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
-const CHECKPOINT_STATUS_COMPLETED = 'completed';
-const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
-const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
+const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
+const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
+  'initialVoiceoverLanguageCode';
 
 @Component({
   selector: 'topic-lesson-card',
@@ -60,14 +60,8 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   } = {};
 
   resolvedThumbnailUrl: string = '';
-  _checkpointStatuses: string[] = [];
   selectedTextLanguageCode: string | null = null;
   selectedVoiceoverLanguageCode: string | null = null;
-
-  private readonly INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
-    'initialContentLanguageCode';
-  private readonly INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
-    'initialVoiceoverLanguageCode';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -85,95 +79,11 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
-      changes.lessonProgressStatus ||
-      changes.totalCheckpointsCount ||
-      changes.visitedCheckpointsCount
-    ) {
-      this._checkpointStatuses = this._computeCheckpointStatuses();
-    }
-
-    if (
       changes.availableTextLanguageCodes ||
       changes.availableVoiceoverLanguageCodes
     ) {
       this.initializeLanguageSelection();
     }
-  }
-
-  get checkpointStatuses(): string[] {
-    return this._checkpointStatuses;
-  }
-
-  private _computeCheckpointStatuses(): string[] {
-    if (
-      this.lessonProgressStatus === 'coming_soon' ||
-      this.totalCheckpointsCount === 0
-    ) {
-      return [];
-    }
-
-    const totalNodes = this.totalCheckpointsCount + 1;
-    const statuses: string[] = [];
-    const visitedCheckpointCount = Math.min(
-      Math.max(this.visitedCheckpointsCount, 0),
-      this.totalCheckpointsCount
-    );
-
-    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
-
-    if (
-      this.lessonProgressStatus === 'completed' ||
-      visitedCheckpointCount >= this.totalCheckpointsCount
-    ) {
-      for (let i = 0; i < totalNodes; i++) {
-        statuses.push(CHECKPOINT_STATUS_COMPLETED);
-      }
-      return statuses;
-    }
-
-    const currentNodeIndex = reachedCheckpointCount;
-
-    for (let i = 0; i < totalNodes; i++) {
-      if (i < currentNodeIndex) {
-        statuses.push(CHECKPOINT_STATUS_COMPLETED);
-      } else if (i === currentNodeIndex) {
-        statuses.push(CHECKPOINT_STATUS_IN_PROGRESS);
-      } else {
-        statuses.push(CHECKPOINT_STATUS_INCOMPLETE);
-      }
-    }
-
-    return statuses;
-  }
-
-  get progressPercent(): number {
-    if (
-      this.totalCheckpointsCount === 0 ||
-      this.lessonProgressStatus === 'coming_soon'
-    ) {
-      return 0;
-    }
-    const visitedCheckpointCount = Math.min(
-      Math.max(this.visitedCheckpointsCount, 0),
-      this.totalCheckpointsCount
-    );
-    if (
-      this.lessonProgressStatus === 'completed' ||
-      visitedCheckpointCount >= this.totalCheckpointsCount
-    ) {
-      return 100;
-    }
-    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
-    return Math.floor(
-      (reachedCheckpointCount / this.totalCheckpointsCount) * 100
-    );
-  }
-
-  get showCheckpointBar(): boolean {
-    return (
-      this.lessonProgressStatus !== 'coming_soon' &&
-      this.totalCheckpointsCount > 0
-    );
   }
 
   navigateTo(url: string): void {
@@ -412,13 +322,13 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     );
 
     lessonStartUrl.searchParams.set(
-      this.INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM,
+      INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM,
       textLanguageCode
     );
 
     if (voiceoverLanguageCode) {
       lessonStartUrl.searchParams.set(
-        this.INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM,
+        INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM,
         voiceoverLanguageCode
       );
     }

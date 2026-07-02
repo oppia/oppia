@@ -36,14 +36,7 @@ from core.domain import (
     voiceover_services,
 )
 
-from typing import (  # pylint: disable=wrong-import-position
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    TypedDict,
-    cast,
-)
+from typing import Dict, List, Optional, Sequence, TypedDict, cast
 
 
 class StoryNodeResponseDict(story_domain.StoryNodeDict):

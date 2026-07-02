@@ -451,23 +451,6 @@ describe('TopicLessonCardComponent', () => {
   });
 
   describe('ngOnChanges', () => {
-    it('should update checkpoint statuses when lesson progress inputs change', () => {
-      component.lessonProgressStatus = 'not_started';
-      component.totalCheckpointsCount = 3;
-      component.visitedCheckpointsCount = 0;
-
-      component.ngOnChanges({
-        lessonProgressStatus: {
-          previousValue: undefined,
-          currentValue: 'not_started',
-          firstChange: true,
-          isFirstChange: () => true,
-        },
-      });
-
-      expect(component.checkpointStatuses.length).toBe(4);
-    });
-
     it('should reinitialize language selection when language codes change', () => {
       component.availableTextLanguageCodes = [];
 
@@ -482,139 +465,6 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.selectedTextLanguageCode).toBeNull();
       expect(component.selectedVoiceoverLanguageCode).toBeNull();
-    });
-  });
-
-  describe('checkpointStatuses', () => {
-    it('should compute checkpoint statuses for a completed lesson', () => {
-      component.lessonProgressStatus = 'completed';
-      component.totalCheckpointsCount = 2;
-      component.visitedCheckpointsCount = 2;
-
-      component.ngOnChanges({
-        lessonProgressStatus: {
-          previousValue: undefined,
-          currentValue: 'completed',
-          firstChange: true,
-          isFirstChange: () => true,
-        },
-      });
-
-      expect(component.checkpointStatuses).toEqual([
-        'completed',
-        'completed',
-        'completed',
-      ]);
-    });
-
-    it('should compute checkpoint statuses when visited count meets total', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 3;
-      component.visitedCheckpointsCount = 3;
-
-      component.ngOnChanges({
-        lessonProgressStatus: {
-          previousValue: undefined,
-          currentValue: 'in_progress',
-          firstChange: true,
-          isFirstChange: () => true,
-        },
-      });
-
-      expect(component.checkpointStatuses).toEqual([
-        'completed',
-        'completed',
-        'completed',
-        'completed',
-      ]);
-    });
-
-    it('should compute checkpoint statuses for partial progress', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 3;
-      component.visitedCheckpointsCount = 2;
-
-      component.ngOnChanges({
-        lessonProgressStatus: {
-          previousValue: undefined,
-          currentValue: 'in_progress',
-          firstChange: true,
-          isFirstChange: () => true,
-        },
-      });
-
-      expect(component.checkpointStatuses).toEqual([
-        'completed',
-        'in-progress',
-        'incomplete',
-        'incomplete',
-      ]);
-    });
-
-    it('should return empty array when lesson is coming_soon', () => {
-      component.lessonProgressStatus = 'coming_soon';
-      component.totalCheckpointsCount = 3;
-
-      component.ngOnChanges({
-        lessonProgressStatus: {
-          previousValue: undefined,
-          currentValue: 'coming_soon',
-          firstChange: true,
-          isFirstChange: () => true,
-        },
-      });
-
-      expect(component.checkpointStatuses).toEqual([]);
-    });
-
-    it('should return empty array when totalCheckpointsCount is 0', () => {
-      component.lessonProgressStatus = 'not_started';
-      component.totalCheckpointsCount = 0;
-
-      component.ngOnChanges({
-        lessonProgressStatus: {
-          previousValue: undefined,
-          currentValue: 'not_started',
-          firstChange: true,
-          isFirstChange: () => true,
-        },
-      });
-
-      expect(component.checkpointStatuses).toEqual([]);
-    });
-  });
-
-  describe('progressPercent', () => {
-    it('should return 0 when totalCheckpointsCount is 0', () => {
-      component.totalCheckpointsCount = 0;
-      expect(component.progressPercent).toBe(0);
-    });
-
-    it('should return 0 when lesson is coming_soon', () => {
-      component.lessonProgressStatus = 'coming_soon';
-      component.totalCheckpointsCount = 5;
-      expect(component.progressPercent).toBe(0);
-    });
-
-    it('should return 100 when lesson is completed', () => {
-      component.lessonProgressStatus = 'completed';
-      component.totalCheckpointsCount = 3;
-      component.visitedCheckpointsCount = 2;
-      expect(component.progressPercent).toBe(100);
-    });
-
-    it('should return 100 when visited count exceeds total', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 3;
-      component.visitedCheckpointsCount = 5;
-      expect(component.progressPercent).toBe(100);
-    });
-
-    it('should compute progress percentage for partial progress', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 2;
-      expect(component.progressPercent).toBe(20);
     });
   });
 
@@ -680,34 +530,6 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.selectedTextLanguageCode).toBeNull();
       expect(component.selectedVoiceoverLanguageCode).toBeNull();
-    });
-  });
-
-  describe('showCheckpointBar', () => {
-    it('should return true when not coming_soon and totalCheckpointsCount > 0', () => {
-      component.lessonProgressStatus = 'not_started';
-      component.totalCheckpointsCount = 5;
-      expect(component.showCheckpointBar).toBe(true);
-
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 3;
-      expect(component.showCheckpointBar).toBe(true);
-
-      component.lessonProgressStatus = 'completed';
-      component.totalCheckpointsCount = 1;
-      expect(component.showCheckpointBar).toBe(true);
-    });
-
-    it('should return false when lesson is coming_soon', () => {
-      component.lessonProgressStatus = 'coming_soon';
-      component.totalCheckpointsCount = 5;
-      expect(component.showCheckpointBar).toBe(false);
-    });
-
-    it('should return false when totalCheckpointsCount is 0', () => {
-      component.lessonProgressStatus = 'not_started';
-      component.totalCheckpointsCount = 0;
-      expect(component.showCheckpointBar).toBe(false);
     });
   });
 
