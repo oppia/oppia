@@ -72,7 +72,7 @@ class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
     not existing ones.
     """
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: base_models.BaseModel
     ) -> Iterator[base_validation_errors.ModelExpiredError]:
         """Yields audit errors that are discovered in the input model.
@@ -117,7 +117,7 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
         # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
         self._pattern = BASE_MODEL_ID_PATTERN
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: base_models.BaseModel
     ) -> Iterator[base_validation_errors.ModelIdRegexError]:
         """Function that defines how to process each entity in a pipeline of
@@ -145,7 +145,7 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
 class ValidatePostCommitStatus(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate post_commit_status."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: base_models.BaseCommitLogEntryModel
     ) -> Iterator[base_validation_errors.InvalidCommitStatusError]:
         """Function validates that post_commit_status is either public or
@@ -175,7 +175,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):  # type: ignore[misc]
     post_commit_is_private is true and vice-versa.
     """
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: base_models.BaseCommitLogEntryModel
     ) -> Iterator[base_validation_errors.InvalidPrivateCommitStatusError]:
         """Function validates that post_commit_is_private is true iff
@@ -214,7 +214,7 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
     post_commit_is_public is true and vice-versa.
     """
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: base_models.BaseCommitLogEntryModel
     ) -> Iterator[base_validation_errors.InvalidPublicCommitStatusError]:
         """Function validates that post_commit_is_public is true iff
@@ -249,7 +249,9 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
 class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether created_on and last_updated timestamps are valid."""
 
-    def process(self, entity: base_models.BaseModel) -> Iterator[
+    def process(
+        self, entity: base_models.BaseModel
+    ) -> Iterator[  # pylint: disable=arguments-differ
         Union[
             base_validation_errors.InconsistentTimestampsError,
             base_validation_errors.ModelMutatedDuringJobError,
@@ -336,7 +338,7 @@ class ValidateModelDomainObjectInstances(
         """
         return ValidationModes.NEUTRAL
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, entity: ModelInstanceType
     ) -> Iterator[base_validation_errors.ModelDomainObjectValidateError]:
         """Function that defines how to process each entity in a pipeline of
@@ -402,7 +404,9 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
             'class. It should be implemented in the derived class.'
         )
 
-    def process(self, entity: ModelInstanceType) -> Iterator[
+    def process(
+        self, entity: ModelInstanceType
+    ) -> Iterator[  # pylint: disable=arguments-differ
         Union[
             base_validation_errors.CommitCmdsNoneError,
             base_validation_errors.CommitCmdsValidateError,
@@ -456,7 +460,7 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
 class ValidateCommitType(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether commit type is valid."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         entity: Union[
             base_models.BaseCommitLogEntryModel,
