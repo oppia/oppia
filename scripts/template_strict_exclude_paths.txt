@@ -47,7 +47,6 @@ core/templates/pages/contributor-dashboard-page/modal-templates/translation-moda
 core/templates/pages/contributor-dashboard-page/modal-templates/translation-suggestion-review-modal.component.ts
 core/templates/pages/contributor-dashboard-page/opportunities-list-item/opportunities-list-item.component.ts
 core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.ts
-core/templates/pages/email-dashboard-pages/email-dashboard-page.component.ts
 core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.ts
 core/templates/pages/exploration-editor-page/editor-navigation/editor-navigation.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/graph-directives/exploration-graph.component.ts
