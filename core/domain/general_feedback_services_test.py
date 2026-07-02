@@ -225,3 +225,21 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                 include_technical_logs=False,
                 page_url='https://oppia.org/learn',
             )
+
+    def test_create_platform_report_routes_to_core_dashboard(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='Technical issue.',
+            source='site',
+            page_url='https://oppia.org/create/12',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        self.assertEqual(
+            report.destination_dashboard,
+            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+        )

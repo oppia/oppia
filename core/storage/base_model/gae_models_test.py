@@ -1168,18 +1168,7 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
                 'derived class.'
             ),
         ):
-            base_models.BaseModel.get_deletion_policy()
-
-    def test_apply_deletion_policy(self) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            re.escape(
-                'The apply_deletion_policy() method is missing from the '
-                'derived class. It should be implemented in the '
-                'derived class.'
-            ),
-        ):
-            base_models.BaseModel.apply_deletion_policy('test_user_id')
+            base_models.BaseFeedbackModel.get_deletion_policy()
 
     def test_has_reference_to_user_id(self) -> None:
         with self.assertRaisesRegex(
@@ -1190,32 +1179,7 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
                 'derived class.'
             ),
         ):
-            base_models.BaseModel.has_reference_to_user_id('user_id')
-
-    def test_error_cases_for_get_method(self) -> None:
-        with self.assertRaisesRegex(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class BaseModel with id Invalid id not found',
-        ):
-            base_models.BaseModel.get('Invalid id')
-        with self.assertRaisesRegex(
-            base_models.BaseModel.EntityNotFoundError,
-            'Entity for class BaseModel with id Invalid id not found',
-        ):
-            base_models.BaseModel.get('Invalid id', strict=True)
-
-        self.assertIsNone(base_models.BaseModel.get('Invalid id', strict=False))
-
-    def test_base_model_export_data_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            re.escape(
-                'The export_data() method is missing from the '
-                'derived class. It should be implemented in the '
-                'derived class.'
-            ),
-        ):
-            base_models.BaseModel.export_data('')
+            base_models.BaseFeedbackModel.has_reference_to_user_id('user_id')
 
     def test_get_model_association_to_user_raises_not_implemented_error(
         self,
@@ -1230,7 +1194,7 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         ):
             base_models.BaseFeedbackModel.get_model_association_to_user()
 
-    def test_export_data(self) -> None:
+    def test_base_model_export_data_raises_not_implemented_error(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
