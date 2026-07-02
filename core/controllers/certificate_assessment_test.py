@@ -19,6 +19,7 @@ from __future__ import annotations
 from unittest import mock
 
 from core import feconf, utils
+from core.controllers import certificate_assessment
 from core.domain import certificate_assessment_services, topic_fetchers
 from core.tests import test_utils
 
@@ -346,6 +347,22 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
         self.assertIn('is_valid', response)
         self.assertIn('validation_errors', response)
         self.assertIn('validation_message', response)
+
+    def test_get_validation_payload_returns_default_when_missing(
+        self,
+    ) -> None:
+        handler = certificate_assessment.ValidateCertificateAssessmentOfferingHandler.__new__(
+            certificate_assessment.ValidateCertificateAssessmentOfferingHandler
+        )
+        handler.normalized_payload = None
+
+        self.assertEqual(
+            handler._get_validation_payload(),
+            {
+                'topic_ids': [],
+                'total_questions': 0,
+            },
+        )
 
     def test_post_returns_invalid_result_for_insufficient_questions(
         self,
