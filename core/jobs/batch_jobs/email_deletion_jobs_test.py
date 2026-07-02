@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import email_models, feedback_models, user_models
 
-(email_models, feedback_models, user_models) = models.Registry.import_models(
+email_models, feedback_models, user_models = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.FEEDBACK, models.Names.USER]
 )
 
@@ -79,21 +79,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
             html_body='html_body',
             sent_datetime=self.DATETIME,
         )
-        self.bulk_email_model = self.create_model(
-            email_models.BulkEmailModel,
-            id='bulk_email_id',
-            sender_id=self.USER_ID,
-            sender_email='sender@email.com',
-            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
-            subject='subject',
-            html_body='html_body',
-            sent_datetime=self.DATETIME,
-        )
         self.unsent_feedback_email_model = self.create_model(
             feedback_models.UnsentFeedbackEmailModel, id=self.USER_ID
-        )
-        self.user_bulk_emails_model = self.create_model(
-            user_models.UserBulkEmailsModel, id=self.USER_ID
         )
 
     def test_job_deletes_sent_email_model_with_user_as_sender(self) -> None:
@@ -120,18 +107,6 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
             email_models.SentEmailModel.get('sent_email_id', strict=False)
         )
 
-    def test_job_deletes_bulk_email_model_with_user_as_sender(self) -> None:
-        self.bulk_email_model.update_timestamps()
-        self.bulk_email_model.put()
-
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='BULK EMAILS SUCCESS: 1')]
-        )
-
-        self.assertIsNone(
-            email_models.BulkEmailModel.get('bulk_email_id', strict=False)
-        )
-
     def test_job_deletes_unsent_feedback_email_model(self) -> None:
         self.unsent_feedback_email_model.update_timestamps()
         self.unsent_feedback_email_model.put()
@@ -146,47 +121,23 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
             )
         )
 
-    def test_job_deletes_bulk_email_model(self) -> None:
-        self.user_bulk_emails_model.update_timestamps()
-        self.user_bulk_emails_model.put()
-
-        self.assert_job_output_is(
-            [job_run_result.JobRunResult(stdout='USER BULK EMAILS SUCCESS: 1')]
-        )
-
-        self.assertIsNone(
-            user_models.UserBulkEmailsModel.get(self.USER_ID, strict=False)
-        )
-
     def test_job_deletes_multiple_models(self) -> None:
         self.sent_email_model_with_sender.update_timestamps()
         self.sent_email_model_with_recipient.update_timestamps()
-        self.bulk_email_model.update_timestamps()
         self.unsent_feedback_email_model.update_timestamps()
-        self.user_bulk_emails_model.update_timestamps()
         self.put_multi(
             [
                 self.sent_email_model_with_sender,
                 self.sent_email_model_with_recipient,
-                self.bulk_email_model,
                 self.unsent_feedback_email_model,
-                self.user_bulk_emails_model,
             ]
         )
 
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(stdout='SENT EMAILS SUCCESS: 2'),
-                job_run_result.JobRunResult(stdout='BULK EMAILS SUCCESS: 1'),
                 job_run_result.JobRunResult(
                     stdout='FEEDBACK EMAILS SUCCESS: 1'
                 ),
-                job_run_result.JobRunResult(
-                    stdout='USER BULK EMAILS SUCCESS: 1'
-                ),
             ]
-        )
-
-        self.assertIsNone(
-            user_models.UserBulkEmailsModel.get(self.USER_ID, strict=False)
         )
