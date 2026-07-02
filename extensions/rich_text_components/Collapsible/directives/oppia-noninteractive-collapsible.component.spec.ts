@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {SimpleChanges} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveCollapsible} from './oppia-noninteractive-collapsible.component';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
@@ -33,7 +33,7 @@ describe('NoninteractiveCollapsible', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgbAccordionModule],
       declarations: [NoninteractiveCollapsible],

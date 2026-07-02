@@ -1408,9 +1408,9 @@ class ModifiableUserDataDict(TypedDict):
     display_alias: str
     pin: Optional[str]
     preferred_language_codes: List[str]
-    preferred_site_language_code: Optional[str]
-    preferred_audio_language_code: Optional[str]
-    preferred_translation_language_code: Optional[str]
+    preferred_site_language_code: str
+    preferred_audio_language_code: str
+    preferred_translation_language_code: str
     user_id: Optional[str]
 
 
@@ -1421,9 +1421,9 @@ class RawUserDataDict(TypedDict):
     display_alias: str
     pin: Optional[str]
     preferred_language_codes: List[str]
-    preferred_site_language_code: Optional[str]
-    preferred_audio_language_code: Optional[str]
-    preferred_translation_language_code: Optional[str]
+    preferred_site_language_code: str
+    preferred_audio_language_code: str
+    preferred_translation_language_code: str
     user_id: Optional[str]
 
 
@@ -1437,11 +1437,12 @@ class ModifiableUserData:
         display_alias: str,
         pin: Optional[str],
         preferred_language_codes: List[str],
-        preferred_site_language_code: Optional[str],
-        preferred_audio_language_code: Optional[str],
-        preferred_translation_language_code: Optional[str],
+        preferred_site_language_code: str,
+        preferred_audio_language_code: str,
+        preferred_translation_language_code: str,
         user_id: Optional[str] = None,
     ) -> None:
+        # Atribuições permanecem idênticas...
         """Constructs a ModifiableUserData domain object.
 
         Args:

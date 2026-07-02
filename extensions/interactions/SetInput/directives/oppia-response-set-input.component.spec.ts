@@ -16,7 +16,7 @@
  * @fileoverview Component for the Set Input response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ResponseSetInputComponent} from './oppia-response-set-input.component';
 import {TranslateModule} from '@ngx-translate/core';
@@ -31,7 +31,7 @@ describe('ResponseSetInputComponent', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         TranslateModule.forRoot({

@@ -42,7 +42,6 @@ from core.controllers import (
     custom_landing_pages,
     diagnostic_test_player,
     editor,
-    email_dashboard,
     feature_flag,
     features,
     feedback,
@@ -1230,20 +1229,6 @@ URLS = [
     get_redirect_route(
         r'%s/<story_id>' % feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler,
-    ),
-    get_redirect_route(
-        r'/emaildashboarddatahandler', email_dashboard.EmailDashboardDataHandler
-    ),
-    get_redirect_route(
-        r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler
-    ),
-    get_redirect_route(
-        r'/emaildashboardcancelresult/<query_id>',
-        email_dashboard.EmailDashboardCancelEmailHandler,
-    ),
-    get_redirect_route(
-        r'/emaildashboardtestbulkemailhandler/<query_id>',
-        email_dashboard.EmailDashboardTestBulkEmailHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,

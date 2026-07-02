@@ -66,6 +66,17 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 class MockNgbModal {
   open() {
     return {
+      componentInstance: {
+        suggestionIdToContribution: null,
+        initialSuggestionId: null,
+        reviewable: null,
+        subheading: null,
+        suggestionId: null,
+        question: null,
+        suggestion: null,
+        queuedSuggestionSummaryEmit: new EventEmitter(),
+        queuedSuggestionEmit: new EventEmitter(),
+      },
       result: Promise.resolve(),
     };
   }
@@ -80,6 +91,9 @@ class MockWindowRef {
 class MockPlatformFeatureService {
   status = {
     ContributorDashboardAccomplishments: {
+      isEnabled: false,
+    },
+    EnableTranslationOppsWithNewOppModels: {
       isEnabled: false,
     },
   };
@@ -821,6 +835,9 @@ describe('Contributions and review component', () => {
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
           'Submitted suggestion review.'
         );
+        expect(
+          contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+        ).toHaveBeenCalled();
       }));
 
       it('should return false on Review Questions tab', () => {
@@ -2879,6 +2896,95 @@ describe('Contributions and review component', () => {
 
       expect(summaryList[3].id).toBe('suggestion_4');
       expect(summaryList[3].labelText).toBe('Obsolete');
+    }));
+
+    it('should get translation contributions summary correctly when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      const suggestionIdToSuggestions = {
+        suggestion_1: {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 1',
+              translation_html: 'Translation 1',
+            },
+            exploration_content_html: 'Content 1',
+          },
+          details: {
+            topic_name: 'Topic',
+            entity_description: 'Entity Description',
+          },
+        },
+      } as unknown as Record<string, SuggestionDetails>;
+
+      const summaryList = component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions
+      );
+
+      expect(summaryList[0].id).toBe('suggestion_1');
+      expect(summaryList[0].subheading).toBe('Topic / Entity Description');
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+    }));
+
+    it('should open translation suggestion modal with correct subheading when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          suggestionIdToContribution: null,
+          initialSuggestionId: null,
+          reviewable: null,
+          subheading: null,
+          queuedSuggestionSummaryEmit: new EventEmitter(),
+          queuedSuggestionEmit: new EventEmitter(),
+        },
+        result: Promise.resolve([]),
+      } as NgbModalRef);
+      component.contributions = {
+        suggestion_1: {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 1',
+              translation_html: 'Translation 1',
+            },
+          },
+          details: {
+            topic_name: 'Topic',
+            entity_description: 'Entity Description',
+          },
+        },
+      } as unknown as Record<string, SuggestionDetails>;
+
+      component._showTranslationSuggestionModal(
+        {
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: 'suggestion_1',
+              status: 'review',
+              change_cmd: {
+                content_html: 'Content 1',
+                translation_html: 'Translation 1',
+              },
+            } as unknown as Suggestion,
+            details: {
+              topic_name: 'Topic',
+              entity_description: 'Entity Description',
+            } as unknown as ContributionDetails,
+          },
+        },
+        'suggestion_1',
+        true
+      );
+
+      expect(modalSpy).toHaveBeenCalled();
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
     }));
   });
 });
