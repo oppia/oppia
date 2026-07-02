@@ -56,7 +56,9 @@ class LearnerPlaylistHandler(
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def post(self, activity_type: str, activity_id: str) -> None:
+    def post(
+        self, activity_type: str, activity_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         assert self.user_id is not None
         assert self.normalized_payload is not None
         position_to_be_inserted_in = self.normalized_payload.get('index')
@@ -101,7 +103,9 @@ class LearnerPlaylistHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_learner_dashboard
-    def delete(self, activity_type: str, activity_id: str) -> None:
+    def delete(
+        self, activity_type: str, activity_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         assert self.user_id is not None
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             learner_playlist_services.remove_exploration_from_learner_playlist(

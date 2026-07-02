@@ -57,7 +57,7 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id: str) -> None:
+    def get(self, story_id: str) -> None:  # pylint: disable=arguments-differ
         """Retrieves and organizes the data needed to display a story.
 
         Args:
@@ -207,7 +207,9 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         return (next_exp_ids, next_node_id, completed_node_ids)
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
-    def get(self, story_id: str, node_id: str) -> None:
+    def get(
+        self, story_id: str, node_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Redirects the user to the next appropriate node or the story page.
 
         Args:
@@ -280,7 +282,9 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.redirect(redirect_url)
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
-    def post(self, story_id: str, node_id: str) -> None:
+    def post(
+        self, story_id: str, node_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Records the completion of a specific node within a story.
 
         Args:

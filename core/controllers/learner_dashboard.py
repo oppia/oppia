@@ -49,7 +49,7 @@ class OldLearnerDashboardRedirectPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
 
@@ -65,7 +65,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         (
@@ -158,7 +158,7 @@ class LearnerCompletedChaptersCountHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         learner_progress_in_topics_and_stories = (
@@ -201,7 +201,7 @@ class LearnerDashboardCollectionsProgressHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         learner_progress, number_of_nonexistent_collections = (
@@ -272,7 +272,7 @@ class LearnerDashboardExplorationsProgressHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         learner_progress, number_of_nonexistent_explorations = (
@@ -405,7 +405,7 @@ class LearnerDashboardIdsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         learner_dashboard_activities = (

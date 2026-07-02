@@ -1102,7 +1102,7 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         csrf_token = CsrfTokenManager.create_csrf_token(self.user_id)
         self.render_json(
             {

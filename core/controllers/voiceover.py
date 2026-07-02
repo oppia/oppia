@@ -47,7 +47,7 @@ class VoiceoverAdminDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves relevant data for the voiceover admin page."""
 
         language_accent_master_list: Dict[str, Dict[str, str]] = (
@@ -108,7 +108,7 @@ class VoiceoverLanguageCodesMappingHandler(
     }
 
     @acl_decorators.can_access_voiceover_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates the language codes mapping for the Oppia supported
         voiceovers.
         """
@@ -159,7 +159,7 @@ class EntityVoiceoversBulkHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self,
         entity_type: str,
         entity_id: str,
@@ -196,7 +196,7 @@ class AutomaticVoiceoverRegenerationRecordHandler(
     }
 
     @acl_decorators.can_access_voiceover_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves automatic voiceover regeneration records within the
         specified start and end dates.
         """
@@ -263,7 +263,9 @@ class RegenerateAutomaticVoiceoverHandler(
     }
 
     @acl_decorators.can_voiceover_exploration
-    def put(self, exploration_id: str) -> None:
+    def put(
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Regenerates the voiceover for the given exploration data."""
         assert self.normalized_payload is not None
         state_name: str = self.normalized_payload['state_name']
@@ -313,7 +315,7 @@ class RegenerateVoiceoverOnExpUpdateHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_voiceover_exploration
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self,
         exploration_id: str,
         exploration_version: int,
@@ -354,7 +356,9 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the status of all voiceover-regeneration requests queued in
         Cloud Tasks for the specified exploration.
 
@@ -384,7 +388,9 @@ class ExplorationDataForVoiceoverRegenerationHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_voiceover_admin_page
-    def get(self, exploration_id: str) -> None:
+    def get(
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Fetches exploration data required for regenerating automatic
         voiceovers for a given exploration.
         """
@@ -480,7 +486,9 @@ class RegenerateVoiceoversForExplorationHandler(
     HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
     @acl_decorators.can_access_voiceover_admin_page
-    def post(self, exploration_id: str, language_accent_code: str) -> None:
+    def post(
+        self, exploration_id: str, language_accent_code: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Regenerates the automatic voiceover for the specified exploration in
         the selected language and accent.
         """

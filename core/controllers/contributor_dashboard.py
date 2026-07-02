@@ -119,7 +119,9 @@ class ContributionOpportunitiesHandler(
     }
 
     @acl_decorators.open_access
-    def get(self, opportunity_type: str) -> None:
+    def get(
+        self, opportunity_type: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Args:
@@ -344,7 +346,7 @@ class ContributionOpportunitiesHandlerV2(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         if not feature_flag_services.is_feature_flag_enabled(
@@ -405,7 +407,7 @@ class ReviewableOpportunitiesHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
         # Default value is None, since this is a GET request handler, which
@@ -550,7 +552,7 @@ class ReviewableOpportunitiesHandlerV2(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
         if not feature_flag_services.is_feature_flag_enabled(
@@ -661,7 +663,7 @@ class TranslatableContentsHandlerV2(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         if not feature_flag_services.is_feature_flag_enabled(
@@ -809,7 +811,7 @@ class LessonsPinningHandler(
     }
 
     @acl_decorators.open_access
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles pinning/unpinning lessons."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
@@ -861,7 +863,7 @@ class TranslatableTextHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Raises:
@@ -1057,7 +1059,7 @@ class MachineTranslationStateTextsHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests. Responds with a mapping from content id to
         translation of form:
 
@@ -1154,7 +1156,7 @@ class UserContributionRightsDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         contribution_rights = None
         if self.username:
@@ -1204,7 +1206,7 @@ class FeaturedTranslationLanguagesHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.render_json(
             {
@@ -1223,7 +1225,7 @@ class TranslatableTopicNamesHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
         self.values = {'topic_names': topic_names}
@@ -1248,7 +1250,7 @@ class TranslatableTopicNamesPerClassroomHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Gets all translatable topics grouped by classroom.
         Returns a JSON response containing topics organized by classroom name.
         """
@@ -1313,7 +1315,7 @@ class TranslationPreferenceHandler(
     }
 
     @acl_decorators.can_manage_own_account
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
@@ -1326,7 +1328,7 @@ class TranslationPreferenceHandler(
         )
 
     @acl_decorators.can_manage_own_account
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -1351,7 +1353,7 @@ class ContributorStatsSummariesHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_fetch_contributor_dashboard_stats
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, contribution_type: str, contribution_subtype: str, username: str
     ) -> None:
         """Handles GET requests.
@@ -1508,7 +1510,9 @@ class ContributorCertificateHandler(
     }
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
-    def get(self, username: str, suggestion_type: str) -> None:
+    def get(
+        self, username: str, suggestion_type: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Generates data for contributor certificates.
 
         Args:
@@ -1555,7 +1559,7 @@ class ContributorAllStatsSummariesHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
-    def get(self, username: str) -> None:
+    def get(self, username: str) -> None:  # pylint: disable=arguments-differ
         """Fetches stats for given contributor.
 
         Args:

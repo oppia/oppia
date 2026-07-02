@@ -191,7 +191,7 @@ class GeneralFeedbackSubmitHandler(
     }
 
     @acl_decorators.open_access
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Submits web user feedback (platform or lesson)."""
         assert self.normalized_payload is not None
         payload = self.normalized_payload
@@ -274,7 +274,7 @@ class GeneralFeedbackCaptchaConfigHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         site_key = captcha_services.get_turnstile_site_key()
         self.render_json({'site_key': site_key})
 
@@ -326,7 +326,9 @@ class CreatorFeedbackListHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_request is not None
         req = self.normalized_request
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -434,7 +436,9 @@ class CreatorFeedbackDetailHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str, thread_id: str) -> None:
+    def get(
+        self, exploration_id: str, thread_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         thread = general_feedback_services.get_thread(thread_id)
         if (
             thread is None
@@ -480,7 +484,9 @@ class CreatorFeedbackDetailHandler(
         self.render_json(feedback_dict)
 
     @acl_decorators.can_play_exploration_as_logged_in_user
-    def put(self, exploration_id: str, thread_id: str) -> None:
+    def put(
+        self, exploration_id: str, thread_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Updates lesson thread status and/or adds a creator message."""
         assert self.user is not None
         assert self.normalized_payload is not None

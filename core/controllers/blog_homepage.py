@@ -185,7 +185,7 @@ class BlogHomepageDataHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves blog post summaries for the blog homepage."""
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
@@ -239,7 +239,9 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, blog_post_url: str) -> None:
+    def get(
+        self, blog_post_url: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves a specific blog post and its related recommendations.
 
         Args:
@@ -354,7 +356,9 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.open_access
-    def get(self, author_username: str) -> None:
+    def get(
+        self, author_username: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves blog post summaries and specific author details.
 
         Args:
@@ -444,7 +448,7 @@ class BlogPostSearchHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Searches for blog posts based on a query and tags."""
         assert self.normalized_request is not None
         query_string = utils.get_formatted_query_string(

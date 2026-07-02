@@ -48,7 +48,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_name: str) -> None:
+    def get(self, topic_name: str) -> None:  # pylint: disable=arguments-differ
         """Accesses a topic viewer page.
 
         Args:
@@ -215,7 +215,7 @@ class TopicNameHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, topic_name: str) -> None:
+    def get(self, topic_name: str) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.
 

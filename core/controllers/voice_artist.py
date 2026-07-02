@@ -92,7 +92,9 @@ class AudioUploadHandler(
     _FILENAME_PREFIX = 'audio'
 
     @acl_decorators.can_voiceover_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Saves an audio file uploaded by a content creator.
 
         Args:
@@ -156,7 +158,9 @@ class StartedTranslationTutorialEventHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_play_exploration_as_logged_in_user
-    def post(self, unused_exploration_id: str) -> None:
+    def post(
+        self, unused_exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Records that the user has started the state translation tutorial.
 
         unused_exploration_id: str. The unused exploration ID.
@@ -232,7 +236,9 @@ class VoiceArtistManagementHandler(
     }
 
     @acl_decorators.can_add_voice_artist
-    def post(self, unused_entity_type: str, entity_id: str) -> None:
+    def post(
+        self, unused_entity_type: str, entity_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Assigns a voice artist role.
 
         Args:
@@ -256,7 +262,9 @@ class VoiceArtistManagementHandler(
         self.render_json({})
 
     @acl_decorators.can_remove_voice_artist
-    def delete(self, unused_entity_type: str, entity_id: str) -> None:
+    def delete(
+        self, unused_entity_type: str, entity_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Removes the voice artist role from a user.
 
         Args:

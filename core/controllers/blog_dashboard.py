@@ -115,7 +115,7 @@ class BlogDashboardDataHandler(
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
         author_details_dict = blog_services.get_blog_author_details(
@@ -164,14 +164,14 @@ class BlogDashboardDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_blog_dashboard
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Creates a new blog post draft."""
         assert self.user_id is not None
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
 
     @acl_decorators.can_access_blog_dashboard
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates author details of the user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -261,7 +261,9 @@ class BlogPostHandler(
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(self, blog_post_id: str) -> None:
+    def get(
+        self, blog_post_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the blog dashboard editor page.
 
         Args:
@@ -311,7 +313,9 @@ class BlogPostHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def put(self, blog_post_id: str) -> None:
+    def put(
+        self, blog_post_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given blog post.
 
         Args:
@@ -338,7 +342,9 @@ class BlogPostHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def post(self, blog_post_id: str) -> None:
+    def post(
+        self, blog_post_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Stores thumbnail of the blog post in the datastore.
 
         Args:
@@ -365,7 +371,9 @@ class BlogPostHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_delete_blog_post
-    def delete(self, blog_post_id: str) -> None:
+    def delete(
+        self, blog_post_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Deletes a blog post.
 
         Args:
@@ -425,7 +433,9 @@ class BlogPostTitleHandler(
     }
 
     @acl_decorators.can_edit_blog_post
-    def get(self, blog_post_id: str) -> None:
+    def get(
+        self, blog_post_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a blog post title and checks whether
         a blog post with the same title exists.
 

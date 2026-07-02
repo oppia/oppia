@@ -98,7 +98,7 @@ class CertificateAssessmentOfferingHandler(
     }
 
     @acl_decorators.can_access_certificate_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Returns all certificate assessment offerings."""
         certificate_offerings = (
             certificate_assessment_services.get_certificate_assessment_offerings()
@@ -113,7 +113,7 @@ class CertificateAssessmentOfferingHandler(
         )
 
     @acl_decorators.can_access_certificate_dashboard
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Creates a certificate assessment offering."""
         assert self.normalized_payload is not None
         topic_ids = [
@@ -192,8 +192,10 @@ class CertificateAssessmentOfferingByIdHandler(
     }
 
     @acl_decorators.can_access_certificate_dashboard
-    def get(self, certificate_id: str) -> None:
-        """Returns a certificate offering by ID.
+    def get(
+        self, certificate_id: str
+    ) -> None:  # pylint: disable=arguments-differ
+        """Returns a stubbed certificate offering.
 
         Args:
             certificate_id: str. The ID of the certificate offering.
@@ -219,8 +221,10 @@ class CertificateAssessmentOfferingByIdHandler(
         )
 
     @acl_decorators.can_access_certificate_dashboard
-    def put(self, certificate_id: str) -> None:
-        """Updates a certificate offering.
+    def put(
+        self, certificate_id: str
+    ) -> None:  # pylint: disable=arguments-differ
+        """Returns the updated certificate ID (stub).
 
         Args:
             certificate_id: str. The ID of the certificate offering.
@@ -257,8 +261,10 @@ class CertificateAssessmentOfferingByIdHandler(
         )
 
     @acl_decorators.can_access_certificate_dashboard
-    def delete(self, certificate_id: str) -> None:
-        """Deletes the certificate offering.
+    def delete(
+        self, certificate_id: str
+    ) -> None:  # pylint: disable=arguments-differ
+        """Deletes the certificate offering (stub).
 
         Args:
             certificate_id: str. The ID of the certificate offering.
