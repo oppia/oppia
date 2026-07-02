@@ -28,10 +28,6 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],

@@ -30,6 +30,23 @@ interface UpdateCertificateOfferingBackendResponse {
   certificate_id: string;
 }
 
+interface GetCertificateOfferingBackendResponse {
+  certificate_offering: {
+    certificate_id: string;
+    title: string;
+    description: string;
+    classroom_id: string;
+    topic_data: {
+      [topicId: string]: number;
+    };
+    demonstrates: string[];
+    total_questions: number;
+    time_limit_in_minutes: number;
+    async_status: string;
+    version: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -41,6 +58,40 @@ export class CertificateAssessmentOfferingBackendApiService {
       '<certificate_id>',
       certificateId
     );
+  }
+
+  async getCertificateAssessmentOfferingAsync(
+    certificateId: string
+  ): Promise<CertificateAssessmentOfferingData> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<GetCertificateOfferingBackendResponse>(
+          this.getCertificateOfferingByIdHandlerUrl(certificateId)
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              CertificateAssessmentOfferingData.createFromBackendDict({
+                certificate_id: response.certificate_offering.certificate_id,
+                title: response.certificate_offering.title,
+                description: response.certificate_offering.description,
+                classroom_id: response.certificate_offering.classroom_id,
+                topic_data: response.certificate_offering.topic_data,
+                demonstrates: response.certificate_offering.demonstrates,
+                total_questions: response.certificate_offering.total_questions,
+                time_limit_in_minutes:
+                  response.certificate_offering.time_limit_in_minutes,
+                async_status: response.certificate_offering.async_status,
+                version: response.certificate_offering.version,
+              })
+            );
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error || errorResponse.message);
+          }
+        );
+    });
   }
 
   async createCertificateAssessmentOfferingAsync(
@@ -87,12 +138,30 @@ export class CertificateAssessmentOfferingBackendApiService {
     certificateId: string,
     certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
+    const topicIds = Object.keys(certificateAssessmentOffering.topicData || {});
     return new Promise((resolve, reject) => {
-      // TODO(#26217-M1.12): Pass the certificate assessment offering payload once the backend update handler supports it.
+      // TODO(#24717-M1.14): Replace the temporary stub fallbacks in this
+      // request with the real edit-form values once the M1.14 wiring is done.
       this.http
         .put<UpdateCertificateOfferingBackendResponse>(
           this.getCertificateOfferingByIdHandlerUrl(certificateId),
-          {}
+          {
+            title: certificateAssessmentOffering.title || 'Stub Certificate',
+            description:
+              certificateAssessmentOffering.description || 'Stub Description',
+            classroom_id:
+              certificateAssessmentOffering.classroomId || 'math_classroom_01',
+            topics:
+              topicIds.length > 0
+                ? topicIds.map(topicId => ({topic_id: topicId}))
+                : [{topic_id: 'topic_place_values'}],
+            total_questions: certificateAssessmentOffering.totalQuestions || 1,
+            time_limit_in_minutes:
+              certificateAssessmentOffering.timeLimitInMinutes || 1,
+            demonstrates: ['Stub demonstration'],
+            async_status:
+              certificateAssessmentOffering.asyncStatus || 'Available',
+          }
         )
         .toPromise()
         .then(

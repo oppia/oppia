@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the profile page navbar component.
  */
 
-import {ComponentFixture, TestBed, async} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {ProfilePageNavbarComponent} from './profile-page-navbar.component';
 import {UrlService} from 'services/contextual/url.service';
@@ -31,7 +31,7 @@ let component: ProfilePageNavbarComponent;
 let fixture: ComponentFixture<ProfilePageNavbarComponent>;
 
 describe('Profile Page Navbar Component', function () {
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ProfilePageNavbarComponent],
       providers: [{provide: UrlService, useClass: MockUrlService}],

@@ -37,8 +37,10 @@ import {OppiaFooterComponent} from './oppia-footer.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
+import {FeedbackModalComponent} from './feedback-modal.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -58,6 +60,14 @@ class MockNgbModal {
   open = jasmine.createSpy('open').and.returnValue({componentInstance: {}});
 }
 
+class MockPlatformFeatureService {
+  status = {
+    WebFeedbackModalEnabled: {
+      isEnabled: false,
+    },
+  };
+}
+
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
   let fixture: ComponentFixture<OppiaFooterComponent>;
@@ -66,6 +76,7 @@ describe('OppiaFooterComponent', () => {
   let mockWindowRef: MockWindowRef;
   let ngbModal: MockNgbModal;
   let siteAnalyticsService: SiteAnalyticsService;
+  let platformFeatureService: MockPlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -85,6 +96,10 @@ describe('OppiaFooterComponent', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -93,6 +108,7 @@ describe('OppiaFooterComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(OppiaFooterComponent);
     alertsService = TestBed.inject(AlertsService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
@@ -126,6 +142,21 @@ describe('OppiaFooterComponent', () => {
   it('should return false when email address is null', () => {
     component.emailAddress = null;
     expect(component.validateEmailAddress()).toBe(false);
+  });
+
+  it('should check WebfeedbackModal feature flag is enabled', () => {
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = true;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
+
+    platformFeatureService.status.WebFeedbackModalEnabled.isEnabled = false;
+    expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(false);
+  });
+
+  it('should open site feedback modal', () => {
+    component.openSiteFeedbackModal();
+    expect(ngbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
   });
 
   it('should return true if not processing subscription and email address is invalid', () => {

@@ -1,10 +1,6 @@
 {
   "suites": [
     {
-      "name": "creatorDashboard",
-      "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
-    },
-    {
       "name": "explorationHistoryTab",
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
     },

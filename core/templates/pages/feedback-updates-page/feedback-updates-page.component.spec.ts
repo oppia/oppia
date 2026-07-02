@@ -20,7 +20,7 @@ import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summ
 
 import {FeedbackUpdatesPageComponent} from './feedback-updates-page.component';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   flush,
@@ -186,7 +186,7 @@ describe('Feedback updates page', () => {
   });
 
   describe('when succesfully fetching feedback updates data', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
         imports: [
@@ -837,7 +837,7 @@ describe('Feedback updates page', () => {
   });
 
   describe('when fetching dashboard data fails', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           BrowserAnimationsModule,
