@@ -3136,6 +3136,56 @@ title: Title
         )
         self.logout()
 
+    def test_sync_checkpoint_no_change_in_new_version(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id, self.EXP_ID, 'Introduction', 1
+        )
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'new objective',
+                }
+            )
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, 'update obj'
+        )
+        user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+            self.viewer_id, self.EXP_ID
+        )
+        self.logout()
+
+    def test_update_checkpoint_progress_earlier_state_new_version(self) -> None:
+        from unittest import mock
+
+        self.login(self.VIEWER_EMAIL)
+        with mock.patch(
+            'core.domain.user_services.get_checkpoints_in_order'
+        ) as mock_checkpoints:
+            mock_checkpoints.return_value = ['Introduction', 'Second State']
+            user_services.update_learner_checkpoint_progress(
+                self.viewer_id, self.EXP_ID, 'Second State', 1
+            )
+            change_list = [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'objective',
+                        'new_value': 'newer objective',
+                    }
+                )
+            ]
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, change_list, 'update obj'
+            )
+            user_services.update_learner_checkpoint_progress(
+                self.viewer_id, self.EXP_ID, 'Introduction', 2
+            )
+        self.logout()
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
