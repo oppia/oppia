@@ -66,8 +66,8 @@
             {{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" 
-              [attr.aria-label]="'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate" 
+      <button class="player-sidebar-button"
+              [attr.aria-label]="'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate"
               (click)="showSendLessonFeedbackModal()"
               *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
               matTooltip="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}"
