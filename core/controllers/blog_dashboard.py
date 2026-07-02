@@ -261,7 +261,7 @@ class BlogPostHandler(
     }
 
     @acl_decorators.can_access_blog_dashboard
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, blog_post_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the blog dashboard editor page.
@@ -313,7 +313,7 @@ class BlogPostHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, blog_post_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given blog post.
@@ -342,7 +342,7 @@ class BlogPostHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, blog_post_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Stores thumbnail of the blog post in the datastore.
@@ -371,7 +371,7 @@ class BlogPostHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_delete_blog_post
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, blog_post_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes a blog post.
@@ -433,7 +433,7 @@ class BlogPostTitleHandler(
     }
 
     @acl_decorators.can_edit_blog_post
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, blog_post_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a blog post title and checks whether

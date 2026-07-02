@@ -101,7 +101,7 @@ class EditableCollectionDataHandler(
     }
 
     @acl_decorators.can_edit_collection
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, collection_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual collection page.
@@ -119,7 +119,7 @@ class EditableCollectionDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_collection
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, collection_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given collection.
@@ -163,7 +163,7 @@ class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, collection_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Gets the editing rights for the given collection.
@@ -228,7 +228,7 @@ class CollectionPublishHandler(
     }
 
     @acl_decorators.can_publish_collection
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, collection_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Publishes the given collection.
@@ -296,7 +296,7 @@ class CollectionUnpublishHandler(
     }
 
     @acl_decorators.can_unpublish_collection
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, collection_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Unpublishes the given collection.

@@ -49,7 +49,7 @@ class ValueGeneratorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, generator_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
@@ -296,7 +296,7 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, folder: str, filename: str
     ) -> None:  # pylint: disable=arguments-differ
         """Redirects to correct copyrighted image for particular deployment.

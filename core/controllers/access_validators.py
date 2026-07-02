@@ -428,7 +428,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about a learner group.
@@ -507,7 +507,7 @@ class ExplorationPlayerAccessValidationPage(
     }
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
@@ -578,7 +578,7 @@ class EditLearnerGroupPageAccessValidationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Validates access to edit learner group page.
@@ -683,7 +683,7 @@ class BlogAuthorProfilePageAccessValidationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, author_username: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about a blog post author.
@@ -790,7 +790,7 @@ class ExplorationEditorAccessValidationHandlerPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Renders an exploration editor page.
@@ -858,7 +858,7 @@ class StoryEditorAccessValidationHandlerPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_story
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_story_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Renders the story editor page.

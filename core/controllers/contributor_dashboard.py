@@ -119,7 +119,7 @@ class ContributionOpportunitiesHandler(
     }
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, opportunity_type: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
@@ -1510,7 +1510,7 @@ class ContributorCertificateHandler(
     }
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, username: str, suggestion_type: str
     ) -> None:  # pylint: disable=arguments-differ
         """Generates data for contributor certificates.

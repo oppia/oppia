@@ -287,7 +287,7 @@ class ValidateExplorationsHandler(
     }
 
     @acl_decorators.can_edit_story
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_story_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a list of exploration IDs, checks whether the
@@ -321,7 +321,7 @@ class StoryUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, story_url_fragment: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a story url fragment and checks whether

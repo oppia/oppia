@@ -263,7 +263,7 @@ class RegenerateAutomaticVoiceoverHandler(
     }
 
     @acl_decorators.can_voiceover_exploration
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Regenerates the voiceover for the given exploration data."""
@@ -356,7 +356,7 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the status of all voiceover-regeneration requests queued in
@@ -388,7 +388,7 @@ class ExplorationDataForVoiceoverRegenerationHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_voiceover_admin_page
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Fetches exploration data required for regenerating automatic
@@ -486,7 +486,7 @@ class RegenerateVoiceoversForExplorationHandler(
     HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
     @acl_decorators.can_access_voiceover_admin_page
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, exploration_id: str, language_accent_code: str
     ) -> None:  # pylint: disable=arguments-differ
         """Regenerates the automatic voiceover for the specified exploration in

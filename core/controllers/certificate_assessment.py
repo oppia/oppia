@@ -192,7 +192,7 @@ class CertificateAssessmentOfferingByIdHandler(
     }
 
     @acl_decorators.can_access_certificate_dashboard
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, certificate_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Returns a stubbed certificate offering.
@@ -221,7 +221,7 @@ class CertificateAssessmentOfferingByIdHandler(
         )
 
     @acl_decorators.can_access_certificate_dashboard
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, certificate_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Returns the updated certificate ID (stub).
@@ -261,7 +261,7 @@ class CertificateAssessmentOfferingByIdHandler(
         )
 
     @acl_decorators.can_access_certificate_dashboard
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, certificate_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes the certificate offering (stub).

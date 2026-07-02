@@ -152,7 +152,7 @@ class ExplorationHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Gets the data for the exploration overview page.
@@ -211,7 +211,7 @@ class ExplorationHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_save_exploration
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given exploration.
@@ -296,7 +296,7 @@ class ExplorationHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_delete_exploration
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes the given exploration.
@@ -413,7 +413,7 @@ class UserExplorationPermissionsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Gets the user permissions for an exploration.
@@ -519,7 +519,7 @@ class ExplorationRightsHandler(
     }
 
     @acl_decorators.can_modify_exploration_roles
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates the editing rights for the given exploration.
@@ -606,7 +606,7 @@ class ExplorationRightsHandler(
         )
 
     @acl_decorators.can_modify_exploration_roles
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes user roles from the exploration.
@@ -689,7 +689,7 @@ class ExplorationStatusHandler(
         exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Publishes an exploration.
@@ -739,7 +739,7 @@ class ExplorationModeratorRightsHandler(
     }
 
     @acl_decorators.can_access_moderator_page
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Unpublishes the given exploration, and sends an email to all its
@@ -826,7 +826,7 @@ class UserExplorationEmailsHandler(
     }
 
     @acl_decorators.can_edit_exploration
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates the email notification preferences for the given exploration.
@@ -900,7 +900,7 @@ class ExplorationFileDownloader(
     }
 
     @acl_decorators.can_download_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Downloads an exploration.
@@ -987,7 +987,7 @@ class StateYamlHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, unused_exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests related to playing an exploration.
@@ -1020,7 +1020,7 @@ class ExplorationSnapshotsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves snapshots metadata of an exploration.
@@ -1062,7 +1062,7 @@ class ExplorationCheckRevertValidHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str, version: int
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the validation error information of an exploration.
@@ -1104,7 +1104,7 @@ class ExplorationRevertHandler(
     }
 
     @acl_decorators.can_edit_exploration
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Reverts an exploration to a previous version.
@@ -1144,7 +1144,7 @@ class ExplorationStatisticsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the statistics of an exploration.
@@ -1174,7 +1174,7 @@ class StateInteractionStatsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str, state_name: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves statistics for a specific state of an exploration.
@@ -1264,7 +1264,7 @@ class FetchPlaythroughHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_exploration_id: str, playthrough_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves a playthrough by its ID.
@@ -1425,7 +1425,7 @@ class ImageUploadHandler(
     }
 
     @acl_decorators.can_edit_entity
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, entity_type: str, entity_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Saves an image uploaded by a content creator.
@@ -1484,7 +1484,7 @@ class StartedTutorialEventHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_play_exploration
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, unused_exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
@@ -1590,7 +1590,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         )
 
     @acl_decorators.can_save_exploration
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles POST request for discarding draft changes.
@@ -1615,7 +1615,7 @@ class StateAnswerStatisticsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
@@ -1639,7 +1639,7 @@ class TopUnresolvedAnswersHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for unresolved answers.
@@ -1681,7 +1681,7 @@ class ExplorationEditsAllowedHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT request to set whether exploration can be edited.
@@ -1737,7 +1737,7 @@ class LearnerAnswerInfoHandler(
     }
 
     @acl_decorators.can_play_entity
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, entity_type: str, entity_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles the GET requests for learner answer info for an
@@ -1817,7 +1817,7 @@ class LearnerAnswerInfoHandler(
         )
 
     @acl_decorators.can_edit_entity
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, entity_type: str, entity_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes the learner answer info by the given id.

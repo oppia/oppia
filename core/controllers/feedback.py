@@ -239,7 +239,7 @@ class ThreadListHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
 
@@ -261,7 +261,7 @@ class ThreadListHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_payload is not None
@@ -494,7 +494,7 @@ class FeedbackStatsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         feedback_thread_analytics = feedback_services.get_thread_analytics(

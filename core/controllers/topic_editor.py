@@ -380,7 +380,7 @@ class EditableSubtopicPageDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, topic_id: str, subtopic_id: int
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the details of a specific subtopic.
@@ -436,7 +436,7 @@ class EditableStudyGuideDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, topic_id: str, subtopic_id: int
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the details of a specific subtopic.
@@ -991,7 +991,7 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, topic_url_fragment: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a topic url fragment and checks whether

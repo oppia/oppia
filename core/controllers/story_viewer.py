@@ -207,7 +207,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         return (next_exp_ids, next_node_id, completed_node_ids)
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, story_id: str, node_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Redirects the user to the next appropriate node or the story page.
@@ -282,7 +282,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.redirect(redirect_url)
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, story_id: str, node_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Records the completion of a specific node within a story.

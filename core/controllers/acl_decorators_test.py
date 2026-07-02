@@ -195,7 +195,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_view_skills
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, selected_skill_ids: List[str]
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'selected_skill_ids': selected_skill_ids})
@@ -267,7 +267,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_download_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -402,7 +402,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_view_exploration_stats
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -577,7 +577,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -673,7 +673,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_exploration_as_logged_in_user
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -770,7 +770,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_collection
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, collection_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'collection_id': collection_id})
@@ -878,7 +878,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_collection
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, collection_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'collection_id': collection_id})
@@ -1235,7 +1235,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_comment_on_feedback_thread
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, thread_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'thread_id': thread_id})
@@ -1390,7 +1390,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_create_feedback_thread
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -1493,7 +1493,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_view_feedback_thread
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, thread_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'thread_id': thread_id})
@@ -1638,7 +1638,7 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             self.render_json({'success': 1})
 
         @acl_decorators.can_manage_email_dashboard
-        def put(
+        def put(  # pylint: disable=arguments-differ
             self, query_id: str
         ) -> None:  # pylint: disable=arguments-differ
             return self.render_json({'query_id': query_id})
@@ -1697,7 +1697,7 @@ class RateExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_rate_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -1786,7 +1786,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_flag_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -2225,7 +2225,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_delete_blog_post
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, blog_post_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'blog_id': blog_post_id})
@@ -2336,7 +2336,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_blog_post
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, blog_post_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'blog_id': blog_post_id})
@@ -2673,7 +2673,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_manage_contributors_role
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, unused_category: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'success': 1})
@@ -2861,7 +2861,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_voiceover_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -3033,7 +3033,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         }
 
         @acl_decorators.can_add_voice_artist
-        def post(
+        def post(  # pylint: disable=arguments-differ
             self, entity_type: str, entity_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json(
@@ -3041,7 +3041,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             )
 
         @acl_decorators.can_remove_voice_artist
-        def delete(
+        def delete(  # pylint: disable=arguments-differ
             self, entity_type: str, entity_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json(
@@ -3304,7 +3304,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -3678,7 +3678,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_delete_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -3776,7 +3776,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_suggest_changes_to_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -3880,7 +3880,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_resubmit_suggestion
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, suggestion_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'suggestion_id': suggestion_id})
@@ -3979,7 +3979,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         @acl_decorators.get_decorator_for_accepting_suggestion(
             acl_decorators.open_access
         )
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, target_id: str, suggestion_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json(
@@ -4190,7 +4190,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_view_reviewable_suggestions
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, target_type: str, suggestion_type: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json(
@@ -4337,7 +4337,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_publish_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -4426,7 +4426,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_modify_exploration_roles
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -4501,7 +4501,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_publish_collection
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, collection_id: str
         ) -> None:  # pylint: disable=arguments-differ
             return self.render_json({'collection_id': collection_id})
@@ -4516,7 +4516,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_unpublish_collection
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, collection_id: str
         ) -> None:  # pylint: disable=arguments-differ
             return self.render_json({'collection_id': collection_id})
@@ -4794,7 +4794,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_topic
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'topic_id': topic_id})
@@ -4876,7 +4876,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_delete_topic
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'topic_id': topic_id})
@@ -4954,7 +4954,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_view_any_topic_editor
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'topic_id': topic_id})
@@ -5038,7 +5038,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_story
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, story_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'story_id': story_id})
@@ -5154,7 +5154,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_delete_story
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, story_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'story_id': story_id})
@@ -5331,7 +5331,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_add_new_story_to_topic
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'topic_id': topic_id})
@@ -5440,7 +5440,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_story_viewer_page_as_logged_in_user
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, story_url_fragment: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'story_url_fragment': story_url_fragment})
@@ -5661,7 +5661,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_story_viewer_page
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, story_url_fragment: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'story_url_fragment': story_url_fragment})
@@ -6205,7 +6205,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_name: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'topic_name': topic_name})
@@ -6394,7 +6394,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_manage_question_skill_status
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, skill_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'skill_id': skill_id})
@@ -6533,7 +6533,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_manage_rights_for_topic
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'topic_id': topic_id})
@@ -6600,7 +6600,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_change_topic_publication_status
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, topic_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({topic_id: topic_id})
@@ -6798,7 +6798,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_skill
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, skill_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'skill_id': skill_id})
@@ -6934,7 +6934,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_question
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, question_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'question_id': question_id})
@@ -7096,7 +7096,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_view_question_editor
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, question_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'question_id': question_id})
@@ -7212,7 +7212,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_delete_question
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, question_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'question_id': question_id})
@@ -7311,7 +7311,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_question
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, question_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'question_id': question_id})
@@ -7364,7 +7364,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_entity
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, entity_type: str, entity_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json(
@@ -7485,7 +7485,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_edit_entity
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, entity_type: str, entity_id: str
         ) -> None:  # pylint: disable=arguments-differ
             return self.render_json(
@@ -7774,7 +7774,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_save_exploration
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, exploration_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'exploration_id': exploration_id})
@@ -7923,7 +7923,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_update_suggestion
-        def get(
+        def get(  # pylint: disable=arguments-differ
             self, suggestion_id: str
         ) -> None:  # pylint: disable=arguments-differ
             self.render_json({'suggestion_id': suggestion_id})

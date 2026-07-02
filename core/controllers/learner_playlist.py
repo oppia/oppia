@@ -56,7 +56,7 @@ class LearnerPlaylistHandler(
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, activity_type: str, activity_id: str
     ) -> None:  # pylint: disable=arguments-differ
         assert self.user_id is not None
@@ -103,7 +103,7 @@ class LearnerPlaylistHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_learner_dashboard
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, activity_type: str, activity_id: str
     ) -> None:  # pylint: disable=arguments-differ
         assert self.user_id is not None

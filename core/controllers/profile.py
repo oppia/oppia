@@ -148,7 +148,7 @@ class BulkEmailWebhookEndpoint(
     # decorator, and here we are getting 'secret' because the decorator always
     # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, unused_secret: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests. This is just an empty endpoint that is
@@ -162,7 +162,7 @@ class BulkEmailWebhookEndpoint(
     # decorator, and here we are getting 'secret' because the decorator always
     # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, unused_secret: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""

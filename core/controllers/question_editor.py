@@ -392,7 +392,7 @@ class EditableQuestionDataHandler(
         self.render_json({'question_dict': question_dict})
 
     @acl_decorators.can_delete_question
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, question_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles Delete requests."""

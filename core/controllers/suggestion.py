@@ -405,7 +405,7 @@ class SuggestionToExplorationActionHandler(
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration
     )
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, target_id: str, suggestion_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
@@ -533,7 +533,7 @@ class ResubmitSuggestionHandler(
     }
 
     @acl_decorators.can_resubmit_suggestion
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, suggestion_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
@@ -614,7 +614,7 @@ class SuggestionToSkillActionHandler(
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill
     )
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, target_id: str, suggestion_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
@@ -847,7 +847,7 @@ class ReviewableSuggestionsHandler(
         return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, target_type: str, suggestion_type: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
@@ -973,7 +973,7 @@ class UserSubmittedSuggestionsHandler(
     }
 
     @acl_decorators.can_suggest_changes
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, target_type: str, suggestion_type: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
@@ -1122,7 +1122,7 @@ class UpdateTranslationSuggestionHandler(
     }
 
     @acl_decorators.can_update_suggestion
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, suggestion_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
@@ -1199,7 +1199,7 @@ class UpdateQuestionSuggestionHandler(
     }
 
     @acl_decorators.can_update_suggestion
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, suggestion_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.

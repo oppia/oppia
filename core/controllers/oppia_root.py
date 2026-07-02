@@ -32,7 +32,7 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     # arguments and even when we don't use them we need to allow them so that
     # there is no error in the callsite.
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, **kwargs: Dict[str, str]
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""

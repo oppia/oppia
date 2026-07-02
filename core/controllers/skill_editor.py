@@ -315,7 +315,7 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, comma_separated_skill_ids: str
     ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on skill pages of the skill ids.
@@ -380,7 +380,7 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_create_skill
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, skill_description: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a skill description and checks whether

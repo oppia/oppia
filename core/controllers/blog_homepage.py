@@ -239,7 +239,7 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, blog_post_url: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves a specific blog post and its related recommendations.
@@ -356,7 +356,7 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, author_username: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves blog post summaries and specific author details.

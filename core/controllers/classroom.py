@@ -56,7 +56,7 @@ class ClassroomDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.does_classroom_exist
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, classroom_url_fragment: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about a classroom.
@@ -278,7 +278,7 @@ class ClassroomHandler(
     }
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, classroom_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the classroom details.
@@ -302,7 +302,7 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, classroom_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of a given classroom.
@@ -377,7 +377,7 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, classroom_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes classroom from the classroom admin page.
@@ -404,7 +404,7 @@ class ClassroomUrlFragmentHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_classroom_admin_page
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, classroom_url_fragment: str
     ) -> None:  # pylint: disable=arguments-differ
         """Checks whether a classroom with given URL fragment exists.
@@ -434,7 +434,7 @@ class ClassroomIdHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, classroom_url_fragment: str
     ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the classroom ID.

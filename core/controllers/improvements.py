@@ -108,7 +108,7 @@ class ExplorationImprovementsHandler(
     }
 
     @acl_decorators.can_edit_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         open_tasks, resolved_task_types_by_state_name = (
@@ -129,7 +129,7 @@ class ExplorationImprovementsHandler(
         )
 
     @acl_decorators.can_edit_exploration
-    def post(
+    def post(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_payload is not None
@@ -200,7 +200,7 @@ class ExplorationImprovementsHistoryHandler(
     }
 
     @acl_decorators.can_edit_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_request is not None
@@ -247,7 +247,7 @@ class ExplorationImprovementsConfigHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         self.render_json(

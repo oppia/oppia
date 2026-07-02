@@ -194,7 +194,7 @@ class LearnerGroupHandler(
     HANDLER_ARGS_SCHEMAS = {'PUT': LEARNER_GROUP_SCHEMA, 'DELETE': {}}
 
     @acl_decorators.can_access_learner_groups
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates an existing learner group."""
@@ -258,7 +258,7 @@ class LearnerGroupHandler(
         )
 
     @acl_decorators.can_access_learner_groups
-    def delete(
+    def delete(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Deletes a learner group."""
@@ -322,7 +322,7 @@ class LearnerGroupLearnerProgressHandler(
     # value. Also, once the value type is changed, please remove
     # List[Mapping[str, Any]] from render_json's argument type.
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for users progress through learner
@@ -410,7 +410,7 @@ class LearnerGroupLearnerSpecificProgressHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for user progress through learner
@@ -478,7 +478,7 @@ class LearnerGroupSyllabusHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for the learner group syllabus."""
@@ -656,7 +656,7 @@ class ViewLearnerGroupInfoHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests for viewing learner group info."""
@@ -799,7 +799,7 @@ class LearnerGroupLearnersInfoHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
@@ -900,7 +900,7 @@ class LearnerGroupLearnerInvitationHandler(
     }
 
     @acl_decorators.can_access_learner_groups
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
@@ -1002,7 +1002,7 @@ class ExitLearnerGroupHandler(
     }
 
     @acl_decorators.can_access_learner_groups
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
@@ -1268,7 +1268,7 @@ class LearnerGroupProgressSharingPermissionHandler(
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
@@ -1283,7 +1283,7 @@ class LearnerGroupProgressSharingPermissionHandler(
         )
 
     @acl_decorators.can_access_learner_groups
-    def put(
+    def put(  # pylint: disable=arguments-differ
         self, learner_group_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""

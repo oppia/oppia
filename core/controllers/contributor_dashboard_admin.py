@@ -585,7 +585,7 @@ class ContributorDashboardAdminStatsHandler(
     }
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, contribution_type: str, contribution_subtype: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""

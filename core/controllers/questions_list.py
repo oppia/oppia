@@ -53,7 +53,7 @@ class QuestionsListHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {'offset': {'schema': {'type': 'int'}}}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, comma_separated_skill_ids: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
@@ -149,7 +149,7 @@ class QuestionCountDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self, comma_separated_skill_ids: str
     ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
