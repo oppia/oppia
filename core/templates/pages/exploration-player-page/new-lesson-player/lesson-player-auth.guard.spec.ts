@@ -186,4 +186,71 @@ describe('LessonPlayerPageAuthGuard', () => {
       done();
     });
   });
+
+  it('should redirect to error/400 for invalid exploration ID without calling backend', done => {
+    const validateSpy = spyOn(
+      backendApiService,
+      'validateAccessToExplorationPlayerPage'
+    );
+
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    const replaceStateSpy = spyOn(location, 'replaceState');
+
+    const route = createMockRoute('learning!&url');
+    const state: RouterStateSnapshot = {
+      url: '/lesson/learning!&url',
+      root: new ActivatedRouteSnapshot(),
+    };
+
+    guard.canActivate(route, state).then(result => {
+      expect(result).toBeFalse();
+      expect(validateSpy).not.toHaveBeenCalled();
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/400`,
+      ]);
+      expect(replaceStateSpy).toHaveBeenCalledWith(state.url);
+      done();
+    });
+  });
+
+  it('should redirect to embed error page for invalid exploration ID in embed URL without calling backend', done => {
+    const validateSpy = spyOn(
+      backendApiService,
+      'validateAccessToExplorationPlayerPage'
+    );
+
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    const replaceStateSpy = spyOn(location, 'replaceState');
+
+    const route = createMockRoute('learning!&url');
+    const state: RouterStateSnapshot = {
+      url: '/embed/lesson/learning!&url',
+      root: new ActivatedRouteSnapshot(),
+    };
+
+    guard.canActivate(route, state).then(result => {
+      expect(result).toBeFalse();
+      expect(validateSpy).not.toHaveBeenCalled();
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+      ]);
+      expect(replaceStateSpy).toHaveBeenCalledWith(state.url);
+      done();
+    });
+  });
+
+  it('should reject if router.navigate fails for invalid exploration ID', done => {
+    spyOn(router, 'navigate').and.returnValue(Promise.reject('nav error'));
+
+    const route = createMockRoute('learning!&url');
+    const state: RouterStateSnapshot = {
+      url: '/lesson/learning!&url',
+      root: new ActivatedRouteSnapshot(),
+    };
+
+    guard.canActivate(route, state).catch(err => {
+      expect(err).toBe('nav error');
+      done();
+    });
+  });
 });

@@ -43,7 +43,7 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping, Optional, Union
+from typing import Dict, Mapping, Optional
 
 
 def validate_suggestion_change(
@@ -266,36 +266,6 @@ def validate_question_state_dict(
     )
 
     return question_state_dict
-
-
-def validate_email_dashboard_data(
-    data: Dict[str, Optional[Union[bool, int]]],
-) -> Dict[str, Optional[Union[bool, int]]]:
-    """Validates email dashboard data.
-
-    Args:
-        data: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the dict after validation.
-
-    Raises:
-        Exception. The key in 'data' is not one of the allowed keys.
-    """
-    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-    possible_keys = [predicate['backend_attr'] for predicate in predicates]
-
-    for key, value in data.items():
-        if value is None:
-            continue
-        if key not in possible_keys:
-            # Raise exception if key is not one of the allowed keys.
-            raise Exception('400 Invalid input for query.')
-    # The method returns a dict containing fields of email dashboard
-    # query params. This dict represents the UserQueryParams class, which is a
-    # namedtuple. Hence the fields of the dict are being validated as a part of
-    # schema validation before saving new user queries in the handler.
-    return data
 
 
 def validate_task_entries(
