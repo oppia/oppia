@@ -1259,7 +1259,6 @@ def _get_target_id_to_exploration_opportunity_dict(
         card_infos = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
             feconf.ENTITY_TYPE_EXPLORATION,
             list(target_ids),
-            language_code,
         )
         target_id_to_in_review_count: Dict[str, int] = {}
         for suggestion in suggestions:

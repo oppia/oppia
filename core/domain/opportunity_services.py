@@ -1568,7 +1568,6 @@ def _get_translation_opportunity_cards_from_models(
 def get_translation_opportunity_cards_by_entity_ids_with_new_models(
     entity_type: str,
     entity_ids: List[str],
-    language_code: Optional[str] = None,
 ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
     """Returns a list of translation opportunity card info objects for the given
     entity IDs and type.
@@ -1576,15 +1575,11 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
     Args:
         entity_type: str. The entity type.
         entity_ids: list(str). The entity IDs.
-        language_code: str|None. Optional language code from callers that need
-            to preserve the existing call signature.
 
     Returns:
         list(TranslationOpportunityCardInfo). A list of
         TranslationOpportunityCardInfo domain objects.
     """
-    del language_code
-
     if not entity_ids:
         return []
 
