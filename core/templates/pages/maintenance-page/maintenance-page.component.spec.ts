@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, async, TestBed} from '@angular/core/testing';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 
 import {MaintenancePageComponent} from 'pages/maintenance-page/maintenance-page.component';
 import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
@@ -28,7 +28,7 @@ let fixture: ComponentFixture<MaintenancePageComponent>;
 describe('Maintenance page', () => {
   let documentAttributeCustomizationService: DocumentAttributeCustomizationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MaintenancePageComponent],
       providers: [DocumentAttributeCustomizationService],

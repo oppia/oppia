@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import collections
+import copy
 import logging
 
 from core import feature_flag_list, feconf
@@ -38,6 +39,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     translation_domain,
+    translation_fetchers,
     translation_services,
 )
 from core.platform import models
@@ -122,9 +124,12 @@ def get_exploration_opportunity_summary_from_model(
         model.chapter_title,
         model.content_count,
         new_incomplete_translation_language_codes,
-        model.translation_counts,
-        model.language_codes_needing_voice_artists,
-        model.language_codes_with_assigned_voice_artists,
+        # We use copy.deepcopy() and list() to ensure that the domain object
+        # gets its own independent copy of these mutable collections. This prevents
+        # accidental modifications to the underlying datastore model properties.
+        copy.deepcopy(model.translation_counts),
+        list(model.language_codes_needing_voice_artists),
+        list(model.language_codes_with_assigned_voice_artists),
         {},
         (
             model.reviewer_only_content_count
@@ -374,13 +379,47 @@ def get_translation_opportunity_summary_from_model(
     return opportunity_domain.TranslationOpportunity(
         entity_type=model.entity_type,
         entity_id=model.entity_id,
-        topic_ids=model.topic_ids,
+        topic_ids=list(model.topic_ids),
         content_count=model.content_count,
-        incomplete_translation_language_codes=(
+        incomplete_translation_language_codes=list(
             model.incomplete_translation_language_codes
         ),
-        translation_counts=model.translation_counts,
+        # We use copy.deepcopy() and list() to prevent accidental modifications
+        # to the underlying datastore model properties when the domain object
+        # is mutated.
+        translation_counts=copy.deepcopy(model.translation_counts),
     )
+
+
+def get_translation_opportunities_by_entity_ids(
+    entity_type: str,
+    entity_ids: List[str],
+) -> Dict[str, Optional[opportunity_domain.TranslationOpportunity]]:
+    """Returns a dict mapping entity ID to corresponding TranslationOpportunity
+    domain objects.
+
+    Args:
+        entity_type: str. The entity type.
+        entity_ids: list(str). The entity IDs.
+
+    Returns:
+        dict(str, TranslationOpportunity|None). A dict with key as the entity ID
+        and values representing the TranslationOpportunity domain objects.
+    """
+    opportunities: Dict[
+        str, Optional[opportunity_domain.TranslationOpportunity]
+    ] = {entity_id: None for entity_id in entity_ids}
+    opportunity_models_list = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+            entity_type, entity_ids
+        )
+    )
+    for model in opportunity_models_list:
+        if model is not None:
+            opportunities[model.entity_id] = (
+                get_translation_opportunity_summary_from_model(model)
+            )
+    return opportunities
 
 
 def compute_translation_opportunity_models_with_updated_entity(
@@ -428,7 +467,9 @@ def compute_translation_opportunity_models_with_updated_entity(
     )
     if model is None:
         # If the model does not exist, we create a new one.
-        create_translation_opportunity({entity_type: [entity_id]})
+        create_translation_opportunity(
+            {entity_type: [entity_id]}, topic_ids=topic_ids
+        )
         model = opportunity_models.TranslationOpportunityModel.get(model_id)
 
     translation_opportunity = get_translation_opportunity_summary_from_model(
@@ -549,16 +590,26 @@ def _build_opportunity_for_non_exploration_entity(
 
 def create_translation_opportunity(
     entity_types_and_ids: Dict[str, List[str]],
+    topic_ids: Optional[List[str]] = None,
 ) -> None:
     """Creates and stores translation opportunities for the given entities.
 
     Args:
         entity_types_and_ids: dict(str, list(str)). A mapping of entity types
             (e.g., 'exploration') to lists of entity IDs to process.
+        topic_ids: list(str)|None. Specific topic IDs to associate with the
+            opportunities. If None, the topic IDs are computed dynamically.
     """
-    entity_to_topics = _compute_topic_ids_of_translation_opportunities(
-        entity_types_and_ids
-    )
+    if topic_ids is not None:
+        entity_to_topics = {
+            entity_id: topic_ids
+            for entity_ids_list in entity_types_and_ids.values()
+            for entity_id in entity_ids_list
+        }
+    else:
+        entity_to_topics = _compute_topic_ids_of_translation_opportunities(
+            entity_types_and_ids
+        )
 
     opportunities_list = []
 
@@ -835,6 +886,14 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list
     )
 
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic.id]
+        )
+
 
 def compute_opportunity_models_with_updated_exploration(
     exp_id: str, content_count: int, translation_counts: Dict[str, int]
@@ -926,11 +985,70 @@ def update_translation_opportunity_with_accepted_suggestion(
             suggestion.
         entity_type: str. The type of the entity.
     """
+
+    # Always update the OLD ExplorationOpportunitySummaryModel for backward compatibility.
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            entity_id, strict=False
+        )
+        if exp_model is not None:
+            exp_opportunity_summary = (
+                get_exploration_opportunity_summary_from_model(exp_model)
+            )
+
+            old_translation_count = (
+                exp_opportunity_summary.translation_counts.get(language_code, 0)
+            )
+
+            entity = get_entity_by_type_and_id(
+                feconf.ENTITY_TYPE_EXPLORATION, entity_id
+            )
+            entity_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                entity_id,
+                entity.version,
+                language_code,
+            )
+            # In V2, we compute the translation count dynamically from the
+            # EntityTranslation object (which tracks actual translated contents)
+            # rather than querying the translation_counts dict from the
+            # deprecated translation suggestion models.
+            new_count = (
+                entity.get_translation_count(entity_translation)
+                if isinstance(entity, translation_domain.BaseTranslatableObject)
+                else 0
+            )
+
+            exp_opportunity_summary.translation_counts[language_code] = (
+                new_count
+            )
+
+            if (
+                exp_opportunity_summary.content_count
+                == exp_opportunity_summary.translation_counts[language_code]
+            ):
+                if (
+                    language_code
+                    in exp_opportunity_summary.incomplete_translation_language_codes
+                ):
+                    exp_opportunity_summary.incomplete_translation_language_codes.remove(
+                        language_code
+                    )
+                exp_opportunity_summary.language_codes_needing_voice_artists.append(
+                    language_code
+                )
+
+            exp_opportunity_summary.validate()
+            _save_multi_exploration_opportunity_summary(
+                [exp_opportunity_summary]
+            )
+
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         model_id = f'{entity_type}.{entity_id}'
+
         model = opportunity_models.TranslationOpportunityModel.get(
             model_id, strict=False
         )
@@ -945,13 +1063,19 @@ def update_translation_opportunity_with_accepted_suggestion(
         )
 
         entity = get_entity_by_type_and_id(entity_type, entity_id)
-        current_translation_counts = (
-            translation_services.get_translation_counts(
-                feconf.TranslatableEntityType(entity_type), entity
-            )
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(entity_type),
+            entity_id,
+            entity.version,
+            language_code,
         )
 
-        new_count = current_translation_counts.get(language_code, 0)
+        new_count = (
+            entity.get_translation_count(entity_translation)
+            if isinstance(entity, translation_domain.BaseTranslatableObject)
+            else 0
+        )
+
         translation_opportunity.translation_counts[language_code] = new_count
         translation_opportunity.content_count = (
             entity.get_content_count()
@@ -1292,8 +1416,10 @@ def _get_translation_opportunity_cards_from_models(
     """
     entity_ids = [model.entity_id for model in opportunity_models_list]
 
-    topic_summaries = topic_fetchers.get_all_topic_summaries()
-    topic_summary_map = {ts.id: ts for ts in topic_summaries if ts is not None}
+    topic_summaries = [
+        ts for ts in topic_fetchers.get_all_topic_summaries() if ts is not None
+    ]
+    topic_summary_map = {ts.id: ts for ts in topic_summaries}
 
     story_map = {}
     skill_map = {}
@@ -1317,6 +1443,17 @@ def _get_translation_opportunity_cards_from_models(
                 story.id: story for story in stories if story is not None
             }
 
+        explorations_map = exp_fetchers.get_multiple_explorations_by_id(
+            entity_ids, strict=False
+        )
+        exp_summary_map = {}
+        exp_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
+            entity_ids
+        )
+        for exp_summary in exp_summaries:
+            if exp_summary is not None:
+                exp_summary_map[exp_summary.id] = exp_summary
+
     elif entity_type == feconf.ENTITY_TYPE_STORY:
         stories = story_fetchers.get_stories_by_ids(entity_ids)
         story_map = {story.id: story for story in stories if story is not None}
@@ -1325,7 +1462,7 @@ def _get_translation_opportunity_cards_from_models(
         skills = skill_fetchers.get_multi_skills(entity_ids, strict=False)
         skill_map = {skill.id: skill for skill in skills if skill is not None}
 
-    else:
+    elif entity_type == feconf.ENTITY_TYPE_TOPIC:
         topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
         topic_map = {topic.id: topic for topic in topics if topic is not None}
 
@@ -1375,7 +1512,7 @@ def _get_translation_opportunity_cards_from_models(
             if model.topic_ids:
                 currently_available_to_learners = True
 
-        else:
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
             currently_available_to_learners = (
                 model.entity_id in published_topic_ids
             )
@@ -1406,6 +1543,22 @@ def _get_translation_opportunity_cards_from_models(
             if topic_val_obj:
                 entity_description = topic_val_obj.name
 
+        story_title_val = None
+        reviewer_only_content_count_val = None
+        language_code_val = None
+
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_id = model.entity_id
+            story_id_val = exp_id_to_story_id.get(exp_id)
+            if story_id_val and story_id_val in story_map:
+                story_title_val = story_map[story_id_val].title
+            if exp_id in explorations_map:
+                reviewer_only_content_count_val = explorations_map[
+                    exp_id
+                ].get_reviewer_only_content_count()
+            if exp_id in exp_summary_map:
+                language_code_val = exp_summary_map[exp_id].language_code
+
         card_info = opportunity_domain.TranslationOpportunityCardInfo(
             topic_ids=model.topic_ids,
             entity_id=model.entity_id,
@@ -1417,6 +1570,9 @@ def _get_translation_opportunity_cards_from_models(
             entity_description=entity_description,
             is_pinned=False,
             currently_available_to_learners=currently_available_to_learners,
+            story_title=story_title_val,
+            language_code=language_code_val,
+            reviewer_only_content_count=reviewer_only_content_count_val,
         )
 
         if model.entity_id in in_review_counts:
@@ -1974,6 +2130,23 @@ def regenerate_opportunities_related_to_topic(
             list(exp_opportunity_models)
         )
 
+        # During the migration phase, both legacy ExplorationOpportunitySummaryModel
+        # and new TranslationOpportunityModel records are maintained in parallel to
+        # support safe fallback. Thus, we delete the V2 models here alongside the
+        # V1 summary models when topic opportunities are being regenerated.
+        if feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            None,
+        ):
+            translation_opportunity_models = (
+                opportunity_models.TranslationOpportunityModel.get_by_topic(
+                    topic_id
+                )
+            )
+            opportunity_models.TranslationOpportunityModel.delete_multi(
+                list(translation_opportunity_models)
+            )
+
     topic = topic_fetchers.get_topic_by_id(topic_id)
     story_ids = topic.get_canonical_story_ids()
     stories = story_fetchers.get_stories_by_ids(story_ids)
@@ -2013,11 +2186,27 @@ def regenerate_opportunities_related_to_topic(
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list
     )
+
+    # During the migration phase, we also create the corresponding V2
+    # TranslationOpportunityModel records when creating exploration opportunities,
+    # ensuring data consistency across both V1 and V2 models.
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic_id]
+        )
+
     return len(exploration_opportunity_summary_list)
 
 
 def update_pinned_opportunity_model(
-    user_id: str, language_code: str, topic_id: str, lesson_id: Optional[str]
+    user_id: str,
+    language_code: str,
+    topic_id: str,
+    lesson_id: Optional[str],
+    entity_type: str = feconf.ENTITY_TYPE_EXPLORATION,
 ) -> None:
     """Pins/Unpins Reviewable opportunities in Contributor Dashboard.
 
@@ -2029,6 +2218,7 @@ def update_pinned_opportunity_model(
             pinned.
         lesson_id: str or None. The opportunity_id/exp_id of opportunity
             to be pinned. None if user wants to unpin the opportunity.
+        entity_type: str. The type of the entity to be pinned.
     """
 
     pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
@@ -2046,12 +2236,14 @@ def update_pinned_opportunity_model(
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=lesson_id,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_type=entity_type,
         )
     else:
         if pinned_opportunity:
-            # Update the model's opportunity_id with the given lesson_id.
+            # Update the model's opportunity_id and entity_type.
             pinned_opportunity.opportunity_id = lesson_id
+            if lesson_id is not None:
+                pinned_opportunity.entity_type = entity_type
             pinned_opportunity.update_timestamps()
             pinned_opportunity.put()
 

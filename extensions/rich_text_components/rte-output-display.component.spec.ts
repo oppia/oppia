@@ -211,6 +211,7 @@ describe('RTE display component', () => {
             },
           },
         ],
+        querySelectorAll: () => [],
       },
     };
     let rteString = '<p>Hi<em>Hello</em>Hello</p>' + '<pre> Hello </pre>';
@@ -229,6 +230,17 @@ describe('RTE display component', () => {
 
     expect(removeChildSpy).toHaveBeenCalled();
   }));
+
+  it('should return early when rteString is null', () => {
+    component.rteString = null as unknown as string;
+
+    expect(() => {
+      // This throws "Property '_updateNode' is private". We need to
+      // suppress this error because we are testing the private method.
+      // @ts-expect-error
+      component._updateNode();
+    }).not.toThrowError();
+  });
 
   it('should remove text nodes which are outside ng container bounds', fakeAsync(() => {
     let rteString = '<p>Hi<em>Hello</em>Hello</p>';
@@ -622,6 +634,12 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should return empty string when link node has no text-with-value attribute', () => {
+    const node = document.createElement('oppia-noninteractive-link');
+
+    expect(component.getReadableTextFromNode(node)).toBe('');
+  });
+
   it('should be able to get empty text from div node', () => {
     let node = document.createElement('div');
     // eslint-disable-next-line oppia/no-inner-html
@@ -652,6 +670,31 @@ describe('RTE display component', () => {
     let expectedString = 'x^2 + y^2 = z^2';
     let readableText = component.getReadableTextFromNode(node.childNodes[0]);
     expect(readableText).toBe(expectedString);
+  });
+
+  it('should return empty string when math node has no math_content-with-value attribute', () => {
+    const node = document.createElement('oppia-noninteractive-math');
+
+    expect(component.getReadableTextFromNode(node)).toBe('');
+  });
+
+  it('should return empty string when math node has no math_content-with-value attribute', () => {
+    const node = document.createElement('oppia-noninteractive-math');
+
+    expect(component.getReadableTextFromNode(node)).toBe('');
+  });
+
+  it('should return empty string when math node has non-string raw_latex', () => {
+    let node = document.createElement('p');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML =
+      '<oppia-noninteractive-math math_content-with-value="' +
+      '{&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
+      'mathImg_20250120_160257_55t4cfik6h_height_2d85_width_12d757_verti' +
+      'cal_0d715.svg&amp;quot;}" ng-version="11.2.14">' +
+      '</oppia-noninteractive-math>';
+
+    expect(component.getReadableTextFromNode(node.childNodes[0])).toBe('');
   });
 
   it('should return space character for unknown tag', () => {
@@ -865,6 +908,12 @@ describe('RTE display component', () => {
         .style.backgroundColor
     ).toBe('');
   }));
+
+  it('should return null when className is undefined', () => {
+    expect(
+      component.getElementMatchingClassAndTextContent(undefined)
+    ).toBeNull();
+  });
 
   it('should not highlight sentence when manual voiceover is available in player page', () => {
     component.previousHighlightedElementId = undefined;

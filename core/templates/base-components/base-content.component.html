@@ -44,7 +44,7 @@
             <nav *ngIf="!isNewLessonPlayerEnabled()" class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
                  role="navigation"
                  headroom>
-              <div class="navbar-container" dir="auto">
+              <div class="navbar-container" [attr.dir]="'auto'">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
                 </div>
@@ -65,7 +65,7 @@
 
             <nav *ngIf="isNewLessonPlayerEnabled()" class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
                  role="navigation">
-              <div class="navbar-container" dir="auto">
+              <div class="navbar-container" [attr.dir]="'auto'">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
                 </div>
@@ -127,21 +127,6 @@
     </div>
   </div>
 
-  <div *ngIf="isWebGeneralFeedbackModalEnabled() && !iframed && !isFeedbackFloaterDismissed"
-       class="oppia-feedback-floater">
-    <button type="button"
-            class="oppia-feedback-floater-dismiss-button"
-            (click)="dismissFeedbackFloater()"
-            aria-label="Dismiss feedback entrypoint">
-      <i class="fa fa-times"></i>
-    </button>
-    <button type="button"
-            class="oppia-feedback-floater-button"
-            (click)="openFeedbackModal()"
-            aria-label="Open feedback form">
-            {{ 'I18N_FEEDBACK_FLOATING_BUTTON' | translate }}
-    </button>
-  </div>
 
   <div *ngIf="DEV_MODE" class="oppia-dev-mode e2e-test-dev-mode">
     Dev Mode
