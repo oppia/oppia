@@ -641,6 +641,42 @@ class BuildTests(test_utils.GenericTestBase):
                         with sync_angular_css_hashes_swap:
                             build.main(args=['--prod_env', '--source_maps'])
 
+    def test_build_with_prod_env_and_skip_ng_build(self) -> None:
+        ensure_files_exist_swap = self.swap(
+            build, '_ensure_files_exist', lambda _: None
+        )
+        build_using_ng_not_expected_swap = self.swap_with_checks(
+            build, 'build_using_ng', lambda: None, called=False
+        )
+        sync_angular_css_hashes_not_expected_swap = self.swap_with_checks(
+            build, 'sync_angular_css_hashes', lambda: None, called=False
+        )
+        modify_constants_swap = self.swap_with_checks(
+            common,
+            'modify_constants',
+            lambda **_: None,
+            expected_kwargs=[
+                {
+                    'prod_env': True,
+                    'emulator_mode': True,
+                    'maintenance_mode': False,
+                }
+            ],
+        )
+        generate_python_package_swap = self.swap_with_checks(
+            build, 'generate_python_package', lambda: None, expected_args=[()]
+        )
+        clean_swap = self.swap_with_checks(
+            build, 'clean', lambda: None, expected_args=[()]
+        )
+
+        with ensure_files_exist_swap, clean_swap:
+            with modify_constants_swap, generate_python_package_swap:
+                with (
+                    build_using_ng_not_expected_swap
+                ), sync_angular_css_hashes_not_expected_swap:
+                    build.main(args=['--prod_env', '--skip_ng_build'])
+
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
             'ensure_files_exist_gets_called': False,

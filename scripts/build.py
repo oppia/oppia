@@ -175,6 +175,13 @@ _PARSER.add_argument(
     dest='source_maps',
     help='Build angular cli with source maps.',
 )
+_PARSER.add_argument(
+    '--skip_ng_build',
+    action='store_true',
+    default=False,
+    dest='skip_ng_build',
+    help='Skip the Angular build step.',
+)
 
 
 class DependencyBundleDict(TypedDict):
@@ -801,8 +808,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         generate_hashes()
         generate_python_package()
-        build_using_ng()
-        sync_angular_css_hashes()
+        if not options.skip_ng_build:
+            build_using_ng()
+            sync_angular_css_hashes()
         rename_assets_with_hashes()
         generate_app_yaml(deploy_mode=options.deploy_mode)
 
