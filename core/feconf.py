@@ -667,7 +667,6 @@ EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
-EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_CD_USER = 'onboard_cd_user'
 EMAIL_INTENT_REMOVE_CD_USER = 'remove_cd_user'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
@@ -690,14 +689,6 @@ EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
 EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
-
-# Possible intents for email sent in bulk.
-BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
-BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
-BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
-BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
-BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
-BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
