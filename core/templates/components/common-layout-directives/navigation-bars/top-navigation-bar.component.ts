@@ -111,6 +111,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
+  isTechLead: boolean = false;
   userIsLoggedIn: boolean = false;
   /**
    * Flag to track whether the auth status has been resolved from the
@@ -301,6 +302,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.isTopicManager = userInfo.isTopicManager();
         this.isSuperAdmin = userInfo.isSuperAdmin();
         this.isBlogAdmin = userInfo.isBlogAdmin();
+        this.isTechLead = userInfo.isTechLead();
         this.isBlogPostEditor = userInfo.isBlogPostEditor();
         this.userIsLoggedIn = userInfo.isLoggedIn();
         let usernameFromUserInfo = userInfo.getUsername();

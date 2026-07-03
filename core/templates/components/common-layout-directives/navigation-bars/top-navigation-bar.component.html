@@ -513,7 +513,7 @@
           </a>
         </li>
         <li class="nav-item"
-            *ngIf="isTechnicalFeedbackDashboardEnabled">
+            *ngIf="isTechnicalFeedbackDashboardEnabled() && isTechLead">
           <a class="dropdown-item nav-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/technical-feedback-dashboard"
