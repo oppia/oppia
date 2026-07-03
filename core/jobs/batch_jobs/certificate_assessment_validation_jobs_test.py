@@ -57,7 +57,6 @@ def _create_topic_model(
     """Helper to build a minimal valid TopicModel for these tests, with all
     of its subtopic skill_ids placed into a single default subtopic.
     """
-
     subtopics = []
     if subtopic_skill_ids:
         subtopics = [
@@ -103,7 +102,6 @@ def _create_question_skill_link_model(
     skill_difficulty: float = 0.3,
 ) -> question_models.QuestionSkillLinkModel:
     """Helper to build a QuestionSkillLinkModel for these tests."""
-
     return self.create_model(
         question_models.QuestionSkillLinkModel,
         id=question_models.QuestionSkillLinkModel.get_model_id(
@@ -113,6 +111,23 @@ def _create_question_skill_link_model(
         skill_id=skill_id,
         skill_difficulty=skill_difficulty,
     )
+
+
+def _create_question_skill_link_models(
+    self: job_test_utils.JobTestBase,
+    skill_id: str,
+    question_ids_and_difficulties: List[tuple[str, float]],
+) -> List[question_models.QuestionSkillLinkModel]:
+    """Helper to build multiple QuestionSkillLinkModels for one skill."""
+    return [
+        _create_question_skill_link_model(
+            self,
+            question_id=question_id,
+            skill_id=skill_id,
+            skill_difficulty=skill_difficulty,
+        )
+        for question_id, skill_difficulty in question_ids_and_difficulties
+    ]
 
 
 def _create_offering_model(
@@ -125,7 +140,6 @@ def _create_offering_model(
     """Helper to build a CertificateAssessmentOfferingModel for these
     tests.
     """
-
     return self.create_model(
         certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
         id=offering_id,
@@ -153,7 +167,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_empty_storage(self) -> None:
         """Test that the job runs successfully with empty storage."""
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -166,10 +179,9 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_does_not_block_offering_with_sufficient_question_pool(
         self,
     ) -> None:
-        """An offering whose topic has enough linked questions should stay
-        Available.
+        """An offering whose topic has enough linked questions (one each
+        of easy, medium, hard) should stay Available.
         """
-
         topic_model = _create_topic_model(
             self,
             topic_id='topic_sufficient',
@@ -178,9 +190,15 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             subtopic_skill_ids=[],
         )
         question_skill_link_models = [
-            _create_question_skill_link_model(self, 'question_1', 'skill_1'),
-            _create_question_skill_link_model(self, 'question_2', 'skill_1'),
-            _create_question_skill_link_model(self, 'question_3', 'skill_1'),
+            *_create_question_skill_link_models(
+                self,
+                'skill_1',
+                [
+                    ('question_1', 0.3),
+                    ('question_2', 0.6),
+                    ('question_3', 0.9),
+                ],
+            ),
         ]
         offering_model = _create_offering_model(
             self,
@@ -197,7 +215,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         ] = [topic_model, offering_model]
         models_to_put.extend(question_skill_link_models)
         self.put_multi(models_to_put)
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -216,7 +233,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         """An offering whose topic does not have enough linked questions
         should be blocked.
         """
-
         topic_model = _create_topic_model(
             self,
             topic_id='topic_insufficient',
@@ -225,7 +241,9 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             subtopic_skill_ids=[],
         )
         question_skill_link_models = [
-            _create_question_skill_link_model(self, 'question_4', 'skill_2'),
+            _create_question_skill_link_model(
+                self, 'question_4', 'skill_2', 0.6
+            ),
         ]
         offering_model = _create_offering_model(
             self,
@@ -242,7 +260,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         ] = [topic_model, offering_model]
         models_to_put.extend(question_skill_link_models)
         self.put_multi(models_to_put)
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -255,7 +272,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
                 ),
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_insufficient'
         )
@@ -264,9 +280,9 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
 
     def test_blocks_offering_with_nonexistent_topic(self) -> None:
         """An offering referencing a topic that no longer exists (e.g. it
-        was deleted) should be blocked.
+        was deleted) should be blocked, since a missing topic can never
+        supply the required questions.
         """
-
         offering_model = _create_offering_model(
             self,
             offering_id='offering_missing_topic',
@@ -274,7 +290,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             total_questions=5,
         )
         self.put_multi([offering_model])
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -287,7 +302,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
                 ),
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_missing_topic'
         )
@@ -297,8 +311,9 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_includes_skills_from_subtopics_and_uncategorized(self) -> None:
         """Questions reachable through a subtopic skill should count toward
         the topic's available question pool, same as uncategorized skills.
+        A single topic requires QUESTIONS_PER_TOPIC (3) questions: one
+        easy, one medium, one hard.
         """
-
         topic_model = _create_topic_model(
             self,
             topic_id='topic_mixed',
@@ -308,17 +323,20 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         )
         question_skill_link_models = [
             _create_question_skill_link_model(
-                self, 'question_5', 'skill_uncategorized'
+                self, 'question_5', 'skill_uncategorized', 0.3
             ),
             _create_question_skill_link_model(
-                self, 'question_6', 'skill_in_subtopic'
+                self, 'question_6', 'skill_in_subtopic', 0.6
+            ),
+            _create_question_skill_link_model(
+                self, 'question_7', 'skill_in_subtopic', 0.9
             ),
         ]
         offering_model = _create_offering_model(
             self,
             offering_id='offering_mixed',
             topic_ids=['topic_mixed'],
-            total_questions=2,
+            total_questions=3,
         )
         models_to_put: List[
             Union[
@@ -329,7 +347,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         ] = [topic_model, offering_model]
         models_to_put.extend(question_skill_link_models)
         self.put_multi(models_to_put)
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -343,7 +360,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         """An offering already in Blocked status should not be
         re-validated or re-logged.
         """
-
         already_blocked_offering = _create_offering_model(
             self,
             offering_id='already_blocked_offering',
@@ -352,7 +368,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             async_status='Blocked',
         )
         self.put_multi([already_blocked_offering])
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -361,7 +376,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
                 )
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'already_blocked_offering'
         )
@@ -374,7 +388,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         """An offering in Not_Ready status should never be validated or
         touched, even if its question pool would otherwise fail.
         """
-
         not_ready_offering = _create_offering_model(
             self,
             offering_id='offering_not_ready',
@@ -383,7 +396,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             async_status='Not_Ready',
         )
         self.put_multi([not_ready_offering])
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -392,7 +404,6 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
                 )
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_not_ready'
         )
@@ -402,11 +413,14 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
     def test_questions_shared_across_topics_count_independently(
         self,
     ) -> None:
-        """A question linked to a skill that's shared across topics (via the
-        skill belonging to both topics) should be counted toward each
-        topic's pool independently.
+        """A skill shared across two topics contributes the same underlying
+        question pool to both topics, but the validator must not reuse a
+        single question to satisfy both topics' requirements. With 2
+        topics x QUESTIONS_PER_TOPIC (3) = 6 required questions (one easy,
+        one medium, one hard per topic), we need 2 distinct questions per
+        difficulty (6 total) so each topic can be assigned its own
+        non-overlapping set.
         """
-
         topic_a = _create_topic_model(
             self,
             topic_id='topic_a',
@@ -421,16 +435,23 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
             uncategorized_skill_ids=['shared_skill'],
             subtopic_skill_ids=[],
         )
-        question_skill_link_models = [
-            _create_question_skill_link_model(
-                self, 'shared_question', 'shared_skill'
-            ),
-        ]
+        question_skill_link_models = _create_question_skill_link_models(
+            self,
+            'shared_skill',
+            [
+                ('question_a1', 0.3),
+                ('question_a2', 0.3),
+                ('question_b1', 0.6),
+                ('question_b2', 0.6),
+                ('question_c1', 0.9),
+                ('question_c2', 0.9),
+            ],
+        )
         offering_model = _create_offering_model(
             self,
             offering_id='offering_shared',
             topic_ids=['topic_a', 'topic_b'],
-            total_questions=2,
+            total_questions=6,
         )
         models_to_put: List[
             Union[
@@ -441,9 +462,10 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         ] = [topic_a, topic_b, offering_model]
         models_to_put.extend(question_skill_link_models)
         self.put_multi(models_to_put)
-
-        # Each topic gets 1 required question (2 total / 2 topics), and
-        # each topic has access to the same 1 shared question, so the
+        # Each topic requires 1 easy + 1 medium + 1 hard question. There
+        # are 2 distinct questions available in each difficulty bucket via
+        # the shared skill, so topic_a and topic_b can each be assigned
+        # their own non-overlapping question in every bucket, and the
         # offering should remain valid.
         self.assert_job_output_is(
             [
@@ -453,6 +475,73 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
                 )
             ]
         )
+
+    def test_blocks_offering_when_shared_questions_cannot_be_split(
+        self,
+    ) -> None:
+        """If two topics share a skill but there is only 1 distinct
+        question in a difficulty bucket, both topics cannot each get a
+        non-overlapping question in that bucket, so the offering should
+        be blocked.
+        """
+        topic_a = _create_topic_model(
+            self,
+            topic_id='topic_c',
+            name='Topic C',
+            uncategorized_skill_ids=['shared_skill_2'],
+            subtopic_skill_ids=[],
+        )
+        topic_b = _create_topic_model(
+            self,
+            topic_id='topic_d',
+            name='Topic D',
+            uncategorized_skill_ids=['shared_skill_2'],
+            subtopic_skill_ids=[],
+        )
+        # Only 1 distinct question per difficulty bucket, shared by both
+        # topics -- not enough to cover both topics' requirements without
+        # reuse.
+        question_skill_link_models = _create_question_skill_link_models(
+            self,
+            'shared_skill_2',
+            [
+                ('question_shared_easy', 0.3),
+                ('question_shared_medium', 0.6),
+                ('question_shared_hard', 0.9),
+            ],
+        )
+        offering_model = _create_offering_model(
+            self,
+            offering_id='offering_shared_insufficient',
+            topic_ids=['topic_c', 'topic_d'],
+            total_questions=6,
+        )
+        models_to_put: List[
+            Union[
+                topic_models.TopicModel,
+                certificate_assessment_offering_models.CertificateAssessmentOfferingModel,
+                question_models.QuestionSkillLinkModel,
+            ]
+        ] = [topic_a, topic_b, offering_model]
+        models_to_put.extend(question_skill_link_models)
+        self.put_multi(models_to_put)
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CertificateAssessmentOfferingModels updated '
+                    'to Blocked: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CertificateAssessmentOfferingModel '
+                    'with ID: offering_shared_insufficient.'
+                ),
+            ]
+        )
+        updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
+            'offering_shared_insufficient'
+        )
+        assert updated_model is not None
+        self.assertEqual(updated_model.async_status, 'Blocked')
 
 
 class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
@@ -468,7 +557,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
 
     def test_empty_storage(self) -> None:
         """Test that the audit job runs successfully with empty storage."""
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -482,7 +570,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         """Test that the audit job logs but does not write the blocked
         status to the datastore.
         """
-
         offering_model = _create_offering_model(
             self,
             offering_id='audit_offering_missing_topic',
@@ -490,7 +577,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
             total_questions=5,
         )
         self.put_multi([offering_model])
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -503,7 +589,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
                 ),
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'audit_offering_missing_topic'
         )
@@ -516,7 +601,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         """An offering in Not_Ready status should never be validated or
         touched, even if its question pool would otherwise fail.
         """
-
         not_ready_offering = _create_offering_model(
             self,
             offering_id='offering_not_ready',
@@ -525,7 +609,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
             async_status='Not_Ready',
         )
         self.put_multi([not_ready_offering])
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -534,7 +617,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
                 )
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'offering_not_ready'
         )
@@ -545,7 +627,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         """An offering already in Blocked status should not be
         re-validated or re-logged.
         """
-
         already_blocked_offering = _create_offering_model(
             self,
             offering_id='already_blocked_offering',
@@ -554,7 +635,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
             async_status='Blocked',
         )
         self.put_multi([already_blocked_offering])
-
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
@@ -563,7 +643,6 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
                 )
             ]
         )
-
         updated_model = certificate_assessment_offering_models.CertificateAssessmentOfferingModel.get(
             'already_blocked_offering'
         )

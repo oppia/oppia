@@ -44,6 +44,13 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     validation_message: str
 
 
+class CertificateAssessmentOfferingTopicInfoDict(TypedDict):
+    """Dict representation of a topic's validation inputs."""
+
+    name: str
+    skill_ids: List[str]
+
+
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
 ) -> Dict[str, List[str]]:
@@ -122,6 +129,236 @@ def _get_topic_validation_result(
             'available': available_questions_by_difficulty['hard'],
         },
     }
+
+
+def validate_certificate_assessment_offering_against_maps(
+    topic_ids: List[str],
+    total_questions: int,
+    topic_id_to_info: Dict[str, CertificateAssessmentOfferingTopicInfoDict],
+    skill_id_to_question_ids: Dict[str, List[str]],
+) -> CertificateAssessmentOfferingValidationResultDict:
+    """Validates an offering using preloaded topic and skill question maps.
+
+    This keeps the validation logic reusable for jobs or other callers that
+    already have in-memory data and should avoid additional datastore fetches.
+    """
+    if not topic_ids:
+        return {
+            'is_valid': False,
+            'validation_errors': {},
+            'validation_message': (
+                'topic_ids must contain at least one topic.'
+            ),
+        }
+    if total_questions < 1:
+        return {
+            'is_valid': False,
+            'validation_errors': {},
+            'validation_message': (
+                'total_questions must be a positive integer.'
+            ),
+        }
+
+    missing_topic_ids = sorted(
+        topic_id for topic_id in topic_ids if topic_id not in topic_id_to_info
+    )
+    if missing_topic_ids:
+        return {
+            'is_valid': False,
+            'validation_errors': {},
+            'validation_message': (
+                'Topic(s) %s do not exist.' % ', '.join(missing_topic_ids)
+            ),
+        }
+
+    topic_id_to_question_ids: Dict[str, List[str]] = {}
+    for topic_id in topic_ids:
+        question_ids = set()
+        for skill_id in topic_id_to_info[topic_id]['skill_ids']:
+            question_ids.update(skill_id_to_question_ids.get(skill_id, []))
+        topic_id_to_question_ids[topic_id] = sorted(question_ids)
+
+    base_questions_per_topic = total_questions // len(topic_ids)
+    remainder = total_questions % len(topic_ids)
+    validation_errors: Dict[str, Dict[str, Dict[str, int]]] = {}
+    message_parts: List[str] = []
+    is_valid = True
+
+    for index, topic_id in enumerate(topic_ids):
+        required_questions = base_questions_per_topic + (
+            1 if index < remainder else 0
+        )
+        available_questions = len(topic_id_to_question_ids[topic_id])
+        available_questions_by_difficulty = _get_difficulty_counts(
+            available_questions
+        )
+        validation_errors[topic_id] = _get_topic_validation_result(
+            available_questions_by_difficulty, required_questions
+        )
+        if available_questions < required_questions:
+            is_valid = False
+            topic_name = topic_id_to_info[topic_id]['name']
+            message_parts.append(
+                '%s needs %d unique questions but only %d are available.'
+                % (topic_name, required_questions, available_questions)
+            )
+
+    validation_message = (
+        'Certificate assessment is valid.'
+        if is_valid
+        else ' '.join(message_parts)
+    )
+    return {
+        'is_valid': is_valid,
+        'validation_errors': validation_errors,
+        'validation_message': validation_message,
+    }
+
+
+def validate_certificate_assessment_offering_against_preloaded_maps(
+    topic_ids: List[str],
+    total_questions: int,
+    topic_name_to_question_ids_map: Dict[str, List[str]],
+    topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, set[str]]],
+    topic_id_to_name: Dict[str, str],
+) -> CertificateAssessmentOfferingValidationResultDict:
+    """Validates an offering using preloaded question-id maps.
+
+    This mirrors validate_certificate_assessment_offering but avoids fetchers.
+    """
+    if not topic_ids:
+        return {
+            'is_valid': False,
+            'validation_errors': {},
+            'validation_message': (
+                'topic_ids must contain at least one topic.'
+            ),
+        }
+    if total_questions < 1:
+        return {
+            'is_valid': False,
+            'validation_errors': {},
+            'validation_message': (
+                'total_questions must be a positive integer.'
+            ),
+        }
+
+    base_questions_per_topic = total_questions // len(topic_ids)
+    remainder = total_questions % len(topic_ids)
+    validation_errors: Dict[str, Dict[str, Dict[str, int]]] = {}
+    message_parts: List[str] = []
+    is_valid = True
+    required_questions_by_topic: Dict[str, Dict[str, int]] = {}
+
+    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    if total_questions < expected_total_questions:
+        is_valid = False
+        message_parts.append(
+            'total_questions must be greater than or equal to %d '
+            '(%d per topic: easy, medium, hard) for %d topic(s).'
+            % (
+                expected_total_questions,
+                QUESTIONS_PER_TOPIC,
+                len(topic_ids),
+            )
+        )
+
+    distinct_question_ids = _get_distinct_question_ids(
+        topic_name_to_question_ids_map, topic_ids
+    )
+    if len(distinct_question_ids) < total_questions:
+        is_valid = False
+        message_parts.append(
+            'Only %d unique question(s) are available across the selected '
+            'topics, but %d are required without reusing questions.'
+            % (len(distinct_question_ids), total_questions)
+        )
+
+    for index, topic_id in enumerate(topic_ids):
+        required_questions = base_questions_per_topic + (
+            1 if index < remainder else 0
+        )
+        required_questions_by_topic[topic_id] = _get_difficulty_counts(
+            required_questions
+        )
+
+        available_questions_by_difficulty = {
+            difficulty: len(question_ids)
+            for difficulty, question_ids in (
+                topic_id_to_question_ids_by_difficulty.get(topic_id, {})
+            ).items()
+        }
+        validation_result = _get_topic_validation_result(
+            available_questions_by_difficulty, required_questions
+        )
+        validation_errors[topic_id] = validation_result
+
+        if not (
+            available_questions_by_difficulty.get('easy', 0)
+            >= validation_result['easy']['required']
+            and available_questions_by_difficulty.get('medium', 0)
+            >= validation_result['medium']['required']
+            and available_questions_by_difficulty.get('hard', 0)
+            >= validation_result['hard']['required']
+        ):
+            is_valid = False
+            message_parts.append(
+                '%s does not have enough questions in every difficulty bucket.'
+                % topic_id_to_name.get(topic_id, topic_id)
+            )
+
+    missing_distinct_difficulties: List[str] = []
+    for difficulty in ('easy', 'medium', 'hard'):
+        if not _has_valid_distinct_assignment(
+            topic_id_to_question_ids_by_difficulty,
+            topic_ids,
+            required_questions_by_topic,
+            difficulty,
+        ):
+            is_valid = False
+            missing_distinct_difficulties.append(difficulty)
+
+    if missing_distinct_difficulties:
+        is_valid = False
+        message_parts.append(
+            'Selected topics %s do not have enough distinct %s questions '
+            'to satisfy the requested certificate without reusing '
+            'questions across topics.'
+            % (
+                _format_list(
+                    [
+                        topic_id_to_name.get(topic_id, topic_id)
+                        for topic_id in topic_ids
+                    ]
+                ),
+                _format_list(missing_distinct_difficulties),
+            )
+        )
+
+    return {
+        'is_valid': is_valid,
+        'validation_errors': validation_errors,
+        'validation_message': (
+            'Certificate assessment is valid.'
+            if is_valid
+            else ' '.join(message_parts)
+        ),
+    }
+
+
+def mark_certificate_assessment_offering_model_as_blocked(
+    model_and_validation_result: tuple[
+        gae_models.CertificateAssessmentOfferingModel,
+        CertificateAssessmentOfferingValidationResultDict,
+    ],
+) -> gae_models.CertificateAssessmentOfferingModel:
+    """Marks an offering model as blocked and logs the reason."""
+    certificate_assessment_offering_model, validation_result = (
+        model_and_validation_result
+    )
+    certificate_assessment_offering_model.async_status = 'Blocked'
+
+    return certificate_assessment_offering_model
 
 
 def _get_distinct_question_ids(

@@ -308,6 +308,65 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
+    def test_validate_offering_against_maps_returns_valid_result(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+            topic_ids=['topic_1'],
+            total_questions=3,
+            topic_id_to_info={
+                'topic_1': {
+                    'name': 'Topic 1',
+                    'skill_ids': ['skill_1'],
+                }
+            },
+            skill_id_to_question_ids={
+                'skill_1': ['q1', 'q2', 'q3'],
+            },
+        )
+
+        self.assertTrue(result['is_valid'])
+        self.assertEqual(
+            result['validation_errors']['topic_1']['easy'],
+            {'required': 1, 'available': 1},
+        )
+        self.assertEqual(
+            result['validation_message'],
+            'Certificate assessment is valid.',
+        )
+
+    def test_mark_certificate_assessment_offering_model_as_blocked(
+        self,
+    ) -> None:
+        offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='History Foundations',
+            description='Covers timelines and source interpretation.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=3,
+            time_limit_in_minutes=45,
+            demonstrates=['Historical reasoning'],
+            async_status='Available',
+        )
+        offering_model = certificate_assessment_services.gae_models.CertificateAssessmentOfferingModel.get_by_id(
+            offering.certificate_id
+        )
+        self.assertIsNotNone(offering_model)
+        assert offering_model is not None
+
+        updated_model = certificate_assessment_services.mark_certificate_assessment_offering_model_as_blocked(
+            (
+                offering_model,
+                {
+                    'is_valid': False,
+                    'validation_errors': {},
+                    'validation_message': 'Not enough questions.',
+                },
+            )
+        )
+
+        self.assertEqual(updated_model.async_status, 'Blocked')
+
     def test_format_list_formats_short_lists(self) -> None:
         format_list = getattr(certificate_assessment_services, '_format_list')
         self.assertEqual(format_list(['one']), 'one')
