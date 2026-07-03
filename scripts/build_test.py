@@ -419,8 +419,7 @@ class BuildTests(test_utils.GenericTestBase):
         with assets_dev_dir_swap, extensions_dev_dir_swap:
             with get_file_hashes_swap, save_hashes_to_file_swap:
                 with generate_md5_hash_swap, ensure_files_exist_swap:
-                    result = build.generate_hashes()
-        self.assertIsNone(result)
+                    build.generate_hashes()
 
     def test_generate_app_yaml_with_deploy_mode(self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'

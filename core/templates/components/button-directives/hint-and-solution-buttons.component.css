@@ -176,6 +176,7 @@ oppia-hint-and-solution-buttons .hint-box::before {
   min-width: 22px;
   padding: inherit;
   width: 32px;
+  z-index: 100;
 }
 
 .oppia-learner-hint-solution-button.viewed.mat-button.viewed {
