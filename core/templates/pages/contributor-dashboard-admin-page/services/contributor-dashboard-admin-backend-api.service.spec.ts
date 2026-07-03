@@ -532,4 +532,50 @@ describe('Contributor dashboard admin backend api service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+  it('should successfully fetch the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const mockResponse = {
+      provider_mapping: {hi: 'azure'},
+      automatic_translation_is_enabled: true,
+    };
+
+    contributorDashboardAdminBackendApiService
+      .fetchTranslationConfigurationAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(mockResponse);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(mockResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully update the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const mockMapping = {hi: 'azure'};
+
+    contributorDashboardAdminBackendApiService
+      .updateTranslationConfigurationAsync(mockMapping, true)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({
+      provider_mapping: mockMapping,
+      automatic_translation_is_enabled: true,
+    });
+    req.flush({});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

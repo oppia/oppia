@@ -1,0 +1,66 @@
+<div class="translation-config-container">
+  
+  <mat-card class="oppia-admin-card oppia-page-card">
+    <h3 class="card-title">Manage supported languages for auto-translation</h3>
+    
+    <table class="table translator-table">
+      <thead>
+        <tr>
+          <th>Language</th>
+          <th>Translation Provider</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let langCode of providerMapping | keyvalue" class="e2e-test-mapping-row">
+          <td>{{ getLanguageName(langCode.key) }}</td>
+          <td>{{ getProviderName(langCode.value) }}</td>
+          <td>
+            <button mat-icon-button color="warn" class="e2e-test-remove-mapping-btn" (click)="removeMapping(langCode.key)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </td>
+        </tr>
+
+        <tr class="add-mapping-row">
+          <td>
+            <select [(ngModel)]="selectedLanguage" class="form-control e2e-test-language-dropdown">
+              <option value="" disabled selected>Language</option>
+              <option *ngFor="let lang of getUnmappedLanguages()" [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <select [(ngModel)]="selectedProvider" class="form-control e2e-test-provider-dropdown">
+              <option value="" disabled selected>Provider</option>
+              <option *ngFor="let provider of availableProviders" [value]="provider.id">
+                {{ provider.name }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-secondary e2e-test-add-mapping-btn" 
+                    [disabled]="!selectedLanguage || !selectedProvider" 
+                    (click)="addMapping()">
+              Add
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card>
+
+  <mat-card class="oppia-admin-card oppia-page-card mt-4">
+    <h3 class="card-title">Automatic Translation</h3>
+    <div class="toggle-container d-flex justify-content-between align-items-center">
+      <span>Enable Automatic Translation Suggestions</span>
+      <mat-slide-toggle 
+        class="e2e-test-auto-translation-toggle"
+        [(ngModel)]="isAutomaticTranslationEnabled" 
+        (change)="toggleAutomaticTranslation()">
+      </mat-slide-toggle>
+    </div>
+  </mat-card>
+
+</div>
