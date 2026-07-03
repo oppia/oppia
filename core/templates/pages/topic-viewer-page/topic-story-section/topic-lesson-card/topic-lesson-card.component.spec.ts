@@ -453,34 +453,6 @@ describe('TopicLessonCardComponent', () => {
         'The story will be played in French (Audio).'
       );
     });
-
-    it('should return Portuguese text when preferred language is pt', () => {
-      component.availableTextLanguageCodes = ['en', 'fr', 'pt-br'];
-      component.selectedTextLanguageCode = 'fr';
-      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue(
-        'pt-br'
-      );
-      languageUtilService.getContentLanguageDescription
-        .withArgs('fr')
-        .and.returnValue('French');
-
-      expect(component.getFallbackInfoTooltipText()).toBe(
-        'A hist\u00f3ria ser\u00e1 reproduzida em French.'
-      );
-    });
-
-    it('should return Portuguese fallback text when lesson is unavailable', () => {
-      component.availableTextLanguageCodes = ['en', 'fr'];
-      component.selectedTextLanguageCode = 'fr';
-      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
-      languageUtilService.getContentLanguageDescription
-        .withArgs('fr')
-        .and.returnValue('French');
-
-      expect(component.getFallbackInfoTooltipText()).toBe(
-        'Esta hist\u00f3ria ainda est\u00e1 em French, mas voc\u00ea ainda pode jog\u00e1-la!'
-      );
-    });
   });
 
   describe('initializeLanguageSelection', () => {

@@ -26,6 +26,7 @@ import {
 } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 import './language-selector.component.css';
 
@@ -52,6 +53,7 @@ export class LanguageSelectorComponent implements OnChanges {
 
   constructor(
     private languageUtilService: LanguageUtilService,
+    private loggerService: LoggerService,
     private translateService: TranslateService
   ) {}
 
@@ -164,9 +166,8 @@ export class LanguageSelectorComponent implements OnChanges {
     } catch {
       // Some exploration-specific accent codes may not be in global constants.
       // In those cases, fall back to showing the raw code.
-      console.warn(
-        'Failed to get audio language description for:',
-        languageCode
+      this.loggerService.warn(
+        'Failed to get audio language description for: ' + languageCode
       );
     }
 

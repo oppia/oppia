@@ -28,6 +28,7 @@ import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/servi
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
 
 import './topic-lesson-card.component.css';
 
@@ -146,7 +147,9 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   get shouldShowInfoIcon(): boolean {
-    return this.availableTextLanguageCodes.some(code => code !== 'en');
+    return this.availableTextLanguageCodes.some(
+      code => code !== AppConstants.DEFAULT_LANGUAGE_CODE
+    );
   }
 
   shouldShowFallbackCta(): boolean {
@@ -155,29 +158,14 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
 
   getFallbackInfoTooltipText(): string {
     const selectedLanguageDescription = this.getLanguageDescription(
-      this.selectedTextLanguageCode || 'en'
+      this.selectedTextLanguageCode || AppConstants.DEFAULT_LANGUAGE_CODE
     );
 
     if (this.isLessonUnavailableInPreferredLanguage()) {
-      if (this.getPreferredLanguageCode().startsWith('pt')) {
-        return (
-          'Esta hist\u00f3ria ainda est\u00e1 em ' +
-          selectedLanguageDescription +
-          ', mas voc\u00ea ainda pode jog\u00e1-la!'
-        );
-      }
       return (
         'This story is still in ' +
         selectedLanguageDescription +
         ', but you can still play it!'
-      );
-    }
-
-    if (this.getPreferredLanguageCode().startsWith('pt')) {
-      return (
-        'A hist\u00f3ria ser\u00e1 reproduzida em ' +
-        selectedLanguageDescription +
-        '.'
       );
     }
 
@@ -232,8 +220,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   private getFallbackTextLanguageCode(): string {
-    if (this.availableTextLanguageCodes.includes('en')) {
-      return 'en';
+    if (
+      this.availableTextLanguageCodes.includes(
+        AppConstants.DEFAULT_LANGUAGE_CODE
+      )
+    ) {
+      return AppConstants.DEFAULT_LANGUAGE_CODE;
     }
     return this.availableTextLanguageCodes[0];
   }
@@ -268,8 +260,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       }
     }
 
-    if (this.availableVoiceoverLanguageCodes.includes('en')) {
-      return 'en';
+    if (
+      this.availableVoiceoverLanguageCodes.includes(
+        AppConstants.DEFAULT_LANGUAGE_CODE
+      )
+    ) {
+      return AppConstants.DEFAULT_LANGUAGE_CODE;
     }
 
     return this.availableVoiceoverLanguageCodes[0];
