@@ -580,10 +580,15 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.questionUndoRedoService.getCommittableChangeList()
             )
             .then(
-              () => {
+              (data: Question) => {
+                this.question = data;
                 this.questionUndoRedoService.clearChanges();
                 this.editorIsOpen = false;
                 this.questionIsBeingSaved = false;
+                this.alertsService.addSuccessMessage(
+                  'Question saved successfully.',
+                  2000
+                );
                 this.questionsListService.resetPageNumber();
                 this.questionsListService.getQuestionSummariesAsync(
                   this.selectedSkillId,
@@ -645,7 +650,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionId,
         this.skillLinkageModificationsArray
       )
-      .then(data => {
+      .then(question => {
+        if (question) {
+          this.question = question;
+        }
         this.skillLinkageModificationsArray = [];
         setTimeout(() => {
           this.questionsListService.resetPageNumber();
@@ -666,8 +674,13 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionId,
         this.skillLinkageModificationsArray
       )
-      .then(data => {
+      .then(question => {
+        this.question = question;
         this.skillLinkageModificationsArray = [];
+        this.alertsService.addSuccessMessage(
+          'Question saved successfully.',
+          2000
+        );
       });
   }
 

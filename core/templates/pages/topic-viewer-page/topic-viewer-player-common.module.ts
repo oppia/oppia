@@ -16,7 +16,6 @@
  * @fileoverview Module for the CkEditor4 components.
  */
 
-import 'core-js/es7/reflect';
 import 'zone.js';
 
 import {CommonModule} from '@angular/common';
@@ -24,6 +23,8 @@ import {NgModule} from '@angular/core';
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
+import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
+import {TopicPracticeCardComponent} from './topic-story-section/topic-practice-card/topic-practice-card.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
@@ -33,16 +34,22 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
+    TopicLessonCardComponent,
+    TopicPracticeCardComponent,
   ],
   entryComponents: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
+    TopicLessonCardComponent,
+    TopicPracticeCardComponent,
   ],
   exports: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
+    TopicLessonCardComponent,
+    TopicPracticeCardComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

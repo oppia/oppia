@@ -41,12 +41,6 @@ import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 
-class MockNgbModalRef {
-  componentInstance: {
-    body: 'xyz';
-  };
-}
-
 class MockNgbModal {
   open() {
     return {
@@ -75,7 +69,7 @@ describe('Story Editor Component having three story nodes', () => {
   let storyUpdateService: StoryUpdateService;
   let storyEditorStateService: StoryEditorStateService;
   let windowRef: WindowRef;
-  let fetchSpy;
+  let fetchSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -123,7 +117,10 @@ describe('Story Editor Component having three story nodes', () => {
       notes: 'Story notes',
       version: 1,
       corresponding_topic_id: 'topic_id',
+      thumbnail_filename: 'fileName',
+      thumbnail_bg_color: 'blue',
       url_fragment: 'story_title',
+      meta_tag_content: 'meta',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [
@@ -137,6 +134,8 @@ describe('Story Editor Component having three story nodes', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
             status: 'Published',
             planned_publication_date_msecs: 30,
             last_modified_msecs: 20,
@@ -153,6 +152,8 @@ describe('Story Editor Component having three story nodes', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
             status: 'Ready To Publish',
             planned_publication_date_msecs: 30,
             last_modified_msecs: 20,
@@ -169,6 +170,8 @@ describe('Story Editor Component having three story nodes', () => {
             outline: 'Outline 3',
             exploration_id: 'exp_3',
             outline_is_finalized: true,
+            thumbnail_filename: null,
+            thumbnail_bg_color: null,
             status: 'Draft',
             planned_publication_date_msecs: 30,
             last_modified_msecs: 20,
@@ -242,11 +245,11 @@ describe('Story Editor Component having three story nodes', () => {
       first_publication_date_msecs: 200,
       unpublishing_reason: null,
     });
-    expect(component.isDragAndDropDisabled(node)).toBeTrue();
+    expect(component.isDragAndDropDisabled(node)).toBe(true);
 
     node.setStatus('Draft');
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1200);
-    expect(component.isDragAndDropDisabled(node)).toBeFalse();
+    expect(component.isDragAndDropDisabled(node)).toBe(false);
   });
 
   it('should change list order', fakeAsync(() => {
@@ -308,18 +311,42 @@ describe('Story Editor Component having three story nodes', () => {
       }),
     ];
 
-    const event1 = {
+    const event1: CdkDragDrop<string[]> = {
       previousIndex: 1,
       currentIndex: 0,
-    } as CdkDragDrop<string[]>;
-    const event2 = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
+    const event2: CdkDragDrop<string[]> = {
       previousIndex: 1,
       currentIndex: 2,
-    } as CdkDragDrop<string[]>;
-    const event3 = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
+    const event3: CdkDragDrop<string[]> = {
       previousIndex: 0,
       currentIndex: 1,
-    } as CdkDragDrop<string[]>;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
 
     expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
     component.drop(event1);
@@ -480,17 +507,14 @@ describe('Story Editor Component having three story nodes', () => {
   }));
 
   it('should call storyUpdateService to add destination node id', () => {
-    class MockComponentInstance {
-      compoenentInstance!: {
-        nodeTitles: null;
-      };
-    }
-
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {};
+    modalRef.result = Promise.resolve();
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      return modalRef;
     });
 
     component.createNode();
@@ -499,11 +523,6 @@ describe('Story Editor Component having three story nodes', () => {
   });
 
   it('should call storyUpdateService to add destination node id', fakeAsync(() => {
-    class MockComponentInstance {
-      compoenentInstance!: {
-        nodeTitles: null;
-      };
-    }
     let sampleStoryBackendObject = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -511,6 +530,10 @@ describe('Story Editor Component having three story nodes', () => {
       notes: 'Story notes',
       version: 1,
       corresponding_topic_id: 'topic_id',
+      thumbnail_filename: 'fileName',
+      thumbnail_bg_color: 'blue',
+      url_fragment: 'url',
+      meta_tag_content: 'meta',
       story_contents: {
         initial_node_id: 'node_1',
         nodes: [
@@ -526,23 +549,27 @@ describe('Story Editor Component having three story nodes', () => {
             outline_is_finalized: false,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
         ],
         next_node_id: 'node_1',
       },
       language_code: 'en',
-      thumbnail_filename: 'fileName',
-      thumbnail_bg_color: 'blue',
-      url_fragment: 'url',
-      meta_tag_content: 'meta',
     };
     spyOn(component, '_initEditor').and.stub();
     component.story = Story.createFromBackendDict(sampleStoryBackendObject);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {};
+    modalRef.result = Promise.resolve();
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      return modalRef;
     });
 
     component.createNode();
@@ -605,8 +632,12 @@ describe('Story Editor Component having three story nodes', () => {
       spyOn(
         storyEditorStateService,
         'updateExistenceOfStoryUrlFragment'
-      ).and.callFake((newUrlFragment, successCallback, errorCallback) =>
-        errorCallback()
+      ).and.callFake(
+        (
+          newUrlFragment: string,
+          successCallback: () => void,
+          errorCallback: () => void
+        ) => errorCallback()
       );
       component.updateStoryUrlFragment('story-url fragment');
       expect(storyUrlFragmentSpy).not.toHaveBeenCalled();
@@ -617,7 +648,7 @@ describe('Story Editor Component having three story nodes', () => {
     let storyUpdateSpy = spyOn(
       storyEditorStateService,
       'updateExistenceOfStoryUrlFragment'
-    ).and.callFake((urlFragment, callback) => callback());
+    ).and.callFake((urlFragment: string, callback: () => void) => callback());
 
     component.updateStoryUrlFragment('story_second');
 
@@ -661,12 +692,13 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should show modal if there are unsaved changes on leaving', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {};
+    modalRef.result = Promise.resolve();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.returnToTopicEditorPage();
 
@@ -675,12 +707,13 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should show modal if there are unsaved changes and click reject', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {};
+    modalRef.result = Promise.reject();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.returnToTopicEditorPage();
     expect(modalSpy).toHaveBeenCalled();

@@ -25,9 +25,8 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
-  FeedbackListResponse,
-  FeedbackSubmitPayload,
-  FeedbackThreadDetail,
+  SendALessonFeedbackModel,
+  IssueReportModel,
 } from 'domain/feedback/feedback.model';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -39,20 +38,33 @@ describe('Feedback backend api service', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let imageUploadHelperService: ImageUploadHelperService;
 
-  const payload: FeedbackSubmitPayload = {
-    category: 'platform',
-    target_type: 'general',
-    target_id: null,
-    description: 'The page is broken.',
-    page_url: 'https://www.oppia.org',
-    language_code: 'en',
-    rating: 4,
-    screenshot_filename: null,
-    submit_anonymously: false,
-    include_session_info: false,
-    session_info: null,
-    captcha_token: null,
-  };
+  const sendALessonFeedbackPayload =
+    SendALessonFeedbackModel.createForSubmission({
+      feedbackText: 'Hello',
+      exploration_context: {
+        explorationId: 'test',
+        explorationVersion: 1,
+        stateName: 'intro',
+        stateIndex: 1,
+        learnerCurrentAnswer: 'test',
+      },
+    });
+
+  const issueReportPayload = IssueReportModel.createForSubmission({
+    source: 'lesson',
+    reportMessage: 'text',
+    explorationContext: {
+      explorationId: 'test',
+      explorationVersion: 1,
+      stateName: 'intro',
+      stateIndex: 1,
+      learnerCurrentAnswer: 'test',
+    },
+    category: 'broken_layout_or_image',
+    includeTechnicalLogs: false,
+    sessionInfo: null,
+    screenshotFilename: null,
+  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -154,26 +166,32 @@ describe('Feedback backend api service', () => {
     );
   }));
 
-  it('should submit feedback', fakeAsync(() => {
+  it('should submit send a lesson feedback', fakeAsync(() => {
     const onSuccess = jasmine.createSpy('onSuccess');
 
-    feedbackBackendApiService.submitFeedbackAsync(payload).then(onSuccess);
+    feedbackBackendApiService
+      .submitLessonFeedbackAsync(sendALessonFeedbackPayload, null)
+      .then(onSuccess);
 
-    const req = httpTestingController.expectOne('/give_general_feedback');
+    const req = httpTestingController.expectOne('/feedback');
     expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({thread_id: 'thread_id'});
+    expect(req.request.body).toEqual(
+      sendALessonFeedbackPayload.toBackendDict()
+    );
+    req.flush({id: 'thread_id'});
     flushMicrotasks();
 
-    expect(onSuccess).toHaveBeenCalledWith({thread_id: 'thread_id'});
+    expect(onSuccess).toHaveBeenCalledWith({id: 'thread_id'});
   }));
 
   it('should reject with http error when feedback submission fails', fakeAsync(() => {
     const onFailure = jasmine.createSpy('onFailure');
 
-    feedbackBackendApiService.submitFeedbackAsync(payload).catch(onFailure);
+    feedbackBackendApiService
+      .submitLessonFeedbackAsync(sendALessonFeedbackPayload, null)
+      .catch(onFailure);
 
-    const req = httpTestingController.expectOne('/give_general_feedback');
+    const req = httpTestingController.expectOne('/feedback');
     req.flush(
       {error: 'Invalid feedback.'},
       {
@@ -185,7 +203,7 @@ describe('Feedback backend api service', () => {
 
     expect(
       onFailure.calls.mostRecent().args[0] instanceof HttpErrorResponse
-    ).toBeTrue();
+    ).toBe(true);
   }));
 
   it('should rethrow non-http errors during feedback submission', fakeAsync(() => {
@@ -199,197 +217,73 @@ describe('Feedback backend api service', () => {
     );
     const onFailure = jasmine.createSpy('onFailure');
 
-    serviceWithFailingHttp.submitFeedbackAsync(payload).catch(onFailure);
+    serviceWithFailingHttp
+      .submitLessonFeedbackAsync(sendALessonFeedbackPayload, null)
+      .catch(onFailure);
     flushMicrotasks();
 
     expect(onFailure).toHaveBeenCalledWith(error);
   }));
 
-  it('should fetch feedback list for creator feedback tab', fakeAsync(() => {
-    const response: FeedbackListResponse = {
-      results: [
-        {
-          id: 'thread_1',
-          category: 'lesson',
-          description_preview: 'Problem with this lesson.',
-          page_url: 'https://www.oppia.org/explore/exp123',
-          status: 'open',
-          created_on_msecs: 1000,
-          rating: 3,
-          has_screenshot: true,
-          has_session_info: false,
-        },
-      ],
-      cursor: 'next_cursor',
-      more: true,
-    };
+  it('should submit site and lesson issue report', fakeAsync(() => {
     const onSuccess = jasmine.createSpy('onSuccess');
 
     feedbackBackendApiService
-      .fetchCreatorFeedbackListAsync('exp123', 'cursor', 'open', 10, 20)
+      .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
       .then(onSuccess);
-
-    const req = httpTestingController.expectOne(
-      request =>
-        request.url === '/creator_feedback_handler/exp123' &&
-        request.params.get('cursor') === 'cursor' &&
-        request.params.get('status') === 'open' &&
-        request.params.get('date_from_msecs') === '10' &&
-        request.params.get('date_to_msecs') === '20'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(response);
     flushMicrotasks();
-
-    expect(onSuccess).toHaveBeenCalledWith(response);
-  }));
-
-  it('should omit unset filters when fetching creator feedback list', fakeAsync(() => {
-    const response: FeedbackListResponse = {
-      results: [],
-      cursor: null,
-      more: false,
-    };
-    const onSuccess = jasmine.createSpy('onSuccess');
-
-    feedbackBackendApiService
-      .fetchCreatorFeedbackListAsync('exp123', null, null, null, null)
-      .then(onSuccess);
-
-    const req = httpTestingController.expectOne(
-      '/creator_feedback_handler/exp123'
-    );
-    expect(req.request.method).toEqual('GET');
-    expect(req.request.params.keys()).toEqual([]);
-    req.flush(response);
-    flushMicrotasks();
-
-    expect(onSuccess).toHaveBeenCalledWith(response);
-  }));
-
-  it('should fetch detailed feedback thread for creator feedback tab', fakeAsync(() => {
-    const response: FeedbackThreadDetail = {
-      id: 'thread_1',
-      category: 'lesson',
-      description: 'Problem with this lesson.',
-      page_url: 'https://www.oppia.org/explore/exp123',
-      language_code: 'en',
-      status: 'open',
-      created_on_msecs: 1000,
-      rating: 3,
-      target_type: 'exploration',
-      target_id: 'exp123',
-      user_id: 'user_id',
-      session_info: null,
-      can_edit_exploration: true,
-      messages: [],
-    };
-    const onSuccess = jasmine.createSpy('onSuccess');
-
-    feedbackBackendApiService
-      .fetchCreatorFeedbackDetailAsync('exp123', 'thread_1')
-      .then(onSuccess);
-
-    const req = httpTestingController.expectOne(
-      '/creator_feedback_handler/exp123/thread_1'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(response);
-    flushMicrotasks();
-
-    expect(onSuccess).toHaveBeenCalledWith(response);
-  }));
-
-  it('should add a creator message with status and screenshot', fakeAsync(() => {
-    feedbackBackendApiService.addCreatorMessageAsync(
-      'exp123',
-      'thread_1',
-      'Thanks for the report.',
-      'fixed',
-      {
-        filename: 'reply.png',
-        files: {
-          'reply.png': 'aW1hZ2UtZGF0YQ==',
-        },
-      }
-    );
-
-    const req = httpTestingController.expectOne(
-      '/creator_feedback_handler/exp123/thread_1'
-    );
-    expect(req.request.method).toEqual('PUT');
+    const req = httpTestingController.expectOne('/report');
+    expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual({
-      action: 'fixed',
-      message: 'Thanks for the report.',
-      screenshotFilename: 'reply.png',
-      files: {
-        'reply.png': 'aW1hZ2UtZGF0YQ==',
-      },
+      ...issueReportPayload.toBackendDict(),
+      screenshot_file: null,
+      captcha_token: 'captcha-token',
     });
-    req.flush(null);
+    req.flush({id: 'thread_id'});
     flushMicrotasks();
+
+    expect(onSuccess).toHaveBeenCalledWith({id: 'thread_id'});
   }));
 
-  it('should add a creator message with screenshot filename only', fakeAsync(() => {
-    feedbackBackendApiService.addCreatorMessageAsync(
-      'exp123',
-      'thread_1',
-      'Thanks for the report.',
-      null,
-      {
-        filename: 'reply.png',
-      }
-    );
-
-    const req = httpTestingController.expectOne(
-      '/creator_feedback_handler/exp123/thread_1'
-    );
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual({
-      action: null,
-      message: 'Thanks for the report.',
-      screenshotFilename: 'reply.png',
-      files: null,
-    });
-    req.flush(null);
-    flushMicrotasks();
-  }));
-
-  it('should add a creator status update without optional fields', fakeAsync(() => {
-    feedbackBackendApiService.addCreatorMessageAsync(
-      'exp123',
-      'thread_1',
-      null,
-      'Compliment',
-      null
-    );
-
-    const req = httpTestingController.expectOne(
-      '/creator_feedback_handler/exp123/thread_1'
-    );
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual({
-      action: 'Compliment',
-      message: null,
-      screenshotFilename: null,
-      files: null,
-    });
-    req.flush(null);
-    flushMicrotasks();
-  }));
-
-  it('should not add a creator update without optional fields', fakeAsync(() => {
+  it('should reject with http error when feedback submission fails', fakeAsync(() => {
     const onFailure = jasmine.createSpy('onFailure');
 
     feedbackBackendApiService
-      .addCreatorMessageAsync('exp123', 'thread_1', null, null, null)
+      .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
       .catch(onFailure);
     flushMicrotasks();
 
-    expect(onFailure).toHaveBeenCalledWith(
-      new Error(
-        'At least one of message, status or screenshot must be provided.'
-      )
+    const req = httpTestingController.expectOne('/report');
+    req.flush(
+      {error: 'Invalid feedback.'},
+      {
+        status: 400,
+        statusText: 'Bad Request',
+      }
     );
+    flushMicrotasks();
+
+    expect(
+      onFailure.calls.mostRecent().args[0] instanceof HttpErrorResponse
+    ).toBe(true);
+  }));
+
+  it('should rethrow non-http errors during feedback submission', fakeAsync(() => {
+    const error = new Error('Unexpected error.');
+    const serviceWithFailingHttp = new FeedbackBackendApiService(
+      {
+        post: () => throwError(error),
+      } as never,
+      imageLocalStorageService,
+      imageUploadHelperService
+    );
+    const onFailure = jasmine.createSpy('onFailure');
+
+    serviceWithFailingHttp
+      .submitSiteAndLessonIssueReportAsync(issueReportPayload, null)
+      .catch(onFailure);
+    flushMicrotasks();
+
+    expect(onFailure).toHaveBeenCalledWith(error);
   }));
 });

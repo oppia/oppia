@@ -21,11 +21,14 @@ import {Injectable} from '@angular/core';
 import {
   TranslatableTexts,
   TranslatableTextsBackendDict,
+  TranslatableTextsBackendDictV2,
 } from 'domain/opportunity/translatable-texts.model';
 import {
   ImageLocalStorageService,
   ImagesData,
 } from 'services/image-local-storage.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {AppConstants} from 'app.constants';
 
 interface Data {
   suggestion_type: string;
@@ -42,17 +45,40 @@ interface Data {
 export class TranslateTextBackendApiService {
   constructor(
     private http: HttpClient,
-    private imageLocalStorageService: ImageLocalStorageService
+    private imageLocalStorageService: ImageLocalStorageService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   async getTranslatableTextsAsync(
-    expId: string,
-    languageCode: string
+    entityId: string,
+    languageCode: string,
+    entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<TranslatableTexts> {
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      return this.http
+        .get<TranslatableTextsBackendDictV2>(
+          '/gettranslatablecontentshandlerv2',
+          {
+            params: {
+              entity_id: entityId,
+              entity_type: entityType,
+              language_code: languageCode,
+            },
+          }
+        )
+        .toPromise()
+        .then((backendDict: TranslatableTextsBackendDictV2) => {
+          return TranslatableTexts.createFromBackendDictV2(backendDict);
+        });
+    }
+
     return this.http
       .get<TranslatableTextsBackendDict>('/gettranslatabletexthandler', {
         params: {
-          exp_id: expId,
+          exp_id: entityId,
           language_code: languageCode,
         },
       })

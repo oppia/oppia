@@ -113,6 +113,7 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
             datetime.datetime.utcnow(),
             datetime.datetime.utcnow(),
             False,
+            'abc-123',
         )
 
         swap_cancel_beam_job = self.swap_to_always_return(
