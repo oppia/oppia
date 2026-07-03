@@ -1702,8 +1702,12 @@ export class LoggedInUser extends BaseUser {
   /**
    * Expects goal progress to be displayed for a given topic.
    * @param {string} topicName - The name of the topic.
+   * @param {number} expectedProgress - The expected progress percentage (0-100).
    */
-  async expectGoalProgressToBeDisplayed(topicName: string): Promise<void> {
+  async expectGoalProgressToBeDisplayed(
+    topicName: string,
+    expectedProgress: number
+  ): Promise<void> {
     await this.expectElementToBeVisible(goalContainerSelector);
     const goalCards = await this.page.$$(goalContainerSelector);
 
@@ -1713,13 +1717,27 @@ export class LoggedInUser extends BaseUser {
       );
 
       if (title && title.includes(topicName)) {
-        const progressElement = await card.$(
-          '.goal-list-progress-bar, circle-progress, .e2e-test-goal-progress'
-        );
+        const progressBar = await card.$('.goal-list-progress-bar');
 
-        if (!progressElement) {
+        if (!progressBar) {
           throw new Error(
             `Progress element not found for goal "${topicName}".`
+          );
+        }
+
+        const widthStyle = await progressBar.$eval(
+          'div',
+          el => (el as HTMLElement).style.width
+        );
+
+        const actualProgress = Math.round(
+          parseFloat(widthStyle.replace('%', ''))
+        );
+
+        if (Math.abs(actualProgress - expectedProgress) > 0.01) {
+          throw new Error(
+            `Expected progress ${expectedProgress}% for goal "${topicName}", ` +
+              `but found ${actualProgress}%.`
           );
         }
         return;

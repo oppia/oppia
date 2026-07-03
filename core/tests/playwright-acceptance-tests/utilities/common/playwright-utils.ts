@@ -302,9 +302,13 @@ export class BaseUser {
     selector: string,
     context: Page = this.page,
     timeout: number = 30000
-  ): Promise<void> {
-    await context.waitForSelector(selector, {state: 'attached', timeout});
+  ): Promise<ElementHandle<Element> | undefined> {
+    const element = await context.waitForSelector(selector, {
+      state: 'attached',
+      timeout,
+    });
     showMessage(`Element ${selector} is attached in DOM.`);
+    return (element ?? undefined) as ElementHandle<Element> | undefined;
   }
 
   /**

@@ -117,7 +117,8 @@ const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
-const addTopicFormFieldInput = '.mat-input-element';
+const addTopicFormFieldInput =
+  '.mat-select-search-input:not(.mat-select-search-hidden)';
 const createNewTopicButton = '.e2e-test-create-topic-button';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 
