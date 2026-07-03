@@ -888,9 +888,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 r'Starting new Angular Compiler',
                 r'abc',
                 r'Build at: 123',
-                r'Starting new RTL CSS Watcher: npm run watch:rtl',
                 r'def',
-                r'Stopping RTL CSS Watcher.*',
                 r'Stopping Angular Compiler.*',
             ],
         )

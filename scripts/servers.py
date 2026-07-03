@@ -527,14 +527,6 @@ def managed_ng_build(
                 # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 
-            exit_stack.enter_context(
-                managed_process(
-                    ['npm', 'run', 'watch:rtl'],
-                    human_readable_name='RTL CSS Watcher',
-                    shell=True,
-                )
-            )
-
         def print_proc_output() -> None:
             """Prints the proc's output until it is exhausted."""
             for line in iter(read_line_func, None):
