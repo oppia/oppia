@@ -16,14 +16,12 @@
  * @fileoverview Root component for get started page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
-import {Meta} from '@angular/platform-browser';
 
 import {AppConstants} from 'app.constants';
 import {PageHeadService} from 'services/page-head.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-get-started-page-root',
@@ -31,51 +29,19 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 })
 export class GetStartedPageRootComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-
   constructor(
     private pageHeadService: PageHeadService,
-    private translateService: TranslateService,
-    private meta: Meta,
-    private windowRef: WindowRef
+    private translateService: TranslateService
   ) {}
 
   setPageTitleAndMetaTags(): void {
-    this.translateService
-      .get(AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE)
-      .subscribe((translatedTitle: string) => {
-        this.pageHeadService.updateTitleAndMetaTags(
-          translatedTitle,
-          AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
-        );
-
-        this.meta.updateTag(
-          {
-            itemprop: 'name',
-            content: 'Personalized Online Learning from Oppia',
-          },
-          'itemprop="name"'
-        );
-        this.meta.updateTag(
-          {
-            itemprop: 'description',
-            content: 'Learn how to get started using Oppia.',
-          },
-          'itemprop="description"'
-        );
-
-        this.meta.updateTag({
-          property: 'og:title',
-          content: 'Personalized Online Learning from Oppia',
-        });
-        this.meta.updateTag({
-          property: 'og:description',
-          content: 'Learn how to get started using Oppia.',
-        });
-        this.meta.updateTag({
-          property: 'og:url',
-          content: this.windowRef.nativeWindow.location.href,
-        });
-      });
+    let translatedTitle = this.translateService.instant(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE
+    );
+    this.pageHeadService.updateTitleAndMetaTags(
+      translatedTitle,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
+    );
   }
 
   ngOnInit(): void {
