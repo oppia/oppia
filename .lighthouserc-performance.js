@@ -92,10 +92,6 @@ module.exports = {
           },
         },
         {
-          matchingUrlPattern: 'http://[^/]+/emaildashboard$',
-          assertions: baseConfig['basePerformanceAssertions'],
-        },
-        {
           matchingUrlPattern: 'http://[^/]+/get-started$',
           assertions: baseConfig['basePerformanceAssertions'],
         },

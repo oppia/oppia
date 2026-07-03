@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ResponseItemSelectionInputComponent} from './oppia-response-item-selection-input.component';
 
@@ -31,7 +31,7 @@ describe('ResponseItemSelectionInput', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseItemSelectionInputComponent],
       providers: [

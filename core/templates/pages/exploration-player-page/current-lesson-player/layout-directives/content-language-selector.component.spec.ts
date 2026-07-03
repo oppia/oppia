@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   discardPeriodicTasks,
   fakeAsync,
@@ -109,7 +109,7 @@ describe('Content language selector component', () => {
   let loggerService: LoggerService;
   let urlInterpolationService: UrlInterpolationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule, NgbModule],
       declarations: [

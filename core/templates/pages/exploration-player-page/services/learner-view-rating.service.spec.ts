@@ -16,7 +16,7 @@
  * @fileoverview Tests for Learner View Rating Service.
  */
 
-import {async, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {waitForAsync, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
@@ -41,7 +41,7 @@ describe('Learner View Rating Service', () => {
     setExplorationVersion(_version: number): void {}
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [

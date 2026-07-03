@@ -64,9 +64,9 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
         display_alias: str,
         pin: Optional[str],
         preferred_language_codes: List[str],
-        preferred_site_language_code: Optional[str],
-        preferred_audio_language_code: Optional[str],
-        preferred_translation_language_code: Optional[str],
+        preferred_site_language_code: str,
+        preferred_audio_language_code: str,
+        preferred_translation_language_code: str,
         user_id: Optional[str] = None,
         fake_field: Optional[str] = None,
     ) -> None:
@@ -94,9 +94,10 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
             modifiable_user_data_dict['display_alias'],
             modifiable_user_data_dict['pin'],
             modifiable_user_data_dict['preferred_language_codes'],
-            modifiable_user_data_dict['preferred_site_language_code'],
-            modifiable_user_data_dict['preferred_audio_language_code'],
-            modifiable_user_data_dict['preferred_translation_language_code'],
+            modifiable_user_data_dict['preferred_site_language_code'] or '',
+            modifiable_user_data_dict['preferred_audio_language_code'] or '',
+            modifiable_user_data_dict['preferred_translation_language_code']
+            or '',
             modifiable_user_data_dict['user_id'],
             modifiable_user_data_dict['fake_field'],
         )
@@ -146,9 +147,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': 'user_id',
         }
         self.modifiable_user_data = (
@@ -159,9 +160,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias_3',
             'pin': None,
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_new_user_data = (

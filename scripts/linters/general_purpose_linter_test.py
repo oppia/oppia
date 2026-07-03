@@ -75,6 +75,22 @@ INVALID_BYPASS_FLAG: Final = os.path.join(
 VALID_SERVICE_FILE_PATH = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts'
 )
+INVALID_MODAL_NGBACTIVEMODAL_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_modal_component_ngbactivemodal.ts'
+)
+INVALID_MODAL_NGBMODAL_OPEN_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_modal_component_ngbmodal_open.ts'
+)
+INVALID_MODAL_NO_BACKDROP_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_modal_component_no_backdrop.ts'
+)
+INVALID_MODAL_MULTIPLE_OPENS_MISSING_BACKDROP_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR,
+    'invalid_modal_component_multiple_opens_missing_backdrop.ts',
+)
+VALID_MODAL_COMPONENT_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_modal_component.ts'
+)
 
 # PY filepaths.
 INVALID_REQUEST_FILEPATH: Final = os.path.join(
@@ -692,3 +708,98 @@ class GeneralLintTests(test_utils.LinterTestBase):
         )
         self.assertFalse(check_status)
         self.assertEqual(error_messages, [])
+
+    def test_modal_component_missing_mat_bottom_sheet_ref(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_MODAL_NGBACTIVEMODAL_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assert_same_list_elements(
+            [
+                '%s --> Modal components using NgbActiveModal must also '
+                'use MatBottomSheetRef to provide a mobile-friendly '
+                'bottom sheet view.' % INVALID_MODAL_NGBACTIVEMODAL_FILEPATH
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_modal_component_missing_mat_bottom_sheet(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_MODAL_NGBMODAL_OPEN_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assert_same_list_elements(
+            [
+                '%s --> Components opening modals with ngbModal.open '
+                'must also use MatBottomSheet to support mobile '
+                'views.' % INVALID_MODAL_NGBMODAL_OPEN_FILEPATH
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_modal_component_missing_backdrop_static(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_MODAL_NO_BACKDROP_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assert_same_list_elements(
+            [
+                '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
+                'to prevent closing on outside clicks.'
+                % INVALID_MODAL_NO_BACKDROP_FILEPATH
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_modal_component_multiple_opens_missing_backdrop(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_MODAL_MULTIPLE_OPENS_MISSING_BACKDROP_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assert_same_list_elements(
+            [
+                '%s --> ngbModal.open must be called with {backdrop: \'static\'} '
+                'to prevent closing on outside clicks.'
+                % INVALID_MODAL_MULTIPLE_OPENS_MISSING_BACKDROP_FILEPATH
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_valid_modal_component_passes(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [VALID_MODAL_COMPONENT_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_spec_files_are_skipped(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            ['scripts/linters/test_files/valid_modal_component.spec.ts'],
+            FILE_CACHE,
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_allowlisted_files_are_skipped(self) -> None:
+        allowlisted_file = (
+            'core/templates/base-components/oppia-footer.component.ts'
+        )
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [allowlisted_file], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
