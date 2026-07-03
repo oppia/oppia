@@ -22,6 +22,7 @@ import collections
 import sys
 
 from core import feconf, utils
+from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
     question_services,
@@ -31,9 +32,6 @@ from core.domain import (
 from core.storage.certificate_assessment import gae_models
 
 from typing import Dict, List, TypedDict, cast
-
-# Number of questions required per topic (one each of easy, medium, hard).
-QUESTIONS_PER_TOPIC = 3
 
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
@@ -94,11 +92,26 @@ def _get_difficulty_label(skill_difficulty: float) -> str | None:
     """Returns the certificate difficulty label for a linked skill difficulty."""
     # Map persisted skill difficulty values into certificate buckets so the
     # validator can count available questions per difficulty.
-    if skill_difficulty == 0.3:
+    if (
+        skill_difficulty
+        == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+            constants.SKILL_DIFFICULTY_EASY
+        ]
+    ):
         return 'easy'
-    if skill_difficulty == 0.6:
+    if (
+        skill_difficulty
+        == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+            constants.SKILL_DIFFICULTY_MEDIUM
+        ]
+    ):
         return 'medium'
-    if skill_difficulty == 0.9:
+    if (
+        skill_difficulty
+        == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+            constants.SKILL_DIFFICULTY_HARD
+        ]
+    ):
         return 'hard'
     return None
 
@@ -255,7 +268,7 @@ def validate_certificate_assessment_offering(
     topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, set[str]]] = {}
     topic_id_to_name: Dict[str, str] = {}
 
-    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    expected_total_questions = len(topic_ids) * constants.QUESTIONS_PER_TOPIC
     if total_questions < expected_total_questions:
         is_valid = False
         message_parts.append(
@@ -263,7 +276,7 @@ def validate_certificate_assessment_offering(
             '(%d per topic: easy, medium, hard) for %d topic(s).'
             % (
                 expected_total_questions,
-                QUESTIONS_PER_TOPIC,
+                constants.QUESTIONS_PER_TOPIC,
                 len(topic_ids),
             )
         )

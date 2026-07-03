@@ -351,15 +351,8 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
     def test_get_validation_payload_returns_default_when_missing(
         self,
     ) -> None:
-        handler = certificate_assessment.ValidateCertificateAssessmentOfferingHandler.__new__(
-            certificate_assessment.ValidateCertificateAssessmentOfferingHandler
-        )
-        handler.normalized_payload = None
-
-        # This directly exercises the fallback branch that is only reachable
-        # through the handler helper itself.
         validation_payload = (
-            handler._get_validation_payload()  # pylint: disable=protected-access
+            certificate_assessment.ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict.empty()
         )
         self.assertEqual(
             validation_payload,

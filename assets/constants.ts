@@ -6216,6 +6216,8 @@ export default {
     "Hard": 0.9
   },
 
+  "QUESTIONS_PER_TOPIC": 3,
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
