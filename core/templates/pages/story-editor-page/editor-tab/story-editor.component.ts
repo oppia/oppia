@@ -257,7 +257,13 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     const previousArcIdsOrder = this.storyContents
       .getArcs()
       .map(arc => arc.getId());
-    const arcId = 'arc_' + Date.now().toString();
+    let arcId = 'arc_' + Date.now().toString();
+    const existingArcIds = new Set(
+      this.storyContents.getArcs().map(arc => arc.getId())
+    );
+    while (existingArcIds.has(arcId)) {
+      arcId = 'arc_' + Date.now().toString();
+    }
     this.storyUpdateService.createArc(
       this.story,
       arcId,
