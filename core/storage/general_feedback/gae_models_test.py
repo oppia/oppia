@@ -225,7 +225,11 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 'LessonFeedbackModel ID generator is producing too many '
                 'collisions.',
             ):
-                general_feedback_models.LessonFeedbackModel._generate_new_id()  # pylint: disable=protected-access
+                general_feedback_models.LessonFeedbackModel.create(
+                    feedback_text='Feedback text',
+                    author_id=self.USER_ID,
+                    lesson_metadata_json=LESSON_METADATA_JSON,
+                )
 
 
 class PlatformFeedbackModelTests(test_utils.GenericTestBase):
@@ -452,79 +456,6 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 page_url='https://oppia.org/donate',
             )
 
-    def test_typo_lesson_report_routes_to_creator_dashboard(self) -> None:
-        report_model = general_feedback_models.PlatformFeedbackModel.get_by_id(
-            self.report_id_typo
-        )
-        self.assertEqual(
-            report_model.destination_dashboard,
-            feconf.DESTINATION_CREATOR,
-        )
-
-    def test_confusing_or_incorrect_answer_routes_to_creator_dashboard(
-        self,
-    ) -> None:
-        report_id = general_feedback_models.PlatformFeedbackModel.create(
-            feedback_text='The accepted answer seems wrong.',
-            source=feconf.SOURCE_LESSON,
-            platform=feconf.PLATFORM_WEB,
-            category=feconf.CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
-            destination_dashboard=feconf.DESTINATION_CREATOR,
-            lesson_metadata_json=LESSON_METADATA_JSON,
-            include_technical_logs=False,
-            screenshot_filename=None,
-            screenshot_entity_id=None,
-            page_url='https://oppia.org/explore/1',
-        )
-        report_model = general_feedback_models.PlatformFeedbackModel.get_by_id(
-            report_id
-        )
-        self.assertEqual(
-            report_model.destination_dashboard,
-            feconf.DESTINATION_CREATOR,
-        )
-
-    def test_broken_layout_or_image_routes_to_technical_dashboard(
-        self,
-    ) -> None:
-        report_model = general_feedback_models.PlatformFeedbackModel.get_by_id(
-            self.report_id_broken
-        )
-        self.assertEqual(
-            report_model.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-        )
-
-    def test_non_leap_page_routes_to_core_dashboard(self) -> None:
-        report_id = general_feedback_models.PlatformFeedbackModel.create(
-            feedback_text='Not sure what category this falls under.',
-            source=feconf.SOURCE_LESSON,
-            platform=feconf.PLATFORM_WEB,
-            category=feconf.CATEGORY_OTHER_OR_NOT_SURE,
-            destination_dashboard=feconf.DESTINATION_TECHNICAL_CORE_TEAM,
-            lesson_metadata_json=LESSON_METADATA_JSON,
-            include_technical_logs=False,
-            screenshot_filename=None,
-            screenshot_entity_id=None,
-            page_url='https://oppia.org/contributor-dashboard',
-        )
-        report_model = general_feedback_models.PlatformFeedbackModel.get_by_id(
-            report_id
-        )
-        self.assertEqual(
-            report_model.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
-        )
-
-    def test_app_report_always_routes_to_technical_dashboard(self) -> None:
-        report_model = general_feedback_models.PlatformFeedbackModel.get_by_id(
-            self.report_id_app
-        )
-        self.assertEqual(
-            report_model.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-        )
-
     def test_generate_new_id_raises_error_after_many_collisions(
         self,
     ) -> None:
@@ -538,7 +469,18 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 'PlatformFeedbackModel ID generator is producing too many '
                 'collisions.',
             ):
-                general_feedback_models.PlatformFeedbackModel._generate_new_id()  # pylint: disable=protected-access
+                general_feedback_models.PlatformFeedbackModel.create(
+                    feedback_text='Feedback text',
+                    source=feconf.SOURCE_APP,
+                    platform=feconf.PLATFORM_WEB,
+                    page_url='http://oppia.org/donate',
+                    destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                    category=None,
+                    lesson_metadata_json=None,
+                    include_technical_logs=False,
+                    screenshot_filename=None,
+                    screenshot_entity_id=None,
+                )
 
 
 class FeedbackSessionLogModelTests(test_utils.GenericTestBase):

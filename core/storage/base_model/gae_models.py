@@ -2090,9 +2090,10 @@ class BaseFeedbackModel(BaseModel):
         created_on: datetime. Timestamp of creation (set by BaseModel).
         last_updated: datetime. Timestamp of last update (set by BaseModel).
         deleted: bool. Soft-delete flag (set by BaseModel).
-        Subclasses must override this with their own prefix string, e.g.
-        'feedback.lesson' or 'feedback.platform'. The generated ID will have
-        the form '<ID_PREFIX>.<timestamp_b64><random_b64>'.
+        ID_PREFIX: str. Prefix used when generating IDs. Subclasses must
+            override this with their own value (e.g. 'feedback.lesson' or
+            'feedback.platform'). Generated IDs have the form
+            '<ID_PREFIX>.<timestamp_b64><random_b64>'.
     """
 
     ID_IS_USED_AS_TAKEOUT_KEY: bool = True
