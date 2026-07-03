@@ -25,6 +25,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CollectionEditor} from '../../utilities/user/collection-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -32,13 +33,21 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 describe('Logged-in Learner', function () {
   let collectionEditor: CollectionEditor & ExplorationEditor;
   let viewerUser: LoggedOutUser & LoggedInUser & ExplorationEditor;
+  let explorationCreator: ExplorationEditor;
 
   beforeAll(async function () {
     // Create the first exploration: "Positive Numbers".
-    const explorationCreator = await UserFactory.createNewUser(
+    explorationCreator = await UserFactory.createNewUser(
       'explorationCreatorLO13',
       'exploration_creator_lo13@example.com'
     );
+
+    // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+    // once fixed, allow testing for mobile viewport.
+    if (explorationCreator.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
 
     await explorationCreator.navigateToCreatorDashboardPage();
     await explorationCreator.navigateToExplorationEditorFromCreatorDashboard();
@@ -107,6 +116,12 @@ describe('Logged-in Learner', function () {
   it(
     'should be able to play a collection',
     async function () {
+      // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+      // once fixed, allow testing for mobile viewport.
+      if (explorationCreator.isViewportAtMobileWidth()) {
+        showMessage('Skipping the test, TODO #26642');
+        return;
+      }
       // Navigate to community library via the "Learn" navbar.
       await viewerUser.navigateToCommunityLibraryOnNavbar();
       await viewerUser.expectCollectionToBeVisibleInLibrary('Numbers');

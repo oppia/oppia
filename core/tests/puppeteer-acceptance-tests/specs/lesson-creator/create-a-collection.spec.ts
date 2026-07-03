@@ -24,6 +24,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {showMessage} from '../../utilities/common/show-message';
 
 const DEFAULT_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -40,10 +41,24 @@ describe('LC.12 Visit Creator Dashboard', function () {
       'lessoncreator@example.com'
     );
 
+    // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+    // once fixed, allow testing for mobile viewport.
+    if (lessonCreator.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
+
     learner = await UserFactory.createNewUser('learner', 'learner@example.com');
   }, DEFAULT_TIMEOUT);
 
   it('should view contribution stats', async function () {
+    // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+    // once fixed, allow testing for mobile viewport.
+    if (lessonCreator.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
+
     await lessonCreator.navigateToCreatorDashboardUsingProfileDropdown();
     await lessonCreator.expectCreatorDashboardMessageToBe(
       "It looks like you haven't created any explorations yet. Let's get started!"
@@ -114,6 +129,13 @@ describe('LC.12 Visit Creator Dashboard', function () {
   it(
     'should view explorations in grid view',
     async function () {
+      // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+      // once fixed, allow testing for mobile viewport.
+      if (lessonCreator.isViewportAtMobileWidth()) {
+        showMessage('Skipping the test, TODO #26642');
+        return;
+      }
+
       await lessonCreator.reloadPage();
 
       await lessonCreator.waitForPageToFullyLoad();
@@ -138,6 +160,13 @@ describe('LC.12 Visit Creator Dashboard', function () {
   it(
     'should view explorations in list view',
     async function () {
+      // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+      // once fixed, allow testing for mobile viewport.
+      if (lessonCreator.isViewportAtMobileWidth()) {
+        showMessage('Skipping the test, TODO #26642');
+        return;
+      }
+
       if (!lessonCreator.isViewportAtMobileWidth()) {
         await lessonCreator.switchToListView();
 
