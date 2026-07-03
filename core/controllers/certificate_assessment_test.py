@@ -352,7 +352,7 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
         self,
     ) -> None:
         validation_payload = (
-            certificate_assessment.ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict.empty()
+            certificate_assessment.create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
         )
         self.assertEqual(
             validation_payload,

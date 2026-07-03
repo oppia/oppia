@@ -65,12 +65,12 @@ class ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict(
     topic_ids: List[str]
     total_questions: int
 
-    @staticmethod
-    def empty() -> (
-        ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict
-    ):
-        """Returns an empty validation payload for fallback use."""
-        return {'topic_ids': [], 'total_questions': 0}
+
+def create_empty_validate_certificate_assessment_offering_handler_normalized_payload() -> (
+    ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict
+):
+    """Returns an empty validation payload for fallback use."""
+    return {'topic_ids': [], 'total_questions': 0}
 
 
 class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
@@ -117,7 +117,7 @@ class ValidateCertificateAssessmentOfferingHandler(
         """Returns a fully populated validation payload for graceful fallback."""
         if self.normalized_payload is None:
             return (
-                ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict.empty()
+                create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
             )
         return self.normalized_payload
 
