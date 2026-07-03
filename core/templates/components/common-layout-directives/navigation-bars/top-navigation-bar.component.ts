@@ -671,6 +671,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.platformFeatureService.status.WebFeedbackModalEnabled.isEnabled;
   }
 
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platformFeatureService.status.EnableCertificateAssessment
+      .isEnabled;
+  }
+
   openSiteFeedbackModal(): void {
     const modalRef = this.ngbModal.open(FeedbackModalComponent, {
       backdrop: 'static',
