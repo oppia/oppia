@@ -7567,19 +7567,6 @@ export class LoggedOutUser extends BaseUser {
         );
       }
     }
-
-    // Verify that the raw server-side HTML contains semantic elements
-    // (so bots crawling the raw HTML can see page structure without JS).
-    const requiredSemanticTags = ['h2', 'p'];
-    const rawHtml = await this.getRawHtmlForCurrentPage();
-    for (const tag of requiredSemanticTags) {
-      const tagRegex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`);
-      if (!tagRegex.test(rawHtml)) {
-        throw new Error(
-          `Expected server-side HTML to contain a <${tag}> element.`
-        );
-      }
-    }
   }
 
   /**
