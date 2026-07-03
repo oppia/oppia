@@ -30,6 +30,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CreateNewClassroomModalComponent} from './create-new-classroom-modal.component';
 import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-backend-api.service';
+import {ClassroomAdminDataService} from '../services/classroom-admin-data.service';
+import {NewClassroomData} from '../new-classroom.model';
 
 describe('Create new classroom modal', () => {
   let fixture: ComponentFixture<CreateNewClassroomModalComponent>;
@@ -117,4 +119,32 @@ describe('Create new classroom modal', () => {
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(expectedDefaultClassroom);
   }));
+
+  it('should return name validation error from the data service', () => {
+    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
+    classroomAdminDataService.nameValidationError = 'Name already exists.';
+
+    expect(componentInstance.nameValidationError).toBe('Name already exists.');
+  });
+
+  it('should return url validation error from the data service', () => {
+    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
+    classroomAdminDataService.urlValidationError = 'Invalid URL fragment.';
+
+    expect(componentInstance.urlValidationError).toBe('Invalid URL fragment.');
+  });
+
+  it('should delegate validateClassroom to the data service', () => {
+    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
+    const tempClassroom = new NewClassroomData('name', 'url', 'desc');
+    const classroom = new NewClassroomData('name', 'url', 'desc');
+    spyOn(classroomAdminDataService, 'validateClassroom');
+
+    componentInstance.validateClassroom(tempClassroom, classroom);
+
+    expect(classroomAdminDataService.validateClassroom).toHaveBeenCalledWith(
+      tempClassroom,
+      classroom
+    );
+  });
 });

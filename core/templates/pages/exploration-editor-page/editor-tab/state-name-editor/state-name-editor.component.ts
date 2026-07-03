@@ -53,7 +53,7 @@ export class StateNameEditorComponent implements OnInit, OnDestroy {
     private stateNameService: StateNameService
   ) {}
 
-  get activeStateName(): string {
+  get activeStateName(): string | null {
     return this.stateEditorService.getActiveStateName();
   }
 
