@@ -930,6 +930,33 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.getArcIdForNode('node_3')).not.toBe('arc_1');
   });
 
+  it('should generate a unique arc ID when the timestamp-based ID collides', () => {
+    const dateNowSpy = spyOn(Date, 'now');
+    dateNowSpy.and.returnValues(1234567890, 1234567890, 1234567891);
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1234567890', 'Arc 1', '', [
+        'node_1',
+        'node_2',
+        'node_3',
+      ])
+    );
+    component.linearNodesList = story.getStoryContents().getNodes();
+    const createArcSpy = spyOn(
+      storyUpdateService,
+      'createArc'
+    ).and.callThrough();
+
+    component.splitIntoArc(2);
+
+    expect(createArcSpy).toHaveBeenCalledWith(
+      component.story,
+      'arc_1234567891',
+      jasmine.any(String),
+      '',
+      ['node_3']
+    );
+  });
+
   it('should move multiple nodes to a new arc when splitting at a middle index', () => {
     component.storyContents.addArc(
       ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2', 'node_3'])
