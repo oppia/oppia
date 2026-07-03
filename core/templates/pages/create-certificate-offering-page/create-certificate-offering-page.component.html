@@ -1,0 +1,32 @@
+<div class="oppia-create-certificate-offering">
+  <oppia-certificate-offering-progress
+    [pageTitle]="'Create Certificate Offering'"
+    [activeSection]="activeSection">
+  </oppia-certificate-offering-progress>
+
+  <div class="oppia-certificate-offering-tab-container">
+    <oppia-certificate-offering-details
+    *ngIf="isDetailsSection()"
+    [certificateAssessmentOffering]="certificateAssessmentOffering"
+    (certificateAssessmentOfferingChange)="updateCertificateAssessmentOffering($event)"
+    (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
+    (cancelClicked)="navigateBackToDashboard()">
+    </oppia-certificate-offering-details>
+
+    <oppia-certificate-offering-add-topic-items
+      *ngIf="isAddTopicsSection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      (topicDataChange)="updateTopicData($event)"
+      (navigateToReviewAndAvailabilitySection)="navigateToReviewAndAvailabilitySection()"
+      (navigateToDetailsSection)="navigateToDetailsSection()">
+    </oppia-certificate-offering-add-topic-items>
+
+    <oppia-certificate-offering-review-and-availability
+      *ngIf="isReviewAndAvailabilitySection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      [useStubData]="true"
+      (saveCertificateOffering)="saveCertificateOffering()"
+      (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
+    </oppia-certificate-offering-review-and-availability>
+  </div>
+</div>

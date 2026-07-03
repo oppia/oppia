@@ -58,6 +58,7 @@ if MYPY:  # pragma: no cover
         app_feedback_report_models,
         auth_models,
         blog_models,
+        certificate_assessment_offering_models,
         collection_models,
         config_models,
         datastore_services,
@@ -79,6 +80,7 @@ if MYPY:  # pragma: no cover
     app_feedback_report_models,
     auth_models,
     blog_models,
+    certificate_assessment_offering_models,
     collection_models,
     config_models,
     email_models,
@@ -99,6 +101,7 @@ if MYPY:  # pragma: no cover
         models.Names.APP_FEEDBACK_REPORT,
         models.Names.AUTH,
         models.Names.BLOG,
+        models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
         models.Names.COLLECTION,
         models.Names.CONFIG,
         models.Names.EMAIL,
@@ -277,9 +280,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': self.user_1_id,
         }
         new_user_data_dict: user_domain.RawUserDataDict = {
@@ -287,9 +290,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias3',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -3935,6 +3938,77 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
 
+class WipeoutServiceDeleteCertificateAssessmentOfferingModelsTests(
+    test_utils.GenericTestBase
+):
+    """Provides testing of certificate assessment offering wipeout."""
+
+    OFFERING_1_ID: Final = 'certificate_offering_1'
+    USER_1_EMAIL: Final = 'some@email.com'
+    USER_1_USERNAME: Final = 'username1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        cert_models = certificate_assessment_offering_models
+        snapshot_metadata_model_class = (
+            cert_models.CertificateAssessmentOfferingSnapshotMetadataModel
+        )
+        commit_log_model_class = (
+            cert_models.CertificateAssessmentOfferingCommitLogEntryModel
+        )
+
+        snapshot_metadata_model_class(
+            id='%s-1' % self.OFFERING_1_ID,
+            committer_id=self.user_1_id,
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            commit_message='Create certificate assessment offering.',
+            commit_cmds=[{}],
+        ).put()
+        commit_log_model_class(
+            id=commit_log_model_class.get_instance_id(self.OFFERING_1_ID, 1),
+            offering_id=self.OFFERING_1_ID,
+            user_id=self.user_1_id,
+            commit_type=feconf.COMMIT_TYPE_CREATE,
+            commit_cmds=[{}],
+            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            version=1,
+        ).put()
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_certificate_assessment_offering_is_pseudonymized(self) -> None:
+        cert_models = certificate_assessment_offering_models
+        snapshot_metadata_model_class = (
+            cert_models.CertificateAssessmentOfferingSnapshotMetadataModel
+        )
+        commit_log_model_class = (
+            cert_models.CertificateAssessmentOfferingCommitLogEntryModel
+        )
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)
+        )
+
+        offering_mappings = user_models.PendingDeletionRequestModel.get_by_id(
+            self.user_1_id
+        ).pseudonymizable_entity_mappings[
+            models.Names.CERTIFICATE_ASSESSMENT_OFFERING.value
+        ]
+        pseudonymized_id = offering_mappings[self.OFFERING_1_ID]
+        metadata_model = snapshot_metadata_model_class.get_by_id(
+            '%s-1' % self.OFFERING_1_ID
+        )
+        self.assertEqual(metadata_model.committer_id, pseudonymized_id)
+
+        commit_log_model = commit_log_model_class.get_by_id(
+            commit_log_model_class.get_instance_id(self.OFFERING_1_ID, 1)
+        )
+        self.assertEqual(commit_log_model.user_id, pseudonymized_id)
+
+
 class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
@@ -5391,9 +5465,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': self.user_1_id,
         }
         new_user_data_dict: user_domain.RawUserDataDict = {
@@ -5401,9 +5475,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias3',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_user_data = (
@@ -5790,9 +5864,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': self.user_1_id,
         }
         new_user_data_dict: user_domain.RawUserDataDict = {
@@ -5800,9 +5874,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias3',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': 'en',
+            'preferred_audio_language_code': 'en',
+            'preferred_translation_language_code': 'en',
             'user_id': None,
         }
         self.modifiable_user_data = (

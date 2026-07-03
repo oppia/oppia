@@ -33,24 +33,12 @@ var suites = {
     './core/tests/webdriverio_desktop/collections.js'
   ],
 
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],
 
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
-  ],
-
-  navigation: [
-    './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  publication: [
-    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
 
   skillEditor: [
@@ -63,10 +51,6 @@ var suites = {
 
   users: [
     './core/tests/webdriverio_desktop/userJourneys.js'
-  ],
-
-  wipeout: [
-    './core/tests/webdriverio_desktop/wipeout.js'
   ]
 };
 

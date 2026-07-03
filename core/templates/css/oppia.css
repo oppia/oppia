@@ -1279,9 +1279,9 @@ textarea {
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
-  border-right: 1px solid #bbb;
+  border-inline-end: 1px solid #bbb;
   margin: 10px 0;
-  padding-left: 35px;
+  padding-inline-start: 35px;
   width: 50%;
 }
 .oppia-dashboard-aggregated-stats .stats-card:last-child {
@@ -2321,6 +2321,17 @@ oppia-parameter {
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
+}
+
+.oppia-certificate-result-modal .modal-content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.oppia-certificate-result-modal .modal-body {
+  background: transparent !important;
+  padding: 0 !important;
 }
 
 .oppia-modal-lesson-information-card .modal-dialog {
@@ -3393,7 +3404,7 @@ oppia-noninteractive-link {
 
   .oppia-dashboard-aggregated-stats .stats-card {
     font-size: 12px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
   }
 }
 

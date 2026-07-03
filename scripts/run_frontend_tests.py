@@ -93,6 +93,8 @@ def get_file_spec(file_path: str) -> str | None:
     normalized_file_path = file_path.replace('\\', '/')
     if normalized_file_path.startswith(
         'core/tests/puppeteer-acceptance-tests/'
+    ) or normalized_file_path.startswith(
+        'core/tests/playwright-acceptance-tests/'
     ):
         return None
 

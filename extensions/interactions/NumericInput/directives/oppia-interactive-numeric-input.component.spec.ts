@@ -18,7 +18,7 @@
 
 import {ChangeDetectorRef} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -80,7 +80,7 @@ describe('InteractiveNumericInput', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveNumericInput],
       imports: [

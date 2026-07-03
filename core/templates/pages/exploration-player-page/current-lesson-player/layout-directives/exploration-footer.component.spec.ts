@@ -19,7 +19,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -159,7 +159,7 @@ describe('ExplorationFooterComponent', () => {
 
   let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, NgbModule],
       declarations: [

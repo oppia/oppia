@@ -19,12 +19,13 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     exp_fetchers,
+    feature_flag_services,
     opportunity_domain,
     opportunity_services,
     suggestion_registry,
@@ -32,6 +33,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -81,6 +83,7 @@ class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     cursor: Optional[str]
     language_code: Optional[str]
     topic_name: Optional[str]
+    search_query: Optional[str]
 
 
 class ContributionOpportunitiesHandler(
@@ -108,6 +111,10 @@ class ContributionOpportunitiesHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'search_query': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -128,11 +135,12 @@ class ContributionOpportunitiesHandler(
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
+        search_query = self.normalized_request.get('search_query')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
-                    search_cursor
+                    search_cursor, search_query
                 )
             )
 
@@ -160,7 +168,7 @@ class ContributionOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(
-        self, cursor: Optional[str]
+        self, cursor: Optional[str], search_query: Optional[str] = None
     ) -> Tuple[List[ClientSideSkillOpportunityDict], Optional[str], bool]:
         """Returns a list of skill opportunities available for questions with
         a corresponding topic name.
@@ -169,6 +177,9 @@ class ContributionOpportunitiesHandler(
             cursor: str or None. If provided, the list of returned entities
                 starts from this datastore cursor. Otherwise, the returned
                 entities start from the beginning of the full list of entities.
+            search_query: str or None. An optional string to filter skill
+                opportunities by. It is a case-insensitive substring match
+                for skill description or topic name.
 
         Returns:
             3-tuple(opportunities, cursor, more). where:
@@ -211,23 +222,33 @@ class ContributionOpportunitiesHandler(
                     in classroom_topic_skill_id_to_topic_name
                 ):
                     skill_opportunity_dict = skill_opportunity.to_dict()
-                    client_side_skill_opportunity_dict: (
-                        ClientSideSkillOpportunityDict
-                    ) = {
-                        'id': skill_opportunity_dict['id'],
-                        'skill_description': skill_opportunity_dict[
-                            'skill_description'
-                        ],
-                        'question_count': skill_opportunity_dict[
-                            'question_count'
-                        ],
-                        'topic_name': (
-                            classroom_topic_skill_id_to_topic_name[
-                                skill_opportunity.id
-                            ]
-                        ),
-                    }
-                    opportunities.append(client_side_skill_opportunity_dict)
+                    topic_name = classroom_topic_skill_id_to_topic_name[
+                        skill_opportunity.id
+                    ]
+                    skill_description = skill_opportunity_dict[
+                        'skill_description'
+                    ]
+
+                    # We filter here in the controller rather than the service/model layer because:
+                    # 1. Datastore does not natively support case-insensitive substring matching.
+                    # 2. SkillOpportunityModel does not store topic_name, so we must fetch the
+                    #    paginated batch, map the topics, and filter them in memory.
+                    # This performs a case-insensitive match on both the skill description and topic name.
+                    if search_query is None or (
+                        search_query.lower() in skill_description.lower()
+                        or search_query.lower() in topic_name.lower()
+                    ):
+                        client_side_skill_opportunity_dict: (
+                            ClientSideSkillOpportunityDict
+                        ) = {
+                            'id': skill_opportunity_dict['id'],
+                            'skill_description': skill_description,
+                            'question_count': skill_opportunity_dict[
+                                'question_count'
+                            ],
+                            'topic_name': topic_name,
+                        }
+                        opportunities.append(client_side_skill_opportunity_dict)
             if (
                 not more
                 or len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE
@@ -278,6 +299,78 @@ class ContributionOpportunitiesHandler(
         )
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
+
+
+class ContributionOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
+    """Dict representation of ContributionOpportunitiesHandlerV2's
+    normalized_request dictionary.
+    """
+
+    cursor: Optional[str]
+    language_code: str
+    topic_name: Optional[str]
+    entity_type: str
+
+
+class ContributionOpportunitiesHandlerV2(
+    base.BaseHandler[
+        Dict[str, str], ContributionOpportunitiesHandlerV2NormalizedRequestDict
+    ]
+):
+    """Provides data for opportunities available in different categories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {'schema': {'type': 'basestring'}, 'default_value': None},
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
+                },
+            },
+            'topic_name': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
+                }
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests."""
+        assert self.normalized_request is not None
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            self.user_id,
+        ):
+            raise self.NotFoundException
+
+        cursor = self.normalized_request.get('cursor')
+        language_code = self.normalized_request['language_code']
+        topic_name = self.normalized_request.get('topic_name')
+        entity_type = self.normalized_request['entity_type']
+
+        opportunities, next_cursor, more = (
+            opportunity_services.get_translation_opportunities_with_new_models(
+                entity_type, language_code, topic_name, cursor
+            )
+        )
+        opportunity_dicts = [opp.to_dict() for opp in opportunities]
+
+        self.values = {
+            'opportunities': opportunity_dicts,
+            'next_cursor': next_cursor,
+            'more': more,
+        }
+        self.render_json(self.values)
 
 
 class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -418,14 +511,274 @@ class ReviewableOpportunitiesHandler(
         return list(ordered_exp_opp_summaries.values())
 
 
+class ReviewableOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableOpportunitiesHandlerV2's
+    normalized_request dictionary.
+    """
+
+    topic_name: Optional[str]
+    language_code: Optional[str]
+    entity_type: str
+
+
+class ReviewableOpportunitiesHandlerV2(
+    base.BaseHandler[
+        Dict[str, str], ReviewableOpportunitiesHandlerV2NormalizedRequestDict
+    ]
+):
+    """Provides data for reviewable opportunities."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'topic_name': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'language_code': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
+                }
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Fetches reviewable translation suggestions."""
+        assert self.normalized_request is not None
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            self.user_id,
+        ):
+            raise self.NotFoundException
+
+        topic_name = self.normalized_request.get('topic_name', None)
+        language = self.normalized_request.get('language_code')
+        entity_type = self.normalized_request['entity_type']
+
+        opportunity_dicts = []
+        if self.user_id:
+            for opp in self._get_reviewable_translation_opportunities(
+                self.user_id, entity_type, topic_name, language
+            ):
+                opportunity_dicts.append(opp.to_dict())
+        self.values = {
+            'opportunities': opportunity_dicts,
+        }
+        self.render_json(self.values)
+
+    def _get_reviewable_translation_opportunities(
+        self,
+        user_id: str,
+        entity_type: str,
+        topic_name: Optional[str],
+        language: Optional[str],
+    ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
+        """Returns translation opportunities that have translation suggestions
+        that are reviewable by the supplied user.
+
+        Args:
+            user_id: str. The user ID of the user.
+            entity_type: str. The type of the entity.
+            topic_name: str|None. A topic name.
+            language: str|None. ISO 639-1 language code.
+
+        Returns:
+            list(TranslationOpportunityCardInfo). A list of the matching
+            translation opportunities.
+        """
+        if topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if topic is None:
+                raise self.InvalidInputException(
+                    'The supplied input topic: %s is not valid' % topic_name
+                )
+
+        in_review_suggestion_target_ids = suggestion_services.get_reviewable_translation_suggestion_target_ids(
+            user_id, language
+        )
+
+        if not in_review_suggestion_target_ids:
+            return []
+
+        if language is None:
+            language = ''
+
+        opportunities = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+            entity_type, in_review_suggestion_target_ids, language
+        )
+
+        filtered_opportunities = []
+        for opp in opportunities:
+            if topic_name is None or opp.topic_name == topic_name:
+                filtered_opportunities.append(opp)
+
+        return filtered_opportunities
+
+
+class TranslatableContentsHandlerV2NormalizedRequestDict(TypedDict):
+    """Dict representation of TranslatableContentsHandlerV2's
+    normalized_request dictionary.
+    """
+
+    language_code: str
+    entity_type: str
+    entity_id: str
+
+
+class TranslatableContentsHandlerV2(
+    base.BaseHandler[
+        Dict[str, str], TranslatableContentsHandlerV2NormalizedRequestDict
+    ]
+):
+    """Provides entity content which can be translated in a given language."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
+                }
+            },
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
+                }
+            },
+            'entity_id': {'schema': {'type': 'basestring'}},
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests."""
+        assert self.normalized_request is not None
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            self.user_id,
+        ):
+            raise self.NotFoundException
+
+        entity_type = self.normalized_request['entity_type']
+        entity_id = self.normalized_request['entity_id']
+        language_code = self.normalized_request['language_code']
+
+        domain_object = None
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            domain_object = exp_fetchers.get_exploration_by_id(
+                entity_id, strict=False
+            )
+        else:
+            raise self.InvalidInputException(
+                'Translation for entity_type %s is not supported yet.'
+                % entity_type
+            )
+
+        if domain_object is None:
+            raise self.InvalidInputException(
+                'Invalid entity_id: %s' % entity_id
+            )
+
+        suggestions = []
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            suggestions = suggestion_services.get_translation_suggestions_in_review_by_exploration(
+                entity_id, language_code
+            )
+
+        entity_translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(entity_type),
+            entity_id,
+            domain_object.version,
+            language_code,
+        )
+
+        reviewable_language_codes = []
+        if self.user_id:
+            contribution_rights = user_services.get_user_contribution_rights(
+                self.user_id
+            )
+            reviewable_language_codes = (
+                contribution_rights.can_review_translation_for_language_codes
+            )
+
+        contents_which_need_translation = (
+            domain_object.get_all_contents_which_need_translations(
+                entity_translations
+            )
+        )
+
+        content_id_to_grouping_key = {}
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            for state_name, state in domain_object.states.items():
+                translatable_contents_collection = (
+                    state.get_translatable_contents_collection()
+                )
+                for (
+                    content_id
+                ) in (
+                    translatable_contents_collection.content_id_to_translatable_content
+                ):
+                    content_id_to_grouping_key[content_id] = state_name
+
+        translatable_contents = []
+        for content in contents_which_need_translation.values():
+            # Skip list-format content if the user does not have reviewer
+            # rights for the selected language. Translating list contents
+            # (such as answer choices) requires reviewer privileges.
+            if (
+                language_code not in reviewable_language_codes
+                and content.is_data_format_list()
+            ):
+                continue
+
+            # Skip content that already has a suggestion in review to
+            # prevent duplicate translation submissions.
+            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if any(
+                    s.change_cmd.content_id == content.content_id
+                    for s in suggestions
+                ):
+                    continue
+
+            content_dict = {
+                'content_id': content.content_id,
+                'content_type': content.content_type.value,
+                'content_format': content.content_format.value,
+                'content_value': content.content_value,
+                'grouping_key': (
+                    content_id_to_grouping_key.get(content.content_id)
+                ),
+            }
+
+            translatable_contents.append(content_dict)
+
+        self.values = {
+            'version': domain_object.version,
+            'translatable_contents': translatable_contents,
+        }
+        self.render_json(self.values)
+
+
 class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of ReviewableOpportunitiesHandler's
+    """Dict representation of LessonsPinningHandler's
     normalized_request dictionary.
     """
 
     language_code: str
     topic_id: str
     opportunity_id: Optional[str]
+    entity_type: str
 
 
 class LessonsPinningHandler(
@@ -445,6 +798,13 @@ class LessonsPinningHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
+                },
+                'default_value': feconf.ENTITY_TYPE_EXPLORATION,
+            },
         },
     }
 
@@ -456,11 +816,16 @@ class LessonsPinningHandler(
         topic_name = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
+        entity_type = self.normalized_payload['entity_type']
         if language_code and topic_name:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             topic_id = topic.id
             opportunity_services.update_pinned_opportunity_model(
-                self.user_id, language_code, topic_id, opportunity_id
+                self.user_id,
+                language_code,
+                topic_id,
+                opportunity_id,
+                entity_type=entity_type,
             )
         self.render_json(self.values)
 
