@@ -292,7 +292,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
-    def _assert_validation_error(  # type: ignore[override] pylint: disable=arguments-differ
+    def _assert_validation_error(  # type: ignore[override]  # pylint: disable=arguments-differ
         self, expected_error_substring: str
     ) -> None:
         """Checks that the collection passes strict validation."""

@@ -125,7 +125,7 @@ class InternetConnectivityHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
@@ -140,7 +140,7 @@ class FrontendErrorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.open_access
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Records errors reported by the frontend."""
         assert self.normalized_payload is not None
         logging.error(
@@ -157,7 +157,7 @@ class WarmupPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET warmup requests."""
         pass
 
@@ -170,7 +170,7 @@ class SplashRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         self.redirect('/')
 
 

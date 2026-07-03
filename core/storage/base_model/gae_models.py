@@ -1072,7 +1072,7 @@ class VersionedModel(BaseModel):
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-    def delete(  # type: ignore[override] pylint: disable=arguments-differ
+    def delete(  # type: ignore[override]  # pylint: disable=arguments-differ
         self,
         committer_id: str,
         commit_message: str,
@@ -1155,7 +1155,7 @@ class VersionedModel(BaseModel):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def delete_multi(  # type: ignore[override] pylint: disable=arguments-differ
+    def delete_multi(  # type: ignore[override]  # pylint: disable=arguments-differ
         cls,
         entity_ids: List[str],
         committer_id: str,

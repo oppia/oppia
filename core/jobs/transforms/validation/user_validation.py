@@ -413,31 +413,3 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
             yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(
                 model
             )
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to
-# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
-# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-@validation_decorators.AuditsExisting(user_models.UserQueryModel)
-class ValidateArchivedModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
-    """DoFn to validate archived models marked deleted."""
-
-    def process(  # pylint: disable=arguments-differ
-        self, input_model: user_models.UserQueryModel
-    ) -> Iterator[user_validation_errors.ArchivedModelNotMarkedDeletedError]:
-        """Function that checks if archived model is marked deleted.
-
-        Args:
-            input_model: user_models.UserQueryModel.
-                Entity to validate.
-
-        Yields:
-            ArchivedModelNotMarkedDeletedError. Error for models marked
-            archived but not deleted.
-        """
-        model = job_utils.clone_model(input_model)
-        if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
-            yield user_validation_errors.ArchivedModelNotMarkedDeletedError(
-                model
-            )
