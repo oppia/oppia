@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,17 @@
  * TS.CD.02 Check their accomplishment.
  */
 
-import testConstants from '../../utilities/common/test-constants';
-import {UserFactory} from '../../utilities/common/user-factory';
-import {Contributor} from '../../utilities/user/contributor';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
-import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
+import path from 'path';
+import testConstants from '../../../utilities/common/test-constants';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {Contributor} from '../../../utilities/user/contributor';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {TranslationReviewer} from '../../../utilities/user/translation-reviewer';
+import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
@@ -131,7 +132,7 @@ describe('Translation Submitter V2', function () {
     );
     await translationSubmitter.expectScreenshotToMatch(
       'translationSubmitterAccomplishment',
-      __dirname
+      path.join(__dirname, '..')
     );
     await translationSubmitter.expectContributionTableToContainRow([
       null, // Date can't be compared as it will be different every time.
@@ -149,7 +150,7 @@ describe('Translation Submitter V2', function () {
     await translationSubmitter.navigateToTabInMyContributions('Badges');
     await translationSubmitter.expectScreenshotToMatch(
       'translationSubmitterBadges',
-      __dirname
+      path.join(__dirname, '..')
     );
     await translationSubmitter.expectBadgesToContain(
       '1',

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,19 +19,20 @@
  * TS.CD.01 Translate exploration in target language.
  */
 
-import {RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
-import testConstants from '../../utilities/common/test-constants';
-import {UserFactory} from '../../utilities/common/user-factory';
-import {Contributor} from '../../utilities/user/contributor';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import path from 'path';
+import {RTE_BUTTON_TITLES} from '../../../utilities/common/rte-editor';
+import testConstants from '../../../utilities/common/test-constants';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {Contributor} from '../../../utilities/user/contributor';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
-} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
+} from '../../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {TranslationSubmitter} from '../../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
@@ -146,7 +147,7 @@ describe('Translation Submitter V2', function () {
     }
     await translationSubmitter.expectScreenshotToMatch(
       'contributorDashboard',
-      __dirname
+      path.join(__dirname, '..')
     );
 
     // Switch to the translation tab.
@@ -160,7 +161,7 @@ describe('Translation Submitter V2', function () {
     await translationSubmitter.expectTranslationOpportunitiesToBePresent(false);
     await translationSubmitter.expectScreenshotToMatch(
       'translationTabInContributionDashboard',
-      __dirname
+      path.join(__dirname, '..')
     );
 
     // Should be able to show correct featured languages.

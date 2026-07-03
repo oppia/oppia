@@ -26,7 +26,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
@@ -40,7 +39,6 @@ describe('Translation Reviewer', function () {
     Contributor;
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     translationReviewer = await UserFactory.createNewUser(
@@ -58,16 +56,6 @@ describe('Translation Reviewer', function () {
       'curriculumAdm',
       'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
-    );
-
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'releaseCoordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_translation_opps_with_new_opp_models'
     );
 
     // Create translation opportunity.
@@ -107,7 +95,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions'
+      'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
@@ -131,7 +119,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
-      'Fractions'
+      'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
@@ -154,11 +142,11 @@ describe('Translation Reviewer', function () {
   it('should be able to move between review cards', async function () {
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
-      'Exploration - Fractions'
+      'Fractions - The Picnic Problem'
     );
     await translationReviewer.startTranslationReview(
       'सामग्री 0',
-      'Fractions / Cutting the Pies'
+      'Fractions / The Picnic'
     );
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
 

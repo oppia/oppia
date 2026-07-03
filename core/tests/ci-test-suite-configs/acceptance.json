@@ -511,8 +511,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "translation-submitter/translate-exploration-in-target-language-v2",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language-v2.spec.ts",
+      "name": "translation-submitter/translation-opps-with-new-opps-model/feature-translate-exploration-in-target-language",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translation-opps-with-new-opps-model/feature-translate-exploration-in-target-language.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -521,8 +521,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "translation-submitter/check-their-accomplishment-v2",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment-v2.spec.ts",
+      "name": "translation-submitter/translation-opps-with-new-opps-model/feature-check-their-accomplishment",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translation-opps-with-new-opps-model/feature-check-their-accomplishment.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -531,8 +531,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "translation-reviewer/review-the-translations-v2",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/review-the-translations-v2.spec.ts",
+      "name": "translation-reviewer/translation-opps-with-new-opps-model/feature-review-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/translation-opps-with-new-opps-model/feature-review-the-translations.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -541,8 +541,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "translation-reviewer/filter-the-translations-v2",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/filter-the-translations-v2.spec.ts",
+      "name": "translation-reviewer/translation-opps-with-new-opps-model/feature-filter-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/translation-opps-with-new-opps-model/feature-filter-the-translations.spec.ts",
       "framework": "puppeteer"
     },
     {
