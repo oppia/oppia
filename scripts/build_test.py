@@ -371,6 +371,57 @@ class BuildTests(test_utils.GenericTestBase):
                     )
                 os.remove(hashes_path)
 
+    def test_generate_hashes(self) -> None:
+        expected_hashes = {
+            'path/to/file.js': '123456',
+            'path/file.min.js': '654321',
+        }
+
+        def mock_get_file_hashes(directory_path: str) -> Dict[str, str]:
+            if directory_path == MOCK_ASSETS_DEV_DIR:
+                return {
+                    'path/to/file.js': '123456',
+                }
+            return {
+                'path/file.min.js': '654321',
+            }
+
+        hashes_json_hash = 'abcdef'
+        get_file_hashes_swap = self.swap(
+            build, 'get_file_hashes', mock_get_file_hashes
+        )
+        save_hashes_to_file_swap = self.swap_with_checks(
+            build,
+            'save_hashes_to_file',
+            lambda _: None,
+            expected_args=[(expected_hashes,)],
+        )
+        generate_md5_hash_swap = self.swap(
+            build,
+            'generate_md5_hash',
+            lambda _: hashes_json_hash,
+        )
+        ensure_files_exist_swap = self.swap_with_checks(
+            build,
+            '_ensure_files_exist',
+            lambda _: None,
+            expected_args=[([build.HASHES_JSON_FILEPATH],)],
+        )
+        assets_dev_dir_swap = self.swap(
+            build, 'ASSETS_DEV_DIR', MOCK_ASSETS_DEV_DIR
+        )
+        extensions_dev_dir_swap = self.swap(
+            build,
+            'EXTENSIONS_DIRNAMES_TO_DIRPATHS',
+            {'dev_dir': MOCK_EXTENSIONS_DEV_DIR},
+        )
+
+        with assets_dev_dir_swap, extensions_dev_dir_swap:
+            with get_file_hashes_swap, save_hashes_to_file_swap:
+                with generate_md5_hash_swap, ensure_files_exist_swap:
+                    result = build.generate_hashes()
+        self.assertIsNone(result)
+
     def test_generate_app_yaml_with_deploy_mode(self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'

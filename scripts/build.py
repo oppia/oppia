@@ -705,13 +705,15 @@ def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     common.write_hashes_json_file(filtered_hashes)
 
 
-def generate_hashes() -> Dict[str, str]:
-    """Generates hashes for files."""
+def generate_hashes() -> None:
+    """Generates hashes for frontend asset files and writes them to
+    assets/hashes.json.
+    """
 
     # The keys for hashes are filepaths relative to the subfolders of the future
     # /build folder. This is so that the replacing inside the HTML files works
     # correctly.
-    hashes = {}
+    hashes: Dict[str, str] = {}
 
     # Create hashes for all directories and files.
     hash_dirs = [
@@ -731,7 +733,6 @@ def generate_hashes() -> Dict[str, str]:
     )
     # Make sure /assets/hashes.json is available to the frontend.
     _ensure_files_exist([HASHES_JSON_FILEPATH])
-    return hashes
 
 
 def generate_python_package() -> None:
