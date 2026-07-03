@@ -353,9 +353,7 @@ def mark_certificate_assessment_offering_model_as_blocked(
     ],
 ) -> gae_models.CertificateAssessmentOfferingModel:
     """Marks an offering model as blocked and logs the reason."""
-    certificate_assessment_offering_model, validation_result = (
-        model_and_validation_result
-    )
+    certificate_assessment_offering_model, _ = model_and_validation_result
     certificate_assessment_offering_model.async_status = 'Blocked'
 
     return certificate_assessment_offering_model

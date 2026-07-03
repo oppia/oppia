@@ -31,6 +31,7 @@ from core.domain import (
     topic_fetchers,
     translation_domain,
 )
+from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 from typing import TypedDict
@@ -348,8 +349,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             demonstrates=['Historical reasoning'],
             async_status='Available',
         )
-        offering_model = certificate_assessment_services.gae_models.CertificateAssessmentOfferingModel.get_by_id(
-            offering.certificate_id
+        offering_model = (
+            gae_models.CertificateAssessmentOfferingModel.get_by_id(
+                offering.certificate_id
+            )
         )
         self.assertIsNotNone(offering_model)
         assert offering_model is not None
