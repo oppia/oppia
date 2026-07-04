@@ -96,12 +96,14 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         exp = exps[0]
 
         # Here we use cast because we are narrowing down the type of translations.
-        translations = list(
-            cast(
+        translations = [
+            t
+            for t in cast(
                 Iterable[translation_models.EntityTranslationsModel],
                 grouped_data['translations'],
             )
-        )
+            if t.entity_version == exp.version
+        ]
         with datastore_services.get_ndb_context():
             content_count = exp.get_content_count(
                 override_metadata_feature_flag=True

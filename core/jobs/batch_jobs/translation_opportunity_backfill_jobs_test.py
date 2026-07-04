@@ -677,6 +677,29 @@ class AuditBackfillTranslationOpportunityModelJobTests(
             [{'cmd': 'edit_exploration_property'}],
         )
 
+        translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration',
+                self.exp_id,
+                2,
+                'hi',
+                {
+                    'content_0': {
+                        'content_format': 'html',
+                        'content_value': '<p>Hola</p>',
+                        'needs_update': False,
+                    },
+                    'content_1': {
+                        'content_format': 'html',
+                        'content_value': '<p>Needs update</p>',
+                        'needs_update': True,
+                    },
+                },
+            )
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
         matching_model = opportunity_models.TranslationOpportunityModel(
             id='exploration.exp_1',
             entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
