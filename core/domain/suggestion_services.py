@@ -241,8 +241,8 @@ def create_suggestion(
                 score_category,
                 language_code,
                 False,
-                datetime.datetime.utcnow(),
-                datetime.datetime.utcnow(),
+                utils.get_current_time(),
+                utils.get_current_time(),
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -329,8 +329,8 @@ def create_suggestion(
             score_category,
             language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_time(),
+            utils.get_current_time(),
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = '%s%s%s' % (
@@ -363,8 +363,8 @@ def create_suggestion(
             score_category,
             add_question_language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_time(),
+            utils.get_current_time(),
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)

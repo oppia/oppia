@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.domain import user_query_domain
@@ -67,7 +65,7 @@ class UserQueryTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
             user_ids=[],
             sent_email_model_id=None,
-            created_on=datetime.datetime.utcnow(),
+            created_on=utils.get_current_time(),
         )
         self.user_query.validate()
 

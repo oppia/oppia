@@ -75,7 +75,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject',
                 'Email Body',
-                datetime.datetime.utcnow(),
+                utils.get_current_time(),
             )
 
     def test_get_deletion_policy(self) -> None:
@@ -154,7 +154,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject',
                 'Email Body',
-                datetime.datetime.utcnow(),
+                utils.get_current_time(),
             )
 
             results = email_models.SentEmailModel.get_by_hash('Email Hash')
@@ -163,7 +163,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_hash_behavior_with_sent_datetime_lower_bound(self) -> None:
         with self.generate_constant_hash_ctx:
-            time_now = datetime.datetime.utcnow()
+            time_now = utils.get_current_time()
             email_models.SentEmailModel.create(
                 'recipient_id',
                 'recipient@email.com',
@@ -172,7 +172,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject',
                 'Email Body',
-                datetime.datetime.utcnow(),
+                utils.get_current_time(),
             )
 
         results = email_models.SentEmailModel.get_by_hash(
@@ -180,16 +180,14 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(results), 1)
 
-        time_now1 = datetime.datetime.utcnow()
+        time_now1 = utils.get_current_time()
 
         results = email_models.SentEmailModel.get_by_hash(
             'Email Hash', sent_datetime_lower_bound=time_now1
         )
         self.assertEqual(len(results), 0)
 
-        time_before = datetime.datetime.utcnow() - datetime.timedelta(
-            minutes=10
-        )
+        time_before = utils.get_current_time() - datetime.timedelta(minutes=10)
 
         results = email_models.SentEmailModel.get_by_hash(
             'Email Hash', sent_datetime_lower_bound=time_before
@@ -244,7 +242,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject',
             'Email Body',
-            datetime.datetime.utcnow(),
+            utils.get_current_time(),
         )
 
         self.assertTrue(
@@ -261,7 +259,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject',
             'Email Body',
-            datetime.datetime.utcnow()
+            utils.get_current_time()
             - datetime.timedelta(minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS),
         )
 
@@ -290,7 +288,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject',
                 'Email Body',
-                datetime.datetime.utcnow(),
+                utils.get_current_time(),
             )
 
             self.assertFalse(
@@ -322,7 +320,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     feconf.EMAIL_INTENT_SIGNUP,
                     'Email Subject',
                     'Email Body',
-                    datetime.datetime.utcnow(),
+                    utils.get_current_time(),
                 )
 
 
@@ -341,7 +339,7 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
             feconf.BULK_EMAIL_INTENT_MARKETING,
             'Email Subject',
             'Email Body',
-            datetime.datetime.utcnow(),
+            utils.get_current_time(),
         )
 
     def test_get_deletion_policy(self) -> None:
@@ -410,7 +408,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.utcnow(),
+            sent_datetime=utils.get_current_time(),
         )
         email_model_instance.update_timestamps()
         email_model_instance.put()
@@ -429,7 +427,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.utcnow(),
+            sent_datetime=utils.get_current_time(),
         )
         email_model_instance.update_timestamps()
         email_model_instance.put()
@@ -443,7 +441,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body2',
-            sent_datetime=datetime.datetime.utcnow(),
+            sent_datetime=utils.get_current_time(),
         )
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
@@ -461,7 +459,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.utcnow(),
+            sent_datetime=utils.get_current_time(),
         )
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
@@ -478,7 +476,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject2',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.utcnow(),
+            sent_datetime=utils.get_current_time(),
         )
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
@@ -495,7 +493,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject2',
             html_body='email_html_body2',
-            sent_datetime=datetime.datetime.utcnow(),
+            sent_datetime=utils.get_current_time(),
         )
         email_model_instance2.update_timestamps()
         email_model_instance2.put()

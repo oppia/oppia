@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 from unittest import mock
 
+from core import utils
 from core.domain import (
     fs_services,
     general_feedback_domain,
@@ -953,7 +954,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(
                 general_feedback_services.delete_general_feedback_older_than(
-                    datetime.datetime.utcnow()
+                    utils.get_current_time()
                 ),
                 0,
             )
@@ -1032,7 +1033,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                                         _delete_message_side_effect
                                     )
                                     deleted_count = general_feedback_services.delete_general_feedback_older_than(
-                                        datetime.datetime.utcnow()
+                                        utils.get_current_time()
                                     )
 
         self.assertEqual(deleted_count, 2)
@@ -1093,7 +1094,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                             mock.Mock(),
                         ):
                             deleted_count = general_feedback_services.delete_general_feedback_older_than(
-                                datetime.datetime.utcnow()
+                                utils.get_current_time()
                             )
         self.assertEqual(deleted_count, 1)
         delete_sessions_mock.assert_not_called()

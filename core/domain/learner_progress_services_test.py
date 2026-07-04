@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.constants import constants
 from core.domain import (
     collection_domain,
@@ -934,7 +935,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         exp_details: IncompleteExplorationDetailsDict = {
-            'timestamp': datetime.datetime.utcnow(),
+            'timestamp': utils.get_current_time(),
             'state_name': state_name,
             'version': version,
         }
@@ -955,7 +956,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 2
 
         modified_exp_details: IncompleteExplorationDetailsDict = {
-            'timestamp': datetime.datetime.utcnow(),
+            'timestamp': utils.get_current_time(),
             'state_name': state_name,
             'version': version,
         }

@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-import datetime
 import itertools
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     email_manager,
     feedback_domain,
@@ -1192,9 +1191,7 @@ def update_feedback_email_retries_transactional(user_id: str) -> None:
         user_id: str. The id of the given user.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
-    time_since_buffered = (
-        datetime.datetime.utcnow() - model.created_on
-    ).seconds
+    time_since_buffered = (utils.get_current_time() - model.created_on).seconds
 
     if (
         time_since_buffered

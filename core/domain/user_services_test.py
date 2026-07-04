@@ -617,13 +617,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_VOICEOVER_ADMIN,
         ]
 
-        less_than_time = datetime.datetime.utcnow()
+        less_than_time = utils.get_current_time()
 
         users_settings = user_services.get_users_settings(user_ids)
         self.assertEqual(len(users_settings), 1)
         admin_settings = users_settings[0]
 
-        greater_than_time = datetime.datetime.utcnow()
+        greater_than_time = utils.get_current_time()
 
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
@@ -3712,9 +3712,9 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         ).last_logged_in
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = datetime.datetime.utcnow()
-        mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        current_datetime = utils.get_current_time()
+        mocked_current_time = current_datetime - datetime.timedelta(days=1)
+        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
             user_services.record_user_logged_in(self.viewer_id)
 
         user_settings = user_services.get_user_settings(self.viewer_id)
@@ -3743,10 +3743,10 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         ).last_logged_in
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = utils.get_current_time()
 
-        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        mocked_current_time = current_datetime + datetime.timedelta(hours=11)
+        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -3755,8 +3755,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             )
             self.logout()
 
-        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=13)
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        mocked_current_time = current_datetime + datetime.timedelta(hours=13)
+        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
 
@@ -3833,11 +3833,11 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.editor_id)
         # Ruling out the possibility of None for mypy type checking.
         assert user_settings.last_edited_an_exploration is not None
-        mocked_datetime_utcnow = (
+        mocked_current_time = (
             user_settings.last_edited_an_exploration
             - datetime.timedelta(hours=13)
         )
-        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
             user_settings.record_user_edited_an_exploration()
             user_services.save_user_settings(user_settings)
 
@@ -3910,9 +3910,13 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.owner_id)
         # Ruling out the possibility of None for mypy type checking.
         assert user_settings.last_created_an_exploration is not None
-        with self.mock_datetime_utcnow(
-            user_settings.last_created_an_exploration
-            - datetime.timedelta(hours=13)
+        with self.swap(
+            utils,
+            'get_current_time',
+            lambda: (
+                user_settings.last_created_an_exploration
+                - datetime.timedelta(hours=13)
+            ),
         ):
             user_services.record_user_created_an_exploration(self.owner_id)
 

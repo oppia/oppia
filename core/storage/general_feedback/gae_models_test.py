@@ -266,7 +266,7 @@ class WebFeedbackThreadModelTests(test_utils.GenericTestBase):
 
         # Test filtering by date range.
         # Here we use cast because NDB query.fetch() loses concrete model typing.
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_time()
         threads = cast(
             Sequence[general_feedback_models.WebFeedbackThreadModel],
             general_feedback_models.WebFeedbackThreadModel.get_filtered_query_of_feedback_threads(

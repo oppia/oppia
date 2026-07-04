@@ -162,7 +162,7 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
 
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
+        with self.swap(utils, 'get_current_time', lambda: self.MOCK_DATE):
             stats_model = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
                 self.user_id_a
             )
@@ -221,7 +221,7 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
 
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
+        with self.swap(utils, 'get_current_time', lambda: self.MOCK_DATE):
             stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
                 self.user_id_a
             )
@@ -280,7 +280,7 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         """Set up for testing blog post reads stats domain object."""
         super().setUp()
         self.blog_id_a = blog_models.BlogPostModel.generate_new_blog_post_id()
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
+        with self.swap(utils, 'get_current_time', lambda: self.MOCK_DATE):
             stats_model = (
                 blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
                     self.blog_id_a
@@ -339,7 +339,7 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         """Set up for testing blog post views stats domain object."""
         super().setUp()
         self.blog_id_a = blog_models.BlogPostModel.generate_new_blog_post_id()
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
+        with self.swap(utils, 'get_current_time', lambda: self.MOCK_DATE):
             stats_model = (
                 blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
                     self.blog_id_a

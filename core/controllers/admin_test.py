@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
 import enum
 import logging
 
@@ -4353,7 +4352,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = utils.get_current_time()
         model.update_timestamps()
         model.put()
 

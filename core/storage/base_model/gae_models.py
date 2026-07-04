@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
 import enum
 import re
 
@@ -193,10 +192,10 @@ class BaseModel(datastore_services.Model):
         super()._pre_put_hook()
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
+            self.created_on = utils.get_current_time()
 
         if self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
+            self.last_updated = utils.get_current_time()
             self._last_updated_timestamp_is_fresh = True
 
         if not self._last_updated_timestamp_is_fresh:
@@ -416,10 +415,10 @@ class BaseModel(datastore_services.Model):
         self._last_updated_timestamp_is_fresh = True
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
+            self.created_on = utils.get_current_time()
 
         if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
+            self.last_updated = utils.get_current_time()
 
     @classmethod
     def update_timestamps_multi(
@@ -614,7 +613,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     def put_for_human(self) -> None:
         """Stores the model instance on behalf of a human."""
-        self.last_updated_by_human = datetime.datetime.utcnow()
+        self.last_updated_by_human = utils.get_current_time()
         return super().put()
 
     def put_for_bot(self) -> None:
@@ -640,7 +639,7 @@ class BaseHumanMaintainedModel(BaseModel):
         Returns:
             list(future). A list of futures.
         """
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_time()
         for instance in instances:
             instance.last_updated_by_human = now
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
