@@ -27,11 +27,29 @@ from core.domain import (
     certificate_assessment_domain,
     question_services,
     skill_fetchers,
+    topic_domain,
     topic_fetchers,
 )
+from core.platform import models
 from core.storage.certificate_assessment import gae_models
 
 from typing import Dict, List, TypedDict, cast
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import skill_models
+
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
+
+CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY: str = (
+    constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
+)
+CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: str = (
+    constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
+)
+CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: str = (
+    constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
+)
 
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
@@ -44,24 +62,34 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
 
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
-) -> Dict[str, List[str]]:
-    """Returns a mapping from topic ID to unique question IDs for its skills."""
+) -> tuple[Dict[str, List[str]], List[topic_domain.Topic]]:
+    """Returns question IDs per topic and the fetched topics themselves."""
     # Build a deduplicated pool of question IDs per topic so we can detect
     # both per-topic shortages and cross-topic overlap later in validation.
     topic_id_to_question_ids: Dict[str, List[str]] = {}
-    for topic_id in topic_ids:
-        try:
-            topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
-        except Exception as e:
-            raise utils.ValidationError(
-                'Topic %s does not exist.' % topic_id
-            ) from e
+    try:
+        topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    except Exception as e:
+        for topic_id in topic_ids:
+            try:
+                topic_fetchers.get_topic_by_id(topic_id, strict=True)
+            except Exception as topic_error:
+                raise utils.ValidationError(
+                    'Topic %s does not exist.' % topic_id
+                ) from topic_error
+        raise utils.ValidationError(
+            'One or more selected topics do not exist.'
+        ) from e
+    for topic_id, topic in zip(topic_ids, topics):
+        assert topic is not None
 
         question_ids: set[str] = set()
-        for skill_id in topic.get_all_skill_ids():
-            skill = skill_fetchers.get_skill_by_id(skill_id)
-            if skill is None:
+        skill_ids = list(topic.get_all_skill_ids())
+        skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
+        for skill_id, skill_model in zip(skill_ids, skill_models_list):
+            if skill_model is None:
                 continue
+            skill = skill_fetchers.get_skill_from_model(skill_model)
             question_ids.update(
                 link.question_id
                 for link in question_services.get_question_skill_links_of_skill(
@@ -70,19 +98,27 @@ def _get_topic_name_to_question_ids_map(
             )
 
         topic_id_to_question_ids[topic_id] = sorted(question_ids)
-    return topic_id_to_question_ids
+    return topic_id_to_question_ids, topics
 
 
 def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     """Distributes questions over medium, easy and hard in a repeating cycle."""
     # Spread required questions across difficulty buckets in a stable order so
     # the validator can compare each bucket against the available pool.
-    counts = {'easy': 0, 'medium': 0, 'hard': 0}
+    counts = {
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY: 0,
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: 0,
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: 0,
+    }
     # Keep this order stable. We intentionally start with medium, then easy,
     # then hard so the extra questions are biased toward the core mastery
     # evidence and discrimination buckets instead of over-allocating easy
     # questions.
-    cycle = ['medium', 'easy', 'hard']
+    cycle = [
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM,
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY,
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD,
+    ]
     for index in range(total_questions):
         counts[cycle[index % len(cycle)]] += 1
     return counts
@@ -98,21 +134,21 @@ def _get_difficulty_label(skill_difficulty: float) -> str | None:
             constants.SKILL_DIFFICULTY_EASY
         ]
     ):
-        return 'easy'
+        return CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
     if (
         skill_difficulty
         == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
             constants.SKILL_DIFFICULTY_MEDIUM
         ]
     ):
-        return 'medium'
+        return CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
     if (
         skill_difficulty
         == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
             constants.SKILL_DIFFICULTY_HARD
         ]
     ):
-        return 'hard'
+        return CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
     return None
 
 
@@ -122,17 +158,23 @@ def _get_topic_validation_result(
     """Returns the required/available breakdown for one topic."""
     required = _get_difficulty_counts(required_questions)
     return {
-        'easy': {
-            'required': required['easy'],
-            'available': available_questions_by_difficulty['easy'],
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY: {
+            'required': required[CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY],
+            'available': available_questions_by_difficulty[
+                CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
+            ],
         },
-        'medium': {
-            'required': required['medium'],
-            'available': available_questions_by_difficulty['medium'],
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: {
+            'required': required[CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM],
+            'available': available_questions_by_difficulty[
+                CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
+            ],
         },
-        'hard': {
-            'required': required['hard'],
-            'available': available_questions_by_difficulty['hard'],
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: {
+            'required': required[CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD],
+            'available': available_questions_by_difficulty[
+                CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
+            ],
         },
     }
 
@@ -194,6 +236,9 @@ def _has_valid_distinct_assignment(
 
     flow = 0
     while True:
+        # Find one more augmenting path so we can assign another distinct
+        # question to each topic without reusing a question already claimed
+        # by another topic.
         parent: Dict[str, str | None] = {source: None}
         queue: collections.deque[str] = collections.deque([source])
         while queue and sink not in parent:
@@ -245,6 +290,15 @@ def validate_certificate_assessment_offering(
 
     Returns:
         dict. Contains is_valid, validation_errors and validation_message.
+
+        The validation checks three things:
+        - Each selected topic exists and has enough questions in every
+          difficulty bucket for its share of the requested total.
+        - The combined set of questions across the selected topics is large
+          enough to satisfy the requested total without reusing questions.
+        - The selected topics can be assigned distinct questions per
+          difficulty so a certificate can be built without overlaps between
+          topics.
     """
     if not topic_ids:
         raise utils.ValidationError(
@@ -255,8 +309,8 @@ def validate_certificate_assessment_offering(
             'total_questions must be a positive integer.'
         )
 
-    topic_name_to_question_ids_map = _get_topic_name_to_question_ids_map(
-        topic_ids
+    topic_name_to_question_ids_map, topics = (
+        _get_topic_name_to_question_ids_map(topic_ids)
     )
     base_questions_per_topic = total_questions // len(topic_ids)
     remainder = total_questions % len(topic_ids)
@@ -292,27 +346,28 @@ def validate_certificate_assessment_offering(
             % (len(distinct_question_ids), total_questions)
         )
 
-    for index, topic_id in enumerate(topic_ids):
+    for index, (topic_id, topic) in enumerate(zip(topic_ids, topics)):
         required_questions = base_questions_per_topic + (
             1 if index < remainder else 0
         )
         required_questions_by_topic[topic_id] = _get_difficulty_counts(
             required_questions
         )
-        topic = topic_fetchers.get_topic_by_id(topic_id)
         topic_id_to_name[topic_id] = (
             topic.name if topic is not None else topic_id
         )
         available_question_ids_by_difficulty: Dict[str, set[str]] = {
-            'easy': set(),
-            'medium': set(),
-            'hard': set(),
+            CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY: set(),
+            CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: set(),
+            CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: set(),
         }
         if topic is not None:
-            for skill_id in topic.get_all_skill_ids():
-                skill = skill_fetchers.get_skill_by_id(skill_id)
-                if skill is None:
+            skill_ids = list(topic.get_all_skill_ids())
+            skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
+            for skill_id, skill_model in zip(skill_ids, skill_models_list):
+                if skill_model is None:
                     continue
+                skill = skill_fetchers.get_skill_from_model(skill_model)
                 for (
                     question_skill_link
                 ) in question_services.get_question_skill_links_of_skill(
@@ -339,12 +394,24 @@ def validate_certificate_assessment_offering(
         )
         validation_errors[topic_id] = validation_result
         if not (
-            available_questions_by_difficulty['easy']
-            >= validation_result['easy']['required']
-            and available_questions_by_difficulty['medium']
-            >= validation_result['medium']['required']
-            and available_questions_by_difficulty['hard']
-            >= validation_result['hard']['required']
+            available_questions_by_difficulty[
+                CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
+            ]
+            >= validation_result[CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY][
+                'required'
+            ]
+            and available_questions_by_difficulty[
+                CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
+            ]
+            >= validation_result[CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM][
+                'required'
+            ]
+            and available_questions_by_difficulty[
+                CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
+            ]
+            >= validation_result[CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD][
+                'required'
+            ]
         ):
             is_valid = False
             message_parts.append(
@@ -353,7 +420,11 @@ def validate_certificate_assessment_offering(
             )
 
     missing_distinct_difficulties: List[str] = []
-    for difficulty in ('easy', 'medium', 'hard'):
+    for difficulty in (
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY,
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM,
+        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD,
+    ):
         if not _has_valid_distinct_assignment(
             topic_id_to_question_ids_by_difficulty,
             topic_ids,
