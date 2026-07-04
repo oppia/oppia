@@ -61,13 +61,21 @@ export class EditCertificateOfferingPageComponent implements OnInit {
     this.certificateOfferingId =
       this.activatedRoute.snapshot.paramMap.get('certificate_offering_id') ||
       '';
-    this.populateCertificateAssessmentOfferingFromId();
+    void this.populateCertificateAssessmentOfferingFromId();
   }
 
-  populateCertificateAssessmentOfferingFromId(): void {
-    // TODO(#24717-M1.14): Replace this with the certificate offering fetch backend call.
-    this.certificateAssessmentOffering =
-      CertificateAssessmentOfferingData.createEmpty();
+  async populateCertificateAssessmentOfferingFromId(): Promise<void> {
+    try {
+      this.certificateAssessmentOffering =
+        await this.certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingAsync(
+          this.certificateOfferingId
+        );
+    } catch {
+      this.alertsService.addWarning(
+        'The certificate offering could not be loaded.'
+      );
+      this.router.navigate(['/certificate-offering-dashboard']);
+    }
   }
 
   isDetailsSection(): boolean {
