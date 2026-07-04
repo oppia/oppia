@@ -71,7 +71,6 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
             feconf.EMAIL_INTENT_DELETE_EXPLORATION,
             feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
-            feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
             feconf.EMAIL_INTENT_ONBOARD_CD_USER,
             feconf.EMAIL_INTENT_REMOVE_CD_USER,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
@@ -79,7 +78,7 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
-            feconf.BULK_EMAIL_INTENT_TEST,
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
             feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
             (feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS),
         ],
@@ -353,143 +352,3 @@ class SentEmailModel(base_models.BaseModel):
                 return True
 
         return False
-
-
-class BulkEmailModel(base_models.BaseModel):
-    """Records the content of an email sent from Oppia to multiple users.
-
-    This model is read-only; entries cannot be modified once created. The
-    id/key of instances of this model is randomly generated string of
-    length 12.
-
-    The recipient IDs are not stored in this model. But, we store all
-    bulk emails that are sent to a particular user in UserBulkEmailsModel.
-    """
-
-    # The user ID of the email sender. For site-generated emails this is equal
-    # to SYSTEM_COMMITTER_ID.
-    sender_id = datastore_services.StringProperty(required=True, indexed=True)
-    # The email address used to send the notification.
-    sender_email = datastore_services.StringProperty(required=True)
-    # The intent of the email.
-    intent = datastore_services.StringProperty(
-        required=True,
-        indexed=True,
-        choices=[
-            feconf.BULK_EMAIL_INTENT_MARKETING,
-            feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
-            feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
-            feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
-            feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT,
-            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
-        ],
-    )
-    # The subject line of the email.
-    subject = datastore_services.TextProperty(required=True)
-    # The HTML content of the email body.
-    html_body = datastore_services.TextProperty(required=True)
-    # The datetime the email was sent, in UTC.
-    sent_datetime = datastore_services.DateTimeProperty(
-        required=True, indexed=True
-    )
-
-    # DEPRECATED in v3.2.1. Do not use.
-    recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: sender_id, and
-        sender_email.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
-        """Users already have access to this data since the emails were sent
-        to them.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model contains data corresponding to a user, but this isn't exported
-        because users already have access to noteworthy details of this data
-        (since emails were sent to them).
-        """
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            },
-        )
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of BulkEmailModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        keys = cls.query(
-            datastore_services.any_of(
-                cls.sender_id == user_id,
-            )
-        ).fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether BulkEmailModel exists for user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return (
-            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None
-        )
-
-    @classmethod
-    def create(
-        cls,
-        instance_id: str,
-        sender_id: str,
-        sender_email: str,
-        intent: str,
-        subject: str,
-        html_body: str,
-        sent_datetime: datetime.datetime,
-    ) -> None:
-        """Creates a new BulkEmailModel entry.
-
-        Args:
-            instance_id: str. The ID of the instance.
-            sender_id: str. The user ID of the email sender.
-            sender_email: str. The email address used to send the notification.
-            intent: str. The intent string, i.e. the purpose of the email.
-            subject: str. The subject line of the email.
-            html_body: str. The HTML content of the email body.
-            sent_datetime: datetime.datetime. The date and time the email
-                was sent, in UTC.
-        """
-        email_model_instance = cls(
-            id=instance_id,
-            sender_id=sender_id,
-            sender_email=sender_email,
-            intent=intent,
-            subject=subject,
-            html_body=html_body,
-            sent_datetime=sent_datetime,
-        )
-        email_model_instance.update_timestamps()
-        email_model_instance.put()

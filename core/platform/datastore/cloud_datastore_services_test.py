@@ -59,11 +59,10 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             learnt_topic_ids=[],
             last_updated=self.curr_time,
         )
-        self.user_query_model = user_models.UserQueryModel(
-            id='query_id',
-            user_ids=[],
-            submitter_id=self.admin_user_id,
-            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
+        self.learner_goals_model = user_models.LearnerGoalsModel(
+            id='goals_id',
+            topic_ids_to_learn=[],
+            topic_ids_to_master=[],
             last_updated=self.curr_time,
         )
 
@@ -71,19 +70,21 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
         )
-        self.assertIsNone(user_models.UserQueryModel.get_by_id('query_id'))
+        self.assertIsNone(user_models.LearnerGoalsModel.get_by_id('goals_id'))
 
         cloud_datastore_services.update_timestamps_multi(
-            [self.completed_activities_model, self.user_query_model], False
+            [self.completed_activities_model, self.learner_goals_model], False
         )
         cloud_datastore_services.put_multi(
-            [self.completed_activities_model, self.user_query_model]
+            [self.completed_activities_model, self.learner_goals_model]
         )
 
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
         )
-        self.assertIsNotNone(user_models.UserQueryModel.get_by_id('query_id'))
+        self.assertIsNotNone(
+            user_models.LearnerGoalsModel.get_by_id('goals_id')
+        )
 
         self.assertEqual(
             self.completed_activities_model.get_by_id(
@@ -92,75 +93,79 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             self.curr_time,
         )
         self.assertEqual(
-            self.user_query_model.get_by_id('query_id').last_updated,
+            self.learner_goals_model.get_by_id('goals_id').last_updated,
             self.curr_time,
         )
 
     def test_delete_multi_transactional(self) -> None:
         cloud_datastore_services.update_timestamps_multi(
-            [self.completed_activities_model, self.user_query_model], False
+            [self.completed_activities_model, self.learner_goals_model], False
         )
         cloud_datastore_services.put_multi(
-            [self.completed_activities_model, self.user_query_model]
+            [self.completed_activities_model, self.learner_goals_model]
         )
 
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
         )
-        self.assertIsNotNone(user_models.UserQueryModel.get_by_id('query_id'))
+        self.assertIsNotNone(
+            user_models.LearnerGoalsModel.get_by_id('goals_id')
+        )
 
         cloud_datastore_services.delete_multi_transactional(
             [
                 datastore_services.Key(
                     user_models.CompletedActivitiesModel, self.admin_user_id
                 ),
-                datastore_services.Key(user_models.UserQueryModel, 'query_id'),
+                datastore_services.Key(
+                    user_models.LearnerGoalsModel, 'goals_id'
+                ),
             ]
         )
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
         )
-        self.assertIsNone(user_models.UserQueryModel.get_by_id('query_id'))
+        self.assertIsNone(user_models.LearnerGoalsModel.get_by_id('goals_id'))
 
     def test_fetch_multiple_entities_by_ids_and_models(self) -> None:
         cloud_datastore_services.update_timestamps_multi(
-            [self.completed_activities_model, self.user_query_model], False
+            [self.completed_activities_model, self.learner_goals_model], False
         )
         cloud_datastore_services.put_multi(
-            [self.completed_activities_model, self.user_query_model]
+            [self.completed_activities_model, self.learner_goals_model]
         )
 
         returned_models = (
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
                     ('CompletedActivitiesModel', [self.admin_user_id]),
-                    ('UserQueryModel', ['query_id']),
+                    ('LearnerGoalsModel', ['goals_id']),
                 ]
             )
         )
 
         self.assertEqual(
             returned_models,
-            [[self.completed_activities_model], [self.user_query_model]],
+            [[self.completed_activities_model], [self.learner_goals_model]],
         )
 
     def test_fetch_multiple_entities_throws_error_on_duplicate_parameters(
         self,
     ) -> None:
         cloud_datastore_services.update_timestamps_multi(
-            [self.completed_activities_model, self.user_query_model], False
+            [self.completed_activities_model, self.learner_goals_model], False
         )
         cloud_datastore_services.put_multi(
-            [self.completed_activities_model, self.user_query_model]
+            [self.completed_activities_model, self.learner_goals_model]
         )
 
         error_msg = 'Model names should not be duplicated in input list.'
         with self.assertRaisesRegex(Exception, error_msg):
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
-                    ('UserQueryModel', ['query_id']),
-                    ('UserQueryModel', ['query_id']),
+                    ('LearnerGoalsModel', ['goals_id']),
+                    ('LearnerGoalsModel', ['goals_id']),
                 ]
             )
 
@@ -195,64 +200,62 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         )
 
     def test_ndb_query_with_filters(self) -> None:
-        user_query_model1 = user_models.UserQueryModel(
-            id='query_id1',
-            user_ids=[],
-            submitter_id=self.admin_user_id,
-            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
+        user_group_model1 = user_models.UserGroupModel(
+            id='group_id_1',
+            name='Group One',
+            user_ids=[self.admin_user_id],
             last_updated=self.curr_time - self.THREE_WEEKS,
         )
-        user_query_model2 = user_models.UserQueryModel(
-            id='query_id2',
-            user_ids=[],
-            submitter_id=self.admin_user_id,
-            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
+        user_group_model2 = user_models.UserGroupModel(
+            id='group_id_2',
+            name='Group Two',
+            user_ids=[self.admin_user_id, 'new_id'],
             last_updated=self.curr_time,
         )
         cloud_datastore_services.update_timestamps_multi(
-            [user_query_model1, user_query_model2], False
+            [user_group_model1, user_group_model2], False
         )
         cloud_datastore_services.put_multi(
-            [user_query_model1, user_query_model2]
+            [user_group_model1, user_group_model2]
         )
 
-        result = user_models.UserQueryModel.query(
+        result = user_models.UserGroupModel.query(
             cloud_datastore_services.all_of(
-                user_models.UserQueryModel.submitter_id == self.admin_user_id,
-                user_models.UserQueryModel.query_status
-                == (feconf.USER_QUERY_STATUS_COMPLETED),
+                user_models.UserGroupModel.name == 'Group Two',
+                user_models.UserGroupModel.user_ids == 'new_id',
             )
         ).get()
 
-        self.assertEqual(result, user_query_model2)
+        self.assertEqual(result, user_group_model2)
 
-        result = user_models.UserQueryModel.query(
+        result = user_models.UserGroupModel.query(
             cloud_datastore_services.any_of(
-                user_models.UserQueryModel.submitter_id == 'new_id',
-                user_models.UserQueryModel.query_status
-                == (feconf.USER_QUERY_STATUS_PROCESSING),
+                user_models.UserGroupModel.name == 'Missing Group',
+                user_models.UserGroupModel.user_ids == self.admin_user_id,
             )
         ).get()
 
-        self.assertEqual(result, user_query_model1)
+        self.assertEqual(result, user_group_model1)
 
-        result = user_models.UserQueryModel.query(
+        result = user_models.UserGroupModel.query(
             cloud_datastore_services.not_equal(
-                user_models.UserQueryModel.query_status,
-                feconf.USER_QUERY_STATUS_PROCESSING,
+                user_models.UserGroupModel.name,
+                'Group One',
             )
         ).fetch()
 
-        self.assertEqual(result, [user_query_model2])
+        self.assertEqual(result, [user_group_model2])
 
         results: Tuple[
             Sequence[cloud_datastore_services.Model],
             cloud_datastore_services.Cursor,
             bool,
-        ] = user_models.UserQueryModel.query(
-            user_models.UserQueryModel.submitter_id == self.admin_user_id,
-        ).fetch_page(
-            2, cloud_datastore_services.make_cursor()
+        ] = (
+            user_models.UserGroupModel.query(
+                user_models.UserGroupModel.user_ids == self.admin_user_id,
+            )
+            .order(user_models.UserGroupModel.name)
+            .fetch_page(2, cloud_datastore_services.make_cursor())
         )
 
-        self.assertEqual(results[0], [user_query_model1, user_query_model2])
+        self.assertEqual(results[0], [user_group_model1, user_group_model2])

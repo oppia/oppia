@@ -30,25 +30,20 @@ if MYPY:  # pragma: no cover
         beam_job_models,
         datastore_services,
         job_models,
-        user_models,
     )
 
-(base_models, beam_job_models, job_models, user_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.BASE_MODEL,
-            models.Names.BEAM_JOB,
-            models.Names.JOB,
-            models.Names.USER,
-        ]
-    )
+base_models, beam_job_models, job_models = models.Registry.import_models(
+    [
+        models.Names.BASE_MODEL,
+        models.Names.BEAM_JOB,
+        models.Names.JOB,
+    ]
 )
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that
 # use versioned models should have their own delete functions.
 MODEL_CLASSES_TO_MARK_AS_DELETED = {
-    user_models.UserQueryModel: datetime.timedelta(days=30),
     beam_job_models.BeamJobRunModel: datetime.timedelta(days=180),
     beam_job_models.BeamJobRunResultModel: datetime.timedelta(days=180),
     job_models.JobModel: datetime.timedelta(days=180),

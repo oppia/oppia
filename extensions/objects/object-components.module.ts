@@ -15,7 +15,6 @@
 /**
  * @fileoverview Module for the object components.
  */
-import 'core-js/es7/reflect';
 import 'zone.js';
 
 import {CommonModule} from '@angular/common';

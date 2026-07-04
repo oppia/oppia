@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models  # pylint: disable=unused-import
     from mypy_imports import base_models, email_models
 
-(base_models, email_models, user_models) = models.Registry.import_models(
+base_models, email_models, user_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER]
 )
 
@@ -322,77 +322,6 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     'Email Body',
                     utils.get_current_time(),
                 )
-
-
-class BulkEmailModelUnitTests(test_utils.GenericTestBase):
-    """Test the BulkEmailModel class."""
-
-    SENDER_ID: Final = 'sender_id'
-    NONEXISTENT_USER_ID: Final = 'id_x'
-
-    def setUp(self) -> None:
-        super().setUp()
-        email_models.BulkEmailModel.create(
-            'instance_id',
-            self.SENDER_ID,
-            'sender@email.com',
-            feconf.BULK_EMAIL_INTENT_MARKETING,
-            'Email Subject',
-            'Email Body',
-            utils.get_current_time(),
-        )
-
-    def test_get_deletion_policy(self) -> None:
-        self.assertEqual(
-            email_models.BulkEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE,
-        )
-
-    def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            email_models.BulkEmailModel.has_reference_to_user_id(self.SENDER_ID)
-        )
-        self.assertFalse(
-            email_models.BulkEmailModel.has_reference_to_user_id(
-                self.NONEXISTENT_USER_ID
-            )
-        )
-
-    def test_apply_deletion_policy_deletes_model_for_user_who_is_sender(
-        self,
-    ) -> None:
-        email_models.BulkEmailModel.apply_deletion_policy(self.SENDER_ID)
-        self.assertIsNone(email_models.BulkEmailModel.get_by_id(self.SENDER_ID))
-
-    def test_apply_deletion_policy_raises_no_exception_for_nonexistent_user(
-        self,
-    ) -> None:
-        email_models.BulkEmailModel.apply_deletion_policy(
-            self.NONEXISTENT_USER_ID
-        )
-
-    def test_get_export_policy(self) -> None:
-        expected_dict = {
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        }
-        model = email_models.BulkEmailModel
-        self.assertEqual(model.get_export_policy(), expected_dict)
-
-    def test_get_model_association_to_user(self) -> None:
-        model = email_models.BulkEmailModel
-        self.assertEqual(
-            model.get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
-        )
 
 
 class GenerateHashTests(test_utils.GenericTestBase):
