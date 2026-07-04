@@ -28,6 +28,7 @@ from core.domain import (
     classroom_config_services,
     collection_services,
     exp_domain,
+    exp_fetchers,
     exp_services,
     fs_services,
     opportunity_services,
@@ -2247,6 +2248,47 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertEqual(node_5.destination_node_ids, [])
         self.logout()
 
+    def test_generate_single_dummy_chapter_without_graph_changes(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'topic',
+            'story_id',
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 1,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        self.assertEqual(len(updated_story.story_contents.nodes), 1)
+        self.assertEqual(
+            updated_story.story_contents.nodes[0].destination_node_ids, []
+        )
+        self.logout()
+
     def test_raises_error_if_not_curriculum_admin(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -2500,6 +2542,124 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
                     'action': 'generate_dummy_state_answers',
                     'exploration_id': '0',
                     'num_dummy_state_answers_to_generate': None,
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_generate_dummy_state_answers_fails_in_production_mode(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy answers in production.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_state_answers',
+                    'exploration_id': '0',
+                    'num_dummy_state_answers_to_generate': 2,
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_generate_dummy_state_answers_fails_for_invalid_exploration_id(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Exploration with id invalid_exp_id does not exist.'
+        )
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_state_answers',
+                    'exploration_id': 'invalid_exp_id',
+                    'num_dummy_state_answers_to_generate': 2,
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_generate_dummy_state_answers_fails_with_no_interaction(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        exploration_id = 'exp_with_no_interaction'
+        curriculum_admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+        exploration = self.save_new_valid_exploration(
+            exploration_id, curriculum_admin_id, end_state_name='End'
+        )
+        exploration.states[exploration.init_state_name].interaction.id = None
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'Initial state of exploration %s has no interaction.'
+            % exploration_id,
+        )
+        with assert_raises_regexp_context_manager, self.swap(
+            exp_fetchers,
+            'get_exploration_by_id',
+            lambda unused_exp_id, strict: exploration,
+        ):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_state_answers',
+                    'exploration_id': exploration_id,
+                    'num_dummy_state_answers_to_generate': 2,
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_generate_dummy_state_answers_fails_for_unsupported_interaction(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        exploration_id = 'exp_with_unsupported_interaction'
+        curriculum_admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+        exploration = self.save_new_valid_exploration(
+            exploration_id, curriculum_admin_id, end_state_name='End'
+        )
+        exploration.states[exploration.init_state_name].interaction.id = (
+            'Continue'
+        )
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'Unsupported interaction id Continue. Currently only TextInput '
+            'is supported.',
+        )
+        with assert_raises_regexp_context_manager, self.swap(
+            exp_fetchers,
+            'get_exploration_by_id',
+            lambda unused_exp_id, strict: exploration,
+        ):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_state_answers',
+                    'exploration_id': exploration_id,
+                    'num_dummy_state_answers_to_generate': 2,
                 },
                 csrf_token=csrf_token,
             )

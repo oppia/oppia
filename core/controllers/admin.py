@@ -1648,7 +1648,7 @@ class AdminHandler(
                 )
 
             story_node_index = 0
-            if story.story_contents is not None:
+            if story.story_contents is not None:  # pragma: no branch
                 story_node_index = (
                     int(story.story_contents.next_node_id[5:]) - 1
                 )
