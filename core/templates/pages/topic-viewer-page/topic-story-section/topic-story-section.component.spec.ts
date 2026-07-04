@@ -62,9 +62,11 @@ describe('TopicStorySectionComponent', () => {
     assetsBackendApiService = jasmine.createSpyObj('AssetsBackendApiService', [
       'getThumbnailUrlForPreview',
     ]);
-    i18nLanguageCodeService = {
-      isCurrentLanguageRTL: jasmine.createSpy('isCurrentLanguageRTL'),
-      onI18nLanguageCodeChange: new EventEmitter<string>(),
+    i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
+      'isCurrentLanguageRTL',
+    ]);
+    (i18nLanguageCodeService as object)['onI18nLanguageCodeChange'] = {
+      subscribe: () => ({unsubscribe: () => {}}),
     };
     chapterProgressLoaderService = jasmine.createSpyObj(
       'ChapterProgressLoaderService',
@@ -203,6 +205,9 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy1.getTitle.and.returnValue('Node title 1');
     storyNodeSpy1.getDescription.and.returnValue('Node description 1');
@@ -216,6 +221,9 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy2.getTitle.and.returnValue('Node title 2');
     storyNodeSpy2.getDescription.and.returnValue('Node description 2');
@@ -726,6 +734,9 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
