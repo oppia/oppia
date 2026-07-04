@@ -325,6 +325,10 @@ describe('FeedbackModalComponent', () => {
     }).compileComponents();
   }));
 
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it('should create the component', () => {
     createComponent();
     expect(component).toBeDefined();

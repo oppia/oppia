@@ -194,6 +194,7 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   signIn(): void {
+    window.sessionStorage.setItem('reopenLessonFeedbackModal', 'true');
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         (
