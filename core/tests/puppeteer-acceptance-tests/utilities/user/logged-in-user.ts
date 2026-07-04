@@ -2341,9 +2341,7 @@ export class LoggedInUser extends BaseUser {
    * Opens the Report a Site Issue Modal from the Profile Dropdown.
    */
   async openReportASiteIssueModal(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 
     await this.page.waitForSelector(reportSiteProblemLink, {

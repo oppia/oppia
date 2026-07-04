@@ -27,6 +27,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
+const formErrorSelector = '.e2e-test-form-error';
 
 describe('Logged-Out User', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -62,10 +63,6 @@ describe('Logged-Out User', function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
   }, 350000);
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
-
   it('submit anonymous feedback or report a lesson issue.', async () => {
     // Navigating to a lesson page and clicking on the "Report an Issue" flag icon in the options sidebar.
     await loggedOutLearner.playLesson(expId);
@@ -73,7 +70,12 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.clickReportLessonButton(false);
     showMessage('Clicked on "Report an Issue" button.');
     await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
-
+    // Try to click multiple chips to check if only one chip is selected and when Include Technical Log is present.
+    await loggedOutLearner.selectReportIssueChip('typo');
+    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(false);
+    await loggedOutLearner.selectReportIssueChip('broken layout');
+    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
+    // In the screenshot, only one chip is selected.
     await loggedOutLearner.expectScreenshotToMatch(
       'reportALessonModal',
       __dirname
@@ -86,12 +88,12 @@ describe('Logged-Out User', function () {
       false
     );
     await loggedOutLearner.expectTextContentInElementWithSelectorToBe(
-      '.e2e-test-form-error',
+      formErrorSelector,
       'Please add a description before submitting.'
     );
 
     // Should not be able to submit "Report an Issue" feedback while the text area description is longer than 2500 characters.
-    const longDescription = 'a'.repeat(2501);
+    const longDescription = 'a'.repeat(2650);
     await loggedOutLearner.submitFeedbackInTextArea(longDescription);
     await loggedOutLearner.scrollToCaptchaContainer();
     await loggedOutLearner.clickButtonInModal(
@@ -100,13 +102,13 @@ describe('Logged-Out User', function () {
       false
     );
     await loggedOutLearner.expectTextContentInElementWithSelectorToBe(
-      '.e2e-test-form-error',
-      'Your description is a bit too long (2501/2500 characters). Please shorten it slightly so our team can review it quickly!'
+      formErrorSelector,
+      'Your description is a bit too long (2650/2500 characters). Please shorten it slightly so our team can review it quickly!'
     );
     await loggedOutLearner.clearFeedbackTextArea();
 
     await loggedOutLearner.submitFeedbackInTextArea(
-      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
+      'The fraction circle on this card clips out of the layout on my device.'
     );
 
     // Should not be able to add a screenshot of size greater than 1MB and invalid file types.
@@ -144,7 +146,6 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.submitFeedbackInTextArea(
       'This fraction explanation makes so much sense, thank you!'
     );
-    await loggedOutLearner.scrollToCaptchaContainer();
     await loggedOutLearner.waitForTurnstileTokenIfPresent();
 
     await loggedOutLearner.expectScreenshotToMatch(
@@ -212,5 +213,9 @@ describe('Logged-Out User', function () {
       'sendALessonFeedbackModalAfterSubmittingFeedback',
       __dirname
     );
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

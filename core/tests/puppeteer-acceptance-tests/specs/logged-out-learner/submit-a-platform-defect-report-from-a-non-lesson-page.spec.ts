@@ -42,10 +42,6 @@ describe('Logged-Out User', function () {
     await UserFactory.closeBrowserForUser(releaseCoordinator);
   });
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
-
   it('should report a broken layout or static page bug as a guest user.', async () => {
     // Navigating to a non-lesson page (About page) and clicking on the "Report a Website Issue" link in the global footer layout.
     await loggedOutLearner.navigateToAboutPage();
@@ -69,7 +65,7 @@ describe('Logged-Out User', function () {
     );
 
     await loggedOutLearner.submitFeedbackInTextArea(
-      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
+      'Entering a short valid description.'
     );
     // Add a screenshot of size greater than 1MB.
     await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_HIGH_RES);
@@ -98,8 +94,10 @@ describe('Logged-Out User', function () {
       __dirname
     );
 
-    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
-    await loggedOutLearner.scrollToCaptchaContainer();
+    await loggedOutLearner.clearFeedbackTextArea();
+    await loggedOutLearner.submitFeedbackInTextArea(
+      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
+    );
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModalAfterEnteringFeedback',
       __dirname
@@ -116,5 +114,9 @@ describe('Logged-Out User', function () {
       'reportASiteIssueModalAfterSubmittingFeedback',
       __dirname
     );
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

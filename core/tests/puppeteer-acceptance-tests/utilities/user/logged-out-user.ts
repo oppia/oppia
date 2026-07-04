@@ -6116,12 +6116,10 @@ export class LoggedOutUser extends BaseUser {
   async toggleOptionsSidebar(): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     if (isMobileViewport) {
-      await this.page.waitForSelector(mobileOpenOptionsButton);
-      await this.page.click(mobileOpenOptionsButton);
+      await this.clickOnElementWithSelector(mobileOpenOptionsButton);
       return;
     }
-    await this.page.waitForSelector(lessonPlayerSideBarToggleButton);
-    await this.page.click(lessonPlayerSideBarToggleButton);
+    await this.clickOnElementWithSelector(lessonPlayerSideBarToggleButton);
   }
 
   /**
@@ -6129,14 +6127,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
    */
   async clickLessonFeedbackButton(isUserLoggedIn: boolean): Promise<void> {
-    const lessonFeedbackButtonElement = await this.page.waitForSelector(
-      lessonFeedbackButtonSelector,
-      {visible: true}
-    );
-    if (!lessonFeedbackButtonElement) {
-      throw new Error('Lesson feedback element not found');
-    }
-    await lessonFeedbackButtonElement.click();
+    await this.clickOnElementWithSelector(lessonFeedbackButtonSelector);
     isUserLoggedIn
       ? await this.expectModalTitleToBe('Send Feedback to the Lessons Team')
       : await this.expectModalTitleToBe('Want to chat with our Lessons Team?');
@@ -6150,14 +6141,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {boolean} isUserLoggedIn - Whether the user is logged in or not.
    */
   async clickReportLessonButton(isUserLoggedIn: boolean): Promise<void> {
-    const reportLessonButtonElement = await this.page.waitForSelector(
-      lessonReportButtonSelector,
-      {visible: true}
-    );
-    if (!reportLessonButtonElement) {
-      throw new Error('Report lesson element not found');
-    }
-    await reportLessonButtonElement.click();
+    await this.clickOnElementWithSelector(lessonReportButtonSelector);
     await this.expectModalTitleToBe('Report an Issue');
     await this.expectElementToBeVisible(commonModalBodySelector);
     await this.expectElementToBeVisible(feedbackModaltextarea);
@@ -6196,7 +6180,7 @@ export class LoggedOutUser extends BaseUser {
   async openReportASiteIssueModalFromGlobalFooter(
     isUserLoggedIn: boolean
   ): Promise<void> {
-    await this.page.waitForSelector(reportWebsiteIssueLink);
+    await this.expectElementToBeVisible(reportWebsiteIssueLink, true);
     await this.clickOnElementWithSelector(reportWebsiteIssueLink);
     await this.expectModalTitleToBe('Report a Website Issue');
     await this.expectElementToBeVisible(commonModalBodySelector);
