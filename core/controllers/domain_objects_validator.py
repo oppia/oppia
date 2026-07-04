@@ -43,7 +43,7 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping, Optional
+from typing import Dict, Mapping
 
 
 def validate_suggestion_change(
@@ -413,7 +413,7 @@ def validate_general_feedback_page_url(page_url: str) -> str:
 
 # Here we use object because session-info diagnostics are heterogeneous
 # JSON-like payloads (nested dict/list values) from client logs.
-def validate_general_feedback_session_info_log_entries(
+def validate_feedback_session_info_log_entries(
     session_info: Dict[str, object],
 ) -> Dict[str, object]:
     """Validates the session info log entries for feedback submission.
@@ -673,111 +673,116 @@ def validate_general_feedback_session_info_log_entries(
     }
 
 
-# Here we use object because session-info diagnostics are heterogeneous
-# JSON-like payloads (nested dict/list values) from client logs.
-def validate_general_feedback_submit_payload_coupling(
-    payload: general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict,
+def validate_lesson_feedback_submit_payload_coupling(
+    payload: general_feedback_domain.FeedbackSubmitPayloadDict,
 ) -> None:
-    """Validates the coupling between different fields of the payload for
-    feedback submission.
+    """Validates cross-field constraints for FeedbackSubmitHandler POST payload."""
+    feedback_text = payload.get('feedback_text', '')
+    if not isinstance(feedback_text, str) or not feedback_text.strip():
+        raise base.BaseHandler.InvalidInputException(
+            'feedback_text must not be empty.'
+        )
 
-    Args:
-        payload: dict. The payload to be validated.
-    """
-    include_session_info = bool(payload.get('include_session_info'))
+    lesson_metadata_json = payload.get('lesson_metadata_json')
+    if lesson_metadata_json is None:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json is required for lesson feedback.'
+        )
+
+    validate_lesson_metadata_fields(lesson_metadata_json)
+
+
+def validate_platform_feedback_submit_payload_coupling(
+    payload: general_feedback_domain.PlatformFeedbackSubmitPayloadDict,
+) -> None:
+    """Validates cross-field constraints for PlatformFeedbackSubmitHandler POST."""
+    report_message = payload.get('report_message', '')
+    if not isinstance(report_message, str) or not report_message.strip():
+        raise base.BaseHandler.InvalidInputException(
+            'report_message must not be empty.'
+        )
+
+    source = payload.get('source')
+    lesson_metadata_json = payload.get('lesson_metadata_json')
+    if source == 'lesson':
+        if lesson_metadata_json is None:
+            raise base.BaseHandler.InvalidInputException(
+                'lesson_metadata_json is required for lesson reports.'
+            )
+        validate_lesson_metadata_fields(lesson_metadata_json)
+
+    elif source == 'site':
+        category = payload.get('category')
+        if category is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'category must be omitted for site reports.'
+            )
+        if lesson_metadata_json is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'lesson_metadata_json must be omitted for site reports.'
+            )
+
+    include_technical_logs = payload.get('include_technical_logs', False)
     session_info = payload.get('session_info')
-    if include_session_info and session_info is None:
+
+    if include_technical_logs and session_info is None:
         raise base.BaseHandler.InvalidInputException(
-            'Session info must be provided if include_session_info is True.'
+            'session_info must be provided when include_technical_logs is True.'
         )
-
-    if not include_session_info and session_info is not None:
+    if not include_technical_logs and session_info is not None:
         raise base.BaseHandler.InvalidInputException(
-            'Session info should not be provided when '
-            'include_session_info is False.'
+            'session_info must be omitted when include_technical_logs is False.'
         )
-
-    description = payload.get('description')
-    if not isinstance(description, str) or not description.strip():
-        raise base.BaseHandler.InvalidInputException('Description is required.')
-
-    category = payload.get('category')
-    target_type = payload.get('target_type')
-    target_id = payload.get('target_id')
-
-    if category == 'lesson':
-        if target_type != 'exploration':
-            raise base.BaseHandler.InvalidInputException(
-                'Lesson feedback requires target_type=exploration.'
-            )
-
-        if not target_id:
-            raise base.BaseHandler.InvalidInputException(
-                'Lesson feedback requires target_id.'
-            )
-
-    elif category == 'platform':
-        if target_type != 'general':
-            raise base.BaseHandler.InvalidInputException(
-                'Platform feedback requires target_type=general.'
-            )
-
-        if target_id is not None:
-            raise base.BaseHandler.InvalidInputException(
-                'Platform feedback should not specify target_id.'
-            )
 
     screenshot_filename = payload.get('screenshot_filename')
     screenshot_file = payload.get('screenshot_file')
 
-    if screenshot_filename is None and screenshot_file:
-        raise base.BaseHandler.InvalidInputException(
-            'Screenshot file requires a screenshot filename.'
-        )
-
     if screenshot_filename is not None and screenshot_file is None:
         raise base.BaseHandler.InvalidInputException(
-            'Screenshot filename requires screenshot file data.'
+            'screenshot_file is required when screenshot_filename is provided.'
         )
-
-    if (
-        screenshot_filename is not None
-        and isinstance(screenshot_filename, str)
-        and re.fullmatch(
-            utils.get_image_filename_regex_pattern(),
-            screenshot_filename,
-        )
-        is None
-    ):
+    if screenshot_file is not None and screenshot_filename is None:
         raise base.BaseHandler.InvalidInputException(
-            'Screenshot filename is invalid.'
+            'screenshot_filename is required when screenshot_file is provided.'
+        )
+    if screenshot_filename is not None and isinstance(screenshot_filename, str):
+        if (
+            re.fullmatch(
+                utils.get_image_filename_regex_pattern(),
+                screenshot_filename,
+            )
+            is None
+        ):
+            raise base.BaseHandler.InvalidInputException(
+                'screenshot_filename is invalid.'
+            )
+
+
+def validate_lesson_metadata_fields(
+    lesson_metadata_json: general_feedback_domain.LessonMetadataDict,
+) -> general_feedback_domain.LessonMetadataDict:
+    """Validates field presence and types within a lesson_metadata_json dict."""
+    exploration_id = lesson_metadata_json.get('exploration_id')
+    if not isinstance(exploration_id, str) or not exploration_id:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.exploration_id must be a non-empty string.'
         )
 
+    exploration_version = lesson_metadata_json.get('exploration_version')
+    if not isinstance(exploration_version, int) or exploration_version < 0:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.exploration_version must be an integer.'
+        )
 
-def validate_general_feedback_screenshot_file(
-    screenshot_file: Optional[Dict[str, str]],
-) -> Optional[Dict[str, str]]:
-    """Validates the screenshot file.
+    state_name = lesson_metadata_json.get('state_name')
+    if not isinstance(state_name, str) or not state_name:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.state_name must be a non-empty string.'
+        )
 
-    Args:
-        screenshot_file: dict. The screenshot file to be validated.
-
-    Returns:
-        dict. The validated screenshot file.
-    """
-    if screenshot_file is None:
-        return None
-
-    files = screenshot_file
-
-    if len(files) > 1:
-        raise utils.ValidationError('Only one screenshot file is allowed.')
-
-    for filename, encoded_data in files.items():
-        if not isinstance(filename, str):
-            raise utils.ValidationError('Filename should be a string.')
-
-        if not isinstance(encoded_data, str):
-            raise utils.ValidationError('Screenshot data should be a string.')
-
-    return files
+    state_index = lesson_metadata_json.get('state_index')
+    if not isinstance(state_index, int) or state_index < 0:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.state_index must be a non-negative integer.'
+        )
+    return lesson_metadata_json
