@@ -65,7 +65,7 @@ describe('TopicStorySectionComponent', () => {
     i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
       'isCurrentLanguageRTL',
     ]);
-    (i18nLanguageCodeService as object).onI18nLanguageCodeChange =
+    i18nLanguageCodeService.onI18nLanguageCodeChange =
       new EventEmitter<string>();
     chapterProgressLoaderService = jasmine.createSpyObj(
       'ChapterProgressLoaderService',
@@ -717,13 +717,13 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should toggle arc expansion state', () => {
-    expect(component.isArcExpanded(0)).toBeFalse();
+    expect(component.isArcExpanded(0)).toBe(false);
 
     component.toggleArc(0);
-    expect(component.isArcExpanded(0)).toBeTrue();
+    expect(component.isArcExpanded(0)).toBe(true);
 
     component.toggleArc(0);
-    expect(component.isArcExpanded(0)).toBeFalse();
+    expect(component.isArcExpanded(0)).toBe(false);
   });
 
   it('should ignore arc node ids not present in all nodes', () => {
