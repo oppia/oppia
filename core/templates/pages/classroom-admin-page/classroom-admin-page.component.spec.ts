@@ -106,6 +106,7 @@ describe('Classroom Admin Page component ', () => {
   let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
+  let classroomAdminDataService: ClassroomAdminDataService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -142,6 +143,7 @@ describe('Classroom Admin Page component ', () => {
     );
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
+    classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -1613,7 +1615,6 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should return the topics graph validation error from the service', () => {
-    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
     classroomAdminDataService.topicsGraphValidationError =
       'Cycle detected in topic dependencies.';
 
@@ -1623,7 +1624,6 @@ describe('Classroom Admin Page component ', () => {
   });
 
   it('should delegate validateClassroom to the data service', () => {
-    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
     const tempClassroomData =
       ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
     const classroomData =

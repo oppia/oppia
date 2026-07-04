@@ -38,6 +38,7 @@ describe('Create new classroom modal', () => {
   let componentInstance: CreateNewClassroomModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let classroomBackendApiService: ClassroomBackendApiService;
+  let classroomAdminDataService: ClassroomAdminDataService;
 
   class MockClassroomBackendApiService {
     getNewClassroomIdAsync() {
@@ -90,6 +91,7 @@ describe('Create new classroom modal', () => {
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
   });
 
   it('should create', () => {
@@ -121,21 +123,18 @@ describe('Create new classroom modal', () => {
   }));
 
   it('should return name validation error from the data service', () => {
-    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
     classroomAdminDataService.nameValidationError = 'Name already exists.';
 
     expect(componentInstance.nameValidationError).toBe('Name already exists.');
   });
 
   it('should return url validation error from the data service', () => {
-    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
     classroomAdminDataService.urlValidationError = 'Invalid URL fragment.';
 
     expect(componentInstance.urlValidationError).toBe('Invalid URL fragment.');
   });
 
   it('should delegate validateClassroom to the data service', () => {
-    const classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
     const tempClassroom = new NewClassroomData('name', 'url', 'desc');
     const classroom = new NewClassroomData('name', 'url', 'desc');
     spyOn(classroomAdminDataService, 'validateClassroom');
