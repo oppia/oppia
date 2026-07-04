@@ -31,10 +31,27 @@ from core.domain import (
     topic_fetchers,
     translation_domain,
 )
+from core.platform import models
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 from typing import TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import skill_models
+
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
+
+CERTIFICATE_DIFFICULTY_EASY = (
+    certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
+)
+CERTIFICATE_DIFFICULTY_MEDIUM = (
+    certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
+)
+CERTIFICATE_DIFFICULTY_HARD = (
+    certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
+)
 
 
 class ValidationSamplingTestCase(TypedDict):
@@ -249,9 +266,11 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             del strict
             return topic_objects[topic_id]
 
-        def _get_skill(skill_id: str, strict: bool = False) -> mock.Mock | None:
-            del strict
-            return skill_objects.get(skill_id)
+        def _get_skill_models(skill_ids: list[str]) -> list[mock.Mock | None]:
+            return [
+                skill_objects[skill_id] if skill_id in skill_objects else None
+                for skill_id in skill_ids
+            ]
 
         def _get_links(
             skill_id: str, skill_description: str
@@ -263,12 +282,18 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             topic_fetchers,
-            'get_topic_by_id',
-            side_effect=_get_topic,
+            'get_topics_by_ids',
+            side_effect=lambda topic_ids, strict=True: [
+                topic_objects[topic_id] for topic_id in topic_ids
+            ],
+        ), mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            side_effect=_get_skill_models,
         ), mock.patch.object(
             skill_fetchers,
-            'get_skill_by_id',
-            side_effect=_get_skill,
+            'get_skill_from_model',
+            side_effect=lambda skill_model: skill_model,
         ), mock.patch.object(
             question_services,
             'get_question_skill_links_of_skill',
@@ -334,6 +359,68 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertEqual(
             result['validation_message'],
             'Certificate assessment is valid.',
+        )
+
+    def test_validate_offering_against_maps_rejects_missing_topic_ids(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+            topic_ids=['missing_topic'],
+            total_questions=3,
+            topic_id_to_info={},
+            skill_id_to_question_ids={},
+        )
+
+        self.assertFalse(result['is_valid'])
+        self.assertEqual(result['validation_errors'], {})
+        self.assertEqual(
+            result['validation_message'],
+            'Topic(s) missing_topic do not exist.',
+        )
+
+    def test_validate_offering_against_maps_rejects_insufficient_questions(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+            topic_ids=['topic_1'],
+            total_questions=4,
+            topic_id_to_info={
+                'topic_1': {
+                    'name': 'Topic 1',
+                    'skill_ids': ['skill_1'],
+                }
+            },
+            skill_id_to_question_ids={
+                'skill_1': ['q1', 'q2', 'q3'],
+            },
+        )
+
+        self.assertFalse(result['is_valid'])
+        self.assertIn(
+            'Topic 1 needs 4 unique questions but only 3 are available.',
+            result['validation_message'],
+        )
+
+    def test_validate_offering_against_preloaded_maps_handles_missing_topic(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
+            topic_ids=['topic_1'],
+            total_questions=3,
+            topic_name_to_question_ids_map={'topic_1': ['q1', 'q2', 'q3']},
+            topic_id_to_question_ids_by_difficulty={
+                'topic_1': {
+                    CERTIFICATE_DIFFICULTY_EASY: {'q1'},
+                    CERTIFICATE_DIFFICULTY_MEDIUM: {'q2'},
+                    CERTIFICATE_DIFFICULTY_HARD: {'q3'},
+                }
+            },
+            topic_id_to_name={'topic_1': 'Topic 1'},
+        )
+
+        self.assertTrue(result['is_valid'])
+        self.assertEqual(
+            result['validation_message'], 'Certificate assessment is valid.'
         )
 
     def test_mark_certificate_assessment_offering_model_as_blocked(
@@ -670,14 +757,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             topic_fetchers,
-            'get_topic_by_id',
-            return_value=topic,
-        ) as get_topic_by_id, mock.patch.object(
+            'get_topics_by_ids',
+            return_value=[topic],
+        ) as get_topics_by_ids, mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock(), mock.Mock()],
+        ) as get_multi_mock, mock.patch.object(
             skill_fetchers,
-            'get_skill_by_id',
-            side_effect=lambda skill_id, strict=False: (
-                skill if skill_id == 'skill_1' else None
-            ),
+            'get_skill_from_model',
+            return_value=skill,
         ), mock.patch.object(
             question_services,
             'get_question_skill_links_of_skill',
@@ -688,8 +777,9 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
-        get_topic_by_id.assert_any_call('topic_1', strict=True)
-        self.assertEqual(get_links.call_count, 2)
+        get_topics_by_ids.assert_called_once_with(['topic_1'], strict=True)
+        self.assertEqual(get_multi_mock.call_count, 2)
+        self.assertEqual(get_links.call_count, 4)
         get_links.assert_any_call('skill_1', 'Skill description')
         self.assertFalse(result['is_valid'])
         self.assertIn(
@@ -778,12 +868,24 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             total_questions=3,
         )
         topic_errors = result['validation_errors'][self.topic_id]
-        self.assertEqual(topic_errors['easy']['required'], 1)
-        self.assertEqual(topic_errors['medium']['required'], 1)
-        self.assertEqual(topic_errors['hard']['required'], 1)
-        self.assertEqual(topic_errors['easy']['available'], 0)
-        self.assertEqual(topic_errors['medium']['available'], 0)
-        self.assertEqual(topic_errors['hard']['available'], 0)
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['required'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_MEDIUM]['required'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_HARD]['required'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['available'], 0
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_MEDIUM]['available'], 0
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_HARD]['available'], 0
+        )
 
     def test_validation_requires_each_difficulty_bucket(self) -> None:
         topic = mock.Mock()
@@ -800,11 +902,15 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             topic_fetchers,
-            'get_topic_by_id',
-            side_effect=[topic, topic],
+            'get_topics_by_ids',
+            return_value=[topic],
+        ), mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock()],
         ), mock.patch.object(
             skill_fetchers,
-            'get_skill_by_id',
+            'get_skill_from_model',
             return_value=skill,
         ), mock.patch.object(
             question_services,
@@ -818,9 +924,15 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         self.assertFalse(result['is_valid'])
         topic_errors = result['validation_errors'][self.topic_id]
-        self.assertEqual(topic_errors['easy']['available'], 2)
-        self.assertEqual(topic_errors['medium']['available'], 0)
-        self.assertEqual(topic_errors['hard']['available'], 1)
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['available'], 2
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_MEDIUM]['available'], 0
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_HARD]['available'], 1
+        )
 
     def test_validation_counts_easy_linked_question_as_available(self) -> None:
         skill_id = 'skill_1'
@@ -861,5 +973,9 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         )
 
         topic_errors = result['validation_errors'][topic_id]
-        self.assertEqual(topic_errors['easy']['available'], 1)
-        self.assertEqual(topic_errors['easy']['required'], 1)
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['available'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['required'], 1
+        )

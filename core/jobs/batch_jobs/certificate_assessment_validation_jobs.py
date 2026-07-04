@@ -72,13 +72,6 @@ ASYNC_STATUS_AVAILABLE = 'Available'
 ASYNC_STATUS_NOT_READY = 'Not_Ready'
 ASYNC_STATUS_BLOCKED = 'Blocked'
 
-assert set(
-    [ASYNC_STATUS_AVAILABLE, ASYNC_STATUS_NOT_READY, ASYNC_STATUS_BLOCKED]
-) == set(certificate_assessment_domain.VALID_ASYNC_STATUSES), (
-    'The async_status constants in this job have drifted from '
-    'certificate_assessment_domain.VALID_ASYNC_STATUSES.'
-)
-
 
 class TopicSkillInfoDict(TypedDict):
     """In-memory representation of a topic's name and skill ids, built
@@ -233,9 +226,9 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             else:
                 topic_id_to_name[topic_id] = topic_info['name']
                 for skill_id in topic_info['skill_ids']:
-                    for skill_question_info in skill_id_to_question_info.get(
-                        skill_id, []
-                    ):
+                    for skill_question_info in skill_id_to_question_info[
+                        skill_id
+                    ]:
                         question_ids.add(skill_question_info['question_id'])
                         difficulty_label = certificate_assessment_services._get_difficulty_label(  # pylint: disable=protected-access
                             skill_question_info['skill_difficulty']
@@ -319,14 +312,6 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             all_question_skill_link_models
             | 'Extract skill id question info pairs'
             >> beam.Map(self.get_skill_id_question_id_pair)
-            | 'Group question infos by skill id' >> beam.GroupByKey()
-            | 'Convert grouped question infos to lists'
-            >> beam.MapTuple(
-                lambda skill_id, question_info: (
-                    skill_id,
-                    list(question_info),
-                )
-            )
         )
 
         validated_offering_models = (
@@ -335,7 +320,7 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             >> beam.Map(
                 self.get_validation_result_for_model,
                 beam.pvalue.AsDict(topic_id_to_info),
-                beam.pvalue.AsDict(skill_id_to_question_info),
+                beam.pvalue.AsMultiMap(skill_id_to_question_info),
             )
         )
 
