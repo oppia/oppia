@@ -108,8 +108,8 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 stats_model_class.create('blog_post_id')
 
     def test_get_new_event_entity_id(self) -> None:
-        time_in_millisecs = utils.get_current_time_in_millisecs()
-        mock_get_current_time_in_millisecs = lambda: time_in_millisecs
+        time_in_millisecs = utils.get_utc_time_in_millisecs()
+        mock_get_utc_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
 
         def mock_convert_to_hash(
@@ -120,8 +120,8 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = blog_stats_models.BlogPostViewedEventLogEntryModel.get_new_event_entity_id(
@@ -212,9 +212,9 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_new_event_entity_id(self) -> None:
-        time_in_millisecs = utils.get_current_time_in_millisecs()
+        time_in_millisecs = utils.get_utc_time_in_millisecs()
         rand_hash = '123456789123'
-        mock_get_current_time_in_millisecs = lambda: time_in_millisecs
+        mock_get_utc_time_in_millisecs = lambda: time_in_millisecs
 
         def mock_convert_to_hash(
             input_string: str,  # pylint: disable=unused-argument
@@ -224,8 +224,8 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = blog_stats_models.BlogPostReadEventLogEntryModel.get_new_event_entity_id(
@@ -346,8 +346,8 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_new_event_entity_id(self) -> None:
-        time_in_millisecs = utils.get_current_time_in_millisecs()
-        mock_get_current_time_in_millisecs = lambda: time_in_millisecs
+        time_in_millisecs = utils.get_utc_time_in_millisecs()
+        mock_get_utc_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
 
         def mock_convert_to_hash(
@@ -358,8 +358,8 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = blog_stats_models.BlogPostExitedEventLogEntryModel.get_new_event_entity_id(

@@ -570,7 +570,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             actual_details['version'], details_fetched_from_model['version']
         )
         # Due to the slight difference in the time in which we call the
-        # get_current_time_in_millisecs function while testing, the times are
+        # get_utc_time_in_millisecs function while testing, the times are
         # usually offset by  few seconds. Therefore we check if the difference
         # between the times is less than 10 seconds.
         self.assertLess(

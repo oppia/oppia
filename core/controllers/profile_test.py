@@ -388,7 +388,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
 
         # Update the first_contribution_msec to the current time in
         # milliseconds.
-        first_time_in_msecs = utils.get_current_time_in_millisecs()
+        first_time_in_msecs = utils.get_utc_time_in_millisecs()
         user_settings_to_update = user_services.get_user_settings(user_id)
         user_settings_to_update.update_first_contribution_msec(
             first_time_in_msecs
@@ -403,7 +403,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
 
         # Test that the contribution date is not changed after the first time it
         # is set.
-        second_time_in_msecs = utils.get_current_time_in_millisecs()
+        second_time_in_msecs = utils.get_utc_time_in_millisecs()
         user_settings_to_update = user_services.get_user_settings(user_id)
         user_settings_to_update.update_first_contribution_msec(
             second_time_in_msecs

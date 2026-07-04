@@ -333,7 +333,7 @@ class CreatorFeedbackListHandler(
         if exploration is None:
             raise self.InvalidInputException('Invalid exploration id.')
         # Default date range is 3 months.
-        now_msecs = utils.get_current_time_in_millisecs()
+        now_msecs = utils.get_utc_time_in_millisecs()
         three_months_ago_msecs = now_msecs - 90 * 24 * 60 * 60 * 1000
 
         date_from_msecs: float | None = req.get('date_from_msecs')
