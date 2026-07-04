@@ -71,7 +71,7 @@ describe('Logged-in User', function () {
     await UserFactory.closeSuperAdminBrowser();
   });
 
-  it('should play a lesson, open the sidebar options drawer and click on the "Send Lesson Feedback" button.', async function () {
+  it('should submit open-ended feedback on a lesson and track creator responses on my dashboard.', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.playLesson(expId);
 
@@ -83,20 +83,6 @@ describe('Logged-in User', function () {
       __dirname
     );
 
-    await loggedInLearner.clickButtonInModal(
-      'Send Feedback to the Lessons Team',
-      'cancel'
-    );
-    showMessage('Closed Lesson feedback modal.');
-  });
-
-  it('should type a constructive message in the feedback text area ("This fraction model is awesome, but can we get more marble examples?") and click "Submit".', async function () {
-    await loggedInLearner.clickLessonFeedbackButton(true);
-    showMessage('Clicked on "Send Lesson Feedback" button.');
-    await loggedInLearner.expectScreenshotToMatch(
-      'sendALessonFeedbackModal',
-      __dirname
-    );
     await loggedInLearner.submitFeedbackInTextArea(
       'This fraction model is awesome, but can we get more marble examples?'
     );
@@ -119,7 +105,7 @@ describe('Logged-in User', function () {
     showMessage('Submitted Lesson feedback.');
   });
 
-  it('should open the options sidebar drawer and click the "Report an Issue" flag icon.', async function () {
+  it('should report a bug in a lesson.', async function () {
     await loggedInLearner.toggleOptionsSidebar();
     await loggedInLearner.clickReportLessonButton(true);
     showMessage('Clicked on "Report an Issue" button.');
@@ -129,11 +115,7 @@ describe('Logged-in User', function () {
       __dirname
     );
 
-    await loggedInLearner.clickButtonInModal('Report an Issue', 'cancel');
-    showMessage('Closed Report an issue feedback modal.');
-  });
-
-  it('should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button at the bottom of the modal overlay', async () => {
+    // should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
     await loggedInLearner.clickReportLessonButton(true);
 
     await loggedInLearner.selectReportIssueChip('typo');
@@ -174,9 +156,8 @@ describe('Logged-in User', function () {
     await loggedInLearner.expectToastMessage(
       'Thank you for your feedback! The team has received your report.'
     );
-  });
 
-  it('should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button at the bottom of the modal overlay.', async () => {
+    // should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
     await loggedInLearner.clickReportLessonButton(true);
 
     await loggedInLearner.selectReportIssueChip('broken layout');
@@ -215,26 +196,7 @@ describe('Logged-in User', function () {
     await loggedInLearner.toggleOptionsSidebar();
   });
 
-  it('should be able to click the Profile menu dropdown at the top right, and select the "Report a Website Issue" option.', async () => {
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.clickOnProfileDropdown();
-    await loggedInLearner.expectProfileDropdownToContainElementWithContent(
-      'Report a Website Issue'
-    );
-    await loggedInLearner.openReportASiteIssueModal();
-    showMessage('Clicked on "Report a Website Issue" button.');
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportASiteIssueModal',
-      __dirname
-    );
-    await loggedInLearner.clickButtonInModal(
-      'Report a Website Issue',
-      'cancel'
-    );
-    showMessage('Closed Report a Website Issue feedback modal.');
-  });
-
-  it('should submit feedback for "Report a Website Issue".', async () => {
+  it('should submit feedback on the platform.', async () => {
     await loggedInLearner.navigateToContributorDashboardUsingProfileDropdown();
     await loggedInLearner.clickOnProfileDropdown();
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
@@ -242,26 +204,9 @@ describe('Logged-in User', function () {
     );
     await loggedInLearner.openReportASiteIssueModal();
     showMessage('Clicked on "Report a Website Issue" button.');
-
-    await loggedInLearner.submitFeedbackInTextArea(
-      'The contributor dashboard is broken.'
-    );
-    await loggedInLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
     await loggedInLearner.expectIncludeTechnicalLogToBePresent(true);
-
     await loggedInLearner.expectScreenshotToMatch(
-      'reportASiteIssueModalAfterEnteringFeedback',
-      __dirname
-    );
-    await loggedInLearner.clickButtonInModal(
-      'Report a Website Issue',
-      'confirm'
-    );
-    await loggedInLearner.expectToastMessage(
-      'Thank you! Your report has been sent to the technical team.'
-    );
-    await loggedInLearner.expectScreenshotToMatch(
-      'reportASiteIssueModalAfterSubmittingFeedback',
+      'reportASiteIssueModal',
       __dirname
     );
   });

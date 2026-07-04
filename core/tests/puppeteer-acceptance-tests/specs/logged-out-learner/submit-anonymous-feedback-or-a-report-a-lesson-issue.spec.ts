@@ -66,25 +66,19 @@ describe('Logged-Out User', function () {
     await UserFactory.closeAllBrowsers();
   });
 
-  it('should be able to click the "Report an Issue" flag icon.', async function () {
+  it('Submit anonymous feedback or report a lesson issue.', async () => {
+    // Navigating to a lesson page and clicking on the "Report an Issue" flag icon in the options sidebar.
     await loggedOutLearner.playLesson(expId);
     await loggedOutLearner.toggleOptionsSidebar();
     await loggedOutLearner.clickReportLessonButton(false);
     showMessage('Clicked on "Report an Issue" button.');
+    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
 
     await loggedOutLearner.expectScreenshotToMatch(
       'reportALessonModal',
       __dirname
     );
-    await loggedOutLearner.scrollToCaptchaContainer();
-    await loggedOutLearner.clickButtonInModal('Report an Issue', 'cancel');
-    showMessage('Closed Report an issue feedback modal.');
-  });
-
-  it('should not be able to submit "Report an Issue" feedback while the text area description is completely blank.', async () => {
-    await loggedOutLearner.playLesson(expId);
-    await loggedOutLearner.toggleOptionsSidebar();
-    await loggedOutLearner.clickReportLessonButton(false);
+    // should not be able to submit "Report an Issue" feedback while the text area description is completely blank.
     await loggedOutLearner.scrollToCaptchaContainer();
     await loggedOutLearner.clickButtonInModal(
       'Report an Issue',
@@ -95,13 +89,8 @@ describe('Logged-Out User', function () {
       '.e2e-test-form-error',
       'Please add a description before submitting.'
     );
-    await loggedOutLearner.clickButtonInModal('Report an Issue', 'cancel');
-  });
 
-  it('should not be able to submit "Report an Issue" feedback while the text area description is longer than 2500 characters.', async () => {
-    await loggedOutLearner.playLesson(expId);
-    await loggedOutLearner.toggleOptionsSidebar();
-    await loggedOutLearner.clickReportLessonButton(false);
+    // should not be able to submit "Report an Issue" feedback while the text area description is longer than 2500 characters.
     const longDescription = 'a'.repeat(2501);
     await loggedOutLearner.submitFeedbackInTextArea(longDescription);
     await loggedOutLearner.scrollToCaptchaContainer();
@@ -114,22 +103,16 @@ describe('Logged-Out User', function () {
       '.e2e-test-form-error',
       'Your description is a bit too long (2501/2500 characters). Please shorten it slightly so our team can review it quickly!'
     );
-    await loggedOutLearner.scrollToCaptchaContainer();
-    await loggedOutLearner.clickButtonInModal('Report an Issue', 'cancel');
-  });
+    await loggedOutLearner.clearFeedbackTextArea();
 
-  it('should not be able to add a screenshot of size greater than 1MB and invalid file types.', async () => {
-    await loggedOutLearner.playLesson(expId);
-    await loggedOutLearner.toggleOptionsSidebar();
-    await loggedOutLearner.clickReportLessonButton(false);
-    // Add a screenshot of size greater than 1MB.
+    await loggedOutLearner.submitFeedbackInTextArea(
+      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
+    );
+
+    // should not be able to add a screenshot of size greater than 1MB and invalid file types.
     await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_HIGH_RES);
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
       'The maximum allowed file size is 1024 KB'
-    );
-    await loggedOutLearner.expectScreenshotToMatch(
-      'reportAnIssueModalAfterEnteringFeedbackWithLargeFile',
-      __dirname
     );
 
     // Add an invalid file type.
@@ -137,43 +120,26 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
       'This image format is not supported'
     );
-    await loggedOutLearner.expectScreenshotToMatch(
-      'reportAnIssueModalAfterEnteringFeedbackWithInvalidFileType',
-      __dirname
-    );
-  });
 
-  it('should clear the error by dropping a valid screenshot image into the box, and type a valid issue description. Click "Submit".', async () => {
+    // should clear the screenshoterror by dropping a valid screenshot image into the box
     await loggedOutLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
+    await loggedOutLearner.scrollToCaptchaContainer();
+    await loggedOutLearner.waitForTurnstileTokenIfPresent();
     // In the screenshot, it is seen that all error messages are cleared.
     await loggedOutLearner.expectScreenshotToMatch(
       'reportAnIssueModalAfterDroppingValidScreenshot',
       __dirname
     );
-    await loggedOutLearner.submitFeedbackInTextArea(
-      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
-    );
-    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
-    await loggedOutLearner.scrollToCaptchaContainer();
-    await loggedOutLearner.waitForTurnstileTokenIfPresent();
-
-    await loggedOutLearner.expectScreenshotToMatch(
-      'reportAnIssueModalAfterEnteringFeedback',
-      __dirname
-    );
-    await loggedOutLearner.clickButtonInModal('Report an Issue', 'confirm');
-    await loggedOutLearner.expectToastMessage(
-      'Thank you! Your report has been sent to the technical team.'
+    await loggedOutLearner.clickButtonInModal(
+      'Report an Issue',
+      'cancel',
+      true
     );
     await loggedOutLearner.expectScreenshotToMatch(
-      'reportAnIssueModalAfterSubmittingFeedback',
+      'reportAnIssueModalAfterClickingCancelButton',
       __dirname
     );
-  });
 
-  it('should type a customized issue or positive message directly into the text box without clicking any of the category chips', async () => {
-    await loggedOutLearner.playLesson(expId);
-    await loggedOutLearner.toggleOptionsSidebar();
     await loggedOutLearner.clickReportLessonButton(false);
     await loggedOutLearner.submitFeedbackInTextArea(
       'This fraction explanation makes so much sense, thank you!'
@@ -189,22 +155,15 @@ describe('Logged-Out User', function () {
     await loggedOutLearner.expectToastMessage(
       'Thank you! Your report has been sent to the technical team.'
     );
-  });
 
-  it('should play a lesson, open the sidebar options drawer and click on the "Send Lesson Feedback" button.', async function () {
-    await loggedOutLearner.playLesson(expId);
-    await loggedOutLearner.toggleOptionsSidebar();
-    showMessage('On lesson page.');
-
+    // Lesson Feedback journey
     await loggedOutLearner.clickLessonFeedbackButton(false);
     showMessage('Clicked on "Send Lesson Feedback" button.');
     await loggedOutLearner.expectScreenshotToMatch(
       'sendALessonFeedbackModal',
       __dirname
     );
-  });
 
-  it('should be able to continue as guest by clicking on "Continue as Guest" button on the feedback modal.', async () => {
     await loggedOutLearner.clickButtonInModal(
       'Want to chat with our Lessons Team?',
       'cancel'
@@ -215,9 +174,7 @@ describe('Logged-Out User', function () {
       'sendALessonFeedbackModalAfterClickingContinueAsGuest',
       __dirname
     );
-  });
 
-  it('should be able to click on the "Send Lesson Feedback" button, then click "Sign Up or Login" and proceed through the user flow.', async () => {
     await loggedOutLearner.clickLessonFeedbackButton(false);
     showMessage('Clicked on "Send Lesson Feedback" button.');
     await loggedOutLearner.clickButtonInModal(

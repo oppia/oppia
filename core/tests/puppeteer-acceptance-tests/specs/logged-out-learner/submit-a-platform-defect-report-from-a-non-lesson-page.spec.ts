@@ -46,26 +46,18 @@ describe('Logged-Out User', function () {
     await UserFactory.closeAllBrowsers();
   });
 
-  it('should scroll down to the bottom global footer layout and click the "Report a Website Issue" link.', async () => {
+  it('Report a broken layout or static page bug as a guest user.', async () => {
+    // Navigating to a non-lesson page (About page) and clicking on the "Report a Website Issue" link in the global footer layout.
     await loggedOutLearner.navigateToAboutPage();
     await loggedOutLearner.scrollToBottomOfPage();
     await loggedOutLearner.openReportASiteIssueModalFromGlobalFooter(false);
+    await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
     showMessage('Clicked on "Report a Website Issue" button.');
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModal',
       __dirname
     );
-    await loggedOutLearner.scrollToCaptchaContainer();
-    await loggedOutLearner.clickButtonInModal(
-      'Report a Website Issue',
-      'cancel'
-    );
-    showMessage('Closed Report a Website Issue feedback modal.');
-  });
-
-  it('should not be able to submit "Report a Website Issue" feedback while the text area description is completely blank.', async () => {
-    await loggedOutLearner.openReportASiteIssueModalFromGlobalFooter(false);
-    await loggedOutLearner.scrollToCaptchaContainer();
+    // should not be able to submit "Report a Website Issue" feedback while the text area description is completely blank.
     await loggedOutLearner.clickButtonInModal(
       'Report a Website Issue',
       'confirm',
@@ -75,14 +67,10 @@ describe('Logged-Out User', function () {
       '.e2e-test-form-error',
       'Please add a description before submitting.'
     );
-    await loggedOutLearner.clickButtonInModal(
-      'Report a Website Issue',
-      'cancel'
-    );
-  });
 
-  it('should not be able to add a screenshot of size greater than 1MB and invalid file types.', async () => {
-    await loggedOutLearner.openReportASiteIssueModalFromGlobalFooter(false);
+    await loggedOutLearner.submitFeedbackInTextArea(
+      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
+    );
     // Add a screenshot of size greater than 1MB.
     await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_HIGH_RES);
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
@@ -92,7 +80,6 @@ describe('Logged-Out User', function () {
       'reportASiteIssueModalAfterEnteringFeedbackWithLargeFile',
       __dirname
     );
-
     // Add an invalid file type.
     await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_BMP);
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
@@ -102,18 +89,15 @@ describe('Logged-Out User', function () {
       'reportASiteIssueModalAfterEnteringFeedbackWithInvalidFileType',
       __dirname
     );
-  });
 
-  it('should clear the error by dropping a valid screenshot image into the box, and type a valid issue description. Click "Submit".', async () => {
+    // should clear the screenshoterror by dropping a valid screenshot image into the box
     await loggedOutLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
-    // In the screenshot, it is seen that all error messages are cleared.
+    // In the screenshot, test is seen that all error messages are cleared.
     await loggedOutLearner.expectScreenshotToMatch(
       'reportASiteIssueModalAfterDroppingValidScreenshot',
       __dirname
     );
-    await loggedOutLearner.submitFeedbackInTextArea(
-      'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
-    );
+
     await loggedOutLearner.expectIncludeTechnicalLogToBePresent(true);
     await loggedOutLearner.scrollToCaptchaContainer();
     await loggedOutLearner.expectScreenshotToMatch(

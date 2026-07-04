@@ -6168,6 +6168,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  clearFeedbackTextArea(): Promise<void> {
+    return this.clearAllTextFrom(feedbackModaltextarea);
+  }
+
   /**
    * Submits the feedback in the text area.
    * @param feedback - The feedback to submit.
