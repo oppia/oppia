@@ -46,7 +46,7 @@ describe('Logged-Out User', function () {
     await UserFactory.closeAllBrowsers();
   });
 
-  it('Report a broken layout or static page bug as a guest user.', async () => {
+  it('should report a broken layout or static page bug as a guest user.', async () => {
     // Navigating to a non-lesson page (About page) and clicking on the "Report a Website Issue" link in the global footer layout.
     await loggedOutLearner.navigateToAboutPage();
     await loggedOutLearner.scrollToBottomOfPage();
@@ -57,7 +57,7 @@ describe('Logged-Out User', function () {
       'reportASiteIssueModal',
       __dirname
     );
-    // should not be able to submit "Report a Website Issue" feedback while the text area description is completely blank.
+    // Should not be able to submit "Report a Website Issue" feedback while the text area description is completely blank.
     await loggedOutLearner.clickButtonInModal(
       'Report a Website Issue',
       'confirm',
@@ -90,7 +90,7 @@ describe('Logged-Out User', function () {
       __dirname
     );
 
-    // should clear the screenshoterror by dropping a valid screenshot image into the box
+    // Should clear the screenshoterror by dropping a valid screenshot image into the box.
     await loggedOutLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
     // In the screenshot, test is seen that all error messages are cleared.
     await loggedOutLearner.expectScreenshotToMatch(

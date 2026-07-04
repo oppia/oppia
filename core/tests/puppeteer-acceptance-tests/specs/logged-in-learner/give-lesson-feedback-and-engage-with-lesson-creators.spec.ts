@@ -115,7 +115,7 @@ describe('Logged-in User', function () {
       __dirname
     );
 
-    // should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
+    // Should be able to choose a "typo" or "confusing or incorrect answer" chip, enter feedback, and click the main "Submit" button.
     await loggedInLearner.clickReportLessonButton(true);
 
     await loggedInLearner.selectReportIssueChip('typo');
@@ -157,7 +157,7 @@ describe('Logged-in User', function () {
       'Thank you for your feedback! The team has received your report.'
     );
 
-    // should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
+    // Should be able to choose a "broken layout / image" or "other" chip, enter feedback, and click the main "Submit" button.
     await loggedInLearner.clickReportLessonButton(true);
 
     await loggedInLearner.selectReportIssueChip('broken layout');

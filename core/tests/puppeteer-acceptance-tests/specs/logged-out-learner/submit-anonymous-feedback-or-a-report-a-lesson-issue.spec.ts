@@ -66,7 +66,7 @@ describe('Logged-Out User', function () {
     await UserFactory.closeAllBrowsers();
   });
 
-  it('Submit anonymous feedback or report a lesson issue.', async () => {
+  it('submit anonymous feedback or report a lesson issue.', async () => {
     // Navigating to a lesson page and clicking on the "Report an Issue" flag icon in the options sidebar.
     await loggedOutLearner.playLesson(expId);
     await loggedOutLearner.toggleOptionsSidebar();
@@ -78,7 +78,7 @@ describe('Logged-Out User', function () {
       'reportALessonModal',
       __dirname
     );
-    // should not be able to submit "Report an Issue" feedback while the text area description is completely blank.
+    // Should not be able to submit "Report an Issue" feedback while the text area description is completely blank.
     await loggedOutLearner.scrollToCaptchaContainer();
     await loggedOutLearner.clickButtonInModal(
       'Report an Issue',
@@ -90,7 +90,7 @@ describe('Logged-Out User', function () {
       'Please add a description before submitting.'
     );
 
-    // should not be able to submit "Report an Issue" feedback while the text area description is longer than 2500 characters.
+    // Should not be able to submit "Report an Issue" feedback while the text area description is longer than 2500 characters.
     const longDescription = 'a'.repeat(2501);
     await loggedOutLearner.submitFeedbackInTextArea(longDescription);
     await loggedOutLearner.scrollToCaptchaContainer();
@@ -109,7 +109,7 @@ describe('Logged-Out User', function () {
       'The partner image grid overlaps text headers when scaling down to smaller mobile screen viewports.'
     );
 
-    // should not be able to add a screenshot of size greater than 1MB and invalid file types.
+    // Should not be able to add a screenshot of size greater than 1MB and invalid file types.
     await loggedOutLearner.addFeedbackScreenshot(FILEPATHS.BANNER_HIGH_RES);
     await loggedOutLearner.expectPhotoUploadErrorMessageToBe(
       'The maximum allowed file size is 1024 KB'
@@ -121,7 +121,7 @@ describe('Logged-Out User', function () {
       'This image format is not supported'
     );
 
-    // should clear the screenshoterror by dropping a valid screenshot image into the box
+    // Should clear the screenshoterror by dropping a valid screenshot image into the box.
     await loggedOutLearner.addFeedbackScreenshot(testConstants.data.oppiaPage);
     await loggedOutLearner.scrollToCaptchaContainer();
     await loggedOutLearner.waitForTurnstileTokenIfPresent();
@@ -156,7 +156,7 @@ describe('Logged-Out User', function () {
       'Thank you! Your report has been sent to the technical team.'
     );
 
-    // Lesson Feedback journey
+    // Lesson Feedback journey.
     await loggedOutLearner.clickLessonFeedbackButton(false);
     showMessage('Clicked on "Send Lesson Feedback" button.');
     await loggedOutLearner.expectScreenshotToMatch(
