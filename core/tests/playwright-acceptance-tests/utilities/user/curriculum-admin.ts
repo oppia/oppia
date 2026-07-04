@@ -64,6 +64,7 @@ const assignSubtopicButton = '.e2e-test-assign-subtopic';
 const skillsTab = 'a.e2e-test-skills-tab';
 const desktopSkillSelector = '.e2e-test-skill-description';
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
+const skillEditorCollapsibleCard = '.e2e-test-skill-editor-collapsible-card';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
@@ -965,11 +966,8 @@ export class CurriculumAdmin extends TopicManager {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(skillsTab);
     await this.expectElementToBeVisible(skillSelector);
-
-    await Promise.all([
-      this.clickOnElementWithSelectorAndText(skillSelector, skillName),
-      this.page.waitForNavigation(),
-    ]);
+    await this.clickOnElementWithSelectorAndText(skillSelector, skillName);
+    await this.expectElementToBeVisible(skillEditorCollapsibleCard);
 
     expect(this.page.url()).toContain('/skill_editor/');
   }

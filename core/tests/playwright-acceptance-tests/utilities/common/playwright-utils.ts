@@ -48,8 +48,8 @@ export class BaseUser {
     this.page = page;
     BaseUser.instances.push(this);
     if (!pagesWithDialogHandler.has(page)) {
-      pagesWithDialogHandler.add(page);
       this.installPageDialogHandler();
+      pagesWithDialogHandler.add(page);
     }
   }
 
@@ -84,6 +84,8 @@ export class BaseUser {
     }
   }
 
+  // TODO(#26646): Remove this pre-installed handler in favor of
+  // explicit per-flow dialog handling.
   /**
    * Installs a dialog handler on the page that automatically accepts known
    * browser alerts and throws on unexpected ones.
@@ -217,18 +219,9 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
-    const elements = await this.page.$$(selector);
-    for (const element of elements) {
-      const elementText = await element.evaluate(el => el.textContent?.trim());
-      if (elementText === text) {
-        await this.clickOnElement(element);
-        return;
-      }
-    }
-    throw new Error(
-      `Cannot find element with selector "${selector}" and text "${text}".`
-    );
+    const locator = this.page.locator(selector).filter({hasText: text});
+    await locator.first().waitFor({state: 'visible'});
+    await locator.first().click();
   }
 
   /**
@@ -297,6 +290,7 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to wait for.
    * @param {Page} context - The page on which the selector should be verified.
    * @param {number} timeout - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
+   * @returns {Promise<ElementHandle<Element> | undefined>} The matched element handle, or undefined if it was not found.
    */
   async expectElementToBeAttachedInDOM(
     selector: string,
@@ -317,6 +311,7 @@ export class BaseUser {
    * @param {boolean} visibility - Whether the element should be visible or not.
    * @param {Page} context - The page on which the selector should be verified.
    * @param {number} timeout - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
+   * @returns {Promise<ElementHandle<Element> | undefined>} The matched element handle, or undefined if it was not found.
    */
   async expectElementToBeVisible(
     selector: string,
@@ -421,11 +416,20 @@ export class BaseUser {
 
     try {
       await this.page.waitForFunction(
-        ({selector, text}: {selector: string; text: string}) => {
-          const element = document.querySelector(selector);
+        ({
+          selector,
+          text,
+          context,
+        }: {
+          selector: string;
+          text: string;
+          context: Element | null;
+        }) => {
+          const root = context ?? document;
+          const element = root.querySelector(selector);
           return element && element.textContent?.trim() === text.trim();
         },
-        {selector, text}
+        {selector, text, context}
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
@@ -496,8 +500,14 @@ export class BaseUser {
     // within it may no longer be showing at the time of evaluation.
     const toastMessageElement =
       await this.expectElementToBeVisible(toastMessageSelector);
+    if (!toastMessageElement) {
+      throw new Error(
+        `Toast message element with selector "${toastMessageSelector}" is not available.`
+      );
+    }
+
     const toastMessage = await this.page.evaluate(
-      el => el?.textContent?.trim() || '',
+      el => el.textContent?.trim() || '',
       toastMessageElement
     );
 
@@ -651,6 +661,15 @@ export class BaseUser {
 
   /**
    * The function clicks an element and waits until the new page is fully loaded.
+   *
+   * @deprecated This function relies on `page.waitForNavigation()`, which can be
+   * flaky — it may hang on SPA route changes that don't trigger a full navigation
+   * event, or race the click if navigation starts before the listener attaches.
+   * Prefer clicking the element and then asserting that an element unique to the
+   * destination page is visible (e.g. via `expectElementToBeVisible`) instead of
+   * using this function, unless a full page navigation is genuinely required and
+   * no other verification is possible.
+   *
    * @param {string} selector - The selector of button to click.
    * @param {boolean} useSelector - Whether to use the selector or the text.
    * @param {number} timeout - The maximum time to wait for navigation in milliseconds. Defaults to 60000.
