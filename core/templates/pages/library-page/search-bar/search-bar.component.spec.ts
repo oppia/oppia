@@ -35,7 +35,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {Subject} from 'rxjs/internal/Subject';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -114,7 +114,7 @@ describe('Search bar component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
-      declarations: [SearchBarComponent, MockTranslatePipe, MockTrunctePipe],
+      declarations: [SearchBarComponent, MockTranslatePipe, MockTruncatePipe],
       providers: [
         {
           provide: WindowRef,

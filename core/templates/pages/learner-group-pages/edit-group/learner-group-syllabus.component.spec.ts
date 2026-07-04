@@ -36,7 +36,7 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -148,7 +148,7 @@ describe('LearnerGroupSyllabusComponent', () => {
       declarations: [
         LearnerGroupSyllabusComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [],
       schemas: [NO_ERRORS_SCHEMA],

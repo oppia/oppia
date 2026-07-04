@@ -33,7 +33,7 @@ import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-bac
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -127,7 +127,7 @@ describe('LearnerGroupLearnerSpecificProgressComponent', () => {
       declarations: [
         LearnerGroupLearnerSpecificProgressComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [
         {

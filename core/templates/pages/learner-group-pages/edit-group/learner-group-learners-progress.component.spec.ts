@@ -35,7 +35,7 @@ import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summar
 import {UserService} from 'services/user.service';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -128,7 +128,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
       declarations: [
         LearnerGroupLearnersProgressComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [
         {

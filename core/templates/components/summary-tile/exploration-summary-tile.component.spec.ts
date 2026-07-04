@@ -46,7 +46,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 class LearnerDashboardIconsComponentStub {}
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe implements PipeTransform {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -171,7 +171,7 @@ describe('Exploration Summary Tile Component', () => {
       declarations: [
         ExplorationSummaryTileComponent,
         MockTruncatePipe,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockTranslatePipe,
         LearnerDashboardIconsComponentStub,

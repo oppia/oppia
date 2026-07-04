@@ -82,7 +82,7 @@ class MockSlicePipe implements PipeTransform {
 }
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -323,7 +323,7 @@ describe('Learner dashboard page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
@@ -1082,7 +1082,7 @@ describe('Learner dashboard page', () => {
           MockTranslatePipe,
           SortByPipe,
           MockSlicePipe,
-          MockTrunctePipe,
+          MockTruncatePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,

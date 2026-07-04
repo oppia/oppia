@@ -46,7 +46,7 @@ import {LearnerGroupSyllabus} from 'domain/learner_group/learner-group-syllabus.
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -133,7 +133,7 @@ describe('AddSyllabusItemsComponent', () => {
       declarations: [
         AddSyllabusItemsComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [
         {

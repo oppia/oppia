@@ -49,7 +49,7 @@ import {ConversationFlowService} from '../../services/conversation-flow.service'
 import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe implements PipeTransform {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -100,7 +100,7 @@ describe('LessonPlayerSidebarComponent', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         LessonPlayerSidebarComponent,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockTranslatePipe,
       ],
       providers: [

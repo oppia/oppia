@@ -44,7 +44,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 class LearnerDashboardIconsComponentStub {}
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe implements PipeTransform {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -98,7 +98,7 @@ describe('Collection Summary Tile Component', () => {
       ],
       declarations: [
         CollectionSummaryTileComponent,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         LearnerDashboardIconsComponentStub,
         MockTranslatePipe,
       ],

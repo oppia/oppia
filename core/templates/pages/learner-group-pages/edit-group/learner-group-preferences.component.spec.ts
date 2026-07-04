@@ -37,7 +37,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 
 @Pipe({name: 'truncate'})
-class MockTrunctePipe implements PipeTransform {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -82,7 +82,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       declarations: [
         LearnerGroupPreferencesComponent,
         MockTranslatePipe,
-        MockTrunctePipe,
+        MockTruncatePipe,
       ],
       providers: [
         {
