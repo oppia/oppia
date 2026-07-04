@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf, utils
+from core import utils
 from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
