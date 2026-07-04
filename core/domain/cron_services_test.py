@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.domain import cron_services
 from core.platform import models
 from core.tests import test_utils
