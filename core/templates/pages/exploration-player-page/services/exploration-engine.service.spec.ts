@@ -27,6 +27,7 @@ import {
   ExplorationBackendDict,
 } from '../../../domain/exploration/exploration.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
   ParamChangeBackendDict,
@@ -39,7 +40,6 @@ import {
 import {StateCard} from 'domain/state_card/state-card.model';
 import {State} from 'domain/state/state.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -88,7 +88,7 @@ describe('Exploration engine service ', () => {
   let stateGraphLayoutService: StateGraphLayoutService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let textInputService: TextInputRulesService;
+  let textInputService: jasmine.SpyObj<InteractionRulesService>;
   let translateService: TranslateService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationDict: ExplorationBackendDict;
@@ -414,7 +414,7 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = jasmine.createSpyObj('InteractionRulesService', ['']);
     translateService = TestBed.inject(TranslateService);
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
@@ -728,7 +728,7 @@ describe('Exploration engine service ', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          {} as Interaction,
+          jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
 
@@ -756,7 +756,7 @@ describe('Exploration engine service ', () => {
 
         const isAnswerCorrect = explorationEngineService.submitAnswer(
           answer,
-          textInputService as InteractionRulesService & TextInputRulesService,
+          textInputService,
           submitAnswerSuccessCb
         );
 
@@ -783,7 +783,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {} as Interaction,
+          jasmine.createSpyObj('Interaction', ['']),
           'feedback_1'
         )
       );
@@ -805,7 +805,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -818,10 +818,10 @@ describe('Exploration engine service ', () => {
     it('should show warning if interaction id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
-      const mockInteraction = {
-        id: null, // Triggers the branch.
+      const mockInteraction = jasmine.createSpyObj('Interaction', [''], {
+        id: null,
         customizationArgs: {},
-      };
+      });
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -834,7 +834,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          mockInteraction as Interaction,
+          mockInteraction,
           'feedback_1'
         )
       );
@@ -870,7 +870,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -895,7 +895,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {} as Interaction,
+          jasmine.createSpyObj('Interaction', ['']),
           'feedback_1'
         )
       );
@@ -924,7 +924,7 @@ describe('Exploration engine service ', () => {
       ).and.returnValue(null);
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         successCallback
       );
 
@@ -956,7 +956,10 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}} as Interaction,
+          jasmine.createSpyObj('Interaction', [''], {
+            id: 'TextInput',
+            customizationArgs: {},
+          }),
           'feedback_1'
         )
       );
@@ -994,7 +997,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1015,7 +1018,7 @@ describe('Exploration engine service ', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          {} as Interaction,
+          jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
 
@@ -1045,7 +1048,7 @@ describe('Exploration engine service ', () => {
         explorationEngineService.answerIsBeingProcessed = true;
         explorationEngineService.submitAnswer(
           answer,
-          textInputService as InteractionRulesService & TextInputRulesService,
+          textInputService,
           submitAnswerSuccessCb
         );
 
@@ -1070,7 +1073,10 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}} as Interaction,
+          jasmine.createSpyObj('Interaction', [''], {
+            id: 'TextInput',
+            customizationArgs: {},
+          }),
           'feedback_1'
         )
       );
@@ -1121,7 +1127,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         'test answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1147,7 +1153,10 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}} as Interaction,
+          jasmine.createSpyObj('Interaction', [''], {
+            id: 'TextInput',
+            customizationArgs: {},
+          }),
           'feedback_1'
         )
       );
@@ -1195,7 +1204,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         'test answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1212,7 +1221,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        {} as Interaction,
+        jasmine.createSpyObj('Interaction', ['']),
         'content_id'
       );
 
@@ -1246,7 +1255,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1264,7 +1273,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        {} as Interaction,
+        jasmine.createSpyObj('Interaction', ['']),
         'content_id'
       );
 
@@ -1297,7 +1306,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1390,6 +1399,17 @@ describe('Exploration engine service ', () => {
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
+      spyOn(lastCard, 'getInteractionCustomizationArgs').and.returnValue({
+        rows: {
+          value: 1,
+        },
+        placeholder: {
+          value: new SubtitledUnicode('', 'ca_placeholder_0'),
+        },
+        catchMisspellings: {
+          value: true,
+        },
+      });
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
       spyOn(
         answerClassificationService,
@@ -1397,7 +1417,8 @@ describe('Exploration engine service ', () => {
       ).and.returnValue(answerClassificationResult);
       spyOn(translateService, 'instant').and.callFake((key: string) => {
         if (
-          (key as string).startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')
+          typeof key === 'string' &&
+          key.startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')
         ) {
           return 'misspelled feedback';
         }
@@ -1415,7 +1436,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1433,7 +1454,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
       expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(2);
@@ -1450,7 +1471,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
       expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(3);
@@ -1505,7 +1526,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         'test answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1556,7 +1577,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         'test answer',
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
 
@@ -1679,7 +1700,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        {} as Interaction,
+        jasmine.createSpyObj('Interaction', ['']),
         'content_id'
       );
 
@@ -1709,7 +1730,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService as InteractionRulesService & TextInputRulesService,
+        textInputService,
         submitAnswerSuccessCb
       );
       expect(explorationEngineService.currentStateName).toBe('Start');
@@ -2072,15 +2093,18 @@ describe('Exploration engine service ', () => {
   });
 
   it('should cover setExplorationProperties false branches', () => {
-    spyOn(urlService, 'getPathname').and.returnValue('/explore/1');
-    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    const getPathnameSpy = spyOn(urlService, 'getPathname').and.returnValue(
+      '/explore/1'
+    );
+    const isInQuestionPlayerModeSpy = spyOn(
+      pageContextService,
+      'isInQuestionPlayerMode'
+    ).and.returnValue(true);
     explorationEngineService.setExplorationProperties();
     expect(pageContextService.isInQuestionPlayerMode).toHaveBeenCalled();
 
-    (pageContextService.isInQuestionPlayerMode as jasmine.Spy).and.returnValue(
-      false
-    );
-    (urlService.getPathname as jasmine.Spy).and.returnValue('/skill_editor/1');
+    isInQuestionPlayerModeSpy.and.returnValue(false);
+    getPathnameSpy.and.returnValue('/skill_editor/1');
     explorationEngineService.setExplorationProperties();
     expect(urlService.getPathname).toHaveBeenCalled();
   });
@@ -2203,7 +2227,10 @@ describe('Exploration engine service ', () => {
         'Start',
         'Content',
         '',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
         'feedback_1'
       )
     );
@@ -2242,11 +2269,7 @@ describe('Exploration engine service ', () => {
       'makeParams'
     ).and.callThrough();
 
-    explorationEngineService.submitAnswer(
-      'answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
-      submitCb
-    );
+    explorationEngineService.submitAnswer('answer', textInputService, submitCb);
 
     expect(makeParamsSpy).not.toHaveBeenCalled();
   }));
@@ -2264,7 +2287,10 @@ describe('Exploration engine service ', () => {
         'Start',
         'Content',
         '',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
         'feedback_1'
       )
     );
@@ -2300,11 +2326,7 @@ describe('Exploration engine service ', () => {
       'getInteractionHtml'
     );
 
-    explorationEngineService.submitAnswer(
-      'answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
-      submitCb
-    );
+    explorationEngineService.submitAnswer('answer', textInputService, submitCb);
 
     expect(htmlFormatterSpy).not.toHaveBeenCalled();
   }));
@@ -2326,7 +2348,10 @@ describe('Exploration engine service ', () => {
         'Start',
         'Content',
         '',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
         'feedback_1'
       )
     );
@@ -2355,7 +2380,7 @@ describe('Exploration engine service ', () => {
 
     const result = explorationEngineService.submitAnswer(
       'answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
+      textInputService,
       submitCb
     );
 
@@ -2384,7 +2409,10 @@ describe('Exploration engine service ', () => {
         'Start',
         '',
         '',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
         'content_id'
       )
     );
@@ -2471,7 +2499,7 @@ describe('Exploration engine service ', () => {
     const makeParamsCallCountBeforeSubmit = makeParamsSpy.calls.count();
     explorationEngineService.submitAnswer(
       'test answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
+      textInputService,
       submitCb
     );
 
@@ -2502,7 +2530,10 @@ describe('Exploration engine service ', () => {
         'Start',
         '',
         '',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
         'content_id'
       )
     );
@@ -2568,7 +2599,7 @@ describe('Exploration engine service ', () => {
 
     explorationEngineService.submitAnswer(
       'test answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
+      textInputService,
       submitCb
     );
 
@@ -2592,7 +2623,10 @@ describe('Exploration engine service ', () => {
         'Start',
         '',
         '',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'TextInput',
+          customizationArgs: {},
+        }),
         'content_id'
       )
     );
@@ -2664,7 +2698,7 @@ describe('Exploration engine service ', () => {
 
     explorationEngineService.submitAnswer(
       'test answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
+      textInputService,
       submitCb
     );
 
@@ -2693,7 +2727,10 @@ describe('Exploration engine service ', () => {
         'Mid',
         '',
         '',
-        {id: 'Continue', customizationArgs: {}} as Interaction,
+        jasmine.createSpyObj('Interaction', [''], {
+          id: 'Continue',
+          customizationArgs: {},
+        }),
         'content_id'
       )
     );
@@ -2712,11 +2749,7 @@ describe('Exploration engine service ', () => {
       submitCb
     );
 
-    explorationEngineService.submitAnswer(
-      'answer',
-      textInputService as InteractionRulesService & TextInputRulesService,
-      submitCb
-    );
+    explorationEngineService.submitAnswer('answer', textInputService, submitCb);
 
     expect(submitCb).toHaveBeenCalled();
   });

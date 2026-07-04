@@ -66,7 +66,6 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {InteractionRulesService} from '../../services/answer-classification.service';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -319,9 +318,11 @@ export class ConversationSkinComponent {
           answer: InteractionAnswer,
           interactionRulesService: Parameters<OnSubmitFn>[1]
         ) => {
-          this.conversationFlowService.submitAnswer(
-            answer as InteractionAnswer & string,
-            interactionRulesService as InteractionRulesService
+          const submitFn: Function = this.conversationFlowService.submitAnswer;
+          submitFn.call(
+            this.conversationFlowService,
+            answer,
+            interactionRulesService
           );
         }
       );

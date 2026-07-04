@@ -441,10 +441,7 @@ describe('Conversation skin component', () => {
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
     furthest_reached_checkpoint_state_name: 'End',
-    // This throws "Type 'null' is not assignable to type 'string'.". We need
-    // to suppress this error because the property can be null.
-    // @ts-expect-error
-    most_recently_reached_checkpoint_state_name: null,
+    most_recently_reached_checkpoint_state_name: '',
     most_recently_reached_checkpoint_exp_version: 2,
   };
   let uniqueProgressIdResponse = '123456';

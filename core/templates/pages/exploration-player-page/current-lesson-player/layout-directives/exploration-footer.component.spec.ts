@@ -26,7 +26,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {ExplorationFooterComponent} from './exploration-footer.component';
-import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
@@ -35,10 +35,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PageContextService} from '../../../../services/page-context.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
-import {
-  ExplorationSummaryBackendApiService,
-  ExplorationSummaryDict,
-} from '../../../../domain/summary/exploration-summary-backend-api.service';
+import {ExplorationSummaryBackendApiService} from '../../../../domain/summary/exploration-summary-backend-api.service';
 import {EventEmitter} from '@angular/core';
 import {LearnerExplorationSummaryBackendDict} from '../../../../domain/summary/learner-exploration-summary.model';
 import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
@@ -115,6 +112,25 @@ class MockNgbModalRef {
     explorationId: null,
   };
 }
+
+const mockExpInfo: LearnerExplorationSummaryBackendDict = {
+  category: 'Algebra',
+  community_owned: false,
+  activity_type: 'exploration',
+  last_updated_msec: 12345678,
+  ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+  id: 'exp1',
+  created_on_msec: 12345678,
+  human_readable_contributors_summary: {},
+  language_code: 'en',
+  num_views: 100,
+  objective: 'Test objective',
+  status: 'public',
+  tags: [],
+  thumbnail_bg_color: '#a33f40',
+  thumbnail_icon_url: '/icon.png',
+  title: 'Test Title',
+};
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -289,7 +305,7 @@ describe('ExplorationFooterComponent', () => {
             objective: 'Solve problem 1 on the Project Euler site',
             thumbnail_icon_url: '/subjects/Lightbulb.svg',
             id: 'exp1',
-          } as ExplorationSummaryDict,
+          },
         ],
       });
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
@@ -463,14 +479,17 @@ describe('ExplorationFooterComponent', () => {
   it('should open progress reminder modal', fakeAsync(() => {
     const ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        checkpointCount: 0,
-        completedCheckpointsCount: 0,
-        explorationTitle: '',
-      },
-      result: Promise.resolve(),
-    } as NgbModalRef);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {
+      checkpointCount: 0,
+      completedCheckpointsCount: 0,
+      explorationTitle: '',
+    };
+    modalRef.result = Promise.resolve();
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
     spyOn(
       editableExplorationBackendApiService,
       'resetExplorationProgressAsync'
@@ -548,14 +567,17 @@ describe('ExplorationFooterComponent', () => {
   it('should resume exploration if progress reminder modal is canceled', fakeAsync(() => {
     const ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        checkpointCount: 0,
-        completedCheckpointsCount: 0,
-        explorationTitle: '',
-      },
-      result: Promise.reject(),
-    } as NgbModalRef);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {
+      checkpointCount: 0,
+      completedCheckpointsCount: 0,
+      explorationTitle: '',
+    };
+    modalRef.result = Promise.reject();
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
     spyOn(
       editableExplorationBackendApiService,
       'resetExplorationProgressAsync'
@@ -661,20 +683,23 @@ describe('ExplorationFooterComponent', () => {
   it('should open the lesson information card', fakeAsync(() => {
     let ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        numberofCheckpoints: 0,
-        completedWidth: 0,
-        contributorNames: [],
-        expInfo: null,
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = {
+      numberofCheckpoints: 0,
+      completedWidth: 0,
+      contributorNames: [],
+      expInfo: null,
+    };
+    modalRef.result = {
+      then: (successCallback: () => void, errorCallback: () => void) => {
+        successCallback();
+        errorCallback();
       },
-      result: {
-        then: (successCallback: () => void, errorCallback: () => void) => {
-          successCallback();
-          errorCallback();
-        },
-      },
-    } as NgbModalRef);
+    };
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
 
     let sampleExpResponse: FetchExplorationBackendResponse = {
       exploration_id: '0',
@@ -933,10 +958,13 @@ describe('ExplorationFooterComponent', () => {
 
   it('should open concept card when user clicks on the icon', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
     });
     component.openConceptCardModal();
     expect(modalSpy).toHaveBeenCalled();
@@ -988,7 +1016,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should display lesson information card', fakeAsync(() => {
     component.explorationId = 'exp1';
-    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    component.expInfo = mockExpInfo;
 
     spyOn(component, 'openInformationCardModal');
     component.showInformationCard();
@@ -1407,10 +1435,13 @@ describe('ExplorationFooterComponent', () => {
     component.completedCheckpointsCount = 0;
     component.expInfo = null;
     spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
     });
     component.openProgressReminderModal();
     tick();
@@ -1441,19 +1472,37 @@ describe('ExplorationFooterComponent', () => {
     component.completedCheckpointsCount = 0;
     component.expInfo = null;
     spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
     });
     component.openInformationCardModal();
     tick();
     fixture.detectChanges();
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.completedCheckpointsCount).toEqual(0);
-    expect(MockNgbModalRef.expInfo).toEqual(
-      {} as LearnerExplorationSummaryBackendDict
-    );
+    expect(MockNgbModalRef.expInfo).toEqual({
+      category: '',
+      community_owned: false,
+      activity_type: 'exploration',
+      last_updated_msec: 0,
+      ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+      id: '',
+      created_on_msec: 0,
+      human_readable_contributors_summary: {},
+      language_code: '',
+      num_views: 0,
+      objective: '',
+      status: '',
+      tags: [],
+      thumbnail_bg_color: '',
+      thumbnail_icon_url: '',
+      title: '',
+    });
   }));
 
   it('should handle lastCheckpointWasCompleted in openInformationCardModal', fakeAsync(() => {
@@ -1476,10 +1525,13 @@ describe('ExplorationFooterComponent', () => {
     component.checkpointCount = 3;
     component.lastCheckpointWasCompleted = true;
     spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve();
+      return modalRef;
     });
     component.openInformationCardModal();
     tick();

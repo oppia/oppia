@@ -28,7 +28,6 @@ import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/ca
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {InteractionSpecsService} from '../../../services/interaction-specs.service';
 import {Outcome} from '../../../domain/exploration/outcome.model';
-import {TextInputRuleInputs} from '../../../../../extensions/interactions/rule-input-defs';
 import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
@@ -52,26 +51,27 @@ describe('Answer Classification Service', () => {
     interactionSpecsService = TestBed.inject(InteractionSpecsService);
     const injectedTextInputRulesService = TestBed.inject(TextInputRulesService);
     textInputRulesService = {
-      Equals: (answer, inputs) =>
-        injectedTextInputRulesService.Equals(
-          answer as string,
-          inputs as TextInputRuleInputs
-        ),
-      FuzzyEquals: (answer, inputs) =>
-        injectedTextInputRulesService.FuzzyEquals(
-          answer as string,
-          inputs as TextInputRuleInputs
-        ),
-      StartsWith: (answer, inputs) =>
-        injectedTextInputRulesService.StartsWith(
-          answer as string,
-          inputs as TextInputRuleInputs
-        ),
-      Contains: (answer, inputs) =>
-        injectedTextInputRulesService.Contains(
-          answer as string,
-          inputs as TextInputRuleInputs
-        ),
+      Equals: (answer, inputs) => {
+        const equalsFn: Function = injectedTextInputRulesService.Equals;
+        return equalsFn.call(injectedTextInputRulesService, answer, inputs);
+      },
+      FuzzyEquals: (answer, inputs) => {
+        const fuzzyEqualsFn: Function =
+          injectedTextInputRulesService.FuzzyEquals;
+        return fuzzyEqualsFn.call(
+          injectedTextInputRulesService,
+          answer,
+          inputs
+        );
+      },
+      StartsWith: (answer, inputs) => {
+        const startsWithFn: Function = injectedTextInputRulesService.StartsWith;
+        return startsWithFn.call(injectedTextInputRulesService, answer, inputs);
+      },
+      Contains: (answer, inputs) => {
+        const containsFn: Function = injectedTextInputRulesService.Contains;
+        return containsFn.call(injectedTextInputRulesService, answer, inputs);
+      },
     };
   });
 
@@ -249,16 +249,17 @@ describe('Answer Classification Service', () => {
     it('should fail if no frontend rules are provided', () => {
       const state = State.createFromBackendDict(stateName, stateDict);
 
-      expect(() =>
-        answerClassificationService.getMatchingClassificationResult(
-          state.name as string,
+      expect(() => {
+        const classifyFn: Function =
+          answerClassificationService.getMatchingClassificationResult;
+        return classifyFn.call(
+          answerClassificationService,
+          state.name ?? '',
           state.interaction,
           '0',
-          // This throws "Argument of type 'null' is not assignable to parameter of type 'InteractionRulesService'.". We need to suppress this error because we need to test the runtime error thrown when interactionRulesService is null.
-          // @ts-expect-error
           null
-        )
-      ).toThrowError(
+        );
+      }).toThrowError(
         'No interactionRulesService was available to classify the answer.'
       );
     });
@@ -271,7 +272,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             '10',
             textInputRulesService
@@ -287,7 +288,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             '5',
             textInputRulesService
@@ -303,7 +304,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             '6',
             textInputRulesService
@@ -324,7 +325,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name as string,
+          state.name ?? '',
           state.interaction,
           '777',
           textInputRulesService
@@ -350,7 +351,7 @@ describe('Answer Classification Service', () => {
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             'abc',
             textInputRulesService
@@ -401,16 +402,17 @@ describe('Answer Classification Service', () => {
 
         const state = State.createFromBackendDict(stateName, stateDict);
 
-        expect(() =>
-          answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+        expect(() => {
+          const classifyFn: Function =
+            answerClassificationService.getMatchingClassificationResult;
+          return classifyFn.call(
+            answerClassificationService,
+            state.name ?? '',
             state.interaction,
             '0',
-            // This throws "Argument of type 'null' is not assignable to parameter of type 'InteractionRulesService'.". We need to suppress this error because we need to test the runtime error thrown when interactionRulesService is null.
-            // @ts-expect-error
             null
-          )
-        ).toThrowError(
+          );
+        }).toThrowError(
           'No interactionRulesService was available to classify the answer.'
         );
       }
@@ -656,7 +658,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             'abc',
             textInputRulesService
@@ -672,7 +674,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             'xyz',
             textInputRulesService
@@ -696,7 +698,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string,
+            state.name ?? '',
             state.interaction,
             'input',
             textInputRulesService
@@ -731,7 +733,7 @@ describe('Answer Classification Service', () => {
 
         let res1 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            state1.name as string,
+            state1.name ?? '',
             state1,
             '777',
             textInputRulesService
@@ -741,7 +743,7 @@ describe('Answer Classification Service', () => {
         expect(
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
-          state1.name as string,
+          state1.name ?? '',
           state1.interaction,
           '777',
           textInputRulesService
@@ -756,7 +758,7 @@ describe('Answer Classification Service', () => {
 
         let res2 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            state2.name as string,
+            state2.name ?? '',
             state2,
             'equal',
             textInputRulesService
@@ -766,7 +768,7 @@ describe('Answer Classification Service', () => {
         expect(
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
-          state2.name as string,
+          state2.name ?? '',
           state2.interaction,
           'equal',
           textInputRulesService

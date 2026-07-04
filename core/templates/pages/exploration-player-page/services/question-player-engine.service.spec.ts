@@ -37,7 +37,6 @@ import {
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {State} from '../../../domain/state/state.model';
-import {Interaction} from '../../../domain/exploration/interaction.model';
 
 describe('Question player engine service', () => {
   let alertsService: AlertsService;
@@ -403,9 +402,7 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(
-      TextInputRulesService
-    ) as InteractionRulesService & TextInputRulesService;
+    textInputService = jasmine.createSpyObj('InteractionRulesService', ['']);
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -519,7 +516,8 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => (html === '' ? (null as string | null as string) : html)
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -559,7 +557,7 @@ describe('Question player engine service', () => {
     );
 
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-      multipleQuestionsObjects[0].getId() as string
+      multipleQuestionsObjects[0].getId() ?? ''
     );
   });
 
@@ -664,7 +662,8 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => (html === '' ? (null as string | null as string) : html)
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -711,7 +710,8 @@ describe('Question player engine service', () => {
         'addWarning'
       ).and.callThrough();
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => (html === '' ? (null as string | null as string) : html)
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -843,7 +843,9 @@ describe('Question player engine service', () => {
         ).and.callThrough();
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
           (html, envs) =>
-            html === '' ? (null as string | null as string) : html
+            html === ''
+              ? jasmine.createSpy('null').and.returnValue(null)()
+              : html
         );
 
         if (
@@ -902,7 +904,8 @@ describe('Question player engine service', () => {
       });
 
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => (html === '' ? (null as string | null as string) : html)
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -939,7 +942,7 @@ describe('Question player engine service', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          {} as Interaction,
+          jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
 
@@ -951,7 +954,9 @@ describe('Question player engine service', () => {
         ).and.returnValue(answerClassificationResult);
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
           (html, envs) =>
-            html === '' ? (null as string | null as string) : html
+            html === ''
+              ? jasmine.createSpy('null').and.returnValue(null)()
+              : html
         );
         spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
           'focusLabel'
@@ -979,7 +984,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[0].getId() as string
+          multipleQuestionsObjects[0].getId() ?? ''
         );
         expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
@@ -992,7 +997,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[1].getId() as string
+          multipleQuestionsObjects[1].getId() ?? ''
         );
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
@@ -1005,7 +1010,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[2].getId() as string
+          multipleQuestionsObjects[2].getId() ?? ''
         );
         // Please note that after submitting answer to the final question,
         // a new card was not created, hence createNewCardSpy was not called.

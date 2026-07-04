@@ -32,7 +32,6 @@ import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {AlertsService} from 'services/alerts.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {PageContextService} from 'services/page-context.service';
@@ -200,12 +199,13 @@ export class ExplorationEngineService {
     envs: Record<string, string>[]
   ): string {
     const oldInteractionId = oldStateCard.getInteractionId();
-    const oldInteractionArgs =
-      oldStateCard.getInteractionCustomizationArgs() as TextInputCustomizationArgs;
+    const oldInteractionArgs = oldStateCard.getInteractionCustomizationArgs();
     const defaultOutcome = oldStateCard.getInteraction()?.defaultOutcome;
     const shouldCheckForMisspelling =
       oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
-      oldInteractionArgs.catchMisspellings &&
+      oldInteractionArgs !== null &&
+      'catchMisspellings' in oldInteractionArgs &&
+      oldInteractionArgs.catchMisspellings.value &&
       isEqual(outcome, defaultOutcome);
 
     if (shouldCheckForMisspelling) {
@@ -435,7 +435,7 @@ export class ExplorationEngineService {
   }
 
   getInitialStateName(): string {
-    return this.exploration.getInitialState().name as string;
+    return this.exploration.getInitialState().name ?? '';
   }
 
   /**
@@ -452,9 +452,9 @@ export class ExplorationEngineService {
     let baseParams: ExplorationParams = {};
     this.exploration.paramSpecs.forEach(
       (paramName: string, paramSpec: ParamSpec) => {
-        baseParams[paramName] = paramSpec
-          .getType()
-          .createDefaultValue() as string;
+        baseParams[paramName] = String(
+          paramSpec.getType().createDefaultValue()
+        );
       }
     );
 

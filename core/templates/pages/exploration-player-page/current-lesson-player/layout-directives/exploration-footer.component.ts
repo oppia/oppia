@@ -301,8 +301,24 @@ export class ExplorationFooterComponent {
     modalRef.componentInstance.completedCheckpointsCount =
       this.completedCheckpointsCount;
     modalRef.componentInstance.contributorNames = this.contributorNames;
-    modalRef.componentInstance.expInfo =
-      this.expInfo ?? ({} as LearnerExplorationSummaryBackendDict);
+    modalRef.componentInstance.expInfo = this.expInfo ?? {
+      category: '',
+      community_owned: false,
+      activity_type: 'exploration',
+      last_updated_msec: 0,
+      ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+      id: '',
+      created_on_msec: 0,
+      human_readable_contributors_summary: {},
+      language_code: '',
+      num_views: 0,
+      objective: '',
+      status: '',
+      tags: [],
+      thumbnail_bg_color: '',
+      thumbnail_icon_url: '',
+      title: '',
+    };
     modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
 
     modalRef.result.then(
