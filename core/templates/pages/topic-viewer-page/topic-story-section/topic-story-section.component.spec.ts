@@ -65,9 +65,8 @@ describe('TopicStorySectionComponent', () => {
     i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
       'isCurrentLanguageRTL',
     ]);
-    (i18nLanguageCodeService as object)['onI18nLanguageCodeChange'] = {
-      subscribe: () => ({unsubscribe: () => {}}),
-    };
+    (i18nLanguageCodeService as object).onI18nLanguageCodeChange =
+      new EventEmitter<string>();
     chapterProgressLoaderService = jasmine.createSpyObj(
       'ChapterProgressLoaderService',
       [

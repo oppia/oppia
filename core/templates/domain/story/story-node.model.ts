@@ -247,20 +247,6 @@ export class StoryNode {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getAvailableTextLanguageCodes(): string[] {
-    return this._availableTextLanguageCodes;
-  }
-
-  getAvailableVoiceoverLanguageCodes(): string[] {
-    return this._availableVoiceoverLanguageCodes;
-  }
-
-  getAvailableVoiceoverLanguageAccentDescriptions(): {
-    [accentCode: string]: string;
-  } {
-    return this._availableVoiceoverLanguageAccentDescriptions;
-  }
-
   prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
