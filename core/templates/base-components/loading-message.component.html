@@ -1,9 +1,8 @@
 <div *ngIf="message"
      class="oppia-loading-fullpage e2e-test-loading-fullpage">
   <div class="oppia-align-center">
-    <span>{{ message | translate }}</span>
-    <span class="oppia-loading-dot-one">.</span>
-    <span class="oppia-loading-dot-two">.</span>
-    <span class="oppia-loading-dot-three">.</span>
+    <div class="loading-message-text">
+      {{ message | translate }}<span class="oppia-loading-dot-one">.</span><span class="oppia-loading-dot-two">.</span><span class="oppia-loading-dot-three">.</span>
+    </div>
   </div>
 </div>

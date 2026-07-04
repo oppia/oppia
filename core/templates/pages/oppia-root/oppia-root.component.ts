@@ -16,10 +16,46 @@
  * @fileoverview Oppia root component.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {
+  NavigationStart,
+  NavigationEnd,
+  NavigationCancel,
+  NavigationError,
+  Router,
+} from '@angular/router';
+import {LoaderService} from 'services/loader.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'oppia-root',
   templateUrl: './oppia-root.component.html',
 })
-export class OppiaRootComponent {}
+export class OppiaRootComponent implements OnInit, OnDestroy {
+  private routerSubscription: Subscription | undefined;
+
+  constructor(
+    private router: Router,
+    private loaderService: LoaderService
+  ) {}
+
+  ngOnInit(): void {
+    this.routerSubscription = this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.loaderService.showLoadingScreen('Loading...');
+      } else if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError
+      ) {
+        this.loaderService.hideLoadingScreen();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+}
