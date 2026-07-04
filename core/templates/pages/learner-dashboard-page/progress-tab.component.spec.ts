@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -284,7 +284,7 @@ describe('Progress Tab Component', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [

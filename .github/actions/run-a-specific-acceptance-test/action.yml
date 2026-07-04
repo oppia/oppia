@@ -12,6 +12,11 @@ inputs:
     options:
       - mobile
       - desktop
+  update-snapshots:
+    description: Whether to update the snapshots instead of comparing them.
+    required: false
+    default: false
+    type: boolean
   enable-screen-recording:
     description: Whether to record the screen during the test.
     required: true
@@ -43,6 +48,7 @@ runs:
         --suite=${{ inputs.test-suite }}
         ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
         --prod_env
+        ${{ inputs.update-snapshots && '--update_snapshots' || '' }}
         --server_log_level=info
         | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
 
