@@ -4999,6 +4999,15 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
+
+    // Dismiss the hint card tooltip if it is covering the hint button.
+    const hintCardTooltipCloseButton = await this.page.$(
+      '.hint-box .btn-close'
+    );
+    if (hintCardTooltipCloseButton) {
+      await hintCardTooltipCloseButton.click();
+    }
+
     await this.clickOnElementWithSelector(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
