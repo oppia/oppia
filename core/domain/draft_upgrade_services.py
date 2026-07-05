@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-import logging
 import copy
+import logging
 
 from core import utils
 from core.domain import (
