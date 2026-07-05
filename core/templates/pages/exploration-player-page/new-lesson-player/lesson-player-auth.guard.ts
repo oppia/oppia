@@ -44,9 +44,35 @@ export class LessonPlayerPageAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve, reject) => {
       const version = route.queryParams.v || null;
       let explorationId = route.paramMap.get('exploration_id') || '';
+      // Validate the exploration ID before making any backend requests.
+      // Invalid IDs (e.g. containing special characters) should be rejected
+      // on the frontend to avoid unnecessary backend calls and server errors.
+      const entityIdRegex = new RegExp(AppConstants.ENTITY_ID_REGEX);
+      if (!entityIdRegex.test(explorationId)) {
+        if (state.url.includes('embed')) {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            }, reject);
+        } else {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/400`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            }, reject);
+        }
+        return;
+      }
       if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
         this.accessValidationBackendApiService
           .validateAccessToExplorationPlayerPage(explorationId, version)

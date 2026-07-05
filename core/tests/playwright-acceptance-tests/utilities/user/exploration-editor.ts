@@ -33,6 +33,14 @@ const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 
 const addInteractionModalSelector = 'customize-interaction-body-container';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
+const solutionInputTextArea =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -41,6 +49,7 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
@@ -162,6 +171,22 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Function to add a hint for a state card.
+   * @param {string} hint - The hint to be added for the current card.
+   */
+  async addHintToState(hint: string): Promise<void> {
+    await this.page.waitForSelector(addHintButton, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(addHintButton);
+    await this.typeInInputField(stateContentInputField, hint);
+    await this.clickOnElementWithSelector(saveHintButton);
+    await this.page.waitForSelector(saveHintButton, {
+      state: 'hidden',
+    });
   }
 
   /**
@@ -289,6 +314,47 @@ export class ExplorationEditor extends BaseUser {
       responseIsCorrect,
       isLastResponse
     );
+  }
+
+  /**
+   * Function to add a solution for a state interaction.
+   * @param {string} answer - The solution of the current state card.
+   * @param {string} answerExplanation - The explanation for this state card's solution.
+   * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
+   */
+  async addSolutionToState(
+    answer: string,
+    answerExplanation: string,
+    isSolutionNumericInput: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
+
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
+    await this.page.waitForSelector(solutionSelector, {state: 'visible'});
+    await this.typeInInputField(solutionSelector, answer);
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.typeInInputField(stateContentInputField, answerExplanation);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitSolutionButton);
+
+    await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
+   * Adds a solution explanation to the current state card and saves it.
+   * @param explanation - The solution explanation to add to the state card.
+   */
+  async addSolutionExplanationAndSave(explanation: string): Promise<void> {
+    await this.typeInInputField(stateContentInputField, explanation);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitSolutionButton);
+    await this.page.waitForSelector(submitSolutionButton, {
+      state: 'hidden',
+    });
   }
 
   /**
@@ -505,6 +571,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.page.$(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
+  }
+
+  /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
@@ -672,6 +753,34 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(toastMessage, false);
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Sets a state as a checkpoint in the exploration.
+   */
+  async setTheStateAsCheckpoint(): Promise<void> {
+    await this.page.waitForSelector(setAsCheckpointButton, {
+      state: 'visible',
+    });
+
+    let checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      await this.clickOnElementWithSelector(setAsCheckpointButton);
+    }
+
+    // Check checkbox value again and throw error if it's still not checked.
+    checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      throw new Error('Failed to set the state as a checkpoint.');
+    }
   }
 
   /**

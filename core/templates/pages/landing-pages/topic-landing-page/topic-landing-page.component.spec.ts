@@ -20,7 +20,7 @@ import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
-  async,
+  waitForAsync,
   tick,
   fakeAsync,
 } from '@angular/core/testing';
@@ -80,7 +80,7 @@ describe('Topic Landing Page', () => {
   let pageTitleService: PageTitleService;
   let translateService: TranslateService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TopicLandingPageComponent],
