@@ -348,26 +348,41 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
         self.assertIn('validation_errors', response)
         self.assertIn('validation_message', response)
 
-    def test_get_validation_payload_returns_default_when_missing(
-        self,
-    ) -> None:
-        handler = certificate_assessment.ValidateCertificateAssessmentOfferingHandler.__new__(
-            certificate_assessment.ValidateCertificateAssessmentOfferingHandler
-        )
-        handler.normalized_payload = None
-
-        # This directly exercises the fallback branch that is only reachable
-        # through the handler helper itself.
-        validation_payload = (
-            handler._get_validation_payload()  # pylint: disable=protected-access
+    def test_create_empty_validation_payload(self) -> None:
+        empty_payload = (
+            certificate_assessment.create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
         )
         self.assertEqual(
-            validation_payload,
+            empty_payload,
             {
                 'topic_ids': [],
                 'total_questions': 0,
             },
         )
+
+    def test_post_uses_empty_validation_payload_when_missing(self) -> None:
+        handler = certificate_assessment.ValidateCertificateAssessmentOfferingHandler.__new__(
+            certificate_assessment.ValidateCertificateAssessmentOfferingHandler
+        )
+        handler.normalized_payload = None
+
+        validation_result = {
+            'is_valid': True,
+            'validation_errors': [],
+            'validation_message': 'Valid.',
+        }
+        with mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value=validation_result,
+        ) as validate_mock, mock.patch.object(
+            certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        validate_mock.assert_called_once_with(topic_ids=[], total_questions=0)
+        render_json_mock.assert_called_once_with(validation_result)
 
     def test_post_returns_invalid_result_for_insufficient_questions(
         self,

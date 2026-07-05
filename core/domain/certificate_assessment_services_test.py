@@ -31,9 +31,26 @@ from core.domain import (
     topic_fetchers,
     translation_domain,
 )
+from core.platform import models
 from core.tests import test_utils
 
 from typing import TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import skill_models
+
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
+
+CERTIFICATE_DIFFICULTY_EASY = (
+    certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
+)
+CERTIFICATE_DIFFICULTY_MEDIUM = (
+    certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
+)
+CERTIFICATE_DIFFICULTY_HARD = (
+    certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
+)
 
 
 class ValidationSamplingTestCase(TypedDict):
@@ -244,13 +261,17 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     for question_id in question_ids
                 ]
 
-        def _get_topic(topic_id: str, strict: bool = True) -> mock.Mock:
-            del strict
-            return topic_objects[topic_id]
+        def _get_topics(
+            requested_topic_ids: list[str], strict: bool = False
+        ) -> list[mock.Mock]:
+            self.assertTrue(strict)
+            return [topic_objects[topic_id] for topic_id in requested_topic_ids]
 
-        def _get_skill(skill_id: str, strict: bool = False) -> mock.Mock | None:
-            del strict
-            return skill_objects.get(skill_id)
+        def _get_skill_models(skill_ids: list[str]) -> list[mock.Mock | None]:
+            return [
+                skill_objects[skill_id] if skill_id in skill_objects else None
+                for skill_id in skill_ids
+            ]
 
         def _get_links(
             skill_id: str, skill_description: str
@@ -262,12 +283,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             topic_fetchers,
-            'get_topic_by_id',
-            side_effect=_get_topic,
+            'get_topics_by_ids',
+            side_effect=_get_topics,
+        ), mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            side_effect=_get_skill_models,
         ), mock.patch.object(
             skill_fetchers,
-            'get_skill_by_id',
-            side_effect=_get_skill,
+            'get_skill_from_model',
+            side_effect=lambda skill_model: skill_model,
         ), mock.patch.object(
             question_services,
             'get_question_skill_links_of_skill',
@@ -308,6 +333,80 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
+    def test_get_topic_name_to_question_ids_map_raises_for_missing_topics(
+        self,
+    ) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+        question_link = mock.Mock(question_id='question_1')
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            side_effect=Exception('topic lookup failed'),
+        ), mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            return_value=topic,
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_by_id',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[question_link],
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'One or more selected topics do not exist.',
+            ):
+                getattr(
+                    certificate_assessment_services,
+                    '_get_topic_name_to_question_ids_map',
+                )(['topic_1'])
+
+    def test_get_topic_name_to_question_ids_map_skips_missing_skill_models(
+        self,
+    ) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1', 'skill_2']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+        question_link = mock.Mock(question_id='question_1')
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[topic],
+        ), mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            side_effect=AssertionError('unused'),
+        ), mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock(), None],
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_from_model',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[question_link],
+        ):
+            result = getattr(
+                certificate_assessment_services,
+                '_get_topic_name_to_question_ids_map',
+            )(['topic_1'])
+
+        self.assertEqual(result[0], {'topic_1': ['question_1']})
+
     def test_format_list_formats_short_lists(self) -> None:
         format_list = getattr(certificate_assessment_services, '_format_list')
         self.assertEqual(format_list(['one']), 'one')
@@ -322,6 +421,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(get_difficulty_label(0.6), 'medium')
+        self.assertIsNone(get_difficulty_label(0.5))
 
     def test_has_valid_distinct_assignment(self) -> None:
         has_valid_distinct_assignment = getattr(
@@ -340,7 +440,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 topic_id_to_question_ids_by_difficulty,
                 ['topic_1', 'topic_2'],
                 required_questions_by_topic,
-                'easy',
+                CERTIFICATE_DIFFICULTY_EASY,
             )
         )
         self.assertTrue(
@@ -348,7 +448,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 topic_id_to_question_ids_by_difficulty,
                 ['topic_1', 'topic_2'],
                 required_questions_by_topic,
-                'medium',
+                CERTIFICATE_DIFFICULTY_MEDIUM,
             )
         )
         self.assertTrue(
@@ -356,7 +456,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 topic_id_to_question_ids_by_difficulty,
                 ['topic_1', 'topic_2'],
                 required_questions_by_topic,
-                'hard',
+                CERTIFICATE_DIFFICULTY_HARD,
             )
         )
 
@@ -364,12 +464,28 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         topic_id_to_question_ids_by_difficulty = {
-            'topic_1': {'easy': {'q1'}, 'medium': {'q2'}, 'hard': {'q3'}},
-            'topic_2': {'easy': {'q1'}, 'medium': {'q2'}, 'hard': {'q3'}},
+            'topic_1': {
+                CERTIFICATE_DIFFICULTY_EASY: {'q1'},
+                CERTIFICATE_DIFFICULTY_MEDIUM: {'q2'},
+                CERTIFICATE_DIFFICULTY_HARD: {'q3'},
+            },
+            'topic_2': {
+                CERTIFICATE_DIFFICULTY_EASY: {'q1'},
+                CERTIFICATE_DIFFICULTY_MEDIUM: {'q2'},
+                CERTIFICATE_DIFFICULTY_HARD: {'q3'},
+            },
         }
         required_questions_by_topic = {
-            'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
-            'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+            'topic_1': {
+                CERTIFICATE_DIFFICULTY_EASY: 1,
+                CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                CERTIFICATE_DIFFICULTY_HARD: 1,
+            },
+            'topic_2': {
+                CERTIFICATE_DIFFICULTY_EASY: 1,
+                CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                CERTIFICATE_DIFFICULTY_HARD: 1,
+            },
         }
 
         has_valid_distinct_assignment = getattr(
@@ -380,7 +496,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 topic_id_to_question_ids_by_difficulty,
                 ['topic_1', 'topic_2'],
                 required_questions_by_topic,
-                'easy',
+                CERTIFICATE_DIFFICULTY_EASY,
             )
         )
 
@@ -408,8 +524,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
-                    'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
-                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
+                    'topic_2': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
                 },
             },
             {
@@ -438,8 +562,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
-                    'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
-                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
+                    'topic_2': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
                 },
             },
             {
@@ -468,8 +600,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
-                    'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
-                    'topic_2': {'easy': 1, 'medium': 2, 'hard': 1},
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 2,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
+                    'topic_2': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 2,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
                 },
             },
             {
@@ -496,8 +636,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     'difficulty bucket.',
                 ],
                 'expected_validation_errors': {
-                    'topic_1': {'easy': 1, 'medium': 2, 'hard': 1},
-                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 1},
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 2,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
+                    'topic_2': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
                 },
             },
             {
@@ -520,8 +668,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     'across topics.',
                 ],
                 'expected_validation_errors': {
-                    'topic_1': {'easy': 1, 'medium': 1, 'hard': 1},
-                    'topic_2': {'easy': 1, 'medium': 1, 'hard': 0},
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 1,
+                    },
+                    'topic_2': {
+                        CERTIFICATE_DIFFICULTY_EASY: 1,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 0,
+                    },
                 },
             },
             {
@@ -540,7 +696,11 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                     '(3 per topic: easy, medium, hard) for 1 topic(s).',
                 ],
                 'expected_validation_errors': {
-                    'topic_1': {'easy': 0, 'medium': 1, 'hard': 0},
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: 0,
+                        CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                        CERTIFICATE_DIFFICULTY_HARD: 0,
+                    },
                 },
             },
         ]
@@ -608,14 +768,16 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             topic_fetchers,
-            'get_topic_by_id',
-            return_value=topic,
-        ) as get_topic_by_id, mock.patch.object(
+            'get_topics_by_ids',
+            return_value=[topic],
+        ) as get_topics_by_ids, mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock(), mock.Mock()],
+        ) as get_multi_mock, mock.patch.object(
             skill_fetchers,
-            'get_skill_by_id',
-            side_effect=lambda skill_id, strict=False: (
-                skill if skill_id == 'skill_1' else None
-            ),
+            'get_skill_from_model',
+            return_value=skill,
         ), mock.patch.object(
             question_services,
             'get_question_skill_links_of_skill',
@@ -626,8 +788,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
-        get_topic_by_id.assert_any_call('topic_1', strict=True)
-        self.assertEqual(get_links.call_count, 2)
+        get_topics_by_ids.assert_called_once_with(['topic_1'], strict=True)
+        self.assertEqual(get_multi_mock.call_count, 2)
+        get_multi_mock.assert_any_call(['skill_1', 'skill_2'])
+        self.assertEqual(get_links.call_count, 4)
         get_links.assert_any_call('skill_1', 'Skill description')
         self.assertFalse(result['is_valid'])
         self.assertIn(
@@ -640,6 +804,46 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             'Mock Topic does not have enough questions in every difficulty '
             'bucket.',
             result['validation_message'],
+        )
+
+    def test_validation_skips_missing_skill_models(self) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1', 'skill_2']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[topic],
+        ) as get_topics_by_ids, mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[None, mock.Mock()],
+        ) as get_multi_mock, mock.patch.object(
+            skill_fetchers,
+            'get_skill_from_model',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[
+                mock.Mock(question_id='question_1', skill_difficulty=0.6)
+            ],
+        ) as get_links:
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=['topic_1'],
+                total_questions=3,
+            )
+
+        get_topics_by_ids.assert_called_once_with(['topic_1'], strict=True)
+        self.assertEqual(get_multi_mock.call_count, 2)
+        self.assertEqual(get_links.call_count, 2)
+        self.assertFalse(result['is_valid'])
+        self.assertEqual(
+            result['validation_errors']['topic_1']['medium']['available'],
+            1,
         )
 
     def test_validation_distributes_remainder_to_earlier_topics(self) -> None:
@@ -716,12 +920,24 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             total_questions=3,
         )
         topic_errors = result['validation_errors'][self.topic_id]
-        self.assertEqual(topic_errors['easy']['required'], 1)
-        self.assertEqual(topic_errors['medium']['required'], 1)
-        self.assertEqual(topic_errors['hard']['required'], 1)
-        self.assertEqual(topic_errors['easy']['available'], 0)
-        self.assertEqual(topic_errors['medium']['available'], 0)
-        self.assertEqual(topic_errors['hard']['available'], 0)
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['required'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_MEDIUM]['required'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_HARD]['required'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['available'], 0
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_MEDIUM]['available'], 0
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_HARD]['available'], 0
+        )
 
     def test_validation_requires_each_difficulty_bucket(self) -> None:
         topic = mock.Mock()
@@ -738,11 +954,15 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             topic_fetchers,
-            'get_topic_by_id',
-            side_effect=[topic, topic],
+            'get_topics_by_ids',
+            return_value=[topic],
+        ) as get_topics_by_ids, mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock()],
         ), mock.patch.object(
             skill_fetchers,
-            'get_skill_by_id',
+            'get_skill_from_model',
             return_value=skill,
         ), mock.patch.object(
             question_services,
@@ -754,11 +974,18 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
+        get_topics_by_ids.assert_called_once_with([self.topic_id], strict=True)
         self.assertFalse(result['is_valid'])
         topic_errors = result['validation_errors'][self.topic_id]
-        self.assertEqual(topic_errors['easy']['available'], 2)
-        self.assertEqual(topic_errors['medium']['available'], 0)
-        self.assertEqual(topic_errors['hard']['available'], 1)
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['available'], 2
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_MEDIUM]['available'], 0
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_HARD]['available'], 1
+        )
 
     def test_validation_counts_easy_linked_question_as_available(self) -> None:
         skill_id = 'skill_1'
@@ -799,5 +1026,9 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         )
 
         topic_errors = result['validation_errors'][topic_id]
-        self.assertEqual(topic_errors['easy']['available'], 1)
-        self.assertEqual(topic_errors['easy']['required'], 1)
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['available'], 1
+        )
+        self.assertEqual(
+            topic_errors[CERTIFICATE_DIFFICULTY_EASY]['required'], 1
+        )
