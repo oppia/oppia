@@ -26,6 +26,7 @@ from core.domain import (
     skill_domain,
     skill_fetchers,
     story_fetchers,
+    topic_domain,
     topic_fetchers,
     user_services,
 )
@@ -368,7 +369,9 @@ class PracticeSessionAccessValidationPage(
             return
 
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        assert isinstance(topic_url_fragment, str)
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
+        assert topic is not None
 
         if node_id is not None:
             self._validate_node_id(topic, node_id)
@@ -402,7 +405,9 @@ class PracticeSessionAccessValidationPage(
             if subtopic_id not in subtopics_ids:
                 raise self.NotFoundException
 
-    def _validate_node_id(self, topic, node_id: str) -> None:
+    def _validate_node_id(
+        self, topic: topic_domain.Topic, node_id: str
+    ) -> None:
         """Validates that the given node ID exists in one of the topic's stories.
 
         Args:
@@ -427,7 +432,7 @@ class PracticeSessionAccessValidationPage(
             'Node with id %s is not part of this topic.' % node_id
         )
 
-    def _validate_arc_id(self, topic, arc_id: str) -> None:
+    def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
         """Validates that the given arc ID exists in one of the topic's stories.
 
         Args:

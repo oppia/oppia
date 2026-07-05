@@ -227,4 +227,146 @@ describe('Practice session page', () => {
     loaderService.onLoadingMessageChange.emit(testMessage);
     expect(component.loadingMessage).toBe(testMessage);
   });
+
+  it('should determine lesson session type from pathname', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/practice/node_1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component['sessionType']).toBe('lesson');
+  }));
+
+  it('should determine arc session type from pathname', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/arc/arc_123'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component['sessionType']).toBe('arc');
+  }));
+
+  it('should determine mastery session type from pathname', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/mastery-challenge'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component['sessionType']).toBe('mastery');
+  }));
+
+  it('should determine legacy session type from pathname with subtopic ids', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/practice/session'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component['sessionType']).toBe('legacy');
+  }));
+
+  it('should build correct data URL for lesson practice', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/practice/node_1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component._getDataUrl()).toContain('abbrev-topic/node_1');
+  }));
+
+  it('should build correct retry URL for arc practice', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/test/arc/arc_1'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component._getRetryUrl()).toContain('abbrev-topic/test/arc/arc_1');
+  }));
+
+  it('should build correct retry URL for mastery challenge', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue(
+      '/learn/math/fractions/mastery-challenge'
+    );
+    spyOn(
+      practiceSessionsBackendApiService,
+      'fetchPracticeSessionsData'
+    ).and.returnValue(
+      Promise.resolve({
+        skill_ids_to_descriptions_map: {},
+        topic_name: 'Fractions',
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component._getRetryUrl()).toContain(
+      'abbrev-topic/mastery-challenge'
+    );
+  }));
 });

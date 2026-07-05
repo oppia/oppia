@@ -19,7 +19,12 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
-from core.domain import skill_fetchers, story_fetchers, topic_fetchers
+from core.domain import (
+    skill_fetchers,
+    story_fetchers,
+    topic_domain,
+    topic_fetchers,
+)
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -131,7 +136,9 @@ class PracticeSessionsPageDataHandler(
         )
         self.render_json(self.values)
 
-    def _get_skill_ids_for_node(self, topic, node_id: str) -> List[str]:
+    def _get_skill_ids_for_node(
+        self, topic: topic_domain.Topic, node_id: str
+    ) -> List[str]:
         """Returns skill IDs associated with a given story node.
 
         Args:
@@ -154,7 +161,9 @@ class PracticeSessionsPageDataHandler(
                     return node.acquired_skill_ids
         return []
 
-    def _get_skill_ids_for_arc(self, topic, arc_id: str) -> List[str]:
+    def _get_skill_ids_for_arc(
+        self, topic: topic_domain.Topic, arc_id: str
+    ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
         Args:

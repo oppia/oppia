@@ -408,4 +408,20 @@ describe('Url Service', () => {
       urlService.getCollectionIdFromEditorUrl();
     }).toThrowError('Invalid collection editor URL');
   });
+
+  it('should correctly retrieve node id from practice url', () => {
+    mockLocation.pathname = '/learn/math/fractions/practice/node_1';
+    expect(urlService.getNodeIdFromPracticeUrl()).toBe('node_1');
+
+    mockLocation.pathname = '/learn/math/fractions/practice/';
+    expect(urlService.getNodeIdFromPracticeUrl()).toBe('');
+  });
+
+  it('should correctly retrieve arc id from url', () => {
+    mockLocation.pathname = '/learn/math/fractions/test/arc/arc_1';
+    expect(urlService.getArcIdFromUrl()).toBe('arc_1');
+
+    mockLocation.pathname = '/learn/math/fractions/practice';
+    expect(urlService.getArcIdFromUrl()).toBe('');
+  });
 });

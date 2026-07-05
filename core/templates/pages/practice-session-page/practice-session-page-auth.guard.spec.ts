@@ -31,9 +31,32 @@ import {AccessValidationBackendApiService} from '../../pages/oppia-root/routing/
 
 class MockAccessValidationBackendApiService {
   validateAccessToPracticeSessionPage(
-    classroomUrlFragment: string,
-    topicUrlFragment: string,
-    selectedSubtopicIds: string
+    _classroomUrlFragment: string,
+    _topicUrlFragment: string,
+    _selectedSubtopicIds: string
+  ) {
+    return Promise.resolve();
+  }
+
+  validateAccessToLessonPracticePage(
+    _classroomUrlFragment: string,
+    _topicUrlFragment: string,
+    _nodeId: string
+  ) {
+    return Promise.resolve();
+  }
+
+  validateAccessToEndOfArcPage(
+    _classroomUrlFragment: string,
+    _topicUrlFragment: string,
+    _arcId: string
+  ) {
+    return Promise.resolve();
+  }
+
+  validateAccessToMasteryChallengePage(
+    _classroomUrlFragment: string,
+    _topicUrlFragment: string
   ) {
     return Promise.resolve();
   }
@@ -142,5 +165,94 @@ describe('PracticeSessionAccessGuard', () => {
       });
 
     tick();
+  }));
+
+  it('should allow access for lesson practice when node_id starts with node_', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToLessonPracticePage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      node_id: 'node_1',
+    };
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', 'node_1');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should allow access for end-of-arc when arc_id is present', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToEndOfArcPage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      arc_id: 'arc_1',
+    };
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', 'arc_1');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should allow access for mastery challenge when no params are present', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToMasteryChallengePage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+    };
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra');
+    expect(navigateSpy).not.toHaveBeenCalled();
   }));
 });

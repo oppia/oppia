@@ -663,4 +663,72 @@ describe('Access validation backend api service', () => {
     expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
+
+  it('should validate access to lesson practice page', fakeAsync(() => {
+    avbas
+      .validateAccessToLessonPracticePage('classroom', 'topic', 'node_1')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_practice_session_page/' +
+        'classroom/topic/practice/node_1'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should validate access to end of arc page', fakeAsync(() => {
+    avbas
+      .validateAccessToEndOfArcPage('classroom', 'topic', 'arc_1')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_practice_session_page/' +
+        'classroom/topic/test/arc/arc_1'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should validate access to mastery challenge page', fakeAsync(() => {
+    avbas
+      .validateAccessToMasteryChallengePage('classroom', 'topic')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_practice_session_page/' +
+        'classroom/topic/mastery-challenge'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should validate access to exploration player page with version', fakeAsync(() => {
+    avbas
+      .validateAccessToExplorationPlayerPage('exploration_id', '2')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_exploration_player_page/' +
+        'exploration_id?v=2'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
 });
