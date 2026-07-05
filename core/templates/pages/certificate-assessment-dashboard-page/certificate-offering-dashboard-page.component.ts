@@ -114,7 +114,7 @@ export class CertificateOfferingDashboardPageComponent implements OnInit {
     return (this.currentPage - 1) * this.certificatesPerPage + 1;
   }
 
-  get endIndex(): number {
+  get endIndexExclusive(): number {
     return Math.min(
       this.currentPage * this.certificatesPerPage,
       this.totalCertificateOfferings

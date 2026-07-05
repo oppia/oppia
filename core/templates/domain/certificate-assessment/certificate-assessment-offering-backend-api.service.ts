@@ -19,7 +19,10 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {CertificateAssessmentOfferingData} from './certificate-assessment-offering.model';
+import {
+  CertificateAssessmentOfferingBackendDict,
+  CertificateAssessmentOfferingData,
+} from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
@@ -60,18 +63,7 @@ interface GetCertificateOfferingBackendResponse {
 }
 
 interface GetCertificateOfferingsBackendResponse {
-  certificate_offerings: {
-    certificate_id: string;
-    title: string;
-    description: string;
-    classroom_id: string;
-    topic_ids: string[];
-    total_questions: number;
-    time_limit_in_minutes: number;
-    demonstrates: string[];
-    async_status: string;
-    version: number;
-  }[];
+  certificate_offerings: CertificateAssessmentOfferingBackendDict[];
 }
 
 @Injectable({
