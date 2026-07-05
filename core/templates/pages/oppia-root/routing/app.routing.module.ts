@@ -136,14 +136,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
-    loadChildren: () =>
-      import('pages/email-dashboard-pages/email-dashboard-page.module').then(
-        m => m.EmailDashboardPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
       .ROUTE,
     loadChildren: () =>
@@ -558,6 +550,15 @@ const routes: Route[] = [
       import(
         'pages/create-certificate-offering-page/create-certificate-offering-page.module'
       ).then(m => m.CreateCertificateOfferingPageModule),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EDIT_CERTIFICATE_OFFERING
+      .ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/edit-certificate-offering-page/edit-certificate-offering-page.module'
+      ).then(m => m.EditCertificateOfferingPageModule),
   },
 ];
 

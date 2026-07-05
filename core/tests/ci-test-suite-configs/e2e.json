@@ -5,24 +5,12 @@
       "module": "core/tests/webdriverio_desktop/collections.js"
     },
     {
-      "name": "creatorDashboard",
-      "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
-    },
-    {
       "name": "explorationHistoryTab",
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
     },
     {
       "name": "learner",
       "module": "core/tests/webdriverio/learnerFlow.js"
-    },
-    {
-      "name": "navigation",
-      "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "publication",
-      "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
     },
     {
       "name": "skillEditor",
@@ -35,10 +23,6 @@
     {
       "name": "users",
       "module": "core/tests/webdriverio_desktop/userJourneys.js"
-    },
-    {
-      "name": "wipeout",
-      "module": "core/tests/webdriverio_desktop/wipeout.js"
     }
   ]
 }

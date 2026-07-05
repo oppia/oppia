@@ -27,27 +27,31 @@
           </thead>
 
           <tbody>
-            <tr>
+            <tr *ngFor="let certificateOffering of certificateOfferings">
               <td>
-                <span class="fw-semibold">Certificate Title</span>
+                <span class="fw-semibold">{{ certificateOffering.title }}</span>
               </td>
 
-              <td>–</td>
-              <td>–</td>
+              <td>{{ certificateOffering.topicsLabel }}</td>
+              <td>{{ certificateOffering.timeLabel }}</td>
 
               <td>
-                <span class="badge bg-secondary">Draft</span>
+                <span class="badge bg-secondary">
+                  {{ certificateOffering.status }}
+                </span>
               </td>
 
               <td class="text-end">
                 <div class="btn-group" role="group" aria-label="Certificate actions"
                 >
                   <button type="button" class="btn btn-sm btn-outline-secondary"
+                 [routerLink]="getEditCertificateOfferingRoute(certificateOffering.certificateId)"
                   >
                     Edit
                   </button>
 
                   <button type="button" class="btn btn-sm btn-outline-danger"
+                          (click)="openDeleteCertificateOfferingModal(certificateOffering.certificateId)"
                   >
                     Delete
                   </button>

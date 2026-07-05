@@ -40,8 +40,8 @@
         "core.controllers.practice_sessions_test",
         "core.controllers.subscriptions_test",
         "extensions.objects.models.objects_test",
-        "core.controllers.email_dashboard_test",
         "core.controllers.features_test",
+        "core.controllers.general_feedback_test",
         "extensions.issues.base_test",
         "core.feature_flag_list_test",
         "core.controllers.skill_mastery_test",
@@ -62,7 +62,10 @@
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
         "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
         "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
-        "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test"
+        "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test",
+        "core.platform.translate.azure_translate_services_test",
+        "core.platform.translate.base_translate_services_test",
+        "core.platform.translate.translate_emulator_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -128,7 +131,6 @@
         "core.domain.subscription_services_test",
         "core.domain.draft_upgrade_services_test",
         "core.domain.event_services_test",
-        "core.domain.user_query_services_test",
         "core.domain.user_services_test",
         "core.domain.fs_services_test",
         "core.domain.recommendations_services_test",
@@ -290,7 +292,6 @@
         "core.platform.email.mailgun_email_services_test",
         "core.storage.story.gae_models_test",
         "core.storage.audit.gae_models_test",
-        "core.domain.user_query_domain_test",
         "core.storage.blog.gae_models_test",
         "core.storage.classroom.gae_models_test",
         "core.controllers.access_validators_test",
@@ -429,6 +430,7 @@
         "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test",
         "core.domain.certificate_assessment_domain_test",
         "core.storage.certificate_assessment.gae_models_test",
-        "core.controllers.certificate_assessment_test"
+        "core.controllers.certificate_assessment_test",
+        "core.domain.certificate_assessment_services_test"
     ]
 }

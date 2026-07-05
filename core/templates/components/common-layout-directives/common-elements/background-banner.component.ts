@@ -19,9 +19,12 @@
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
+import './background-banner.component.css';
+
 @Component({
   selector: 'background-banner',
   templateUrl: './background-banner.component.html',
+  styleUrls: ['./background-banner.component.css'],
 })
 export class BackgroundBannerComponent implements OnInit {
   constructor(private urlInterpolationService: UrlInterpolationService) {}

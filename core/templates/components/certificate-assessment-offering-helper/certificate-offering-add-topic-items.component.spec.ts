@@ -67,4 +67,147 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(topicDataChangeSpy).toHaveBeenCalledWith({topic_id_2: 10});
     expect(navigateSpy).toHaveBeenCalled();
   });
+
+  it('should not emit next events when no topics are selected', () => {
+    const topicDataChangeSpy = spyOn(component.topicDataChange, 'emit');
+    const navigateSpy = spyOn(
+      component.navigateToReviewAndAvailabilitySection,
+      'emit'
+    );
+
+    component.onNextClicked();
+
+    expect(topicDataChangeSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should initialize selected topics from offering data', () => {
+    component.selectedTopics = [];
+    component.certificateAssessmentOffering.topicData = {
+      topic_1: 1,
+      topic_3: 2,
+    };
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: CertificateAssessmentOfferingData.createEmpty(),
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.selectedTopics.map(topic => topic.id)).toEqual([
+      'topic_1',
+      'topic_3',
+    ]);
+  });
+
+  it('should clear stale selected topics when offering data is empty', () => {
+    component.selectedTopics = [component.availableTopics[0]];
+    component.selectedTopicIds = new Set([component.availableTopics[0].id]);
+    component.certificateAssessmentOffering.topicData = {};
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: {
+          ...CertificateAssessmentOfferingData.createEmpty(),
+          topicData: {topic_1: 1},
+        },
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.selectedTopics).toEqual([]);
+    expect(component.selectedTopicIds.size).toEqual(0);
+  });
+
+  it('should preserve topic order from topic data positions', () => {
+    component.certificateAssessmentOffering.topicData = {
+      topic_3: 2,
+      topic_1: 1,
+    };
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: CertificateAssessmentOfferingData.createEmpty(),
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.selectedTopics.map(topic => topic.id)).toEqual([
+      'topic_1',
+      'topic_3',
+    ]);
+  });
+
+  it('should add and remove topics while syncing topic data', () => {
+    const topic = component.availableTopics[0];
+
+    component.toggleTopic(topic);
+
+    expect(component.selectedTopics.map(selected => selected.id)).toEqual([
+      topic.id,
+    ]);
+    expect(component.selectedTopicIds.has(topic.id)).toBeTrue();
+    expect(component.certificateAssessmentOffering.topicData).toEqual({
+      [topic.id]: 1,
+    });
+
+    component.toggleTopic(topic);
+
+    expect(component.selectedTopics).toEqual([]);
+    expect(component.selectedTopicIds.has(topic.id)).toBeFalse();
+    expect(component.certificateAssessmentOffering.topicData).toEqual({});
+  });
+
+  it('should remove a selected topic and update topic data order', () => {
+    const firstTopic = component.availableTopics[0];
+    const secondTopic = component.availableTopics[1];
+    component.selectedTopics = [firstTopic, secondTopic];
+    component.certificateAssessmentOffering.topicData = {
+      [firstTopic.id]: 1,
+      [secondTopic.id]: 2,
+    };
+
+    component.removeSelectedTopic(firstTopic.id);
+
+    expect(component.selectedTopics.map(topic => topic.id)).toEqual([
+      secondTopic.id,
+    ]);
+    expect(component.certificateAssessmentOffering.topicData).toEqual({
+      [secondTopic.id]: 1,
+    });
+  });
+
+  it('should filter topics by title and classroom name', () => {
+    component.searchQuery = 'science';
+
+    expect(component.filteredTopics.map(topic => topic.id)).toEqual([
+      'topic_6',
+      'topic_7',
+    ]);
+
+    component.searchQuery = 'fractions';
+
+    expect(component.filteredTopics.map(topic => topic.id)).toEqual([
+      'topic_4',
+    ]);
+  });
+
+  it('should show the empty selected-topics message when no topics are selected', () => {
+    const emptyStateEl: HTMLElement | null =
+      fixture.nativeElement.querySelector(
+        '.oppia-certificate-offering-empty-selected-topics'
+      );
+
+    expect(emptyStateEl).not.toBeNull();
+    expect(emptyStateEl?.textContent?.trim()).toBe(
+      'You have not added any topic. Start by adding one!'
+    );
+  });
 });

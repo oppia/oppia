@@ -27,11 +27,24 @@ import {
   TranslateTextService,
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import {TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING} from 'domain/exploration/written-translation.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
   let httpTestingController: HttpTestingController;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   const getTranslatableItem = (text: string) => {
     return {
       content_format: 'html',
@@ -43,8 +56,15 @@ describe('TranslateTextService', () => {
   };
 
   beforeEach(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextService = TestBed.inject(TranslateTextService);
@@ -242,6 +262,37 @@ describe('TranslateTextService', () => {
       const textAndAvailability = translateTextService.getTextToTranslate();
 
       expect(textAndAvailability.translation).toEqual([]);
+    }));
+
+    it('should initialize correctly for V2 when feature flag is enabled', fakeAsync(() => {
+      spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+        EnableTranslationOppsWithNewOppModels: {
+          isEnabled: true,
+        },
+      } as unknown as FeatureStatusChecker);
+
+      const sampleDataResults = {
+        translatable_contents: [
+          {
+            content_id: 'contentId1',
+            content_type: 'content',
+            content_format: 'html',
+            content_value: 'text1',
+            state_name: 'stateName1',
+          },
+        ],
+        version: '2',
+      };
+
+      translateTextService.init('1', 'en', () => {}, 'exploration');
+      const req = httpTestingController.expectOne(
+        '/gettranslatablecontentshandlerv2?entity_id=1&entity_type=exploration&language_code=en'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(translateTextService.stateAndContent[0].contentText).toBe('text1');
     }));
   });
 
