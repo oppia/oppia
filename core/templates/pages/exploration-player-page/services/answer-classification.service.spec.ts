@@ -749,7 +749,7 @@ describe('Answer Classification Service', () => {
           textInputRulesService
         );
 
-        // Returns true if any answer group matches.
+        // Returns true if any answer group matches
 
         if (stateDict.interaction.default_outcome) {
           stateDict.interaction.default_outcome.dest = 'default';
