@@ -35,7 +35,6 @@ from __future__ import annotations
 import logging
 
 from core.domain import (
-    certificate_assessment_domain,
     certificate_assessment_services,
 )
 from core.jobs import base_jobs

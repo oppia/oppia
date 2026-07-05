@@ -27,6 +27,7 @@ from core.domain import (
     certificate_assessment_domain,
     question_services,
     skill_fetchers,
+    topic_domain,
     topic_fetchers,
 )
 from core.platform import models
@@ -71,7 +72,7 @@ class CertificateAssessmentOfferingTopicInfoDict(TypedDict):
 
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
-    topics: List[object] | None = None,
+    topics: List[topic_domain.Topic] | None = None,
 ) -> Dict[str, List[str]]:
     """Returns a mapping from topic ID to unique question IDs for its skills."""
     # Build a deduplicated pool of question IDs per topic so we can detect
