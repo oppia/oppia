@@ -1,0 +1,21 @@
+.oppia-error-modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.oppia-error-details-toggle-link {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.oppia-error-details-arrow {
+  margin-right: 5px;
+}
+
+.oppia-error-success-message {
+  padding: 20px 0;
+  text-align: center;
+}

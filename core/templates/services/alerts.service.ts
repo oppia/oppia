@@ -16,7 +16,7 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-import {Injectable} from '@angular/core';
+import {Injectable, EventEmitter} from '@angular/core';
 
 import {LoggerService} from 'services/contextual/logger.service';
 
@@ -44,6 +44,11 @@ export class AlertsService {
 
   private _warnings: Warning[] = [];
   private _messages: Message[] = [];
+  private _warningAddedEventEmitter: EventEmitter<string> = new EventEmitter();
+
+  get onWarningAdded(): EventEmitter<string> {
+    return this._warningAddedEventEmitter;
+  }
 
   get warnings(): Warning[] {
     return this._warnings;
@@ -70,6 +75,7 @@ export class AlertsService {
       type: 'warning',
       content: warning,
     });
+    this._warningAddedEventEmitter.emit(warning);
   }
 
   /**

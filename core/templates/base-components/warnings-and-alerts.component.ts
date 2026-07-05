@@ -16,8 +16,11 @@
  * @fileoverview Component for warning and alerts.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
 import {AlertsService, Message, Warning} from 'services/alerts.service';
+import {ErrorModalComponent} from 'components/common-layout-directives/common-elements/error-modal.component';
 
 import './warnings-and-alerts.component.css';
 
@@ -26,8 +29,48 @@ import './warnings-and-alerts.component.css';
   templateUrl: './warnings-and-alerts.component.html',
   styleUrls: ['./warnings-and-alerts.component.css'],
 })
-export class WarningsAndAlertsComponent {
-  constructor(private alertsService: AlertsService) {}
+export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
+  private directiveSubscriptions = new Subscription();
+
+  constructor(
+    private alertsService: AlertsService,
+    private modalService: NgbModal
+  ) {}
+
+  ngOnInit(): void {
+    if (this.alertsService.warnings.length > 0) {
+      this.openErrorModal(this.alertsService.warnings[0].content);
+    }
+
+    this.directiveSubscriptions.add(
+      this.alertsService.onWarningAdded.subscribe((warningMessage: string) => {
+        this.openErrorModal(warningMessage);
+      })
+    );
+  }
+
+  openErrorModal(warningMessage: string): void {
+    if (this.modalService.hasOpenModals()) {
+      return;
+    }
+
+    const modalRef = this.modalService.open(ErrorModalComponent, {
+      backdropClass: 'oppia-error-modal-backdrop',
+      backdrop: 'static',
+      keyboard: false,
+    });
+    modalRef.componentInstance.errorMessage = warningMessage;
+
+    modalRef.result.finally(() => {
+      if (this.alertsService.warnings.length > 0) {
+        this.alertsService.deleteWarning(this.alertsService.warnings[0]);
+      }
+
+      if (this.alertsService.warnings.length > 0) {
+        this.openErrorModal(this.alertsService.warnings[0].content);
+      }
+    });
+  }
 
   getWarnings(): Warning[] {
     return this.alertsService.warnings;
@@ -39,5 +82,9 @@ export class WarningsAndAlertsComponent {
 
   getMessages(): Message[] {
     return this.alertsService.messages;
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
