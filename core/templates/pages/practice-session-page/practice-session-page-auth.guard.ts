@@ -45,13 +45,41 @@ export class PracticeSessionAccessGuard implements CanActivate {
     const classroomUrlFragment =
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
+    const nodeId = route.paramMap.get('node_id') || '';
+    const arcId = route.paramMap.get('arc_id') || '';
     return new Promise<boolean>(resolve => {
-      this.accessValidationBackendApiService
-        .validateAccessToPracticeSessionPage(
-          classroomUrlFragment,
-          topicUrlFragment,
-          selectedSubtopicIds
-        )
+      let validationPromise: Promise<void>;
+
+      if (nodeId && nodeId.startsWith('node_')) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToLessonPracticePage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            nodeId
+          );
+      } else if (arcId) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToEndOfArcPage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            arcId
+          );
+      } else if (selectedSubtopicIds) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToPracticeSessionPage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            selectedSubtopicIds
+          );
+      } else {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToMasteryChallengePage(
+            classroomUrlFragment,
+            topicUrlFragment
+          );
+      }
+
+      validationPromise
         .then(() => {
           resolve(true);
         })

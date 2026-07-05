@@ -251,10 +251,36 @@ export class UrlService {
   getSelectedSubtopicsFromUrl(): string {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
-    if (pathname.match(/\/practice/g) && queryStrings.length === 2) {
+    if (pathname.match(/\/practice\/session/g) && queryStrings.length === 2) {
       return decodeURIComponent(queryStrings[1]);
     }
-    throw new Error('Invalid URL for practice session');
+    return '';
+  }
+
+  /**
+   * This function returns the node ID from the lesson practice URL.
+   * @return {string} the node ID.
+   */
+  getNodeIdFromPracticeUrl(): string {
+    const pathname = this.getPathname();
+    const match = pathname.match(/\/practice\/(node_\d+)/);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+    return '';
+  }
+
+  /**
+   * This function returns the arc ID from the end-of-arc URL.
+   * @return {string} the arc ID.
+   */
+  getArcIdFromUrl(): string {
+    const pathname = this.getPathname();
+    const match = pathname.match(/\/test\/arc\/(\w+)/);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+    return '';
   }
 
   /**

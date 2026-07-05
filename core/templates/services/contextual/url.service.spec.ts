@@ -259,18 +259,14 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve selected subtopics from url', () => {
-    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(urlService.getSelectedSubtopicsFromUrl()).toBe('abcdefgijklm');
     mockLocation.pathname = '/topic/abcdefgijklm';
-    expect(function () {
-      urlService.getSelectedSubtopicsFromUrl();
-    }).toThrowError('Invalid URL for practice session');
-    mockLocation.pathname = '/practice_session/topicName';
+    expect(urlService.getSelectedSubtopicsFromUrl()).toBe('');
+    mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
-    expect(function () {
-      urlService.getSelectedSubtopicsFromUrl();
-    }).toThrowError('Invalid URL for practice session');
+    expect(urlService.getSelectedSubtopicsFromUrl()).toBe('');
   });
 
   it('should correctly retrieve classroom url fragment from url', () => {

@@ -25,6 +25,7 @@ from core.domain import (
     learner_group_services,
     skill_domain,
     skill_fetchers,
+    story_fetchers,
     topic_fetchers,
     user_services,
 )
@@ -310,11 +311,19 @@ class ManageOwnAccountValidationHandler(
 class PracticeSessionAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates access to practice seesion page."""
+    """Validates access to practice session page."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'node_id': {
+            'schema': {'type': 'basestring'},
+            'default_value': None,
+        },
+        'arc_id': {
+            'schema': {'type': 'basestring'},
+            'default_value': None,
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -342,6 +351,8 @@ class PracticeSessionAccessValidationPage(
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
         skill_ids = self.normalized_request.get('skill_ids')
+        node_id = self.request.route_kwargs.get('node_id')
+        arc_id = self.request.route_kwargs.get('arc_id')
 
         if skill_ids is not None:
             if not isinstance(skill_ids, list) or not all(
@@ -354,19 +365,90 @@ class PracticeSessionAccessValidationPage(
                 raise self.NotFoundException(e)
             return
 
+        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
+
+        if node_id is not None:
+            self._validate_node_id(topic, node_id)
+            return
+
+        if arc_id is not None:
+            self._validate_arc_id(topic, arc_id)
+            return
+
+        if subtopics is None:
+            # Legacy practice session without subtopics should fail.
+            is_legacy_path = (
+                'practice/session' in self.request.path
+                or self.request.path.endswith('practice/session')
+            )
+            if is_legacy_path:
+                raise self.InvalidInputException(
+                    'No subtopic IDs provided for practice session.'
+                )
+            # Mastery challenge - just validate topic access (done by decorator).
+            return
+
         if not isinstance(subtopics, list) or not all(
             isinstance(s, int) for s in subtopics
         ):
             raise self.InvalidInputException('Invalid subtopic IDs')
-
-        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
-        topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
 
         subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
 
         for subtopic_id in subtopics:
             if subtopic_id not in subtopics_ids:
                 raise self.NotFoundException
+
+    def _validate_node_id(self, topic, node_id: str) -> None:
+        """Validates that the given node ID exists in one of the topic's stories.
+
+        Args:
+            topic: Topic. The topic object.
+            node_id: str. The node ID to validate.
+
+        Raises:
+            NotFoundException. The node ID was not found in any story.
+        """
+        story_ids = topic.get_canonical_story_ids(include_only_published=True)
+        story_ids.extend(
+            topic.get_additional_story_ids(include_only_published=True)
+        )
+        stories = story_fetchers.get_stories_by_ids(story_ids)
+        for story in stories:
+            if story is None:
+                continue
+            for node in story.story_contents.nodes:
+                if node.id == node_id:
+                    return
+        raise self.NotFoundException(
+            'Node with id %s is not part of this topic.' % node_id
+        )
+
+    def _validate_arc_id(self, topic, arc_id: str) -> None:
+        """Validates that the given arc ID exists in one of the topic's stories.
+
+        Args:
+            topic: Topic. The topic object.
+            arc_id: str. The arc ID to validate.
+
+        Raises:
+            NotFoundException. The arc ID was not found in any story.
+        """
+        story_ids = topic.get_canonical_story_ids(include_only_published=True)
+        story_ids.extend(
+            topic.get_additional_story_ids(include_only_published=True)
+        )
+        stories = story_fetchers.get_stories_by_ids(story_ids)
+        for story in stories:
+            if story is None:
+                continue
+            for arc in story.story_contents.arcs:
+                if arc.id == arc_id:
+                    return
+        raise self.NotFoundException(
+            'Arc with id %s is not part of this topic.' % arc_id
+        )
 
 
 class ProfileExistsValidationHandler(
