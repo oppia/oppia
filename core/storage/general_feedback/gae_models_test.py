@@ -22,7 +22,7 @@ from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -161,7 +161,10 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         export_data = general_feedback_models.LessonFeedbackModel.export_data(
             self.USER_ID
         )
-        expected = {
+        # Here we use type Any because the expected dictionary contains
+        # heterogeneous values, including strings, integers, dictionaries,
+        # lists, and None.
+        expected: Dict[str, Any] = {
             'feedback_text': FEEDBACK_TEXT,
             'status': feconf.STATUS_CHOICES_OPEN,
             'exploration_id': LESSON_METADATA_JSON['exploration_id'],
