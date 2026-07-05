@@ -20,13 +20,14 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const questionText = 'Add 1+2';
 
 describe('Topic Manager', function () {
-  let topicManager: TopicManager & CurriculumAdmin;
+  let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
@@ -37,29 +38,38 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Mathematics', 'math');
-    await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics', false);
+    await curriculumAdmin.createTopic(
+      'Arithmetic Operations',
+      'arithmetic-ops'
+    );
+    await curriculumAdmin.createSkillForTopic(
+      'Addition 101',
+      'Arithmetic Operations',
+      false
+    );
+    await curriculumAdmin.createSkillForTopic(
+      'Subtraction 101',
+      'Arithmetic Operations',
+      false
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Mathematics'
+      'Arithmetic Operations'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to open question editor, edit a question, manage linking and unlinking skills with the questions, create and delete questions, and preview a question.',
     async function () {
-      // TODO(#20590): Once the issue is resolved, please ensure to add a check for
-      // this scenario (linking and unlinking a skill to a question) in the acceptance test.
-      // See: https://github.com/oppia/oppia/issues/20590
       await topicManager.navigateToTopicAndSkillsDashboardPage();
 
-      await topicManager.openSkillEditor('Addition');
+      await topicManager.openSkillEditor('Addition 101');
       await topicManager.navigateToSkillQuestionEditorTab();
 
-      await topicManager.createQuestionsForSkill('Addition', 1);
+      await topicManager.createQuestionsForSkill('Addition 101', 1);
       await topicManager.expectToastMessageToBe(
         'Question created successfully.'
       );
@@ -70,8 +80,30 @@ describe('Topic Manager', function () {
       await topicManager.expectPreviewInteractionType('Numeric Input');
 
       await topicManager.navigateToSkillQuestionEditorTab();
-      await topicManager.deleteQuestion(questionText);
+
+      // TM.4: Manage complex skill linkages and optimized commit modal flow.
+      await topicManager.openQuestionEditor(questionText);
+
+      // Row 1: Link "Subtraction 101". Should NOT show commit modal (auto-saved).
+      await topicManager.linkAnotherSkillToQuestion('Subtraction 101');
+      await topicManager.expectSaveQuestionButtonDisabled();
+
+      // Row 2: Edit content text. Should TRIGGERS the Commit Modal.
+      await topicManager.updateCardContent('Add 4+5');
+      // Row 3: Click "Save" (corresponds to "Confirm" in spreadsheet).
+      await topicManager.saveQuestionAndExpectCommitModal(
+        'Updated question content.'
+      );
+
+      // Verify the updated question "Add 4+5" is visible in the list.
+      await topicManager.expectQuestionToBeVisible('Add 4+5');
+
+      // TM.4 Row 4: Delete the question via the trash icon in the question list.
+      // After the commit modal (Row 3), the editor closes and we are back on
+      // the question list. Click the trash icon, confirm the warning modal.
+      await topicManager.deleteQuestion('Add 4+5');
       await topicManager.expectToastMessageToBe('Question Removed');
+      await topicManager.expectQuestionToNotBeVisible('Add 4+5');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

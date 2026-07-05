@@ -20,6 +20,7 @@
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -184,6 +185,62 @@ export class UrlService {
       }
     }
     throw new Error('Invalid URL for classroom');
+  }
+
+  /**
+   * This function is used to construct the classroom URL for learner pages.
+   * @return {string} The classroom URL.
+   */
+  getLearnerClassroomUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    return classroomFragment ? `/learn/${classroomFragment}` : '/learn';
+  }
+
+  /**
+   * This function is used to construct the story URL for learner pages.
+   * @return {string} The story URL.
+   */
+  getLearnerTopicStoryUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
+
+    return classroomFragment && topicFragment
+      ? this.getLearnerTopicUrl(
+          classroomFragment,
+          topicFragment,
+          ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE
+        )
+      : '/learn';
+  }
+
+  /**
+   * This function is used to construct the study guide URL for learner pages.
+   * @return {string} The study guide URL.
+   */
+  getLearnerTopicStudyGuideUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
+
+    return classroomFragment && topicFragment
+      ? this.getLearnerTopicUrl(
+          classroomFragment,
+          topicFragment,
+          ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE
+        )
+      : '#';
+  }
+
+  private getLearnerTopicUrl(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    urlTemplate: string
+  ): string {
+    return urlTemplate
+      .replace(
+        '<classroom_url_fragment>',
+        encodeURIComponent(classroomUrlFragment)
+      )
+      .replace('<topic_url_fragment>', encodeURIComponent(topicUrlFragment));
   }
 
   /**

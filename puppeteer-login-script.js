@@ -42,8 +42,6 @@ module.exports = async (browser, context) => {
   await login(context, page);
   if (context.url.includes('moderator')) {
     await setRole(page, 'MODERATOR');
-  } else if (context.url.includes('emaildashboard')) {
-    await setRole(page, 'ADMIN');
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {

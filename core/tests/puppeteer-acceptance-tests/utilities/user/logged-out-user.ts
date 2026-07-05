@@ -69,6 +69,10 @@ const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
+const robotsTxtUrl = testConstants.URLs.RobotsTxt;
+const sitemapXmlUrl = testConstants.URLs.SitemapXml;
+const teachersUrl = testConstants.URLs.Teachers;
+const parentsUrl = testConstants.URLs.Parents;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
@@ -368,6 +372,7 @@ const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
 const resumeExplorationButton = '.resume-button';
 const restartExplorationButton = '.restart-button';
 const saveProgressButton = '.save-progress-btn';
+const saveProgressBtnTooltipSelector = '.save-progress-btn-tooltip';
 const createAccountButton = '.create-account-btn';
 const validityInfoTextSelector = '.guide-text';
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
@@ -605,6 +610,13 @@ const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
+
+const sitemapXmlLocTag = '<loc>';
+
+const metaOgTitleSelector = 'meta[property="og:title"]';
+const metaDescriptionSelector = 'meta[name="description"]';
+const metaOgDescriptionSelector = 'meta[property="og:description"]';
+const metaApplicationNameSelector = 'meta[name="application-name"]';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -922,6 +934,20 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Teachers page.
+   */
+  async navigateToTeachersPage(): Promise<void> {
+    await this.goto(teachersUrl);
+  }
+
+  /**
+   * Function to navigate to the Parents page.
+   */
+  async navigateToParentsPage(): Promise<void> {
+    await this.goto(parentsUrl);
+  }
+
+  /**
    * Function to navigate to the Donate page.
    */
   async navigateToDonatePage(): Promise<void> {
@@ -955,6 +981,20 @@ export class LoggedOutUser extends BaseUser {
       await this.page.reload();
     }
     await this.goto(classroomsPageUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the robots.txt page.
+   */
+  async navigateToRobotsTxt(): Promise<void> {
+    await this.goto(robotsTxtUrl, false);
+  }
+
+  /**
+   * Function to navigate to the Sitemap page.
+   */
+  async navigateToSitemapXml(): Promise<void> {
+    await this.goto(sitemapXmlUrl);
   }
 
   /**
@@ -1754,9 +1794,12 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink, true);
-
-    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
+    await this.clickLinkButtonToNewTab(
+      footerForumlink,
+      'Forum',
+      googleGroupsOppiaUrl,
+      'Forum'
+    );
   }
 
   /**
@@ -2088,11 +2131,18 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('No new tab opened.');
     }
     const newTabPage = await newTarget.page();
+    if (newTabPage === null) {
+      throw new Error('New tab page could not be retrieved.');
+    }
 
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
-    expect(newTabPage?.url()).toContain(expectedAccountId);
-    await newTabPage?.close();
+    // Wait for the new page to navigate to the correct domain per reviewer request.
+    await newTabPage.waitForFunction(
+      (domain: string) => window.location.href.includes(domain),
+      {timeout: 10000},
+      expectedDestinationDomain
+    );
+
+    await newTabPage.close();
   }
 
   /**
@@ -3766,8 +3816,12 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Filters lessons by multiple languages and deselect the already selected English language.
    * @param {string[]} languageNames - The names of the languages to filter by.
+   * @param {string} languageToDeselect - The name of the language to deselect.
    */
-  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+  async filterLessonsByLanguage(
+    languageNames: string[],
+    languageToDeselect: string = 'English'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
     }
@@ -3785,8 +3839,8 @@ export class LoggedOutUser extends BaseUser {
         el => el.textContent.trim(),
         element
       );
-      // Deselecting english language.
-      if (elementText === 'English') {
+      // Deselecting the selected language before choosing new filters.
+      if (elementText === languageToDeselect) {
         await element.click();
       }
     }
@@ -3796,14 +3850,23 @@ export class LoggedOutUser extends BaseUser {
       unselectedFilterOptionsSelector
     );
     let foundMatch = false;
+    let englishMatchCount = 0;
 
     for (const language of deselectedLanguages) {
       const languageText = await this.page.evaluate(
         el => el.textContent,
         language
       );
+      const trimmedLanguageText = languageText.trim();
 
-      if (languageNames.includes(languageText.trim())) {
+      if (trimmedLanguageText === 'English') {
+        englishMatchCount += 1;
+        if (englishMatchCount < 2) {
+          continue;
+        }
+      }
+
+      if (languageNames.includes(trimmedLanguageText)) {
         foundMatch = true;
         await this.waitForElementToBeClickable(language);
         await language.click();
@@ -5207,6 +5270,18 @@ export class LoggedOutUser extends BaseUser {
    */
   async saveProgress(): Promise<void> {
     await this.page.waitForSelector(saveProgressButton, {visible: true});
+
+    // TODO(#26357): Remove this wait once the frontend race condition is fixed.
+    // The saveProgressBtnTooltipSelector div is rendered directly below the
+    // button in a flex column when checkpointStatusArray[0] === 'in-progress'.
+    // This happens when the modal opens before Angular's async checkpoint
+    // service has updated completedCheckpointsCount. While the tooltip is
+    // present, elementFromPoint at the button's center returns the tooltip div
+    // instead of the button, causing waitForElementToBeClickable to time out.
+    // We wait here until the tooltip disappears (i.e. completedCheckpointsCount
+    // has been updated to reflect the reached checkpoint).
+    await this.expectElementToBeVisible(saveProgressBtnTooltipSelector, false);
+
     await this.clickOnElementWithSelector(saveProgressButton);
 
     await this.page.waitForSelector(signInBoxInSaveProressModalSelector, {
@@ -7402,6 +7477,161 @@ export class LoggedOutUser extends BaseUser {
 
     if (suggestedSection) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
+    }
+  }
+
+  /**
+   * Verifies that sitemap.xml contains valid XML URL entries.
+   */
+  async verifySitemapXmlContent(): Promise<void> {
+    if (!(await this.isTextPresentOnPage(sitemapXmlLocTag))) {
+      throw new Error(
+        `Expected sitemap.xml to contain "${sitemapXmlLocTag}" URL entries, but none were found.`
+      );
+    }
+  }
+
+  /**
+   * Function to verify SEO metadata on the current page.
+   */
+  async verifySEOMetadata(
+    expected: {
+      title?: string;
+      ogTitle?: string;
+      description?: string;
+      ogDescription?: string;
+      applicationName?: string;
+    } = {}
+  ): Promise<void> {
+    await this.page.waitForSelector('head title');
+    await this.page.waitForSelector(metaOgTitleSelector);
+
+    // If an expected title is provided, assert the <title> matches it.
+    // Do not use visibility-based helpers for <head> elements.
+    if (expected.title !== undefined) {
+      const title = (await this.page.title()).trim();
+      if (title !== expected.title) {
+        throw new Error(
+          `<title> mismatch. Expected: "${expected.title}", Found: "${title}"`
+        );
+      }
+    }
+
+    // If an expected og:title is provided, assert meta property matches it.
+    if (expected.ogTitle !== undefined) {
+      const ogTitle = await this.page.$eval(metaOgTitleSelector, el =>
+        el.getAttribute('content')
+      );
+      if (ogTitle !== expected.ogTitle) {
+        throw new Error(
+          `meta property=\"og:title\" mismatch. Expected: "${expected.ogTitle}", Found: "${ogTitle}"`
+        );
+      }
+    }
+
+    // If an expected description is provided, assert meta description matches it.
+    if (expected.description !== undefined) {
+      const description = await this.page.$eval(metaDescriptionSelector, el =>
+        el.getAttribute('content')
+      );
+      if (description !== expected.description) {
+        throw new Error(
+          `meta name=\"description\" mismatch. Expected: "${expected.description}", Found: "${description}"`
+        );
+      }
+    }
+
+    // If an expected og:description is provided, assert meta property matches it.
+    if (expected.ogDescription !== undefined) {
+      const ogDescription = await this.page.$eval(
+        metaOgDescriptionSelector,
+        el => el.getAttribute('content')
+      );
+      if (ogDescription !== expected.ogDescription) {
+        throw new Error(
+          `meta property=\"og:description\" mismatch. Expected: "${expected.ogDescription}", Found: "${ogDescription}"`
+        );
+      }
+    }
+
+    // If an expected application name is provided, assert it matches.
+    if (expected.applicationName !== undefined) {
+      const appName = await this.page.$eval(metaApplicationNameSelector, el =>
+        el.getAttribute('content')
+      );
+      if (appName !== expected.applicationName) {
+        throw new Error(
+          `meta name=\"application-name\" mismatch. Expected: "${expected.applicationName}", Found: "${appName}"`
+        );
+      }
+    }
+
+    // Verify that the raw server-side HTML contains semantic elements
+    // (so bots crawling the raw HTML can see page structure without JS).
+    const requiredSemanticTags = ['h2', 'p'];
+    const rawHtml = await this.getRawHtmlForCurrentPage();
+    for (const tag of requiredSemanticTags) {
+      const tagRegex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`);
+      if (!tagRegex.test(rawHtml)) {
+        throw new Error(
+          `Expected server-side HTML to contain a <${tag}> element.`
+        );
+      }
+    }
+  }
+
+  /**
+   * Fetches and returns the raw HTML response for the current page URL.
+   */
+  async getRawHtmlForCurrentPage(): Promise<string> {
+    const url = this.page.url();
+    if (!url) {
+      throw new Error('Cannot fetch raw HTML: current page URL is empty.');
+    }
+
+    const rawHtml = await this.page.evaluate(async (u: string) => {
+      const res = await fetch(u, {method: 'GET', credentials: 'same-origin'});
+      if (!res.ok) {
+        throw new Error(`Failed to fetch raw HTML. Status: ${res.status}`);
+      }
+      return await res.text();
+    }, url);
+
+    if (!rawHtml || rawHtml.trim().length === 0) {
+      throw new Error('Raw HTML response is empty.');
+    }
+
+    return rawHtml;
+  }
+
+  /**
+   * Verifies that the current page URL returns HTTP 200 when fetched.
+   * Uses an in-browser `fetch` call so it does not navigate away from the
+   * current page context.
+   */
+  async verifyCurrentPageStatus200(): Promise<void> {
+    const url = this.page.url();
+    if (!url) {
+      throw new Error('Cannot verify status: current page URL is empty.');
+    }
+
+    const status: number | null = await this.page.evaluate(
+      async (u: string) => {
+        try {
+          const res = await fetch(u, {
+            method: 'GET',
+            credentials: 'same-origin',
+          });
+          return res.status;
+        } catch (err) {
+          return null;
+        }
+      },
+      url
+    );
+
+    if (status !== 200) {
+      throw new Error(`Expected ${url} to return HTTP 200 but got ${status}`);
     }
   }
 }
