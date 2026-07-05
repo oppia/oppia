@@ -36,7 +36,6 @@ if MYPY:  # pragma: no cover
         auth_models,
         collection_models,
         datastore_services,
-        email_models,
         exp_models,
         feedback_models,
         skill_models,
@@ -47,7 +46,6 @@ if MYPY:  # pragma: no cover
 (
     auth_models,
     collection_models,
-    email_models,
     exp_models,
     feedback_models,
     skill_models,
@@ -57,7 +55,6 @@ if MYPY:  # pragma: no cover
     [
         models.Names.AUTH,
         models.Names.COLLECTION,
-        models.Names.EMAIL,
         models.Names.EXPLORATION,
         models.Names.FEEDBACK,
         models.Names.SKILL,
@@ -314,28 +311,6 @@ def story_progress_model_relationships(
     yield model.story_id, [story_models.StoryModel]
 
 
-@validation_decorators.RelationshipsOf(user_models.UserQueryModel)
-def user_query_model_relationships(
-    model: Type[user_models.UserQueryModel],
-) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]
-]:
-    """Yields how the properties of the model relates to the ID of others."""
-
-    yield model.sent_email_model_id, [email_models.BulkEmailModel]
-
-
-@validation_decorators.RelationshipsOf(user_models.UserBulkEmailsModel)
-def user_bulk_emails_model_relationships(
-    model: Type[user_models.UserBulkEmailsModel],
-) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]
-]:
-    """Yields how the properties of the model relates to the ID of others."""
-
-    yield model.sent_email_model_ids, [email_models.BulkEmailModel]
-
-
 @validation_decorators.RelationshipsOf(user_models.UserSkillMasteryModel)
 def user_skill_mastery_model_relationships(
     model: Type[user_models.UserSkillMasteryModel],
@@ -415,33 +390,5 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
             and model.draft_change_list_last_updated > current_time
         ):
             yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(
-                model
-            )
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to
-# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
-# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-@validation_decorators.AuditsExisting(user_models.UserQueryModel)
-class ValidateArchivedModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
-    """DoFn to validate archived models marked deleted."""
-
-    def process(
-        self, input_model: user_models.UserQueryModel
-    ) -> Iterator[user_validation_errors.ArchivedModelNotMarkedDeletedError]:
-        """Function that checks if archived model is marked deleted.
-
-        Args:
-            input_model: user_models.UserQueryModel.
-                Entity to validate.
-
-        Yields:
-            ArchivedModelNotMarkedDeletedError. Error for models marked
-            archived but not deleted.
-        """
-        model = job_utils.clone_model(input_model)
-        if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
-            yield user_validation_errors.ArchivedModelNotMarkedDeletedError(
                 model
             )

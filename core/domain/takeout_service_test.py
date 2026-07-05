@@ -405,14 +405,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ANDROID_DEVICE_MODEL: Final = 'Pixel 4a'
     ANDROID_SDK_VERSION: Final = 28
     ENTRY_POINT_NAVIGATION_DRAWER: Final = 'navigation_drawer'
-    WEB_FEEDBACK_CATEGORY: Final = 'platform'
-    WEB_FEEDBACK_PAGE_URL: Final = '/learn'
-    WEB_FEEDBACK_LANGUAGE_CODE: Final = 'en'
-    WEB_FEEDBACK_RATING: Final = 5
-    WEB_FEEDBACK_TARGET_TYPE: Final = 'general'
-    WEB_FEEDBACK_TARGET_ID: Final = 'learn_page'
-    WEB_FEEDBACK_STATUS: Final = 'open'
-    WEB_FEEDBACK_TEXT: Final = 'Web feedback export test.'
     TEXT_LANGUAGE_CODE_ENGLISH: Final = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH: Final = 'en'
     ANDROID_REPORT_INFO: Dict[
@@ -469,6 +461,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     PROFILE_PICTURE_DATA_WEBP: Final = (
         'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA'  # pylint: disable=line-too-long
     )
+    LESSON_FEEDBACK_ID_1 = 'lesson_feedback_id_1'
+    PARENT_FEEDBACK_ID_1 = 'parent_feedback_id_1'
+    LESSON_FEEDBACK_TEXT_1 = 'lesson_feedback_text_1'
+    LESSON_METADATA_JSON = {
+        'exploration_id': 'exp_id_1',
+        'exploration_version': 1,
+        'state_name': 'state_1',
+        'state_index': 0,
+    }
+    LESSON_FEEDBACK_RESPONSE_LIST: List[Dict[str, Union[str, float]]] = []
+    LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT = 1
+    LESSON_FEEDBACK_CREATED_ON = datetime.datetime.utcnow()
+    LESSON_FEEDBACK_LAST_UPDATED = datetime.datetime.utcnow()
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -1221,6 +1226,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         general_suggestion_data: Dict[str, Dict[str, Union[int, str]]] = {}
         last_playthrough_data: Dict[str, Dict[str, Union[int, str]]] = {}
         learner_goals_data: Dict[str, List[str]] = {}
+        lesson_feedback_model_data: Dict[str, Dict[str, Union[int, str]]] = {}
         incomplete_activities_data: Dict[str, List[str]] = {}
         user_settings_data: Dict[str, Union[List[str], Optional[str], int]] = {
             'email': 'user1@example.com',
@@ -1328,16 +1334,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
-        # Here we use type Any because this dictionary contains other
-        # different types of dictionaries whose values can vary from int
-        # to complex Union types. So, to make this Dict generalized for
-        # every other Dict. We used Any here.
-        expected_web_feedback_thread_data: Dict[
-            str, Dict[str, Union[str, bool, int, float, None]]
-        ] = {}
-        expected_web_feedback_message_data: Dict[
-            str, Dict[str, Union[str, int, float, None]]
-        ] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1361,6 +1357,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_goals': learner_goals_data,
             'learner_group': expected_learner_group_model_data,
             'learner_groups_user': expected_learner_grp_user_model_data,
+            'lesson_feedback': lesson_feedback_model_data,
             'exploration_stats_task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
             'collection_progress': collection_progress_data,
@@ -1400,8 +1397,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             ),
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
-            'web_feedback_message': expected_web_feedback_message_data,
-            'web_feedback_thread': expected_web_feedback_thread_data,
         }
 
         # Perform export and compare.
@@ -1463,7 +1458,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         MULTIPLE_INSTANCES_PER_USER.
         """
         self.set_up_non_trivial()
-
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -1660,6 +1654,21 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def test_export_data_for_full_user_nontrivial_is_correct(self) -> None:
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
+        lesson_feedback_model = general_feedback_models.LessonFeedbackModel(
+            id=self.LESSON_FEEDBACK_ID_1,
+            author_id=self.USER_ID_1,
+            feedback_text=self.LESSON_FEEDBACK_TEXT_1,
+            status=feedback_models.STATUS_CHOICES_OPEN,
+            lesson_metadata_schema_version=(
+                feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
+            ),
+            lesson_metadata_json=self.LESSON_METADATA_JSON,
+            parent_feedback_id=self.PARENT_FEEDBACK_ID_1,
+            response_list=self.LESSON_FEEDBACK_RESPONSE_LIST,
+            unread_response_count=self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,
+        )
+        lesson_feedback_model.update_timestamps()
+        lesson_feedback_model.put()
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -2036,6 +2045,22 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 }
             ],
         }
+        expected_lesson_feedback_data = {
+            self.LESSON_FEEDBACK_ID_1: {
+                'feedback_text': self.LESSON_FEEDBACK_TEXT_1,
+                'status': feedback_models.STATUS_CHOICES_OPEN,
+                'lesson_metadata_json': self.LESSON_METADATA_JSON,
+                'parent_feedback_id': self.PARENT_FEEDBACK_ID_1,
+                'response_list': self.LESSON_FEEDBACK_RESPONSE_LIST,
+                'unread_response_count': self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,
+                'created_on_msec': utils.get_time_in_millisecs(
+                    lesson_feedback_model.created_on
+                ),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    lesson_feedback_model.last_updated
+                ),
+            }
+        }
 
         expected_translation_contribution_stats_data = {
             '%s.%s.%s'
@@ -2256,87 +2281,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'opportunity_id': self.EXPLORATION_IDS[0],
             }
         }
-        web_feedback_thread_id = (
-            general_feedback_models.WebFeedbackThreadModel.create(
-                category=self.WEB_FEEDBACK_CATEGORY,
-                page_url=self.WEB_FEEDBACK_PAGE_URL,
-                language_code=self.WEB_FEEDBACK_LANGUAGE_CODE,
-                rating=self.WEB_FEEDBACK_RATING,
-                target_type=self.WEB_FEEDBACK_TARGET_TYPE,
-                target_id=self.WEB_FEEDBACK_TARGET_ID,
-                has_screenshot=False,
-                has_session_info=False,
-                original_author_id=self.USER_ID_1,
-            )
-        )
-        general_feedback_models.WebFeedbackMessageModel.create(
-            thread_id=web_feedback_thread_id,
-            message_index=0,
-            author_status=general_feedback_models.AUTHOR_ROLE_LEARNER,
-            author_id=self.USER_ID_1,
-            text=self.WEB_FEEDBACK_TEXT,
-            screenshot_filename=None,
-            screenshot_entity_id=None,
-            updated_status=self.WEB_FEEDBACK_STATUS,
-        )
-        web_feedback_thread_model = (
-            general_feedback_models.WebFeedbackThreadModel.get_by_id(
-                web_feedback_thread_id
-            )
-        )
-        web_feedback_message_model = (
-            general_feedback_models.WebFeedbackMessageModel.get_by_id(
-                '%s.%d' % (web_feedback_thread_id, 0)
-            )
-        )
-        self.assertIsNotNone(web_feedback_thread_model)
-        self.assertIsNotNone(web_feedback_message_model)
-        if (
-            web_feedback_thread_model is None
-            or web_feedback_message_model is None
-        ):
-            raise AssertionError('Web feedback test models were not created.')
-        expected_web_feedback_thread_data: Dict[
-            str, Dict[str, Union[str, bool, int, float, None]]
-        ] = {
-            web_feedback_thread_model.id: {
-                'category': self.WEB_FEEDBACK_CATEGORY,
-                'target_type': self.WEB_FEEDBACK_TARGET_TYPE,
-                'page_url': self.WEB_FEEDBACK_PAGE_URL,
-                'language_code': self.WEB_FEEDBACK_LANGUAGE_CODE,
-                'rating': self.WEB_FEEDBACK_RATING,
-                'has_screenshot': False,
-                'has_session_info': False,
-                'session_info': None,
-                'status': self.WEB_FEEDBACK_STATUS,
-                'message_count': 0,
-                'created_on_msec': utils.get_time_in_millisecs(
-                    web_feedback_thread_model.created_on
-                ),
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    web_feedback_thread_model.last_updated
-                ),
-            }
-        }
-        expected_web_feedback_message_data: Dict[
-            str, Dict[str, Union[str, int, float, None]]
-        ] = {
-            web_feedback_message_model.id: {
-                'thread_id': web_feedback_thread_model.id,
-                'message_index': 0,
-                'author_status': general_feedback_models.AUTHOR_ROLE_LEARNER,
-                'text': self.WEB_FEEDBACK_TEXT,
-                'updated_status': self.WEB_FEEDBACK_STATUS,
-                'screenshot_filename': None,
-                'screenshot_entity_id': None,
-                'created_on_msec': utils.get_time_in_millisecs(
-                    web_feedback_message_model.created_on
-                ),
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    web_feedback_message_model.last_updated
-                ),
-            }
-        }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
@@ -2354,6 +2298,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_goals': expected_learner_goals_data,
             'learner_group': expected_learner_group_data,
             'learner_groups_user': expected_learner_groups_user_data,
+            'lesson_feedback': expected_lesson_feedback_data,
             'exploration_stats_task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
             'collection_progress': expected_collection_progress_data,
@@ -2397,8 +2342,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
             'blog_author_details': expected_blog_author_details,
-            'web_feedback_message': expected_web_feedback_message_data,
-            'web_feedback_thread': expected_web_feedback_thread_data,
         }
 
         with open(
