@@ -5,7 +5,7 @@
   position: relative;
 }
 
-.oppia-certificate-offering-available-page__hero-card {
+.oppia-certificate-offering-available-page-hero-card {
   align-items: flex-start;
   background: #fff;
   border: 1px solid #dce3ea;
@@ -18,51 +18,51 @@
   position: relative;
 }
 
-.oppia-certificate-offering-available-page__hero-image {
+.oppia-certificate-offering-available-page-hero-image {
   border-radius: 16px;
   flex: 0 0 280px;
   max-width: 280px;
   width: 280px;
 }
 
-.oppia-certificate-offering-available-page__hero-copy {
+.oppia-certificate-offering-available-page-hero-copy {
   flex: 1;
   padding-top: 12px;
   text-align: center;
 }
 
-.oppia-certificate-offering-available-page__exit-button {
+.oppia-certificate-offering-available-page-exit-button {
   position: absolute;
   right: 24px;
   top: 24px;
 }
 
-.oppia-certificate-offering-available-page__eyebrow {
+.oppia-certificate-offering-available-page-eyebrow {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.oppia-certificate-offering-available-page__summary {
+.oppia-certificate-offering-available-page-summary {
   margin: 0 auto;
   max-width: 620px;
 }
 
-.oppia-certificate-offering-available-page__panel {
+.oppia-certificate-offering-available-page-panel {
   margin: 28px auto 0;
   max-width: 820px;
   text-align: left;
 }
 
-.oppia-certificate-offering-available-page__panel h2 {
+.oppia-certificate-offering-available-page-panel h2 {
   margin-bottom: 20px;
 }
 
-.oppia-certificate-offering-available-page__tiles {
+.oppia-certificate-offering-available-page-tiles {
   display: grid;
   gap: 20px;
 }
 
-.oppia-certificate-offering-available-page__tile {
+.oppia-certificate-offering-available-page-tile {
   background: #fff;
   border: 1px solid #dce3ea;
   border-radius: 16px;
@@ -70,29 +70,29 @@
   padding: 24px;
 }
 
-.oppia-certificate-offering-available-page__tile-top {
+.oppia-certificate-offering-available-page-tile-top {
   align-items: flex-start;
   display: flex;
   gap: 16px;
   justify-content: space-between;
 }
 
-.oppia-certificate-offering-available-page__tile h3,
-.oppia-certificate-offering-available-page__tile-subtitle {
+.oppia-certificate-offering-available-page-tile h3,
+.oppia-certificate-offering-available-page-tile-subtitle {
   margin: 0;
 }
 
-.oppia-certificate-offering-available-page__tile h3 {
+.oppia-certificate-offering-available-page-tile h3 {
   font-size: 1.125rem;
   font-weight: 600;
 }
 
-.oppia-certificate-offering-available-page__tile-subtitle {
+.oppia-certificate-offering-available-page-tile-subtitle {
   color: #5b6472;
   margin-top: 4px;
 }
 
-.oppia-certificate-offering-available-page__status {
+.oppia-certificate-offering-available-page-status {
   background: #eef2f7;
   border-radius: 999px;
   color: #24324a;
@@ -101,12 +101,12 @@
   white-space: nowrap;
 }
 
-.oppia-certificate-offering-available-page__status--passed {
+.oppia-certificate-offering-available-page-status--passed {
   background: #e6f6ee;
   color: #11663a;
 }
 
-.oppia-certificate-offering-available-page__actions {
+.oppia-certificate-offering-available-page-actions {
   display: flex;
   gap: 12px;
   margin-top: 18px;
@@ -117,26 +117,26 @@
     padding: 24px 16px 56px;
   }
 
-  .oppia-certificate-offering-available-page__hero-card {
+  .oppia-certificate-offering-available-page-hero-card {
     flex-direction: column;
     padding-top: 72px;
   }
 
-  .oppia-certificate-offering-available-page__hero-image {
+  .oppia-certificate-offering-available-page-hero-image {
     max-width: 100%;
     width: 100%;
   }
 
-  .oppia-certificate-offering-available-page__hero-copy {
+  .oppia-certificate-offering-available-page-hero-copy {
     text-align: left;
   }
 
-  .oppia-certificate-offering-available-page__exit-button {
+  .oppia-certificate-offering-available-page-exit-button {
     position: static;
   }
 
-  .oppia-certificate-offering-available-page__tile-top,
-  .oppia-certificate-offering-available-page__actions {
+  .oppia-certificate-offering-available-page-tile-top,
+  .oppia-certificate-offering-available-page-actions {
     align-items: stretch;
     flex-direction: column;
   }

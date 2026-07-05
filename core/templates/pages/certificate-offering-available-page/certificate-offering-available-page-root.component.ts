@@ -46,6 +46,8 @@ export class AvailableCertificateOfferingPageRootComponent extends BaseRootCompo
   ) {
     super(pageHeadService, translateService);
     this.classroomUrlFragment =
-      activatedRoute.snapshot.paramMap.get('classroomUrlFragment') || '';
+      activatedRoute.snapshot.paramMap.get('classroomUrlFragment') ||
+      activatedRoute.snapshot.parent?.paramMap.get('classroomUrlFragment') ||
+      '';
   }
 }

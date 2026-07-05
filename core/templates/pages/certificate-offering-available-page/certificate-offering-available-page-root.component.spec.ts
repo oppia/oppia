@@ -69,4 +69,29 @@ describe('AvailableCertificateOfferingPageRootComponent', () => {
         .META as unknown as typeof component.meta
     );
   });
+
+  it('should read the classroom url fragment from the parent route when needed', () => {
+    const parentParamMapGetSpy = jasmine.createSpy().and.returnValue('math');
+    const activatedRoute = {
+      snapshot: {
+        paramMap: {
+          get: jasmine.createSpy().and.returnValue(null),
+        },
+        parent: {
+          paramMap: {
+            get: parentParamMapGetSpy,
+          },
+        },
+      },
+    } as ActivatedRoute;
+
+    component = new AvailableCertificateOfferingPageRootComponent(
+      {} as PageHeadService,
+      {} as TranslateService,
+      activatedRoute
+    );
+
+    expect(component.classroomUrlFragment).toBe('math');
+    expect(parentParamMapGetSpy).toHaveBeenCalledWith('classroomUrlFragment');
+  });
 });
