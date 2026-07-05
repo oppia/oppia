@@ -2204,9 +2204,7 @@ class BaseFeedbackModel(BaseModel):
         for _ in range(MAX_RETRIES):
             new_id = '%s.%s%s' % (
                 cls.ID_PREFIX,
-                utils.base64_from_int(
-                    int(utils.get_current_time_in_millisecs())
-                ),
+                utils.base64_from_int(int(utils.get_utc_time_in_millisecs())),
                 utils.base64_from_int(utils.get_random_int(RAND_RANGE)),
             )
             if not cls.get_by_id(new_id):
