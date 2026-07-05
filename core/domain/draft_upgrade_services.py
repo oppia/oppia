@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+import copy
 
 from core import utils
 from core.domain import (
@@ -350,7 +351,7 @@ class DraftUpgradeUtil:
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        for i, change in enumerate(draft_change_list):
+        for change_index, change in enumerate(draft_change_list):
             if (
                 change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
                 and change.property_name
@@ -362,16 +363,20 @@ class DraftUpgradeUtil:
                     exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
                     change,
                 )
-                new_value = edit_interaction_cust_args_cmd.new_value
+                new_value = copy.deepcopy(
+                    edit_interaction_cust_args_cmd.new_value
+                )
                 if 'allowExponentialNotation' not in new_value:
                     new_value['allowExponentialNotation'] = {'value': True}
-                    draft_change_list[i] = exp_domain.ExplorationChange(
-                        {
-                            'cmd': change.cmd,
-                            'property_name': change.property_name,
-                            'state_name': change.state_name,
-                            'new_value': new_value,
-                        }
+                    draft_change_list[change_index] = (
+                        exp_domain.ExplorationChange(
+                            {
+                                'cmd': change.cmd,
+                                'property_name': change.property_name,
+                                'state_name': change.state_name,
+                                'new_value': new_value,
+                            }
+                        )
                     )
         return draft_change_list
 
