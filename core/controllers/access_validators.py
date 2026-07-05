@@ -358,7 +358,9 @@ class PracticeSessionAccessValidationPage(
             if not isinstance(skill_ids, list) or not all(
                 isinstance(s, str) for s in skill_ids
             ):
-                raise self.InvalidInputException('Invalid skill IDs')
+                raise self.InvalidInputException('Invalid skill_ids')
+            if len(skill_ids) == 0:
+                raise self.InvalidInputException('Empty skill_ids provided.')
             try:
                 skill_fetchers.get_multi_skills(skill_ids)
             except Exception as e:
@@ -384,7 +386,7 @@ class PracticeSessionAccessValidationPage(
             )
             if is_legacy_path:
                 raise self.InvalidInputException(
-                    'No subtopic IDs provided for practice session.'
+                    'Expected skill_ids or selected_subtopic_ids.'
                 )
             # Mastery challenge - just validate topic access (done by decorator).
             return

@@ -90,6 +90,14 @@ class PracticeSessionsPageDataHandler(
         node_id = self.request.route_kwargs.get('node_id')
         arc_id = self.request.route_kwargs.get('arc_id')
 
+        if skill_ids is not None:
+            if not isinstance(skill_ids, list) or not all(
+                isinstance(s, str) for s in skill_ids
+            ):
+                raise self.InvalidInputException('Invalid skill_ids')
+            if len(skill_ids) == 0:
+                raise self.InvalidInputException('Empty skill_ids provided.')
+
         selected_skill_ids: List[str] = []
         if skill_ids is not None:
             selected_skill_ids = skill_ids

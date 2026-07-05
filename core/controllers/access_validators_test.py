@@ -344,6 +344,21 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
+    def test_get_fails_with_empty_skill_ids(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'skill_ids': '[]'},
+            expected_status_int=400,
+        )
+
+    def test_any_user_can_access_mastery_challenge_page(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/mastery-challenge'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            expected_status_int=200,
+        )
+
 
 class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 

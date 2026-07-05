@@ -736,6 +736,10 @@ MAX_AUDIO_FILE_LENGTH_SEC = 300
 # The maximum number of questions to be fetched at one time.
 MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 
+# The minimum number of questions required per skill before a story
+# referencing that skill can be published.
+MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH = 10
+
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10

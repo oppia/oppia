@@ -1630,20 +1630,40 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')
 
-    all_acquired_skill_ids = set()
-    for node in story.story_contents.nodes:
-        for skill_id in node.acquired_skill_ids:
-            all_acquired_skill_ids.add(skill_id)
-    for skill_id in all_acquired_skill_ids:
-        question_count = (
-            question_services.get_total_question_count_for_skill_ids([skill_id])
-        )
-        if question_count < 10:
-            raise utils.ValidationError(
-                'Skill %s has only %d questions. Each skill linked to a '
-                'story node must have at least 10 questions before '
-                'publishing.' % (skill_id, question_count)
+    # If the story has any already-published nodes, this is a re-publish
+    # (e.g. after editing an already-published story). In that case, skip
+    # the question-count check so that stories published before this
+    # validation existed can still be edited and re-published.
+    has_existing_published_nodes = any(
+        node.status == constants.STORY_NODE_STATUS_PUBLISHED
+        for node in story.story_contents.nodes
+    )
+    if not has_existing_published_nodes:
+        all_acquired_skill_ids = set()
+        for node in story.story_contents.nodes:
+            for skill_id in node.acquired_skill_ids:
+                all_acquired_skill_ids.add(skill_id)
+        # Note: this loop performs a datastore call per skill (N+1).
+        # Since story publishing is an infrequent admin operation and the
+        # number of skills per story is typically small (<=5), this is
+        # acceptable.
+        for skill_id in all_acquired_skill_ids:
+            question_count = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]
+                )
             )
+            if question_count < feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH:
+                raise utils.ValidationError(
+                    'Skill %s has only %d questions. Each skill linked to a '
+                    'story node must have at least %d questions before '
+                    'publishing.'
+                    % (
+                        skill_id,
+                        question_count,
+                        feconf.MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH,
+                    )
+                )
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])

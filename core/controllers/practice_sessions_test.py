@@ -199,6 +199,39 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
         self.assertEqual(response['error'], error_msg)
 
+    def test_get_fails_with_invalid_skill_ids_format(self) -> None:
+        self.get_json(
+            '%s/staging/%s?skill_ids=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '"not_a_list"',
+            ),
+            expected_status_int=400,
+        )
+
+    def test_get_fails_with_non_string_skill_ids(self) -> None:
+        self.get_json(
+            '%s/staging/%s?skill_ids=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '[1, 2]',
+            ),
+            expected_status_int=400,
+        )
+
+    def test_get_fails_with_empty_skill_ids(self) -> None:
+        self.get_json(
+            '%s/staging/%s?skill_ids=%s'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+                '[]',
+            ),
+            expected_status_int=400,
+        )
+
     def test_get_succeeds_with_valid_skill_ids(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s?skill_ids=%s'
