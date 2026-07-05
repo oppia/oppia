@@ -25,13 +25,31 @@ from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class CertificateAssessmentResponseCreateDict(TypedDict):
+    """Input needed to create a certificate assessment response."""
+
+    attempt_id: str
+    question_id: str
+    question_version: int
+    selected_answer: str
+    is_correct: bool
+
+
+CertificateAssessmentAttemptVersionDataValue = Union[
+    str,
+    int,
+    Dict[str, int],
+    Dict[str, List[str]],
+]
 
 
 class CertificateAssessmentOfferingSnapshotMetadataModel(
@@ -75,10 +93,10 @@ class CertificateAssessmentOfferingCommitLogEntryModel(
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user, but this isn't exported."""
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{'offering_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
-        )
+        return {
+            **super(cls, cls).get_export_policy(),
+            'offering_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
 
     @classmethod
     def get_instance_id(cls, offering_id: str, offering_version: int) -> str:
@@ -147,19 +165,17 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'classroom_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'total_questions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'time_limit_in_minutes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'demonstrates': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'async_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            },
-        )
+        return {
+            **super(cls, cls).get_export_policy(),
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'classroom_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_questions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_limit_in_minutes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'demonstrates': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'async_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
 
     @classmethod
     def _get_new_id(cls) -> str:
@@ -343,19 +359,17 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user."""
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'learner_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'total_score': base_models.EXPORT_POLICY.EXPORTED,
-                'attempt_index': base_models.EXPORT_POLICY.EXPORTED,
-                'attempt_data': base_models.EXPORT_POLICY.EXPORTED,
-                'version_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'started_at': base_models.EXPORT_POLICY.EXPORTED,
-                'finished_at': base_models.EXPORT_POLICY.EXPORTED,
-                'is_submitted': base_models.EXPORT_POLICY.EXPORTED,
-            },
-        )
+        return {
+            **super(cls, cls).get_export_policy(),
+            'learner_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_score': base_models.EXPORT_POLICY.EXPORTED,
+            'attempt_index': base_models.EXPORT_POLICY.EXPORTED,
+            'attempt_data': base_models.EXPORT_POLICY.EXPORTED,
+            'version_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'started_at': base_models.EXPORT_POLICY.EXPORTED,
+            'finished_at': base_models.EXPORT_POLICY.EXPORTED,
+            'is_submitted': base_models.EXPORT_POLICY.EXPORTED,
+        }
 
     @classmethod
     def _get_new_id(cls) -> str:
@@ -387,7 +401,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         total_score: float,
         attempt_index: int,
         attempt_data: Dict[str, Dict[str, int]],
-        version_data: Dict[str, object],
+        version_data: Dict[str, CertificateAssessmentAttemptVersionDataValue],
         started_at: datetime.datetime,
         finished_at: Optional[datetime.datetime],
         is_submitted: bool,
@@ -444,9 +458,7 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         required=True, indexed=False
     )
     # The answer selected by the learner.
-    selected_answer = datastore_services.StringProperty(
-        required=True, indexed=True
-    )
+    selected_answer = datastore_services.TextProperty(required=True)
     # Whether the selected answer was correct.
     is_correct = datastore_services.BooleanProperty(required=True, indexed=True)
 
@@ -470,16 +482,14 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         """Model contains data corresponding to a user, but this isn't
         exported directly since the model is not directly tied to a user.
         """
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'attempt_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'question_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'selected_answer': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'is_correct': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            },
-        )
+        return {
+            **super(cls, cls).get_export_policy(),
+            'attempt_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'selected_answer': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_correct': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
 
     @classmethod
     def _get_new_id(cls) -> str:
@@ -538,3 +548,33 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         response_instance.put()
 
         return response_instance
+
+    @classmethod
+    def create_multi(
+        cls,
+        response_dicts: List[CertificateAssessmentResponseCreateDict],
+    ) -> List[CertificateAssessmentResponseModel]:
+        """Creates and persists multiple certificate assessment responses.
+
+        Args:
+            response_dicts: list(CertificateAssessmentResponseCreateDict).
+                The response payloads to persist.
+
+        Returns:
+            list(CertificateAssessmentResponseModel). The newly created
+            response instances.
+        """
+        response_instances = [
+            cls(
+                id=cls._get_new_id(),
+                attempt_id=response_dict['attempt_id'],
+                question_id=response_dict['question_id'],
+                question_version=response_dict['question_version'],
+                selected_answer=response_dict['selected_answer'],
+                is_correct=response_dict['is_correct'],
+            )
+            for response_dict in response_dicts
+        ]
+        cls.update_timestamps_multi(response_instances)
+        cls.put_multi(response_instances)
+        return response_instances

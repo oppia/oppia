@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf, utils
+from core.domain import certificate_assessment_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -195,7 +196,12 @@ class CertificateAssessmentOfferingCommitLogEntryModelUnitTest(
 class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
     """Test the CertificateAssessmentAttemptModel class."""
 
-    def _get_sample_attempt_data(self):
+    def _get_sample_attempt_data(
+        self,
+    ) -> dict[
+        str,
+        certificate_assessment_domain.CertificateAssessmentAttemptTopicStatsDict,
+    ]:
         """Returns sample attempt_data for use in tests."""
         return {
             'topic_id_101': {
@@ -204,7 +210,11 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
             }
         }
 
-    def _get_sample_version_data(self):
+    def _get_sample_version_data(
+        self,
+    ) -> (
+        certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict
+    ):
         """Returns sample version_data for use in tests."""
         return {
             'certificate_id': 'cert_abc123',
@@ -293,18 +303,17 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
                 'The id generator for CertificateAssessmentAttemptModel '
                 'is producing too many collisions.'
             ),
-        ):
-            with get_by_id_swap, convert_to_hash_swap:
-                certificate_models.CertificateAssessmentAttemptModel.create(
-                    learner_id='learner_id_1',
-                    total_score=0.0,
-                    attempt_index=1,
-                    attempt_data=self._get_sample_attempt_data(),
-                    version_data=self._get_sample_version_data(),
-                    started_at=datetime.datetime.utcnow(),
-                    finished_at=None,
-                    is_submitted=False,
-                )
+        ), get_by_id_swap, convert_to_hash_swap:
+            certificate_models.CertificateAssessmentAttemptModel.create(
+                learner_id='learner_id_1',
+                total_score=0.0,
+                attempt_index=1,
+                attempt_data=self._get_sample_attempt_data(),
+                version_data=self._get_sample_version_data(),
+                started_at=datetime.datetime.utcnow(),
+                finished_at=None,
+                is_submitted=False,
+            )
 
 
 class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
@@ -348,6 +357,53 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(fetched_model.selected_answer, 'Option A')
         self.assertTrue(fetched_model.is_correct)
 
+    def test_create_multi_and_retrieve_lifecycle(self) -> None:
+        responses = (
+            certificate_models.CertificateAssessmentResponseModel.create_multi(
+                [
+                    {
+                        'attempt_id': 'attempt_id_1',
+                        'question_id': 'question_id_1',
+                        'question_version': 1,
+                        'selected_answer': 'Option A',
+                        'is_correct': True,
+                    },
+                    {
+                        'attempt_id': 'attempt_id_1',
+                        'question_id': 'question_id_2',
+                        'question_version': 1,
+                        'selected_answer': 'Option B',
+                        'is_correct': False,
+                    },
+                ]
+            )
+        )
+
+        self.assertEqual(len(responses), 2)
+        self.assertNotEqual(responses[0].id, responses[1].id)
+
+        fetched_models = (
+            certificate_models.CertificateAssessmentResponseModel.get_multi(
+                [response.id for response in responses]
+            )
+        )
+        self.assertEqual(
+            [fetched_model.attempt_id for fetched_model in fetched_models],
+            ['attempt_id_1', 'attempt_id_1'],
+        )
+        self.assertEqual(
+            [fetched_model.question_id for fetched_model in fetched_models],
+            ['question_id_1', 'question_id_2'],
+        )
+        self.assertEqual(
+            [fetched_model.selected_answer for fetched_model in fetched_models],
+            ['Option A', 'Option B'],
+        )
+        self.assertEqual(
+            [fetched_model.is_correct for fetched_model in fetched_models],
+            [True, False],
+        )
+
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         """Ensures the ID generator raises after exhausting retries."""
         get_by_id_swap = self.swap(
@@ -365,12 +421,11 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
                 'The id generator for CertificateAssessmentResponseModel '
                 'is producing too many collisions.'
             ),
-        ):
-            with get_by_id_swap, convert_to_hash_swap:
-                certificate_models.CertificateAssessmentResponseModel.create(
-                    attempt_id='attempt_id_1',
-                    question_id='question_id_1',
-                    question_version=1,
-                    selected_answer='Option A',
-                    is_correct=False,
-                )
+        ), get_by_id_swap, convert_to_hash_swap:
+            certificate_models.CertificateAssessmentResponseModel.create(
+                attempt_id='attempt_id_1',
+                question_id='question_id_1',
+                question_version=1,
+                selected_answer='Option A',
+                is_correct=False,
+            )

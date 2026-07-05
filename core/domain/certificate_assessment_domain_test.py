@@ -23,6 +23,8 @@ import datetime
 from core.domain import certificate_assessment_domain
 from core.tests import test_utils
 
+from typing import Dict
+
 
 class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
     """Tests for the CertificateAssessmentOffering domain object."""
@@ -260,7 +262,12 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
     SAMPLE_STARTED_AT = datetime.datetime(2026, 1, 1, 10, 0, 0)
     SAMPLE_FINISHED_AT = datetime.datetime(2026, 1, 1, 10, 20, 0)
 
-    def _get_sample_attempt_data(self):
+    def _get_sample_attempt_data(
+        self,
+    ) -> Dict[
+        str,
+        certificate_assessment_domain.CertificateAssessmentAttemptTopicStatsDict,
+    ]:
         """Returns sample attempt_data for use in tests."""
         return {
             'topic_place_values': {
@@ -273,7 +280,11 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
             },
         }
 
-    def _get_sample_version_data(self):
+    def _get_sample_version_data(
+        self,
+    ) -> (
+        certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict
+    ):
         """Returns sample version_data for use in tests."""
         return {
             'certificate_id': 'cert_abc123',
@@ -310,7 +321,9 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
             is_submitted=True,
         )
 
-    def _get_sample_attempt_dict(self):
+    def _get_sample_attempt_dict(
+        self,
+    ) -> certificate_assessment_domain.CertificateAssessmentAttemptDict:
         """Returns a dict matching the sample attempt above."""
         return {
             'attempt_id': 'attempt_abc123',
@@ -371,7 +384,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_non_numeric_total_score(self) -> None:
         attempt = self._get_sample_attempt()
-        attempt.total_score = '75'
+        setattr(attempt, 'total_score', '75')
         with self.assertRaisesRegex(
             Exception, 'total_score must be a non-negative number'
         ):
@@ -387,7 +400,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_empty_attempt_data(self) -> None:
         attempt = self._get_sample_attempt()
-        attempt.attempt_data = {}
+        setattr(attempt, 'attempt_data', {})
         with self.assertRaisesRegex(
             Exception,
             'attempt_data must contain stats for at least one topic',
@@ -396,9 +409,11 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_attempt_data_with_missing_keys(self) -> None:
         attempt = self._get_sample_attempt()
-        attempt.attempt_data = {
-            'topic_place_values': {'total_related_questions': 6}
-        }
+        setattr(
+            attempt,
+            'attempt_data',
+            {'topic_place_values': {'total_related_questions': 6}},
+        )
         with self.assertRaisesRegex(
             Exception,
             (
@@ -406,6 +421,65 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
                 '\'total_related_questions\' and '
                 '\'total_correct_questions\''
             ),
+        ):
+            attempt.validate()
+
+    def test_validate_rejects_attempt_data_with_extra_keys(self) -> None:
+        attempt = self._get_sample_attempt()
+        setattr(
+            attempt,
+            'attempt_data',
+            {
+                'topic_place_values': {
+                    'total_related_questions': 6,
+                    'total_correct_questions': 5,
+                    'extra_key': 1,
+                }
+            },
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            (
+                'attempt_data values must contain exactly '
+                '\'total_related_questions\' and '
+                '\'total_correct_questions\''
+            ),
+        ):
+            attempt.validate()
+
+    def test_validate_rejects_empty_topic_id_in_attempt_data(self) -> None:
+        attempt = self._get_sample_attempt()
+        setattr(
+            attempt,
+            'attempt_data',
+            {
+                '': {
+                    'total_related_questions': 6,
+                    'total_correct_questions': 5,
+                }
+            },
+        )
+        with self.assertRaisesRegex(
+            Exception, 'attempt_data must use non-empty strings as topic ids'
+        ):
+            attempt.validate()
+
+    def test_validate_rejects_non_string_topic_id_in_attempt_data(
+        self,
+    ) -> None:
+        attempt = self._get_sample_attempt()
+        setattr(
+            attempt,
+            'attempt_data',
+            {
+                1: {
+                    'total_related_questions': 6,
+                    'total_correct_questions': 5,
+                }
+            },
+        )
+        with self.assertRaisesRegex(
+            Exception, 'attempt_data must use non-empty strings as topic ids'
         ):
             attempt.validate()
 
@@ -459,11 +533,25 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
     def test_validate_rejects_version_data_missing_keys(self) -> None:
         attempt = self._get_sample_attempt()
         version_data = self._get_sample_version_data()
-        del version_data['question_versions']
-        attempt.version_data = version_data
+        setattr(
+            attempt,
+            'version_data',
+            {
+                'certificate_id': version_data['certificate_id'],
+                'certificate_version': version_data['certificate_version'],
+                'topic_versions': version_data['topic_versions'],
+                'question_topic_links': version_data['question_topic_links'],
+            },
+        )
         with self.assertRaisesRegex(
             Exception, 'version_data is missing required keys'
         ):
+            attempt.validate()
+
+    def test_validate_rejects_non_dict_version_data(self) -> None:
+        attempt = self._get_sample_attempt()
+        setattr(attempt, 'version_data', [])
+        with self.assertRaisesRegex(Exception, 'version_data must be a dict'):
             attempt.validate()
 
     def test_validate_rejects_empty_certificate_id_in_version_data(
@@ -472,7 +560,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
         attempt = self._get_sample_attempt()
         version_data = self._get_sample_version_data()
         version_data['certificate_id'] = ''
-        attempt.version_data = version_data
+        setattr(attempt, 'version_data', version_data)
         with self.assertRaisesRegex(
             Exception,
             'version_data.certificate_id must be a non-empty string',
@@ -483,7 +571,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
         attempt = self._get_sample_attempt()
         version_data = self._get_sample_version_data()
         version_data['certificate_version'] = 0
-        attempt.version_data = version_data
+        setattr(attempt, 'version_data', version_data)
         with self.assertRaisesRegex(
             Exception,
             'version_data.certificate_version must be a positive integer',
@@ -493,16 +581,42 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
     def test_validate_rejects_non_dict_topic_versions(self) -> None:
         attempt = self._get_sample_attempt()
         version_data = self._get_sample_version_data()
-        version_data['topic_versions'] = ['not', 'a', 'dict']
-        attempt.version_data = version_data
+        # Here we use MyPy ignore because this negative test intentionally
+        # assigns an invalid value to exercise the validator branch.
+        version_data['topic_versions'] = ['not', 'a', 'dict']  # type: ignore[typeddict-item]
+        setattr(attempt, 'version_data', version_data)
         with self.assertRaisesRegex(
             Exception, 'version_data.topic_versions must be a dict'
         ):
             attempt.validate()
 
+    def test_validate_rejects_non_dict_question_versions(self) -> None:
+        attempt = self._get_sample_attempt()
+        version_data = self._get_sample_version_data()
+        # Here we use MyPy ignore because this negative test intentionally
+        # assigns an invalid value to exercise the validator branch.
+        version_data['question_versions'] = ['not', 'a', 'dict']  # type: ignore[typeddict-item]
+        setattr(attempt, 'version_data', version_data)
+        with self.assertRaisesRegex(
+            Exception, 'version_data.question_versions must be a dict'
+        ):
+            attempt.validate()
+
+    def test_validate_rejects_non_dict_question_topic_links(self) -> None:
+        attempt = self._get_sample_attempt()
+        version_data = self._get_sample_version_data()
+        # Here we use MyPy ignore because this negative test intentionally
+        # assigns an invalid value to exercise the validator branch.
+        version_data['question_topic_links'] = ['not', 'a', 'dict']  # type: ignore[typeddict-item]
+        setattr(attempt, 'version_data', version_data)
+        with self.assertRaisesRegex(
+            Exception, 'version_data.question_topic_links must be a dict'
+        ):
+            attempt.validate()
+
     def test_validate_rejects_invalid_started_at(self) -> None:
         attempt = self._get_sample_attempt()
-        attempt.started_at = '2026-01-01'
+        setattr(attempt, 'started_at', '2026-01-01')
         with self.assertRaisesRegex(
             Exception, 'started_at must be a datetime.datetime instance'
         ):
@@ -510,7 +624,7 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_invalid_finished_at(self) -> None:
         attempt = self._get_sample_attempt()
-        attempt.finished_at = '2026-01-01'
+        setattr(attempt, 'finished_at', '2026-01-01')
         with self.assertRaisesRegex(
             Exception,
             'finished_at must be a datetime.datetime instance or None',
@@ -519,8 +633,10 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_finished_at_before_started_at(self) -> None:
         attempt = self._get_sample_attempt()
-        attempt.finished_at = self.SAMPLE_STARTED_AT - datetime.timedelta(
-            minutes=5
+        setattr(
+            attempt,
+            'finished_at',
+            self.SAMPLE_STARTED_AT - datetime.timedelta(minutes=5),
         )
         with self.assertRaisesRegex(
             Exception, 'finished_at cannot be earlier than started_at'
@@ -568,7 +684,9 @@ class CertificateAssessmentResponseTest(test_utils.GenericTestBase):
             is_correct=True,
         )
 
-    def _get_sample_response_dict(self):
+    def _get_sample_response_dict(
+        self,
+    ) -> certificate_assessment_domain.CertificateAssessmentResponseDict:
         """Returns a dict matching the sample response above."""
         return {
             'attempt_id': 'attempt_abc123',
@@ -613,9 +731,23 @@ class CertificateAssessmentResponseTest(test_utils.GenericTestBase):
         ):
             response.validate()
 
+        response = self._get_sample_response()
+        response.question_version = True
+        with self.assertRaisesRegex(
+            Exception, 'question_version must be a positive integer'
+        ):
+            response.validate()
+
     def test_validate_rejects_empty_selected_answer(self) -> None:
         response = self._get_sample_response()
         response.selected_answer = '   '
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be a non-empty string'
+        ):
+            response.validate()
+
+        response = self._get_sample_response()
+        setattr(response, 'selected_answer', None)
         with self.assertRaisesRegex(
             Exception, 'selected_answer must be a non-empty string'
         ):

@@ -319,6 +319,7 @@ class CertificateAssessmentAttempt:
         is_submitted: bool,
     ) -> None:
         """Initializes a CertificateAssessmentAttempt domain object.
+
         Args:
             attempt_id: str. The unique ID of this attempt. Corresponds
                 to the storage model ID.
@@ -350,11 +351,8 @@ class CertificateAssessmentAttempt:
         self.finished_at = finished_at
         self.is_submitted = is_submitted
 
-    def validate(self) -> None:
-        """Validates the CertificateAssessmentAttempt domain object.
-        Raises:
-            utils.ValidationError. If any field is invalid.
-        """
+    def _validate_ids_and_scores(self) -> None:
+        """Validates the attempt identity and score fields."""
         if not isinstance(self.attempt_id, str) or not self.attempt_id:
             raise utils.ValidationError(
                 'attempt_id must be a non-empty string.'
@@ -379,6 +377,9 @@ class CertificateAssessmentAttempt:
             raise utils.ValidationError(
                 'attempt_index must be a positive integer.'
             )
+
+    def _validate_attempt_data(self) -> None:
+        """Validates the per-topic attempt statistics."""
         if not isinstance(self.attempt_data, dict) or not self.attempt_data:
             raise utils.ValidationError(
                 'attempt_data must contain stats for at least one topic.'
@@ -423,6 +424,9 @@ class CertificateAssessmentAttempt:
                     'total_related_questions for any topic in '
                     'attempt_data.'
                 )
+
+    def _validate_version_data(self) -> None:
+        """Validates the captured certificate version snapshot."""
         if not isinstance(self.version_data, dict):
             raise utils.ValidationError('version_data must be a dict.')
         missing_keys = [
@@ -462,6 +466,9 @@ class CertificateAssessmentAttempt:
             raise utils.ValidationError(
                 'version_data.question_topic_links must be a dict.'
             )
+
+    def _validate_timestamps(self) -> None:
+        """Validates the attempt timestamps and submission flag."""
         if not isinstance(self.started_at, datetime.datetime):
             raise utils.ValidationError(
                 'started_at must be a datetime.datetime instance.'
@@ -479,9 +486,21 @@ class CertificateAssessmentAttempt:
         if not isinstance(self.is_submitted, bool):
             raise utils.ValidationError('is_submitted must be a boolean.')
 
+    def validate(self) -> None:
+        """Validates the CertificateAssessmentAttempt domain object.
+
+        Raises:
+            utils.ValidationError. If any field is invalid.
+        """
+        self._validate_ids_and_scores()
+        self._validate_attempt_data()
+        self._validate_version_data()
+        self._validate_timestamps()
+
     def to_dict(self) -> CertificateAssessmentAttemptDict:
         """Returns a dict representation of this
         CertificateAssessmentAttempt.
+
         Returns:
             CertificateAssessmentAttemptDict. A dictionary containing
             all fields of this domain object.
@@ -504,10 +523,12 @@ class CertificateAssessmentAttempt:
     ) -> CertificateAssessmentAttempt:
         """Returns a CertificateAssessmentAttempt domain object from a
         dict.
+
         Args:
             attempt_dict: CertificateAssessmentAttemptDict. A
                 dictionary containing all fields needed to construct a
                 CertificateAssessmentAttempt.
+
         Returns:
             CertificateAssessmentAttempt. The corresponding domain
             object.
@@ -549,6 +570,7 @@ class CertificateAssessmentResponse:
         is_correct: bool,
     ) -> None:
         """Initializes a CertificateAssessmentResponse domain object.
+
         Args:
             attempt_id: str. The ID of the attempt this response
                 belongs to.
@@ -566,6 +588,7 @@ class CertificateAssessmentResponse:
 
     def validate(self) -> None:
         """Validates the CertificateAssessmentResponse domain object.
+
         Raises:
             utils.ValidationError. If any field is invalid.
         """
@@ -598,6 +621,7 @@ class CertificateAssessmentResponse:
     def to_dict(self) -> CertificateAssessmentResponseDict:
         """Returns a dict representation of this
         CertificateAssessmentResponse.
+
         Returns:
             CertificateAssessmentResponseDict. A dictionary containing
             all fields of this domain object.
@@ -616,10 +640,12 @@ class CertificateAssessmentResponse:
     ) -> CertificateAssessmentResponse:
         """Returns a CertificateAssessmentResponse domain object from a
         dict.
+
         Args:
             response_dict: CertificateAssessmentResponseDict. A
                 dictionary containing all fields needed to construct a
                 CertificateAssessmentResponse.
+
         Returns:
             CertificateAssessmentResponse. The corresponding domain
             object.
