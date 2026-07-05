@@ -256,7 +256,7 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_USER = 'user'
 ENTITY_TYPE_CLASSROOM = 'classroom'
-ENTITY_TYPE_FEEDBACK_SCREENSHOT = 'feedback_screenshot'
+ENTITY_TYPE_FEEDBACK = 'feedback'
 
 DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
 DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
@@ -342,7 +342,7 @@ CURRENT_STATE_SCHEMA_VERSION = 57
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 6
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 7
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 5
@@ -383,6 +383,14 @@ CURRENT_SESSION_INFO_SCHEMA_VERSION = 1
 
 # This is the minimum version of the FeedbackSessionLogModel schema that is supported.
 MINIMUM_SESSION_INFO_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema Of Lesson Metadata
+# schema changes.
+CURRENT_LESSON_METADATA_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema Of Response List
+# schema changes.
+CURRENT_RESPONSE_LIST_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -657,7 +665,6 @@ EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
-EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_CD_USER = 'onboard_cd_user'
 EMAIL_INTENT_REMOVE_CD_USER = 'remove_cd_user'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
@@ -680,14 +687,6 @@ EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
 EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
-
-# Possible intents for email sent in bulk.
-BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
-BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
-BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
-BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
-BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
-BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
@@ -941,7 +940,6 @@ CONTRIBUTOR_OPPORTUNITIES_DATA_V2_URL = '/opportunitieshandlerv2'
 PINNED_OPPORTUNITIES_URL = '/pinned-opportunities'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
-CREATOR_FEEDBACK_HANDLER_URL = '/creator_feedback_handler'
 CSRF_HANDLER_URL = '/csrfhandler'
 CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
 CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
@@ -977,7 +975,6 @@ FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-GENERAL_FEEDBACK_SUBMISSION_URL = '/give_general_feedback'
 GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL = '/feedback_captcha_config_handler'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
@@ -1003,6 +1000,7 @@ LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
+LESSON_FEEDBACK_URL = '/feedback'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -1024,6 +1022,7 @@ PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice/session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
+PLATFORM_FEEDBACK_URL = '/platform-feedback'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
@@ -1703,7 +1702,7 @@ CONTRIBUTION_SUBTYPE_COORDINATE: Final = 'coordinate'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
-TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
+TRANSLATION_TEAM_LEAD = 'Aanuoluwapo Adeoti'
 QUESTION_TEAM_LEAD = 'Ryan Hsiao'
 
 # Suggestion fields that can be queried.
@@ -1869,3 +1868,76 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
         'regenerate_voiceovers_for_batch_contents'
     ),
 }
+
+# Allowed feedback thread statuses.
+STATUS_CHOICES_OPEN: Final = 'open'
+STATUS_CHOICES_FIXED: Final = 'fixed'
+STATUS_CHOICES_COMPLIMENT: Final = 'compliment'
+STATUS_CHOICES_NOT_ACTIONABLE: Final = 'not_actionable'
+STATUS_CHOICES_TRANSFERED_TO_GITHUB: Final = 'transferred_to_github'
+STATUS_CHOICES: Final = [
+    STATUS_CHOICES_OPEN,
+    STATUS_CHOICES_FIXED,
+    STATUS_CHOICES_COMPLIMENT,
+    STATUS_CHOICES_NOT_ACTIONABLE,
+    STATUS_CHOICES_TRANSFERED_TO_GITHUB,
+]
+
+# Allowed Report category choices.
+CATEGORY_TYPO: Final = 'typo'
+CATEGORY_BROKEN_LAYOUT_OR_IMAGE: Final = 'broken_layout_or_image'
+CATEGORY_CONFUSING_OR_INCORRECT_ANSWER: Final = 'confusing_or_incorrect_answer'
+CATEGORY_OTHER_OR_NOT_SURE: Final = 'other_or_not_sure'
+CATEGORY_CHOICES: Final = [
+    CATEGORY_TYPO,
+    CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+    CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
+    CATEGORY_OTHER_OR_NOT_SURE,
+]
+
+# Categories that route to the Creator Dashboard.
+CREATOR_DASHBOARD_CATEGORIES: Final = frozenset(
+    [
+        CATEGORY_TYPO,
+        CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
+    ]
+)
+
+# Report source choices.
+SOURCE_LESSON: Final = 'lesson'
+SOURCE_APP: Final = 'app'
+SOURCE_CHOICES: Final = [SOURCE_LESSON, SOURCE_APP]
+
+# Platform choices.
+PLATFORM_WEB: Final = 'web'
+PLATFORM_ANDROID: Final = 'android'
+PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
+
+# Destination choices.
+DESTINATION_CREATOR: Final = 'creator'
+DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
+DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
+DESTINATION_CHOICES: Final = [
+    DESTINATION_CREATOR,
+    DESTINATION_TECHNICAL_LEAP_TEAM,
+    DESTINATION_TECHNICAL_CORE_TEAM,
+]
+
+LEAP_DASHBOARD_PATHS = frozenset(
+    [
+        'about',
+        'community-library',
+        'contact',
+        'explore',
+        'learn',
+        'learner-dashboard',
+        'lesson',
+        'profile',
+        'partnerships',
+        'preferences',
+        'volunteer',
+        'teach',
+        'blog',
+        'donate',
+    ]
+)

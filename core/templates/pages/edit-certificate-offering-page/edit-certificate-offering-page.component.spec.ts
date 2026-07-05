@@ -43,6 +43,20 @@ describe('Edit Certificate Offering Page Component', () => {
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let ngbModal: NgbModal;
   let router: Router;
+  const alertsServiceMock = {
+    addWarning: () => {},
+    addSuccessMessage: () => {},
+  } as Pick<AlertsService, 'addWarning' | 'addSuccessMessage'>;
+  const certificateAssessmentOfferingBackendApiServiceMock = {
+    getCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
+    updateCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve('certificate_offering_id'),
+  } as Pick<
+    CertificateAssessmentOfferingBackendApiService,
+    | 'getCertificateAssessmentOfferingAsync'
+    | 'updateCertificateAssessmentOfferingAsync'
+  >;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -60,17 +74,11 @@ describe('Edit Certificate Offering Page Component', () => {
         },
         {
           provide: AlertsService,
-          useValue: {
-            addSuccessMessage: () => {},
-            addWarning: () => {},
-          },
+          useValue: alertsServiceMock,
         },
         {
           provide: CertificateAssessmentOfferingBackendApiService,
-          useValue: {
-            updateCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve('certificate_offering_id'),
-          },
+          useValue: certificateAssessmentOfferingBackendApiServiceMock,
         },
         {
           provide: NgbModal,
@@ -116,30 +124,80 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(component.certificateOfferingId).toEqual('certificate_offering_id');
   });
 
-  it('should populate the certificate assessment offering with an empty model', () => {
-    component.populateCertificateAssessmentOfferingFromId();
+  it('should populate the certificate assessment offering with an empty model', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.resolve(CertificateAssessmentOfferingData.createEmpty())
+    );
 
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(apiSpy).toHaveBeenCalledWith('certificate_offering_id');
     expect(component.certificateAssessmentOffering).toEqual(
       CertificateAssessmentOfferingData.createEmpty()
     );
-  });
+  }));
+
+  it('should populate the certificate assessment offering from backend data', fakeAsync(() => {
+    const fetchedOffering = new CertificateAssessmentOfferingData(
+      'certificate_offering_id',
+      'Loaded Title',
+      'Loaded Description',
+      'loaded_classroom',
+      {topic_1: 1},
+      3,
+      15,
+      [],
+      'Available',
+      1
+    );
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve(fetchedOffering));
+
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(component.certificateAssessmentOffering).toEqual(fetchedOffering);
+  }));
+
+  it('should warn and navigate away if loading the certificate offering fails', fakeAsync(() => {
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject(new Error('Backend error')));
+
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'The certificate offering could not be loaded.'
+    );
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
 
   it('should correctly evaluate active sections', () => {
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
-    expect(component.isDetailsSection()).toBeTrue();
-    expect(component.isAddTopicsSection()).toBeFalse();
-    expect(component.isReviewAndAvailabilitySection()).toBeFalse();
+    expect(component.isDetailsSection()).toBe(true);
+    expect(component.isAddTopicsSection()).toBe(false);
+    expect(component.isReviewAndAvailabilitySection()).toBe(false);
 
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
-    expect(component.isDetailsSection()).toBeFalse();
-    expect(component.isAddTopicsSection()).toBeTrue();
-    expect(component.isReviewAndAvailabilitySection()).toBeFalse();
+    expect(component.isDetailsSection()).toBe(false);
+    expect(component.isAddTopicsSection()).toBe(true);
+    expect(component.isReviewAndAvailabilitySection()).toBe(false);
 
     component.activeSection =
       CERTIFICATE_OFFERING_SECTION_IDS.REVIEW_AND_AVAILABILITY;
-    expect(component.isDetailsSection()).toBeFalse();
-    expect(component.isAddTopicsSection()).toBeFalse();
-    expect(component.isReviewAndAvailabilitySection()).toBeTrue();
+    expect(component.isDetailsSection()).toBe(false);
+    expect(component.isAddTopicsSection()).toBe(false);
+    expect(component.isReviewAndAvailabilitySection()).toBe(true);
   });
 
   it('should navigate to specific sections correctly', () => {

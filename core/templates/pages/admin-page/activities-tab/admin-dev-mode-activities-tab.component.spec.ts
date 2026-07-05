@@ -17,12 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {
-  async,
-  ComponentFixture,
-  TestBed,
-  waitForAsync,
-} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
@@ -103,7 +98,7 @@ describe('Admin dev mode activities tab', () => {
   };
   let mockConfirmResult: (val: boolean) => void;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
@@ -115,7 +110,7 @@ describe('Admin dev mode activities tab', () => {
     }).compileComponents();
   }));
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(AdminDevModeActivitiesTabComponent);
     component = fixture.componentInstance;
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
@@ -172,7 +167,7 @@ describe('Admin dev mode activities tab', () => {
       expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
-    it('should load explorations', async(() => {
+    it('should load explorations', waitForAsync(() => {
       const expId = component.demoExplorationIds[0];
 
       spyOn(adminBackendApiService, 'reloadExplorationAsync').and.returnValue(
@@ -195,7 +190,7 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
-    it('should not load explorations with wrong exploration ID', async(() => {
+    it('should not load explorations with wrong exploration ID', waitForAsync(() => {
       const expId = 'wrong-exp-id';
 
       spyOn(adminBackendApiService, 'reloadExplorationAsync').and.returnValue(
@@ -304,7 +299,7 @@ describe('Admin dev mode activities tab', () => {
       expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
-    it('should reload all explorations', async(() => {
+    it('should reload all explorations', waitForAsync(() => {
       const demoExplorationIds = ['expId'];
       component.demoExplorationIds = demoExplorationIds;
       component.reloadingAllExplorationPossible = true;
@@ -329,7 +324,7 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
-    it('should not reload all exploration if exploration ID is wrong', async(() => {
+    it('should not reload all exploration if exploration ID is wrong', waitForAsync(() => {
       const demoExplorationIds = ['wrongId'];
       component.demoExplorationIds = demoExplorationIds;
       component.reloadingAllExplorationPossible = true;
@@ -379,7 +374,7 @@ describe('Admin dev mode activities tab', () => {
       }
     );
 
-    it('should generate dummy explorations', async(() => {
+    it('should generate dummy explorations', waitForAsync(() => {
       component.numDummyExpsToPublish = 1;
       component.numDummyExpsToGenerate = 2;
 
@@ -404,7 +399,7 @@ describe('Admin dev mode activities tab', () => {
 
     it(
       'should show error message when dummy explorations' + 'are not generated',
-      async(() => {
+      waitForAsync(() => {
         component.numDummyExpsToPublish = 2;
         component.numDummyExpsToGenerate = 2;
 
@@ -474,7 +469,7 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateDummyBlogPost', () => {
-    it('should generate dummy blog post', async(() => {
+    it('should generate dummy blog post', waitForAsync(() => {
       spyOn(
         adminBackendApiService,
         'generateDummyBlogPostAsync'
@@ -496,7 +491,7 @@ describe('Admin dev mode activities tab', () => {
 
     it(
       'should show error message if new dummy blog post ' + 'title is empty',
-      async(() => {
+      waitForAsync(() => {
         spyOn(component.setStatusMessage, 'emit');
 
         component.generateNewBlogPost('');
@@ -509,7 +504,7 @@ describe('Admin dev mode activities tab', () => {
 
     it(
       'should show error message if new dummy blog post ' + 'is not generated',
-      async(() => {
+      waitForAsync(() => {
         spyOn(
           adminBackendApiService,
           'generateDummyBlogPostAsync'
@@ -532,7 +527,7 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.loadNewStructuresData', () => {
-    it('should generate structures data', async(() => {
+    it('should generate structures data', waitForAsync(() => {
       spyOn(
         adminBackendApiService,
         'generateDummyNewStructuresDataAsync'
@@ -553,7 +548,7 @@ describe('Admin dev mode activities tab', () => {
 
     it(
       'should show error message if new structues data' + 'is not generated',
-      async(() => {
+      waitForAsync(() => {
         spyOn(
           adminBackendApiService,
           'generateDummyNewStructuresDataAsync'
@@ -575,7 +570,7 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateNewSkillData', () => {
-    it('should generate structures data', async(() => {
+    it('should generate structures data', waitForAsync(() => {
       spyOn(
         adminBackendApiService,
         'generateDummyNewSkillDataAsync'
@@ -596,7 +591,7 @@ describe('Admin dev mode activities tab', () => {
 
     it(
       'should show error message if new structues data' + 'is not generated',
-      async(() => {
+      waitForAsync(() => {
         spyOn(
           adminBackendApiService,
           'generateDummyNewSkillDataAsync'
@@ -618,7 +613,7 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateNewClassroom', () => {
-    it('should generate classroom data', async(() => {
+    it('should generate classroom data', waitForAsync(() => {
       spyOn(
         adminBackendApiService,
         'generateDummyClassroomDataAsync'
@@ -641,7 +636,7 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
-    it('should show error message if new classroom data is not generated', async(() => {
+    it('should show error message if new classroom data is not generated', waitForAsync(() => {
       spyOn(
         adminBackendApiService,
         'generateDummyClassroomDataAsync'
@@ -688,7 +683,7 @@ describe('Admin dev mode activities tab', () => {
       }
     );
 
-    it('should generate dummy explorations', async(() => {
+    it('should generate dummy explorations', waitForAsync(() => {
       component.numDummyExpsToPublish = 1;
       component.numDummyExpsToGenerate = 2;
 
@@ -711,7 +706,7 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
-    it('should show error message when dummy explorations are not generated', async(() => {
+    it('should show error message when dummy explorations are not generated', waitForAsync(() => {
       component.numDummyExpsToPublish = 2;
       component.numDummyExpsToGenerate = 2;
 
@@ -906,7 +901,7 @@ describe('Admin dev mode activities tab', () => {
       expect(adminBackendSpy).not.toHaveBeenCalled();
     });
 
-    it('should reload collection', async(() => {
+    it('should reload collection', waitForAsync(() => {
       spyOn(adminBackendApiService, 'reloadCollectionAsync').and.returnValue(
         Promise.resolve()
       );
@@ -927,7 +922,7 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
-    it('should show error message is collection is not reloaded', async(() => {
+    it('should show error message is collection is not reloaded', waitForAsync(() => {
       const wrongCollectionId = 'wrongCollectionId';
 
       spyOn(adminBackendApiService, 'reloadCollectionAsync').and.returnValue(

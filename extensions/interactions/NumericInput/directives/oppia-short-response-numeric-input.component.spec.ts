@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the NumericInput short response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseNumericInput} from './oppia-short-response-numeric-input.component';
 import {NumberConversionService} from 'services/number-conversion.service';
@@ -37,7 +37,7 @@ describe('ShortResponseNumericInput', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ShortResponseNumericInput],
       providers: [
