@@ -1230,14 +1230,448 @@ describe('Story update service', () => {
       'updateEntityEditorBrowserTabsInfo'
     ).and.callFake(() => {});
 
-    expect(
-      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ).toBeFalse();
+    expect(storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()).toBe(
+      false
+    );
 
     storyUpdateService.setStoryDescription(_sampleStory, 'new description');
 
-    expect(
-      storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ).toBeTrue();
+    expect(storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()).toBe(
+      true
+    );
+  });
+
+  it('should create/delete an arc in the story', () => {
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      ['node_1']
+    );
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
+      'Description 1'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+    ]);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
+  });
+
+  it('should create a proper backend change dict for creating an arc', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      ['node_1']
+    );
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'create_arc',
+        arc_id: 'arc_1',
+        title: 'Arc 1',
+        description: 'Description 1',
+        node_ids: ['node_1'],
+      },
+    ]);
+  });
+
+  it('should restore a deleted arc on undo', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      ['node_1']
+    );
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
+
+    storyUpdateService.deleteArc(_sampleStory, 'arc_1');
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
+      'Description 1'
+    );
+  });
+
+  it('should create a proper backend change dict for deleting an arc', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    storyUpdateService.deleteArc(_sampleStory, 'arc_1');
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'create_arc',
+        arc_id: 'arc_1',
+        title: 'Arc 1',
+        description: 'Description 1',
+        node_ids: [],
+      },
+      {
+        cmd: 'delete_arc',
+        arc_id: 'arc_1',
+      },
+    ]);
+  });
+
+  it('should rename an arc in the story', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+
+    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Arc Title');
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'New Arc Title'
+    );
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+  });
+
+  it('should create a proper backend change dict for renaming an arc', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Arc Title');
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'create_arc',
+        arc_id: 'arc_1',
+        title: 'Arc 1',
+        description: 'Description 1',
+        node_ids: [],
+      },
+      {
+        cmd: 'rename_arc',
+        arc_id: 'arc_1',
+        new_title: 'New Arc Title',
+      },
+    ]);
+  });
+
+  it('should update arc title property', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+
+    storyUpdateService.updateArcProperty(
+      _sampleStory,
+      'arc_1',
+      'title',
+      'Arc 1',
+      'New Title'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'New Title'
+    );
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+  });
+
+  it('should update arc description property', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
+      'Description 1'
+    );
+
+    storyUpdateService.updateArcProperty(
+      _sampleStory,
+      'arc_1',
+      'description',
+      'Description 1',
+      'New Description'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
+      'New Description'
+    );
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
+      'Description 1'
+    );
+  });
+
+  it(
+    'should create a proper backend change dict for updating an arc ' +
+      'property',
+    () => {
+      storyUpdateService.createArc(
+        _sampleStory,
+        'arc_1',
+        'Arc 1',
+        'Description 1',
+        []
+      );
+      storyUpdateService.updateArcProperty(
+        _sampleStory,
+        'arc_1',
+        'title',
+        'Arc 1',
+        'New Title'
+      );
+      expect(undoRedoService.getCommittableChangeList()).toEqual([
+        {
+          cmd: 'create_arc',
+          arc_id: 'arc_1',
+          title: 'Arc 1',
+          description: 'Description 1',
+          node_ids: [],
+        },
+        {
+          cmd: 'update_arc_property',
+          arc_id: 'arc_1',
+          property_name: 'title',
+          old_value: 'Arc 1',
+          new_value: 'New Title',
+        },
+      ]);
+    }
+  );
+
+  it('should throw error when updating property of non-existent arc', () => {
+    expect(() => {
+      storyUpdateService.updateArcProperty(
+        _sampleStory,
+        'non_existent',
+        'title',
+        'old',
+        'new'
+      );
+    }).toThrowError("The given arc doesn't exist");
+  });
+
+  it('should throw error when updating arc with invalid property name', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+
+    expect(() => {
+      storyUpdateService.updateArcProperty(
+        _sampleStory,
+        'arc_1',
+        'invalid_prop',
+        'old',
+        'new'
+      );
+    }).toThrowError('Invalid arc property');
+  });
+
+  it('should rearrange arcs in the story', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_2',
+      'Arc 2',
+      'Description 2',
+      []
+    );
+
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
+    expect(_sampleStory.getStoryContents().getArcs()[1].getId()).toBe('arc_2');
+
+    storyUpdateService.rearrangeArcs(_sampleStory, ['arc_2', 'arc_1']);
+
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_2');
+    expect(_sampleStory.getStoryContents().getArcs()[1].getId()).toBe('arc_1');
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
+    expect(_sampleStory.getStoryContents().getArcs()[1].getId()).toBe('arc_2');
+  });
+
+  it('should create a proper backend change dict for rearranging arcs', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      []
+    );
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_2',
+      'Arc 2',
+      'Description 2',
+      []
+    );
+    storyUpdateService.rearrangeArcs(_sampleStory, ['arc_2', 'arc_1']);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'create_arc',
+        arc_id: 'arc_1',
+        title: 'Arc 1',
+        description: 'Description 1',
+        node_ids: [],
+      },
+      {
+        cmd: 'create_arc',
+        arc_id: 'arc_2',
+        title: 'Arc 2',
+        description: 'Description 2',
+        node_ids: [],
+      },
+      {
+        cmd: 'rearrange_arcs',
+        arc_ids_order: ['arc_2', 'arc_1'],
+      },
+    ]);
+  });
+
+  it('should move a node to a different arc', () => {
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Arc 1',
+      'Description 1',
+      ['node_1', 'node_2']
+    );
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_2',
+      'Arc 2',
+      'Description 2',
+      []
+    );
+
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+      'node_2',
+    ]);
+    expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual(
+      []
+    );
+
+    storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_2');
+
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_2',
+    ]);
+    expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual([
+      'node_1',
+    ]);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+      'node_2',
+    ]);
+    expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual(
+      []
+    );
+  });
+
+  it(
+    'should create a proper backend change dict for moving a node to an ' +
+      'arc',
+    () => {
+      storyUpdateService.createArc(
+        _sampleStory,
+        'arc_1',
+        'Arc 1',
+        'Description 1',
+        ['node_1', 'node_2']
+      );
+      storyUpdateService.createArc(
+        _sampleStory,
+        'arc_2',
+        'Arc 2',
+        'Description 2',
+        []
+      );
+      storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_2');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([
+        {
+          cmd: 'create_arc',
+          arc_id: 'arc_1',
+          title: 'Arc 1',
+          description: 'Description 1',
+          node_ids: ['node_1', 'node_2'],
+        },
+        {
+          cmd: 'create_arc',
+          arc_id: 'arc_2',
+          title: 'Arc 2',
+          description: 'Description 2',
+          node_ids: [],
+        },
+        {
+          cmd: 'move_node_to_arc',
+          node_id: 'node_1',
+          to_arc_id: 'arc_2',
+        },
+      ]);
+    }
+  );
+
+  it('should keep node in target arc on undo when old arc is missing', () => {
+    storyUpdateService.createArc(_sampleStory, 'arc_1', 'Arc 1', 'Desc', []);
+
+    storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_1');
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+    ]);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+    ]);
   });
 });
