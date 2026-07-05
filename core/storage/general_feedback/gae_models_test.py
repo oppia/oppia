@@ -99,6 +99,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.EXPORTED,
                 'status': base_models.EXPORT_POLICY.EXPORTED,
+                'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
@@ -163,6 +164,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         expected = {
             'feedback_text': FEEDBACK_TEXT,
             'status': feconf.STATUS_CHOICES_OPEN,
+            'exploration_id': LESSON_METADATA_JSON['exploration_id'],
             'lesson_metadata_json': LESSON_METADATA_JSON,
             'parent_feedback_id': None,
             'response_list': [],
@@ -312,6 +314,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),

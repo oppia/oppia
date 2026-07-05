@@ -2077,6 +2077,8 @@ class BaseFeedbackModel(BaseModel):
         feedback_text: str. The main text body submitted by the learner.
         status: str. Current moderation status of the feedback entry
             (open | closed | ignored | not_actionable).
+        exploration_id: Optional[str]. ID of the exploration, or None for
+            site-level (non-lesson) submissions.
         lesson_metadata_schema_version: Optional[int]. Schema version for the
             lesson_metadata_json blob. Allows future migrations.
         lesson_metadata_json: Optional[Dict]. Lesson Metadata at
@@ -2107,6 +2109,10 @@ class BaseFeedbackModel(BaseModel):
         required=True,
         indexed=True,
         choices=feconf.STATUS_CHOICES,
+    )
+    exploration_id = datastore_services.StringProperty(
+        required=False,
+        indexed=True,
     )
     lesson_metadata_schema_version = datastore_services.IntegerProperty(
         required=False,
