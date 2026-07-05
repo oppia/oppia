@@ -382,6 +382,25 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             )
 
     @classmethod
+    def _get_filtered_query(
+        cls, destination_dashboard: str, platform: str, source: str, **kwargs
+    ):
+        """
+        Returns a filtered query based on the given parameters.
+        """
+        query = super()._get_filtered_query(**kwargs)
+
+        if destination_dashboard:
+            query = query.filter(
+                cls.destination_dashboard == destination_dashboard
+            )
+        if platform:
+            query = query.filter(cls.platform == platform)
+        if source:
+            query = query.filter(cls.source == source)
+        return query
+
+    @classmethod
     def create(
         cls,
         feedback_text: str,

@@ -386,6 +386,9 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the Technical Feedback Dashboard, allowing '
             'LEAP and CORE tech leads/co-leads to review and manage '
             'technical feedback submitted by learners.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
     FeatureNames.STORY_EDITOR_ARCS.value: (
         (
             'This flag enables arc-based chapter groupings in the story editor, '

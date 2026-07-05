@@ -2077,6 +2077,8 @@ class BaseFeedbackModel(BaseModel):
         feedback_text: str. The main text body submitted by the learner.
         status: str. Current moderation status of the feedback entry
             (open | closed | ignored | not_actionable).
+        exploration_id: Optional[str]. ID of the exploration to which the
+            feedback pertains, or None for site-level (non-lesson) submissions.
         lesson_metadata_schema_version: Optional[int]. Schema version for the
             lesson_metadata_json blob. Allows future migrations.
         lesson_metadata_json: Optional[Dict]. Lesson Metadata at
@@ -2107,6 +2109,10 @@ class BaseFeedbackModel(BaseModel):
         required=True,
         indexed=True,
         choices=feconf.STATUS_CHOICES,
+    )
+    exploration_id = datastore_services.StringProperty(
+        required=False,
+        indexed=True,
     )
     lesson_metadata_schema_version = datastore_services.IntegerProperty(
         required=False,
@@ -2214,3 +2220,75 @@ class BaseFeedbackModel(BaseModel):
         raise Exception(
             '%s ID generator is producing too many collisions.' % cls.__name__
         )
+
+    @classmethod
+    def _get_filtered_query(
+        cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+    ) -> datastore_services.Query:
+        """Returns a query object filtered by the given parameters.
+
+        Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime.datetime]. If provided, filters for
+                entries created on or after this date.
+            date_to: Optional[datetime.datetime]. If provided, filters for
+                entries created on or before this date.
+
+        Returns:
+            Query. The filtered query object.
+        """
+        query = cls.query()
+        # Ignoring deleted threads as they are not relevant for operations.
+        query = query.filter(cls.deleted.IN([False]))
+
+        if author_id is not None:
+            query = query.filter(cls.author_id == author_id)
+        if status_filter and status_filter in feconf.STATUS_CHOICES:
+            query = query.filter(cls.status == status_filter)
+        if exploration_id is not None:
+            query = query.filter(cls.exploration_id == exploration_id)
+        if date_from is not None:
+            query = query.filter(cls.created_on >= date_from)
+        if date_to is not None:
+            query = query.filter(cls.created_on <= date_to)
+
+        return query
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        cursor: Optional[str] = None,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = None,
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+    ) -> tuple[Sequence['BaseFeedbackModel'], Optional[str], bool]:
+        """Fetches a page of feedback entries sorted by created_on_desc."""
+        query = cls._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+        ).order(-cls.created_on)
+
+        start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
+        results: Sequence[BaseFeedbackModel]
+        results, next_cursor, more = query.fetch_page(
+            page_size, start_cursor=start_cursor
+        )
+
+        next_cursor_str = None
+        if next_cursor and more:
+            next_cursor_str = next_cursor.urlsafe()
+        return results, next_cursor_str, more
