@@ -194,6 +194,7 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   signIn(): void {
+    window.sessionStorage.setItem('reopenLessonFeedbackModal', 'true');
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         (
@@ -251,12 +252,13 @@ export class FeedbackModalComponent implements OnInit {
     }
 
     if (this.feedbackText.length > this.MAX_REPORT_MESSAGE_LENGTH) {
-      this.formError =
-        'Your description is a bit too long (' +
-        this.feedbackText.length +
-        '/' +
-        this.MAX_REPORT_MESSAGE_LENGTH +
-        ' characters). Please shorten it slightly so our team can review it quickly!';
+      this.formError = this.translateService.instant(
+        'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG',
+        {
+          length: this.feedbackText.length,
+          maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
+        }
+      );
       return false;
     }
 
@@ -266,11 +268,10 @@ export class FeedbackModalComponent implements OnInit {
       !this.captchaToken
     ) {
       this.captchaSubmitError = this.translateService.instant(
-        'I18N_LESSON_FEEDBACK_CAPTCHA_REQUIRED'
+        'I18N_FEEDBACK_CAPTCHA_REQUIRED'
       );
       return false;
     }
-
     this.formError = null;
     return true;
   }

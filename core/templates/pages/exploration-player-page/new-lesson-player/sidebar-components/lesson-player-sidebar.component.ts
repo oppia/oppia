@@ -72,6 +72,13 @@ export class LessonPlayerSidebarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const shouldOpen = window.sessionStorage.getItem(
+      'reopenLessonFeedbackModal'
+    );
+    if (shouldOpen) {
+      this.showSendLessonFeedbackModal();
+      window.sessionStorage.removeItem('reopenLessonFeedbackModal');
+    }
     this.mobileMenuService.getMenuVisibility().subscribe(visibility => {
       this.mobileMenuVisible = visibility;
     });

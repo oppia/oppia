@@ -20,7 +20,20 @@ from typing import Dict, List, Optional, TypedDict
 
 
 class LessonMetadataDict(TypedDict):
-    """Lesson metadata captured at feedback or report submission time."""
+    """Lesson metadata captured when lesson feedback is submitted.
+
+    Attributes:
+        exploration_id: ID of the exploration where the feedback was
+            submitted.
+        exploration_version: Version of the exploration viewed by the learner.
+        state_name: Name of the exploration state (card) where the learner
+            submitted the feedback.
+        state_index: Position of the displayed exploration card at the time
+            the feedback was submitted. This helps reviewers identify the
+            lesson context in which the learner submitted the feedback.
+        learner_current_answer: The learner's current answer for the state, if
+            available.
+    """
 
     exploration_id: str
     exploration_version: int
@@ -28,6 +41,15 @@ class LessonMetadataDict(TypedDict):
     state_index: int
     learner_current_answer: Optional[str]
 
+class LessonFeedbackResponseDict(TypedDict):
+    """A single creator response entry as included in takeout exports.
+
+    Note: responded_by is intentionally excluded; it is stored on the model
+    for internal use but stripped before any user-facing export.
+    """
+
+    response_text: str
+    responded_on: float
 
 class LessonFeedbackResponseDict(TypedDict):
     """A single creator response entry as included in takeout exports.
@@ -50,8 +72,7 @@ class LessonFeedbackDict(TypedDict):
     lesson_metadata: LessonMetadataDict
     parent_feedback_id: Optional[str]
     response_list: List[LessonFeedbackResponseDict]
-    response_count: int
-    seen_response_count: int
+    unread_response_count: int
     created_on_msecs: float
 
 
@@ -116,8 +137,7 @@ class LessonFeedback:
         response_list: List[LessonFeedbackResponseDict]. Ordered list of
             creator responses. Each entry exposes only response_text and
             responded_on (responded_by is stored internally and never exported).
-        response_count: int. Total number of creator responses.
-        seen_response_count: int. Number of responses the learner has seen.
+        unread_response_count: int. Total number of creator responses that have not yet been marked as read by the learner.
         created_on_msecs: float. Creation timestamp in milliseconds.
     """
 
@@ -129,8 +149,7 @@ class LessonFeedback:
         status: str,
         lesson_metadata: LessonMetadataDict,
         response_list: List[LessonFeedbackResponseDict],
-        response_count: int,
-        seen_response_count: int,
+        unread_response_count: int,
         created_on_msecs: float,
         parent_feedback_id: Optional[str] = None,
     ) -> None:
@@ -141,8 +160,7 @@ class LessonFeedback:
         self.lesson_metadata = lesson_metadata
         self.parent_feedback_id = parent_feedback_id
         self.response_list = response_list
-        self.response_count = response_count
-        self.seen_response_count = seen_response_count
+        self.unread_response_count = unread_response_count
         self.created_on_msecs = created_on_msecs
 
     def to_dict(self) -> LessonFeedbackDict:
@@ -159,8 +177,7 @@ class LessonFeedback:
             'lesson_metadata': self.lesson_metadata,
             'parent_feedback_id': self.parent_feedback_id,
             'response_list': self.response_list,
-            'response_count': self.response_count,
-            'seen_response_count': self.seen_response_count,
+            'unread_response_count': self.unread_response_count,
             'created_on_msecs': self.created_on_msecs,
         }
 

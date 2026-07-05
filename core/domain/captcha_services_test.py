@@ -36,16 +36,19 @@ class CaptchaServicesTests(test_utils.GenericTestBase):
     """Tests for captcha services."""
 
     def test_get_turnstile_site_key_in_dev_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
-            with self.swap(constants, 'EMULATOR_MODE', False):
-                self.assertEqual(
-                    '1x00000000000000000000AA',
-                    captcha_services.get_turnstile_site_key(),
-                )
+        with self.swap(constants, 'EMULATOR_MODE', True):
+            self.assertEqual(
+                '1x00000000000000000000AA',
+                captcha_services.get_turnstile_site_key(),
+            )
 
-    def test_get_turnstile_site_key_in_emulator_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(constants, 'EMULATOR_MODE', True):
+    def test_get_turnstile_site_key_in_prod_mode(self) -> None:
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            with self.swap(
+                secrets_services,
+                'get_secret',
+                mock.Mock(return_value='site-key'),
+            ):
                 self.assertEqual(
                     '1x00000000000000000000AA',
                     captcha_services.get_turnstile_site_key(),
@@ -66,7 +69,7 @@ class CaptchaServicesTests(test_utils.GenericTestBase):
     def test_verify_turnstile_token_returns_false_when_secret_is_missing(
         self,
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             with self.swap(
                 secrets_services, 'get_secret', mock.Mock(return_value=None)
             ):
@@ -88,7 +91,7 @@ class CaptchaServicesTests(test_utils.GenericTestBase):
         ).encode('utf-8')
         mock_http_response.__enter__.return_value = mock_http_response
 
-        with self.swap(constants, 'DEV_MODE', True):
+        with self.swap(constants, 'EMULATOR_MODE', True):
             with mock.patch.object(
                 urllib_request, 'urlopen', return_value=mock_http_response
             ):
@@ -105,7 +108,7 @@ class CaptchaServicesTests(test_utils.GenericTestBase):
         ).encode('utf-8')
         mock_http_response.__enter__.return_value = mock_http_response
 
-        with self.swap(constants, 'DEV_MODE', True):
+        with self.swap(constants, 'EMULATOR_MODE', True):
             with mock.patch.object(
                 urllib_request, 'urlopen', return_value=mock_http_response
             ):
@@ -116,7 +119,7 @@ class CaptchaServicesTests(test_utils.GenericTestBase):
     def test_verify_turnstile_token_returns_false_when_exception_occurs(
         self,
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with self.swap(constants, 'EMULATOR_MODE', True):
             with mock.patch.object(
                 urllib_request,
                 'urlopen',

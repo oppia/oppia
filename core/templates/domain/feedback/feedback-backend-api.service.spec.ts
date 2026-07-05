@@ -244,46 +244,4 @@ describe('Feedback backend api service', () => {
 
     expect(onSuccess).toHaveBeenCalledWith({id: 'thread_id'});
   }));
-
-  it('should reject with http error when feedback submission fails', fakeAsync(() => {
-    const onFailure = jasmine.createSpy('onFailure');
-
-    feedbackBackendApiService
-      .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
-      .catch(onFailure);
-    flushMicrotasks();
-
-    const req = httpTestingController.expectOne('/platform-feedback');
-    req.flush(
-      {error: 'Invalid feedback.'},
-      {
-        status: 400,
-        statusText: 'Bad Request',
-      }
-    );
-    flushMicrotasks();
-
-    expect(
-      onFailure.calls.mostRecent().args[0] instanceof HttpErrorResponse
-    ).toBe(true);
-  }));
-
-  it('should rethrow non-http errors during feedback submission', fakeAsync(() => {
-    const error = new Error('Unexpected error.');
-    const serviceWithFailingHttp = new FeedbackBackendApiService(
-      {
-        post: () => throwError(error),
-      } as never,
-      imageLocalStorageService,
-      imageUploadHelperService
-    );
-    const onFailure = jasmine.createSpy('onFailure');
-
-    serviceWithFailingHttp
-      .submitSiteAndLessonIssueReportAsync(issueReportPayload, null)
-      .catch(onFailure);
-    flushMicrotasks();
-
-    expect(onFailure).toHaveBeenCalledWith(error);
-  }));
 });

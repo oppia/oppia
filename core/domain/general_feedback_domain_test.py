@@ -63,8 +63,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             'lesson_metadata': LESSON_METADATA,
             'parent_feedback_id': 'parent_feedback_id',
             'response_list': RESPONSE_LIST,
-            'response_count': 2,
-            'seen_response_count': 1,
+            'unread_response_count': 0,
             'created_on_msecs': 1700000000000.0,
         }
 
@@ -76,8 +75,7 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
             lesson_metadata=LESSON_METADATA,
             parent_feedback_id='parent_feedback_id',
             response_list=RESPONSE_LIST,
-            response_count=2,
-            seen_response_count=1,
+            unread_response_count=0,
             created_on_msecs=1700000000000.0,
         )
 

@@ -154,9 +154,9 @@ export class PlatformFeedbackModel {
 export type FeedbackStatus =
   | 'open'
   | 'fixed'
-  | 'ignored'
   | 'compliment'
-  | 'not_actionable';
+  | 'not_actionable'
+  | 'transferred_to_github';
 
 export interface FeedbackSessionInfo {
   console_logs_json: {

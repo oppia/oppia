@@ -36,6 +36,7 @@ export class FeedbackSessionInfoService {
   private static readonly MAX_FAILED_REQUESTS = 25;
   private static readonly MAX_NAVIGATION_ENTRIES = 5;
   private static readonly MAX_STACK_TRACE_LENGTH = 4000;
+  private static readonly MAX_ERROR_MESSAGE_LENGTH = 1000;
   private static consolePatched = false;
   private static activeInstance: FeedbackSessionInfoService | null = null;
   private recentConsoleErrors: FeedbackSessionInfo['console_logs_json'] = [];
@@ -114,7 +115,7 @@ export class FeedbackSessionInfoService {
       return String(value);
     }
     if (value instanceof Error) {
-      return value.stack ?? value.message;
+      return value.toString();
     }
     if (typeof value === 'object') {
       if (seenObjects.has(value)) {
@@ -128,7 +129,7 @@ export class FeedbackSessionInfoService {
           seenObjects.add(nestedValue);
         }
         if (nestedValue instanceof Error) {
-          return nestedValue.stack ?? nestedValue.message;
+          return nestedValue.toString();
         }
         return nestedValue;
       });
@@ -181,7 +182,6 @@ export class FeedbackSessionInfoService {
             )
           : entry.stack_trace,
     });
-
     if (
       this.recentConsoleErrors.length >
       FeedbackSessionInfoService.MAX_CONSOLE_ERRORS

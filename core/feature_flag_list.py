@@ -107,6 +107,7 @@ class FeatureNames(enum.Enum):
     EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB = (
         'exploration_editor_new_creator_feedback_tab'
     )
+    STORY_EDITOR_ARCS = 'story_editor_arcs'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -137,6 +138,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
+    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -372,6 +374,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.STORY_EDITOR_ARCS.value: (
+        (
+            'This flag enables arc-based chapter groupings in the story editor, '
+            'allowing creators to organize chapters into named arcs.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),

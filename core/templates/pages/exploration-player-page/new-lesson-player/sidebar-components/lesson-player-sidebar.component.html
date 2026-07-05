@@ -66,10 +66,12 @@
             {{ 'I18N_REPORT_LESSON_BUG_TITLE' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button e2e-test-lesson-feedback-button" [attr.aria-label]="'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate" (click)="showSendLessonFeedbackModal()"
-          *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
-          matTooltip="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}"
-          matTooltipPosition="above">
+      <button class="player-sidebar-button"
+              [attr.aria-label]="'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate"
+              (click)="showSendLessonFeedbackModal()"
+              *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
+              matTooltip="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}"
+              matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-comments"></i>

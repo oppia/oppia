@@ -259,7 +259,7 @@ class PlatformFeedbackSubmitHandler(
 
         # Verify captcha token, only for logged-out users.
         if self.user_id is None:
-            if not captcha_token:
+            if not isinstance(captcha_token, str):
                 raise self.InvalidInputException(
                     'Captcha token is required for logged-out users.'
                 )
