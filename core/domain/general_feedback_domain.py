@@ -41,15 +41,6 @@ class LessonMetadataDict(TypedDict):
     state_index: int
     learner_current_answer: Optional[str]
 
-class LessonFeedbackResponseDict(TypedDict):
-    """A single creator response entry as included in takeout exports.
-
-    Note: responded_by is intentionally excluded; it is stored on the model
-    for internal use but stripped before any user-facing export.
-    """
-
-    response_text: str
-    responded_on: float
 
 class LessonFeedbackResponseDict(TypedDict):
     """A single creator response entry as included in takeout exports.

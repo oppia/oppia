@@ -36,7 +36,6 @@ export class FeedbackSessionInfoService {
   private static readonly MAX_FAILED_REQUESTS = 25;
   private static readonly MAX_NAVIGATION_ENTRIES = 5;
   private static readonly MAX_STACK_TRACE_LENGTH = 4000;
-  private static readonly MAX_ERROR_MESSAGE_LENGTH = 1000;
   private static consolePatched = false;
   private static activeInstance: FeedbackSessionInfoService | null = null;
   private recentConsoleErrors: FeedbackSessionInfo['console_logs_json'] = [];

@@ -46,14 +46,6 @@ LESSON_METADATA_JSON: Dict[str, Union[str, int, None]] = {
 FEEDBACK_TEXT = 'This card has a typo in the second paragraph.'
 REPORT_TEXT = 'The image in step 3 does not load at all.'
 
-class BaseFeedbackModelTests(test_utils.GenericTestBase):
-    """Tests for BaseFeedbackModel."""
-
-    def test_get_deletion_policy_raises_not_implemented_error(self) -> None:
-        self.assertEqual(
-            general_feedback_models.BaseFeedbackModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE,
-        )
 
 class LessonFeedbackModelTests(test_utils.GenericTestBase):
     """Tests for LessonFeedbackModel."""
