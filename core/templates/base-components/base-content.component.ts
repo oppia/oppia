@@ -111,10 +111,6 @@ export class BaseContentComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  isLanguageRTL(): boolean {
-    return this.isRtl;
-  }
-
   getHeaderText(): string {
     return this.pageTitleService.getNavbarTitleForMobileView();
   }
