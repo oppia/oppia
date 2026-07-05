@@ -1,0 +1,103 @@
+<section class="topic-story-section"
+         [attr.aria-label]="storyTitle ? ('Story section: ' + storyTitle) : 'Story section'">
+  <div class="story-callout-row">
+    <img class="story-callout-avatar"
+         [src]="oppiaAvatarImageUrl"
+         (error)="onAvatarImageError()"
+         alt=""
+         aria-hidden="true">
+    <p *ngIf="storyDescription" class="story-description-bubble">
+      <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="white" />
+      </svg>
+      {{ storyDescription }}
+    </p>
+  </div>
+
+  <div class="story-card" [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
+    <div class="story-card-header">
+      <div class="story-card-header-left">
+        <h3 class="story-title"><span class="story-label">Story: </span>"{{ storyTitle }}"</h3>
+        <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
+          {{ getStoryMetaText() }}
+        </p>
+      </div>
+      <div class="story-card-header-right">
+        <a class="study-skills-cta" [href]="studyGuideUrl" [attr.aria-label]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA_ARIA_LABEL' | translate: {storyTitle: storyTitle || 'this story'}">
+          <img class="study-skills-icon"
+               src="/assets/images/icons/study-skills-icon.png"
+               alt=""
+               aria-hidden="true">
+          <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA' | translate"></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="story-card-body">
+      <ng-container *ngIf="arcGroups.length > 0; else flatLessonList">
+        <div class="arc-group" *ngFor="let arcGroup of arcGroups; index as arcIdx">
+          <div class="arc-header" (click)="toggleArc(arcIdx)" role="button" tabindex="0"
+               [attr.aria-expanded]="isArcExpanded(arcIdx)"
+               (keydown.enter)="toggleArc(arcIdx)"
+               (keydown.space)="toggleArc(arcIdx); $event.preventDefault()">
+            <div class="arc-header-left">
+              <span class="arc-chevron" [class.expanded]="isArcExpanded(arcIdx)">&#9654;</span>
+              <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
+            </div>
+            <span class="arc-lesson-count">{{ arcGroup.lessonCards.length }} lesson{{ arcGroup.lessonCards.length !== 1 ? 's' : '' }}</span>
+          </div>
+          <p *ngIf="arcGroup.arcDescription && isArcExpanded(arcIdx)" class="arc-description">
+            {{ arcGroup.arcDescription }}
+          </p>
+          <div *ngIf="isArcExpanded(arcIdx)" class="arc-lessons">
+            <div class="story-lesson-card-wrapper"
+                 *ngFor="let lessonCard of arcGroup.lessonCards">
+              <topic-lesson-card
+                [lessonTitle]="lessonCard.lessonTitle"
+                [lessonDescription]="lessonCard.lessonDescription"
+                [thumbnailUrl]="lessonCard.thumbnailUrl"
+                [startUrl]="lessonCard.startUrl"
+                [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+                [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
+                [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
+                [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
+                [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
+                [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions">
+              </topic-lesson-card>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #flatLessonList>
+        <div class="story-lesson-card-wrapper"
+             *ngFor="let lessonCard of lessonCards">
+          <topic-lesson-card
+            [lessonTitle]="lessonCard.lessonTitle"
+            [lessonDescription]="lessonCard.lessonDescription"
+            [thumbnailUrl]="lessonCard.thumbnailUrl"
+            [startUrl]="lessonCard.startUrl"
+            [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+            [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
+            [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
+            [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
+            [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
+            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions">
+          </topic-lesson-card>
+        </div>
+      </ng-template>
+
+      <div class="story-practice-card-wrapper"
+        *ngIf="isPracticeCardVisible">
+        <topic-practice-card
+          [practiceTitle]="practiceCard.practiceTitle"
+          [practiceDescription]="practiceCard.practiceDescription"
+          [relatedLessonNumber]="practiceCard.relatedLessonNumber"
+          [thumbnailUrl]="practiceCard.thumbnailUrl"
+          [studyUrl]="practiceCard.studyUrl"
+          [practiceUrl]="practiceCard.practiceUrl">
+        </topic-practice-card>
+      </div>
+    </div>
+  </div>
+</section>

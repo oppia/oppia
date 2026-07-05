@@ -36,17 +36,17 @@
     </mat-card>
     <div *ngIf="!newQuestionIsBeingCreated" class="linked-skills-container">
       <h4> <strong> Linked Skills </strong> </h4>
-      <mat-card class="question-skill-id" *ngFor="let skill of associatedSkillSummaries">
+      <mat-card class="question-skill-id e2e-test-skill-linkage-item" *ngFor="let skill of associatedSkillSummaries">
         <div class="skill-description-card">
-          <span (click)="removeSkill(skill.getId())" aria-hidden="true">
+          <button type="button" (click)="removeSkill(skill.getId())" aria-hidden="true" class="e2e-test-remove-skill-linkage-button">
             <i class="material-icons oppia-cross-icon md-18">&#xE14C;</i>
-          </span>
-          <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener">
+          </button>
+          <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener" class="e2e-test-skill-linkage-description">
             {{skill.getDescription()}}
           </a>
         </div>
       </mat-card>
-      <button class="btn btn-success btn-sm" (click)="addSkill()" *ngIf="associatedSkillSummaries.length < MAX_SKILLS_PER_QUESTION">Link Another Skill</button>
+      <button type="button" class="btn btn-success btn-sm e2e-test-link-another-skill-button" (click)="addSkill()" *ngIf="associatedSkillSummaries.length < MAX_SKILLS_PER_QUESTION">Link Another Skill</button>
     </div>
     <oppia-question-editor [questionId]="questionId"
                            [misconceptionsBySkill]="misconceptionsBySkill"
@@ -139,7 +139,7 @@
       </div>
     </div>
     <div class="save-question-button-container">
-      <button class="btn question-edit-cancel-button" (click)="cancel()">CANCEL</button>
+      <button type="button" class="btn question-edit-cancel-button e2e-test-cancel-question-button" (click)="cancel()">CANCEL</button>
       <span matTooltip="To Save please add: interaction, hint, solution and address all misconceptions"
             matTooltipClass="oppia-mat-tooltip-list"
             [matTooltipDisabled]="isQuestionSavable()"

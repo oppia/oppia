@@ -1,0 +1,167 @@
+<div class="oppia-certificate-review-container
+            e2e-test-certificate-review-container">
+
+  <section class="oppia-certificate-review-card">
+    <h3 class="oppia-certificate-review-section-heading">
+      Certificate Summary
+    </h3>
+    <hr class="oppia-certificate-review-divider">
+    <p class="oppia-certificate-review-cert-title">
+      {{ certificateAssessmentOffering.title ||
+         'Everyday Arithmetic & Number Confidence' }}
+    </p>
+    <p class="oppia-certificate-review-cert-description">
+      {{ certificateAssessmentOffering.description ||
+         'Demonstrates ability to reason with whole numbers
+          in everyday situations.' }}
+    </p>
+    <p class="oppia-certificate-review-cert-time">
+      <strong>Estimated Time:</strong>&nbsp;
+      {{ certificateAssessmentOffering.timeLimitInMinutes || 60 }}
+      minutes
+    </p>
+  </section>
+
+  <section class="oppia-certificate-review-card">
+    <h3 class="oppia-certificate-review-section-heading">
+      Topic Readiness
+    </h3>
+
+    <table class="oppia-certificate-review-table">
+      <caption class="oppia-visually-hidden">
+        Topic readiness breakdown for certificate assessment
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Topic Name</th>
+          <th scope="col">Easy</th>
+          <th scope="col">Medium</th>
+          <th scope="col">Hard</th>
+          <th scope="col">Total Questions</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of topicReadinessRows"
+            [class.oppia-certificate-review-row--fail]="!row.isReady">
+
+          <td>{{ row.topicName }}</td>
+
+          <td [class.oppia-certificate-review-cell--fail]="
+              !row.easySufficient">
+            {{ row.easy }}
+          </td>
+
+          <td [class.oppia-certificate-review-cell--fail]="!row.mediumSufficient">
+            {{ row.medium }}
+          </td>
+
+          <td [class.oppia-certificate-review-cell--fail]="!row.hardSufficient">
+            {{ row.hard }}
+          </td>
+
+          <td>{{ row.totalQuestions }}</td>
+
+          <td>
+            <span *ngIf="row.isReady" class="oppia-certificate-review-badge--pass"
+                  aria-label="Ready">
+              <mat-icon>check_circle</mat-icon>
+              Ready
+            </span>
+            <span *ngIf="!row.isReady" class="oppia-certificate-review-badge--fail"
+                  aria-label="Not Ready">
+              <mat-icon>cancel</mat-icon>
+              Not Ready
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="oppia-certificate-review-card">
+    <h3 class="oppia-certificate-review-section-heading">
+      Overall Status
+    </h3>
+    <ng-container *ngIf="!isValid">
+      <p class="oppia-certificate-review-overall-status
+                oppia-certificate-review-overall-status--fail">
+        <mat-icon class="oppia-certificate-review-status-icon
+                         oppia-certificate-review-status-icon--fail">
+          cancel
+        </mat-icon>
+        <strong>Requirements Not Met</strong>
+      </p>
+      <p class="oppia-certificate-review-overall-desc">
+        One or more topics do not have enough eligible questions
+        for certificate assessment.
+      </p>
+
+      <p class="oppia-certificate-review-fix-label">
+        <strong>What still needs to be fixed:</strong>
+      </p>
+      <ul class="oppia-certificate-review-errors-list">
+        <li *ngFor="let error of errorMessages" class="oppia-certificate-review-error-item">
+          {{ getErrorText(error) }}
+        </li>
+      </ul>
+
+      <div class="oppia-certificate-review-info-box">
+        <span aria-hidden="true" class="oppia-certificate-review-info-icon">
+          <mat-icon>info_outline</mat-icon>
+        </span>
+        <div>
+          <p class="oppia-certificate-review-info-title">
+            <strong>
+              You can still save this certificate as Not Ready.
+            </strong>
+          </p>
+          <p class="oppia-certificate-review-info-body">
+            It will not be visible to learners until all
+            requirements are met.<br>
+            Once the missing requirements are completed, you can
+            update the certificate status to
+            <strong>Available.</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="oppia-certificate-review-actions">
+        <button type="button" class="oppia-certificate-review-btn--back e2e-test-certificate-review-back-btn"
+                (click)="onBackClicked()">
+          ‹ Back
+        </button>
+        <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
+                (click)="onSaveClicked()">
+          {{ getSaveButtonText() }}
+        </button>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="isValid">
+      <p class="oppia-certificate-review-overall-status oppia-certificate-review-overall-status--pass">
+        <mat-icon class="oppia-certificate-review-status-icon oppia-certificate-review-status-icon--pass">
+          check_circle
+        </mat-icon>
+        <strong>Requirements Met</strong>
+      </p>
+      <p class="oppia-certificate-review-overall-desc">
+        All topics have sufficient questions for the certificate
+        assessment.
+      </p>
+
+      <div class="oppia-certificate-review-actions">
+        <button type="button" class="oppia-certificate-review-btn--back e2e-test-certificate-review-back-btn"
+                (click)="onBackClicked()">
+          ‹ Back
+        </button>
+        <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
+                (click)="onSaveClicked()">
+          {{ getSaveButtonText() }}
+        </button>
+      </div>
+    </ng-container>
+
+  </section>
+
+</div>
