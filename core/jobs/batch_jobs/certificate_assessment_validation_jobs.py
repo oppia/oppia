@@ -34,9 +34,7 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import (
-    certificate_assessment_services,
-)
+from core.domain import certificate_assessment_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
