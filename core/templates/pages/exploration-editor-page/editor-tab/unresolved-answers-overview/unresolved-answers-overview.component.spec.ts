@@ -199,7 +199,7 @@ describe('Unresolved Answers Overview Component', () => {
     stateInteractionIdService.savedMemento = null;
 
     expect(() => component.getCurrentInteractionId()).toThrowError(
-      'Expected stateinteraction ID to be non-null.'
+      'Expected stateInteraction ID to be non-null.'
     );
   });
 
