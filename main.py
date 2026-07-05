@@ -1057,21 +1057,16 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_FEEDBACK_SUBMISSION_URL,
-        general_feedback.GeneralFeedbackSubmitHandler,
+        r'%s' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackSubmitHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
         general_feedback.GeneralFeedbackCaptchaConfigHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackListHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>'
-        % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackDetailHandler,
     ),
     get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler

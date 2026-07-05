@@ -1,0 +1,30 @@
+<div class="modal-header">
+  <h3 [innerHTML]="'I18N_STORY_EDITOR_EDIT_ARC' | translate"></h3>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <div class="arc-input">
+    <label for="arcTitle" class="arc-input-label">Title*</label>
+    <input id="arcTitle"
+           class="form-control e2e-test-edit-arc-title-field"
+            [(ngModel)]="arcTitle"
+           [ngModelOptions]="{standalone: true}"
+           autofocus>
+  </div>
+  <div class="arc-input">
+    <label for="arcDescription" class="arc-input-label">Description</label>
+    <textarea id="arcDescription"
+              class="form-control e2e-test-edit-arc-description-field"
+               [(ngModel)]="arcDescription"
+              [ngModelOptions]="{standalone: true}"
+              rows="3">
+    </textarea>
+  </div>
+  <div *ngIf="errorMessage" class="arc-error-message">{{ errorMessage }}</div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary e2e-test-cancel-edit-arc-button" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate">
+  </button>
+  <button type="button" class="btn btn-success e2e-test-save-edit-arc-button" (click)="save()" [innerHTML]="'I18N_STORY_EDITOR_SAVE_ARC' | translate">
+  </button>
+</div>
