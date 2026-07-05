@@ -104,6 +104,7 @@ EXCLUDED_PATHS: Final = (
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
     'core/tests/puppeteer-acceptance-tests/data/*',
+    'core/tests/playwright-acceptance-tests/data/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
 )
 
