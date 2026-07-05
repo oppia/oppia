@@ -58,8 +58,7 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             status='open',
             lesson_metadata=self._get_lesson_metadata(),
             response_list=[],
-            response_count=0,
-            seen_response_count=0,
+            unread_response_count=0,
             created_on_msecs=0,
         )
         create_lesson_feedback_mock = mock.Mock(return_value=feedback)

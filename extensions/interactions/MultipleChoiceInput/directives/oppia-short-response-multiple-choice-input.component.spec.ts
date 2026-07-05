@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the MultipleChoiceInput response.
  */
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseMultipleChoiceInputComponent} from './oppia-short-response-multiple-choice-input.component';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -34,7 +34,7 @@ describe('ShortResponseMultipleChoiceInputComponent', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ShortResponseMultipleChoiceInputComponent],
       providers: [

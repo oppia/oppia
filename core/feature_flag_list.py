@@ -110,6 +110,7 @@ class FeatureNames(enum.Enum):
     TECHNICAL_FEEDBACK_DASHBOARD_ENABLED = (
         'technical_feedback_dashboard_enabled'
     )
+    STORY_EDITOR_ARCS = 'story_editor_arcs'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -142,6 +143,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
+    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -384,6 +386,10 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the Technical Feedback Dashboard, allowing '
             'LEAP and CORE tech leads/co-leads to review and manage '
             'technical feedback submitted by learners.',
+    FeatureNames.STORY_EDITOR_ARCS.value: (
+        (
+            'This flag enables arc-based chapter groupings in the story editor, '
+            'allowing creators to organize chapters into named arcs.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),

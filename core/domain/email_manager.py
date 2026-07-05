@@ -66,7 +66,7 @@ if MYPY:  # pragma: no cover
         transaction_services,
     )
 
-(email_models, suggestion_models) = models.Registry.import_models(
+email_models, suggestion_models = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.SUGGESTION]
 )
 app_identity_services = models.Registry.import_app_identity_services()
@@ -481,9 +481,6 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
-    feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
     feconf.EMAIL_INTENT_MARKETING: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
@@ -519,22 +516,6 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_VOICEOVER_REGENERATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
-    feconf.BULK_EMAIL_INTENT_MARKETING: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
-        user_services.is_curriculum_admin
-    ),
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
-        user_services.is_curriculum_admin
-    ),
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.BULK_EMAIL_INTENT_TEST: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
 }
 
 
@@ -715,105 +696,6 @@ def _send_email(
         )
 
     _send_email_transactional()
-
-
-def _send_bulk_mail(
-    recipient_ids: List[str],
-    sender_id: str,
-    intent: str,
-    email_subject: str,
-    email_html_body: str,
-    sender_email: str,
-    sender_name: str,
-    instance_id: str,
-    attachments: Optional[List[Dict[str, str]]] = None,
-) -> None:
-    """Sends an email to all given recipients.
-
-    Args:
-        recipient_ids: list(str). The user IDs of the email recipients.
-        sender_id: str. The ID of the user sending the email.
-        intent: str. The intent string, i.e. the purpose of the email.
-        email_subject: str. The subject of the email.
-        email_html_body: str. The body (message) of the email.
-        sender_email: str. The sender's email address.
-        sender_name: str. The name to be shown in the "sender" field of the
-            email.
-        instance_id: str. The ID of the BulkEmailModel entity instance.
-        attachments: list(dict)|None. Optional argument. A list of
-            dictionaries, where each dictionary includes the keys `filename`
-            and `path` with their corresponding values.
-    """
-    require_sender_id_is_valid(intent, sender_id)
-
-    recipients_settings = user_services.get_users_settings(
-        recipient_ids, strict=True
-    )
-    recipient_emails = [user.email for user in recipients_settings]
-
-    cleaned_html_body = html_cleaner.clean(email_html_body)
-    if cleaned_html_body != email_html_body:
-        logging.error(
-            'Original email HTML body does not match cleaned HTML body:\n'
-            'Original:\n%s\n\nCleaned:\n%s\n'
-            % (email_html_body, cleaned_html_body)
-        )
-        return
-
-    raw_plaintext_body = (
-        cleaned_html_body.replace('<br/>', '\n')
-        .replace('<br>', '\n')
-        .replace('<li>', '<li>- ')
-        .replace('</p><p>', '</p>\n<p>')
-    )
-    cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
-
-    @transaction_services.run_in_transaction_wrapper
-    def _send_bulk_mail_transactional(instance_id: str) -> None:
-        """Sends the emails in bulk to the recipients.
-
-        Args:
-            instance_id: str. The ID of the BulkEmailModel entity instance.
-        """
-        sender_name_email = '%s <%s>' % (sender_name, sender_email)
-
-        try:
-            email_services.send_bulk_mail(
-                sender_name_email,
-                recipient_emails,
-                email_subject,
-                cleaned_plaintext_body,
-                cleaned_html_body,
-                attachments,
-            )
-        except Exception as e:
-            logging.error(
-                'Bulk email failed to send: %s. Enqueuing for retry.', e
-            )
-
-            for recipient_email in recipient_emails:
-                payload = {
-                    'sender_email': sender_name_email,
-                    'recipient_id': recipient_email,
-                    'subject': email_subject,
-                    'html_body': cleaned_html_body,
-                    'text_body': cleaned_plaintext_body,
-                }
-                taskqueue_services.enqueue_task(
-                    feconf.TASK_URL_RETRY_FAILED_EMAIL, payload, 0
-                )
-
-        email_models.BulkEmailModel.create(
-            instance_id,
-            sender_id,
-            sender_name_email,
-            intent,
-            email_subject,
-            cleaned_html_body,
-            datetime.datetime.utcnow(),
-        )
-
-    _send_bulk_mail_transactional(instance_id)
 
 
 def send_dummy_mail_to_admin(username: str) -> None:
@@ -1654,174 +1536,6 @@ def send_flag_exploration_email(
             email_body,
             noreply_email_address,
         )
-
-
-def send_query_completion_email(recipient_id: str, query_id: str) -> None:
-    """Send an email to the initiator of a bulk email query with a link to view
-    the query results.
-
-    Args:
-        recipient_id: str. The recipient ID.
-        query_id: str. The query ID.
-    """
-    email_subject = 'Query %s has successfully completed' % query_id
-
-    email_body_template = (
-        'Hi %s,<br>'
-        'Your query with id %s has succesfully completed its '
-        'execution. Visit the result page '
-        '<a href="https://www.oppia.org/emaildashboardresult/%s">here</a> '
-        'to see result of your query.<br><br>'
-        'Thanks!<br>'
-        '<br>'
-        'Best wishes,<br>'
-        'The Oppia Team<br>'
-        '<br>%s'
-    )
-
-    recipient_username = user_services.get_username(recipient_id)
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
-    email_body = email_body_template % (
-        recipient_username,
-        query_id,
-        query_id,
-        email_footer,
-    )
-    noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-        )
-    )
-    assert isinstance(noreply_email_address, str)
-    _send_email(
-        recipient_id,
-        feconf.SYSTEM_COMMITTER_ID,
-        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
-        email_subject,
-        email_body,
-        noreply_email_address,
-    )
-
-
-def send_query_failure_email(
-    recipient_id: str, query_id: str, query_params: Dict[str, str]
-) -> None:
-    """Send an email to the initiator of a failed bulk email query.
-
-    Args:
-        recipient_id: str. The recipient ID.
-        query_id: str. The query ID.
-        query_params: dict. The parameters of the query, as key:value.
-    """
-    email_subject = 'Query %s has failed' % query_id
-
-    email_body_template = (
-        'Hi %s,<br>'
-        'Your query with id %s has failed due to error '
-        'during execution. '
-        'Please check the query parameters and submit query again.<br><br>'
-        'Thanks!<br>'
-        '<br>'
-        'Best wishes,<br>'
-        'The Oppia Team<br>'
-        '<br>%s'
-    )
-
-    recipient_username = user_services.get_username(recipient_id)
-    email_footer = platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamName.EMAIL_FOOTER.value
-    )
-    email_body = email_body_template % (
-        recipient_username,
-        query_id,
-        email_footer,
-    )
-    noreply_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
-        )
-    )
-    assert isinstance(noreply_email_address, str)
-    _send_email(
-        recipient_id,
-        feconf.SYSTEM_COMMITTER_ID,
-        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
-        email_subject,
-        email_body,
-        noreply_email_address,
-    )
-
-    admin_email_subject = 'Query job has failed.'
-    admin_email_body_template = (
-        'Query job with %s query id has failed in its execution.\n'
-        'Query parameters:\n\n'
-    )
-
-    for key in sorted(query_params):
-        admin_email_body_template += '%s: %s\n' % (key, query_params[key])
-
-    admin_email_body = admin_email_body_template % query_id
-    send_mail_to_admin(admin_email_subject, admin_email_body)
-
-
-def send_user_query_email(
-    sender_id: str,
-    recipient_ids: List[str],
-    email_subject: str,
-    email_body: str,
-    email_intent: str,
-) -> str:
-    """Sends an email to all the recipients of the query.
-
-    Args:
-        sender_id: str. The ID of the user sending the email.
-        recipient_ids: list(str). The user IDs of the email recipients.
-        email_subject: str. The subject of the email.
-        email_body: str. The body of the email.
-        email_intent: str. The intent string, i.e. the purpose of the email.
-
-    Returns:
-        bulk_email_model_id: str. The ID of the bulk email model.
-    """
-    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
-    sender_name = user_services.get_username(sender_id)
-    sender_email = user_services.get_email_from_user_id(sender_id)
-    _send_bulk_mail(
-        recipient_ids,
-        sender_id,
-        email_intent,
-        email_subject,
-        email_body,
-        sender_email,
-        sender_name,
-        bulk_email_model_id,
-    )
-    return bulk_email_model_id
-
-
-def send_test_email_for_bulk_emails(
-    tester_id: str, email_subject: str, email_body: str
-) -> None:
-    """Sends a test email to the tester.
-
-    Args:
-        tester_id: str. The user ID of the tester.
-        email_subject: str. The subject of the email.
-        email_body: str. The body of the email.
-    """
-    tester_name = user_services.get_username(tester_id)
-    tester_email = user_services.get_email_from_user_id(tester_id)
-    _send_email(
-        tester_id,
-        feconf.SYSTEM_COMMITTER_ID,
-        feconf.BULK_EMAIL_INTENT_TEST,
-        email_subject,
-        email_body,
-        tester_email,
-        sender_name=tester_name,
-    )
 
 
 def send_mail_to_onboard_new_reviewers(
@@ -2817,17 +2531,16 @@ def send_reminder_mail_to_notify_curriculum_admins(
     assert isinstance(system_email_name, str)
 
     if chapters_are_overdue or chapters_are_upcoming:
-        bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
-        _send_bulk_mail(
-            curriculum_admin_ids,
-            feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
-            email_subject,
-            email_body,
-            noreply_email_address,
-            system_email_name,
-            bulk_email_model_id,
-        )
+        for curriculum_admin_id in curriculum_admin_ids:
+            _send_email(
+                curriculum_admin_id,
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
+                email_subject,
+                email_body,
+                noreply_email_address,
+                sender_name=system_email_name,
+            )
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:

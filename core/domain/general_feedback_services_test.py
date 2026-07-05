@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import general_feedback_domain, general_feedback_services
 from core.platform import models
 from core.tests import test_utils
@@ -55,13 +56,10 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(feedback.author_id, 'user_id')
         self.assertEqual(feedback.feedback_text, 'This lesson helped.')
-        self.assertEqual(
-            feedback.status, general_feedback_models.STATUS_CHOICES_OPEN
-        )
+        self.assertEqual(feedback.status, feconf.STATUS_CHOICES_OPEN)
         self.assertEqual(feedback.lesson_metadata, self.get_lesson_metadata())
         self.assertEqual(feedback.response_list, [])
-        self.assertEqual(feedback.response_count, 0)
-        self.assertEqual(feedback.seen_response_count, 0)
+        self.assertEqual(feedback.unread_response_count, 0)
 
     def test_create_lesson_feedback_preserves_parent_feedback_id(
         self,
@@ -81,7 +79,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         report = general_feedback_services.create_platform_report(
             feedback_text='There is a typo.',
             source='lesson',
-            category=general_feedback_models.CATEGORY_TYPO,
+            category=feconf.CATEGORY_TYPO,
             lesson_metadata_json=self.get_lesson_metadata(),
             session_info_json=None,
             screenshot_filename=None,
@@ -91,13 +89,13 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(report.feedback_text, 'There is a typo.')
-        self.assertEqual(report.source, general_feedback_models.SOURCE_LESSON)
-        self.assertEqual(report.platform, general_feedback_models.PLATFORM_WEB)
+        self.assertEqual(report.source, feconf.SOURCE_LESSON)
+        self.assertEqual(report.platform, feconf.PLATFORM_WEB)
         self.assertEqual(
             report.destination_dashboard,
-            general_feedback_models.DESTINATION_CREATOR,
+            feconf.DESTINATION_CREATOR,
         )
-        self.assertEqual(report.category, general_feedback_models.CATEGORY_TYPO)
+        self.assertEqual(report.category, feconf.CATEGORY_TYPO)
         self.assertEqual(report.lesson_metadata, self.get_lesson_metadata())
         self.assertFalse(report.include_technical_logs)
 
@@ -114,10 +112,10 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             page_url='https://oppia.com/donate',
         )
 
-        self.assertEqual(report.source, general_feedback_models.SOURCE_APP)
+        self.assertEqual(report.source, feconf.SOURCE_APP)
         self.assertEqual(
             report.destination_dashboard,
-            general_feedback_models.DESTINATION_TECHNICAL_LEAP_TEAM,
+            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
         )
         self.assertIsNone(report.category)
         self.assertIsNone(report.lesson_metadata)
@@ -143,7 +141,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         report = general_feedback_services.create_platform_report(
             feedback_text='The card image is broken.',
             source='lesson',
-            category=general_feedback_models.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+            category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
             lesson_metadata_json=self.get_lesson_metadata(),
             session_info_json=session_info,
             screenshot_filename='feedback.png',
@@ -192,7 +190,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         report = general_feedback_services.create_platform_report(
             feedback_text='Broken page',
             source='lesson',
-            category=(general_feedback_models.CATEGORY_BROKEN_LAYOUT_OR_IMAGE),
+            category=(feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE),
             lesson_metadata_json=self.get_lesson_metadata(),
             session_info_json=session_info,
             screenshot_filename=None,
@@ -219,7 +217,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.create_platform_report(
                 feedback_text='The card image is broken.',
                 source='lesson',
-                category=general_feedback_models.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+                category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
                 lesson_metadata_json=None,
                 session_info_json=None,
                 screenshot_filename=None,
@@ -227,3 +225,21 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                 include_technical_logs=False,
                 page_url='https://oppia.org/learn',
             )
+
+    def test_create_platform_report_routes_to_core_dashboard(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='Technical issue.',
+            source='site',
+            page_url='https://oppia.org/create/12',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        self.assertEqual(
+            report.destination_dashboard,
+            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+        )

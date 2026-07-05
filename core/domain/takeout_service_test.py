@@ -478,8 +478,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         'state_index': 0,
     }
     LESSON_FEEDBACK_RESPONSE_LIST: List[Dict[str, Union[str, float]]] = []
-    LESSON_FEEDBACK_RESPONSE_COUNT = 0
-    LESSON_FEEDBACK_SEEN_RESPONSE_COUNT = 1
+    LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT = 1
     LESSON_FEEDBACK_CREATED_ON = datetime.datetime.utcnow()
     LESSON_FEEDBACK_LAST_UPDATED = datetime.datetime.utcnow()
 
@@ -1687,8 +1686,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             lesson_metadata_json=self.LESSON_METADATA_JSON,
             parent_feedback_id=self.PARENT_FEEDBACK_ID_1,
             response_list=self.LESSON_FEEDBACK_RESPONSE_LIST,
-            response_count=self.LESSON_FEEDBACK_RESPONSE_COUNT,
-            seen_response_count=self.LESSON_FEEDBACK_SEEN_RESPONSE_COUNT,
+            unread_response_count=self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,
         )
         lesson_feedback_model.update_timestamps()
         lesson_feedback_model.put()
@@ -2079,10 +2077,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'lesson_metadata_json': self.LESSON_METADATA_JSON,
                 'parent_feedback_id': self.PARENT_FEEDBACK_ID_1,
                 'response_list': self.LESSON_FEEDBACK_RESPONSE_LIST,
-                'response_count': self.LESSON_FEEDBACK_RESPONSE_COUNT,
-                'seen_response_count': (
-                    self.LESSON_FEEDBACK_SEEN_RESPONSE_COUNT
-                ),
+                'unread_response_count': self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,
                 'created_on_msec': utils.get_time_in_millisecs(
                     lesson_feedback_model.created_on
                 ),

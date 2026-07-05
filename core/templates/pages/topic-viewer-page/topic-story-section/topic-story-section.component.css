@@ -145,12 +145,91 @@
   padding: 0 24px 24px;
 }
 
+.arc-group {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.arc-header {
+  align-items: center;
+  background: #f5fafa;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 18px;
+  user-select: none;
+}
+
+.arc-header:hover {
+  background: #eaf6f8;
+}
+
+.arc-header:focus {
+  outline: 2px solid #00645c;
+  outline-offset: -2px;
+}
+
+.arc-header-left {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.arc-chevron {
+  color: #00645c;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.arc-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.arc-title {
+  color: #00645c;
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.arc-lesson-count {
+  color: #777;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+}
+
+.arc-description {
+  border-top: 1px solid #e0e0e0;
+  color: #555;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 12px 18px;
+}
+
+.arc-lessons {
+  border-top: 1px solid #e0e0e0;
+  padding: 12px 18px;
+}
+
 .story-lesson-card-wrapper,
 .story-practice-card-wrapper {
   align-self: center;
   margin-top: auto;
   max-width: 912px;
   width: 100%;
+}
+
+.arc-lessons .story-lesson-card-wrapper {
+  margin-top: 12px;
+}
+
+.arc-lessons .story-lesson-card-wrapper:first-child {
+  margin-top: 0;
 }
 
 @media (max-width: 768px) {

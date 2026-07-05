@@ -86,6 +86,7 @@ export class FeedbackModalComponent implements OnInit {
   captchaToken: string = '';
   captchaSiteKey: string | null = null;
   captchaLoadError: string | null = null;
+  captchaSubmitError: string | null = null;
 
   constructor(
     private userService: UserService,
@@ -182,7 +183,7 @@ export class FeedbackModalComponent implements OnInit {
     }
 
     if (!this.isLessonFeedbackMode) {
-      this.initializeCaptchaIfRequired();
+      await this.initializeCaptchaIfRequired();
     }
   }
 
@@ -193,6 +194,7 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   signIn(): void {
+    window.sessionStorage.setItem('reopenLessonFeedbackModal', 'true');
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         (
@@ -260,11 +262,24 @@ export class FeedbackModalComponent implements OnInit {
       return false;
     }
 
+    if (
+      !this.isLessonFeedbackMode &&
+      !this.isUserLoggedIn &&
+      !this.captchaToken
+    ) {
+      this.captchaSubmitError = this.translateService.instant(
+        'I18N_FEEDBACK_CAPTCHA_REQUIRED'
+      );
+      return false;
+    }
     this.formError = null;
     return true;
   }
 
   async submit(): Promise<void> {
+    if (!this.isFormValid()) {
+      return;
+    }
     switch (this.feedbackModalType) {
       case FeedbackModalType.LESSON_FEEDBACK:
         await this.submitLessonFeedback();
@@ -292,9 +307,6 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   private async submitLessonIssue(): Promise<void> {
-    if (!this.isFormValid()) {
-      return;
-    }
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
     const sessionInfo = this.includeTechnicalLogs
       ? this.feedbackSessionInfoService.getSessionInfo()
@@ -343,10 +355,6 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   private async submitLessonFeedback(): Promise<void> {
-    if (!this.isFormValid()) {
-      return;
-    }
-
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
     const feedbackPayload = LessonFeedbackModel.createForSubmission({
       feedbackText: this.feedbackText,
@@ -381,9 +389,6 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   private async submitSiteIssue(): Promise<void> {
-    if (!this.isFormValid()) {
-      return;
-    }
     const sessionInfo = this.includeTechnicalLogs
       ? this.feedbackSessionInfoService.getSessionInfo()
       : null;
@@ -486,6 +491,8 @@ export class FeedbackModalComponent implements OnInit {
     this.category = null;
     this.includeTechnicalLogs = true;
     this.formError = null;
+    this.captchaToken = '';
+    this.captchaSubmitError = null;
     this.removeScreenshot();
     this.ngbActiveModal.dismiss();
   }
