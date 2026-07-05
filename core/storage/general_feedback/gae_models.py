@@ -447,7 +447,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             feedback_text=feedback_text,
             status=feconf.STATUS_CHOICES_OPEN,
             exploration_id=(
-                lesson_metadata_json['exploration_id']
+                lesson_metadata_json.get('exploration_id')
                 if lesson_metadata_json is not None
                 else None
             ),
