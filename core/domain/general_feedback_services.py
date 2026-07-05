@@ -32,7 +32,6 @@ if MYPY:  # pragma: no cover
     [models.Names.GENERAL_FEEDBACK]
 )
 
-_PLATFORM_WEB: str = general_feedback_models.PLATFORM_WEB
 
 def _lesson_feedback_model_to_domain(
     model: general_feedback_models.LessonFeedbackModel,
@@ -123,8 +122,6 @@ def _platform_feedback_model_to_domain(
         created_on_msecs=utils.get_time_in_millisecs(model.created_on),
     )
 
-    model = general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
-    return _lesson_feedback_model_to_domain(model)
 
 def _determine_destination_dashboard(
     page_url: str, category: Optional[str]
