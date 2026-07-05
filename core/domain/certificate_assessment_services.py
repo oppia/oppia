@@ -51,9 +51,6 @@ CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: str = (
     constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
 )
 
-# Number of questions required per topic (one each of easy, medium, hard).
-QUESTIONS_PER_TOPIC = 3
-
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     """Dict representation of certificate offering validation results."""
@@ -72,21 +69,27 @@ class CertificateAssessmentOfferingTopicInfoDict(TypedDict):
 
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
-    topics: List[topic_domain.Topic] | None = None,
-) -> Dict[str, List[str]]:
-    """Returns a mapping from topic ID to unique question IDs for its skills."""
+) -> tuple[Dict[str, List[str]], List[topic_domain.Topic]]:
+    """Returns question IDs per topic and the fetched topics themselves."""
     # Build a deduplicated pool of question IDs per topic so we can detect
     # both per-topic shortages and cross-topic overlap later in validation.
     topic_id_to_question_ids: Dict[str, List[str]] = {}
-    if topics is None:
-        try:
-            topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
-        except Exception as e:
-            raise utils.ValidationError(
-                'Topic %s does not exist.' % topic_ids[0]
-            ) from e
+    try:
+        topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    except Exception as e:
+        for topic_id in topic_ids:
+            try:
+                topic_fetchers.get_topic_by_id(topic_id, strict=True)
+            except Exception as topic_error:
+                raise utils.ValidationError(
+                    'Topic %s does not exist.' % topic_id
+                ) from topic_error
+        raise utils.ValidationError(
+            'One or more selected topics do not exist.'
+        ) from e
     for topic_id, topic in zip(topic_ids, topics):
         assert topic is not None
+
         question_ids: set[str] = set()
         skill_ids = list(topic.get_all_skill_ids())
         skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
@@ -102,7 +105,7 @@ def _get_topic_name_to_question_ids_map(
             )
 
         topic_id_to_question_ids[topic_id] = sorted(question_ids)
-    return topic_id_to_question_ids
+    return topic_id_to_question_ids, topics
 
 
 def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
@@ -132,11 +135,26 @@ def _get_difficulty_label(skill_difficulty: float) -> str | None:
     """Returns the certificate difficulty label for a linked skill difficulty."""
     # Map persisted skill difficulty values into certificate buckets so the
     # validator can count available questions per difficulty.
-    if skill_difficulty == 0.3:
+    if (
+        skill_difficulty
+        == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+            constants.SKILL_DIFFICULTY_EASY
+        ]
+    ):
         return CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
-    if skill_difficulty == 0.6:
+    if (
+        skill_difficulty
+        == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+            constants.SKILL_DIFFICULTY_MEDIUM
+        ]
+    ):
         return CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
-    if skill_difficulty == 0.9:
+    if (
+        skill_difficulty
+        == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+            constants.SKILL_DIFFICULTY_HARD
+        ]
+    ):
         return CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
     return None
 
@@ -453,6 +471,9 @@ def _has_valid_distinct_assignment(
 
     flow = 0
     while True:
+        # Find one more augmenting path so we can assign another distinct
+        # question to each topic without reusing a question already claimed
+        # by another topic.
         parent: Dict[str, str | None] = {source: None}
         queue: collections.deque[str] = collections.deque([source])
         while queue and sink not in parent:
@@ -504,6 +525,15 @@ def validate_certificate_assessment_offering(
 
     Returns:
         dict. Contains is_valid, validation_errors and validation_message.
+
+        The validation checks three things:
+        - Each selected topic exists and has enough questions in every
+          difficulty bucket for its share of the requested total.
+        - The combined set of questions across the selected topics is large
+          enough to satisfy the requested total without reusing questions.
+        - The selected topics can be assigned distinct questions per
+          difficulty so a certificate can be built without overlaps between
+          topics.
     """
     if not topic_ids:
         raise utils.ValidationError(
@@ -514,14 +544,8 @@ def validate_certificate_assessment_offering(
             'total_questions must be a positive integer.'
         )
 
-    try:
-        topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
-    except Exception as e:
-        raise utils.ValidationError(
-            'Topic %s does not exist.' % topic_ids[0]
-        ) from e
-    topic_name_to_question_ids_map = _get_topic_name_to_question_ids_map(
-        topic_ids, topics
+    topic_name_to_question_ids_map, topics = (
+        _get_topic_name_to_question_ids_map(topic_ids)
     )
     base_questions_per_topic = total_questions // len(topic_ids)
     remainder = total_questions % len(topic_ids)
@@ -533,7 +557,7 @@ def validate_certificate_assessment_offering(
     topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, set[str]]] = {}
     topic_id_to_name: Dict[str, str] = {}
 
-    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    expected_total_questions = len(topic_ids) * constants.QUESTIONS_PER_TOPIC
     if total_questions < expected_total_questions:
         is_valid = False
         message_parts.append(
@@ -541,7 +565,7 @@ def validate_certificate_assessment_offering(
             '(%d per topic: easy, medium, hard) for %d topic(s).'
             % (
                 expected_total_questions,
-                QUESTIONS_PER_TOPIC,
+                constants.QUESTIONS_PER_TOPIC,
                 len(topic_ids),
             )
         )
