@@ -333,6 +333,80 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 total_questions=3,
             )
 
+    def test_get_topic_name_to_question_ids_map_raises_for_missing_topics(
+        self,
+    ) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+        question_link = mock.Mock(question_id='question_1')
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            side_effect=Exception('topic lookup failed'),
+        ), mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            return_value=topic,
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_by_id',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[question_link],
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'One or more selected topics do not exist.',
+            ):
+                getattr(
+                    certificate_assessment_services,
+                    '_get_topic_name_to_question_ids_map',
+                )(['topic_1'])
+
+    def test_get_topic_name_to_question_ids_map_skips_missing_skill_models(
+        self,
+    ) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1', 'skill_2']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+        question_link = mock.Mock(question_id='question_1')
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[topic],
+        ), mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_id',
+            side_effect=AssertionError('unused'),
+        ), mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock(), None],
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_from_model',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[question_link],
+        ):
+            result = getattr(
+                certificate_assessment_services,
+                '_get_topic_name_to_question_ids_map',
+            )(['topic_1'])
+
+        self.assertEqual(result[0], {'topic_1': ['question_1']})
+
     def test_format_list_formats_short_lists(self) -> None:
         format_list = getattr(certificate_assessment_services, '_format_list')
         self.assertEqual(format_list(['one']), 'one')
@@ -347,6 +421,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(get_difficulty_label(0.6), 'medium')
+        self.assertIsNone(get_difficulty_label(0.5))
 
     def test_has_valid_distinct_assignment(self) -> None:
         has_valid_distinct_assignment = getattr(
@@ -729,6 +804,46 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             'Mock Topic does not have enough questions in every difficulty '
             'bucket.',
             result['validation_message'],
+        )
+
+    def test_validation_skips_missing_skill_models(self) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = ['skill_1', 'skill_2']
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[topic],
+        ) as get_topics_by_ids, mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[None, mock.Mock()],
+        ) as get_multi_mock, mock.patch.object(
+            skill_fetchers,
+            'get_skill_from_model',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=[
+                mock.Mock(question_id='question_1', skill_difficulty=0.6)
+            ],
+        ) as get_links:
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=['topic_1'],
+                total_questions=3,
+            )
+
+        get_topics_by_ids.assert_called_once_with(['topic_1'], strict=True)
+        self.assertEqual(get_multi_mock.call_count, 2)
+        self.assertEqual(get_links.call_count, 2)
+        self.assertFalse(result['is_valid'])
+        self.assertEqual(
+            result['validation_errors']['topic_1']['medium']['available'],
+            1,
         )
 
     def test_validation_distributes_remainder_to_earlier_topics(self) -> None:
