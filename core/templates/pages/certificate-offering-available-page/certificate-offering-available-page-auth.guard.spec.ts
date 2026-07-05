@@ -17,7 +17,7 @@
  */
 
 import {Location} from '@angular/common';
-import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
   Router,
@@ -73,44 +73,35 @@ describe('CertificateOfferingAvailablePageAuthGuard', () => {
     location = TestBed.inject(Location);
   });
 
-  it('should allow access when certificate assessment is enabled', fakeAsync(() => {
+  it('should allow access when certificate assessment is enabled', async () => {
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );
 
-    let canActivateResult: boolean | null = null;
-
-    guard
-      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => {
-        canActivateResult = result;
-      });
-
-    tick();
+    const canActivateResult = await guard.canActivate(
+      new ActivatedRouteSnapshot(),
+      {} as RouterStateSnapshot
+    );
 
     expect(canActivateResult).toBeTrue();
     expect(navigateSpy).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('should redirect to 404 when certificate assessment is disabled', fakeAsync(() => {
+  it('should redirect to 404 when certificate assessment is disabled', async () => {
     platformFeatureService.status.EnableCertificateAssessment.isEnabled = false;
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );
     const replaceStateSpy = spyOn(location, 'replaceState');
 
-    let canActivateResult: boolean | null = null;
     const stateSnapshot = {
       url: '/learn/math/certificate-offering-available',
     } as RouterStateSnapshot;
 
-    guard
-      .canActivate(new ActivatedRouteSnapshot(), stateSnapshot)
-      .then(result => {
-        canActivateResult = result;
-      });
-
-    tick();
+    const canActivateResult = await guard.canActivate(
+      new ActivatedRouteSnapshot(),
+      stateSnapshot
+    );
 
     expect(canActivateResult).toBeFalse();
     expect(navigateSpy).toHaveBeenCalledWith([
@@ -119,5 +110,30 @@ describe('CertificateOfferingAvailablePageAuthGuard', () => {
     expect(replaceStateSpy).toHaveBeenCalledWith(
       '/learn/math/certificate-offering-available'
     );
-  }));
+  });
+
+  it('should still replace the state if redirect navigation fails', async () => {
+    platformFeatureService.status.EnableCertificateAssessment.isEnabled = false;
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.reject(new Error('navigation failed'))
+    );
+    const replaceStateSpy = spyOn(location, 'replaceState');
+
+    const stateSnapshot = {
+      url: '/learn/math/certificate-offering-available',
+    } as RouterStateSnapshot;
+
+    const canActivateResult = await guard.canActivate(
+      new ActivatedRouteSnapshot(),
+      stateSnapshot
+    );
+
+    expect(canActivateResult).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
+    expect(replaceStateSpy).toHaveBeenCalledWith(
+      '/learn/math/certificate-offering-available'
+    );
+  });
 });

@@ -18,13 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync,
-} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
@@ -147,7 +141,7 @@ describe('Classroom Page Component', () => {
     expect(component.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
-  it('should initialize', fakeAsync(() => {
+  it('should initialize', async () => {
     let classroomUrlFragment = 'math';
     let bannerImageUrl = 'banner_image_url';
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
@@ -229,9 +223,7 @@ describe('Classroom Page Component', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
       false
     );
-    component.ngOnInit();
-    tick();
-    tick();
+    await component.ngOnInit();
     expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
     expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
@@ -248,9 +240,9 @@ describe('Classroom Page Component', () => {
       classroomBackendApiService.onInitializeTranslation.emit
     ).toHaveBeenCalled();
     expect(siteAnalyticsService.registerClassroomPageViewed).toHaveBeenCalled();
-  }));
+  });
 
-  it('should display alert when unable to fetch classroom data', fakeAsync(() => {
+  it('should display alert when unable to fetch classroom data', async () => {
     let classroomUrlFragment = 'test_fragment';
     let bannerImageUrl = 'banner_image_url';
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
@@ -269,8 +261,7 @@ describe('Classroom Page Component', () => {
       'fetchClassroomDataAsync'
     ).and.returnValue(Promise.reject({status: 500}));
     spyOn(alertsService, 'addWarning');
-    component.ngOnInit();
-    tick();
+    await component.ngOnInit();
     expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
     expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
@@ -280,7 +271,7 @@ describe('Classroom Page Component', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Failed to get classroom data'
     );
-  }));
+  });
 
   it('should link to the classroom certificate assessment page', () => {
     component.classroomData = ClassroomData.createFromBackendData(
@@ -335,6 +326,9 @@ describe('Classroom Page Component', () => {
         '.e2e-test-take-certificate-assessment'
       )
     ).toBeNull();
+
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      true;
   });
 
   it(

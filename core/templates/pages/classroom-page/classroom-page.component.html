@@ -67,7 +67,15 @@
           <h4>Ready to show what you’ve learned?</h4>
           <p>Take a certificate assessment and earn recognition for what you know.</p>
         </div>
-        <a [href]="'/learn/' + classroomData.getUrlFragment() + '/certificate-offering-available'" class="e2e-test-take-certificate-assessment">Learn more</a>
+        <a
+          [routerLink]="[
+            '/learn',
+            classroomData.getUrlFragment(),
+            'certificate-offering-available'
+          ]"
+        >
+          Learn more
+        </a>
       </div>
       <div class="topic-tiles-container">
         <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"

@@ -49,15 +49,14 @@ export class CertificateOfferingAvailablePageAuthGuard implements CanActivate {
       return true;
     }
 
-    return new Promise<boolean>(resolve => {
-      this.router
-        .navigate([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-        ])
-        .then(() => {
-          this.location.replaceState(state.url);
-          resolve(false);
-        });
-    });
+    try {
+      await this.router.navigate([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+      ]);
+      this.location.replaceState(state.url);
+    } catch {
+      this.location.replaceState(state.url);
+    }
+    return false;
   }
 }
