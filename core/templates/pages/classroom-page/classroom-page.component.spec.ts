@@ -18,7 +18,13 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
@@ -419,7 +425,7 @@ describe('Classroom Page Component', () => {
       1
     );
     component.classroomData = classroomData;
-    expect(component.diagnosticTestIsEnabled()).toBeFalse();
+    expect(component.diagnosticTestIsEnabled()).toBe(false);
   });
 
   it('should show private classroom banner to curriculum admins', fakeAsync(() => {
@@ -427,7 +433,7 @@ describe('Classroom Page Component', () => {
       isCurriculumAdmin: () => true,
       isModerator: () => false,
     } as UserInfo;
-    expect(component.showPrivateClassroomBanner).toBeFalse();
+    expect(component.showPrivateClassroomBanner).toBe(false);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo)
     );
@@ -461,7 +467,7 @@ describe('Classroom Page Component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showPrivateClassroomBanner).toBeTrue();
+    expect(component.showPrivateClassroomBanner).toBe(true);
   }));
 
   it(
@@ -474,9 +480,9 @@ describe('Classroom Page Component', () => {
         teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
         topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
       };
-      expect(
-        component.isHackyClassroomTranslationDisplayed('tags')
-      ).toBeFalse();
+      expect(component.isHackyClassroomTranslationDisplayed('tags')).toBe(
+        false
+      );
     }
   );
 
@@ -484,6 +490,6 @@ describe('Classroom Page Component', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 });
