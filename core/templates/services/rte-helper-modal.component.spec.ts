@@ -339,6 +339,24 @@ describe('RteHelperModalComponent', () => {
         'convertImageDataToImageFile'
       ).and.returnValue(new Blob());
 
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'svgFile',
+        svg_filename: 'svg_filename',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+      component.tmpCustomizationArgs = [
+        {
+          name: 'math_content',
+          value: {
+            raw_latex: 'x^2',
+            svg_filename: 'mathImage.svg',
+          },
+        },
+      ];
+
       component.save();
       flush();
 
