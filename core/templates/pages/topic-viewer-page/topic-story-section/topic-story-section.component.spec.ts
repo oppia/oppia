@@ -121,9 +121,16 @@ describe('TopicStorySectionComponent', () => {
     urlInterpolationService.getStaticCopyrightedImageUrl.and.callFake(
       (p: string) => `/assets/copyrighted-images${p}`
     );
-    urlInterpolationService.interpolateUrl.and.callFake((template: string) => {
-      return template.replace('<exp_id>', 'exp_1');
-    });
+    urlInterpolationService.interpolateUrl.and.callFake(
+      (template: string, params: Record<string, string>) => {
+        let url = template;
+        for (const [key, value] of Object.entries(params)) {
+          url = url.replace(`<${key}>`, value);
+        }
+        url = url.replace('<exp_id>', 'exp_1');
+        return url;
+      }
+    );
 
     assetsBackendApiService.getThumbnailUrlForPreview.and.returnValue(
       '/thumbnail/story/story_id/thumb.png'

@@ -80,6 +80,7 @@ class PracticeSessionsPageDataHandler(
 
         Args:
             topic_name: str. The topic name.
+            **kwargs: str. The keyword arguments.
 
         Raises:
             NotFoundException. The page cannot be found.

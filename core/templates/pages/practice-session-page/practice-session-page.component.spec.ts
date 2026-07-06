@@ -245,6 +245,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
+    // eslint-disable-next-line dot-notation
     expect(component['sessionType']).toBe('lesson');
   }));
 
@@ -265,6 +266,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
+    // eslint-disable-next-line dot-notation
     expect(component['sessionType']).toBe('arc');
   }));
 
@@ -285,6 +287,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
+    // eslint-disable-next-line dot-notation
     expect(component['sessionType']).toBe('mastery');
   }));
 
@@ -305,6 +308,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
+    // eslint-disable-next-line dot-notation
     expect(component['sessionType']).toBe('legacy');
   }));
 
