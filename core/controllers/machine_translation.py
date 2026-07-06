@@ -114,7 +114,19 @@ class TranslationProviderMappingHandler(
     # nested types for validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
         'GET': {},
-        'PUT': {'provider_mapping': {'schema': {'type': 'object_dict'}}},
+        'PUT': {
+            'provider_mapping': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {'schema': {'type': 'unicode'}},
+                    'values': {'schema': {'type': 'unicode'}},
+                }
+            },
+            'automatic_translation_is_enabled': {
+                'schema': {'type': 'bool'},
+                'default_value': None,
+            },
+        },
     }
 
     @acl_decorators.can_access_admin_page
@@ -134,7 +146,20 @@ class TranslationProviderMappingHandler(
             machine_translation_services.get_translation_provider_mapping()
         )
 
-        self.render_json({'provider_mapping': mapping})
+        is_enabled = (
+            machine_translation_services.is_automatic_translation_enabled()
+        )
+        available_providers = (
+            machine_translation_services.get_available_providers_for_ui()
+        )
+
+        self.render_json(
+            {
+                'provider_mapping': mapping,
+                'automatic_translation_is_enabled': is_enabled,
+                'available_providers': available_providers,
+            }
+        )
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
@@ -152,10 +177,14 @@ class TranslationProviderMappingHandler(
         new_translation_provider_mapping = self.normalized_payload.get(
             'provider_mapping'
         )
+        new_is_enabled = self.normalized_payload.get(
+            'automatic_translation_is_enabled'
+        )
 
         try:
-            machine_translation_services.save_translation_provider_mapping(
-                new_translation_provider_mapping
+            machine_translation_services.update_machine_translation_policy(
+                language_to_provider_mapping=new_translation_provider_mapping,
+                automatic_translation_is_enabled=new_is_enabled,
             )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)

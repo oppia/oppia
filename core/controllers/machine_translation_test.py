@@ -199,11 +199,28 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
             'get_translation_provider_mapping',
             lambda: {'hi': 'azure'},
         )
+        is_enabled_swap = self.swap(
+            machine_translation_services,
+            'is_automatic_translation_enabled',
+            lambda: True,
+        )
+        providers_swap = self.swap(
+            machine_translation_services,
+            'get_available_providers_for_ui',
+            lambda: [{'id': 'azure', 'display_name': 'Azure Translator'}],
+        )
 
-        with self.feature_flag_swap, domain_swap:
+        with self.feature_flag_swap, (
+            domain_swap
+        ), is_enabled_swap, providers_swap:
             response = self.get_json('/translation-provider-mapping')
 
         self.assertEqual(response['provider_mapping'], {'hi': 'azure'})
+        self.assertEqual(response['automatic_translation_is_enabled'], True)
+        self.assertEqual(
+            response['available_providers'],
+            [{'id': 'azure', 'display_name': 'Azure Translator'}],
+        )
         self.logout()
 
     def test_get_fails_if_feature_flag_disabled(self) -> None:
@@ -290,4 +307,71 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=404,
             )
 
+        self.logout()
+
+    def test_put_updates_toggle_when_provided(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        toggle_calls = []
+
+        def mock_update_toggle(is_enabled: bool) -> None:
+            toggle_calls.append(is_enabled)
+
+        mapping_swap = self.swap(
+            machine_translation_services,
+            'save_translation_provider_mapping',
+            lambda m: None,
+        )
+        toggle_swap = self.swap(
+            machine_translation_services,
+            'update_translation_automatic_status',
+            mock_update_toggle,
+        )
+
+        payload = {
+            'provider_mapping': {'hi': 'azure'},
+            'automatic_translation_is_enabled': True,
+        }
+
+        with self.feature_flag_swap, mapping_swap, toggle_swap:
+            csrf_token = self.get_new_csrf_token()
+            response = self.put_json(
+                '/translation-provider-mapping',
+                payload,
+                csrf_token=csrf_token,
+            )
+
+        self.assertEqual(response['status'], 'success')
+        self.assertEqual(toggle_calls, [True])
+        self.logout()
+
+    def test_put_does_not_update_toggle_when_not_provided(self) -> None:
+        self.login(self.ADMIN_EMAIL)
+
+        toggle_calls = []
+
+        def mock_update_toggle(is_enabled: bool) -> None:
+            toggle_calls.append(is_enabled)
+
+        mapping_swap = self.swap(
+            machine_translation_services,
+            'save_translation_provider_mapping',
+            lambda m: None,
+        )
+        toggle_swap = self.swap(
+            machine_translation_services,
+            'update_translation_automatic_status',
+            mock_update_toggle,
+        )
+
+        with self.feature_flag_swap, mapping_swap, toggle_swap:
+            csrf_token = self.get_new_csrf_token()
+            response = self.put_json(
+                '/translation-provider-mapping',
+                self.valid_payload,
+                csrf_token=csrf_token,
+            )
+
+        self.assertEqual(response['status'], 'success')
+        self.assertEqual(toggle_calls, [])  # Toggle NOT called
         self.logout()

@@ -1,0 +1,84 @@
+<div class="e2e-test-translation-config-container">
+  <mat-card class="oppia-admin-card oppia-page-card">
+    <h3>Manage supported languages for auto-translation</h3>
+
+    <table class="table e2e-test-provider-mapping-table">
+      <thead>
+        <tr>
+          <th scope="col">Language</th>
+          <th scope="col">Translation Provider</th>
+          <th scope="col">Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let entry of providerMapping | keyvalue"
+          class="e2e-test-mapping-row">
+          <td>{{ getLanguageName(entry.key) }}</td>
+          <td>{{ getProviderDisplayName(entry.value) }}</td>
+          <td>
+            <button
+              mat-icon-button
+              color="warn"
+              class="e2e-test-remove-mapping-btn"
+              [attr.aria-label]="'Remove ' + getLanguageName(entry.key)"
+              (click)="removeMapping(entry.key)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </td>
+        </tr>
+
+        <tr class="add-mapping-row">
+          <td>
+            <select
+              [(ngModel)]="selectedLanguage"
+              (ngModelChange)="onLanguageChange()"
+              class="form-control e2e-test-language-dropdown"
+              aria-label="Select language">
+              <option value="" disabled>Language</option>
+              <option
+                *ngFor="let lang of getUnmappedLanguageOptions()"
+                [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <select
+              [(ngModel)]="selectedProvider"
+              class="form-control e2e-test-provider-dropdown"
+              aria-label="Select provider">
+              <option value="" disabled>Provider</option>
+              <option
+                *ngFor="let provider of availableProvidersForLanguage"
+                [value]="provider.id">
+                {{ provider.display_name }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <button
+              class="btn btn-secondary e2e-test-add-mapping-btn"
+              [disabled]="!selectedLanguage || !selectedProvider"
+              (click)="addMapping()">
+              Add
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card>
+
+  <mat-card class="oppia-admin-card oppia-page-card mt-4">
+    <h3>Automatic Translation</h3>
+    <div class="d-flex justify-content-between align-items-center">
+      <span>Enable Automatic Translation Suggestions</span>
+      <mat-slide-toggle
+        class="e2e-test-auto-translation-toggle"
+        [(ngModel)]="isAutomaticTranslationEnabled"
+        (change)="toggleAutomaticTranslation()"
+        aria-label="Enable automatic translation suggestions">
+      </mat-slide-toggle>
+    </div>
+  </mat-card>
+</div>

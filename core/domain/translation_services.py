@@ -485,3 +485,44 @@ def save_machine_translation_provider_mapping(
         model.language_to_provider_mapping = language_to_provider_mapping
     model.update_timestamps()
     model.put()
+
+
+def update_machine_translation_policy(
+    language_to_provider_mapping: Optional[Dict[str, str]] = None,
+    automatic_translation_is_enabled: Optional[bool] = None,
+) -> None:
+    if language_to_provider_mapping is not None:
+        mapping_domain_object = (
+            translation_domain.MachineTranslationProviderMapping(
+                language_to_provider_mapping
+            )
+        )
+        mapping_domain_object.validate()
+
+    model = translation_models.MachineTranslationPolicyModel.get(
+        translation_models.MACHINE_TRANSLATION_POLICY_ID, strict=False
+    )
+    if model is None:
+        model = translation_models.MachineTranslationPolicyModel(
+            id=translation_models.MACHINE_TRANSLATION_POLICY_ID,
+            automatic_translation_is_enabled=(
+                automatic_translation_is_enabled
+                if automatic_translation_is_enabled is not None
+                else False
+            ),
+            language_to_provider_mapping=(
+                language_to_provider_mapping
+                if language_to_provider_mapping is not None
+                else {}
+            ),
+        )
+    else:
+        if language_to_provider_mapping is not None:
+            model.language_to_provider_mapping = language_to_provider_mapping
+        if automatic_translation_is_enabled is not None:
+            model.automatic_translation_is_enabled = (
+                automatic_translation_is_enabled
+            )
+
+    model.update_timestamps()
+    model.put()

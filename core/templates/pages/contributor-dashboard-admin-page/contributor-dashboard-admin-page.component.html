@@ -5,6 +5,10 @@
 </div>
 <br>
 
+<div *ngIf="isAutoTranslationEnabled">
+  <oppia-translation-configuration-tab></oppia-translation-configuration-tab>
+</div>
+
 <div *ngIf="isNewUiEnabled">
   <contributor-admin-dashboard-page></contributor-admin-dashboard-page>
 </div>

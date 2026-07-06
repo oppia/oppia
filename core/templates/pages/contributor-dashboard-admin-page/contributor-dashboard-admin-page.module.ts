@@ -22,6 +22,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {MatTableModule} from '@angular/material/table';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
@@ -35,6 +36,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ContributorDashboardAdminPageRootComponent} from './contributor-dashboard-admin-page-root.component';
 import {ContributorDashboardAdminAuthGuard} from './contributor-dashboard-admin-auth.guard';
 import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-admin-page.component';
+import {TranslationConfigurationTabComponent} from './translation-configuration-tab/translation-configuration-tab.component';
 
 @NgModule({
   imports: [
@@ -42,11 +44,13 @@ import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-ad
     FormsModule,
     MatTableModule,
     MatTooltipModule,
+    MatSlideToggleModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
         path: '',
         component: ContributorDashboardAdminPageRootComponent,
+        TranslationConfigurationTabComponent,
         canActivate: [ContributorDashboardAdminAuthGuard],
       },
     ]),
@@ -61,8 +65,10 @@ import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-ad
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal,
+    TranslationConfigurationTabComponent,
     ContributorDashboardAdminPageComponent,
     ContributorDashboardAdminPageRootComponent,
+    TranslationConfigurationTabComponent,
   ],
   entryComponents: [
     CdAdminTranslationRoleEditorModal,
@@ -73,6 +79,7 @@ import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-ad
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal,
+    TranslationConfigurationTabComponent,
   ],
 })
 export class ContributorDashboardAdminPageModule {}

@@ -221,3 +221,48 @@ def save_translation_provider_mapping(new_mapping: Dict[str, str]) -> None:
         new_mapping: dict. The new mapping to save.
     """
     translation_services.save_machine_translation_provider_mapping(new_mapping)
+
+
+def is_automatic_translation_enabled() -> bool:
+    # Returns whether automatic translation is enabled.
+    return translation_services.is_automatic_translation_enabled()
+
+
+def update_translation_automatic_status(is_enabled: bool) -> None:
+    # Updates the automatic translation enabled/disabled flag.
+    translation_services.update_automatic_translation_status(is_enabled)
+
+
+def get_available_providers_for_ui() -> list:
+    # Returns available providers with human-readable display names.
+    provider_display_names: Dict[str, str] = {
+        'azure': 'Azure Translator',
+        'gcp': 'Google Cloud Translate',
+    }
+    whitelist: Dict[str, list] = json.loads(
+        utils.get_file_contents('assets/auto_translation_provider_mapping.json')
+    )
+    all_provider_ids: set = set()
+    for providers in whitelist.values():
+        all_provider_ids.update(providers)
+    return sorted(
+        [
+            {
+                'id': pid,
+                'display_name': provider_display_names.get(
+                    pid, pid.capitalize()
+                ),
+            }
+            for pid in all_provider_ids
+        ],
+        key=lambda p: p['id'],
+    )
+
+
+def update_machine_translation_policy(
+    language_to_provider_mapping: Optional[Dict[str, str]] = None,
+    automatic_translation_is_enabled: Optional[bool] = None,
+) -> None:
+    translation_services.update_machine_translation_policy(
+        language_to_provider_mapping, automatic_translation_is_enabled
+    )

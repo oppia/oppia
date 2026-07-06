@@ -1134,14 +1134,18 @@ class MachineTranslationProviderMapping:
                 'language_to_provider_mapping must be a dictionary.'
             )
         machine_translation_providers = json.loads(
-            utils.get_file_contents('auto_translation_provider_mapping.json')
+            utils.get_file_contents(
+                'assets/auto_translation_provider_mapping.json'
+            )
         )
 
         for (
             language_code,
             provider,
         ) in self.language_to_provider_mapping.items():
-            if not utils.is_valid_language_code(language_code):
+            if not utils.is_supported_audio_language_code(
+                language_code
+            ) and not utils.is_valid_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language code: %s' % language_code
                 )

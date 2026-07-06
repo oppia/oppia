@@ -91,6 +91,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   statusMessage: string = '';
   UserIsTranslationAdmin: boolean = false;
   isNewUiEnabled: boolean = false;
+  isAutoTranslationEnabled: boolean = false;
 
   USER_FILTER_CRITERION_ROLE: string;
   USER_FILTER_CRITERION_USERNAME: string;
@@ -205,6 +206,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   ngOnInit(): void {
     this.isNewUiEnabled =
       this.platformFeatureService.status.CdAdminDashboardNewUi.isEnabled;
+    this.isAutoTranslationEnabled =
+      this.platformFeatureService.status.EnableAutomaticTranslationSuggestions.isEnabled;
     this.userService.getUserInfoAsync().then(userInfo => {
       let translationCategories = {};
       let questionCategories = {};
