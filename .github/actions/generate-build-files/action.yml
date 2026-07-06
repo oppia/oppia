@@ -21,11 +21,11 @@ runs:
           /home/runner/work/oppia/oppia/backend_prod_files
           /home/runner/work/oppia/oppia/dist
           /home/runner/work/oppia/oppia/third_party/generated
-    - name: Build (prod)
+    - name: Build Webpack (prod)
       if: steps.restore_build_files_cache.outputs.cache-hit != 'true' && inputs.prod-env != 'false'
       run: python -m scripts.build --prod_env
       shell: bash
-    - name: Build (dev)
+    - name: Build Webpack (dev)
       if: steps.restore_build_files_cache.outputs.cache-hit != 'true' && inputs.prod-env == 'false'
       run: python -c "from scripts import build; build.build_js_files(dev_mode=True)"
       shell: bash
