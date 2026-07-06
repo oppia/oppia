@@ -38,6 +38,7 @@ import {
   Collection,
   CollectionBackendDict,
 } from 'domain/collection/collection.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -395,12 +396,7 @@ describe('Collection player page component', () => {
       tick();
 
       // This happens when collection is not loaded.
-      component.collectionPlaythrough = undefined as unknown as {
-        getNextExplorationId: () => string | null;
-        getCompletedExplorationIds: () => string[];
-        getNextRecommendedCollectionNodeCount: () => number;
-        getCompletedExplorationNodeCount: () => number;
-      };
+      component.collectionPlaythrough = undefined;
       let res = component.isCompletedExploration('123');
 
       expect(res).toBe(false);
@@ -758,7 +754,7 @@ describe('Collection player page component', () => {
     component.fetchSummaryAsync('collectionId');
     tick();
     expect(component.collectionSummary).toEqual(
-      summaryDict as unknown as import('domain/collection/collection-summary.model').CollectionSummaryBackendDict
+      summaryDict as CollectionSummaryBackendDict
     );
   }));
 

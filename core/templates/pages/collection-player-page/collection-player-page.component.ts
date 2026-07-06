@@ -74,7 +74,7 @@ export interface CollectionHandler {
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   collection!: Collection;
-  collectionPlaythrough!: {
+  collectionPlaythrough?: {
     getNextExplorationId: () => string | null;
     getCompletedExplorationIds: () => string[];
     getNextRecommendedCollectionNodeCount: () => number;

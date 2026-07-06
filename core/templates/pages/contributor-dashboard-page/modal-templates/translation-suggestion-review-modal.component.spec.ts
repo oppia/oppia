@@ -534,7 +534,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewMessage).toBe('');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it(
@@ -559,7 +559,7 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       expect(component.errorFound).toBe(true);
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
@@ -660,8 +660,8 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.updateSuggestion();
 
-      expect(isSubmittingInServiceCall).toBeTrue();
-      expect(component.isSubmitting).toBeFalse();
+      expect(isSubmittingInServiceCall).toBe(true);
+      expect(component.isSubmitting).toBe(false);
       expect(
         contributionAndReviewService.updateTranslationSuggestionAsync
       ).toHaveBeenCalledWith(
@@ -694,7 +694,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(
         component.showTranslationSuggestionUpdateError
       ).toHaveBeenCalledWith(error);
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
@@ -1023,7 +1023,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewMessage).toBe('');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it(
@@ -1048,7 +1048,7 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       expect(component.errorFound).toBe(true);
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     it('should reset resolvingSuggestion to false when acceptAndReviewNext fails', function () {
@@ -1074,7 +1074,7 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.acceptAndReviewNext();
 
-      expect(component.resolvingSuggestion).toBeFalse();
+      expect(component.resolvingSuggestion).toBe(false);
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Invalid Suggestion: Error'
       );
@@ -1104,7 +1104,7 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.rejectAndReviewNext(component.reviewMessage);
 
-      expect(component.resolvingSuggestion).toBeFalse();
+      expect(component.resolvingSuggestion).toBe(false);
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Invalid Suggestion: Error'
       );
@@ -1495,8 +1495,8 @@ describe('Translation Suggestion Review Modal Component', function () {
 
       component.updateSuggestion();
 
-      expect(isSubmittingInServiceCall).toBeTrue();
-      expect(component.isSubmitting).toBeFalse();
+      expect(isSubmittingInServiceCall).toBe(true);
+      expect(component.isSubmitting).toBe(false);
       expect(
         contributionAndReviewService.updateTranslationSuggestionAsync
       ).toHaveBeenCalledWith(
@@ -1529,7 +1529,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(
         component.showTranslationSuggestionUpdateError
       ).toHaveBeenCalledWith(error);
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     describe('isHtmlContentEqual', function () {
@@ -2335,7 +2335,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should reset isSubmitting to false when refreshActiveContributionState is called', () => {
       component.isSubmitting = true;
       component.refreshActiveContributionState();
-      expect(component.isSubmitting).toBeFalse();
+      expect(component.isSubmitting).toBe(false);
     });
 
     const reviewable = true;

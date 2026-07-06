@@ -29,7 +29,10 @@ import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Subscription, Observable} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
-import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {
+  FetchSkillResponse,
+  SkillBackendApiService,
+} from 'domain/skill/skill-backend-api.service';
 import {
   MisconceptionSkillMap,
   Misconception,
@@ -38,6 +41,7 @@ import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
   TranslationSuggestionReviewModalComponent,
+  PendingSuggestionDict,
 } from '../modal-templates/translation-suggestion-review-modal.component';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import {QuestionSuggestionReviewModalComponent} from '../modal-templates/question-suggestion-review-modal.component';
@@ -67,6 +71,11 @@ export interface Suggestion {
     translation_html: string | string[];
     question_dict: QuestionBackendDict;
     skill_difficulty: string[];
+    cmd?: string;
+    content_id?: string;
+    data_format?: string;
+    language_code?: string;
+    state_name?: string;
   };
   status: string;
   suggestion_type: string;
@@ -74,6 +83,9 @@ export interface Suggestion {
   suggestion_id: string;
   author_name: string;
   exploration_content_html: string | null;
+  language_code?: string;
+  last_updated_msecs?: number;
+  target_type?: string;
 }
 
 export interface ContributionsSummary {
@@ -175,7 +187,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     reviewer_message: string;
     commit_message?: string;
   } | null = null;
-  queuedSuggestion: Suggestion | null = null;
+  queuedSuggestion: PendingSuggestionDict | null = null;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   tabNameToOpportunityFetchFunction: {
     [key: string]: {
@@ -493,7 +505,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
 
     modalRef.componentInstance.queuedSuggestionEmit.subscribe(
-      (queuedSuggestion: Suggestion) => {
+      (queuedSuggestion: PendingSuggestionDict) => {
         this.queuedSuggestion = queuedSuggestion;
       }
     );
@@ -636,7 +648,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     for (let suggestionId in this.contributions) {
       var contribution = this.contributions[suggestionId];
       suggestionIdToContribution[suggestionId] =
-        contribution as unknown as ActiveContributionDict;
+        contribution as ActiveContributionDict;
     }
     const skillId = suggestion.change_cmd.skill_id;
 
@@ -645,13 +657,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       skillId
     );
 
-    this.skillBackendApiService.fetchSkillAsync(skillId).then(
-      (skillDict: {
-        skill: {
-          getId: () => string;
-          getMisconceptions: () => Misconception[];
-        };
-      }) => {
+    this.skillBackendApiService
+      .fetchSkillAsync(skillId)
+      .then((skillDict: FetchSkillResponse) => {
         const misconceptionsBySkill: MisconceptionSkillMap = {};
         const skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
@@ -662,8 +670,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           question as Question,
           misconceptionsBySkill
         );
-      }
-    );
+      });
   }
 
   onClickViewSuggestion(suggestionId: string): void {
@@ -678,7 +685,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       for (let suggestionId in this.contributions) {
         const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] =
-          contribution as unknown as ActiveContributionDict;
+          contribution as ActiveContributionDict;
       }
       this.pageContextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,

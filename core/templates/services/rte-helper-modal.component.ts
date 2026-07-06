@@ -28,7 +28,7 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ServicesConstants} from 'services/services.constants';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, AbstractControl} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
 
@@ -210,8 +210,10 @@ export class RteHelperModalComponent {
       }
     }
 
-    const formGroupControls: {[key: number]: unknown} = {};
-    this.customizationArgSpecs.forEach((_: unknown, index: number) => {
+    const formGroupControls: {
+      [key: string]: AbstractControl;
+    } = {};
+    this.customizationArgSpecs.forEach((_, index: number) => {
       formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
@@ -243,7 +245,9 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: {[key: number]: unknown}): void {
+  onCustomizationArgsFormChange(value: {
+    [key: number]: CustomizationArgsNameAndValueArray[number]['value'];
+  }): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = (value[0] as {raw_latex: string}).raw_latex;
@@ -276,7 +280,7 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      const tabsArray = value[0] as {title: string; content: string}[];
+      const tabsArray = value[0] as readonly {title: string; content: string}[];
       for (let tabIndex = 0; tabIndex < tabsArray.length; tabIndex++) {
         if (tabsArray[tabIndex].title === '') {
           this.updateRteErrorMessage(
@@ -599,6 +603,11 @@ export class RteHelperModalComponent {
               this.ngbActiveModal.dismiss('cancel');
             }
           );
+      } else {
+        this.alertsService.addWarning(
+          'Error: Could not retrieve entity type or entity ID.'
+        );
+        this.ngbActiveModal.dismiss('cancel');
       }
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {

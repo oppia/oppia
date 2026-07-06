@@ -326,6 +326,28 @@ describe('RteHelperModalComponent', () => {
       expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
     }));
 
+    it('should handle missing entity context when saving math SVG', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(pageContextService, 'getEntityType').and.returnValue(
+        undefined as unknown as string
+      );
+      spyOn(pageContextService, 'getEntityId').and.returnValue(
+        undefined as unknown as string
+      );
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(new Blob());
+
+      component.save();
+      flush();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Error: Could not retrieve entity type or entity ID.'
+      );
+      expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+    }));
+
     it('should cancel the modal when math SVG exceeds 100 KB', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
