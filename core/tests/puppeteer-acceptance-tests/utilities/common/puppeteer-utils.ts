@@ -938,10 +938,12 @@ export class BaseUser {
     await this.page.select(selector, option);
   }
 
-  /**
-   * This function navigates to the given URL.
-   */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
+    const currentUrl = this.page.url().replace(/\/$/, '');
+    const targetUrl = url.replace(/\/$/, '');
+    if (currentUrl === targetUrl) {
+      return;
+    }
     await this.page.goto(url, {
       waitUntil: ['networkidle2', 'load'],
       timeout: 60000,
