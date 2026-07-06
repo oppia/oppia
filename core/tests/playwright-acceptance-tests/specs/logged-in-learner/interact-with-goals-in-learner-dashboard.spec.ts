@@ -162,7 +162,7 @@ test.describe('Logged-In Learner', function () {
     );
   });
 
-  test('should complete Chapter 2 and update progress to 66%', async function () {
+  test('should complete Chapter 2 and update progress to 67%', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
@@ -180,10 +180,10 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
 
-    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 66);
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 67);
 
     await loggedInUser.expectScreenshotToMatch(
-      'chapter2CompletedWith66PercentProgress'
+      'chapter2CompletedWith67PercentProgress'
     );
   });
 
