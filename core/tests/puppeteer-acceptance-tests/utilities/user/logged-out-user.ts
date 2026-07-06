@@ -899,6 +899,7 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
