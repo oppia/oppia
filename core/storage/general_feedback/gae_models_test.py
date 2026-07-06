@@ -465,10 +465,10 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
     def test_create_raises_error_when_lesson_metadata_has_no_exploration_id(
         self,
     ) -> None:
-        lesson_metadata_without_exploration_id = {
-            **LESSON_METADATA_JSON,
-            'exploration_id': None,
-        }
+        lesson_metadata_without_exploration_id: Dict[
+            str, Union[str, int, None]
+        ] = dict(LESSON_METADATA_JSON)
+        lesson_metadata_without_exploration_id['exploration_id'] = None
 
         with self.assertRaisesRegex(
             ValueError,
