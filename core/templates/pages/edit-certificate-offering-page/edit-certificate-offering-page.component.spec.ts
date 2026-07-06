@@ -25,19 +25,45 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {AlertsService} from 'services/alerts.service';
+
+const CERTIFICATE_OFFERING_UPDATED_ACTION =
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+const CERTIFICATE_OFFERING_NOT_READY_ACTION =
+  CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY;
 
 describe('Edit Certificate Offering Page Component', () => {
   let component: EditCertificateOfferingPageComponent;
   let fixture: ComponentFixture<EditCertificateOfferingPageComponent>;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
+  let ngbModal: NgbModal;
   let router: Router;
+  const alertsServiceMock = {
+    addWarning: () => {},
+    addSuccessMessage: () => {},
+  } as Pick<AlertsService, 'addWarning' | 'addSuccessMessage'>;
+  const certificateAssessmentOfferingBackendApiServiceMock = {
+    getCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
+    updateCertificateAssessmentOfferingAsync: async () =>
+      Promise.resolve('certificate_offering_id'),
+  } as Pick<
+    CertificateAssessmentOfferingBackendApiService,
+    | 'getCertificateAssessmentOfferingAsync'
+    | 'updateCertificateAssessmentOfferingAsync'
+  >;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,15 +81,22 @@ describe('Edit Certificate Offering Page Component', () => {
         },
         {
           provide: AlertsService,
-          useValue: {
-            addSuccessMessage: () => {},
-          },
+          useValue: alertsServiceMock,
         },
         {
           provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: certificateAssessmentOfferingBackendApiServiceMock,
+        },
+        {
+          provide: NgbModal,
           useValue: {
-            updateCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve('certificate_offering_id'),
+            open: () =>
+              ({
+                componentInstance: {
+                  isCertificateValid: true,
+                },
+                result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
+              }) as NgbModalRef,
           },
         },
         {
@@ -84,6 +117,7 @@ describe('Edit Certificate Offering Page Component', () => {
     certificateAssessmentOfferingBackendApiService = TestBed.inject(
       CertificateAssessmentOfferingBackendApiService
     );
+    ngbModal = TestBed.inject(NgbModal);
     router = TestBed.inject(Router);
     fixture.detectChanges();
   });
@@ -97,30 +131,78 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(component.certificateOfferingId).toEqual('certificate_offering_id');
   });
 
-  it('should populate the certificate assessment offering with an empty model', () => {
-    component.populateCertificateAssessmentOfferingFromId();
+  it('should populate the certificate assessment offering with an empty model', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.resolveTo(CertificateAssessmentOfferingData.createEmpty());
 
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(apiSpy).toHaveBeenCalledWith('certificate_offering_id');
     expect(component.certificateAssessmentOffering).toEqual(
       CertificateAssessmentOfferingData.createEmpty()
     );
-  });
+  }));
+
+  it('should populate the certificate assessment offering from backend data', fakeAsync(() => {
+    const fetchedOffering = new CertificateAssessmentOfferingData(
+      'certificate_offering_id',
+      'Loaded Title',
+      'Loaded Description',
+      'loaded_classroom',
+      {topic_1: 1},
+      3,
+      15,
+      [],
+      'Available',
+      1
+    );
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.resolveTo(fetchedOffering);
+
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(component.certificateAssessmentOffering).toEqual(fetchedOffering);
+  }));
+
+  it('should warn and navigate away if loading the certificate offering fails', fakeAsync(() => {
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject(new Error('Backend error')));
+
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'The certificate offering could not be loaded.'
+    );
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
 
   it('should correctly evaluate active sections', () => {
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
-    expect(component.isDetailsSection()).toBeTrue();
-    expect(component.isAddTopicsSection()).toBeFalse();
-    expect(component.isReviewAndAvailabilitySection()).toBeFalse();
+    expect(component.isDetailsSection()).toBe(true);
+    expect(component.isAddTopicsSection()).toBe(false);
+    expect(component.isReviewAndAvailabilitySection()).toBe(false);
 
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
-    expect(component.isDetailsSection()).toBeFalse();
-    expect(component.isAddTopicsSection()).toBeTrue();
-    expect(component.isReviewAndAvailabilitySection()).toBeFalse();
+    expect(component.isDetailsSection()).toBe(false);
+    expect(component.isAddTopicsSection()).toBe(true);
+    expect(component.isReviewAndAvailabilitySection()).toBe(false);
 
     component.activeSection =
       CERTIFICATE_OFFERING_SECTION_IDS.REVIEW_AND_AVAILABILITY;
-    expect(component.isDetailsSection()).toBeFalse();
-    expect(component.isAddTopicsSection()).toBeFalse();
-    expect(component.isReviewAndAvailabilitySection()).toBeTrue();
+    expect(component.isDetailsSection()).toBe(false);
+    expect(component.isAddTopicsSection()).toBe(false);
+    expect(component.isReviewAndAvailabilitySection()).toBe(true);
   });
 
   it('should navigate to specific sections correctly', () => {
@@ -170,21 +252,104 @@ describe('Edit Certificate Offering Page Component', () => {
   });
 
   it('should update certificate offering successfully and navigate away', fakeAsync(() => {
+    const modalRef = {
+      componentInstance: {
+        isCertificateValid: true,
+        action: undefined as string | undefined,
+      },
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
+    } as NgbModalRef;
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(modalRef.componentInstance.action).toBe(
+      CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
+    );
+    expect(apiSpy).toHaveBeenCalledWith(
+      'certificate_offering_id',
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
+    );
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
+
+  it('should open the post-result modal for updated certificates and navigate after dismissal', fakeAsync(() => {
+    const firstModalRef = {
+      componentInstance: {
+        isCertificateValid: true,
+        action: undefined as string | undefined,
+      },
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
+    } as NgbModalRef;
+    const secondModalRef = {
+      componentInstance: {
+        action: undefined as string | undefined,
+      },
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef;
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.resolveTo('certificate_offering_id');
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
+      firstModalRef,
+      secondModalRef
+    );
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(apiSpy).toHaveBeenCalledWith(
+      'certificate_offering_id',
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
+    );
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(secondModalRef.componentInstance.action).toBe(
+      CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
+    );
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
+
+  it('should save certificate offering as not ready and navigate away', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.resolveTo('certificate_offering_id');
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
+    } as NgbModalRef);
 
     component.updateCertificateOffering();
     flushMicrotasks();
 
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Not_Ready',
+      })
     );
-    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
@@ -195,11 +360,83 @@ describe('Edit Certificate Offering Page Component', () => {
     ).and.returnValue(Promise.resolve(''));
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
+    } as NgbModalRef);
 
     component.updateCertificateOffering();
     flushMicrotasks();
 
     expect(alertsSpy).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should return early when the confirmation modal is dismissed', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    );
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef);
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(apiSpy).not.toHaveBeenCalled();
+    expect(alertsSpy).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should show the backend error message when update fails with Error', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
+    } as NgbModalRef);
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.reject(new Error('Failed to update certificate.'))
+    );
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to update certificate.');
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should fall back to a generic warning when update fails with a non-Error', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
+    } as NgbModalRef);
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject('Failed to update certificate.'));
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to update certificate.');
     expect(routerSpy).not.toHaveBeenCalled();
   }));
 });

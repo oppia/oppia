@@ -836,6 +836,7 @@ def managed_acceptance_tests_server(
     headless: bool = False,
     mobile: bool = False,
     prod_env: bool = False,
+    update_snapshots: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
@@ -847,6 +848,9 @@ def managed_acceptance_tests_server(
         headless: bool. Whether to run the acceptance tests in headless mode.
         mobile: bool. Whether to run the acceptance tests in mobile mode.
         prod_env: bool. Whether to run the acceptance tests in production mode.
+        update_snapshots: bool. Whether to update Playwright screenshot
+            baselines instead of comparing against them. Ignored for
+            Puppeteer suites.
         stdout: int. The file descriptor where the standard output of the
             subprocess is sent.
 
@@ -931,6 +935,7 @@ def managed_acceptance_tests_server(
             'MOBILE': 'true' if mobile else 'false',
             'PROD_ENV': 'true' if prod_env else 'false',
             'SPEC_NAME': suite_name,
+            'UPDATE_SNAPSHOTS': 'true' if update_snapshots else 'false',
         }
         playwright_args = [
             playwright_bin,
@@ -941,6 +946,8 @@ def managed_acceptance_tests_server(
         ]
         if headless is False:
             playwright_args.append('--headed')
+        if update_snapshots:
+            playwright_args.append('--update-snapshots')
 
         managed_proc = managed_process(
             playwright_args,

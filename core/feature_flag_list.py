@@ -103,10 +103,11 @@ class FeatureNames(enum.Enum):
         'enable_financial_literacy_campaign_banner_test_mode'
     )
     ENABLE_CERTIFICATE_ASSESSMENT = 'enable_certificate_assessment'
-    WEB_GENERAL_FEEDBACK_MODAL_ENABLED = 'web_general_feedback_modal_enabled'
+    WEB_FEEDBACK_MODAL_ENABLED = 'web_feedback_modal_enabled'
     EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB = (
         'exploration_editor_new_creator_feedback_tab'
     )
+    STORY_EDITOR_ARCS = 'story_editor_arcs'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -135,8 +136,9 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
-    FeatureNames.WEB_GENERAL_FEEDBACK_MODAL_ENABLED,
+    FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
+    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -362,9 +364,9 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV,
         )
     ),
-    FeatureNames.WEB_GENERAL_FEEDBACK_MODAL_ENABLED.value: (
+    FeatureNames.WEB_FEEDBACK_MODAL_ENABLED.value: (
         (
-            'This flag enables the global feedback entry button and feedback modal across web pages. ',
+            'This flag enables the feedback entrypoints and their respective modals, allowing learners to provide feedback, report an issue and give suggestion on lessons and on the site. ',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
@@ -372,6 +374,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.STORY_EDITOR_ARCS.value: (
+        (
+            'This flag enables arc-based chapter groupings in the story editor, '
+            'allowing creators to organize chapters into named arcs.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
