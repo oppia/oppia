@@ -366,7 +366,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         self,
     ) -> None:
         story_id = 'story_id'
+        deleted_story_id = 'del_story'
         exp_id = 'exp_1'
+        exp_id_2 = 'exp_2'
         self.save_new_valid_exploration(exp_id, self.admin_id)
         self.publish_exploration(self.admin_id, exp_id)
         self.save_new_story(story_id, self.admin_id, self.topic_id)
@@ -399,9 +401,17 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Added node.',
         )
         topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
         topic_services.add_canonical_story(
-            self.admin_id, self.topic_id, 'nonexistent'
+            self.admin_id, self.topic_id, deleted_story_id
         )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
             '%s/staging/%s/nonexistent_node'

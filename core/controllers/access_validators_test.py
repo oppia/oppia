@@ -539,7 +539,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_lesson_practice_with_story_that_does_not_exist(self) -> None:
         story_id = 'story_id'
+        deleted_story_id = 'del_story'
         exp_id = 'exp_1'
+        exp_id_2 = 'exp_3'
         self.save_new_valid_exploration(exp_id, self.admin_id)
         self.publish_exploration(self.admin_id, exp_id)
         self.save_new_story(story_id, self.admin_id, self.topic_id)
@@ -572,10 +574,16 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             'Added node.',
         )
         topic_services.publish_story(self.topic_id, story_id, self.admin_id)
-        # Add a non-existent story to trigger the story is None branch.
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
         topic_services.add_canonical_story(
-            self.admin_id, self.topic_id, 'nonexistent'
+            self.admin_id, self.topic_id, deleted_story_id
         )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/practice/%s'
@@ -590,7 +598,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_end_of_arc_page_with_story_that_does_not_exist(self) -> None:
         story_id = 'story_id_2'
+        deleted_story_id = 'del_story2'
         exp_id = 'exp_2'
+        exp_id_2 = 'exp_4'
         self.save_new_valid_exploration(exp_id, self.admin_id)
         self.publish_exploration(self.admin_id, exp_id)
         self.save_new_story(story_id, self.admin_id, self.topic_id)
@@ -639,10 +649,16 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             ],
             'Added arc.',
         )
-        # Add a non-existent story to trigger the story is None branch.
+        self.save_new_valid_exploration(exp_id_2, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id_2)
+        self.save_new_story(deleted_story_id, self.admin_id, self.topic_id)
         topic_services.add_canonical_story(
-            self.admin_id, self.topic_id, 'nonexistent'
+            self.admin_id, self.topic_id, deleted_story_id
         )
+        topic_services.publish_story(
+            self.topic_id, deleted_story_id, self.admin_id
+        )
+        story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
