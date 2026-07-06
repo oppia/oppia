@@ -60,13 +60,6 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     validation_message: str
 
 
-class CertificateAssessmentOfferingTopicInfoDict(TypedDict):
-    """Dict representation of a topic's validation inputs."""
-
-    name: str
-    skill_ids: List[str]
-
-
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
 ) -> tuple[Dict[str, List[str]], List[topic_domain.Topic]]:

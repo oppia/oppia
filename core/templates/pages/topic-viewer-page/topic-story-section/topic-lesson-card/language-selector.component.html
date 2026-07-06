@@ -1,0 +1,72 @@
+<div class="topic-lesson-language-selector-row topic-lesson-language-selector-row--compact">
+  <div class="topic-lesson-language-selector-select-container">
+    <i class="fas fa-file-alt topic-lesson-language-selector-leading-icon"
+       aria-hidden="true">
+    </i>
+    <div class="topic-lesson-language-selector-text-block">
+      <span class="topic-lesson-language-selector-chip-label">{{ 'I18N_LANGUAGE_SELECTOR_TEXT_LABEL' | translate }}</span>
+      <span class="topic-lesson-language-selector-selected-value">
+        {{ selectedTextLanguageCode ? getLanguageDescription(selectedTextLanguageCode) : ('I18N_LANGUAGE_SELECTOR_SELECT' | translate) }}
+      </span>
+    </div>
+
+    <select
+            class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
+            [ngModel]="selectedTextLanguageCode"
+            (ngModelChange)="onTextLanguageChange($event)"
+            [attr.aria-label]="'I18N_LANGUAGE_SELECTOR_TEXT_ARIA_LABEL' | translate"
+            required>
+      <option *ngFor="let textLanguageCode of availableTextLanguageCodes"
+              [value]="textLanguageCode">
+        {{ getLanguageDescription(textLanguageCode) }}
+      </option>
+    </select>
+
+    <i class="fa fa-angle-down topic-lesson-language-selector-trailing-icon"
+       aria-hidden="true">
+    </i>
+  </div>
+
+  <div class="topic-lesson-language-selector-select-container">
+    <i class="fa fa-headphones topic-lesson-language-selector-leading-icon"
+       aria-hidden="true">
+    </i>
+    <div class="topic-lesson-language-selector-text-block">
+      <span class="topic-lesson-language-selector-chip-label">{{ 'I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate }}</span>
+      <span class="topic-lesson-language-selector-selected-value">
+        {{ getSelectedVoiceoverLanguageLabel() }}
+      </span>
+    </div>
+
+    <select
+            class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
+            [ngModel]="getValidSelectedVoiceoverLanguageCode()"
+            (ngModelChange)="onVoiceoverLanguageChange($event)"
+            [attr.aria-label]="'I18N_LANGUAGE_SELECTOR_VOICEOVER_ARIA_LABEL' | translate"
+            [disabled]="!hasVoiceoverLanguageOptions()">
+      <option
+              *ngFor="let voiceoverLanguageCode of filteredVoiceoverLanguageCodes"
+              [value]="voiceoverLanguageCode">
+        {{ getLanguageDescription(voiceoverLanguageCode) }}
+      </option>
+    </select>
+
+    <i class="fa fa-angle-down topic-lesson-language-selector-trailing-icon"
+       aria-hidden="true">
+    </i>
+  </div>
+</div>
+
+<p
+   class="topic-lesson-language-selector-note"
+   *ngIf="shouldShowNoAccentsMessage()"
+   aria-live="polite">
+  {{ 'I18N_LANGUAGE_SELECTOR_NO_ACCENTS_MESSAGE' | translate }}
+</p>
+
+<p
+   class="topic-lesson-language-selector-error"
+   *ngIf="shouldShowTextLanguageValidationError()"
+   aria-live="assertive">
+  {{ 'I18N_LANGUAGE_SELECTOR_CHOOSE_TEXT_LANGUAGE' | translate }}
+</p>

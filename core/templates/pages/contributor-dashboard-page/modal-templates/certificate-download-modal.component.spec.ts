@@ -496,6 +496,8 @@ describe('Contributor Certificate Download Modal Component', () => {
         moveTo: () => {},
         lineTo: () => {},
         stroke: () => {},
+        save: () => {},
+        restore: () => {},
       }),
       toBlob: (cb: (blob: Blob | null) => void) => cb(mockBlob),
       toDataURL: () => '',
@@ -520,6 +522,295 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     const image = new Image();
     image.dispatchEvent(new Event('load'));
+  });
+
+  it('should draw updated three-line text for translation certificates', () => {
+    const fillTextCalls: {text: string; x: number; y: number}[] = [];
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: (text: string, x: number, y: number) => {
+          fillTextCalls.push({text, x, y});
+        },
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: () => {},
+      toDataURL: () => 'data:image/png;base64,',
+    };
+
+    // Mock Image so that assigning onload synchronously triggers the
+    // callback. This is needed because the source code sets image.src
+    // before image.onload, so the callback must fire on assignment.
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: () => {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return document.createElement(tag);
+    });
+
+    // Override the global Image constructor.
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    component.suggestionType = 'translate_content';
+    component.createCertificate(certificateData);
+
+    // Restore the original Image constructor.
+    window.Image = originalImage;
+
+    const drawnTexts = fillTextCalls.map(call => call.text);
+
+    // Verify the inverted-pyramid text split for the updated certificate.
+    expect(drawnTexts).toContain(
+      "for their dedication and time in translating Oppia's " +
+        'basic maths, science,'
+    );
+    expect(drawnTexts).toContain(
+      'and financial literacy lessons to Hindi which will help our ' +
+        'Hindi-speaking'
+    );
+    expect(drawnTexts).toContain('learners better understand the lessons.');
+  });
+
+  it('should draw Translations Coordinator title below the signature', () => {
+    const fillTextCalls: {text: string; x: number; y: number}[] = [];
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: (text: string, x: number, y: number) => {
+          fillTextCalls.push({text, x, y});
+        },
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: () => {},
+      toDataURL: () => 'data:image/png;base64,',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: () => {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    component.suggestionType = 'translate_content';
+    component.createCertificate(certificateData);
+
+    window.Image = originalImage;
+
+    // Find the signature name and title calls.
+    const signatureCall = fillTextCalls.find(
+      call => call.text === certificateData.team_lead
+    );
+    const titleCall = fillTextCalls.find(
+      call => call.text === 'Translations Coordinator'
+    );
+
+    expect(signatureCall).toBeDefined();
+    expect(titleCall).toBeDefined();
+
+    if (signatureCall && titleCall) {
+      // The title should be drawn 20px below the signature name
+      // (name is at linePosition - 25, title is at linePosition - 5).
+      expect(titleCall.y).toBe(signatureCall.y + 20);
+      // Both should share the same X coordinate (SIGNATURE_BASE_COORDINATE).
+      expect(titleCall.x).toBe(signatureCall.x);
+    }
+  });
+
+  it('should display singular minute for exactly 1 minute of contribution', () => {
+    const fillTextCalls: {text: string; x: number; y: number}[] = [];
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: (text: string, x: number, y: number) => {
+          fillTextCalls.push({text, x, y});
+        },
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: () => {},
+      toDataURL: () => 'data:image/png;base64,',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: () => {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    // 1/60 hours = exactly 1 minute.
+    const oneMinuteData: ContributorCertificateInfo = {
+      ...certificateData,
+      contribution_hours: 1 / 60,
+    };
+    component.suggestionType = 'translate_content';
+    component.createCertificate(oneMinuteData);
+
+    window.Image = originalImage;
+
+    const drawnTexts = fillTextCalls.map(call => call.text);
+    const timeText = drawnTexts.find(text => text.includes('1 minute'));
+
+    expect(timeText).toBeDefined();
+    // Should say "1 minute" not "1 minutes".
+    expect(timeText).toContain('1 minute of service');
+  });
+
+  it('should not draw Translations Coordinator title on question certificates', () => {
+    const fillTextCalls: {text: string; x: number; y: number}[] = [];
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: (text: string, x: number, y: number) => {
+          fillTextCalls.push({text, x, y});
+        },
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: () => {},
+      toDataURL: () => 'data:image/png;base64,',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: () => {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    component.suggestionType = 'add_question';
+    component.createCertificate(certificateData);
+
+    window.Image = originalImage;
+
+    const drawnTexts = fillTextCalls.map(call => call.text);
+
+    // The title should NOT appear on question certificates.
+    expect(drawnTexts).not.toContain('Translations Coordinator');
+
+    // The signature name should still be drawn.
+    expect(drawnTexts).toContain(certificateData.team_lead);
   });
 
   afterEach(() => {
