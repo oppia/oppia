@@ -39,14 +39,11 @@ export class CertificateDownloadModalComponent {
   @Input() suggestionType!: string;
   @Input() username!: string;
   @Input() languageCode!: string | null;
-  maxSelectableDate: string = this.getDateInInputFormat(new Date());
   fromDate!: string;
   toDate!: string;
   errorMessage!: string;
   errorsFound = false;
-  isDownloading = false;
-  isPrinting = false;
-  isCancelled = false;
+  certificateDownloading = false;
   datesSelected = false;
 
   CERTIFICATE_WIDTH: number = 1500;
@@ -73,14 +70,7 @@ export class CertificateDownloadModalComponent {
   ) {}
 
   close(): void {
-    this.isCancelled = true;
     this.activeModal.close();
-  }
-
-  private getDateInInputFormat(date: Date): string {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${date.getFullYear()}-${month}-${day}`;
   }
 
   validateDate(): void {
@@ -88,7 +78,7 @@ export class CertificateDownloadModalComponent {
     today.setHours(0, 0, 0, 0);
     const toDate = new Date(this.toDate);
     toDate.setHours(0, 0, 0, 0);
-    if (!this.fromDate || !this.toDate || new Date(this.fromDate) > toDate) {
+    if (!this.fromDate || !this.toDate || new Date(this.fromDate) >= toDate) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';
       return;
@@ -102,56 +92,11 @@ export class CertificateDownloadModalComponent {
     this.errorsFound = false;
     this.errorMessage = '';
   }
-  get isDownloadDisabled(): boolean {
-    return (
-      this.isDownloading ||
-      this.isPrinting ||
-      this.disableDownloadButton() ||
-      this.errorsFound
-    );
-  }
 
-  printCertificate(): void {
-    this.errorsFound = false;
-    this.errorMessage = '';
-    this.isPrinting = true;
-    this.isCancelled = false;
-
-    this.contributionAndReviewService
-      .downloadContributorCertificateAsync(
-        this.username,
-        this.suggestionType,
-        this.languageCode,
-        this.fromDate,
-        this.toDate
-      )
-      .then((response: ContributorCertificateResponse) => {
-        if (this.isCancelled) {
-          return;
-        }
-        if (response.certificate_data) {
-          this.createCertificate(response.certificate_data, true);
-        } else {
-          this.errorsFound = true;
-          this.errorMessage =
-            'There are no contributions for the given date range.';
-        }
-        this.isPrinting = false;
-      })
-      .catch((err: HttpErrorResponse) => {
-        if (this.isCancelled) {
-          return;
-        }
-        this.errorsFound = true;
-        this.isPrinting = false;
-        this.errorMessage = err.error.error;
-      });
-  }
   downloadCertificate(): void {
     this.errorsFound = false;
     this.errorMessage = '';
-    this.isDownloading = true;
-    this.isCancelled = false;
+    this.certificateDownloading = true;
     this.contributionAndReviewService
       .downloadContributorCertificateAsync(
         this.username,
@@ -161,9 +106,6 @@ export class CertificateDownloadModalComponent {
         this.toDate
       )
       .then((response: ContributorCertificateResponse) => {
-        if (this.isCancelled) {
-          return;
-        }
         if (response.certificate_data) {
           this.createCertificate(response.certificate_data);
         } else {
@@ -171,14 +113,11 @@ export class CertificateDownloadModalComponent {
           this.errorMessage =
             'There are no contributions for the given date range.';
         }
-        this.isDownloading = false;
+        this.certificateDownloading = false;
       })
       .catch((err: HttpErrorResponse) => {
-        if (this.isCancelled) {
-          return;
-        }
         this.errorsFound = true;
-        this.isDownloading = false;
+        this.certificateDownloading = false;
         this.errorMessage = err.error.error;
       });
   }
@@ -187,10 +126,7 @@ export class CertificateDownloadModalComponent {
     return this.fromDate === undefined || this.toDate === undefined;
   }
 
-  createCertificate(
-    info: ContributorCertificateInfo,
-    isPrinting: boolean = false
-  ): void {
+  createCertificate(info: ContributorCertificateInfo): void {
     const canvas = document.createElement('canvas');
     const currentDate = new Date();
     // Intl.DateTimeFormatOptions is used to enable language sensitive date
@@ -259,27 +195,13 @@ export class CertificateDownloadModalComponent {
       ctx.font = '40px Capriola';
       ctx.fillStyle = '#00645C';
       linePosition += 100;
-      ctx.fillText(
-        info.contributor_name,
-        this.CERTIFICATE_MID_POINT,
-        linePosition
-      );
+      ctx.fillText(this.username, this.CERTIFICATE_MID_POINT, linePosition);
 
       ctx.font = '28px Capriola';
       ctx.fillStyle = '#8F9899';
       linePosition += 100;
 
       if (this.suggestionType === 'translate_content') {
-        // Determine time display: use minutes if less than 1 hour,
-        // otherwise use hours.
-        let timeDisplay: string;
-        if (info.contribution_hours < 1) {
-          const minutes = Math.round(info.contribution_hours * 60);
-          timeDisplay = minutes === 1 ? '1 minute' : minutes + ' minutes';
-        } else {
-          timeDisplay = info.contribution_hours + ' hours';
-        }
-
         const certificateContentData: CertificateContentData[] = [
           {
             text:
@@ -299,7 +221,7 @@ export class CertificateDownloadModalComponent {
           {
             text:
               'This certificate confirms that ' +
-              info.contributor_name +
+              this.username +
               ' has contributed ' +
               info.contribution_hours +
               ' hours ' +
@@ -308,9 +230,7 @@ export class CertificateDownloadModalComponent {
           },
           {
             text:
-              'representing ' +
-              timeDisplay +
-              ' of service from ' +
+              'translations from ' +
               info.from_date +
               ' to ' +
               info.to_date +
@@ -339,7 +259,7 @@ export class CertificateDownloadModalComponent {
           {
             text:
               'This certificate confirms that ' +
-              info.contributor_name +
+              this.username +
               ' has contributed ' +
               info.contribution_hours +
               ' hours',
@@ -383,31 +303,11 @@ export class CertificateDownloadModalComponent {
       ctx.fillText('SIGNATURE', this.SIGNATURE_BASE_COORDINATE, linePosition);
       ctx.fillText('DATE', this.DATE_BASE_COORDINATE, linePosition);
 
-      if (isPrinting) {
-        canvas.toBlob(blob => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = url;
-            document.body.appendChild(iframe);
-
-            iframe.onload = () => {
-              iframe.contentWindow?.print();
-              setTimeout(() => {
-                document.body.removeChild(iframe);
-                URL.revokeObjectURL(url);
-              }, 1000);
-            };
-          }
-        });
-      } else {
-        // Create an HTML link and clicks on it to download.
-        const link = document.createElement('a');
-        link.download = 'certificate.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      }
+      // Create an HTML link and clicks on it to download.
+      const link = document.createElement('a');
+      link.download = 'certificate.png';
+      link.href = canvas.toDataURL();
+      link.click();
     };
   }
 

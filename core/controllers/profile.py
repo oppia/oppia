@@ -436,7 +436,11 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                         'Profile name has already been set and cannot be '
                         'changed.'
                     )
-                user_settings.profile_name = data
+                try:
+                    user_settings.profile_name = data
+                    user_settings.validate()
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException(e)
             else:
                 raise self.InvalidInputException(
                     'Invalid update type: %s' % update_type

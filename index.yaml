@@ -728,24 +728,6 @@ indexes:
   - name: __key__
     direction: desc
 
-- kind: CollectionCommitLogEntryModel
-  properties:
-  - name: post_commit_is_private
-  - name: last_updated
-    direction: desc
-
-- kind: TestSnapshotMetadataModel
-  properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
-
-- kind: BaseSnapshotMetadataModel
-  properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
-
 - kind: UserContributionProficiencyModel
   properties:
   - name: deleted
