@@ -566,6 +566,10 @@ AZURE_TEXT_TO_SPEECH_REGION = 'centralus'
 
 OPPIA_CONTENT_TAG_DELIMITER = '; '
 
+# Azure Translator API configuration for automatic translation suggestions.
+AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
+AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
+
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
@@ -593,6 +597,8 @@ SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
+# The email address for the translation technical support group.
+TRANSLATION_TECH_SUPPORT_EMAIL = 'translations-tech-support@oppia.org'
 CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).

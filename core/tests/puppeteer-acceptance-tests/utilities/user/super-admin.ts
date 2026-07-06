@@ -1374,6 +1374,49 @@ export class SuperAdmin extends BaseUser {
 
     return platformParameterContainerElements[index];
   }
+
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
+    await this.goto('/contributor-dashboard-admin');
+  }
+
+  async enableAutoTranslation(): Promise<void> {
+    const toggleSelector = '.e2e-test-auto-translation-toggle input';
+    await this.waitForElementToBePresent(toggleSelector);
+    const isChecked = await this.page.$eval(
+      toggleSelector,
+      (el: HTMLInputElement) => el.checked
+    );
+    if (!isChecked) {
+      await this.clickOn(toggleSelector);
+    }
+  }
+
+  async addTranslationProviderMapping(
+    languageCode: string,
+    providerId: string
+  ): Promise<void> {
+    const langDropdown = '.e2e-test-language-dropdown';
+    const providerDropdown = '.e2e-test-provider-dropdown';
+    const addButton = '.e2e-test-add-mapping-btn';
+
+    await this.waitForElementToBePresent(langDropdown);
+    await this.page.select(langDropdown, languageCode);
+
+    await this.waitForElementToBePresent(providerDropdown);
+    await this.page.select(providerDropdown, providerId);
+
+    await this.clickOn(addButton);
+  }
+
+  async removeTranslationProviderMapping(languageCode: string): Promise<void> {
+    const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`; // Simplified, might need adjustment based on rendered lang name
+    await this.clickOn(removeButton);
+  }
+
+  async getProviderMappingRowCount(): Promise<number> {
+    const rows = await this.page.$$('.e2e-test-mapping-row');
+    return rows.length;
+  }
 }
 
 export let SuperAdminFactory = (): SuperAdmin => new SuperAdmin();

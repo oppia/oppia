@@ -67,7 +67,7 @@
 .topic-header.studyguide-view-active .topic-header-description {
   display: none;
 }
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .topic-header-breadcrumbs-desktop {
     display: none;
   }

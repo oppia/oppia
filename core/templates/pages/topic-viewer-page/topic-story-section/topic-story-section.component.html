@@ -14,11 +14,10 @@
     </p>
   </div>
 
-  <article class="story-card"
-           [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
+  <div class="story-card" [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
     <div class="story-card-header">
       <div class="story-card-header-left">
-        <h3 class="story-title"><span class="story-label">Story: </span>“{{ storyTitle }}”</h3>
+        <h3 class="story-title"><span class="story-label">Story: </span>"{{ storyTitle }}"</h3>
         <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
           {{ getStoryMetaText() }}
         </p>
@@ -34,6 +33,31 @@
       </div>
     </div>
 
-    <div class="story-card-body"></div>
-  </article>
+    <div class="story-card-body">
+      <div class="story-lesson-card-wrapper"
+           *ngFor="let lessonCard of lessonCards">
+        <topic-lesson-card
+          [lessonTitle]="lessonCard.lessonTitle"
+          [lessonDescription]="lessonCard.lessonDescription"
+          [thumbnailUrl]="lessonCard.thumbnailUrl"
+          [startUrl]="lessonCard.startUrl"
+          [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+          [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
+          [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount">
+        </topic-lesson-card>
+      </div>
+
+      <div class="story-practice-card-wrapper"
+        *ngIf="isPracticeCardVisible">
+        <topic-practice-card
+          [practiceTitle]="practiceCard.practiceTitle"
+          [practiceDescription]="practiceCard.practiceDescription"
+          [relatedLessonNumber]="practiceCard.relatedLessonNumber"
+          [thumbnailUrl]="practiceCard.thumbnailUrl"
+          [studyUrl]="practiceCard.studyUrl"
+          [practiceUrl]="practiceCard.practiceUrl">
+        </topic-practice-card>
+      </div>
+    </div>
+  </div>
 </section>

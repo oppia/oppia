@@ -24,6 +24,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
 import {AppConstants} from 'app.constants';
 
+export interface TranslationAdminConfigResponse {
+  provider_mapping: Record<string, string>;
+  automatic_translation_is_enabled: boolean;
+  available_providers: {id: string; display_name: string}[];
+}
+
 export interface ViewContributionBackendResponse {
   usernames: string[];
 }
@@ -251,6 +257,7 @@ export class ContributorDashboardAdminBackendApiService {
       }
     }
   }
+
   async fetchTranslationConfigurationAsync(): Promise<TranslationAdminConfigResponse> {
     return new Promise((resolve, reject) => {
       this.http
