@@ -361,17 +361,25 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         """Validates arguments passed to create()."""
 
         if source == feconf.SOURCE_LESSON:
-            if not lesson_metadata_json:
+            if lesson_metadata_json is None:
                 raise ValueError(
                     'Lesson feedback must include lesson metadata.'
                 )
+
+            if lesson_metadata_json.get('exploration_id') is None:
+                raise ValueError(
+                    'Lesson feedback must include an exploration ID.'
+                )
+
         elif source == feconf.SOURCE_APP:
-            if category:
+            if category is not None:
                 raise ValueError('App feedback must not include a category.')
-            if lesson_metadata_json:
+
+            if lesson_metadata_json is not None:
                 raise ValueError(
                     'App feedback must not include lesson metadata.'
                 )
+
         else:
             raise ValueError('Invalid source: %s' % source)
 

@@ -462,6 +462,48 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 page_url='https://oppia.org/donate',
             )
 
+    def test_create_raises_error_when_lesson_metadata_has_no_exploration_id(
+        self,
+    ) -> None:
+        lesson_metadata_without_exploration_id = {
+            **LESSON_METADATA_JSON,
+            'exploration_id': None,
+        }
+
+        with self.assertRaisesRegex(
+            ValueError,
+            'Lesson feedback must include an exploration ID.',
+        ):
+            general_feedback_models.PlatformFeedbackModel.create(
+                feedback_text=REPORT_TEXT,
+                source=feconf.SOURCE_LESSON,
+                platform=feconf.PLATFORM_WEB,
+                destination_dashboard=feconf.DESTINATION_CREATOR,
+                category=feconf.CATEGORY_TYPO,
+                lesson_metadata_json=lesson_metadata_without_exploration_id,
+                include_technical_logs=False,
+                screenshot_filename=None,
+                screenshot_entity_id=None,
+                page_url='https://oppia.org/donate',
+            )
+
+    def test_app_report_has_no_top_level_exploration_id(self) -> None:
+        report = general_feedback_models.PlatformFeedbackModel.get_by_id(
+            self.report_id_app
+        )
+
+        self.assertIsNone(report.exploration_id)
+
+    def test_create_stores_top_level_exploration_id(self) -> None:
+        report = general_feedback_models.PlatformFeedbackModel.get_by_id(
+            self.report_id_typo
+        )
+
+        self.assertEqual(
+            report.exploration_id,
+            LESSON_METADATA_JSON['exploration_id'],
+        )
+
     def test_generate_new_id_raises_error_after_many_collisions(
         self,
     ) -> None:
