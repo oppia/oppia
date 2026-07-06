@@ -25,7 +25,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, TypedDict, Union
+from typing import Dict, List, Mapping, Optional, Sequence, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -42,6 +42,17 @@ class CertificateAssessmentResponseCreateDict(TypedDict):
     question_version: int
     selected_answer: str
     is_correct: bool
+
+
+class CertificateAssessmentAttemptExportDict(TypedDict):
+    """Dictionary for a single exported certificate assessment attempt."""
+
+    total_score: float
+    attempt_index: int
+    attempt_data: Dict[str, Dict[str, int]]
+    started_at_msec: float
+    finished_at_msec: Optional[float]
+    is_submitted: bool
 
 
 CertificateAssessmentAttemptVersionDataValue = Union[
@@ -357,6 +368,19 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether any certificate assessment attempts exist for user."""
+        return (
+            cls.query(cls.learner_id == user_id).get(keys_only=True) is not None
+        )
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete all certificate assessment attempts for the user."""
+        keys = cls.query(cls.learner_id == user_id).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
+
+    @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user."""
         return {
@@ -370,6 +394,41 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
             'finished_at': base_models.EXPORT_POLICY.EXPORTED,
             'is_submitted': base_models.EXPORT_POLICY.EXPORTED,
         }
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, CertificateAssessmentAttemptExportDict]:
+        """Exports all certificate assessment attempts for a learner.
+
+        Args:
+            user_id: str. The learner ID whose attempts should be exported.
+
+        Returns:
+            dict. A dictionary keyed by attempt ID, with JSON-serializable
+            attempt data.
+        """
+        attempt_models: Sequence[CertificateAssessmentAttemptModel] = cls.query(
+            cls.learner_id == user_id
+        ).fetch()
+
+        user_data: Dict[str, CertificateAssessmentAttemptExportDict] = {}
+        for attempt_model in attempt_models:
+            user_data[attempt_model.id] = {
+                'total_score': attempt_model.total_score,
+                'attempt_index': attempt_model.attempt_index,
+                'attempt_data': attempt_model.attempt_data,
+                'started_at_msec': utils.get_time_in_millisecs(
+                    attempt_model.started_at
+                ),
+                'finished_at_msec': (
+                    None
+                    if attempt_model.finished_at is None
+                    else utils.get_time_in_millisecs(attempt_model.finished_at)
+                ),
+                'is_submitted': attempt_model.is_submitted,
+            }
+        return user_data
 
     @classmethod
     def _get_new_id(cls) -> str:
@@ -464,18 +523,45 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
+        """Model contains data corresponding to a learner via its attempt."""
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user() -> (
         base_models.MODEL_ASSOCIATION_TO_USER
     ):
-        """Model does not directly correspond to a user; it is linked to a
-        learner only indirectly, through the parent
-        CertificateAssessmentAttemptModel.
-        """
+        """Model is not exported directly because it is linked indirectly."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether any responses exist for attempts owned by a learner."""
+        attempt_models: Sequence[CertificateAssessmentAttemptModel] = (
+            CertificateAssessmentAttemptModel.query(
+                CertificateAssessmentAttemptModel.learner_id == user_id
+            ).fetch(keys_only=False)
+        )
+        attempt_ids = [attempt.id for attempt in attempt_models]
+        if not attempt_ids:
+            return False
+        return (
+            cls.query(cls.attempt_id.IN(attempt_ids)).get(keys_only=True)
+            is not None
+        )
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete all responses attached to the learner's attempts."""
+        attempt_models: Sequence[CertificateAssessmentAttemptModel] = (
+            CertificateAssessmentAttemptModel.query(
+                CertificateAssessmentAttemptModel.learner_id == user_id
+            ).fetch(keys_only=False)
+        )
+        attempt_ids = [attempt.id for attempt in attempt_models]
+        if not attempt_ids:
+            return
+        keys = cls.query(cls.attempt_id.IN(attempt_ids)).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:

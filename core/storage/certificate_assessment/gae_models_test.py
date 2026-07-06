@@ -23,6 +23,7 @@ import datetime
 from core import feconf, utils
 from core.domain import certificate_assessment_domain
 from core.platform import models
+from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 MYPY = False
@@ -238,6 +239,50 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER,
         )
 
+    def test_export_data(self) -> None:
+        started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
+        finished_at = started_at + datetime.timedelta(minutes=7)
+        attempt = certificate_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_id_1',
+            total_score=84.5,
+            attempt_index=2,
+            attempt_data=self._get_sample_attempt_data(),
+            version_data=self._get_sample_version_data(),
+            started_at=started_at,
+            finished_at=finished_at,
+            is_submitted=True,
+        )
+
+        exported_data = (
+            certificate_models.CertificateAssessmentAttemptModel.export_data(
+                'learner_id_1'
+            )
+        )
+
+        self.assertEqual(
+            exported_data,
+            {
+                attempt.id: {
+                    'total_score': 84.5,
+                    'attempt_index': 2,
+                    'attempt_data': self._get_sample_attempt_data(),
+                    'started_at_msec': utils.get_time_in_millisecs(started_at),
+                    'finished_at_msec': utils.get_time_in_millisecs(
+                        finished_at
+                    ),
+                    'is_submitted': True,
+                }
+            },
+        )
+
+    def test_export_data_returns_empty_dict_for_missing_user(self) -> None:
+        self.assertEqual(
+            certificate_models.CertificateAssessmentAttemptModel.export_data(
+                'missing_learner'
+            ),
+            {},
+        )
+
     def test_create_and_retrieve_lifecycle(self) -> None:
         started_at = datetime.datetime.utcnow()
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
@@ -319,10 +364,10 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
 class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
     """Test the CertificateAssessmentResponseModel class."""
 
-    def test_get_deletion_policy_is_not_applicable(self) -> None:
+    def test_get_deletion_policy_is_delete(self) -> None:
         self.assertEqual(
             certificate_models.CertificateAssessmentResponseModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE,
+            base_models.DELETION_POLICY.DELETE,
         )
 
     def test_get_model_association_to_user_is_not_corresponding_to_user(
@@ -331,6 +376,89 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             certificate_models.CertificateAssessmentResponseModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_has_reference_to_user_id(self) -> None:
+        attempt: gae_models.CertificateAssessmentAttemptModel = (
+            gae_models.CertificateAssessmentAttemptModel.create(
+                learner_id='learner_id_1',
+                total_score=75.0,
+                attempt_index=1,
+                attempt_data={
+                    'topic_id_101': {
+                        'total_related_questions': 1,
+                        'total_correct_questions': 1,
+                    }
+                },
+                version_data={
+                    'certificate_id': 'cert_abc123',
+                    'certificate_version': 1,
+                    'topic_versions': {'topic_id_101': 2},
+                    'question_versions': {'question_id_1': 1},
+                    'question_topic_links': {'question_id_1': ['topic_id_101']},
+                },
+                started_at=datetime.datetime.utcnow(),
+                finished_at=None,
+                is_submitted=False,
+            )
+        )
+        gae_models.CertificateAssessmentResponseModel.create(
+            attempt_id=attempt.id,
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
+        )
+
+        self.assertTrue(
+            gae_models.CertificateAssessmentResponseModel.has_reference_to_user_id(
+                'learner_id_1'
+            )
+        )
+        self.assertFalse(
+            gae_models.CertificateAssessmentResponseModel.has_reference_to_user_id(
+                'learner_id_2'
+            )
+        )
+
+    def test_apply_deletion_policy_deletes_responses_for_user(self) -> None:
+        attempt: gae_models.CertificateAssessmentAttemptModel = (
+            gae_models.CertificateAssessmentAttemptModel.create(
+                learner_id='learner_id_1',
+                total_score=75.0,
+                attempt_index=1,
+                attempt_data={
+                    'topic_id_101': {
+                        'total_related_questions': 1,
+                        'total_correct_questions': 1,
+                    }
+                },
+                version_data={
+                    'certificate_id': 'cert_abc123',
+                    'certificate_version': 1,
+                    'topic_versions': {'topic_id_101': 2},
+                    'question_versions': {'question_id_1': 1},
+                    'question_topic_links': {'question_id_1': ['topic_id_101']},
+                },
+                started_at=datetime.datetime.utcnow(),
+                finished_at=None,
+                is_submitted=False,
+            )
+        )
+        response = gae_models.CertificateAssessmentResponseModel.create(
+            attempt_id=attempt.id,
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
+        )
+
+        gae_models.CertificateAssessmentResponseModel.apply_deletion_policy(
+            'learner_id_1'
+        )
+
+        self.assertIsNone(
+            gae_models.CertificateAssessmentResponseModel.get_by_id(response.id)
         )
 
     def test_create_and_retrieve_lifecycle(self) -> None:
