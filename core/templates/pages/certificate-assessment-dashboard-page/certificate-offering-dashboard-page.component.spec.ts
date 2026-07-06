@@ -395,19 +395,19 @@ describe('CertificateOfferingDashboardPageComponent', () => {
       expect(component.paginatedCertificateOfferings.length).toBe(2);
     });
 
-    it('should compute startIndex and endIndex for the current page', () => {
+    it('should compute first and final certificate numbers for the current page', () => {
       component.currentPage = 1;
-      expect(component.startIndex).toBe(1);
-      expect(component.endIndex).toBe(5);
+      expect(component.firstCertificateNumber).toBe(1);
+      expect(component.finalCertificateNumber).toBe(5);
 
       component.currentPage = 2;
-      expect(component.startIndex).toBe(6);
-      expect(component.endIndex).toBe(7);
+      expect(component.firstCertificateNumber).toBe(6);
+      expect(component.finalCertificateNumber).toBe(7);
     });
 
-    it('should return startIndex 0 when there are no offerings', () => {
+    it('should return first certificate number 0 when there are no offerings', () => {
       component.certificateOfferings = [];
-      expect(component.startIndex).toBe(0);
+      expect(component.firstCertificateNumber).toBe(0);
     });
 
     it('should know whether it can go to the previous or next page', () => {

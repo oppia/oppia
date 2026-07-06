@@ -79,7 +79,7 @@
       <div *ngIf="!isLoading && certificateOfferings.length > 0"
            class="d-flex justify-content-between align-items-center px-4 py-3 oppia-table-footer">
         <span class="text-muted small">
-          Showing {{ startIndex }} to {{ endIndexExclusive }} of {{ totalCertificateOfferings }} certificates
+          Showing {{ firstCertificateNumber }} to {{ finalCertificateNumber }} of {{ totalCertificateOfferings }} certificates
         </span>
         <div class="oppia-pagination-controls" aria-label="Certificate pagination">
           <button type="button" class="btn btn-sm oppia-pagination-button" [disabled]="!canGoToPreviousPage()"

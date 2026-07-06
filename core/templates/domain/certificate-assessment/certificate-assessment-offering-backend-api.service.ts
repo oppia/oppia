@@ -106,6 +106,7 @@ export class CertificateAssessmentOfferingBackendApiService {
                       title: certificateOfferingBackendDict.title,
                       description: certificateOfferingBackendDict.description,
                       classroom_id: certificateOfferingBackendDict.classroom_id,
+                      topic_ids: certificateOfferingBackendDict.topic_ids,
                       topic_data: topicData,
                       demonstrates: certificateOfferingBackendDict.demonstrates,
                       total_questions:
@@ -141,6 +142,7 @@ export class CertificateAssessmentOfferingBackendApiService {
         title: response.certificate_offering.title,
         description: response.certificate_offering.description,
         classroom_id: response.certificate_offering.classroom_id,
+        topic_ids: Object.keys(response.certificate_offering.topic_data),
         topic_data: response.certificate_offering.topic_data,
         demonstrates: response.certificate_offering.demonstrates,
         total_questions: response.certificate_offering.total_questions,

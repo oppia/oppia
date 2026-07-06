@@ -107,14 +107,14 @@ export class CertificateOfferingDashboardPageComponent implements OnInit {
     );
   }
 
-  get startIndex(): number {
+  get firstCertificateNumber(): number {
     if (this.totalCertificateOfferings === 0) {
       return 0;
     }
     return (this.currentPage - 1) * this.certificatesPerPage + 1;
   }
 
-  get endIndexExclusive(): number {
+  get finalCertificateNumber(): number {
     return Math.min(
       this.currentPage * this.certificatesPerPage,
       this.totalCertificateOfferings
