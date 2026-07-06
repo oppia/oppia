@@ -246,21 +246,87 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         created_models_results = self._compute_translation_opportunities()
 
+        computed_opp_models_pcoll = (
+            created_models_results
+            | 'Filter OK results for cleanup'
+            >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap models for cleanup' >> beam.Map(lambda res: res.unwrap())
+        )
+
+        existing_opp_models_pcoll = (
+            self.pipeline
+            | 'Get all TranslationOpportunityModels for cleanup'
+            >> ndb_io.GetModels(
+                opportunity_models.TranslationOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+        )
+
+        computed_by_id = (
+            computed_opp_models_pcoll
+            | 'Map computed by id' >> beam.Map(lambda model: (model.id, model))
+        )
+        existing_by_id = (
+            existing_opp_models_pcoll
+            | 'Map existing by id' >> beam.Map(lambda model: (model.id, model))
+        )
+
+        grouped_opp_models = {
+            'computed': computed_by_id,
+            'existing': existing_by_id,
+        } | 'Group opp models for deletion' >> beam.CoGroupByKey()
+
+        def get_orphans(
+            element: Tuple[
+                str,
+                Dict[
+                    str,
+                    Iterable[opportunity_models.TranslationOpportunityModel],
+                ],
+            ],
+        ) -> Iterable[opportunity_models.TranslationOpportunityModel]:
+            _, grouped_data = element
+            existing = list(grouped_data['existing'])
+            computed = list(grouped_data['computed'])
+            if existing and not computed:
+                yield existing[0]
+
+        orphans_pcoll = grouped_opp_models | 'Extract orphans' >> beam.FlatMap(
+            get_orphans
+        )
+
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
-                created_models_results
-                | 'Filter OK results' >> beam.Filter(lambda res: res.is_ok())
-                | 'Unwrap models' >> beam.Map(lambda res: res.unwrap())
-                | 'Put models' >> ndb_io.PutModels()
+                computed_opp_models_pcoll | 'Put models' >> ndb_io.PutModels()
             )
 
-        return (
+            unused_delete_results = (
+                orphans_pcoll
+                | 'Get orphan keys' >> beam.Map(lambda model: model.key)
+                | 'Delete orphan models' >> ndb_io.DeleteModels()
+            )
+
+        creation_results = (
             created_models_results
-            | 'Generate results'
+            | 'Generate creation results'
             >> job_result_transforms.ResultsToJobRunResults(
                 'TRANSLATION OPPORTUNITY MODEL CREATION'
             )
         )
+
+        deletion_results = (
+            orphans_pcoll
+            | 'Generate deletion results'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'TRANSLATION OPPORTUNITY MODEL DELETION'
+            )
+        )
+
+        return (
+            creation_results,
+            deletion_results,
+        ) | 'Flatten results' >> beam.Flatten()
 
 
 class AuditBackfillTranslationOpportunityModelJob(

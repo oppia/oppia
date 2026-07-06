@@ -223,14 +223,65 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.translation_counts, {'hi': 1})
 
     def test_run_with_datastore_updates_disabled(self) -> None:
+        orphaned_model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.orphaned_exp_id',
+            entity_type='exploration',
+            entity_id='orphaned_exp_id',
+            topic_ids=['topic_id'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 1},
+        )
+        orphaned_model.update_timestamps()
+        orphaned_model.put()
+
         with self.swap(self.JOB_CLASS, 'DATASTORE_UPDATES_ALLOWED', False):
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
                         stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
                     ),
+                    job_run_result.JobRunResult(
+                        stdout='TRANSLATION OPPORTUNITY MODEL DELETION SUCCESS: 1'
+                    ),
                 ]
             )
+
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                'exploration.orphaned_exp_id'
+            )
+        )
+
+    def test_deletes_orphaned_translation_opportunity_model(self) -> None:
+        orphaned_model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.orphaned_exp_id',
+            entity_type='exploration',
+            entity_id='orphaned_exp_id',
+            topic_ids=['topic_id'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 1},
+        )
+        orphaned_model.update_timestamps()
+        orphaned_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL DELETION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                'exploration.orphaned_exp_id'
+            )
+        )
 
     @test_utils.enable_feature_flags(
         [
