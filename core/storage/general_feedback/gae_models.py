@@ -110,6 +110,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
                 'last_updated': base_models.EXPORT_POLICY.EXPORTED,
                 # author_id is pseudonymized, not exported directly.
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
                 'feedback_text': base_models.EXPORT_POLICY.EXPORTED,
                 'status': base_models.EXPORT_POLICY.EXPORTED,
                 'lesson_metadata_schema_version': (
@@ -183,6 +184,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
                 'feedback_text': feedback_model.feedback_text,
                 'status': feedback_model.status,
                 'lesson_metadata_json': feedback_model.lesson_metadata_json,
+                'exploration_id': feedback_model.exploration_id,
                 'parent_feedback_id': feedback_model.parent_feedback_id,
                 'response_list': sanitized_response_list,
                 'unread_response_count': feedback_model.unread_response_count,
@@ -225,6 +227,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
             author_id=author_id,
             feedback_text=feedback_text,
             status=feconf.STATUS_CHOICES_OPEN,
+            exploration_id=lesson_metadata_json['exploration_id'],
             lesson_metadata_schema_version=feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION,
             lesson_metadata_json=lesson_metadata_json,
             parent_feedback_id=parent_feedback_id,
@@ -327,6 +330,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
@@ -357,17 +361,25 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         """Validates arguments passed to create()."""
 
         if source == feconf.SOURCE_LESSON:
-            if not lesson_metadata_json:
+            if lesson_metadata_json is None:
                 raise ValueError(
                     'Lesson feedback must include lesson metadata.'
                 )
+
+            if lesson_metadata_json.get('exploration_id') is None:
+                raise ValueError(
+                    'Lesson feedback must include an exploration ID.'
+                )
+
         elif source == feconf.SOURCE_APP:
-            if category:
+            if category is not None:
                 raise ValueError('App feedback must not include a category.')
-            if lesson_metadata_json:
+
+            if lesson_metadata_json is not None:
                 raise ValueError(
                     'App feedback must not include lesson metadata.'
                 )
+
         else:
             raise ValueError('Invalid source: %s' % source)
 
@@ -383,20 +395,33 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
 
     @classmethod
     def _get_filtered_query(
-        cls, destination_dashboard: str, platform: str, source: str, **kwargs
+        cls,
+        destination_dashboard: Optional[str] = None,
+        platform: Optional[str] = None,
+        source: Optional[str] = None,
+        **kwargs,
     ):
-        """
-        Returns a filtered query based on the given parameters.
+        """Returns a filtered query based on the given parameters.
+
+        Args:
+            destination_dashboard: Optional[str]. If provided, filters reports
+                routed to this dashboard.
+            platform: Optional[str]. If provided, filters by platform.
+            source: Optional[str]. If provided, filters by source.
+            **kwargs: *. Filters handled by BaseFeedbackModel.
+
+        Returns:
+            Query. The filtered query object.
         """
         query = super()._get_filtered_query(**kwargs)
 
-        if destination_dashboard:
+        if destination_dashboard is not None:
             query = query.filter(
                 cls.destination_dashboard == destination_dashboard
             )
-        if platform:
+        if platform is not None:
             query = query.filter(cls.platform == platform)
-        if source:
+        if source is not None:
             query = query.filter(cls.source == source)
         return query
 
@@ -461,6 +486,11 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             author_id=None,
             feedback_text=feedback_text,
             status=feconf.STATUS_CHOICES_OPEN,
+            exploration_id=(
+                lesson_metadata_json.get('exploration_id')
+                if lesson_metadata_json is not None
+                else None
+            ),
             lesson_metadata_schema_version=(
                 feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
                 if lesson_metadata_json is not None

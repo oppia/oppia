@@ -1679,6 +1679,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.LESSON_FEEDBACK_ID_1,
             author_id=self.USER_ID_1,
             feedback_text=self.LESSON_FEEDBACK_TEXT_1,
+            exploration_id='exp_id_1',
             status=feedback_models.STATUS_CHOICES_OPEN,
             lesson_metadata_schema_version=(
                 feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
@@ -2075,6 +2076,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'feedback_text': self.LESSON_FEEDBACK_TEXT_1,
                 'status': feedback_models.STATUS_CHOICES_OPEN,
                 'lesson_metadata_json': self.LESSON_METADATA_JSON,
+                'exploration_id': 'exp_id_1',
                 'parent_feedback_id': self.PARENT_FEEDBACK_ID_1,
                 'response_list': self.LESSON_FEEDBACK_RESPONSE_LIST,
                 'unread_response_count': self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,

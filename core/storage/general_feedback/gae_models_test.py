@@ -22,7 +22,7 @@ from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -99,6 +99,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.EXPORTED,
                 'status': base_models.EXPORT_POLICY.EXPORTED,
+                'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
@@ -160,9 +161,13 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         export_data = general_feedback_models.LessonFeedbackModel.export_data(
             self.USER_ID
         )
-        expected = {
+        # Here we use type Any because the expected dictionary contains
+        # heterogeneous values, including strings, integers, dictionaries,
+        # lists, and None.
+        expected: Dict[str, Any] = {
             'feedback_text': FEEDBACK_TEXT,
             'status': feconf.STATUS_CHOICES_OPEN,
+            'exploration_id': LESSON_METADATA_JSON['exploration_id'],
             'lesson_metadata_json': LESSON_METADATA_JSON,
             'parent_feedback_id': None,
             'response_list': [],
@@ -312,6 +317,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),

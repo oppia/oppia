@@ -1070,6 +1070,15 @@ URLS = [
         general_feedback.PlatformFeedbackSubmitHandler,
     ),
     get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>/<report_id>'
+        % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackListHandler,
+    ),
+    get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
         general_feedback.GeneralFeedbackCaptchaConfigHandler,
     ),

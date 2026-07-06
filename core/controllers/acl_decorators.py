@@ -5180,3 +5180,71 @@ def can_access_technical_feedback_dashboard(
         )
 
     return test_can_access_technical_feedback_dashboard
+
+
+def can_access_platform_feedback_reports(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Checks whether the user can access platform feedback reports.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access PlatformFeedbackModel reports.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_platform_feedback_reports(
+        self,
+        dashboard: str,
+        dashboard_id: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the user can access the requested feedback dashboard.
+
+        Args:
+            dashboard: str. The requested dashboard.
+            dashboard_id: str. Exploration ID for creator dashboards and a
+                placeholder for technical dashboards.
+            *args: list(*). Positional arguments for the decorated handler.
+            **kwargs: *. Keyword arguments for the decorated handler.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. The requested dashboard is invalid.
+        """
+
+        if dashboard == feconf.DESTINATION_CREATOR:
+            return can_edit_exploration(handler)(
+                self, dashboard_id, dashboard, dashboard_id, *args, **kwargs
+            )
+
+        if dashboard in (
+            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+        ):
+
+            def wrapped_handler(
+                handler_self: _SelfBaseHandlerType, **unused_kwargs: Any
+            ) -> _GenericHandlerFunctionReturnType:
+                """Calls the original handler after dashboard access checks."""
+                return handler(
+                    handler_self, dashboard, dashboard_id, *args, **kwargs
+                )
+
+            return can_access_technical_feedback_dashboard(wrapped_handler)(
+                self
+            )
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access feedback reports.'
+        )
+
+    return test_can_access_platform_feedback_reports

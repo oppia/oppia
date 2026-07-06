@@ -412,3 +412,180 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL)
 
         self.assertEqual(response, {'site_key': 'site-key'})
+
+
+class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
+    """Tests for PlatformFeedbackListHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration('exp_id', self.owner_id)
+
+        self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
+        self.add_user_role(
+            self.TECH_LEAD_USERNAME,
+            feconf.ROLE_ID_TECH_LEAD,
+        )
+
+    def _get_lesson_metadata(
+        self,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': 'exp_id',
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': None,
+        }
+
+    def test_creator_can_list_feedback_for_owned_exploration(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=self._get_lesson_metadata(),
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json('/platform-feedback/creator/exp_id')
+
+        self.assertEqual(len(response['summaries']), 1)
+        self.assertEqual(response['summaries'][0]['id'], report.id)
+        self.assertEqual(
+            response['summaries'][0]['report_message_preview'],
+            'There is a typo.',
+        )
+        self.assertIsNone(response['next_cursor'])
+        self.assertFalse(response['more'])
+
+    def test_tech_lead_can_list_technical_feedback(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='The donate page is broken.',
+            source='site',
+            page_url='https://oppia.org/donate',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.TECH_LEAD_EMAIL):
+            response = self.get_json('/platform-feedback/LEAP/team')
+
+        self.assertEqual(len(response['summaries']), 1)
+        self.assertEqual(response['summaries'][0]['id'], report.id)
+
+
+class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
+    """Tests for PlatformFeedbackDetailHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration('exp_id', self.owner_id)
+
+    def _get_lesson_metadata(
+        self,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': 'exp_id',
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': None,
+        }
+
+    def test_creator_can_get_feedback_detail_for_owned_exploration(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=self._get_lesson_metadata(),
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json(
+                '/platform-feedback/creator/exp_id/%s' % report.id
+            )
+
+        self.assertEqual(response['id'], report.id)
+        self.assertEqual(response['feedback_text'], 'There is a typo.')
+
+    def test_creator_can_update_feedback_status_for_owned_exploration(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=self._get_lesson_metadata(),
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                '/platform-feedback/creator/exp_id/%s' % report.id,
+                {'status': feconf.STATUS_CHOICES_FIXED},
+                csrf_token=csrf_token,
+                expected_status_int=200,
+            )
+
+        updated_report = general_feedback_services.get_platform_feedback(
+            report.id
+        )
+        self.assertEqual(response, {'success': True})
+        self.assertIsNotNone(updated_report)
+        assert updated_report is not None
+        self.assertEqual(updated_report.status, feconf.STATUS_CHOICES_FIXED)
+
+    def test_creator_cannot_get_feedback_for_different_exploration(
+        self,
+    ) -> None:
+        other_lesson_metadata = self._get_lesson_metadata()
+        other_lesson_metadata['exploration_id'] = 'other_exp_id'
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=other_lesson_metadata,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json(
+                '/platform-feedback/creator/exp_id/%s' % report.id,
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Feedback with ID %s does not exist.' % report.id,
+        )

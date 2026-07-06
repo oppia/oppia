@@ -155,6 +155,52 @@ def _determine_destination_dashboard(
             return feconf.DESTINATION_TECHNICAL_CORE_TEAM
 
 
+def validate_platform_feedback_belongs_to_dashboard(
+    feedback: general_feedback_domain.PlatformFeedback,
+    dashboard: str,
+    dashboard_id: str,
+) -> None:
+    """Validates that the feedback belongs to the requested dashboard.
+
+    Args:
+        feedback: PlatformFeedback. The feedback to validate.
+        dashboard: str. The dashboard from which the feedback is being
+            accessed.
+        dashboard_id: str. The dashboard-specific identifier. This is the
+            exploration ID for the Creator Dashboard and the team identifier
+            ('leap' or 'core') for the Technical Dashboard.
+
+    Raises:
+        ValueError. The feedback does not belong to the requested dashboard.
+    """
+    if dashboard == feconf.DESTINATION_CREATOR:
+        if (
+            feedback.destination_dashboard != feconf.DESTINATION_CREATOR
+            or feedback.lesson_metadata is None
+        ):
+            raise ValueError(
+                'Feedback does not belong to the requested dashboard.'
+            )
+        exploration_id = feedback.lesson_metadata['exploration_id']
+        if exploration_id != dashboard_id:
+            raise ValueError(
+                'Feedback does not belong to the requested exploration.'
+            )
+        return
+
+    if dashboard in (
+        feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+        feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+    ):
+        if feedback.destination_dashboard != dashboard:
+            raise ValueError(
+                'Feedback does not belong to the requested dashboard.'
+            )
+        return
+
+    raise ValueError('Invalid dashboard.')
+
+
 def create_lesson_feedback(
     author_id: str,
     feedback_text: str,
@@ -288,3 +334,135 @@ def create_platform_report(
 
     model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
     return _platform_feedback_model_to_domain(model)
+
+
+def get_platform_feedback(
+    report_id: str,
+) -> Optional[general_feedback_domain.PlatformFeedback]:
+    """Returns the full PlatformFeedback domain object for the given ID.
+
+    Args:
+        report_id: str. The ID of the platform feedback to retrieve.
+
+    Returns:
+        Optional[PlatformFeedback]. The retrieved report, or None if not found.
+    """
+    model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
+    if model is None:
+        return None
+    return _platform_feedback_model_to_domain(model)
+
+
+def get_platform_feedback_summaries(
+    destination_dashboard: str,
+    exploration_id: Optional[str] = None,
+    status_filter: Optional[str] = feconf.STATUS_CHOICES_OPEN,
+    cursor: Optional[str] = None,
+) -> tuple[
+    List[general_feedback_domain.PlatformFeedbackSummaryDict],
+    Optional[str],
+    bool,
+]:
+    """Returns a page of platform feedback summaries with optional filters.
+
+    Used by the Creator Dashboard GET and Technical Dashboard GET.
+
+    Args:
+        exploration_id: Optional[str]. If provided, only return reports linked
+            to this exploration.
+        status_filter: Optional[str]. If provided, only return reports with
+            this status. Otherwise, open status reports are shown.
+        cursor: Optional[str]. Pagination cursor from a previous response.
+
+    Returns:
+        Tuple of (summaries, next_cursor, more):
+            summaries: List[PlatformFeedbackSummaryDict].
+            next_cursor: Optional[str]. Cursor for the next page, or None.
+            more: bool. True if there are more results beyond this page.
+
+    Raises:
+        ValueError. The destination dashboard is invalid, or a creator dashboard
+        request does not include an exploration ID.
+    """
+    if destination_dashboard not in feconf.DESTINATION_CHOICES:
+        raise ValueError(
+            'Invalid destination dashboard: %s' % (destination_dashboard)
+        )
+    if (
+        destination_dashboard == feconf.DESTINATION_CREATOR
+        and exploration_id is None
+    ):
+        raise ValueError(
+            'An exploration ID is required for creator dashboard feedback.'
+        )
+    model_list, next_cursor, more = (
+        general_feedback_models.PlatformFeedbackModel.fetch_page(
+            page_size=20,
+            cursor=cursor,
+            exploration_id=exploration_id,
+            status_filter=status_filter,
+        )
+    )
+    summaries = [
+        _platform_feedback_model_to_domain(model).to_summary_dict()
+        for model in model_list
+    ]
+    return summaries, next_cursor, more
+
+
+def _update_platform_feedback_model_status(
+    model: general_feedback_models.PlatformFeedbackModel,
+    new_status: str,
+) -> general_feedback_domain.PlatformFeedback:
+    """Updates the status of a platform feedback model.
+
+    Args:
+        model: PlatformFeedbackModel. The model to update.
+        new_status: str. The new status value.
+
+    Returns:
+        PlatformFeedback. The updated report.
+    """
+    model.status = new_status
+    model.update_timestamps()
+    model.put()
+    return _platform_feedback_model_to_domain(model)
+
+
+def update_platform_feedback_status_for_dashboard(
+    report_id: str,
+    new_status: str,
+    dashboard: str,
+    dashboard_id: str,
+) -> Optional[general_feedback_domain.PlatformFeedback]:
+    """Updates the status of a platform feedback report for a dashboard.
+
+    Args:
+        report_id: str. ID of the PlatformFeedbackModel to update.
+        new_status: str. The new status value. Must be a valid status choice.
+        dashboard: str. The dashboard from which the feedback is being
+            accessed.
+        dashboard_id: str. The dashboard-specific identifier. This is the
+            exploration ID for the Creator Dashboard and the team identifier
+            ('leap' or 'core') for the Technical Dashboard.
+
+    Returns:
+        Optional[PlatformFeedback]. The updated report, or None if not found.
+
+    Raises:
+        ValueError. The new status is invalid, or the feedback does not belong
+        to the requested dashboard.
+    """
+    if new_status not in feconf.STATUS_CHOICES:
+        raise ValueError('Invalid status: %s' % new_status)
+
+    model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
+    if model is None or model.deleted:
+        return None
+
+    validate_platform_feedback_belongs_to_dashboard(
+        feedback=_platform_feedback_model_to_domain(model),
+        dashboard=dashboard,
+        dashboard_id=dashboard_id,
+    )
+    return _update_platform_feedback_model_status(model, new_status)

@@ -108,6 +108,18 @@ class PlatformFeedbackSubmitPayloadDict(TypedDict):
     screenshot_file: Optional[str]
 
 
+class PlatformFeedbackSummaryDict(TypedDict):
+    """Lightweight dict representation of a PlatformFeedback."""
+
+    id: str
+    report_message_preview: str
+    status: str
+    source: str
+    category: Optional[str]
+    destination_dashboard: str
+    created_on_msecs: float
+
+
 class LessonFeedback:
     """Domain object for a learner lesson feedback submission.
 
@@ -248,5 +260,22 @@ class PlatformFeedback:
             'include_technical_logs': self.include_technical_logs,
             'screenshot_filename': self.screenshot_filename,
             'screenshot_entity_id': self.screenshot_entity_id,
+            'created_on_msecs': self.created_on_msecs,
+        }
+
+    def to_summary_dict(self) -> PlatformFeedbackSummaryDict:
+        """Returns a lightweight summary dict for use in list views.
+
+        Returns:
+            PlatformFeedbackSummaryDict. A summary dict representation of the
+            object.
+        """
+        return {
+            'id': self.id,
+            'report_message_preview': self.feedback_text,
+            'status': self.status,
+            'source': self.source,
+            'category': self.category,
+            'destination_dashboard': self.destination_dashboard,
             'created_on_msecs': self.created_on_msecs,
         }

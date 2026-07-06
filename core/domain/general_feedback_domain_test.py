@@ -119,3 +119,32 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(feedback.to_dict(), expected_dict)
+
+    def test_to_summary_dict(self) -> None:
+        expected_dict: general_feedback_domain.PlatformFeedbackSummaryDict = {
+            'id': 'feedback_id',
+            'report_message_preview': 'Feedback text',
+            'status': 'open',
+            'source': 'lesson',
+            'category': 'category',
+            'destination_dashboard': 'creator_dashboard',
+            'created_on_msecs': 1700000000000.0,
+        }
+
+        feedback = general_feedback_domain.PlatformFeedback(
+            report_id='feedback_id',
+            feedback_text='Feedback text',
+            source='lesson',
+            platform='platform',
+            destination_dashboard='creator_dashboard',
+            status='open',
+            page_url='page_url',
+            category='category',
+            lesson_metadata=LESSON_METADATA,
+            include_technical_logs=True,
+            screenshot_filename='screenshot_filename',
+            screenshot_entity_id='screenshot_entity_id',
+            created_on_msecs=1700000000000.0,
+        )
+
+        self.assertEqual(feedback.to_summary_dict(), expected_dict)
