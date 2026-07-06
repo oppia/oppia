@@ -17,7 +17,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component.ts';
+import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
