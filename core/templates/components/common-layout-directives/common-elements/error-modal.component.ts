@@ -16,7 +16,7 @@
  * @fileoverview Component for the new frontend error modal.
  */
 
-import {Component, Input, Optional, ViewEncapsulation} from '@angular/core';
+import {Component, Input, Optional} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {FrontendErrorBackendApiService} from 'services/frontend-error-backend-api.service';
@@ -26,7 +26,6 @@ import {ConfirmOrCancelModal} from './confirm-or-cancel-modal.component';
   selector: 'oppia-error-modal',
   templateUrl: './error-modal.component.html',
   styleUrls: ['./error-modal.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class ErrorModalComponent extends ConfirmOrCancelModal {
   @Input() errorMessage: string = '';

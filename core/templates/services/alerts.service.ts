@@ -44,7 +44,7 @@ export class AlertsService {
 
   private _warnings: Warning[] = [];
   private _messages: Message[] = [];
-  private _warningAddedEventEmitter: EventEmitter<string> = new EventEmitter();
+  private _warningAddedEventEmitter = new EventEmitter<string>();
 
   get onWarningAdded(): EventEmitter<string> {
     return this._warningAddedEventEmitter;
