@@ -100,6 +100,9 @@ def _create_story(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     story.version += 1
     create_story_summary(story.id)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story.id]
+    )
 
     exp_ids = story.story_contents.get_all_linked_exp_ids()
     new_exploration_context_models = [
@@ -475,6 +478,56 @@ def apply_change_list(
                     story.rearrange_node_in_story(
                         update_node_cmd.old_value, update_node_cmd.new_value
                     )
+            elif change.cmd == story_domain.CMD_CREATE_ARC:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                create_arc_cmd = cast(story_domain.CreateArcCmd, change)
+                arc = story_domain.Arc(
+                    arc_id=create_arc_cmd.arc_id,
+                    title=create_arc_cmd.title,
+                    description=create_arc_cmd.description,
+                    node_ids=create_arc_cmd.node_ids,
+                )
+                story.add_arc(arc)
+            elif change.cmd == story_domain.CMD_DELETE_ARC:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                delete_arc_cmd = cast(story_domain.DeleteArcCmd, change)
+                story.delete_arc(delete_arc_cmd.arc_id)
+            elif change.cmd == story_domain.CMD_RENAME_ARC:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                rename_arc_cmd = cast(story_domain.RenameArcCmd, change)
+                story.story_contents.get_arc(rename_arc_cmd.arc_id).title = (
+                    rename_arc_cmd.new_title
+                )
+            elif change.cmd == story_domain.CMD_REARRANGE_ARCS:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                rearrange_arcs_cmd = cast(story_domain.RearrangeArcsCmd, change)
+                story.rearrange_arcs(rearrange_arcs_cmd.arc_ids_order)
+            elif change.cmd == story_domain.CMD_MOVE_NODE_TO_ARC:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                move_node_cmd = cast(story_domain.MoveNodeToArcCmd, change)
+                story.move_node_to_arc(
+                    move_node_cmd.node_id, move_node_cmd.to_arc_id
+                )
+            elif change.cmd == story_domain.CMD_UPDATE_ARC_PROPERTY:
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_arc_cmd = cast(story_domain.UpdateArcPropertyCmd, change)
+                arc = story.story_contents.get_arc(update_arc_cmd.arc_id)
+                if (
+                    update_arc_cmd.property_name
+                    == story_domain.ARC_PROPERTY_TITLE
+                ):
+                    arc.title = update_arc_cmd.new_value
+                elif (
+                    update_arc_cmd.property_name
+                    == story_domain.ARC_PROPERTY_DESCRIPTION
+                ):
+                    arc.description = update_arc_cmd.new_value
             elif (
                 change.cmd == story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION
             ):
@@ -997,7 +1050,11 @@ def delete_story_summary(story_id: str) -> None:
             be deleted.
     """
 
-    story_models.StorySummaryModel.get(story_id).delete()
+    story_summary_model = story_models.StorySummaryModel.get(
+        story_id, strict=False
+    )
+    if story_summary_model is not None:
+        story_summary_model.delete()
 
 
 def compute_summary_of_story(
