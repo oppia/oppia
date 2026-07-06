@@ -26,6 +26,7 @@ from core.domain import (
     user_services,
 )
 from core.tests import test_utils
+from typing import cast, List
 
 
 class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
@@ -334,7 +335,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
-                        'old_value': [],
+                        'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1, self.skill_id2],
                     }
                 ),
@@ -403,7 +404,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
-                        'old_value': [],
+                        'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1, self.skill_id2],
                     }
                 ),

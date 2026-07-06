@@ -45,7 +45,7 @@ from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
 
-from typing import Dict, Final
+from typing import Dict, Final, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -405,7 +405,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
-                        'old_value': [],
+                        'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1],
                     }
                 ),
@@ -479,7 +479,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
-                        'old_value': [],
+                        'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1],
                     }
                 ),
