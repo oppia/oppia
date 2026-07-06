@@ -60,6 +60,13 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     validation_message: str
 
 
+class CertificateAssessmentOfferingTopicInfoDict(TypedDict):
+    """Side-input topic metadata used by preloaded-map validation."""
+
+    name: str
+    skill_ids: List[str]
+
+
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
 ) -> tuple[Dict[str, List[str]], List[topic_domain.Topic]]:
@@ -298,7 +305,7 @@ def validate_certificate_assessment_offering_against_preloaded_maps(
     is_valid = True
     required_questions_by_topic: Dict[str, Dict[str, int]] = {}
 
-    expected_total_questions = len(topic_ids) * QUESTIONS_PER_TOPIC
+    expected_total_questions = len(topic_ids) * constants.QUESTIONS_PER_TOPIC
     if total_questions < expected_total_questions:
         is_valid = False
         message_parts.append(
@@ -306,7 +313,7 @@ def validate_certificate_assessment_offering_against_preloaded_maps(
             '(%d per topic: easy, medium, hard) for %d topic(s).'
             % (
                 expected_total_questions,
-                QUESTIONS_PER_TOPIC,
+                constants.QUESTIONS_PER_TOPIC,
                 len(topic_ids),
             )
         )
