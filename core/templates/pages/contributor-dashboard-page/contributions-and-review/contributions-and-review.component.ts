@@ -33,10 +33,7 @@ import {
   FetchSkillResponse,
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
-import {
-  MisconceptionSkillMap,
-  Misconception,
-} from 'domain/skill/misconception.model';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
