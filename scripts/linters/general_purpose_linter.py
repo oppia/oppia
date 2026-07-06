@@ -830,9 +830,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                 open_calls = self._extract_ngb_modal_open_calls(
                     file_content_without_comments
                 )
-                backdrop_re = re.compile(
-                    r'backdrop\s*:\s*[\'"]static[\'"]'
-                )
+                backdrop_re = re.compile(r'backdrop\s*:\s*[\'"]static[\'"]')
                 missing_backdrop = any(
                     not backdrop_re.search(call) for call in open_calls
                 )
