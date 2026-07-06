@@ -941,13 +941,33 @@ export class BaseUser {
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     const currentUrl = this.page.url().replace(/\/$/, '');
     const targetUrl = url.replace(/\/$/, '');
-    if (currentUrl === targetUrl) {
-      return;
+    const currentObj = new URL(currentUrl);
+    const targetObj = new URL(targetUrl);
+
+    if (
+      currentObj.origin === targetObj.origin &&
+      currentObj.pathname === targetObj.pathname
+    ) {
+      if (currentUrl === targetUrl) {
+        await this.page.reload({
+          waitUntil: ['networkidle2', 'load'],
+          timeout: 60000,
+        });
+        return;
+      }
+      // Same page but different hash. Just navigate and reload to ensure clean,
+      // fully loaded state without Puppeteer timing out on hash change.
+      await this.page.goto(url);
+      await this.page.reload({
+        waitUntil: ['networkidle2', 'load'],
+        timeout: 60000,
+      });
+    } else {
+      await this.page.goto(url, {
+        waitUntil: ['networkidle2', 'load'],
+        timeout: 60000,
+      });
     }
-    await this.page.goto(url, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
 
     if (verifyURL) {
       await this.page.waitForFunction(
