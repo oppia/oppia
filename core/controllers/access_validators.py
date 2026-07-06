@@ -346,7 +346,7 @@ class PracticeSessionAccessValidationPage(
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, _: str) -> None:
+    def get(self, _: str, **kwargs: str) -> None:
         """Handles GET requests."""
 
         assert self.normalized_request is not None
