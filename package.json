@@ -95,15 +95,12 @@
     "lint-staged": "~13.0.3",
     "mocha": "^9.0.0",
     "nyc": "^15.1.0",
-
     "postcss-html": "^1.3.0",
-
     "prettier": "^3.2.5",
     "protoc-gen-ts": "^0.3.4",
     "puppeteer": "^13.0.0",
     "puppeteer-screen-recorder": "2.1.2",
     "reflect-metadata": "^0.1.12",
-
     "sourcemapped-stacktrace": "^1.1.11",
     "style-loader": "^2.0.0",
     "stylelint": "^14.1.0",
@@ -197,7 +194,6 @@
     "ngx-translate-cache": "^9.0.2",
     "ngx-trim-directive": "^1.1.0",
     "path-browserify": "^1.0.1",
-    "postcss": "^8.5.12",
     "proxy-polyfill": "^0.3.2",
     "readable-stream": "2.3.7",
     "requireindex": "^1.2.0",
