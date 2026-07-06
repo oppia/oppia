@@ -2109,10 +2109,7 @@ describe('Exploration engine service ', () => {
     expect(urlService.getPathname).toHaveBeenCalled();
   });
 
-  // ---- Branch coverage: loadInitialState ----
-
   it('should skip learnerParamsService.init when newParams is null in loadInitialState', () => {
-    // Branch: line 377 (if (newParams)) false branch.
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
@@ -2142,7 +2139,6 @@ describe('Exploration engine service ', () => {
   });
 
   it('should skip interaction html when interactionId is null in loadInitialState', () => {
-    // Branch: line 401 (if (interactionId)) false branch – no interaction ID.
     const successCb = jasmine.createSpy('success');
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
@@ -2182,10 +2178,7 @@ describe('Exploration engine service ', () => {
     expect(htmlFormatterSpy).not.toHaveBeenCalled();
   });
 
-  // ---- Branch coverage: getAuthorRecommendedExpIdsByStateName ----
-
   it('should return empty array when getAuthorRecommendedExpIds returns null', () => {
-    // Branch: line 660 false branch (authorRecommendedExpIds falsy → []).
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
@@ -2209,10 +2202,7 @@ describe('Exploration engine service ', () => {
     expect(result).toEqual([]);
   });
 
-  // ---- Branch coverage: submitAnswer internal branches ----
-
   it('should skip makeParams when newState is falsy in submitAnswer ternary (line 809)', fakeAsync(() => {
-    // Branch: line 808-810 – the ternary `newState ? makeParams(...) : oldParams`.
     // Return null only for the first lookup of the destination state so the
     // ternary takes the falsy branch, then return a valid state for later calls.
     const submitCb = jasmine.createSpy('success');
@@ -2275,7 +2265,6 @@ describe('Exploration engine service ', () => {
   }));
 
   it('should skip interaction html when interaction.id is null in submitAnswer (line 852 false branch)', fakeAsync(() => {
-    // Branch: line 852 – interaction.id is falsy → nextInteractionHtml stays null.
     const submitCb = jasmine.createSpy('success');
 
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
@@ -2332,7 +2321,6 @@ describe('Exploration engine service ', () => {
   }));
 
   it('should warn about empty params when newParams is null in submitAnswer (line 811)', fakeAsync(() => {
-    // Branch: line 811 – newParams === null → addWarning and return false.
     // We achieve this by making makeParams throw, then testing the null guard
     // directly. In the source, the null guard at line 811 covers `=== null`.
     // We trigger it by mocking getState to return a real object (so newState
@@ -2390,10 +2378,7 @@ describe('Exploration engine service ', () => {
     expect(result).toBe(false);
   }));
 
-  // ---- Branch coverage: _getNextCardIfReallyStuck internal branches ----
-
   it('should skip makeParams when newStateIfStuck is falsy in _getNextCardIfReallyStuck (line 934)', fakeAsync(() => {
-    // Branch: line 934 – `newStateIfStuck ? makeParams(...) : oldParams`.
     // Return null only for the first stuck-state lookup so the ternary takes
     // the falsy branch, then return a valid state for later content access.
     const submitCb = jasmine.createSpy('success');
@@ -2513,7 +2498,6 @@ describe('Exploration engine service ', () => {
   }));
 
   it('should skip stuck-state html generation when interaction.id is null (line 959)', fakeAsync(() => {
-    // Branch: line 959 – interaction.id is falsy in stuck state path.
     // The _getInteractionHtmlByStateName private method should NOT be called
     // for the stuck state; instead we verify the stuck card is returned without
     // html generation for the stuck state.
@@ -2609,7 +2593,6 @@ describe('Exploration engine service ', () => {
   }));
 
   it('should return null from _getNextCardIfReallyStuck when contentId is null (line 972)', fakeAsync(() => {
-    // Branch: line 972 – contentId === null → return null from stuck helper.
     const submitCb = jasmine.createSpy('success');
     answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
     answerClassificationResult.answerGroupIndex = 0;
@@ -2710,11 +2693,7 @@ describe('Exploration engine service ', () => {
     expect(callArgs[10]).toBeNull();
   }));
 
-  // ---- Branch coverage: _getFeedback defaultOutcome undefined path (line 205) ----
-
   it('should return feedback html when interaction is not TextInput (_getFeedback line 205 branch)', () => {
-    // Branch: line 205 – shouldCheckForMisspelling is false because interactionId
-    // is not TextInput, so the defaultOutcome optional-chain is not evaluated.
     const submitCb = jasmine.createSpy('success');
 
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
