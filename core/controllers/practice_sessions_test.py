@@ -26,7 +26,8 @@ from core.domain import (
     user_services,
 )
 from core.tests import test_utils
-from typing import cast, List
+
+from typing import List, cast
 
 
 class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
@@ -335,6 +336,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
                         'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1, self.skill_id2],
                     }
@@ -357,6 +361,124 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             json_response['skill_ids_to_descriptions_map'][self.skill_id2],
             'Skill 2',
         )
+
+    def test_get_returns_empty_skill_ids_for_nonexistent_node_id(
+        self,
+    ) -> None:
+        story_id = 'story_id'
+        exp_id = 'exp_1'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, 'nonexistent'
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/nonexistent_node'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+            ),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
+
+    def test_get_returns_empty_skill_ids_for_nonexistent_arc_id(
+        self,
+    ) -> None:
+        story_id = 'story_id_2'
+        exp_id = 'exp_2'
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        self.save_new_story(story_id, self.admin_id, self.topic_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, story_id
+        )
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': 'node_1',
+                        'title': 'Chapter 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': exp_id,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(self.topic_id, story_id, self.admin_id)
+        story_services.update_story(
+            self.admin_id,
+            story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': ['node_1'],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+        topic_services.add_canonical_story(
+            self.admin_id, self.topic_id, 'nonexistent'
+        )
+
+        json_response = self.get_json(
+            '%s/staging/%s/arc/nonexistent_arc'
+            % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name',
+            ),
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 0)
 
     def test_get_succeeds_with_arc_id(self) -> None:
         story_id = 'story_id_2'
@@ -404,6 +526,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
+                        # Here we use cast because the empty list's type cannot
+                        # be inferred, and List[str] is needed to match
+                        # AcceptableChangeDictTypes.
                         'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1, self.skill_id2],
                     }
