@@ -2272,6 +2272,7 @@ class BaseFeedbackModel(BaseModel):
         exploration_id: Optional[str] = None,
         date_from: Optional[datetime.datetime] = None,
         date_to: Optional[datetime.datetime] = None,
+        **kwargs: Any,
     ) -> tuple[Sequence['BaseFeedbackModel'], Optional[str], bool]:
         """Fetches a page of feedback entries sorted by created_on_desc."""
         query = cls._get_filtered_query(
@@ -2280,6 +2281,7 @@ class BaseFeedbackModel(BaseModel):
             exploration_id=exploration_id,
             date_from=date_from,
             date_to=date_to,
+            **kwargs,
         ).order(-cls.created_on)
 
         start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
@@ -2289,6 +2291,8 @@ class BaseFeedbackModel(BaseModel):
         )
 
         next_cursor_str = None
+        if len(results) < page_size:
+            more = False
         if next_cursor and more:
             next_cursor_str = next_cursor.urlsafe()
         return results, next_cursor_str, more

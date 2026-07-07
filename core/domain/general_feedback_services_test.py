@@ -306,7 +306,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
                 destination_dashboard=feconf.DESTINATION_CREATOR,
-                exploration_id='exp_id',
+                dashboard_id='exp_id',
             )
         )
 
@@ -344,6 +344,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
                 destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                dashboard_id='team',
             )
         )
 

@@ -17,27 +17,61 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
   let fixture: ComponentFixture<TechnicalFeedbackDashboardPageComponent>;
+  let feedbackBackendApiService: jasmine.SpyObj<FeedbackBackendApiService>;
 
   beforeEach(async () => {
+    feedbackBackendApiService = jasmine.createSpyObj(
+      'FeedbackBackendApiService',
+      ['fetchPlatformFeedbackModelThreadsAsync']
+    );
+    feedbackBackendApiService.fetchPlatformFeedbackModelThreadsAsync.and.resolveTo(
+      {
+        results: [],
+        cursor: null,
+        more: false,
+      }
+    );
+
     await TestBed.configureTestingModule({
       declarations: [TechnicalFeedbackDashboardPageComponent],
+      providers: [
+        {
+          provide: FeedbackBackendApiService,
+          useValue: feedbackBackendApiService,
+        },
+      ],
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TechnicalFeedbackDashboardPageComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create the component instance', () => {
     expect(component instanceof TechnicalFeedbackDashboardPageComponent).toBe(
       true
     );
+  });
+
+  it('should fetch and log platform feedback threads on init', async () => {
+    const consoleLogSpy = spyOn(console, 'log');
+
+    await component.ngOnInit();
+
+    expect(
+      feedbackBackendApiService.fetchPlatformFeedbackModelThreadsAsync
+    ).toHaveBeenCalledWith('LEAP', 'team', null, null, null, null);
+    expect(consoleLogSpy).toHaveBeenCalledWith({
+      results: [],
+      cursor: null,
+      more: false,
+    });
   });
 });

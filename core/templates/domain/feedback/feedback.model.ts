@@ -203,3 +203,17 @@ export interface FeedbackCaptchaConfigResponse {
 export interface FeedbackSubmitResponse {
   id: string;
 }
+
+export interface PlatformFeedbackThreadSummary {
+  id: string;
+  report_message_preview: string;
+  status: FeedbackStatus;
+  source: string;
+  category: ReportAnIssueCategory | null;
+}
+
+export interface PlatformFeedbackThreadsBackendResponse {
+  summaries: PlatformFeedbackThreadSummary[];
+  next_cursor: string | null;
+  more: boolean;
+}

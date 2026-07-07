@@ -116,8 +116,6 @@ class PlatformFeedbackSummaryDict(TypedDict):
     status: str
     source: str
     category: Optional[str]
-    destination_dashboard: str
-    created_on_msecs: float
 
 
 class LessonFeedback:
@@ -276,6 +274,4 @@ class PlatformFeedback:
             'status': self.status,
             'source': self.source,
             'category': self.category,
-            'destination_dashboard': self.destination_dashboard,
-            'created_on_msecs': self.created_on_msecs,
         }

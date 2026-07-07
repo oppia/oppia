@@ -16,7 +16,7 @@
  * @fileoverview Backend API service for web feedback submission and triage.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -28,6 +28,8 @@ import {
   FeedbackCaptchaConfigResponse,
   LessonFeedbackModel,
   PlatformFeedbackModel,
+  PlatformFeedbackThreadsBackendResponse,
+  PlatformFeedbackThreadSummary,
   FeedbackSubmitResponse,
 } from './feedback.model';
 
@@ -119,5 +121,49 @@ export class FeedbackBackendApiService {
         ...(captchaToken ? {captcha_token: captchaToken} : {}),
       })
       .toPromise();
+  }
+
+  async fetchPlatformFeedbackModelThreadsAsync(
+    destinationDashboard: string,
+    dashboardId: string,
+    cursor: string | null,
+    statusFilter: string | null,
+    dateFromMsecs: number | null,
+    dateToMsecs: number | null
+  ): Promise<{
+    results: PlatformFeedbackThreadSummary[];
+    cursor: string | null;
+    more: boolean;
+  }> {
+    let params = new HttpParams();
+    if (cursor !== null) {
+      params = params.set('cursor', cursor);
+    }
+    if (statusFilter !== null) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs !== null) {
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    }
+    if (dateToMsecs !== null) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+
+    const platformFeedbackReportUrl = [
+      this.reportUrl,
+      encodeURIComponent(destinationDashboard),
+      encodeURIComponent(dashboardId),
+    ].join('/');
+    const response = await this.http
+      .get<PlatformFeedbackThreadsBackendResponse>(platformFeedbackReportUrl, {
+        params,
+      })
+      .toPromise();
+
+    return {
+      results: response.summaries,
+      cursor: response.next_cursor,
+      more: response.more,
+    };
   }
 }

@@ -587,5 +587,6 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Feedback with ID %s does not exist.' % report.id,
+            'Could not find the resource '
+            'http://localhost/platform-feedback/creator/exp_id/%s.' % report.id,
         )

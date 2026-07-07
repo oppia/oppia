@@ -15,12 +15,28 @@
 /**
  * @fileoverview Component for Technical feedback dashboard.
  */
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 
 @Component({
   selector: 'oppia-technical-feedback-dashboard-page',
   templateUrl: './technical-feedback-dashboard-page.component.html',
 })
-export class TechnicalFeedbackDashboardPageComponent {
-  // Stub: no data or logic yet.
+export class TechnicalFeedbackDashboardPageComponent implements OnInit {
+  constructor(private feedbackBackendApiService: FeedbackBackendApiService) {}
+
+  async ngOnInit(): Promise<void> {
+    const feedbackThreads =
+      await this.feedbackBackendApiService.fetchPlatformFeedbackModelThreadsAsync(
+        'CORE',
+        'team',
+        null,
+        null,
+        null,
+        null
+      );
+    // TODO(#22447): Replace this with dashboard rendering once the technical
+    // feedback dashboard UI is implemented.
+    console.log(feedbackThreads);
+  }
 }

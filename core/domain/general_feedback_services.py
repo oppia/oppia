@@ -355,9 +355,11 @@ def get_platform_feedback(
 
 def get_platform_feedback_summaries(
     destination_dashboard: str,
-    exploration_id: Optional[str] = None,
+    dashboard_id: str,
     status_filter: Optional[str] = feconf.STATUS_CHOICES_OPEN,
     cursor: Optional[str] = None,
+    date_from_msecs: Optional[float] = None,
+    date_to_msecs: Optional[float] = None,
 ) -> tuple[
     List[general_feedback_domain.PlatformFeedbackSummaryDict],
     Optional[str],
@@ -368,11 +370,16 @@ def get_platform_feedback_summaries(
     Used by the Creator Dashboard GET and Technical Dashboard GET.
 
     Args:
-        exploration_id: Optional[str]. If provided, only return reports linked
-            to this exploration.
+        destination_dashboard: str. The dashboard for which feedback is
+            requested.
+        dashboard_id: str. Identifier associated with the requested dashboard.
         status_filter: Optional[str]. If provided, only return reports with
             this status. Otherwise, open status reports are shown.
         cursor: Optional[str]. Pagination cursor from a previous response.
+        date_from_msecs: Optional[float]. If provided, only return reports
+            created after this time.
+        date_to_msecs: Optional[float]. If provided, only return reports
+            created before this time.
 
     Returns:
         Tuple of (summaries, next_cursor, more):
@@ -388,19 +395,31 @@ def get_platform_feedback_summaries(
         raise ValueError(
             'Invalid destination dashboard: %s' % (destination_dashboard)
         )
-    if (
-        destination_dashboard == feconf.DESTINATION_CREATOR
-        and exploration_id is None
-    ):
-        raise ValueError(
-            'An exploration ID is required for creator dashboard feedback.'
-        )
+    if destination_dashboard == feconf.DESTINATION_CREATOR:
+        exploration_id = dashboard_id
+        dashboard_filter = None
+    else:
+        exploration_id = None
+        dashboard_filter = destination_dashboard
+    date_from = (
+        utils.convert_millisecs_time_to_datetime_object(date_from_msecs)
+        if date_from_msecs is not None
+        else None
+    )
+    date_to = (
+        utils.convert_millisecs_time_to_datetime_object(date_to_msecs)
+        if date_to_msecs is not None
+        else None
+    )
     model_list, next_cursor, more = (
         general_feedback_models.PlatformFeedbackModel.fetch_page(
             page_size=20,
             cursor=cursor,
+            destination_dashboard=dashboard_filter,
             exploration_id=exploration_id,
             status_filter=status_filter,
+            date_from=date_from,
+            date_to=date_to,
         )
     )
     summaries = [

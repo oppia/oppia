@@ -5222,9 +5222,18 @@ def can_access_platform_feedback_reports(
         """
 
         if dashboard == feconf.DESTINATION_CREATOR:
-            return can_edit_exploration(handler)(
-                self, dashboard_id, dashboard, dashboard_id, *args, **kwargs
-            )
+
+            def wrapped_handler(
+                handler_self: _SelfBaseHandlerType,
+                unused_exploration_id: str,
+                **unused_kwargs: Any,
+            ) -> _GenericHandlerFunctionReturnType:
+                """Calls the original handler after exploration access checks."""
+                return handler(
+                    handler_self, dashboard, dashboard_id, *args, **kwargs
+                )
+
+            return can_edit_exploration(wrapped_handler)(self, dashboard_id)
 
         if dashboard in (
             feconf.DESTINATION_TECHNICAL_CORE_TEAM,

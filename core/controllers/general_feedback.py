@@ -339,6 +339,18 @@ class PlatformFeedbackListHandler(
                 },
                 'default_value': None,
             },
+            'date_from_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+            'date_to_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
         },
     }
 
@@ -352,12 +364,16 @@ class PlatformFeedbackListHandler(
         req = self.normalized_request
         status = req.get('status')
         cursor = req.get('cursor')
+        date_from_msecs = req.get('date_from_msecs')
+        date_to_msecs = req.get('date_to_msecs')
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
                 destination_dashboard=dashboard,
-                exploration_id=dashboard_id,
+                dashboard_id=dashboard_id,
                 status_filter=status,
                 cursor=cursor,
+                date_from_msecs=date_from_msecs,
+                date_to_msecs=date_to_msecs,
             )
         )
         self.render_json(
@@ -462,8 +478,8 @@ class PlatformFeedbackDetailHandler(
         dashboard_id: str,
         report_id: str,
     ) -> None:
-        assert self.normalized_request is not None
-        payload = self.normalized_request
+        assert self.normalized_payload is not None
+        payload = self.normalized_payload
         status = payload['status']
         try:
             updated_feedback = general_feedback_services.update_platform_feedback_status_for_dashboard(
