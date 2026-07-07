@@ -759,6 +759,115 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                         total_questions=test_case['total_questions'],
                     )
 
+    def test_validate_against_maps_returns_expected_result(self) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+            topic_ids=['topic_1', 'topic_2'],
+            total_questions=4,
+            topic_id_to_info={
+                'topic_1': {
+                    'name': 'Topic 1',
+                    'skill_ids': ['skill_1'],
+                },
+                'topic_2': {
+                    'name': 'Topic 2',
+                    'skill_ids': ['skill_2'],
+                },
+            },
+            skill_id_to_question_ids={
+                'skill_1': ['q1', 'q2'],
+                'skill_2': ['q3', 'q4', 'q5'],
+            },
+        )
+
+        self.assertTrue(result['is_valid'])
+        self.assertEqual(
+            result['validation_message'], 'Certificate assessment is valid.'
+        )
+        self.assertEqual(
+            result['validation_errors']['topic_1'],
+            {
+                CERTIFICATE_DIFFICULTY_EASY: {'required': 1, 'available': 1},
+                CERTIFICATE_DIFFICULTY_MEDIUM: {'required': 1, 'available': 1},
+                CERTIFICATE_DIFFICULTY_HARD: {'required': 0, 'available': 0},
+            },
+        )
+
+    def test_validate_against_maps_rejects_invalid_inputs(self) -> None:
+        self.assertEqual(
+            certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+                topic_ids=[],
+                total_questions=4,
+                topic_id_to_info={},
+                skill_id_to_question_ids={},
+            )[
+                'validation_message'
+            ],
+            'topic_ids must contain at least one topic.',
+        )
+        self.assertEqual(
+            certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+                topic_ids=['topic_1'],
+                total_questions=0,
+                topic_id_to_info={
+                    'topic_1': {'name': 'Topic 1', 'skill_ids': []}
+                },
+                skill_id_to_question_ids={},
+            )[
+                'validation_message'
+            ],
+            'total_questions must be a positive integer.',
+        )
+        self.assertEqual(
+            certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+                topic_ids=['topic_1'],
+                total_questions=1,
+                topic_id_to_info={},
+                skill_id_to_question_ids={},
+            )[
+                'validation_message'
+            ],
+            'Topic(s) topic_1 do not exist.',
+        )
+
+    def test_validate_against_preloaded_maps_handles_limits_and_distinctness(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
+            topic_ids=['topic_1', 'topic_2'],
+            total_questions=5,
+            topic_name_to_question_ids_map={
+                'topic_1': ['q1', 'q2'],
+                'topic_2': ['q2', 'q3'],
+            },
+            topic_id_to_question_ids_by_difficulty={
+                'topic_1': {
+                    CERTIFICATE_DIFFICULTY_EASY: {'q1'},
+                    CERTIFICATE_DIFFICULTY_MEDIUM: {'q2'},
+                    CERTIFICATE_DIFFICULTY_HARD: set(),
+                },
+                'topic_2': {
+                    CERTIFICATE_DIFFICULTY_EASY: {'q2'},
+                    CERTIFICATE_DIFFICULTY_MEDIUM: {'q3'},
+                    CERTIFICATE_DIFFICULTY_HARD: set(),
+                },
+            },
+            topic_id_to_name={},
+        )
+
+        self.assertFalse(result['is_valid'])
+        self.assertIn(
+            'total_questions must be greater than or equal to 6',
+            result['validation_message'],
+        )
+        self.assertIn(
+            'Only 3 unique question(s) are available across the selected topics, but 5 are required without reusing questions.',
+            result['validation_message'],
+        )
+        self.assertIn(
+            'Selected topics topic_1 and topic_2 do not have enough distinct hard questions to satisfy the requested certificate without reusing questions across topics.',
+            result['validation_message'],
+        )
+
     def test_validation_uses_skill_questions_for_available_counts(self) -> None:
         topic = mock.Mock()
         topic.name = 'Mock Topic'
