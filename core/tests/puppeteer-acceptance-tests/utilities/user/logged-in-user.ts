@@ -4776,7 +4776,10 @@ export class LoggedInUser extends BaseUser {
     await button?.evaluate(el =>
       el.scrollIntoView({block: 'center', inline: 'center'})
     );
-    await this.clickOnElementWithSelector(lessonInfoButton);
+    await this.page.evaluate((selector: string) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      el?.click();
+    }, lessonInfoButton);
     await this.expectElementToBeVisible(lessonInfoCardSelector, true);
   }
 
