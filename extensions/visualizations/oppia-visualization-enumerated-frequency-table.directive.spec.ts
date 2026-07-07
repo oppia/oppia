@@ -32,6 +32,7 @@ import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {OppiaVisualizationEnumeratedFrequencyTableComponent} from './oppia-visualization-enumerated-frequency-table.directive';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -136,4 +137,25 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
 
     expect(component.answerVisible[0]).toEqual(false);
   }));
+
+  it('should return empty array when row answer is falsy', () => {
+    const row = AnswerStats.createFromBackendDict({answer: null, frequency: 1});
+    expect(component.getAnswerAsArray(row)).toEqual([]);
+  });
+
+  it('should return answer wrapped in array when not already an array', () => {
+    const row = AnswerStats.createFromBackendDict({
+      answer: 'foo',
+      frequency: 1,
+    });
+    expect(component.getAnswerAsArray(row)).toEqual(['foo']);
+  });
+
+  it('should return string as is from getAnswerAsString', () => {
+    expect(component.getAnswerAsString('foo')).toEqual('foo');
+  });
+
+  it('should JSON stringify non-string from getAnswerAsString', () => {
+    expect(component.getAnswerAsString(42 as never)).toEqual('42');
+  });
 });
