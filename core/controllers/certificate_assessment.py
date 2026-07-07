@@ -30,7 +30,22 @@ class CertificateAssessmentOfferingTopicDict(TypedDict):
 
 
 class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of CertificateAssessmentOfferingHandler payload."""
+    """Dict representation of CertificateAssessmentOfferingHandler payload.
+
+    Attributes:
+        title: Title of the certificate assessment offering.
+        description: Description of the certificate assessment offering.
+        classroom_id: ID of the classroom the assessment offering belongs to.
+        topics: List of topics covered in the assessment offering.
+        total_questions: Total number of questions in the assessment.
+        time_limit_in_minutes: Time limit for completing the assessment, in
+            minutes.
+        demonstrates: List of plain-text strings describing what the
+            certificate demonstrates (e.g. skills or competencies earned
+            upon completion).
+        async_status: Availability status of the assessment offering,
+            indicating whether it is available, blocked, or not yet ready.
+    """
 
     title: str
     description: str
@@ -42,10 +57,65 @@ class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
     async_status: str
 
 
+class ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict(
+    TypedDict
+):
+    """Dict representation of the validation handler payload."""
+
+    topic_ids: List[str]
+    total_questions: int
+
+
+def create_empty_validate_certificate_assessment_offering_handler_normalized_payload() -> (
+    ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict
+):
+    """Returns an empty validation payload for fallback use."""
+    return {'topic_ids': [], 'total_questions': 0}
+
+
 class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of certificate_id path args."""
 
     certificate_id: str
+
+
+class ValidateCertificateAssessmentOfferingHandler(
+    base.BaseHandler[
+        ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        Dict[str, str],
+    ]
+):
+    """Validates whether a certificate offering can be created or updated."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'topic_ids': {
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+            },
+            'total_questions': {'schema': {'type': 'int'}},
+        },
+    }
+
+    @acl_decorators.can_access_certificate_dashboard
+    def post(self) -> None:
+        """Validates the selected topics and total question count."""
+        payload = (
+            self.normalized_payload
+            if self.normalized_payload is not None
+            else (
+                create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
+            )
+        )
+        topic_ids = payload['topic_ids']
+        total_questions = payload['total_questions']
+
+        validation_result = certificate_assessment_services.validate_certificate_assessment_offering(
+            topic_ids=topic_ids,
+            total_questions=total_questions,
+        )
+        self.render_json(validation_result)
 
 
 class CertificateAssessmentOfferingHandler(
@@ -120,6 +190,7 @@ class CertificateAssessmentOfferingHandler(
             topic['topic_id'] for topic in self.normalized_payload['topics']
         ]
         total_questions = int(self.normalized_payload['total_questions'])
+
         time_limit_in_minutes = int(
             self.normalized_payload['time_limit_in_minutes']
         )
@@ -234,6 +305,7 @@ class CertificateAssessmentOfferingByIdHandler(
             topic['topic_id'] for topic in self.normalized_payload['topics']
         ]
         total_questions = int(self.normalized_payload['total_questions'])
+
         time_limit_in_minutes = int(
             self.normalized_payload['time_limit_in_minutes']
         )

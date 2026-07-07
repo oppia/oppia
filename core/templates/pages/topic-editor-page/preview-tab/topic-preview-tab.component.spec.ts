@@ -56,7 +56,8 @@ describe('Topic Preview Tab Component', () => {
       0,
       [],
       0,
-      []
+      [],
+      undefined
     ),
   ];
 
