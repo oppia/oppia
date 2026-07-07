@@ -42,12 +42,12 @@ from core.controllers import (
     custom_landing_pages,
     diagnostic_test_player,
     editor,
-    email_dashboard,
     feature_flag,
     features,
     feedback,
     feedback_updates,
     firebase,
+    general_feedback,
     improvements,
     incoming_app_feedback_report,
     learner_dashboard,
@@ -464,6 +464,10 @@ URLS = [
         contributor_dashboard.ContributionOpportunitiesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_V2_URL,
+        contributor_dashboard.ContributionOpportunitiesHandlerV2,
+    ),
+    get_redirect_route(
         r'/preferredtranslationlanguage',
         contributor_dashboard.TranslationPreferenceHandler,
     ),
@@ -472,12 +476,20 @@ URLS = [
         contributor_dashboard.ReviewableOpportunitiesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL,
+        contributor_dashboard.ReviewableOpportunitiesHandlerV2,
+    ),
+    get_redirect_route(
         r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
         contributor_dashboard.LessonsPinningHandler,
     ),
     get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.TRANSLATABLE_CONTENTS_V2_URL,
+        contributor_dashboard.TranslatableContentsHandlerV2,
     ),
     get_redirect_route(
         r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
@@ -1045,6 +1057,18 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
+        general_feedback.GeneralFeedbackCaptchaConfigHandler,
+    ),
+    get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler
     ),
     get_redirect_route(
@@ -1191,20 +1215,6 @@ URLS = [
     get_redirect_route(
         r'%s/<story_id>' % feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler,
-    ),
-    get_redirect_route(
-        r'/emaildashboarddatahandler', email_dashboard.EmailDashboardDataHandler
-    ),
-    get_redirect_route(
-        r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler
-    ),
-    get_redirect_route(
-        r'/emaildashboardcancelresult/<query_id>',
-        email_dashboard.EmailDashboardCancelEmailHandler,
-    ),
-    get_redirect_route(
-        r'/emaildashboardtestbulkemailhandler/<query_id>',
-        email_dashboard.EmailDashboardTestBulkEmailHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
@@ -1400,6 +1410,14 @@ URLS = [
     get_redirect_route(
         feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
         certificate_assessment.CertificateAssessmentOfferingHandler,
+    ),
+    get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingByIdHandler,
+    ),
+    get_redirect_route(
+        feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+        certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
     ),
 ]
 

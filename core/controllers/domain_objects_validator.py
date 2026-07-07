@@ -20,6 +20,7 @@ handler arguments.
 
 from __future__ import annotations
 
+import re
 import urllib.parse
 
 from core import feconf, utils
@@ -30,6 +31,7 @@ from core.domain import (
     blog_services,
     change_domain,
     exp_domain,
+    general_feedback_domain,
     image_validation_services,
     improvements_domain,
     platform_parameter_domain,
@@ -41,7 +43,7 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping, Optional, Union
+from typing import Dict, Mapping
 
 
 def validate_suggestion_change(
@@ -266,36 +268,6 @@ def validate_question_state_dict(
     return question_state_dict
 
 
-def validate_email_dashboard_data(
-    data: Dict[str, Optional[Union[bool, int]]],
-) -> Dict[str, Optional[Union[bool, int]]]:
-    """Validates email dashboard data.
-
-    Args:
-        data: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the dict after validation.
-
-    Raises:
-        Exception. The key in 'data' is not one of the allowed keys.
-    """
-    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-    possible_keys = [predicate['backend_attr'] for predicate in predicates]
-
-    for key, value in data.items():
-        if value is None:
-            continue
-        if key not in possible_keys:
-            # Raise exception if key is not one of the allowed keys.
-            raise Exception('400 Invalid input for query.')
-    # The method returns a dict containing fields of email dashboard
-    # query params. This dict represents the UserQueryParams class, which is a
-    # namedtuple. Hence the fields of the dict are being validated as a part of
-    # schema validation before saving new user queries in the handler.
-    return data
-
-
 def validate_task_entries(
     task_entries: improvements_domain.TaskEntryDict,
 ) -> improvements_domain.TaskEntryDict:
@@ -441,7 +413,7 @@ def validate_general_feedback_page_url(page_url: str) -> str:
 
 # Here we use object because session-info diagnostics are heterogeneous
 # JSON-like payloads (nested dict/list values) from client logs.
-def validate_general_feedback_session_info_log_entries(
+def validate_feedback_session_info_log_entries(
     session_info: Dict[str, object],
 ) -> Dict[str, object]:
     """Validates the session info log entries for feedback submission.
@@ -701,24 +673,116 @@ def validate_general_feedback_session_info_log_entries(
     }
 
 
-# Here we use object because session-info diagnostics are heterogeneous
-# JSON-like payloads (nested dict/list values) from client logs.
-def validate_general_feedback_submit_payload_coupling(
-    payload: Dict[str, object],
-) -> Dict[str, object]:
-    """Validates the coupling between different fields of the payload for
-    feedback submission.
-
-    Args:
-        payload: dict. The payload to be validated.
-
-    Returns:
-        dict. The validated payload.
-    """
-    include_session_info = bool(payload.get('include_session_info'))
-    session_info = payload.get('session_info')
-    if include_session_info and session_info is None:
+def validate_lesson_feedback_submit_payload_coupling(
+    payload: general_feedback_domain.FeedbackSubmitPayloadDict,
+) -> None:
+    """Validates cross-field constraints for FeedbackSubmitHandler POST payload."""
+    feedback_text = payload.get('feedback_text', '')
+    if not isinstance(feedback_text, str) or not feedback_text.strip():
         raise base.BaseHandler.InvalidInputException(
-            'Session info must be provided if include_session_info is True.'
+            'feedback_text must not be empty.'
         )
-    return payload
+
+    lesson_metadata_json = payload.get('lesson_metadata_json')
+    if lesson_metadata_json is None:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json is required for lesson feedback.'
+        )
+
+    validate_lesson_metadata_fields(lesson_metadata_json)
+
+
+def validate_platform_feedback_submit_payload_coupling(
+    payload: general_feedback_domain.PlatformFeedbackSubmitPayloadDict,
+) -> None:
+    """Validates cross-field constraints for PlatformFeedbackSubmitHandler POST."""
+    report_message = payload.get('report_message', '')
+    if not isinstance(report_message, str) or not report_message.strip():
+        raise base.BaseHandler.InvalidInputException(
+            'report_message must not be empty.'
+        )
+
+    source = payload.get('source')
+    lesson_metadata_json = payload.get('lesson_metadata_json')
+    if source == 'lesson':
+        if lesson_metadata_json is None:
+            raise base.BaseHandler.InvalidInputException(
+                'lesson_metadata_json is required for lesson reports.'
+            )
+        validate_lesson_metadata_fields(lesson_metadata_json)
+
+    elif source == 'site':
+        category = payload.get('category')
+        if category is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'category must be omitted for site reports.'
+            )
+        if lesson_metadata_json is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'lesson_metadata_json must be omitted for site reports.'
+            )
+
+    include_technical_logs = payload.get('include_technical_logs', False)
+    session_info = payload.get('session_info')
+
+    if include_technical_logs and session_info is None:
+        raise base.BaseHandler.InvalidInputException(
+            'session_info must be provided when include_technical_logs is True.'
+        )
+    if not include_technical_logs and session_info is not None:
+        raise base.BaseHandler.InvalidInputException(
+            'session_info must be omitted when include_technical_logs is False.'
+        )
+
+    screenshot_filename = payload.get('screenshot_filename')
+    screenshot_file = payload.get('screenshot_file')
+
+    if screenshot_filename is not None and screenshot_file is None:
+        raise base.BaseHandler.InvalidInputException(
+            'screenshot_file is required when screenshot_filename is provided.'
+        )
+    if screenshot_file is not None and screenshot_filename is None:
+        raise base.BaseHandler.InvalidInputException(
+            'screenshot_filename is required when screenshot_file is provided.'
+        )
+    if screenshot_filename is not None and isinstance(screenshot_filename, str):
+        if (
+            re.fullmatch(
+                utils.get_image_filename_regex_pattern(),
+                screenshot_filename,
+            )
+            is None
+        ):
+            raise base.BaseHandler.InvalidInputException(
+                'screenshot_filename is invalid.'
+            )
+
+
+def validate_lesson_metadata_fields(
+    lesson_metadata_json: general_feedback_domain.LessonMetadataDict,
+) -> general_feedback_domain.LessonMetadataDict:
+    """Validates field presence and types within a lesson_metadata_json dict."""
+    exploration_id = lesson_metadata_json.get('exploration_id')
+    if not isinstance(exploration_id, str) or not exploration_id:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.exploration_id must be a non-empty string.'
+        )
+
+    exploration_version = lesson_metadata_json.get('exploration_version')
+    if not isinstance(exploration_version, int) or exploration_version < 0:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.exploration_version must be an integer.'
+        )
+
+    state_name = lesson_metadata_json.get('state_name')
+    if not isinstance(state_name, str) or not state_name:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.state_name must be a non-empty string.'
+        )
+
+    state_index = lesson_metadata_json.get('state_index')
+    if not isinstance(state_index, int) or state_index < 0:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata_json.state_index must be a non-negative integer.'
+        )
+    return lesson_metadata_json

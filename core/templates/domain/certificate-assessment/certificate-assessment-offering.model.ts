@@ -27,6 +27,7 @@ export interface CertificateAssessmentOfferingBackendDict {
   description: string;
   classroom_id: string;
   topic_data: CertificateAssessmentOfferingTopicData;
+  demonstrates: string[];
   total_questions: number;
   time_limit_in_minutes: number;
   async_status: string;
@@ -41,6 +42,7 @@ export class CertificateAssessmentOfferingData {
   _topicData: CertificateAssessmentOfferingTopicData;
   _totalQuestions: number;
   _timeLimitInMinutes: number;
+  _demonstrates: string[];
   _asyncStatus: string;
   _version: number;
 
@@ -52,6 +54,7 @@ export class CertificateAssessmentOfferingData {
     topicData: CertificateAssessmentOfferingTopicData,
     totalQuestions: number,
     timeLimitInMinutes: number,
+    demonstrates: string[],
     asyncStatus: string,
     version: number
   ) {
@@ -62,6 +65,7 @@ export class CertificateAssessmentOfferingData {
     this._topicData = topicData;
     this._totalQuestions = totalQuestions;
     this._timeLimitInMinutes = timeLimitInMinutes;
+    this._demonstrates = demonstrates;
     this._asyncStatus = asyncStatus;
     this._version = version;
   }
@@ -118,6 +122,14 @@ export class CertificateAssessmentOfferingData {
     this._timeLimitInMinutes = timeLimitInMinutes;
   }
 
+  get demonstrates(): string[] {
+    return this._demonstrates;
+  }
+
+  set demonstrates(demonstrates: string[]) {
+    this._demonstrates = demonstrates;
+  }
+
   get asyncStatus(): string {
     return this._asyncStatus;
   }
@@ -135,6 +147,7 @@ export class CertificateAssessmentOfferingData {
       {},
       0,
       0,
+      [],
       'Not_Ready',
       0
     );
@@ -151,6 +164,7 @@ export class CertificateAssessmentOfferingData {
       certificateAssessmentOfferingBackendDict.topic_data,
       certificateAssessmentOfferingBackendDict.total_questions,
       certificateAssessmentOfferingBackendDict.time_limit_in_minutes,
+      certificateAssessmentOfferingBackendDict.demonstrates,
       certificateAssessmentOfferingBackendDict.async_status,
       certificateAssessmentOfferingBackendDict.version
     );

@@ -52,48 +52,6 @@
   padding: 10px;
 }
 
-.oppia-feedback-floater {
-  align-items: flex-end;
-  bottom: 50%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: fixed;
-  right: 0; 
-  transition: transform 0.15s ease-in-out;
-  z-index: 1000;
-}
-
-.oppia-feedback-floater-dismiss-button {
-  align-items: center;
-  align-self: center;
-  background: #3b82f6;
-  border: 1px solid #dbeafe;
-  border-radius: 50%;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  font-size: 14px;
-  height: 28px;
-  justify-content: center;
-  width: 28px;
-}
-
-.oppia-feedback-floater-button {
-  background: #3b82f6;
-  border: 1px solid #24564d;
-  border-radius: 8px 0 0 8px;
-  border-right-width: 0;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  padding: 12px 10px;
-  text-orientation: mixed;
-  writing-mode: vertical-rl;
-}
-
 .oppia-cookie-banner-container {
   background: rgb(0, 0, 0, 0.9);
   bottom: 0;

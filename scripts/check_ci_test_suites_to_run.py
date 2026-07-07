@@ -76,6 +76,7 @@ class TestSuitesByTypeDict(TypedDict):
 
     e2e: List[GenericTestSuiteDict]
     acceptance: List[GenericTestSuiteDict]
+    acceptance_playwright: List[GenericTestSuiteDict]
     lighthouse_performance: List[LighthouseTestSuiteDict]
     lighthouse_accessibility: List[LighthouseTestSuiteDict]
 
@@ -92,6 +93,7 @@ class CITestSuitesToRunDict(TypedDict):
 
     e2e: CITestSuitesDict
     acceptance: CITestSuitesDict
+    acceptance_playwright: CITestSuitesDict
     lighthouse_performance: CITestSuitesDict
     lighthouse_accessibility: CITestSuitesDict
 
@@ -141,6 +143,7 @@ def create_ci_test_suites_dict(
 def create_ci_test_suites_to_run_dict(
     e2e: Optional[CITestSuitesDict] = None,
     acceptance: Optional[CITestSuitesDict] = None,
+    acceptance_playwright: Optional[CITestSuitesDict] = None,
     lighthouse_performance: Optional[CITestSuitesDict] = None,
     lighthouse_accessibility: Optional[CITestSuitesDict] = None,
 ) -> CITestSuitesToRunDict:
@@ -149,6 +152,8 @@ def create_ci_test_suites_to_run_dict(
     Args:
         e2e: dict | None. The e2e test suites to run in the CI.
         acceptance: dict | None. The acceptance test suites to run in the CI.
+        acceptance_playwright: dict | None. The Playwright acceptance test
+            suites to run in the CI.
         lighthouse_performance: dict | None. The lighthouse performance test
             suites to run in the CI.
         lighthouse_accessibility: dict | None. The lighthouse accessibility
@@ -160,6 +165,8 @@ def create_ci_test_suites_to_run_dict(
     return {
         'e2e': e2e or create_ci_test_suites_dict(),
         'acceptance': acceptance or create_ci_test_suites_dict(),
+        'acceptance_playwright': acceptance_playwright
+        or create_ci_test_suites_dict(),
         'lighthouse_performance': lighthouse_performance
         or create_ci_test_suites_dict(),
         'lighthouse_accessibility': lighthouse_accessibility
@@ -257,6 +264,7 @@ def output_test_suites_to_run_to_github_workflow(
     test_suites_to_run_output = {
         'e2e': test_suites_to_run['e2e'],
         'acceptance': test_suites_to_run['acceptance'],
+        'acceptance_playwright': test_suites_to_run['acceptance_playwright'],
         'lighthouse_performance': test_suites_to_run['lighthouse_performance'],
         'lighthouse_accessibility': test_suites_to_run[
             'lighthouse_accessibility'
@@ -352,6 +360,9 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
     acceptance_test_suites = get_test_suites_from_config(
         os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'acceptance.json')
     )
+    acceptance_playwright_suites = [
+        s for s in acceptance_test_suites if s.get('framework') == 'playwright'
+    ]
 
     lighthouse_accessibility_test_suites = (
         partition_lighthouse_pages_into_test_suites(
@@ -367,6 +378,7 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
     return {
         'e2e': e2e_test_suites,
         'acceptance': acceptance_test_suites,
+        'acceptance_playwright': acceptance_playwright_suites,
         'lighthouse_accessibility': lighthouse_accessibility_test_suites,
         'lighthouse_performance': lighthouse_performance_test_suites,
     }
@@ -379,6 +391,9 @@ def output_all_test_suites_to_run_to_github_workflow() -> None:
         e2e=create_ci_test_suites_dict(all_test_suites_by_type['e2e']),
         acceptance=create_ci_test_suites_dict(
             all_test_suites_by_type['acceptance']
+        ),
+        acceptance_playwright=create_ci_test_suites_dict(
+            all_test_suites_by_type['acceptance_playwright']
         ),
         lighthouse_performance=create_ci_test_suites_dict(
             all_test_suites_by_type['lighthouse_performance']
@@ -618,6 +633,10 @@ def get_ci_test_suites_to_run(
             ),
         )
 
+    acceptance_playwright_test_suites = [
+        s for s in acceptance_test_suites if s.get('framework') == 'playwright'
+    ]
+
     lighthouse_accessibility_test_suites = (
         partition_lighthouse_pages_into_test_suites(
             LIGHTHOUSE_ACCESSIBILITY_MODULE,
@@ -639,6 +658,9 @@ def get_ci_test_suites_to_run(
     return create_ci_test_suites_to_run_dict(
         e2e=create_ci_test_suites_dict(all_test_suites_by_type['e2e']),
         acceptance=create_ci_test_suites_dict(acceptance_test_suites),
+        acceptance_playwright=create_ci_test_suites_dict(
+            acceptance_playwright_test_suites
+        ),
         lighthouse_accessibility=create_ci_test_suites_dict(
             lighthouse_accessibility_test_suites
         ),

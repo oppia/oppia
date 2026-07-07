@@ -20,7 +20,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  async,
+  waitForAsync,
   tick,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -40,7 +40,7 @@ describe('TopicManagerRoleEditorModalComponent', () => {
   let adminBackendApiService: AdminBackendApiService;
   let alertsService: AlertsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, MaterialModule, HttpClientTestingModule],
       declarations: [TopicManagerRoleEditorModalComponent],
