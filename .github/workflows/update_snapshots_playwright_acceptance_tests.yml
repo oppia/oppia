@@ -138,14 +138,48 @@ jobs:
           enable-screen-recording: false
           modified-suite-name-for-uploads: ${{ steps.generate_suite_name_for_artifacts.outputs.MOBILE_SUITE_NAME }}
 
-      - name: Upload snapshots for review
+      - name: Stage only changed/new snapshot files
         if: ${{ !cancelled() }}
+        id: stage_changed_snapshots
+        run: |
+          STAGING_DIR="$GITHUB_WORKSPACE/staged-snapshots"
+          rm -rf "$STAGING_DIR"
+          mkdir -p "$STAGING_DIR"
+
+          SPECS_PREFIX="core/tests/playwright-acceptance-tests/specs/"
+
+          # -z for NUL-separated output (safe with any filename), and we
+          # match both modified/renamed tracked files and new untracked
+          # files (update-snapshots can create brand-new baseline images).
+          CHANGED_COUNT=0
+          while IFS= read -r -d '' filepath; do
+            echo "Raw filepath: '$filepath'"
+            # git status --porcelain -z prefixes each entry with a 2-char
+            # status code and a space; strip that to get the bare path.
+            filepath="${filepath:3}"
+            case "$filepath" in
+              *-screenshots/*)
+                # Strip the leading specs/ prefix so the artifact zip is rooted
+                # at the suite directory (e.g. logged-in-learner/...) instead of
+                # the full repo path.
+                relative_path="${filepath#$SPECS_PREFIX}"
+                mkdir -p "$STAGING_DIR/$(dirname "$relative_path")"
+                cp "$filepath" "$STAGING_DIR/$relative_path"
+                CHANGED_COUNT=$((CHANGED_COUNT + 1))
+                ;;
+            esac
+          done < <(git status --porcelain -z --untracked-files=all -- 'core/tests/playwright-acceptance-tests/specs/')
+
+          echo "Staged $CHANGED_COUNT changed/new snapshot file(s)."
+          echo "STAGING_DIR=$STAGING_DIR" >> "$GITHUB_OUTPUT"
+          echo "HAS_CHANGES=$([[ $CHANGED_COUNT -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload changed snapshots for review
+        if: ${{ !cancelled() && steps.stage_changed_snapshots.outputs.HAS_CHANGES == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: updated-snapshots_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: |
-            /home/runner/work/oppia/oppia/core/tests/playwright-acceptance-tests/specs/${{ steps.generate_suite_name_for_artifacts.outputs.SPEC_DIR }}/${{ github.event.inputs.env-mode }}-desktop-screenshots/
-            /home/runner/work/oppia/oppia/core/tests/playwright-acceptance-tests/specs/${{ steps.generate_suite_name_for_artifacts.outputs.SPEC_DIR }}/${{ github.event.inputs.env-mode }}-mobile-screenshots/
+          path: ${{ steps.stage_changed_snapshots.outputs.STAGING_DIR }}
           if-no-files-found: warn
 
   consolidate_snapshots:
@@ -166,3 +200,31 @@ jobs:
           name: updated-snapshots-all-${{ github.event.inputs.env-mode }}
           path: merged-snapshots
           if-no-files-found: warn
+
+  delete_individual_snapshot_artifacts:
+    name: Delete individual per-suite snapshot artifacts
+    needs: consolidate_snapshots
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-22.04
+    permissions:
+      actions: write
+    steps:
+      - name: Delete per-suite artifacts (keep consolidated one)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # List all artifacts for this run, filter to the per-suite ones
+          # (updated-snapshots_<suite>), and delete each by ID. The
+          # consolidated artifact is named updated-snapshots-all-<env-mode>,
+          # so it won't match this prefix and is left intact.
+          gh api \
+            "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts?per_page=100" \
+            --paginate \
+            --jq '.artifacts[] | select(.name | startswith("updated-snapshots_")) | .id' \
+          | while read -r artifact_id; do
+              echo "Deleting artifact ID $artifact_id"
+              gh api \
+                --method DELETE \
+                "repos/${{ github.repository }}/actions/artifacts/$artifact_id" \
+                || echo "Failed to delete artifact $artifact_id (may already be gone)."
+            done
