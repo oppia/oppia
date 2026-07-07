@@ -33,6 +33,14 @@ const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 
 const addInteractionModalSelector = 'customize-interaction-body-container';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
+const solutionInputTextArea =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -41,6 +49,7 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
@@ -60,8 +69,7 @@ const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
-// TODO(#23019): Required selector for code below.
-// const stateContentSelector = '.e2e-test-actual-state-content';
+const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 
 const toastMessage = '.e2e-test-toast-message';
@@ -78,12 +86,40 @@ const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const tagsField = '.e2e-test-chip-list-tags';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
+const multipleChoiceResponseDropdown =
+  'mat-select.e2e-test-main-html-select-selector';
+const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
+const responseModalBodySelector = '.e2e-test-response-modal-body';
+const floatFormInput = '.e2e-test-float-form-input';
+const addResponseOptionButton = 'button.e2e-test-add-list-entry';
+const textInputInteractionOption =
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
+const intEditorField = '.e2e-test-editor-int';
+
+const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
+const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
+const addNewResponseButton = 'button.e2e-test-add-new-response';
+const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const addAnotherResponseButton = 'button.e2e-test-add-another-response';
+
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
+const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
+const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
+
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
-const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -137,13 +173,25 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to add a hint for a state card.
+   * @param {string} hint - The hint to be added for the current card.
+   */
+  async addHintToState(hint: string): Promise<void> {
+    await this.expectElementToBeVisible(addHintButton);
+    await this.clickOnElementWithSelector(addHintButton);
+    await this.typeInInputField(stateContentInputField, hint);
+    await this.clickOnElementWithSelector(saveHintButton);
+    await this.expectElementToBeVisible(saveHintButton, false);
+  }
+
+  /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
-   * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
+   * @param {boolean} skipInteractionCustomization - Whether to skip interaction customization.
    */
   async addInteraction(
     interactionToAdd: string,
-    skipInteractionCustoization: boolean = true
+    skipInteractionCustomization: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
 
@@ -158,19 +206,23 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    await this.page.waitForLoadState('networkidle');
+    await this.waitForNetworkIdle();
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
+    // Wait for active tab panel fade transition to complete.
+    await this.expectElementToBeVisible('css=.tab-pane.active.show');
 
-    const interactionElement = await this.page.waitForSelector(
+    const interactionElement = await this.expectElementToBeVisible(
       `xpath=//*[contains(normalize-space(text()), "${tileText}")]`,
-      {timeout: 90000}
+      true,
+      this.page,
+      90000
     );
     if (!interactionElement) {
       throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
     }
     await this.clickOnElement(interactionElement);
-    if (skipInteractionCustoization) {
+    if (skipInteractionCustomization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
       );
@@ -182,8 +234,128 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds the response details in the response modal.
+   * @param {string} feedback The feedback to be added in the response modal.
+   * @param {string} destination The destination to be added in the response modal.
+   * @param {boolean} responseIsCorrect The response is correct or not.
+   * @param {boolean} isLastResponse Whether the response is the last response or not.
+   */
+  async addResponseDetailsInResponseModal(
+    feedback: string,
+    destination?: string,
+    responseIsCorrect?: boolean,
+    isLastResponse: boolean = true
+  ): Promise<void> {
+    await this.clickOnElementWithSelector(feedbackEditorSelector);
+    await this.typeInInputField(stateContentInputField, feedback);
+    await this.expectTextContentToBe(stateContentInputField, feedback);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    if (destination) {
+      await this.select(destinationCardSelector, '/');
+      await this.typeInInputField(addStateInput, destination);
+    }
+    if (responseIsCorrect) {
+      await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
+    }
+    if (isLastResponse) {
+      await this.expectElementToBeVisible(addNewResponseButton);
+      await this.clickOnElementWithSelector(addNewResponseButton);
+      await this.expectElementToBeVisible(
+        responseModalHeaderSelector,
+        false
+      ).catch(async () => {
+        await this.clickOnElementWithSelector(addNewResponseButton);
+      });
+    } else {
+      await this.clickOnElementWithSelector(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // to the "Save Draft" request from change-list.service.ts
+      // to get executed, the Add Response modal to fully appear
+      // and all the fields in it to become clickable before
+      // moving on to next steps.
+      await this.waitForNetworkIdle();
+    }
+  }
+
+  /**
+   * Function to add responses to the interactions.
+   * Currently, it only handles 'Number Input', 'Multiple Choice', 'Number Input', and 'Text Input' interaction types.
+   * @param {string} interactionType - The type of the interaction.
+   * @param {string} answer - The response to be added.
+   * @param {string} feedback - The feedback for the response.
+   * @param {string} destination - The destination state for the response.
+   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
+   */
+  async addResponsesToTheInteraction(
+    interactionType: string,
+    answer: string,
+    feedback: string,
+    destination?: string,
+    responseIsCorrect?: boolean,
+    isLastResponse: boolean = true
+  ): Promise<void> {
+    await this.updateAnswersInResponseModal(
+      interactionType as INTERACTION_TYPES,
+      answer
+    );
+
+    await this.addResponseDetailsInResponseModal(
+      feedback,
+      destination,
+      responseIsCorrect,
+      isLastResponse
+    );
+  }
+
+  /**
+   * Function to add a solution for a state interaction.
+   * @param {string} answer - The solution of the current state card.
+   * @param {string} answerExplanation - The explanation for this state card's solution.
+   * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
+   */
+  async addSolutionToState(
+    answer: string,
+    answerExplanation: string,
+    isSolutionNumericInput: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
+
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
+    await this.expectElementToBeVisible(solutionSelector);
+    await this.typeInInputField(solutionSelector, answer);
+    await this.expectElementToBeVisible(
+      `${submitAnswerButton}:not([disabled])`
+    );
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.typeInInputField(stateContentInputField, answerExplanation);
+    await this.expectElementToBeVisible(
+      `${submitSolutionButton}:not([disabled])`
+    );
+    await this.clickOnElementWithSelector(submitSolutionButton);
+
+    await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
+   * Adds a solution explanation to the current state card and saves it.
+   * @param {string} explanation - The solution explanation to add to the state card.
+   */
+  async addSolutionExplanationAndSave(explanation: string): Promise<void> {
+    await this.typeInInputField(stateContentInputField, explanation);
+    await this.expectElementToBeVisible(
+      `${submitSolutionButton}:not([disabled])`
+    );
+    await this.clickOnElementWithSelector(submitSolutionButton);
+    await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
    * Changes tab in interaction selection modal.
-   * @param interactionType Interaction type to change tab.
+   * @param {INTERACTION_TYPES} interactionType - Interaction type to change tab.
    */
   async changeTabInInteractionSelectionModal(
     interactionType: INTERACTION_TYPES
@@ -220,6 +392,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} explorationTitle - The title of the exploration.
    * @param {string} category - The category of the exploration.,
    * @param {number} numberOfCards - The number of cards to create.
+   * @param {boolean} expectedWelcomeModal - Whether to expect the welcome modal.
    */
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
@@ -288,8 +461,8 @@ export class ExplorationEditor extends BaseUser {
    * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
    *
-   * @param content - content of the exploration
-   * @param interaction - the interaction to be added to the exploration
+   * @param {string} content - content of the exploration
+   * @param {string} interaction - the interaction to be added to the exploration
    */
   async createMinimalExploration(
     content: string,
@@ -317,11 +490,57 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
+  }
+
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
+  /**
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} directToCard - The card to direct to (optional).
+   * @param {string} directToCardWhenStuck - The card to direct to when the learner is stuck (optional).
+   */
+  async editDefaultResponseFeedbackInExplorationEditorPage(
+    defaultResponseFeedback: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(defaultFeedbackTab);
+    await this.clickOnElementWithSelector(defaultFeedbackTab);
+
+    if (defaultResponseFeedback) {
+      await this.updateDefaultResponseFeedbackInExplorationEditorPage(
+        defaultResponseFeedback
+      );
+    }
+
+    if (directToCard) {
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
+      await this.select(destinationSelectorDropdown, directToCard);
+      await this.clickOnElementWithSelector(saveDestinationButtonSelector);
+      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.typeInInputField(
+        addDestinationStateWhenStuckInput,
+        directToCardWhenStuck
+      );
+      await this.clickOnElementWithSelector(saveStuckDestinationButtonSelector);
+      await this.expectElementToBeVisible(
+        saveStuckDestinationButtonSelector,
+        false
+      );
+    }
   }
 
   /**
@@ -347,8 +566,24 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.expectElementToBeVisible(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
+  }
+
+  /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
+   * @param {boolean} retry - Whether to retry navigation if it fails (default: true).
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
@@ -379,7 +614,7 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(explorationStateGraphModalSelector);
     }
-    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    await this.expectElementToBeVisible(scopedStateNodeGroupSelector);
     elements = await this.page.$$(scopedStateNodeGroupSelector);
 
     const cardNames = await Promise.all(
@@ -402,7 +637,10 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Click on the node background rect which has the click handler.
-    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    const nodeBackground = await this.getElementInParent(
+      '.e2e-test-node-background',
+      nodeGroup
+    );
     if (!nodeBackground) {
       throw new Error(
         `Could not find clickable background for card: ${cardName}`
@@ -412,7 +650,7 @@ export class ExplorationEditor extends BaseUser {
       el.scrollIntoView({block: 'center', inline: 'center'})
     );
     await this.clickOnElement(nodeBackground);
-    await this.page.waitForLoadState('networkidle');
+    await this.waitForNetworkIdle();
 
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
@@ -447,6 +685,17 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
     });
+    // Puppeteer used waitForNetworkIdle here via clickAndWaitForNavigation.
+    // Without this, Angular hasn't finished bootstrapping the modal
+    // by the time dismissWelcomeModal fires.
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to navigate to exploration editor.
+   */
+  async navigateToExplorationEditorPage(): Promise<void> {
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
   }
 
   /**
@@ -460,11 +709,7 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(stateContentInputField, false);
-
-    // TODO(#23019): Currently, the content automatically changes spaces in the
-    // card content. So, skipping the post-check. Once the issue is resolved,
-    // uncomment the following line.
-    // await this.expectTextContentToContain(stateContentSelector, content);
+    await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
   }
 
@@ -485,9 +730,8 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
 
-      await this.page.waitForSelector(
-        `${mobileSaveChangesButtonSelector}:not([disabled])`,
-        {state: 'visible'}
+      await this.expectElementToBeVisible(
+        `${mobileSaveChangesButtonSelector}:not([disabled])`
       );
       await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector);
     } else {
@@ -507,6 +751,32 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(toastMessage, false);
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Sets a state as a checkpoint in the exploration.
+   */
+  async setTheStateAsCheckpoint(): Promise<void> {
+    await this.expectElementToBeVisible(setAsCheckpointButton);
+
+    let checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      await this.clickOnElementWithSelector(setAsCheckpointButton);
+    }
+
+    // Check checkbox value again and throw error if it's still not checked.
+    checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      throw new Error('Failed to set the state as a checkpoint.');
+    }
   }
 
   /**
@@ -598,11 +868,77 @@ export class ExplorationEditor extends BaseUser {
       );
       if (errorSavingExplorationElement) {
         await this.clickOnElementWithSelector(errorSavingExplorationModal);
-        await this.page.waitForLoadState('networkidle');
+        await this.waitForNetworkIdle();
       }
       await publishExploration();
       return await confirmPublish();
     }
+  }
+
+  /**
+   * This function updates the answers in the response modal.
+   * @param {INTERACTION_TYPES} interactionType - The type of the interaction.
+   * @param {string} answer - The answer to set in the response modal.
+   */
+  async updateAnswersInResponseModal(
+    interactionType: INTERACTION_TYPES,
+    answer: string
+  ): Promise<void> {
+    switch (interactionType) {
+      case INTERACTION_TYPES.NUMBER_INPUT:
+        await this.waitForElementToStabilize(
+          `${responseModalBodySelector} ${floatFormInput}`
+        );
+        await this.typeInInputField(
+          `${responseModalBodySelector} ${floatFormInput}`,
+          answer
+        );
+        break;
+      case INTERACTION_TYPES.MULTIPLE_CHOICE:
+        await this.expectElementToBeVisible(multipleChoiceResponseDropdown);
+        await this.clickOnElementWithSelector(multipleChoiceResponseDropdown);
+        await this.clickOnElementWithSelectorAndText(
+          multipleChoiceResponseOption,
+          answer
+        );
+        break;
+      case INTERACTION_TYPES.TEXT_INPUT:
+        await this.expectElementToBeVisible(responseModalBodySelector);
+        await this.clickOnElementWithSelector(addResponseOptionButton);
+        await this.expectElementToBeVisible(textInputInteractionOption);
+        await this.typeInInputField(textInputInteractionOption, answer);
+        break;
+      case INTERACTION_TYPES.FRACTION_INPUT:
+        await this.expectElementToBeVisible(intEditorField);
+        await this.clearAllTextFrom(intEditorField);
+        await this.typeInInputField(intEditorField, answer);
+        break;
+      // Add cases for other interaction types here
+      // case 'otherInteractionType':
+      //   await this.type(otherFormInput, answer);
+      //   break;
+      default:
+        throw new Error(`Unsupported interaction type: ${interactionType}`);
+    }
+  }
+
+  /**
+   * Function to update the default response feedback for a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   */
+  async updateDefaultResponseFeedbackInExplorationEditorPage(
+    defaultResponseFeedback: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(openOutcomeFeedBackEditor);
+    await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
+    await this.clickOnElementWithSelector(stateContentInputField);
+    await this.typeInInputField(
+      stateContentInputField,
+      defaultResponseFeedback
+    );
+    await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
+
+    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
   }
 
   /**

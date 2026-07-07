@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the translation topic selector component.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {
   TranslationTopicSelectorComponent,
@@ -46,7 +46,7 @@ describe('Translation language selector', () => {
   let clickDropdown: () => void;
   let getDropdownOptionsContainer: () => HTMLElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TranslationTopicSelectorComponent],
       providers: [

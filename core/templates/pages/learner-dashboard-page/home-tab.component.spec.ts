@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -57,7 +57,7 @@ describe('Home tab Component', () => {
   }
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
@@ -751,7 +751,7 @@ describe('Home tab Component Loader visibility tests', () => {
   }
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [MockTranslatePipe, HomeTabComponent],

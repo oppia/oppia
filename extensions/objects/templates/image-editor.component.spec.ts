@@ -39,7 +39,8 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from 'third-party-imports/gif-frames.import';
+import {of} from 'rxjs';
 
 let gifshot = require('gifshot');
 
@@ -54,6 +55,7 @@ describe('ImageEditor', () => {
   let svgSanitizerService: SvgSanitizerService;
   let httpTestingController: HttpTestingController;
   let gifFrames: GifFramesService;
+  let windowImageSpy: jasmine.Spy;
   let dimensionsOfImage = {
     width: 450,
     height: 350,
@@ -305,7 +307,7 @@ describe('ImageEditor', () => {
 
   // This is used to generate a mock Image file from the data URI
   // present above.
-  let localConvertImageDataToImageFile = dataURI => {
+  let localConvertImageDataToImageFile = (dataURI: string) => {
     var byteString = atob(dataURI.split(',')[1]);
     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
     var ab = new ArrayBuffer(byteString.length);
@@ -318,7 +320,7 @@ describe('ImageEditor', () => {
   };
 
   class MockImageUploadHelperService {
-    convertImageDataToImageFile(dataURI) {
+    convertImageDataToImageFile(dataURI: string) {
       return dataURI;
     }
 
@@ -341,37 +343,34 @@ describe('ImageEditor', () => {
   }
 
   class MockReaderObject {
-    onload = null;
-    result = null;
+    onload: ((this: FileReader, ev: ProgressEvent) => void) | null = null;
+    result: string | null = null;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
 
-    readAsDataURL(file) {
-      this.onload();
+    readAsDataURL(file: File) {
+      if (this.onload) {
+        this.onload.call(new FileReader(), new ProgressEvent('load'));
+      }
       return 'The file is loaded';
     }
   }
 
-  class MockImageObject {
-    source = null;
-    onload = null;
-    constructor() {
-      this.onload = () => {
-        return 'Fake onload executed';
-      };
-    }
-
-    set src(url) {
-      this.onload();
-    }
-
-    addEventListener(txt, func, bool) {
-      func();
-    }
-  }
+  const createMockImageElement = (): HTMLImageElement => {
+    const imageElement = document.createElement('img');
+    Object.defineProperty(imageElement, 'src', {
+      set: () => {
+        imageElement.dispatchEvent(new Event('load'));
+        if (imageElement.onload) {
+          imageElement.onload(new Event('load'));
+        }
+      },
+    });
+    return imageElement;
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -402,20 +401,14 @@ describe('ImageEditor', () => {
     gifFrames = TestBed.inject(GifFramesService);
     spyOn(pageContextService, 'getEntityId').and.returnValue('2');
     spyOn(pageContextService, 'getEntityType').and.returnValue('question');
-    // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this
-    // error because 'HTMLImageElement' has around 250 more properties.
-    // We have only defined the properties we need in 'mockImageObject'.
-    // @ts-expect-error
-    spyOn(window, 'Image').and.returnValues(new MockImageObject(), {
-      src: null,
-    });
-    // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this
-    // error because 'HTMLImageElement' has around 250 more properties.
-    // We have only defined the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+    windowImageSpy = spyOn(window, 'Image');
+    windowImageSpy.and.returnValues(
+      createMockImageElement(),
+      document.createElement('img')
+    );
+    spyOn(window, 'FileReader').and.returnValue(
+      new MockReaderObject() as Partial<FileReader> as FileReader
+    );
 
     component.ngOnInit();
 
@@ -427,13 +420,10 @@ describe('ImageEditor', () => {
         // properties from type 'File': arrayBuffer, slice, stream, text"
         // We need to suppress this error because we only need the values given
         // below.
-        // @ts-expect-error
-        uploadedFile: {
-          lastModified: 1622307491398,
-          name: '2442125.svg',
-          size: 2599,
+        uploadedFile: new File(['<svg></svg>'], '2442125.svg', {
           type: 'image/svg+xml',
-        },
+          lastModified: 1622307491398 as unknown as number,
+        }),
         uploadedImageData:
           'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb2' +
           '5lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHID' +
@@ -648,7 +638,7 @@ describe('ImageEditor', () => {
   });
 
   it('should return false if file is not uploaded', () => {
-    component.data.metadata.savedImageFilename = null;
+    component.data.metadata.savedImageFilename = undefined;
 
     expect(component.validate(component.data)).toBe(false);
   });
@@ -689,7 +679,7 @@ describe('ImageEditor', () => {
       offsetTop: 0,
       offsetParent: null,
       classList: {
-        contains: text => {
+        contains: (text: string) => {
           return false;
         },
       },
@@ -741,7 +731,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -785,7 +775,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -829,7 +819,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -873,7 +863,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -917,7 +907,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -961,7 +951,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1005,7 +995,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1049,7 +1039,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1093,7 +1083,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1136,7 +1126,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1179,7 +1169,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1222,7 +1212,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1265,7 +1255,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1306,7 +1296,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1347,7 +1337,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1388,7 +1378,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1431,7 +1421,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1474,7 +1464,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1515,7 +1505,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1533,8 +1523,8 @@ describe('ImageEditor', () => {
         x: 0,
         y: 0,
       });
-      expect(component.cropAreaXWhenLastDown).toBeUndefined();
-      expect(component.cropAreaYWhenLastDown).toBeUndefined();
+      expect(component.cropAreaXWhenLastDown).toBe(0);
+      expect(component.cropAreaYWhenLastDown).toBe(0);
       expect(component.userIsDraggingCropArea).toBe(false);
 
       component.onMouseDownOnCropArea(dummyMouseEvent);
@@ -1560,7 +1550,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -1732,28 +1722,35 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
+        getContext: (txt: string) => {
           return {
-            drawImage: (txt, x, y) => {
+            drawImage: (txt: CanvasImageSource, x: number, y: number) => {
               return;
             },
-            getImageData: (x, y, width, height) => {
-              return 'data';
+            getImageData: (
+              x: number,
+              y: number,
+              width: number,
+              height: number
+            ) => {
+              return new ImageData(1, 1);
             },
-            putImageData: (data, x, y) => {
+            putImageData: (data: ImageData, x: number, y: number) => {
               return;
             },
           };
         },
-        toDataURL: (str, x) => {
-          return component.data.metadata.uploadedImageData;
+        toDataURL: (str: string, x: number) => {
+          return component.data.metadata.uploadedImageData as string;
         },
       })
     );
     let dataSvg = component.data.metadata;
+    const uploadedFile = dataSvg.uploadedFile as File;
+    const uploadedImageData = dataSvg.uploadedImageData as string;
     component.data = {mode: component.MODE_EMPTY, metadata: {}, crop: true};
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
-      dataSvg.uploadedImageData
+      uploadedImageData
     );
     spyOn(
       svgSanitizerService,
@@ -1762,15 +1759,15 @@ describe('ImageEditor', () => {
     spyOn(
       svgSanitizerService,
       'removeAllInvalidTagsAndAttributes'
-    ).and.returnValue(dataSvg.uploadedImageData.toString());
+    ).and.returnValue(uploadedImageData.toString());
 
-    component.onFileChanged(dataSvg.uploadedFile);
+    component.onFileChanged(uploadedFile);
 
     expect(component.data).toEqual({
       mode: 2,
       metadata: {
-        uploadedFile: dataSvg.uploadedFile,
-        uploadedImageData: dataSvg.uploadedImageData,
+        uploadedFile: uploadedFile,
+        uploadedImageData: uploadedImageData,
         originalWidth: 300,
         originalHeight: 150,
       },
@@ -1781,32 +1778,32 @@ describe('ImageEditor', () => {
   it('should show inline warning if uploaded image cannot be read', () => {
     component.data = {mode: component.MODE_EMPTY, metadata: {}, crop: true};
 
-    const mockImageObjectWithError = {
-      onload: null,
-      onerror: null,
-      set src(_url: string) {
-        if (this.onerror) {
-          this.onerror(new Event('error'));
+    const mockImageObjectWithError = document.createElement('img');
+    Object.defineProperty(mockImageObjectWithError, 'src', {
+      set: () => {
+        mockImageObjectWithError.dispatchEvent(new Event('error'));
+        if (mockImageObjectWithError.onerror) {
+          mockImageObjectWithError.onerror(new Event('error'));
         }
       },
-    };
-    (window.Image as jasmine.Spy).and.returnValue(
-      mockImageObjectWithError as unknown as HTMLImageElement
-    );
+    });
+    windowImageSpy.and.returnValue(mockImageObjectWithError);
 
     const file = new File(['invalid svg'], 'invalid.svg', {
       type: 'image/svg+xml',
     });
     component.onFileChanged(file);
 
-    expect(component.invalidImageWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBe(true);
     expect(component.data.mode).toBe(component.MODE_EMPTY);
   });
 
   it("should crop svg when user clicks the 'crop' button", () => {
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({image: obj.images});
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: object, func: (response: object) => void) => {
+        func({image: obj.images});
+      }
+    );
     spyOn(component, 'updateDimensions').and.callThrough();
     component.cropArea = {
       x1: 0,
@@ -1831,9 +1828,11 @@ describe('ImageEditor', () => {
   });
 
   it("should crop png when user clicks the 'crop' button", () => {
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({image: obj.images});
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: object, func: (response: object) => void) => {
+        func({image: obj.images});
+      }
+    );
     spyOn(component, 'updateDimensions').and.callThrough();
     component.cropArea = {
       x1: 0,
@@ -1845,20 +1844,25 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
+        getContext: (txt: string) => {
           return {
-            drawImage: (txt, x, y) => {
+            drawImage: (txt: string, x: number, y: number) => {
               return;
             },
-            getImageData: (x, y, width, height) => {
+            getImageData: (
+              x: number,
+              y: number,
+              width: number,
+              height: number
+            ) => {
               return 'data';
             },
-            putImageData: (data, x, y) => {
+            putImageData: (data: string, x: number, y: number) => {
               return;
             },
           };
         },
-        toDataURL: (str, x) => {
+        toDataURL: (str: string, x: number) => {
           return component.data.metadata.uploadedImageData;
         },
       })
@@ -1887,9 +1891,11 @@ describe('ImageEditor', () => {
   });
 
   it("should crop gif when user clicks the 'crop' button", done => {
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({image: dataGif.uploadedImageData});
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: object, func: (response: object) => void) => {
+        func({image: dataGif.uploadedImageData});
+      }
+    );
     component.cropArea = {
       x1: 0,
       y1: 0,
@@ -1900,20 +1906,25 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
+        getContext: (txt: string) => {
           return {
-            drawImage: (txt, x, y) => {
+            drawImage: (txt: string, x: number, y: number) => {
               return;
             },
-            getImageData: (x, y, width, height) => {
+            getImageData: (
+              x: number,
+              y: number,
+              width: number,
+              height: number
+            ) => {
               return 'data';
             },
-            putImageData: (data, x, y) => {
+            putImageData: (data: string, x: number, y: number) => {
               return;
             },
           };
         },
-        toDataURL: (str, x) => {
+        toDataURL: (str: string, x: number) => {
           return component.data.metadata.uploadedImageData;
         },
       })
@@ -1925,9 +1936,7 @@ describe('ImageEditor', () => {
         getImage: () => {
           return {
             toDataURL: () => {
-              return {
-                image: dataGif.uploadedImageData,
-              };
+              return dataGif.uploadedImageData;
             },
           };
         },
@@ -1974,6 +1983,347 @@ describe('ImageEditor', () => {
       y2: 864,
     });
   });
+
+  it(
+    "should handle null resampled file for SVG in 'confirm crop'" + ' image',
+    () => {
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+      spyOn(alertsService, 'addWarning');
+
+      component.confirmCropImage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Could not get resampled file.'
+      );
+    }
+  );
+
+  it(
+    "should handle null resampled file for PNG in 'confirm crop'" + ' image',
+    () => {
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            return {
+              drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                return;
+              },
+              getImageData: (
+                x: number,
+                y: number,
+                width: number,
+                height: number
+              ) => {
+                return 'data';
+              },
+              putImageData: (data: ImageData, x: number, y: number) => {
+                return;
+              },
+            };
+          },
+          toDataURL: (str: string, x: number) => {
+            return component.data.metadata.uploadedImageData;
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+      spyOn(alertsService, 'addWarning');
+
+      component.confirmCropImage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Could not get resampled file.'
+      );
+    }
+  );
+
+  it('should not crop for GIF image when resample fails', fakeAsync(() => {
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: object, func: (response: object) => void) => {
+        func({image: dataGif.uploadedImageData});
+      }
+    );
+    spyOn(gifFrames, 'getFrames').and.resolveTo([
+      {
+        getImage: () => {
+          return {
+            toDataURL: () => {
+              return dataGif.uploadedImageData;
+            },
+            getContext: () => {
+              return {
+                drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                  return;
+                },
+              };
+            },
+            width: 100,
+            height: 100,
+          };
+        },
+        frameInfo: {
+          disposal: 1,
+        },
+      },
+    ] as never);
+    // This throws "Argument of type '{ width: number; height: number;
+    // data: string; size: number; type: string; }' is missing the
+    // following properties from type 'File': arrayBuffer, slice, stream,
+    // text".
+    // We need to suppress this error because we only need the values
+    // given below.
+    // @ts-expect-error
+    component.data.metadata = dataGif;
+    component.cropArea = {
+      x1: 0,
+      y1: 0,
+      x2: 140,
+      y2: 120,
+    };
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+    spyOn(alertsService, 'addWarning');
+
+    component.confirmCropImage();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.'
+    );
+  }));
+
+  it(
+    'should throw error when canvas context is null in' +
+      ' getCroppedImageData',
+    () => {
+      let contextCallCount = 0;
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            contextCallCount++;
+            if (contextCallCount === 1) {
+              return null;
+            }
+            return {
+              drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                return;
+              },
+              getImageData: (
+                x: number,
+                y: number,
+                width: number,
+                height: number
+              ) => {
+                return new ImageData(1, 1);
+              },
+              putImageData: (data: ImageData, x: number, y: number) => {
+                return;
+              },
+            };
+          },
+          toDataURL: (str: string, x: number) => {
+            return 'data:image/png;base64,abc';
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+
+      expect(() => component.confirmCropImage()).toThrowError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should throw error when crop canvas context is null in' +
+      ' getCroppedImageData',
+    () => {
+      let contextCallCount = 0;
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            contextCallCount++;
+            if (contextCallCount === 2) {
+              return null;
+            }
+            return {
+              drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                return;
+              },
+              getImageData: (
+                x: number,
+                y: number,
+                width: number,
+                height: number
+              ) => {
+                return new ImageData(1, 1);
+              },
+              putImageData: (data: ImageData, x: number, y: number) => {
+                return;
+              },
+            };
+          },
+          toDataURL: (str: string, x: number) => {
+            return 'data:image/png;base64,abc';
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+
+      expect(() => component.confirmCropImage()).toThrowError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should throw error when crop canvas context is null in' +
+      ' getCroppedImageData',
+    async () => {
+      spyOn(document, 'createElement').and.returnValue({
+        width: 0,
+        height: 0,
+        getContext: (txt: string) => {
+          return null;
+        },
+        toDataURL: (str: string, x: number) => {
+          return 'data:image/png;base64,abc';
+        },
+      });
+
+      // This throws "Property 'getCroppedGIFDataAsync' is private". We
+      // need to suppress this error because we are testing the private
+      // method.
+      // @ts-expect-error
+      let promise = component.getCroppedGIFDataAsync(
+        0,
+        0,
+        100,
+        100,
+        'data:image/png;base64,abc'
+      );
+
+      await expectAsync(promise).toBeRejectedWithError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should reject when crop canvas context is null in' +
+      ' getCroppedGIFDataAsync',
+    async () => {
+      let callCount = 0;
+      spyOn(document, 'createElement').and.callFake((tagName: string) => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            width: 0,
+            height: 0,
+            getContext: () => ({
+              drawImage: () => {},
+              getImageData: () => ({
+                data: new Uint8ClampedArray(40000),
+                width: 100,
+                height: 100,
+              }),
+            }),
+            toDataURL: () => 'data:image/png;base64,abc',
+          } as unknown as HTMLCanvasElement;
+        }
+        return {
+          width: 0,
+          height: 0,
+          getContext: () => null,
+          toDataURL: () => 'data:image/png;base64,abc',
+        } as unknown as HTMLCanvasElement;
+      });
+
+      // This throws "Property 'getCroppedGIFDataAsync' is private". We
+      // need to suppress this error because we are testing the private
+      // method.
+      // @ts-expect-error
+      let promise = component.getCroppedGIFDataAsync(
+        0,
+        0,
+        100,
+        100,
+        'data:image/png;base64,abc'
+      );
+
+      await expectAsync(promise).toBeRejectedWithError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should reject when image fails to load in' + ' getCroppedGIFDataAsync',
+    async () => {
+      const mockImageElement = document.createElement('img');
+      Object.defineProperty(mockImageElement, 'src', {
+        set: () => {
+          mockImageElement.dispatchEvent(new Event('error'));
+          if (mockImageElement.onerror) {
+            mockImageElement.onerror(new Event('error'));
+          }
+        },
+      });
+      windowImageSpy.and.returnValue(mockImageElement);
+
+      // This throws "Property 'getCroppedGIFDataAsync' is private". We
+      // need to suppress this error because we are testing the private
+      // method.
+      // @ts-expect-error
+      let promise = component.getCroppedGIFDataAsync(
+        0,
+        0,
+        100,
+        100,
+        'data:image/png;base64,abc'
+      );
+
+      await expectAsync(promise).toBeRejectedWithError(
+        'Image could not be loaded.'
+      );
+    }
+  );
 
   it(
     'should show help text when image uploaded by user is too big for the' +
@@ -2051,9 +2401,11 @@ describe('ImageEditor', () => {
     'should decrease iamge size when user decreases the image size' +
       " percentage by clicking the '-' button",
     done => {
-      spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-        func(obj);
-      });
+      spyOn(gifshot, 'createGIF').and.callFake(
+        (obj: object, func: (response: object) => void) => {
+          func(obj);
+        }
+      );
       spyOn(component, 'validateProcessedFilesize').and.stub();
       // This throws an error "Type '{ lastModified: number; name:
       // string; size: number; type: string; }' is missing the following
@@ -2082,14 +2434,14 @@ describe('ImageEditor', () => {
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
+          getContext: (txt: string) => {
             return {
-              drawImage: (txt, x, y) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
           },
-          toDataURL: (str, x) => {
+          toDataURL: (str: string, x: number) => {
             return component.data.metadata.uploadedImageData;
           },
         })
@@ -2116,78 +2468,72 @@ describe('ImageEditor', () => {
   it('should discard uploaded file when user clicks discard button', () => {
     component.processedImageIsTooLarge = true;
 
-    expect(component.data).toEqual({
-      mode: 2,
-      metadata: {
-        uploadedFile: {
-          lastModified: 1622307491398,
-          name: '2442125.svg',
-          size: 2599,
-          type: 'image/svg+xml',
-        },
-        uploadedImageData:
-          'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb2' +
-          '5lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHID' +
-          'IwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVk' +
-          'ctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bW' +
-          'xucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iNzI2LjAwMD' +
-          'AwMHB0IiBoZWlnaHQ9IjEyODAuMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCA3MjYuMD' +
-          'AwMDAwIDEyODAuMDAwMDAwIgogcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaW' +
-          'QgbWVldCI+CjxtZXRhZGF0YT4KQ3JlYXRlZCBieSBwb3RyYWNlIDEuMTUsIHdyaX' +
-          'R0ZW4gYnkgUGV0ZXIgU2VsaW5nZXIgMjAwMS0yMDE3CjwvbWV0YWRhdGE+CjxnIH' +
-          'RyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDEyODAuMDAwMDAwKSBzY2FsZS' +
-          'gwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbm' +
-          'UiPgo8cGF0aCBkPSJNMzU3NSAxMjc2MyBjLTQ5OSAtNDUyIC03NzIgLTc2MSAtMT' +
-          'A2OCAtMTIwOSAtODUyIC0xMjg5IC0xMTIyCi0yODY4IC03OTEgLTQ2MjQgMTM3IC' +
-          '03MjcgMzk2IC0xNTIxIDcwOSAtMjE3NiBsNjQgLTEzNCAxMTMxIDAgMTEzMSAwID' +
-          'Y5IDE0NApjMzgwIDc5NiA2NzEgMTc4MCA3NzkgMjYzNiA3MSA1NjMgODAgMTE2MC' +
-          'AyNSAxNjUwIC0xMTYgMTAzOSAtNDczIDE5NTkgLTEwNzMKMjc2NSAtMjQyIDMyNC' +
-          'AtNDk5IDYwMSAtODQ3IDkxMyAtNDQgMzkgLTgzIDcyIC04NSA3MiAtMiAwIC0yMi' +
-          'AtMTcgLTQ0IC0zN3oKbTIyMiAtMzA3OCBjMzg2IC03MyA2ODIgLTM0NyA3ODUgLT' +
-          'cyNSAyMCAtNzQgMjMgLTEwNyAyMiAtMjU1IDAgLTE5NCAtMTUKLTI2NCAtODIgLT' +
-          'QwOSAtNTQgLTExNSAtMTEyIC0xOTggLTIwMSAtMjg3IC0xMjYgLTEyNiAtMjgyIC' +
-          '0yMTYgLTQ1MyAtMjYyCi03MCAtMTggLTEwOSAtMjIgLTI0OCAtMjIgLTE5NiAxIC' +
-          '0yNzYgMTggLTQzNSA5NiAtMjY5IDEzMSAtNDYyIDM3NSAtNTMxIDY3NAotMjggMT' +
-          'E4IC0yNiAzMjkgNCA0NDkgODMgMzMyIDMzNCA2MDIgNjYxIDcxMSAxMzUgNDQgMz' +
-          'M1IDU3IDQ3OCAzMHogbS0zMgotMjI4MCBjMzkgLTggMTEyIC0zNSAxNjMgLTYwID' +
-          'I2NCAtMTMxIDQxNSAtNDM1IDM1OCAtNzI1IC00NyAtMjM5IC0yMTcgLTQzNgotND' +
-          'Q4IC01MTcgLTEwNiAtMzggLTI3MyAtNDQgLTM4MSAtMTQgLTE5OSA1NCAtMzU1ID' +
-          'E4MCAtNDQxIDM1NiAtNDcgOTQgLTY4CjE4OSAtNjcgMzA1IDAgMTE1IDE4IDE4OC' +
-          'A3MyAzMDAgMzMgNjkgNTggMTAxIDEyNyAxNzAgNTMgNTMgMTA5IDk4IDE0NiAxMT' +
-          'cKNTggMzAgMTY0IDY4IDIxNSA3NiA1OCAxMCAxOTAgNiAyNTUgLTh6IG0tMzYgLT' +
-          'E2NTAgYzIyMSAtNTMgMzc5IC0yODUgMzQyCi01MDUgLTIyIC0xMzMgLTg4IC0yMz' +
-          'kgLTE5MSAtMzA5IC0xNDMgLTk1IC0zMjEgLTEwNyAtNDcxIC0zMCAtNTIgMjYgLT' +
-          'E0NQoxMTQgLTE3NiAxNjYgLTEzMiAyMjYgLTUwIDUyMiAxNzkgNjM5IDEwMyA1My' +
-          'AyMDQgNjUgMzE3IDM5eiIvPgo8cGF0aCBkPSJNNTUxMiA2MjI4IGMtMjMgLTczIC' +
-          '02NyAtMjM4IC05NyAtMzY3IC05MCAtMzgyIC0xNzkgLTYyNiAtMzg3Ci0xMDUzIC' +
-          '01NiAtMTE1IC05OSAtMjEwIC05NyAtMjEyIDE1IC0xMyAyNTAgLTE2NiA0MzQgLT' +
-          'I4MyA3ODYgLTQ5OSAxMjk0Ci03NTUgMTYwNCAtODA4IDIzNiAtNDEgMzI5IDU2ID' +
-          'I3NSAyODUgLTY1IDI4MCAtMzM3IDc1NiAtNzk0IDEzOTUgLTIxNyAzMDIKLTgxNy' +
-          'AxMDkyIC04ODQgMTE2MyAtMTAgMTAgLTIxIC0xNSAtNTQgLTEyMHoiLz4KPHBhdG' +
-          'ggZD0iTTE1NzMgNjE3OCBjLTU3NCAtNzI2IC0xMDQ5IC0xMzkyIC0xMjk4IC0xOD' +
-          'IzIC05MyAtMTYwIC0yMDAgLTM4NwotMjM2IC00OTggLTI3IC04MyAtMzMgLTExOC' +
-          'AtMzQgLTE4OSAwIC05MyAxMSAtMTE5IDY3IC0xNjEgMzQgLTI2IDE1NSAtMzQKMj' +
-          'QwIC0xNyAyNDMgNDcgNjYwIDI0NSAxMTk4IDU2OCAyOTQgMTc3IDgyMCA1MTUgOD' +
-          'IwIDUyOCAwIDQgLTQxIDg5IC05MCAxOTAKLTE0MyAyOTEgLTI0MiA1MjYgLTMwNS' +
-          'A3MjQgLTE0IDQ3IC01NiAyMDQgLTkxIDM1MCAtNTkgMjQzIC0xMjkgNDkwIC0xMz' +
-          'kgNDkwCi0yIDAgLTYxIC03MyAtMTMyIC0xNjJ6Ii8+CjxwYXRoIGQ9Ik0yNjc5ID' +
-          'QzODMgYy0zMDkgLTMyNCAtNTQwIC03NDEgLTY0OSAtMTE3MiAtNTkgLTIzNCAtOD' +
-          'EgLTQxNCAtODEKLTY3MSAwIC0yMzkgMTYgLTM5MSA2NyAtNjIwIDI4IC0xMjQgMT' +
-          'IxIC00MjAgMTMzIC00MjAgNCAwIDE3IDM5IDMwIDg4IDE0NQo1NjIgMzE2IDkzOS' +
-          'A0NjUgMTAyNyA1OCAzNCAxMjQgMzQgMTgyIDAgMjQxIC0xNDEgNDkyIC05MTYgNz' +
-          'M0IC0yMjY1IDI4IC0xNTcKNTMgLTI5NiA1NyAtMzEwIDYgLTI4IDMgLTQzIDczID' +
-          'M0NSAyMTUgMTE5MiA0MzcgMTkyNSA2NTQgMjE2MiA2NiA3MiAxMDQgOTMKMTY2ID' +
-          'kzIDE3NSAwIDM1MiAtMzE5IDUyNiAtOTQ4IDU5IC0yMTcgNTMgLTIwMSA2NiAtMT' +
-          'c5IDE4IDMzIDc4IDIyMCAxMDggMzM3CjExOCA0NjIgMTE2IDk1MiAtNSAxMzk1IC' +
-          '0xMTUgNDE4IC0zMzkgODIxIC02MjAgMTExNCBsLTk3IDEwMSAtODY4IDAgLTg2Ny' +
-          'AwCi03NCAtNzd6Ii8+CjwvZz4KPC9zdmc+Cg==',
-        originalWidth: 968,
-        originalHeight: 1707,
-        savedImageFilename: 'saved_file_name.png',
-        savedImageUrl: 'assets/images',
-      },
-      crop: false,
-    });
+    expect(component.data.mode).toBe(2);
+    expect(component.data.metadata.uploadedFile).toEqual(jasmine.any(File));
+    expect(component.data.metadata.uploadedImageData).toBe(
+      'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb2' +
+        '5lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHID' +
+        'IwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVk' +
+        'ctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bW' +
+        'xucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iNzI2LjAwMD' +
+        'AwMHB0IiBoZWlnaHQ9IjEyODAuMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCA3MjYuMD' +
+        'AwMDAwIDEyODAuMDAwMDAwIgogcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaW' +
+        'QgbWVldCI+CjxtZXRhZGF0YT4KQ3JlYXRlZCBieSBwb3RyYWNlIDEuMTUsIHdyaX' +
+        'R0ZW4gYnkgUGV0ZXIgU2VsaW5nZXIgMjAwMS0yMDE3CjwvbWV0YWRhdGE+CjxnIH' +
+        'RyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDEyODAuMDAwMDAwKSBzY2FsZS' +
+        'gwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbm' +
+        'UiPgo8cGF0aCBkPSJNMzU3NSAxMjc2MyBjLTQ5OSAtNDUyIC03NzIgLTc2MSAtMT' +
+        'A2OCAtMTIwOSAtODUyIC0xMjg5IC0xMTIyCi0yODY4IC03OTEgLTQ2MjQgMTM3IC' +
+        '03MjcgMzk2IC0xNTIxIDcwOSAtMjE3NiBsNjQgLTEzNCAxMTMxIDAgMTEzMSAwID' +
+        'Y5IDE0NApjMzgwIDc5NiA2NzEgMTc4MCA3NzkgMjYzNiA3MSA1NjMgODAgMTE2MC' +
+        'AyNSAxNjUwIC0xMTYgMTAzOSAtNDczIDE5NTkgLTEwNzMKMjc2NSAtMjQyIDMyNC' +
+        'AtNDk5IDYwMSAtODQ3IDkxMyAtNDQgMzkgLTgzIDcyIC04NSA3MiAtMiAwIC0yMi' +
+        'AtMTcgLTQ0IC0zN3oKbTIyMiAtMzA3OCBjMzg2IC03MyA2ODIgLTM0NyA3ODUgLT' +
+        'cyNSAyMCAtNzQgMjMgLTEwNyAyMiAtMjU1IDAgLTE5NCAtMTUKLTI2NCAtODIgLT' +
+        'QwOSAtNTQgLTExNSAtMTEyIC0xOTggLTIwMSAtMjg3IC0xMjYgLTEyNiAtMjgyIC' +
+        '0yMTYgLTQ1MyAtMjYyCi03MCAtMTggLTEwOSAtMjIgLTI0OCAtMjIgLTE5NiAxIC' +
+        '0yNzYgMTggLTQzNSA5NiAtMjY5IDEzMSAtNDYyIDM3NSAtNTMxIDY3NAotMjggMT' +
+        'E4IC0yNiAzMjkgNCA0NDkgODMgMzMyIDMzNCA2MDIgNjYxIDcxMSAxMzUgNDQgMz' +
+        'M1IDU3IDQ3OCAzMHogbS0zMgotMjI4MCBjMzkgLTggMTEyIC0zNSAxNjMgLTYwID' +
+        'I2NCAtMTMxIDQxNSAtNDM1IDM1OCAtNzI1IC00NyAtMjM5IC0yMTcgLTQzNgotND' +
+        'Q4IC01MTcgLTEwNiAtMzggLTI3MyAtNDQgLTM4MSAtMTQgLTE5OSA1NCAtMzU1ID' +
+        'E4MCAtNDQxIDM1NiAtNDcgOTQgLTY4CjE4OSAtNjcgMzA1IDAgMTE1IDE4IDE4OC' +
+        'A3MyAzMDAgMzMgNjkgNTggMTAxIDEyNyAxNzAgNTMgNTMgMTA5IDk4IDE0NiAxMT' +
+        'cKNTggMzAgMTY0IDY4IDIxNSA3NiA1OCAxMCAxOTAgNiAyNTUgLTh6IG0tMzYgLT' +
+        'E2NTAgYzIyMSAtNTMgMzc5IC0yODUgMzQyCi01MDUgLTIyIC0xMzMgLTg4IC0yMz' +
+        'kgLTE5MSAtMzA5IC0xNDMgLTk1IC0zMjEgLTEwNyAtNDcxIC0zMCAtNTIgMjYgLT' +
+        'E0NQoxMTQgLTE3NiAxNjYgLTEzMiAyMjYgLTUwIDUyMiAxNzkgNjM5IDEwMyA1My' +
+        'AyMDQgNjUgMzE3IDM5eiIvPgo8cGF0aCBkPSJNNTUxMiA2MjI4IGMtMjMgLTczIC' +
+        '02NyAtMjM4IC05NyAtMzY3IC05MCAtMzgyIC0xNzkgLTYyNiAtMzg3Ci0xMDUzIC' +
+        '01NiAtMTE1IC05OSAtMjEwIC05NyAtMjEyIDE1IC0xMyAyNTAgLTE2NiA0MzQgLT' +
+        'I4MyA3ODYgLTQ5OSAxMjk0Ci03NTUgMTYwNCAtODA4IDIzNiAtNDEgMzI5IDU2ID' +
+        'I3NSAyODUgLTY1IDI4MCAtMzM3IDc1NiAtNzk0IDEzOTUgLTIxNyAzMDIKLTgxNy' +
+        'AxMDkyIC04ODQgMTE2MyAtMTAgMTAgLTIxIC0xNSAtNTQgLTEyMHoiLz4KPHBhdG' +
+        'ggZD0iTTE1NzMgNjE3OCBjLTU3NCAtNzI2IC0xMDQ5IC0xMzkyIC0xMjk4IC0xOD' +
+        'IzIC05MyAtMTYwIC0yMDAgLTM4NwotMjM2IC00OTggLTI3IC04MyAtMzMgLTExOC' +
+        'AtMzQgLTE4OSAwIC05MyAxMSAtMTE5IDY3IC0xNjEgMzQgLTI2IDE1NSAtMzQKMj' +
+        'QwIC0xNyAyNDMgNDcgNjYwIDI0NSAxMTk4IDU2OCAyOTQgMTc3IDgyMCA1MTUgOD' +
+        'IwIDUyOCAwIDQgLTQxIDg5IC05MCAxOTAKLTE0MyAyOTEgLTI0MiA1MjYgLTMwNS' +
+        'A3MjQgLTE0IDQ3IC01NiAyMDQgLTkxIDM1MCAtNTkgMjQzIC0xMjkgNDkwIC0xMz' +
+        'kgNDkwCi0yIDAgLTYxIC03MyAtMTMyIC0xNjJ6Ii8+CjxwYXRoIGQ9Ik0yNjc5ID' +
+        'QzODMgYy0zMDkgLTMyNCAtNTQwIC03NDEgLTY0OSAtMTE3MiAtNTkgLTIzNCAtOD' +
+        'EgLTQxNCAtODEKLTY3MSAwIC0yMzkgMTYgLTM5MSA2NyAtNjIwIDI4IC0xMjQgMT' +
+        'IxIC00MjAgMTMzIC00MjAgNCAwIDE3IDM5IDMwIDg4IDE0NQo1NjIgMzE2IDkzOS' +
+        'A0NjUgMTAyNyA1OCAzNCAxMjQgMzQgMTgyIDAgMjQxIC0xNDEgNDkyIC05MTYgNz' +
+        'M0IC0yMjY1IDI4IC0xNTcKNTMgLTI5NiA1NyAtMzEwIDYgLTI4IDMgLTQzIDczID' +
+        'M0NSAyMTUgMTE5MiA0MzcgMTkyNSA2NTQgMjE2MiA2NiA3MiAxMDQgOTMKMTY2ID' +
+        'kzIDE3NSAwIDM1MiAtMzE5IDUyNiAtOTQ4IDU5IC0yMTcgNTMgLTIwMSA2NiAtMT' +
+        'c5IDE4IDMzIDc4IDIyMCAxMDggMzM3CjExOCA0NjIgMTE2IDk1MiAtNSAxMzk1IC' +
+        '0xMTUgNDE4IC0zMzkgODIxIC02MjAgMTExNCBsLTk3IDEwMSAtODY4IDAgLTg2Ny' +
+        'AwCi03NCAtNzd6Ii8+CjwvZz4KPC9zdmc+Cg=='
+    );
+    expect(component.data.metadata.originalWidth).toBe(968);
+    expect(component.data.metadata.originalHeight).toBe(1707);
+    expect(component.data.metadata.savedImageFilename).toBe(
+      'saved_file_name.png'
+    );
+    expect(component.data.metadata.savedImageUrl).toBe('assets/images');
+    expect(component.data.crop).toBe(false);
 
     component.discardUploadedFile();
 
@@ -2212,7 +2558,7 @@ describe('ImageEditor', () => {
       let dimensions = {width: 490, height: 327};
 
       let resampledFile = localConvertImageDataToImageFile(
-        component.data.metadata.uploadedImageData
+        component.data.metadata.uploadedImageData as string
       );
 
       component.postImageToServer(dimensions, resampledFile, 'gif');
@@ -2252,7 +2598,7 @@ describe('ImageEditor', () => {
 
       let dimensions = {width: 490, height: 327};
       let resampledFile = localConvertImageDataToImageFile(
-        component.data.metadata.uploadedImageData
+        component.data.metadata.uploadedImageData as string
       );
 
       component.postImageToServer(dimensions, resampledFile, 'gif');
@@ -2264,7 +2610,7 @@ describe('ImageEditor', () => {
       expect(req.request.method).toEqual('POST');
       req.flush(null, {
         status: 500,
-        statusText: null,
+        statusText: 'Error',
       });
 
       flushMicrotasks();
@@ -2281,6 +2627,29 @@ describe('ImageEditor', () => {
   );
 
   it(
+    'should alert user when server returns undefined in' + ' postImageToServer',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      // This throws "Property 'http' is private". We need to suppress
+      // this error because we are spying on the private http service.
+      // @ts-expect-error
+      spyOn(component.http, 'post').and.returnValue(of(undefined));
+
+      let dimensions = {width: 490, height: 327};
+      let resampledFile = localConvertImageDataToImageFile(
+        component.data.metadata.uploadedImageData as string
+      );
+
+      component.postImageToServer(dimensions, resampledFile, 'gif');
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Error communicating with server.'
+      );
+    })
+  );
+
+  it(
     'should save uploaded gif when user clicks `Use Image`' + ' button',
     fakeAsync(() => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
@@ -2290,22 +2659,22 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
       });
-      spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-        func(obj);
-      });
+      spyOn(gifshot, 'createGIF').and.callFake(
+        (obj: object, func: (response: object) => void) => {
+          func(obj);
+        }
+      );
       spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
               toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
+                return dataGif.uploadedImageData;
               },
             };
           },
@@ -2359,17 +2728,19 @@ describe('ImageEditor', () => {
       offsetTop: 0,
       offsetParent: null,
       classList: {
-        contains: text => {
+        contains: (text: string) => {
           return false;
         },
       },
     });
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({
-        image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
-        error: false,
-      });
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: object, func: (response: object) => void) => {
+        func({
+          image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
+          error: false,
+        });
+      }
+    );
     spyOn(component, 'saveImage');
     spyOn(component, 'validateProcessedFilesize').and.callThrough();
     // This throws an error "Type '{ lastModified: number; name:
@@ -2392,6 +2763,64 @@ describe('ImageEditor', () => {
   });
 
   it(
+    'should handle canvas context null when processing GIF frames' +
+      ' in processGIFImage',
+    fakeAsync(() => {
+      const frameData = [
+        {
+          getImage: () => {
+            return {
+              getContext: () => {
+                return null;
+              },
+              toDataURL: () => {
+                return 'data:image/png;base64,abc';
+              },
+              width: 100,
+              height: 100,
+            };
+          },
+          frameInfo: {
+            disposal: 2,
+          },
+        },
+      ];
+
+      let errorCaught: Error | null = null;
+      spyOn(gifFrames, 'getFrames').and.returnValue({
+        then: (callback: Function) => {
+          const result = Promise.resolve(callback(frameData));
+          result.catch((err: Error) => {
+            errorCaught = err;
+          });
+          return {
+            then: () => {},
+            catch: () => {},
+          };
+        },
+      });
+
+      spyOn(gifshot, 'createGIF').and.stub();
+
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataGif;
+      component.saveUploadedFile();
+      tick();
+
+      expect(errorCaught).not.toBeNull();
+      expect((errorCaught as Error).message).toBe(
+        'Could not get canvas context.'
+      );
+    })
+  );
+
+  it(
     'should alert user if resampled gif file is not obtained when the user' +
       ' saves image',
     fakeAsync(() => {
@@ -2403,22 +2832,22 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
       });
-      spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-        func(obj);
-      });
+      spyOn(gifshot, 'createGIF').and.callFake(
+        (obj: object, func: (response: object) => void) => {
+          func(obj);
+        }
+      );
       spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
               toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
+                return dataGif.uploadedImageData;
               },
             };
           },
@@ -2465,7 +2894,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -2494,7 +2923,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -2503,14 +2932,14 @@ describe('ImageEditor', () => {
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
+          getContext: (txt: string) => {
             return {
-              drawImage: (txt, x, y) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
           },
-          toDataURL: (str, x) => {
+          toDataURL: (str: string, x: number) => {
             return component.data.metadata.uploadedImageData;
           },
         })
@@ -2542,7 +2971,7 @@ describe('ImageEditor', () => {
       offsetTop: 0,
       offsetParent: null,
       classList: {
-        contains: text => {
+        contains: (text: string) => {
           return false;
         },
       },
@@ -2551,15 +2980,15 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
+        getContext: (txt: string) => {
           return {
-            drawImage: (txt, x, y) => {
+            drawImage: (txt: CanvasImageSource, x: number, y: number) => {
               return;
             },
           };
         },
-        toDataURL: (str, x) => {
-          return component.data.metadata.uploadedImageData;
+        toDataURL: (str: string, x: number) => {
+          return component.data.metadata.uploadedImageData as string;
         },
       })
     );
@@ -2570,13 +2999,10 @@ describe('ImageEditor', () => {
       // properties from type 'File': arrayBuffer, slice, stream, text"
       // We need to suppress this error because we only need the values given
       // below.
-      // @ts-expect-error
-      uploadedFile: {
-        lastModified: 1622307491398,
-        name: '2442125.png',
-        size: 102410,
+      uploadedFile: new File([new ArrayBuffer(1)], '2442125.png', {
         type: 'image/png',
-      },
+        lastModified: 1622307491398 as unknown as number,
+      }),
       uploadedImageData: btoa(
         'data:image/png;base64,' + Array(102410).join('a')
       ),
@@ -2589,7 +3015,7 @@ describe('ImageEditor', () => {
     component.saveUploadedFile();
 
     expect(component.saveImage).not.toHaveBeenCalled();
-    expect(component.processedImageIsTooLarge).toBeTrue();
+    expect(component.processedImageIsTooLarge).toBe(true);
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
   });
 
@@ -2604,7 +3030,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -2613,14 +3039,14 @@ describe('ImageEditor', () => {
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
+          getContext: (txt: string) => {
             return {
-              drawImage: (txt, x, y) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
           },
-          toDataURL: (str, x) => {
+          toDataURL: (str: string, x: number) => {
             return component.data.metadata.uploadedImageData;
           },
         })
@@ -2632,13 +3058,10 @@ describe('ImageEditor', () => {
         // properties from type 'File': arrayBuffer, slice, stream, text"
         // We need to suppress this error because we only need the values given
         // below.
-        // @ts-expect-error
-        uploadedFile: {
-          lastModified: 1622307491398,
-          name: '2442125.png',
-          size: 10241024,
+        uploadedFile: new File([new ArrayBuffer(1)], '2442125.png', {
           type: 'image/png',
-        },
+          lastModified: 1622307491398 as unknown as number,
+        }),
         uploadedImageData: btoa(
           'data:image/png;base64,' + Array(10241024).join('a')
         ),
@@ -2651,7 +3074,7 @@ describe('ImageEditor', () => {
       component.saveUploadedFile();
 
       expect(component.saveImage).not.toHaveBeenCalled();
-      expect(component.processedImageIsTooLarge).toBeTrue();
+      expect(component.processedImageIsTooLarge).toBe(true);
       expect(component.data.mode).toBe(component.MODE_UPLOADED);
     }
   );
@@ -2667,7 +3090,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -2676,14 +3099,14 @@ describe('ImageEditor', () => {
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
+          getContext: (txt: string) => {
             return {
-              drawImage: (txt, x, y) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
           },
-          toDataURL: (str, x) => {
+          toDataURL: (str: string, x: number) => {
             return component.data.metadata.uploadedImageData;
           },
         })
@@ -2704,7 +3127,7 @@ describe('ImageEditor', () => {
       component.saveUploadedFile();
 
       expect(component.saveImage).toHaveBeenCalled();
-      expect(component.processedImageIsTooLarge).toBeFalse();
+      expect(component.processedImageIsTooLarge).toBe(false);
       expect(component.data.mode).toBe(component.MODE_SAVED);
     }
   );
@@ -2721,7 +3144,7 @@ describe('ImageEditor', () => {
         offsetTop: 0,
         offsetParent: null,
         classList: {
-          contains: text => {
+          contains: (text: string) => {
             return false;
           },
         },
@@ -2730,14 +3153,14 @@ describe('ImageEditor', () => {
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
+          getContext: (txt: string) => {
             return {
-              drawImage: (txt, x, y) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
           },
-          toDataURL: (str, x) => {
+          toDataURL: (str: string, x: number) => {
             return component.data.metadata.uploadedImageData;
           },
         })
@@ -2770,7 +3193,7 @@ describe('ImageEditor', () => {
       ' is save image',
     () => {
       spyOn(alertsService, 'addWarning');
-      component.data.metadata.uploadedFile = null;
+      delete component.data.metadata.uploadedFile;
 
       component.saveUploadedFile();
 
@@ -2785,7 +3208,7 @@ describe('ImageEditor', () => {
       ' is save image',
     () => {
       spyOn(alertsService, 'addWarning');
-      component.data.metadata.uploadedFile = null;
+      delete component.data.metadata.uploadedFile;
 
       component.saveUploadedFile();
 
@@ -2795,12 +3218,63 @@ describe('ImageEditor', () => {
     }
   );
 
+  it(
+    'should handle null resampled file for SVG in' + ' saveUploadedFile',
+    () => {
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+      spyOn(alertsService, 'addWarning');
+
+      expect(component.data.mode).toBe(component.MODE_UPLOADED);
+
+      component.saveUploadedFile();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Could not get resampled file.'
+      );
+      expect(component.imageIsUploading).toBe(false);
+    }
+  );
+
+  it(
+    'should throw error when canvas context is null in' +
+      ' getResampledImageData',
+    () => {
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            return null;
+          },
+          toDataURL: (str: string, x: number) => {
+            return 'data:image/png;base64,abc';
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+
+      expect(() => component.saveUploadedFile()).toThrowError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
   it('should set file name when user saves image', () => {
     spyOn(alertsService, 'clearWarnings');
     spyOn(component.valueChanged, 'emit');
     spyOn(component.validityChange, 'emit');
 
-    expect(component.value).toBeUndefined();
+    expect(component.value).toBe('');
     expect(component.data.metadata.savedImageFilename).toBe(
       'saved_file_name.png'
     );
@@ -2820,12 +3294,31 @@ describe('ImageEditor', () => {
     expect(component.validityChange.emit).toHaveBeenCalled();
   });
 
+  it(
+    'should return empty string when raw image data is null from' +
+      ' local storage in getTrustedResourceUrlForImageFileName',
+    () => {
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
+      spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+      spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(null);
+
+      component.setSavedImageFilename(
+        'img_12345_height_250_width_250.png',
+        false
+      );
+
+      expect(component.data.metadata.savedImageUrl).toBe('');
+    }
+  );
+
   it('should not update parent when the component is reset', () => {
     spyOn(alertsService, 'clearWarnings');
     spyOn(component.valueChanged, 'emit');
     spyOn(component.validityChange, 'emit');
 
-    expect(component.value).toBeUndefined();
+    expect(component.value).toBe('');
     expect(component.data.metadata.savedImageFilename).toBe(
       'saved_file_name.png'
     );
@@ -2844,7 +3337,7 @@ describe('ImageEditor', () => {
     );
     // The following values should not get updated when resetting the
     // component.
-    expect(component.value).toBeUndefined();
+    expect(component.value).toBe('');
     expect(alertsService.clearWarnings).not.toHaveBeenCalled();
     expect(component.valueChanged.emit).not.toHaveBeenCalled();
     expect(component.validityChange.emit).not.toHaveBeenCalled();
