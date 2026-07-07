@@ -18,10 +18,16 @@
 
 from __future__ import annotations
 
+import logging
 import os
+from unittest import mock
 
+from core.domain import platform_parameter_domain, platform_parameter_services
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
+from scripts import common
+
+from google.cloud import resourcemanager_v3
 
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
@@ -66,3 +72,62 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
                 'some_id-resources',
             )
+
+    @mock.patch.object(logging, 'warning')
+    def test_get_compute_engine_default_service_account_email_from_dev_mode(
+        self, logging_warning_mock: mock.Mock
+    ) -> None:
+        with self.swap_to_always_return(
+            platform_parameter_services,
+            'get_server_mode',
+            platform_parameter_domain.ServerMode.DEV,
+        ):
+            self.assertIsNone(
+                gae_app_identity_services.get_compute_engine_default_service_account_email()
+            )
+            logging_warning_mock.assert_not_called()
+
+    @mock.patch.object(logging, 'warning')
+    def test_get_compute_engine_default_service_account_email_from_prod_mode(
+        self, logging_warning_mock: mock.Mock
+    ) -> None:
+        with (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_server_mode',
+                platform_parameter_domain.ServerMode.PROD,
+            ),
+            self.swap_to_always_return(
+                resourcemanager_v3.ProjectsClient,
+                'get_project',
+                resourcemanager_v3.Project(
+                    name=f'projects/{common.DEV_NUMERIC_PROJECT_ID}'
+                ),
+            ),
+        ):
+            self.assertEqual(
+                gae_app_identity_services.get_compute_engine_default_service_account_email(),
+                f'{common.DEV_NUMERIC_PROJECT_ID}-compute@developer.gserviceaccount.com',
+            )
+            logging_warning_mock.assert_not_called()
+
+    @mock.patch.object(logging, 'warning')
+    def test_get_compute_engine_default_service_account_email_from_prod_mode_with_request_error(
+        self, logging_warning_mock: mock.Mock
+    ) -> None:
+        with (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_server_mode',
+                platform_parameter_domain.ServerMode.PROD,
+            ),
+            self.swap_to_always_raise(
+                resourcemanager_v3.ProjectsClient,
+                'get_project',
+                Exception('uh-oh'),
+            ),
+        ):
+            self.assertIsNone(
+                gae_app_identity_services.get_compute_engine_default_service_account_email()
+            )
+            logging_warning_mock.assert_called_once_with(mock.ANY)
