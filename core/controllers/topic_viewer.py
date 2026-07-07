@@ -18,13 +18,14 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
     exp_fetchers,
+    feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
@@ -47,7 +48,7 @@ class StoryNodeResponseDict(story_domain.StoryNodeDict):
     available_voiceover_language_accent_descriptions: Dict[str, str]
 
 
-class StoryResponseDict(TypedDict):
+class StoryResponseDict(TypedDict, total=False):
     """TypedDict for the canonical/additional story data in the API response."""
 
     id: str
@@ -60,6 +61,7 @@ class StoryResponseDict(TypedDict):
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[StoryNodeResponseDict]
+    arcs: List[story_domain.ArcDict]
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -103,6 +105,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
+        are_story_arcs_enabled = feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
+            None,
+        )
+
         canonical_story_dicts: List[StoryResponseDict] = []
         canonical_story_nodes: List[Sequence[story_domain.StoryNode]] = []
         exploration_ids: set[str] = set()
@@ -144,6 +151,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [],
             }
+            if are_story_arcs_enabled:
+                story = story_fetchers.get_story_by_id(story_summary.id)
+                canonical_story_dict['arcs'] = [
+                    arc.to_dict() for arc in story.story_contents.arcs
+                ]
             canonical_story_dicts.append(canonical_story_dict)
             canonical_story_nodes.append(filtered_nodes)
 
@@ -175,6 +187,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [],
             }
+            if are_story_arcs_enabled:
+                story = story_fetchers.get_story_by_id(story_summary.id)
+                additional_story_dict['arcs'] = [
+                    arc.to_dict() for arc in story.story_contents.arcs
+                ]
             additional_story_dicts.append(additional_story_dict)
 
         exploration_id_to_available_text_languages: Dict[str, List[str]] = {}

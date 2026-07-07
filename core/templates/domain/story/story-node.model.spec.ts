@@ -48,6 +48,46 @@ describe('Story node model', () => {
     );
   });
 
+  it('should return default empty language codes when backend dict has none', () => {
+    expect(_sampleStoryNode.getAvailableTextLanguageCodes()).toEqual([]);
+    expect(_sampleStoryNode.getAvailableVoiceoverLanguageCodes()).toEqual([]);
+    expect(
+      _sampleStoryNode.getAvailableVoiceoverLanguageAccentDescriptions()
+    ).toEqual({});
+  });
+
+  it('should store language codes from backend dict', () => {
+    const backendDict: StoryNodeBackendDict = {
+      id: 'node_1',
+      thumbnail_filename: null,
+      title: 'Title',
+      description: 'Desc',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [],
+      outline: '',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: null,
+      status: 'Draft',
+      planned_publication_date_msecs: null,
+      last_modified_msecs: null,
+      first_publication_date_msecs: null,
+      unpublishing_reason: null,
+      available_text_language_codes: ['en', 'hi'],
+      available_voiceover_language_codes: ['en'],
+      available_voiceover_language_accent_descriptions: {
+        en: 'English',
+      },
+    };
+    const node = StoryNode.createFromBackendDict(backendDict);
+    expect(node.getAvailableTextLanguageCodes()).toEqual(['en', 'hi']);
+    expect(node.getAvailableVoiceoverLanguageCodes()).toEqual(['en']);
+    expect(node.getAvailableVoiceoverLanguageAccentDescriptions()).toEqual({
+      en: 'English',
+    });
+  });
+
   it('should correctly create a node from node id alone', () => {
     const storyNode = StoryNode.createFromIdAndTitle('node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
