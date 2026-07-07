@@ -38,6 +38,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
+        self.set_super_admins([self.CONTRIBUTOR_USERNAME])
         self.contributor_id = self.get_user_id_from_email(
             self.CONTRIBUTOR_EMAIL
         )
@@ -181,6 +182,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
+        self.set_super_admins([self.ADMIN_USERNAME])
         self.valid_payload = {
             'provider_mapping': {'hi': 'azure', 'es': 'google'}
         }

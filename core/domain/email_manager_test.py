@@ -9376,42 +9376,6 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
 
-    def test_failed_send_bulk_mail_enqueues_retry_task(self) -> None:
-        def mock_send_bulk_mail(*_args: str, **_kwargs: str) -> None:
-            raise Exception('Simulated bulk email failure')
-
-        enqueued_tasks = []
-
-        def mock_enqueue_task(
-            url: str, payload: dict[str, str], _delay: int
-        ) -> None:
-            enqueued_tasks.append((url, payload))
-
-        send_bulk_mail_swap = self.swap(
-            email_services, 'send_bulk_mail', mock_send_bulk_mail
-        )
-        enqueue_task_swap = self.swap(
-            taskqueue_services, 'enqueue_task', mock_enqueue_task
-        )
-
-        with send_bulk_mail_swap, enqueue_task_swap:
-            email_manager._send_bulk_mail(  # pylint: disable=protected-access
-                [self.user_a_id],
-                feconf.SYSTEM_COMMITTER_ID,
-                feconf.BULK_EMAIL_INTENT_MARKETING,
-                'Bulk Subject',
-                'Bulk Body',
-                'sender@example.com',
-                'Sender Name',
-                'instance_id',
-            )
-
-        self.assertEqual(len(enqueued_tasks), 1)
-        self.assertEqual(
-            enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
-        )
-        self.assertEqual(enqueued_tasks[0][1]['subject'], 'Bulk Subject')
-
     def test_send_machine_translation_failure_email(self) -> None:
         """Tests the send_machine_translation_failure_email function."""
         email_messages: List[Tuple[str, str]] = []

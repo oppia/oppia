@@ -50,7 +50,6 @@ import {TranslationConfigurationTabComponent} from './translation-configuration-
       {
         path: '',
         component: ContributorDashboardAdminPageRootComponent,
-        TranslationConfigurationTabComponent,
         canActivate: [ContributorDashboardAdminAuthGuard],
       },
     ]),
@@ -65,7 +64,6 @@ import {TranslationConfigurationTabComponent} from './translation-configuration-
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal,
-    TranslationConfigurationTabComponent,
     ContributorDashboardAdminPageComponent,
     ContributorDashboardAdminPageRootComponent,
     TranslationConfigurationTabComponent,

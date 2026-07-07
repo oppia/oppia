@@ -18,11 +18,7 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {SuperAdmin} from '../../utilities/user/super-admin';
-
-const DEFAULT_USER_EMAIL = testConstants.DEFAULT_USER_EMAIL;
-const DEFAULT_USER_ROLE = testConstants.DEFAULT_USER_ROLE;
 
 describe('Contributor Dashboard Admin - Translation Configuration', function () {
   let superAdmin: SuperAdmin;
@@ -32,20 +28,20 @@ describe('Contributor Dashboard Admin - Translation Configuration', function () 
   });
 
   it('should allow the admin to enable auto-translation and map providers', async function () {
-    // 1. Log in as super admin and navigate to CD admin page
+    // 1. Log in as super admin and navigate to CD admin page.
     await superAdmin.navigateToContributorDashboardAdminPage();
 
-    // 2. Enable automatic translation suggestions
+    // 2. Enable automatic translation suggestions.
     await superAdmin.enableAutoTranslation();
 
-    // 3. Add Hindi -> Azure mapping
+    // 3. Add Hindi -> Azure mapping.
     await superAdmin.addTranslationProviderMapping('hi', 'azure');
 
-    // Verify mapping was added
+    // Verify mapping was added.
     let rowCount = await superAdmin.getProviderMappingRowCount();
     expect(rowCount).toBeGreaterThan(0);
 
-    // 4. Remove the mapping
+    // 4. Remove the mapping.
     await superAdmin.removeTranslationProviderMapping('hi');
   });
 

@@ -35,7 +35,7 @@ from core.platform.translate import (
     translate_emulator,
 )
 
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 (translation_models,) = models.Registry.import_models(
     [models.Names.TRANSLATION]
@@ -233,16 +233,17 @@ def update_translation_automatic_status(is_enabled: bool) -> None:
     translation_services.update_automatic_translation_status(is_enabled)
 
 
-def get_available_providers_for_ui() -> list:
+def get_available_providers_for_ui() -> List[Dict[str, str]]:
     # Returns available providers with human-readable display names.
-    provider_display_names: Dict[str, str] = {
-        'azure': 'Azure Translator',
-        'gcp': 'Google Cloud Translate',
-    }
-    whitelist: Dict[str, list] = json.loads(
+    provider_display_names: Dict[str, str] = json.loads(
+        utils.get_file_contents(
+            'assets/translation_provider_display_names.json'
+        )
+    )
+    whitelist: Dict[str, List[str]] = json.loads(
         utils.get_file_contents('assets/auto_translation_provider_mapping.json')
     )
-    all_provider_ids: set = set()
+    all_provider_ids: Set[str] = set()
     for providers in whitelist.values():
         all_provider_ids.update(providers)
     return sorted(

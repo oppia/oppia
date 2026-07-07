@@ -1409,7 +1409,7 @@ export class SuperAdmin extends BaseUser {
   }
 
   async removeTranslationProviderMapping(languageCode: string): Promise<void> {
-    const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`; // Simplified, might need adjustment based on rendered lang name
+    const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
     await this.clickOn(removeButton);
   }
 

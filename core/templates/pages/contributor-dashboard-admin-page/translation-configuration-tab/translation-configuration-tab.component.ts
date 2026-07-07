@@ -78,9 +78,6 @@ export class TranslationConfigurationTabComponent implements OnInit {
   // Returns available languages that are not yet mapped to a provider.
   // Derived from all providers' supported language codes.
   getUnmappedLanguageOptions(): LanguageOption[] {
-    const allLangCodes = new Set<string>();
-    // For now we don't have the full list of all whitelisted languages per provider from the backend in this component.
-    // However, the language dropdown should ideally show Oppia's supported audio languages that are not yet mapped.
     const allOppiaLanguages =
       this.languageUtilService.getAllVoiceoverLanguageCodes();
 

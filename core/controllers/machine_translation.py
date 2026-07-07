@@ -67,13 +67,10 @@ class MachineTranslationGenerateHandler(
         # to verify the user holds the new "translation submitter" role before
         # allowing them to trigger paid Azure API calls.
 
-        source_text = self.normalized_payload.get('source_text')
-        source_language_code = self.normalized_payload.get(
-            'source_language_code'
-        )
-        target_language_code = self.normalized_payload.get(
-            'target_language_code'
-        )
+        assert self.normalized_payload is not None
+        source_text = self.normalized_payload['source_text']
+        source_language_code = self.normalized_payload['source_language_code']
+        target_language_code = self.normalized_payload['target_language_code']
 
         try:
             translation_result = (
@@ -174,12 +171,13 @@ class TranslationProviderMappingHandler(
         # TODO(#24714): In Milestone 2 (PR 2.1), replace can_access_admin_page with strict
         # role-based access control to verify the user is a Translation Admin.
 
-        new_translation_provider_mapping = self.normalized_payload.get(
+        assert self.normalized_payload is not None
+        new_translation_provider_mapping = self.normalized_payload[
             'provider_mapping'
-        )
-        new_is_enabled = self.normalized_payload.get(
+        ]
+        new_is_enabled = self.normalized_payload[
             'automatic_translation_is_enabled'
-        )
+        ]
 
         try:
             machine_translation_services.update_machine_translation_policy(
