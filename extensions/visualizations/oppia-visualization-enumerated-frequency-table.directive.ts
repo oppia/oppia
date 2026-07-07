@@ -49,6 +49,9 @@ export class OppiaVisualizationEnumeratedFrequencyTableComponent
   }
 
   getAnswerAsArray(row: AnswerStats): InteractionAnswer[] {
+    if (!row.answer) {
+      return [];
+    }
     return Array.isArray(row.answer) ? row.answer : [row.answer];
   }
 
