@@ -594,11 +594,9 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = (
-    'firebase-authentication-read-only'
-)
+SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = 'firebase-auth-readonly'
 SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID = (
-    'firebase-authentication-read-and-write'
+    'sensitive-firebase-auth-read-write'
 )
 CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
     '{service_account_id}@{app_id}.iam.gserviceaccount.com'
