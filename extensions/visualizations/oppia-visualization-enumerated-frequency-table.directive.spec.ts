@@ -32,7 +32,6 @@ import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {OppiaVisualizationEnumeratedFrequencyTableComponent} from './oppia-visualization-enumerated-frequency-table.directive';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {InteractionAnswer} from 'interactions/answer-defs';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -139,7 +138,7 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
   }));
 
   it('should return empty array when row answer is falsy', () => {
-    const row = AnswerStats.createFromBackendDict({answer: null, frequency: 1});
+    const row = AnswerStats.createFromBackendDict({answer: '', frequency: 1});
     expect(component.getAnswerAsArray(row)).toEqual([]);
   });
 
