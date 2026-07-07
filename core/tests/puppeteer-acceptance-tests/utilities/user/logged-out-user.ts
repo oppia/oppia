@@ -618,10 +618,8 @@ const desktopCollectionExplorationTileSelector =
 const mobileCollectionExplorationTileSelector =
   '.e2e-mobile-test-collection-exploration';
 const backToCollectionButtonSelector = '.conversation-skin-back-to-collection';
-const collectionCardSelector = '.e2e-test-collection-card';
 const collectionSummaryTileTitleSelector =
   '.e2e-test-collection-summary-tile-title';
-const collectionCardLinkSelector = '.e2e-test-collection-card a';
 const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
 const collectionPreviewTileLinkSelector =
   '.oppia-exploration-summary-tile a[href*="/explore/"]';
