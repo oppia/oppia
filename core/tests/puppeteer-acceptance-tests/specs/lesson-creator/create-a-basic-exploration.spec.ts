@@ -176,6 +176,7 @@ describe('Lesson Creator', function () {
       await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
       await explorationEditor.expectStateNameToBe(CARD_NAMES.SECOND);
       await explorationEditor.navigateToPreviewTab();
+      await explorationEditor.waitForPageToFullyLoad();
 
       await explorationEditor.openLessonInfoModal();
       await explorationEditor.expectLessonInfoTextToBe('Lesson Info');
