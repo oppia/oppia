@@ -7584,7 +7584,9 @@ export class LoggedOutUser extends BaseUser {
   async expectCollectionToBeVisibleInLibrary(
     collectionName: string
   ): Promise<void> {
-    await this.page.waitForSelector(collectionCardSelector, {visible: true});
+    await this.page.waitForSelector(collectionSummaryTileTitleSelector, {
+      visible: true,
+    });
     const titles = await this.page.$$eval(
       collectionSummaryTileTitleSelector,
       elements => elements.map(el => el.textContent?.trim() ?? '')
