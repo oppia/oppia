@@ -127,8 +127,6 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
             'status': 'open',
             'source': 'lesson',
             'category': 'category',
-            'destination_dashboard': 'creator_dashboard',
-            'created_on_msecs': 1700000000000.0,
         }
 
         feedback = general_feedback_domain.PlatformFeedback(
