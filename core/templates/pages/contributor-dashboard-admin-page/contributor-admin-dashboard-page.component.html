@@ -76,7 +76,7 @@
                 <div class="oppia-filter-selector-dropdown-option e2e-test-language-selector-option"
                      *ngFor="let option of languageChoices"
                      (click)="selectLanguage(option.language)"
-                     [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option.language === selectedLanguage.language}">
+                     [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
                   {{option.language}}
                 </div>
               </div>
@@ -142,7 +142,7 @@
               <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option e2e-test-language-selector-option"
                    *ngFor="let option of languageChoices"
                    (click)="selectLanguage(option.language)"
-                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option.language === selectedLanguage.language}">
+                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
                 {{option.language}}
               </div>
             </div>
