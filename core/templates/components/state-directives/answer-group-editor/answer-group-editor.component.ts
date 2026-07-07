@@ -108,20 +108,42 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.onSaveAnswerGroupCorrectnessLabel.emit(event);
   }
 
+  private _misconceptionOutcome!: MisconceptionOutcome;
+  private _lastOutcomeFeedbackHtml: string | undefined;
+  private _lastOutcomeLabelledAsCorrect: boolean | undefined;
+
   get misconceptionOutcome(): MisconceptionOutcome {
     if (!this.outcome) {
-      return {
-        feedback: {
-          html: '',
-          content_id: 'default_outcome',
-        },
-        labelledAsCorrect: false,
+      if (!this._misconceptionOutcome || this._lastOutcomeFeedbackHtml !== '') {
+        this._lastOutcomeFeedbackHtml = '';
+        this._lastOutcomeLabelledAsCorrect = false;
+        this._misconceptionOutcome = {
+          feedback: {
+            html: '',
+            content_id: 'default_outcome',
+          },
+          labelledAsCorrect: false,
+        };
+      }
+      return this._misconceptionOutcome;
+    }
+
+    const currentHtml = this.outcome.feedback.html;
+    const currentLabelledAsCorrect = this.outcome.labelledAsCorrect;
+
+    if (
+      !this._misconceptionOutcome ||
+      this._lastOutcomeFeedbackHtml !== currentHtml ||
+      this._lastOutcomeLabelledAsCorrect !== currentLabelledAsCorrect
+    ) {
+      this._lastOutcomeFeedbackHtml = currentHtml;
+      this._lastOutcomeLabelledAsCorrect = currentLabelledAsCorrect;
+      this._misconceptionOutcome = {
+        feedback: this.outcome.feedback.toBackendDict(),
+        labelledAsCorrect: this.outcome.labelledAsCorrect,
       };
     }
-    return {
-      feedback: this.outcome.feedback.toBackendDict(),
-      labelledAsCorrect: this.outcome.labelledAsCorrect,
-    };
+    return this._misconceptionOutcome;
   }
 
   sendOnSaveAnswerGroupFeedback(event: Outcome | MisconceptionOutcome): void {

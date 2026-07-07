@@ -39,12 +39,10 @@ export class MergeSkillModalComponent extends ConfirmOrCancelModal {
   selectedSkillId!: string;
   allowSkillsFromOtherTopics: boolean = true;
 
-  get groupedSkillSummaries(): GroupedSkillSummaries {
-    return {
-      current: [],
-      others: [],
-    };
-  }
+  groupedSkillSummaries: GroupedSkillSummaries = {
+    current: [],
+    others: [],
+  };
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

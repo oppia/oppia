@@ -46,20 +46,26 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   errorMessage: string =
     'This skill is already linked to the current question.';
 
-  get groupedSkillSummaries(): GroupedSkillSummaries {
-    return {
-      current: [],
-      others: [],
-    };
-  }
+  groupedSkillSummaries: GroupedSkillSummaries = {
+    current: [],
+    others: [],
+  };
+
+  private _lastUntriagedSkillSummaries: SkillSummaryBackendDict[] | undefined;
+  private _untriagedSkillSummariesForSelector: SkillSummary[] = [];
 
   get untriagedSkillSummariesForSelector(): SkillSummary[] {
     if (!this.untriagedSkillSummaries) {
       return [];
     }
-    return this.untriagedSkillSummaries.map(dict =>
-      SkillSummary.createFromBackendDict(dict)
-    );
+    if (this._lastUntriagedSkillSummaries !== this.untriagedSkillSummaries) {
+      this._lastUntriagedSkillSummaries = this.untriagedSkillSummaries;
+      this._untriagedSkillSummariesForSelector =
+        this.untriagedSkillSummaries.map(dict =>
+          SkillSummary.createFromBackendDict(dict)
+        );
+    }
+    return this._untriagedSkillSummariesForSelector;
   }
 
   constructor(private ngbActiveModal: NgbActiveModal) {
