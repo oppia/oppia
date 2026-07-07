@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Tests that the corresponding constants in android_validation_constants and
-constants are the same.
+constants are the same45.
 """
 
 from __future__ import annotations
