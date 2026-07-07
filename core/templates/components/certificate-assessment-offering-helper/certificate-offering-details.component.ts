@@ -16,7 +16,15 @@
  * @fileoverview Details step for creating or editing a certificate offering.
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 import {
   ClassroomBackendApiService,
@@ -39,7 +47,7 @@ interface CertificateOfferingDetailsFormData {
   selector: 'oppia-certificate-offering-details',
   templateUrl: './certificate-offering-details.component.html',
 })
-export class CertificateOfferingDetailsComponent implements OnInit {
+export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   readonly TITLE_MAX_LENGTH = 80;
   readonly DESCRIPTION_MAX_LENGTH = 500;
   readonly TIME_LIMIT_MAX_VALUE = 60;
@@ -70,6 +78,15 @@ export class CertificateOfferingDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.setFormValues();
     this.loadClassrooms();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.certificateAssessmentOffering &&
+      !changes.certificateAssessmentOffering.firstChange
+    ) {
+      this.setFormValues();
+    }
   }
 
   async loadClassrooms(): Promise<void> {
