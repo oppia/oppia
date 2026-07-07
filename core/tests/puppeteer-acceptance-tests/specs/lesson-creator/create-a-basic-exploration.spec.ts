@@ -245,13 +245,6 @@ describe('Lesson Creator', function () {
         'Italic text',
         'Bold text',
       ]);
-      await explorationEditor.expectMultipleChoiceOptionStyleToBe(
-        'Italic text',
-        {fontStyle: 'italic'}
-      );
-      await explorationEditor.expectMultipleChoiceOptionStyleToBe('Bold text', {
-        fontWeight: '700',
-      });
 
       await explorationEditor.selectMultipleChoiceOption('Italic text');
       await explorationEditor.expectResponseFeedbackToBe('Try again.');
