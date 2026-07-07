@@ -173,8 +173,7 @@ export class SuperAdmin extends LoggedInUser {
         if (!button) {
           throw new Error('Button not found');
         }
-        await this.waitForElementToBeClickable(button);
-        await button.click();
+        await this.clickOnElement(button);
 
         await this.page.waitForFunction(
           ({selector, topic}: {selector: string; topic: string}) => {

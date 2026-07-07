@@ -57,25 +57,30 @@ if MYPY:  # pragma: no cover
     from mypy_imports import (
         app_feedback_report_models,
         exp_models,
+        job_models,
         suggestion_models,
         user_models,
     )
 
-(app_feedback_report_models, exp_models, suggestion_models, user_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.APP_FEEDBACK_REPORT,
-            models.Names.EXPLORATION,
-            models.Names.SUGGESTION,
-            models.Names.USER,
-        ]
-    )
+(
+    app_feedback_report_models,
+    exp_models,
+    suggestion_models,
+    job_models,
+    user_models,
+) = models.Registry.import_models(
+    [
+        models.Names.APP_FEEDBACK_REPORT,
+        models.Names.EXPLORATION,
+        models.Names.SUGGESTION,
+        models.Names.JOB,
+        models.Names.USER,
+    ]
 )
 
 
 class CronJobTests(test_utils.GenericTestBase):
 
-    FIVE_WEEKS: Final = datetime.timedelta(weeks=5)
     NINE_WEEKS: Final = datetime.timedelta(weeks=9)
     FOURTEEN_WEEKS: Final = datetime.timedelta(weeks=14)
 
@@ -165,22 +170,18 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def test_run_cron_to_mark_old_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-
-        user_query_model = user_models.UserQueryModel(
-            id='query_id',
-            user_ids=[],
-            submitter_id=admin_user_id,
-            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-            last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS,
+        job_model = job_models.JobModel(
+            id='job_id',
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=181),
         )
-        user_query_model.update_timestamps(update_last_updated_time=False)
-        user_query_model.put()
+        job_model.update_timestamps(update_last_updated_time=False)
+        job_model.put()
 
         with self.testapp_swap:
             self.get_json('/cron/models/cleanup')
 
-        self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+        self.assertTrue(job_model.get_by_id('job_id').deleted)
 
     def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(
         self,

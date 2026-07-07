@@ -88,12 +88,6 @@ module.exports = {
           },
         },
         {
-          matchingUrlPattern: '^http://localhost:8181/emailDashboard$',
-          assertions: {
-            'categories:accessibility': ['error', {minScore: 1}],
-          },
-        },
-        {
           matchingUrlPattern: '^http://localhost:8181/get-started$',
           assertions: {
             'categories:accessibility': ['error', {minScore: 0.98}],

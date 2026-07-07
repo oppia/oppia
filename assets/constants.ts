@@ -6216,6 +6216,13 @@ export default {
     "Hard": 0.9
   },
 
+  // Certificate assessment question difficulty.
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY": "easy",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM": "medium",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD": "hard",
+
+  "QUESTIONS_PER_TOPIC": 3,
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
@@ -6566,99 +6573,6 @@ export default {
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
   "MAX_REVIEW_MESSAGE_LENGTH": 2000,
 
-  "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
-    {
-      "backend_id": "user_inactivity",
-      "backend_attr": "inactive_in_last_n_days",
-      "description": "Inactive in last n days",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "user_login_activity",
-      "backend_attr": "has_not_logged_in_for_n_days",
-      "description": "Has not logged in for n days",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "minimum_exp_created",
-      "backend_attr": "created_at_least_n_exps",
-      "description": "Has created at least n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "maximum_exp_created",
-      "backend_attr": "created_fewer_than_n_exps",
-      "description": "Has created fewer than n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "minimum_exp_edited",
-      "backend_attr": "edited_at_least_n_exps",
-      "description": "Has edited at least n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "maximum_exp_edited",
-      "backend_attr": "edited_fewer_than_n_exps",
-      "description": "Has edited fewer than n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "created_collection",
-      "backend_attr": "created_collection",
-      "description": "Has created collection",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
-    }
-  ],
-
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
@@ -6858,24 +6772,6 @@ export default {
     "CONTRIBUTOR_DASHBOARD": {
       "ROUTE": "contributor-dashboard",
       "TITLE": "Contributor Dashboard | Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
-    },
-    "EMAIL_DASHBOARD": {
-      "ROUTE": "emaildashboard",
-      "TITLE": "Email Dashboard - Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
