@@ -92,6 +92,7 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should show an error message when loading classrooms fails', fakeAsync(() => {
+    flushMicrotasks();
     spyOn(console, 'error');
     spyOn(
       TestBed.inject(ClassroomBackendApiService),
@@ -99,7 +100,7 @@ describe('Certificate Offering Details Component', () => {
     ).and.returnValue(Promise.reject(new Error('boom')));
 
     component.loadClassrooms();
-    flushMicrotasks();
+
 
     expect(component.classroomOptions).toEqual([]);
     expect(component.classroomLoadErrorMessage).toEqual(
