@@ -7610,7 +7610,7 @@ export class LoggedOutUser extends BaseUser {
     // unlike collectionCardSelector which is desktop-only.
     const path = await this.page.$$eval(
       collectionSummaryTileTitleSelector,
-      (elements, name) => {
+      (elements, name: string) => {
         const titleEl = elements.find(el =>
           el.textContent?.trim().includes(name)
         );
