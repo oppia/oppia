@@ -4770,6 +4770,12 @@ export class LoggedInUser extends BaseUser {
    */
   async openLessonInfoModal(): Promise<void> {
     await this.expectElementToBeVisible(lessonInfoButton, true);
+    const button = await this.page.waitForSelector(lessonInfoButton, {
+      visible: true,
+    });
+    await button?.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
     await this.clickOnElementWithSelector(lessonInfoButton);
     await this.expectElementToBeVisible(lessonInfoCardSelector, true);
   }
