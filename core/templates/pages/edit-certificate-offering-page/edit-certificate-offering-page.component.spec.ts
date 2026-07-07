@@ -31,10 +31,17 @@ import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {AlertsService} from 'services/alerts.service';
 
-const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
-const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+const CERTIFICATE_OFFERING_UPDATED_ACTION =
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+const CERTIFICATE_OFFERING_NOT_READY_ACTION =
+  CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY;
 
 describe('Edit Certificate Offering Page Component', () => {
   let component: EditCertificateOfferingPageComponent;
@@ -128,9 +135,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'getCertificateAssessmentOfferingAsync'
-    ).and.returnValue(
-      Promise.resolve(CertificateAssessmentOfferingData.createEmpty())
-    );
+    ).and.resolveTo(CertificateAssessmentOfferingData.createEmpty());
 
     component.populateCertificateAssessmentOfferingFromId();
     flushMicrotasks();
@@ -157,7 +162,7 @@ describe('Edit Certificate Offering Page Component', () => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'getCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve(fetchedOffering));
+    ).and.resolveTo(fetchedOffering);
 
     component.populateCertificateAssessmentOfferingFromId();
     flushMicrotasks();
@@ -257,7 +262,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
@@ -267,11 +272,13 @@ describe('Edit Certificate Offering Page Component', () => {
 
     expect(modalSpy).toHaveBeenCalled();
     expect(modalRef.componentInstance.action).toBe(
-      CERTIFICATE_OFFERING_UPDATED_ACTION
+      CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
@@ -294,7 +301,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
     const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
@@ -308,11 +315,13 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(modalSpy).toHaveBeenCalledTimes(2);
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Available',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
     expect(secondModalRef.componentInstance.action).toBe(
-      CERTIFICATE_OFFERING_UPDATED_ACTION
+      CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
@@ -321,7 +330,7 @@ describe('Edit Certificate Offering Page Component', () => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    ).and.resolveTo('certificate_offering_id');
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
     spyOn(ngbModal, 'open').and.returnValue({
@@ -336,7 +345,9 @@ describe('Edit Certificate Offering Page Component', () => {
 
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
-      component.certificateAssessmentOffering
+      jasmine.objectContaining({
+        asyncStatus: 'Not_Ready',
+      })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
