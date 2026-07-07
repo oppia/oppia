@@ -7604,42 +7604,61 @@ export class LoggedOutUser extends BaseUser {
    * language change).
    */
   async navigateToCollectionFromLibrary(collectionName: string): Promise<void> {
-    const cards = await this.page.$$(collectionCardSelector);
-    for (const card of cards) {
-      const text = await card.evaluate(el => el.textContent?.trim() ?? '');
-      if (!text.includes(collectionName)) {
-        continue;
-      }
+    await this.page.waitForSelector(collectionSummaryTileTitleSelector, {
+      visible: true,
+    });
 
-      const path = await card
-        .$eval(collectionCardLinkSelector, el => {
-          const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
-          return href.startsWith('http')
-            ? new URL(href).pathname + new URL(href).search
-            : href;
-        })
-        .catch(() => null);
+    // Use the title selector which works on both mobile and desktop viewports,
+    // unlike collectionCardSelector which is desktop-only.
+    const path = await this.page.$$eval(
+      collectionSummaryTileTitleSelector,
+      (elements, name) => {
+        const titleEl = elements.find(el =>
+          el.textContent?.trim().includes(name)
+        );
+        if (!titleEl) {
+          return null;
+        }
 
-      this.storedCollectionPath = path;
+        // Walk up from the title to find the nearest ancestor anchor with a
+        // collection href.
+        let node: Element | null = titleEl;
+        while (node) {
+          if (node.tagName === 'A') {
+            const href = (node as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          }
 
-      if (path) {
-        await this.page.goto(`http://localhost:8181${path}`, {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000,
-        });
-      } else {
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: 'networkidle0',
-            timeout: 20000,
-          }),
-          card.click(),
-        ]);
-      }
-      await this.waitForPageToFullyLoad();
-      return;
+          const link = node.parentElement?.querySelector(
+            'a[href*="/collection/"]'
+          );
+          if (link) {
+            const href = (link as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          }
+
+          node = node.parentElement;
+        }
+
+        return null;
+      },
+      collectionName
+    );
+
+    if (!path) {
+      throw new Error(`Could not open ${collectionName} collection card.`);
     }
-    throw new Error(`Could not open ${collectionName} collection card.`);
+
+    this.storedCollectionPath = path;
+    await this.page.goto(`http://localhost:8181${path}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await this.waitForPageToFullyLoad();
   }
 
   /**
