@@ -326,7 +326,7 @@ class CreatorFeedbackListHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(  # pylint: disable=arguments-differ
+    def get(
         self, exploration_id: str
     ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_request is not None
@@ -436,7 +436,7 @@ class CreatorFeedbackDetailHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(  # pylint: disable=arguments-differ
+    def get(
         self, exploration_id: str, thread_id: str
     ) -> None:  # pylint: disable=arguments-differ
         thread = general_feedback_services.get_thread(thread_id)
@@ -484,7 +484,7 @@ class CreatorFeedbackDetailHandler(
         self.render_json(feedback_dict)
 
     @acl_decorators.can_play_exploration_as_logged_in_user
-    def put(  # pylint: disable=arguments-differ
+    def put(
         self, exploration_id: str, thread_id: str
     ) -> None:  # pylint: disable=arguments-differ
         """Updates lesson thread status and/or adds a creator message."""
