@@ -420,8 +420,7 @@ export class ExplorationEngineService {
 
     let contentId = initialState.content.contentId;
     if (contentId === null) {
-      this.alertsService.addWarning('Content id cannot be null.');
-      return;
+      throw new Error('Content id cannot be null.');
     }
 
     let initialCard = StateCard.createNewCard(
@@ -863,8 +862,7 @@ export class ExplorationEngineService {
     let contentId = this.exploration.getState(this.nextStateName).content
       .contentId;
     if (contentId === null) {
-      this.alertsService.addWarning('Content id cannot be null.');
-      return false;
+      throw new Error('Content id cannot be null.');
     }
 
     let nextCard = StateCard.createNewCard(

@@ -742,21 +742,29 @@ describe('Question player engine service', () => {
   });
 
   describe('on submitting answer ', () => {
+    let submitAnswerSuccessCb: jasmine.Spy;
+    let initSuccessCb: jasmine.Spy;
+    let initErrorCb: jasmine.Spy;
+    let answer: string;
+    let answerClassificationResult: AnswerClassificationResult;
+
+    beforeEach(() => {
+      submitAnswerSuccessCb = jasmine.createSpy('success');
+      initSuccessCb = jasmine.createSpy('success');
+      initErrorCb = jasmine.createSpy('fail');
+      answer = 'answer';
+      answerClassificationResult = new AnswerClassificationResult(
+        Outcome.createNew('default', 'feedback_id', 'feedback', []),
+        1,
+        0,
+        'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+    });
+
     it(
       'should call success callback if the submitted ' + 'answer is correct',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let initSuccessCb = jasmine.createSpy('success');
-        let initErrorCb = jasmine.createSpy('fail');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', 'feedback_id', 'feedback', []),
-          1,
-          0,
-          'default_outcome'
-        );
-        answerClassificationResult.outcome.labelledAsCorrect = true;
-
         spyOn(
           answerClassificationService,
           'getMatchingClassificationResult'
@@ -781,15 +789,6 @@ describe('Question player engine service', () => {
       'should not submit answer again if the answer ' +
         'is already being processed',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', 'feedback_id', 'feedback', []),
-          1,
-          0,
-          'default_outcome'
-        );
-
         spyOn(
           answerClassificationService,
           'getMatchingClassificationResult'
@@ -821,17 +820,7 @@ describe('Question player engine service', () => {
     it(
       'should show warning message if the feedback ' + 'content is empty',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let initSuccessCb = jasmine.createSpy('success');
-        let initErrorCb = jasmine.createSpy('fail');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
-          1,
-          0,
-          'default_outcome'
-        );
-        answerClassificationResult.outcome.labelledAsCorrect = true;
+        answerClassificationResult.outcome.feedback.html = '';
 
         spyOn(
           answerClassificationService,
@@ -874,18 +863,6 @@ describe('Question player engine service', () => {
     );
 
     it('should show warning message if the question ' + 'name is empty', () => {
-      let submitAnswerSuccessCb = jasmine.createSpy('success');
-      let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', 'feedback_id', 'feedback', []),
-        1,
-        0,
-        'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
       singleQuestionBackendDict.question_state_data.content.html = '';
       let sampleQuestion = Question.createFromBackendDict(
         singleQuestionBackendDict
@@ -928,16 +905,6 @@ describe('Question player engine service', () => {
     it(
       'should not create next card if the existing ' + 'card is the last one',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let initSuccessCb = jasmine.createSpy('success');
-        let initErrorCb = jasmine.createSpy('fail');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', 'feedback_id', 'feedback', []),
-          1,
-          0,
-          'default_outcome'
-        );
         let sampleCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
@@ -945,8 +912,6 @@ describe('Question player engine service', () => {
           jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
-
-        answerClassificationResult.outcome.labelledAsCorrect = true;
 
         spyOn(
           answerClassificationService,

@@ -544,30 +544,28 @@ describe('Exploration engine service ', () => {
     }
   );
 
-  it('should alert if contentId is null in initial state when calling init', () => {
+  it('should throw error if contentId is null in initial state when calling init', () => {
     let initSuccessCb = jasmine.createSpy('success');
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
     mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       false
     );
-    spyOn(alertsService, 'addWarning');
 
     const clonedExplorationDict = cloneDeep(explorationDict);
     clonedExplorationDict.states.Start.content.content_id = null;
 
-    explorationEngineService.init(
-      clonedExplorationDict,
-      1,
-      null,
-      true,
-      ['en'],
-      [],
-      initSuccessCb
-    );
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Content id cannot be null.'
-    );
+    expect(() => {
+      explorationEngineService.init(
+        clonedExplorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        initSuccessCb
+      );
+    }).toThrowError('Content id cannot be null.');
     expect(initSuccessCb).not.toHaveBeenCalled();
   });
 
@@ -717,6 +715,15 @@ describe('Exploration engine service ', () => {
   });
 
   describe('on submitting answer ', () => {
+    beforeEach(() => {
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
+        'Start'
+      );
+    });
+
     it(
       'should call success callback if the submitted ' + 'answer is correct',
       () => {
@@ -732,12 +739,6 @@ describe('Exploration engine service ', () => {
           'content_id'
         );
 
-        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-          false
-        );
-        spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-          'Start'
-        );
         spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
         spyOn(
           answerClassificationService,
@@ -772,12 +773,6 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.ruleIndex = null;
       answerClassificationResult.answerGroupIndex = 0;
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -823,12 +818,6 @@ describe('Exploration engine service ', () => {
         customizationArgs: {},
       });
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -884,12 +873,6 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.answerGroupIndex = 0;
       const successCallback = jasmine.createSpy('successCallback');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -934,7 +917,7 @@ describe('Exploration engine service ', () => {
       expect(result).toBe(false);
     }));
 
-    it('should show warning if content id is null', fakeAsync(() => {
+    it('should throw error if content id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
       answerClassificationResult.answerGroupIndex = 0;
@@ -945,12 +928,6 @@ describe('Exploration engine service ', () => {
         'get'
       ).and.returnValue(null);
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -993,18 +970,13 @@ describe('Exploration engine service ', () => {
         customizationArgs: {},
       });
 
-      spyOn(alertsService, 'addWarning');
-
-      const result = explorationEngineService.submitAnswer(
-        'answer',
-        textInputService,
-        submitAnswerSuccessCb
-      );
-
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Content id cannot be null.'
-      );
-      expect(result).toBe(false);
+      expect(() => {
+        explorationEngineService.submitAnswer(
+          'answer',
+          textInputService,
+          submitAnswerSuccessCb
+        );
+      }).toThrowError('Content id cannot be null.');
     }));
 
     it(
@@ -1022,12 +994,6 @@ describe('Exploration engine service ', () => {
           'content_id'
         );
 
-        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-          false
-        );
-        spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-          'Start'
-        );
         spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
         spyOn(
           answerClassificationService,
@@ -1062,12 +1028,6 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
       answerClassificationResult.answerGroupIndex = 0;
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -1142,12 +1102,6 @@ describe('Exploration engine service ', () => {
       answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
       answerClassificationResult.answerGroupIndex = 0;
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -1225,12 +1179,6 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
       spyOn(
         answerClassificationService,
@@ -1277,12 +1225,6 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
       spyOn(
         answerClassificationService,
@@ -1393,12 +1335,6 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
       spyOn(lastCard, 'getInteractionCustomizationArgs').and.returnValue({
         rows: {
           value: 1,
@@ -1483,12 +1419,7 @@ describe('Exploration engine service ', () => {
     it('should handle submitAnswer where old state is same as new state and not inline', () => {
       const submitAnswerSuccessCb = jasmine.createSpy('success');
       answerClassificationResult.outcome.dest = 'Start';
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
+
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
@@ -1537,12 +1468,9 @@ describe('Exploration engine service ', () => {
 
     it('should handle submitAnswer when in exploration editor page', () => {
       const submitAnswerSuccessCb = jasmine.createSpy('success');
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        true
-      );
-      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
-        'Start'
-      );
+      (
+        pageContextService.isInExplorationEditorPage as jasmine.Spy
+      ).and.returnValue(true);
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
