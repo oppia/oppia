@@ -249,9 +249,9 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
 
         typo                        → creator
         confusing_or_incorrect_answer → creator
-        broken_layout_or_image      → technical
-        other_or_not_sure           → technical
-        all site (app) reports      → technical
+        broken_layout_or_image      → LEAP or CORE
+        other_or_not_sure           → LEAP or CORE
+        all site (app) reports      → LEAP or CORE
 
     The id of instances of this class has the form
         feedback.platform.<timestamp_base64><random_base64>
@@ -259,7 +259,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     Fields (in addition to BaseFeedbackModel fields):
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Platform of the report ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "technical").
+        destination_dashboard: str. Routing target ("creator" | "LEAP" |
+            "CORE").
         category: Optional[str]. Report category; required for lesson reports,
             must be None for site reports.
         include_technical_logs: bool. Whether session diagnostics are included.
@@ -447,7 +448,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             platform: str. Platform of the report ("web" | "android").
             category: Optional[str]. Report category; can be for lesson
                 reports, must be None for site (app) reports.
-            destination_dashboard: str. Routing target ("creator" | "LEAP" | "CORE).
+            destination_dashboard: str. Routing target ("creator" | "LEAP" |
+                "CORE").
             lesson_metadata_json: Optional[Dict]. Lesson metadata at
                 submission time;
                 required for lesson reports, must be None for site reports.

@@ -249,9 +249,9 @@ describe('Feedback backend api service', () => {
     const onSuccess = jasmine.createSpy('onSuccess');
 
     feedbackBackendApiService
-      .fetchPlatformFeedbackModelThreadsAsync(
+      .fetchPlatformFeedbackListAsync(
+        'technical',
         'LEAP',
-        'team',
         'cursor',
         'open',
         1000,
@@ -260,7 +260,7 @@ describe('Feedback backend api service', () => {
       .then(onSuccess);
 
     const req = httpTestingController.expectOne(request => {
-      return request.url === '/platform-feedback/LEAP/team';
+      return request.url === '/platform-feedback/technical/LEAP';
     });
     expect(req.request.method).toEqual('GET');
     expect(req.request.params.get('cursor')).toEqual('cursor');

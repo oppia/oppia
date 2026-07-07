@@ -28,8 +28,8 @@ import {
   FeedbackCaptchaConfigResponse,
   LessonFeedbackModel,
   PlatformFeedbackModel,
-  PlatformFeedbackThreadsBackendResponse,
-  PlatformFeedbackThreadSummary,
+  PlatformFeedbackBackendResponse,
+  PlatformFeedbackDetailResponse,
   FeedbackSubmitResponse,
 } from './feedback.model';
 
@@ -123,18 +123,14 @@ export class FeedbackBackendApiService {
       .toPromise();
   }
 
-  async fetchPlatformFeedbackModelThreadsAsync(
-    destinationDashboard: string,
+  async fetchPlatformFeedbackListAsync(
+    dashboard: string,
     dashboardId: string,
     cursor: string | null,
     statusFilter: string | null,
     dateFromMsecs: number | null,
     dateToMsecs: number | null
-  ): Promise<{
-    results: PlatformFeedbackThreadSummary[];
-    cursor: string | null;
-    more: boolean;
-  }> {
+  ): Promise<PlatformFeedbackBackendResponse> {
     let params = new HttpParams();
     if (cursor !== null) {
       params = params.set('cursor', cursor);
@@ -151,19 +147,81 @@ export class FeedbackBackendApiService {
 
     const platformFeedbackReportUrl = [
       this.reportUrl,
-      encodeURIComponent(destinationDashboard),
+      encodeURIComponent(dashboard),
       encodeURIComponent(dashboardId),
     ].join('/');
-    const response = await this.http
-      .get<PlatformFeedbackThreadsBackendResponse>(platformFeedbackReportUrl, {
-        params,
-      })
-      .toPromise();
 
-    return {
-      results: response.summaries,
-      cursor: response.next_cursor,
-      more: response.more,
-    };
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<PlatformFeedbackBackendResponse>(platformFeedbackReportUrl, {
+          params,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async fetchPlatformFeedbackDetailAsync(
+    dashboard: string,
+    dashboardId: string,
+    reportId: string
+  ): Promise<PlatformFeedbackDetailResponse> {
+    const platformFeedbackReportUrl = [
+      this.reportUrl,
+      encodeURIComponent(dashboard),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<PlatformFeedbackDetailResponse>(platformFeedbackReportUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async updatePlatformFeedbackStatusAsync(
+    dashboard: string,
+    dashboardId: string,
+    reportId: string,
+    status: string
+  ): Promise<{success: boolean}> {
+    const platformFeedbackReportUrl = [
+      this.reportUrl,
+      encodeURIComponent(dashboard),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .post<{success: boolean}>(platformFeedbackReportUrl, {
+          status,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
   }
 }

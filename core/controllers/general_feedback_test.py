@@ -150,10 +150,10 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
         """Returns a PlatformFeedback domain object."""
         return general_feedback_domain.PlatformFeedback(
             report_id=report_id,
-            feedback_text='The card image is broken.',
+            report_message='The card image is broken.',
             source=source,
             platform='web',
-            destination_dashboard='technical',
+            destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
             status='open',
             category=category,
             lesson_metadata=lesson_metadata,
@@ -480,7 +480,7 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.login_context(self.TECH_LEAD_EMAIL):
-            response = self.get_json('/platform-feedback/LEAP/team')
+            response = self.get_json('/platform-feedback/technical/LEAP')
 
         self.assertEqual(len(response['summaries']), 1)
         self.assertEqual(response['summaries'][0]['id'], report.id)
@@ -528,7 +528,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
             )
 
         self.assertEqual(response['id'], report.id)
-        self.assertEqual(response['feedback_text'], 'There is a typo.')
+        self.assertEqual(response['report_message'], 'There is a typo.')
 
     def test_creator_can_update_feedback_status_for_owned_exploration(
         self,

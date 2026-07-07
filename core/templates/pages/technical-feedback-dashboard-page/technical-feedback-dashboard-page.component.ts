@@ -15,28 +15,48 @@
 /**
  * @fileoverview Component for Technical feedback dashboard.
  */
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import './technical-feedback-dashboard-page.component.css';
 
 @Component({
   selector: 'oppia-technical-feedback-dashboard-page',
   templateUrl: './technical-feedback-dashboard-page.component.html',
 })
-export class TechnicalFeedbackDashboardPageComponent implements OnInit {
+export class TechnicalFeedbackDashboardPageComponent {
   constructor(private feedbackBackendApiService: FeedbackBackendApiService) {}
 
-  async ngOnInit(): Promise<void> {
-    const feedbackThreads =
-      await this.feedbackBackendApiService.fetchPlatformFeedbackModelThreadsAsync(
+  selectedReportId: string = '';
+
+  async fetchListButton(): Promise<void> {
+    let response =
+      await this.feedbackBackendApiService.fetchPlatformFeedbackListAsync(
+        'technical',
         'CORE',
-        'team',
         null,
         null,
         null,
         null
       );
-    // TODO(#22447): Replace this with dashboard rendering once the technical
-    // feedback dashboard UI is implemented.
-    console.log(feedbackThreads);
+    console.log(response);
+  }
+
+  async getDetailedViewButton(): Promise<void> {
+    let detailedResponse =
+      await this.feedbackBackendApiService.fetchPlatformFeedbackDetailAsync(
+        'technical',
+        'CORE',
+        this.selectedReportId
+      );
+    console.log(detailedResponse);
+  }
+
+  async updateStatusButton(): Promise<void> {
+    await this.feedbackBackendApiService.updatePlatformFeedbackStatusAsync(
+      'technical',
+      'CORE',
+      this.selectedReportId,
+      'fixed'
+    );
   }
 }

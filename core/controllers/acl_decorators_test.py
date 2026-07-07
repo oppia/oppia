@@ -8587,7 +8587,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
             'dashboard': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.DESTINATION_CHOICES,
+                    'choices': feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES,
                 },
             },
             'dashboard_id': {
@@ -8637,7 +8637,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/technical-feedback-dashboard/LEAP/team',
+                '/technical-feedback-dashboard/technical/LEAP',
                 expected_status_int=401,
             )
 
@@ -8652,7 +8652,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
     ) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/technical-feedback-dashboard/LEAP/team',
+                '/technical-feedback-dashboard/technical/LEAP',
                 expected_status_int=401,
             )
 
@@ -8668,7 +8668,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/technical-feedback-dashboard/LEAP/team',
+                '/technical-feedback-dashboard/technical/LEAP',
                 expected_status_int=401,
             )
 
@@ -8698,7 +8698,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/technical-feedback-dashboard/CORE/team',
+                '/technical-feedback-dashboard/technical/CORE',
                 expected_status_int=401,
             )
 
@@ -8714,7 +8714,9 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         self.login(self.TECH_LEAD_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/technical-feedback-dashboard/LEAP/team')
+            response = self.get_json(
+                '/technical-feedback-dashboard/technical/LEAP'
+            )
 
         self.assertEqual(response['success'], 1)
         self.logout()

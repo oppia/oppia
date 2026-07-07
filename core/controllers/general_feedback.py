@@ -298,7 +298,7 @@ class PlatformFeedbackListHandler(
         dashboard_id: str. Identifier associated with the requested dashboard.
             For the Creator Dashboard, this is the exploration ID.
             For the Technical Dashboard, this is the team identifier
-            ('leap' or 'core').
+            ('LEAP' or 'CORE').
 
     Query params:
         status: Optional[str]. Filters feedback by status.
@@ -315,7 +315,7 @@ class PlatformFeedbackListHandler(
         'dashboard': {
             'schema': {
                 'type': 'basestring',
-                'choices': feconf.DESTINATION_CHOICES,
+                'choices': feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES,
             },
         },
         'dashboard_id': {
@@ -368,7 +368,7 @@ class PlatformFeedbackListHandler(
         date_to_msecs = req.get('date_to_msecs')
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
-                destination_dashboard=dashboard,
+                dashboard=dashboard,
                 dashboard_id=dashboard_id,
                 status_filter=status,
                 cursor=cursor,
@@ -402,7 +402,7 @@ class PlatformFeedbackDetailHandler(
         dashboard_id: str. Identifier associated with the requested dashboard.
             For the Creator Dashboard, this is the exploration ID.
             For the Technical Dashboard, this is the team identifier
-            ('leap' or 'core').
+            ('LEAP' or 'CORE').
         report_id: str. The feedback identifier.
 
     POST payload:
@@ -419,7 +419,7 @@ class PlatformFeedbackDetailHandler(
         'dashboard': {
             'schema': {
                 'type': 'basestring',
-                'choices': feconf.DESTINATION_CHOICES,
+                'choices': feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES,
             },
         },
         'dashboard_id': {

@@ -71,7 +71,7 @@ class PlatformFeedbackDict(TypedDict):
     """Dict representation of a PlatformFeedback domain object."""
 
     id: str
-    feedback_text: str
+    report_message: str
     source: str
     platform: str
     destination_dashboard: str
@@ -192,10 +192,11 @@ class PlatformFeedback:
 
     Fields:
         id: str. Unique identifier of the report.
-        feedback_text: str. The text body of the report.
+        report_message: str. The text body of the report.
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Submission platform ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "technical").
+        destination_dashboard: str. Routing target ("creator" | "LEAP" |
+            "CORE").
         status: str. Current moderation status
             (open | fixed | ignored | compliment | not_actionable).
         category: Optional[str]. Report category; present for lesson reports,
@@ -212,7 +213,7 @@ class PlatformFeedback:
     def __init__(
         self,
         report_id: str,
-        feedback_text: str,
+        report_message: str,
         source: str,
         platform: str,
         destination_dashboard: str,
@@ -226,7 +227,7 @@ class PlatformFeedback:
         screenshot_entity_id: Optional[str] = None,
     ) -> None:
         self.id = report_id
-        self.feedback_text = feedback_text
+        self.report_message = report_message
         self.source = source
         self.platform = platform
         self.destination_dashboard = destination_dashboard
@@ -247,7 +248,7 @@ class PlatformFeedback:
         """
         return {
             'id': self.id,
-            'feedback_text': self.feedback_text,
+            'report_message': self.report_message,
             'source': self.source,
             'platform': self.platform,
             'destination_dashboard': self.destination_dashboard,
@@ -270,7 +271,7 @@ class PlatformFeedback:
         """
         return {
             'id': self.id,
-            'report_message_preview': self.feedback_text,
+            'report_message_preview': self.report_message,
             'status': self.status,
             'source': self.source,
             'category': self.category,

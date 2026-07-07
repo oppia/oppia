@@ -108,7 +108,7 @@ def _platform_feedback_model_to_domain(
 
     return general_feedback_domain.PlatformFeedback(
         report_id=model.id,
-        feedback_text=model.feedback_text,
+        report_message=model.feedback_text,
         source=model.source,
         platform=model.platform,
         destination_dashboard=model.destination_dashboard,
@@ -129,18 +129,21 @@ def _determine_destination_dashboard(
     """Determines the destination dashboard based on page_url, source and category.
 
     Routing rules:
-        - All site (app) reports → technical (depends on the team that owns the page URL.)
+        - All site (app) reports → technical (depends on the team that owns
+          the page URL.)
         - typo → creator
         - confusing_or_incorrect_answer → creator
-        - broken_layout_or_image → technical (depends on the team that owns the page URL.)
-        - other_or_not_sure → technical (depends on the team that owns the page URL.)
+        - broken_layout_or_image → technical (depends on the team that owns
+          the page URL.)
+        - other_or_not_sure → technical (depends on the team that owns the
+          page URL.)
 
     Args:
         page_url: str. The page URL where the report was submitted.
         category: Optional[str]. The report category; None for site reports.
 
     Returns:
-        str. The destination dashboard ("creator" | "LEAP" | "CORE).
+        str. The destination dashboard ("creator" | "LEAP" | "CORE").
     """
     if category in feconf.CREATOR_DASHBOARD_CATEGORIES:
         return feconf.DESTINATION_CREATOR
@@ -165,10 +168,10 @@ def validate_platform_feedback_belongs_to_dashboard(
     Args:
         feedback: PlatformFeedback. The feedback to validate.
         dashboard: str. The dashboard from which the feedback is being
-            accessed.
+            accessed. This is either "creator" or "technical".
         dashboard_id: str. The dashboard-specific identifier. This is the
             exploration ID for the Creator Dashboard and the team identifier
-            ('leap' or 'core') for the Technical Dashboard.
+            ('LEAP' or 'CORE') for the Technical Dashboard.
 
     Raises:
         ValueError. The feedback does not belong to the requested dashboard.
@@ -188,11 +191,10 @@ def validate_platform_feedback_belongs_to_dashboard(
             )
         return
 
-    if dashboard in (
-        feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-        feconf.DESTINATION_TECHNICAL_CORE_TEAM,
-    ):
-        if feedback.destination_dashboard != dashboard:
+    if dashboard == feconf.DESTINATION_TECHNICAL:
+        if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
+            raise ValueError('Invalid technical feedback team.')
+        if feedback.destination_dashboard != dashboard_id:
             raise ValueError(
                 'Feedback does not belong to the requested dashboard.'
             )
@@ -354,7 +356,7 @@ def get_platform_feedback(
 
 
 def get_platform_feedback_summaries(
-    destination_dashboard: str,
+    dashboard: str,
     dashboard_id: str,
     status_filter: Optional[str] = feconf.STATUS_CHOICES_OPEN,
     cursor: Optional[str] = None,
@@ -370,9 +372,11 @@ def get_platform_feedback_summaries(
     Used by the Creator Dashboard GET and Technical Dashboard GET.
 
     Args:
-        destination_dashboard: str. The dashboard for which feedback is
-            requested.
+        dashboard: str. The dashboard for which feedback is requested. This is
+            either "creator" or "technical".
         dashboard_id: str. Identifier associated with the requested dashboard.
+            This is an exploration ID for creator dashboards and a technical
+            team ("LEAP" or "CORE") for technical dashboards.
         status_filter: Optional[str]. If provided, only return reports with
             this status. Otherwise, open status reports are shown.
         cursor: Optional[str]. Pagination cursor from a previous response.
@@ -388,19 +392,20 @@ def get_platform_feedback_summaries(
             more: bool. True if there are more results beyond this page.
 
     Raises:
-        ValueError. The destination dashboard is invalid, or a creator dashboard
-        request does not include an exploration ID.
+        ValueError. The dashboard or technical team is invalid.
     """
-    if destination_dashboard not in feconf.DESTINATION_CHOICES:
-        raise ValueError(
-            'Invalid destination dashboard: %s' % (destination_dashboard)
-        )
-    if destination_dashboard == feconf.DESTINATION_CREATOR:
+    if dashboard not in feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES:
+        raise ValueError('Invalid dashboard: %s' % dashboard)
+    if dashboard == feconf.DESTINATION_CREATOR:
         exploration_id = dashboard_id
         dashboard_filter = None
     else:
+        if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
+            raise ValueError(
+                'Invalid technical feedback team: %s' % dashboard_id
+            )
         exploration_id = None
-        dashboard_filter = destination_dashboard
+        dashboard_filter = dashboard_id
     date_from = (
         utils.convert_millisecs_time_to_datetime_object(date_from_msecs)
         if date_from_msecs is not None
@@ -460,10 +465,10 @@ def update_platform_feedback_status_for_dashboard(
         report_id: str. ID of the PlatformFeedbackModel to update.
         new_status: str. The new status value. Must be a valid status choice.
         dashboard: str. The dashboard from which the feedback is being
-            accessed.
+            accessed. This is either "creator" or "technical".
         dashboard_id: str. The dashboard-specific identifier. This is the
             exploration ID for the Creator Dashboard and the team identifier
-            ('leap' or 'core') for the Technical Dashboard.
+            ('LEAP' or 'CORE') for the Technical Dashboard.
 
     Returns:
         Optional[PlatformFeedback]. The updated report, or None if not found.

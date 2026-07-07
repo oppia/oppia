@@ -204,7 +204,7 @@ export interface FeedbackSubmitResponse {
   id: string;
 }
 
-export interface PlatformFeedbackThreadSummary {
+export interface PlatformFeedbackSummary {
   id: string;
   report_message_preview: string;
   status: FeedbackStatus;
@@ -212,8 +212,25 @@ export interface PlatformFeedbackThreadSummary {
   category: ReportAnIssueCategory | null;
 }
 
-export interface PlatformFeedbackThreadsBackendResponse {
-  summaries: PlatformFeedbackThreadSummary[];
+export interface PlatformFeedbackBackendResponse {
+  summaries: PlatformFeedbackSummary[];
   next_cursor: string | null;
   more: boolean;
+}
+
+export interface PlatformFeedbackDetailResponse {
+  id: string;
+  report_message: string;
+  source: ReportType;
+  status: FeedbackStatus;
+  platform: 'web' | 'android';
+  destination_dashboard: 'LEAP' | 'CORE' | 'creator';
+  page_url: string;
+  category: ReportAnIssueCategory | null;
+  lesson_metadata_json: LessonFeedbackMetadataBackendDict | null;
+  include_technical_logs: boolean;
+  session_info: FeedbackSessionInfo | null;
+  screenshot_filename: string | null;
+  screenshot_entity_id: string | null;
+  created_on_msecs: number;
 }

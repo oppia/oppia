@@ -90,7 +90,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             page_url='https://example.com',
         )
 
-        self.assertEqual(report.feedback_text, 'There is a typo.')
+        self.assertEqual(report.report_message, 'There is a typo.')
         self.assertEqual(report.source, feconf.SOURCE_LESSON)
         self.assertEqual(report.platform, feconf.PLATFORM_WEB)
         self.assertEqual(
@@ -266,7 +266,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertIsNotNone(retrieved_report)
         assert retrieved_report is not None
         self.assertEqual(retrieved_report.id, report.id)
-        self.assertEqual(retrieved_report.feedback_text, 'There is a typo.')
+        self.assertEqual(retrieved_report.report_message, 'There is a typo.')
 
     def test_get_platform_feedback_returns_none_for_missing_report(
         self,
@@ -305,7 +305,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
-                destination_dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CREATOR,
                 dashboard_id='exp_id',
             )
         )
@@ -343,8 +343,8 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
-                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-                dashboard_id='team',
+                dashboard=feconf.DESTINATION_TECHNICAL,
+                dashboard_id=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
             )
         )
 
