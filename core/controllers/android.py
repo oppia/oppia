@@ -36,7 +36,6 @@ from core.domain import (
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
-    subtopic_page_services,
     topic_domain,
     topic_fetchers,
     translation_fetchers,
@@ -244,45 +243,28 @@ class AndroidActivityHandler(
                 )
 
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            # Subtopic pages require special handling because their IDs are
-            # compound keys (topic_id-subtopic_id) that need to be split and
-            # processed separately.
-            split_ids_and_versions = [
-                (activity_data['id'].split('-'), activity_data.get('version'))
-                for activity_data in activities_data
-            ]
-            topic_subtopic_version_tuples = [
-                (
+            # Subtopic pages are now backed by StudyGuide models. We fetch
+            # from StudyGuide but return data in the SubtopicPage format so
+            # that existing Android clients receive the shape they expect.
+            for activity_data in activities_data:
+                topic_id, study_guide_id = activity_data['id'].split('-')
+                study_guide = study_guide_services.get_study_guide_by_id(
                     topic_id,
-                    int(stringified_subtopic_index),
-                    subtopic_page_version,
+                    int(study_guide_id),
+                    strict=False,
+                    version=activity_data.get('version'),
                 )
-                for (
-                    (topic_id, stringified_subtopic_index),
-                    subtopic_page_version,
-                ) in split_ids_and_versions
-            ]
-            subtopic_pages = (
-                subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
-                    topic_subtopic_version_tuples
-                )
-            )
-            activities.extend(
-                [
+                activities.append(
                     {
                         'id': activity_data['id'],
                         'version': activity_data.get('version'),
                         'payload': (
-                            subtopic_page.to_dict()
-                            if subtopic_page is not None
+                            study_guide.to_subtopic_page_dict_for_android()
+                            if study_guide is not None
                             else None
                         ),
                     }
-                    for (activity_data, subtopic_page) in zip(
-                        activities_data, subtopic_pages
-                    )
-                ]
-            )
+                )
 
         elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
             # Questions require special handling as they are fetched in bulk.
