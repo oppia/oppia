@@ -109,6 +109,15 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   get misconceptionOutcome(): MisconceptionOutcome {
+    if (!this.outcome) {
+      return {
+        feedback: {
+          html: '',
+          content_id: 'default_outcome',
+        },
+        labelledAsCorrect: false,
+      };
+    }
     return {
       feedback: this.outcome.feedback.toBackendDict(),
       labelledAsCorrect: this.outcome.labelledAsCorrect,
