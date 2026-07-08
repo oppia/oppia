@@ -925,6 +925,40 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             },
         )
 
+    def test_validate_against_preloaded_maps_rejects_invalid_inputs(
+        self,
+    ) -> None:
+        self.assertEqual(
+            certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
+                topic_ids=[],
+                total_questions=4,
+                topic_name_to_question_ids_map={},
+                topic_id_to_question_ids_by_difficulty={},
+                topic_id_to_name={},
+            )[
+                'validation_message'
+            ],
+            'topic_ids must contain at least one topic.',
+        )
+        self.assertEqual(
+            certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
+                topic_ids=['topic_1'],
+                total_questions=0,
+                topic_name_to_question_ids_map={'topic_1': ['q1']},
+                topic_id_to_question_ids_by_difficulty={
+                    'topic_1': {
+                        CERTIFICATE_DIFFICULTY_EASY: set(),
+                        CERTIFICATE_DIFFICULTY_MEDIUM: set(),
+                        CERTIFICATE_DIFFICULTY_HARD: set(),
+                    }
+                },
+                topic_id_to_name={'topic_1': 'Topic 1'},
+            )[
+                'validation_message'
+            ],
+            'total_questions must be a positive integer.',
+        )
+
     def test_validation_uses_skill_questions_for_available_counts(self) -> None:
         topic = mock.Mock()
         topic.name = 'Mock Topic'
@@ -969,6 +1003,42 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertIn(
             'Mock Topic does not have enough questions in every difficulty '
             'bucket.',
+            result['validation_message'],
+        )
+
+    def test_validation_skips_missing_topics(self) -> None:
+        with mock.patch.object(
+            certificate_assessment_services,
+            '_get_topic_name_to_question_ids_map',
+            return_value=({'topic_1': []}, [None]),
+        ):
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=['topic_1'],
+                total_questions=3,
+            )
+
+        self.assertFalse(result['is_valid'])
+        self.assertEqual(
+            result['validation_errors'],
+            {
+                'topic_1': {
+                    CERTIFICATE_DIFFICULTY_EASY: {
+                        'required': 1,
+                        'available': 0,
+                    },
+                    CERTIFICATE_DIFFICULTY_MEDIUM: {
+                        'required': 1,
+                        'available': 0,
+                    },
+                    CERTIFICATE_DIFFICULTY_HARD: {
+                        'required': 1,
+                        'available': 0,
+                    },
+                }
+            },
+        )
+        self.assertIn(
+            'topic_1 does not have enough questions in every difficulty bucket.',
             result['validation_message'],
         )
 
