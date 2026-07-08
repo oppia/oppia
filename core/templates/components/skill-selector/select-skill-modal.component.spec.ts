@@ -165,9 +165,47 @@ describe('Select Skill Modal', () => {
     expect(componentInstance.untriagedSkillSummariesForSelector).toEqual([]);
   });
 
-  it('should map untriaged skill summaries for selector', () => {
-    expect(componentInstance.untriagedSkillSummariesForSelector[0].id).toBe(
-      '3'
-    );
+  it('should map untriaged skill summaries for selector and cache them', () => {
+    // First call creates the cache.
+    const firstCall = componentInstance.untriagedSkillSummariesForSelector;
+    expect(firstCall[0].id).toBe('3');
+
+    // Second call returns the exact same array reference.
+    const secondCall = componentInstance.untriagedSkillSummariesForSelector;
+    expect(secondCall).toBe(firstCall);
+
+    // Changing the underlying array should recreate the cache.
+    componentInstance.untriagedSkillSummaries = [
+      {
+        id: '4',
+        description: 'description4',
+        language_code: 'language_code',
+        version: 1,
+        misconception_count: 0,
+        skill_model_created_on: 2,
+        skill_model_last_updated: 3,
+      },
+    ];
+    const thirdCall = componentInstance.untriagedSkillSummariesForSelector;
+    expect(thirdCall).not.toBe(firstCall);
+    expect(thirdCall[0].id).toBe('4');
+  });
+
+  it('should clear untriaged skill summaries cache when set to undefined', () => {
+    // Populate the cache first.
+    expect(componentInstance.untriagedSkillSummariesForSelector.length).toBe(1);
+
+    // Set to undefined.
+    componentInstance.untriagedSkillSummaries =
+      undefined as unknown as SkillSummaryBackendDict[];
+
+    // Calling it should return an empty array and clear the cache.
+    const undefinedCall = componentInstance.untriagedSkillSummariesForSelector;
+    expect(undefinedCall).toEqual([]);
+
+    // Successive calls should return the same empty array reference.
+    const secondUndefinedCall =
+      componentInstance.untriagedSkillSummariesForSelector;
+    expect(secondUndefinedCall).toBe(undefinedCall);
   });
 });

@@ -109,14 +109,14 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   private _misconceptionOutcome!: MisconceptionOutcome;
-  private _lastOutcomeFeedbackHtml: string | undefined;
-  private _lastOutcomeLabelledAsCorrect: boolean | undefined;
+  private _lastOutcomeHtml: string = '';
+  private _lastOutcomeLabelledAsCorrect: boolean = false;
+  private _outcomeIsUndefined: boolean = true;
 
   get misconceptionOutcome(): MisconceptionOutcome {
     if (!this.outcome) {
-      if (!this._misconceptionOutcome || this._lastOutcomeFeedbackHtml !== '') {
-        this._lastOutcomeFeedbackHtml = '';
-        this._lastOutcomeLabelledAsCorrect = false;
+      if (!this._misconceptionOutcome || !this._outcomeIsUndefined) {
+        this._outcomeIsUndefined = true;
         this._misconceptionOutcome = {
           feedback: {
             html: '',
@@ -133,10 +133,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
     if (
       !this._misconceptionOutcome ||
-      this._lastOutcomeFeedbackHtml !== currentHtml ||
+      this._outcomeIsUndefined ||
+      this._lastOutcomeHtml !== currentHtml ||
       this._lastOutcomeLabelledAsCorrect !== currentLabelledAsCorrect
     ) {
-      this._lastOutcomeFeedbackHtml = currentHtml;
+      this._outcomeIsUndefined = false;
+      this._lastOutcomeHtml = currentHtml;
       this._lastOutcomeLabelledAsCorrect = currentLabelledAsCorrect;
       this._misconceptionOutcome = {
         feedback: this.outcome.feedback.toBackendDict(),

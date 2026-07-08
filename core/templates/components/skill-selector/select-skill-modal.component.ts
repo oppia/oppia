@@ -51,12 +51,15 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
     others: [],
   };
 
-  private _lastUntriagedSkillSummaries: SkillSummaryBackendDict[] | undefined;
   private _untriagedSkillSummariesForSelector: SkillSummary[] = [];
+  private _lastUntriagedSkillSummaries!: SkillSummaryBackendDict[];
 
   get untriagedSkillSummariesForSelector(): SkillSummary[] {
     if (!this.untriagedSkillSummaries) {
-      return [];
+      if (this._untriagedSkillSummariesForSelector.length > 0) {
+        this._untriagedSkillSummariesForSelector = [];
+      }
+      return this._untriagedSkillSummariesForSelector;
     }
     if (this._lastUntriagedSkillSummaries !== this.untriagedSkillSummaries) {
       this._lastUntriagedSkillSummaries = this.untriagedSkillSummaries;

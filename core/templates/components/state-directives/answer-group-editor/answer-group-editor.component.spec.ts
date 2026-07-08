@@ -575,7 +575,7 @@ describe('Answer Group Editor Component', () => {
     expect(component.changeActiveRuleIndex).toHaveBeenCalled();
   });
 
-  it('should get misconception outcome from current outcome', () => {
+  it('should get misconception outcome from current outcome and cache it', () => {
     component.outcome = Outcome.createNew(
       null,
       'feedback_1',
@@ -583,13 +583,54 @@ describe('Answer Group Editor Component', () => {
       []
     );
 
-    expect(component.misconceptionOutcome).toEqual({
+    const firstCall = component.misconceptionOutcome;
+    expect(firstCall).toEqual({
       feedback: {
         content_id: 'feedback_1',
         html: 'Feedback text',
       },
       labelledAsCorrect: false,
     });
+
+    // Should return the cached object if outcome is the same.
+    const secondCall = component.misconceptionOutcome;
+    expect(secondCall).toBe(firstCall);
+
+    // Should recreate if outcome feedback changes.
+    component.outcome.feedback.html = 'New feedback';
+    const thirdCall = component.misconceptionOutcome;
+    expect(thirdCall).not.toBe(firstCall);
+    expect(thirdCall.feedback.html).toBe('New feedback');
+  });
+
+  it('should get default misconception outcome if outcome is undefined and cache it', () => {
+    // Force outcome to be undefined.
+    // The 'unknown' type is used here to bypass type checking for testing purposes.
+    component.outcome = undefined as unknown as Outcome;
+
+    const firstCall = component.misconceptionOutcome;
+    expect(firstCall).toEqual({
+      feedback: {
+        html: '',
+        content_id: 'default_outcome',
+      },
+      labelledAsCorrect: false,
+    });
+
+    // Successive calls should return the same cached default object.
+    const secondCall = component.misconceptionOutcome;
+    expect(secondCall).toBe(firstCall);
+
+    // If it becomes defined, it should recreate.
+    component.outcome = Outcome.createNew(
+      null,
+      'feedback_1',
+      'Feedback text',
+      []
+    );
+    const thirdCall = component.misconceptionOutcome;
+    expect(thirdCall).not.toBe(firstCall);
+    expect(thirdCall.feedback.html).toBe('Feedback text');
   });
 
   it('should save answer group feedback for misconception outcome', () => {
