@@ -28,6 +28,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, List, Set, Union, cast
+from unittest import mock
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1213,3 +1214,80 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
             'ID_PREFIX',
         ):
             base_models.BaseFeedbackModel._generate_new_id()  # pylint: disable=protected-access
+
+    def test_fetch_page_handles_string_cursor(self) -> None:
+        query = mock.Mock()
+        cursor = mock.Mock()
+
+        cursor.urlsafe.return_value = 'cursor123'
+
+        query.fetch_page.return_value = (
+            [mock.Mock()] * 20,
+            cursor,
+            True,
+        )
+
+        with mock.patch.object(
+            base_models.BaseFeedbackModel,
+            '_get_filtered_query',
+            return_value=query,
+        ):
+            query.order.return_value = query
+
+            _, next_cursor, more = base_models.BaseFeedbackModel.fetch_page(
+                page_size=20
+            )
+
+        self.assertEqual(next_cursor, 'cursor123')
+        self.assertTrue(more)
+
+    def test_fetch_page_decodes_bytes_cursor(self) -> None:
+        query = mock.Mock()
+        cursor = mock.Mock()
+
+        cursor.urlsafe.return_value = b'cursor123'
+
+        query.fetch_page.return_value = (
+            [mock.Mock()] * 20,
+            cursor,
+            True,
+        )
+
+        with mock.patch.object(
+            base_models.BaseFeedbackModel,
+            '_get_filtered_query',
+            return_value=query,
+        ):
+            query.order.return_value = query
+
+            _, next_cursor, _ = base_models.BaseFeedbackModel.fetch_page(
+                page_size=20
+            )
+
+        self.assertEqual(next_cursor, 'cursor123')
+
+    def test_fetch_page_sets_more_false_when_results_less_than_page_size(self):
+        query = mock.Mock()
+        cursor = mock.Mock()
+
+        cursor.urlsafe.return_value = b'cursor'
+
+        query.fetch_page.return_value = (
+            [mock.Mock()],
+            cursor,
+            True,
+        )
+
+        with mock.patch.object(
+            base_models.BaseFeedbackModel,
+            '_get_filtered_query',
+            return_value=query,
+        ):
+            query.order.return_value = query
+
+            _, next_cursor, more = base_models.BaseFeedbackModel.fetch_page(
+                page_size=20
+            )
+
+        self.assertFalse(more)
+        self.assertIsNone(next_cursor)

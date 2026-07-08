@@ -123,7 +123,7 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
     def test_to_summary_dict(self) -> None:
         expected_dict: general_feedback_domain.PlatformFeedbackSummaryDict = {
             'id': 'feedback_id',
-            'report_message_preview': 'Report text',
+            'report_message_preview': 'N' * 97 + '...',
             'status': 'open',
             'source': 'lesson',
             'category': 'category',
@@ -131,7 +131,7 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
 
         feedback = general_feedback_domain.PlatformFeedback(
             report_id='feedback_id',
-            report_message='Report text',
+            report_message='N' * 110,
             source='lesson',
             platform='platform',
             destination_dashboard='creator_dashboard',

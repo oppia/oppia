@@ -119,6 +119,8 @@ class PlatformFeedbackSummaryDict(TypedDict):
 
 
 class PlatformFeedbackListRequestDict(TypedDict):
+    """Normalized payload for PlatformFeedbackListHandler GET."""
+
     status: str
     cursor: Optional[str]
     date_from_msecs: Optional[float]

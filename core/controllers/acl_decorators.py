@@ -5219,6 +5219,10 @@ def can_access_platform_feedback_reports(
 
         Raises:
             UnauthorizedUserException. The requested dashboard is invalid.
+            InvalidInputException. The technical feedback team dashboard_id is not a
+            valid choice.
+            NotLoggedInException. The user is not logged in (raised
+            indirectly by can_edit_exploration and can_access_technical_feedback_dashboard).
         """
 
         if dashboard == feconf.DESTINATION_CREATOR:

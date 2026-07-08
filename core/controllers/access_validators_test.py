@@ -1807,6 +1807,7 @@ class TechnicalFeedbackDashboardAccessValidationHandlerTests(
             % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=401,
         )
+        self.logout()
 
     def test_tech_lead_passes_validation(self) -> None:
         self.login(self.TECH_LEAD_EMAIL)
@@ -1815,3 +1816,4 @@ class TechnicalFeedbackDashboardAccessValidationHandlerTests(
             '%s/can_access_technical_feedback_dashboard'
             % ACCESS_VALIDATION_HANDLER_PREFIX
         )
+        self.logout()
