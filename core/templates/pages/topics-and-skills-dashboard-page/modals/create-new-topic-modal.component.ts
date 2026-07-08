@@ -142,5 +142,9 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
           this.topicEditorStateService.getTopicWithNameExists();
       }
     );
+    this.imageUploaderParameters = {
+      ...this.imageUploaderParameters,
+      previewTitle: this.newlyCreatedTopic.name,
+    };
   }
 }
