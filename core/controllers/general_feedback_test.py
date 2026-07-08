@@ -329,7 +329,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
         response = self.post_json(
             feconf.PLATFORM_FEEDBACK_URL,
             {
-                'source': 'site',
+                'source': 'app',
                 'report_message': 'The page is broken.',
                 'page_url': 'https://oppia.org/exp1',
                 'category': None,
@@ -469,7 +469,7 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
     def test_tech_lead_can_list_technical_feedback(self) -> None:
         report = general_feedback_services.create_platform_report(
             feedback_text='The donate page is broken.',
-            source='site',
+            source='app',
             page_url='https://oppia.org/donate',
             category=None,
             lesson_metadata_json=None,
@@ -484,6 +484,22 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(response['summaries']), 1)
         self.assertEqual(response['summaries'][0]['id'], report.id)
+
+    def test_invalid_dashboard_fails_to_list_feedback(self) -> None:
+        with self.login_context(self.OWNER_EMAIL):
+            self.get_json(
+                '/platform-feedback/invalid-dashboard/exp_id',
+                expected_status_int=400,
+            )
+
+    def test_invalid_technical_dashboard_id_fails_to_list_feedback(
+        self,
+    ) -> None:
+        with self.login_context(self.TECH_LEAD_EMAIL):
+            self.get_json(
+                '/platform-feedback/technical/invalid-id',
+                expected_status_int=400,
+            )
 
 
 class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
@@ -529,6 +545,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(response['id'], report.id)
         self.assertEqual(response['report_message'], 'There is a typo.')
+        self.assertEqual(response, report.to_dict())
 
     def test_creator_can_update_feedback_status_for_owned_exploration(
         self,
@@ -561,6 +578,30 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         self.assertIsNotNone(updated_report)
         assert updated_report is not None
         self.assertEqual(updated_report.status, feconf.STATUS_CHOICES_FIXED)
+
+    def test_creator_can_not_update_feedback_status_for_owned_exploration_with_invalid_status(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=self._get_lesson_metadata(),
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                '/platform-feedback/creator/exp_id/%s' % report.id,
+                {'status': 'invalid_status'},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
 
     def test_creator_cannot_get_feedback_for_different_exploration(
         self,

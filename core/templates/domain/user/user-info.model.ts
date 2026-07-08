@@ -137,7 +137,7 @@ export class UserInfo {
     return this._roles.includes(UserRoles.TRANSLATION_ADMIN);
   }
 
-  isTechLead(): boolean {
+  isTechTeamLead(): boolean {
     return this._roles.includes(UserRoles.TECH_TEAM_LEAD);
   }
 

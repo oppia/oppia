@@ -1,7 +1,5 @@
-.button-container {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 32px;
+.title {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 20px;
 }

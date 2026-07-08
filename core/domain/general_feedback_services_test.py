@@ -104,7 +104,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_platform_report_for_site_maps_source_to_app(self) -> None:
         report = general_feedback_services.create_platform_report(
             feedback_text='The page is broken.',
-            source='site',
+            source='app',
             category=None,
             lesson_metadata_json=None,
             session_info_json=None,
@@ -231,7 +231,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_platform_report_routes_to_core_dashboard(self) -> None:
         report = general_feedback_services.create_platform_report(
             feedback_text='Technical issue.',
-            source='site',
+            source='app',
             page_url='https://oppia.org/create/12',
             category=None,
             lesson_metadata_json=None,
@@ -320,7 +320,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     ) -> None:
         expected_report = general_feedback_services.create_platform_report(
             feedback_text='The donate page is broken.',
-            source='site',
+            source='app',
             category=None,
             lesson_metadata_json=None,
             session_info_json=None,
@@ -331,7 +331,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         )
         general_feedback_services.create_platform_report(
             feedback_text='The create page is broken.',
-            source='site',
+            source='app',
             category=None,
             lesson_metadata_json=None,
             session_info_json=None,

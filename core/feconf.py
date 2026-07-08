@@ -1935,6 +1935,7 @@ TECHNICAL_FEEDBACK_TEAM_CHOICES: Final = [
     DESTINATION_TECHNICAL_CORE_TEAM,
 ]
 
+
 LEAP_DASHBOARD_PATHS = frozenset(
     [
         'about',

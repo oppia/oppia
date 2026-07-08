@@ -394,7 +394,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'site',
+      source: 'app',
       reportMessage: this.feedbackText,
       explorationContext: null,
       category: null,

@@ -711,7 +711,7 @@ def validate_platform_feedback_submit_payload_coupling(
             )
         validate_lesson_metadata_fields(lesson_metadata_json)
 
-    elif source == 'site':
+    elif source == 'app':
         category = payload.get('category')
         if category is not None:
             raise base.BaseHandler.InvalidInputException(

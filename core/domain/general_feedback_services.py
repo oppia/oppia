@@ -284,7 +284,7 @@ def create_platform_report(
     """
     # Map the handler-facing "site" source value to the model constant.
     model_source = (
-        feconf.SOURCE_APP if source == 'site' else feconf.SOURCE_LESSON
+        feconf.SOURCE_APP if source == 'app' else feconf.SOURCE_LESSON
     )
 
     destination_dashboard = _determine_destination_dashboard(

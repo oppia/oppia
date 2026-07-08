@@ -5237,8 +5237,8 @@ def can_access_platform_feedback_reports(
 
         if dashboard == feconf.DESTINATION_TECHNICAL:
             if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
-                raise self.UnauthorizedUserException(
-                    'You do not have credentials to access feedback reports.'
+                raise self.InvalidInputException(
+                    f'Invalid technical feedback team: {dashboard_id}.'
                 )
 
             def wrapped_handler(

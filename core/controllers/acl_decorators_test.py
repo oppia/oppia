@@ -8760,3 +8760,20 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
             'You do not have credentials to edit this exploration.',
         )
         self.logout()
+
+    def test_invalid_technical_dashboard_id_raises_invalid_input_error(
+        self,
+    ) -> None:
+        self.login(self.TECH_LEAD_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/invalid_dashboard_id',
+                expected_status_int=400,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Invalid technical feedback team: invalid_dashboard_id.',
+        )
+        self.logout()

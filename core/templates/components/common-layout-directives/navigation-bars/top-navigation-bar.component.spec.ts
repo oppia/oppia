@@ -64,6 +64,9 @@ class MockPlatformFeatureService {
     WebFeedbackModalEnabled: {
       isEnabled: false,
     },
+    TechnicalFeedbackDashboardEnabled: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -733,6 +736,7 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTechTeamLead: () => false,
       isTranslationAdmin: () => false,
       isTranslationCoordinator: () => false,
       isQuestionCoordinator: () => false,

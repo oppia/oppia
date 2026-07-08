@@ -79,7 +79,7 @@ export type ReportAnIssueCategory =
   | 'confusing_or_incorrect_answer'
   | 'other_or_not_sure';
 
-export type ReportType = 'lesson' | 'site';
+export type ReportType = 'lesson' | 'app';
 
 export interface PlatformFeedbackBackendDict {
   source: ReportType;
