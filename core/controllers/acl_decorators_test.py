@@ -8599,7 +8599,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_platform_feedback_reports
-        def get(self, unused_dashboard: str, unused_dashboard_id: str) -> None:
+        def get(self, dashboard: str, dashboard_id: str) -> None:
             self.render_json({'success': 1})
 
     def setUp(self) -> None:
@@ -8622,7 +8622,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
             webapp2.WSGIApplication(
                 [
                     webapp2.Route(
-                        '/platform-feedback/<unused_>/<dashboard_id>unused_',
+                        '/platform-feedback/<dashboard>/<dashboard_id>',
                         self.MockHandler,
                     )
                 ],
