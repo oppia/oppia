@@ -86,12 +86,14 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
     def test_get_compute_engine_default_service_account_email_from_prod_mode(
         self, logging_warning_mock: mock.Mock
     ) -> None:
+        mock_client = mock.Mock()
+        mock_client.get_project.return_value = resourcemanager_v3.Project(
+            name='projects/12345'
+        )
         with (
             self.swap(constants, 'DEV_MODE', False),
             self.swap_to_always_return(
-                resourcemanager_v3.ProjectsClient,
-                'get_project',
-                resourcemanager_v3.Project(name='projects/12345'),
+                resourcemanager_v3, 'ProjectsClient', mock_client
             ),
         ):
             self.assertEqual(
@@ -104,12 +106,12 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
     def test_get_compute_engine_default_service_account_email_from_prod_mode_with_request_error(
         self, logging_warning_mock: mock.Mock
     ) -> None:
+        mock_client = mock.Mock()
+        mock_client.get_project.side_effect = Exception('uh-oh')
         with (
             self.swap(constants, 'DEV_MODE', False),
-            self.swap_to_always_raise(
-                resourcemanager_v3.ProjectsClient,
-                'get_project',
-                Exception('uh-oh'),
+            self.swap_to_always_return(
+                resourcemanager_v3, 'ProjectsClient', mock_client
             ),
         ):
             self.assertIsNone(
