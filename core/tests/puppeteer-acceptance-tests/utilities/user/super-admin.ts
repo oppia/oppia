@@ -833,7 +833,9 @@ export class SuperAdmin extends BaseUser {
    */
   async expectControlsNotAvailable(): Promise<void> {
     try {
-      const activitiesTabElement = await this.page.$(prodModeActivitiesTab);
+      const activitiesTabElement = await this.page.waitForSelector(
+        prodModeActivitiesTab
+      );
       const activitiesTabText = await this.page.evaluate(
         element => element.textContent,
         activitiesTabElement
