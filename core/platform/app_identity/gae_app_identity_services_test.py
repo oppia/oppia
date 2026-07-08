@@ -127,4 +127,4 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             self.assertIsNone(
                 gae_app_identity_services.get_compute_engine_default_service_account_email()
             )
-            logging_warning_mock.assert_called_once_with(mock.ANY)
+            logging_warning_mock.assert_called_once()
