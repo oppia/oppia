@@ -80,9 +80,9 @@ export class PageContextService {
   // or the current page is not the editor.
   getEditorTabContext(): string | null {
     let hash = this.urlService.getHash();
-    if (hash.indexOf('#/gui') === 0 || hash === '' || hash === '#/') {
+    if (hash.startsWith('#/gui') || hash === '' || hash === '#/') {
       return ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR;
-    } else if (hash.indexOf('#/preview') === 0) {
+    } else if (hash.startsWith('#/preview')) {
       return ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
     } else {
       return null;
