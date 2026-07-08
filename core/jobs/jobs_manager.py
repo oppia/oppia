@@ -376,4 +376,12 @@ def choose_service_account_id_for_job(
         case firebase_server_sync_jobs.AuditFirebaseServerSyncJob:
             return feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID
         case _:
+            message = (
+                f'{job_class.__name__} does not need a custom service account, '
+                'so the Compute Engine default service account will be assumed'
+            )
+            email = (
+                app_identity_services.get_compute_engine_default_service_account_email()
+            )
+            logging.info('%s: %s' % (message, email) if email else message)
             return None
