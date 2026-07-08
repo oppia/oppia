@@ -703,7 +703,6 @@
 /core/templates/components/certificate-assessment-offering-helper/ @oppia/contributor-experience-team
 /core/templates/domain/certificate-assessment/ @oppia/contributor-experience-team
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
-
 /core/templates/pages/certificate-offering-available-page @oppia/lace-frontend-reviewers
 
 # Speed Improvement team.
