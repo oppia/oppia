@@ -25,7 +25,6 @@ from unittest import mock
 from core.domain import platform_parameter_domain, platform_parameter_services
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
-from scripts import common
 
 from google.cloud import resourcemanager_v3
 
@@ -100,14 +99,12 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             self.swap_to_always_return(
                 resourcemanager_v3.ProjectsClient,
                 'get_project',
-                resourcemanager_v3.Project(
-                    name=f'projects/{common.DEV_NUMERIC_PROJECT_ID}'
-                ),
+                resourcemanager_v3.Project(name='projects/12345'),
             ),
         ):
             self.assertEqual(
                 gae_app_identity_services.get_compute_engine_default_service_account_email(),
-                f'{common.DEV_NUMERIC_PROJECT_ID}-compute@developer.gserviceaccount.com',
+                '12345-compute@developer.gserviceaccount.com',
             )
             logging_warning_mock.assert_not_called()
 
