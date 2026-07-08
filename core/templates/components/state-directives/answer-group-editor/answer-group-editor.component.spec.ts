@@ -142,6 +142,7 @@ describe('Answer Group Editor Component', () => {
     'should save rules when current rule is valid and user' +
       ' triggers an external save',
     fakeAsync(() => {
+      const outcome = Outcome.createNew(null, 'feedback_1', 'Feedback', []);
       let externalSaveEmitter = new EventEmitter();
       spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
         externalSaveEmitter
@@ -154,15 +155,8 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       component.sendOnSaveTaggedMisconception(null);
-      // The 'unknown' type is used here to bypass type checking for testing
-      // purposes, allowing us to pass 'undefined' to a method that expects
-      // an 'Outcome' object to test error handling or default behavior.
-      component.sendOnSaveAnswerGroupCorrectnessLabel(
-        undefined as unknown as Outcome
-      );
-      // The 'unknown' type is used here to bypass type checking for testing
-      // purposes.
-      component.sendOnSaveAnswerGroupFeedback(undefined as unknown as Outcome);
+      component.sendOnSaveAnswerGroupCorrectnessLabel(outcome);
+      component.sendOnSaveAnswerGroupFeedback(outcome);
 
       externalSaveEmitter.emit();
       tick();
@@ -579,5 +573,89 @@ describe('Answer Group Editor Component', () => {
 
     expect(component.rulesMemento).toEqual([rule1]);
     expect(component.changeActiveRuleIndex).toHaveBeenCalled();
+  });
+
+  it('should get misconception outcome from current outcome and cache it', () => {
+    component.outcome = Outcome.createNew(
+      null,
+      'feedback_1',
+      'Feedback text',
+      []
+    );
+
+    const firstCall = component.misconceptionOutcome;
+    expect(firstCall).toEqual({
+      feedback: {
+        content_id: 'feedback_1',
+        html: 'Feedback text',
+      },
+      labelledAsCorrect: false,
+    });
+
+    // Should return the cached object if outcome is the same.
+    const secondCall = component.misconceptionOutcome;
+    expect(secondCall).toBe(firstCall);
+
+    // Should recreate if outcome feedback changes.
+    component.outcome.feedback.html = 'New feedback';
+    const thirdCall = component.misconceptionOutcome;
+    expect(thirdCall).not.toBe(firstCall);
+    expect(thirdCall.feedback.html).toBe('New feedback');
+  });
+
+  it('should get default misconception outcome if outcome is undefined and cache it', () => {
+    // Force outcome to be undefined.
+    // The 'unknown' type is used here to bypass type checking for testing purposes.
+    component.outcome = undefined as unknown as Outcome;
+
+    const firstCall = component.misconceptionOutcome;
+    expect(firstCall).toEqual({
+      feedback: {
+        html: '',
+        content_id: 'default_outcome',
+      },
+      labelledAsCorrect: false,
+    });
+
+    // Successive calls should return the same cached default object.
+    const secondCall = component.misconceptionOutcome;
+    expect(secondCall).toBe(firstCall);
+
+    // If it becomes defined, it should recreate.
+    component.outcome = Outcome.createNew(
+      null,
+      'feedback_1',
+      'Feedback text',
+      []
+    );
+    const thirdCall = component.misconceptionOutcome;
+    expect(thirdCall).not.toBe(firstCall);
+    expect(thirdCall.feedback.html).toBe('Feedback text');
+  });
+
+  it('should save answer group feedback for misconception outcome', () => {
+    component.outcome = Outcome.createNew(
+      null,
+      'feedback_1',
+      'Old feedback',
+      []
+    );
+    spyOn(component.onSaveAnswerGroupFeedback, 'emit');
+
+    component.sendOnSaveAnswerGroupFeedback({
+      feedback: {
+        content_id: 'feedback_1',
+        html: 'New feedback',
+      },
+      labelledAsCorrect: false,
+    });
+
+    expect(component.onSaveAnswerGroupFeedback.emit).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        feedback: jasmine.objectContaining({
+          html: 'New feedback',
+        }),
+      })
+    );
   });
 });
