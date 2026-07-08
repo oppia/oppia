@@ -2263,6 +2263,8 @@ class BaseFeedbackModel(BaseModel):
         return query
 
     @classmethod
+    # Here we use type Any because subclasses can extend the filtered query with
+    # model-specific keyword filters.
     def fetch_page(
         cls,
         page_size: int,
@@ -2290,9 +2292,14 @@ class BaseFeedbackModel(BaseModel):
             page_size, start_cursor=start_cursor
         )
 
-        next_cursor_str = None
+        next_cursor_str: Optional[str] = None
         if len(results) < page_size:
             more = False
         if next_cursor and more:
-            next_cursor_str = next_cursor.urlsafe()
+            raw_next_cursor = next_cursor.urlsafe()
+            next_cursor_str = (
+                raw_next_cursor.decode('utf-8')
+                if isinstance(raw_next_cursor, bytes)
+                else raw_next_cursor
+            )
         return results, next_cursor_str, more

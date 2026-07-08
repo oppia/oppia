@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -394,17 +396,32 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
                 'provided or both be None.'
             )
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @classmethod
     def _get_filtered_query(
         cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
         destination_dashboard: Optional[str] = None,
         platform: Optional[str] = None,
         source: Optional[str] = None,
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> datastore_services.Query:
         """Returns a filtered query based on the given parameters.
 
         Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime]. If provided, filters reports created
+                on or after this date.
+            date_to: Optional[datetime]. If provided, filters reports created
+                on or before this date.
             destination_dashboard: Optional[str]. If provided, filters reports
                 routed to this dashboard.
             platform: Optional[str]. If provided, filters by platform.
@@ -414,7 +431,14 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         Returns:
             Query. The filtered query object.
         """
-        query = super()._get_filtered_query(**kwargs)
+        query = super()._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+            **kwargs,
+        )
 
         if destination_dashboard is not None:
             query = query.filter(

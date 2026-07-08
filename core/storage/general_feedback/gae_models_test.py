@@ -365,6 +365,28 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 page_url='https://oppia.org/donate',
             )
 
+    def test_create_raises_error_when_lesson_report_has_no_exploration_id(
+        self,
+    ) -> None:
+        lesson_metadata_json = dict(LESSON_METADATA_JSON)
+        lesson_metadata_json['exploration_id'] = None
+
+        with self.assertRaisesRegex(
+            ValueError, 'Lesson feedback must include an exploration ID.'
+        ):
+            general_feedback_models.PlatformFeedbackModel.create(
+                feedback_text=REPORT_TEXT,
+                source=feconf.SOURCE_LESSON,
+                platform=feconf.PLATFORM_WEB,
+                category=feconf.CATEGORY_TYPO,
+                destination_dashboard=feconf.DESTINATION_CREATOR,
+                lesson_metadata_json=lesson_metadata_json,
+                include_technical_logs=False,
+                screenshot_filename=None,
+                screenshot_entity_id=None,
+                page_url='https://oppia.org/donate',
+            )
+
     def test_create_raises_error_for_invalid_source(self) -> None:
         with self.assertRaisesRegex(
             ValueError, 'Invalid source: invalid_source'
@@ -461,6 +483,24 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 screenshot_entity_id='only_entity_id',
                 page_url='https://oppia.org/donate',
             )
+
+    def test_fetch_page_filters_by_platform_source_and_destination(
+        self,
+    ) -> None:
+        report_models, next_cursor, more = (
+            general_feedback_models.PlatformFeedbackModel.fetch_page(
+                page_size=10,
+                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                platform=feconf.PLATFORM_ANDROID,
+                source=feconf.SOURCE_APP,
+            )
+        )
+
+        self.assertEqual(
+            [model.id for model in report_models], [self.report_id_app]
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
 
     def test_generate_new_id_raises_error_after_many_collisions(
         self,
@@ -563,6 +603,27 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             session_log_model.environment_json, {'user_agent': 'test-agent'}
         )
+
+    def test_create_accepts_empty_session_sections(self) -> None:
+        general_feedback_models.FeedbackSessionLogModel.create(
+            report_id=self.feedback_id1,
+            console_logs_json=None,
+            failed_requests_json=None,
+            navigation_history_json=None,
+            environment_json=None,
+        )
+        session_log_model = (
+            general_feedback_models.FeedbackSessionLogModel.get_by_id(
+                self.feedback_id1
+            )
+        )
+
+        self.assertIsNotNone(session_log_model)
+        assert session_log_model is not None
+        self.assertIsNone(session_log_model.console_logs_json)
+        self.assertIsNone(session_log_model.failed_requests_json)
+        self.assertIsNone(session_log_model.navigation_history_json)
+        self.assertIsNone(session_log_model.environment_json)
 
     def test_create_raises_error_for_duplicate_thread_id(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(

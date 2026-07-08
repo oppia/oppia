@@ -22,7 +22,7 @@ from core import feconf, utils
 from core.domain import general_feedback_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Union, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -362,7 +362,7 @@ def get_platform_feedback_summaries(
     cursor: Optional[str] = None,
     date_from_msecs: Optional[float] = None,
     date_to_msecs: Optional[float] = None,
-) -> tuple[
+) -> Tuple[
     List[general_feedback_domain.PlatformFeedbackSummaryDict],
     Optional[str],
     bool,
@@ -386,10 +386,11 @@ def get_platform_feedback_summaries(
             created before this time.
 
     Returns:
-        Tuple of (summaries, next_cursor, more):
-            summaries: List[PlatformFeedbackSummaryDict].
-            next_cursor: Optional[str]. Cursor for the next page, or None.
-            more: bool. True if there are more results beyond this page.
+        tuple(summaries, next_cursor, more). Where:
+            summaries: list(PlatformFeedbackSummaryDict). The feedback
+                summaries on the page.
+            next_cursor: str|None. The cursor for the next page, or None.
+            more: bool. Whether more results exist.
 
     Raises:
         ValueError. The dashboard or technical team is invalid.
@@ -398,7 +399,7 @@ def get_platform_feedback_summaries(
         raise ValueError('Invalid dashboard: %s' % dashboard)
     if dashboard == feconf.DESTINATION_CREATOR:
         exploration_id = dashboard_id
-        dashboard_filter = None
+        dashboard_filter = feconf.DESTINATION_CREATOR
     else:
         if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
             raise ValueError(
@@ -427,8 +428,12 @@ def get_platform_feedback_summaries(
             date_to=date_to,
         )
     )
+    # Here we use cast because PlatformFeedbackModel.fetch_page() inherits its
+    # return annotation from BaseFeedbackModel.fetch_page().
     summaries = [
-        _platform_feedback_model_to_domain(model).to_summary_dict()
+        _platform_feedback_model_to_domain(
+            cast(general_feedback_models.PlatformFeedbackModel, model)
+        ).to_summary_dict()
         for model in model_list
     ]
     return summaries, next_cursor, more
@@ -464,18 +469,14 @@ def update_platform_feedback_status_for_dashboard(
     Args:
         report_id: str. ID of the PlatformFeedbackModel to update.
         new_status: str. The new status value. Must be a valid status choice.
-        dashboard: str. The dashboard from which the feedback is being
-            accessed. This is either "creator" or "technical".
-        dashboard_id: str. The dashboard-specific identifier. This is the
-            exploration ID for the Creator Dashboard and the team identifier
-            ('LEAP' or 'CORE') for the Technical Dashboard.
+        dashboard: str. The dashboard from which the feedback is being accessed.
+        dashboard_id: str. The dashboard-specific identifier.
 
     Returns:
         Optional[PlatformFeedback]. The updated report, or None if not found.
 
     Raises:
-        ValueError. The new status is invalid, or the feedback does not belong
-        to the requested dashboard.
+        ValueError. The new status is invalid or dashboard access is invalid.
     """
     if new_status not in feconf.STATUS_CHOICES:
         raise ValueError('Invalid status: %s' % new_status)

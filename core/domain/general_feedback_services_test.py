@@ -75,6 +75,49 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(feedback.parent_feedback_id, 'parent_id')
 
+    def test_lesson_feedback_domain_conversion_strips_response_author(
+        self,
+    ) -> None:
+        existing_feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata_json=self.get_lesson_metadata(),
+        )
+        model = general_feedback_models.LessonFeedbackModel.get_by_id(
+            existing_feedback.id
+        )
+        assert model is not None
+        model.response_list = [
+            {
+                'response_text': 'Thanks for reporting this.',
+                'responded_by': 'creator_id',
+                'responded_on': 1.0,
+            }
+        ]
+        model.update_timestamps()
+        model.put()
+
+        with self.swap(
+            general_feedback_models.LessonFeedbackModel,
+            'create',
+            mock.Mock(return_value=existing_feedback.id),
+        ):
+            domain_feedback = general_feedback_services.create_lesson_feedback(
+                author_id='user_id',
+                feedback_text='This lesson helped.',
+                lesson_metadata_json=self.get_lesson_metadata(),
+            )
+
+        self.assertEqual(
+            domain_feedback.response_list,
+            [
+                {
+                    'response_text': 'Thanks for reporting this.',
+                    'responded_on': 1.0,
+                }
+            ],
+        )
+
     def test_create_platform_report_for_lesson_routes_to_creator(
         self,
     ) -> None:
@@ -353,6 +396,26 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(next_cursor)
         self.assertFalse(more)
 
+    def test_get_platform_feedback_summaries_rejects_invalid_dashboard(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, 'Invalid dashboard: invalid'):
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard='invalid',
+                dashboard_id='exp_id',
+            )
+
+    def test_get_platform_feedback_summaries_rejects_invalid_technical_team(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            ValueError, 'Invalid technical feedback team: invalid'
+        ):
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard=feconf.DESTINATION_TECHNICAL,
+                dashboard_id='invalid',
+            )
+
     def test_update_platform_feedback_status_for_dashboard_updates_model(
         self,
     ) -> None:
@@ -419,6 +482,46 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                 dashboard_id='exp_id',
             )
         )
+
+    def test_update_platform_feedback_status_for_dashboard_returns_none_for_deleted_report(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=self.get_lesson_metadata(),
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+        model = general_feedback_models.PlatformFeedbackModel.get_by_id(
+            report.id
+        )
+        assert model is not None
+        model.delete()
+
+        self.assertIsNone(
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard_id='exp_id',
+            )
+        )
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_invalid_status(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, 'Invalid status: invalid'):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id='report_id',
+                new_status='invalid',
+                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard_id='exp_id',
+            )
 
     def test_update_platform_feedback_status_for_dashboard_rejects_other_dashboard(
         self,

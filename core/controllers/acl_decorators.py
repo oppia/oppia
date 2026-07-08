@@ -5199,7 +5199,7 @@ def can_access_platform_feedback_reports(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_platform_feedback_reports(
-        self,
+        self: _SelfBaseHandlerType,
         dashboard: str,
         dashboard_id: str,
         *args: Any,
@@ -5223,9 +5223,11 @@ def can_access_platform_feedback_reports(
 
         if dashboard == feconf.DESTINATION_CREATOR:
 
+            # Here we use type Any because the decorated handler may receive
+            # handler-specific keyword arguments.
             def wrapped_handler(
                 handler_self: _SelfBaseHandlerType,
-                unused_exploration_id: str,
+                unused_exploration_id: str = '',
                 **unused_kwargs: Any,
             ) -> _GenericHandlerFunctionReturnType:
                 """Calls the original handler after exploration access checks."""
@@ -5241,17 +5243,21 @@ def can_access_platform_feedback_reports(
                     f'Invalid technical feedback team: {dashboard_id}.'
                 )
 
-            def wrapped_handler(
-                handler_self: _SelfBaseHandlerType, **unused_kwargs: Any
+            # Here we use type Any because the decorated handler may receive
+            # handler-specific keyword arguments.
+            def wrapped_technical_handler(
+                handler_self: _SelfBaseHandlerType,
+                unused_exploration_id: str = '',
+                **unused_kwargs: Any,
             ) -> _GenericHandlerFunctionReturnType:
                 """Calls the original handler after dashboard access checks."""
                 return handler(
                     handler_self, dashboard, dashboard_id, *args, **kwargs
                 )
 
-            return can_access_technical_feedback_dashboard(wrapped_handler)(
-                self
-            )
+            return can_access_technical_feedback_dashboard(
+                wrapped_technical_handler
+            )(self)
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to access feedback reports.'

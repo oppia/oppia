@@ -127,6 +127,10 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
 class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
     """Tests for PlatformFeedbackSubmitHandler."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
     def _get_lesson_metadata(
         self,
     ) -> general_feedback_domain.LessonMetadataDict:
@@ -209,6 +213,44 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             screenshot_entity_id=None,
             include_technical_logs=False,
         )
+
+    def test_logged_in_submitter_does_not_need_captcha_token(self) -> None:
+        report = self._get_report(
+            'report_id',
+            'lesson',
+            'https://oppia.org/exp1',
+            'broken_layout_or_image',
+            self._get_lesson_metadata(),
+        )
+        create_platform_report_mock = mock.Mock(return_value=report)
+
+        with self.login_context(self.VIEWER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            with self.swap(
+                general_feedback_services,
+                'create_platform_report',
+                create_platform_report_mock,
+            ):
+                response = self.post_json(
+                    feconf.PLATFORM_FEEDBACK_URL,
+                    {
+                        'source': 'lesson',
+                        'report_message': 'The card image is broken.',
+                        'page_url': 'https://oppia.org/exp1',
+                        'category': 'broken_layout_or_image',
+                        'lesson_metadata_json': self._get_lesson_metadata(),
+                        'include_technical_logs': False,
+                        'session_info': None,
+                        'screenshot_filename': None,
+                        'screenshot_file': None,
+                        'captcha_token': None,
+                    },
+                    csrf_token=csrf_token,
+                    expected_status_int=200,
+                )
+
+        self.assertEqual(response, {'id': 'report_id'})
+        create_platform_report_mock.assert_called_once()
 
     def test_submit_report_rejects_missing_captcha_token(self) -> None:
         csrf_token = self.get_new_csrf_token()
@@ -547,6 +589,19 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['report_message'], 'There is a typo.')
         self.assertEqual(response, report.to_dict())
 
+    def test_creator_cannot_get_missing_feedback_detail(self) -> None:
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json(
+                '/platform-feedback/creator/exp_id/missing_report',
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Could not find the resource '
+            'http://localhost/platform-feedback/creator/exp_id/missing_report.',
+        )
+
     def test_creator_can_update_feedback_status_for_owned_exploration(
         self,
     ) -> None:
@@ -596,12 +651,28 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
 
         with self.login_context(self.OWNER_EMAIL):
             csrf_token = self.get_new_csrf_token()
-            response = self.post_json(
+            self.post_json(
                 '/platform-feedback/creator/exp_id/%s' % report.id,
                 {'status': 'invalid_status'},
                 csrf_token=csrf_token,
                 expected_status_int=400,
             )
+
+    def test_creator_cannot_update_missing_feedback_detail(self) -> None:
+        with self.login_context(self.OWNER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                '/platform-feedback/creator/exp_id/missing_report',
+                {'status': feconf.STATUS_CHOICES_FIXED},
+                csrf_token=csrf_token,
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Could not find the resource '
+            'http://localhost/platform-feedback/creator/exp_id/missing_report.',
+        )
 
     def test_creator_cannot_get_feedback_for_different_exploration(
         self,
