@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Routing module for teach page.
+ * @fileoverview Routing module for technical feedback dashboard page.
  */
 
 import {NgModule} from '@angular/core';

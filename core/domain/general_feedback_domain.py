@@ -118,6 +118,13 @@ class PlatformFeedbackSummaryDict(TypedDict):
     category: Optional[str]
 
 
+class PlatformFeedbackListRequestDict(TypedDict):
+    status: str
+    cursor: Optional[str]
+    date_from_msecs: Optional[float]
+    date_to_msecs: Optional[float]
+
+
 class LessonFeedback:
     """Domain object for a learner lesson feedback submission.
 
@@ -269,9 +276,12 @@ class PlatformFeedback:
             PlatformFeedbackSummaryDict. A summary dict representation of the
             object.
         """
+        report_message_preview = self.report_message
+        if len(report_message_preview) > 100:
+            report_message_preview = report_message_preview[:97] + '...'
         return {
             'id': self.id,
-            'report_message_preview': self.report_message,
+            'report_message_preview': report_message_preview,
             'status': self.status,
             'source': self.source,
             'category': self.category,

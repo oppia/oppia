@@ -132,7 +132,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_TRANSLATION_ADMIN,
     feconf.ROLE_ID_QUESTION_COORDINATOR,
     feconf.ROLE_ID_TRANSLATION_COORDINATOR,
-    feconf.ROLE_ID_TECH_LEAD,
+    feconf.ROLE_ID_TECH_TEAM_LEAD,
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
@@ -152,7 +152,7 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_VOICEOVER_ADMIN,
     feconf.ROLE_ID_QUESTION_COORDINATOR,
     feconf.ROLE_ID_TRANSLATION_COORDINATOR,
-    feconf.ROLE_ID_TECH_LEAD,
+    feconf.ROLE_ID_TECH_TEAM_LEAD,
 ]
 
 # The string corresponding to role IDs that should be visible to admin.
@@ -172,7 +172,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_VOICEOVER_ADMIN: 'voiceover admin',
     feconf.ROLE_ID_QUESTION_COORDINATOR: 'question coordinator',
     feconf.ROLE_ID_TRANSLATION_COORDINATOR: 'translation coordinator',
-    feconf.ROLE_ID_TECH_LEAD: 'tech lead',
+    feconf.ROLE_ID_TECH_TEAM_LEAD: 'tech lead',
 }
 
 
@@ -291,7 +291,7 @@ _ROLE_ACTIONS = {
         ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE,
         ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES,
     ],
-    feconf.ROLE_ID_TECH_LEAD: [ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD],
+    feconf.ROLE_ID_TECH_TEAM_LEAD: [ACTION_ACCESS_TECHNICAL_FEEDBACK_DASHBOARD],
 }
 
 

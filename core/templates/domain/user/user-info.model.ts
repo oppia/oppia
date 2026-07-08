@@ -21,7 +21,7 @@ export enum UserRoles {
   QUESTION_ADMIN = 'QUESTION_ADMIN',
   BLOG_ADMIN = 'BLOG_ADMIN',
   BLOG_POST_EDITOR = 'BLOG_POST_EDITOR',
-  TECH_LEAD = 'TECH_LEAD',
+  TECH_TEAM_LEAD = 'TECH_TEAM_LEAD',
   TRANSLATION_ADMIN = 'TRANSLATION_ADMIN',
   TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR',
   VOICEOVER_ADMIN = 'VOICEOVER_ADMIN',
@@ -138,7 +138,7 @@ export class UserInfo {
   }
 
   isTechLead(): boolean {
-    return this._roles.includes(UserRoles.TECH_LEAD);
+    return this._roles.includes(UserRoles.TECH_TEAM_LEAD);
   }
 
   isQuestionAdmin(): boolean {

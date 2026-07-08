@@ -4,25 +4,4 @@
    backend 
    Once the UI components are created, remove this comment and the below code.-->
   {{ 'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate }}
-  <div class="button-container">
-    <button
-      class="btn btn-primary"
-      (click)="fetchListButton()">
-      Get List of LEAP Reports
-    </button>
-    <button
-      class="btn btn-primary"
-      (click)="getDetailedViewButton()">
-      view LEAP report
-    </button>
-    <input
-      type="text"
-      [(ngModel)]="selectedReportId"
-      placeholder="Enter ReportId"/>
-    <button
-      class="btn btn-primary"
-      (click)="updateStatusButton()">
-      update LEAP report's status
-    </button>
-  </div>
 </div>

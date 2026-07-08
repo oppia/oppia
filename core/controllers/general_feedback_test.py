@@ -426,7 +426,7 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
         self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
         self.add_user_role(
             self.TECH_LEAD_USERNAME,
-            feconf.ROLE_ID_TECH_LEAD,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
         )
 
     def _get_lesson_metadata(

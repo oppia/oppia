@@ -359,11 +359,6 @@ URLS = [
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TechnicalFeedbackDashboardAccessValidationHandler,
     ),
-    get_redirect_route(
-        r'%s/can_access_platform_feedback_reports'
-        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.PlatformFeedbackReportsAccessValidationHandler,
-    ),
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),

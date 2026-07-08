@@ -32,7 +32,6 @@ from typing import Dict
 
 _MAX_FEEDBACK_TEXT_LENGTH = 2500
 _MAX_FILENAME_LENGTH = 200
-_ALLOWED_REPORT_SOURCES = (feconf.SOURCE_LESSON, 'site')
 
 
 def _resolve_feedback_screenshot_entity_id(
@@ -145,7 +144,7 @@ class PlatformFeedbackSubmitHandler(
             'source': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': _ALLOWED_REPORT_SOURCES,
+                    'choices': feconf.SOURCE_CHOICES,
                 },
             },
             'report_message': {
@@ -283,7 +282,9 @@ class PlatformFeedbackSubmitHandler(
 
 
 class PlatformFeedbackListHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[
+        Dict[str, str], general_feedback_domain.PlatformFeedbackListRequestDict
+    ]
 ):
     """Handles retrieval of platform feedback for the Creator and Technical
     Dashboards.
@@ -304,6 +305,8 @@ class PlatformFeedbackListHandler(
         status: Optional[str]. Filters feedback by status.
         cursor: Optional[str]. Pagination cursor returned by a previous
             request.
+        date_from_msecs: Optional[float]. Filters feedback from this date.
+        date_to_msecs: Optional[float]. Filters feedback until this date.
 
     Access:
         - Creator Dashboard: Requires edit access to the exploration.
@@ -465,10 +468,10 @@ class PlatformFeedbackDetailHandler(
                 dashboard=dashboard,
                 dashboard_id=dashboard_id,
             )
-        except ValueError:
+        except ValueError as e:
             raise self.NotFoundException(
                 'Feedback with ID %s does not exist.' % report_id
-            )
+            ) from e
         self.render_json(feedback.to_dict())
 
     @acl_decorators.can_access_platform_feedback_reports
@@ -488,10 +491,10 @@ class PlatformFeedbackDetailHandler(
                 dashboard=dashboard,
                 dashboard_id=dashboard_id,
             )
-        except ValueError:
+        except ValueError as e:
             raise self.NotFoundException(
                 'Feedback with ID %s does not exist.' % report_id
-            )
+            ) from e
         if updated_feedback is None:
             raise self.NotFoundException(
                 'Feedback with ID %s does not exist.' % report_id

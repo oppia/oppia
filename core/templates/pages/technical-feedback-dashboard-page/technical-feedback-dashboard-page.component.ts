@@ -16,7 +16,6 @@
  * @fileoverview Component for Technical feedback dashboard.
  */
 import {Component} from '@angular/core';
-import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import './technical-feedback-dashboard-page.component.css';
 
 @Component({
@@ -24,39 +23,6 @@ import './technical-feedback-dashboard-page.component.css';
   templateUrl: './technical-feedback-dashboard-page.component.html',
 })
 export class TechnicalFeedbackDashboardPageComponent {
-  constructor(private feedbackBackendApiService: FeedbackBackendApiService) {}
-
-  selectedReportId: string = '';
-
-  async fetchListButton(): Promise<void> {
-    let response =
-      await this.feedbackBackendApiService.fetchPlatformFeedbackListAsync(
-        'technical',
-        'CORE',
-        null,
-        null,
-        null,
-        null
-      );
-    console.log(response);
-  }
-
-  async getDetailedViewButton(): Promise<void> {
-    let detailedResponse =
-      await this.feedbackBackendApiService.fetchPlatformFeedbackDetailAsync(
-        'technical',
-        'CORE',
-        this.selectedReportId
-      );
-    console.log(detailedResponse);
-  }
-
-  async updateStatusButton(): Promise<void> {
-    await this.feedbackBackendApiService.updatePlatformFeedbackStatusAsync(
-      'technical',
-      'CORE',
-      this.selectedReportId,
-      'fixed'
-    );
-  }
+  constructor() {}
+  // Stub: no data or logic yet.
 }

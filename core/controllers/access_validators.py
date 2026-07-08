@@ -890,18 +890,3 @@ class TechnicalFeedbackDashboardAccessValidationHandler(
     def get(self) -> None:
         """Handles GET requests."""
         pass
-
-
-class PlatformFeedbackReportsAccessValidationHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Validates access to Platform Feedback Reports."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_platform_feedback_reports
-    def get(self) -> None:
-        """Handles GET requests."""
-        pass

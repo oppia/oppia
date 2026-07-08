@@ -88,6 +88,7 @@ describe('TechnicalFeedbackDashboardPageComponentAuthGuard', () => {
     });
 
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    const replaceStateSpy = spyOn(location, 'replaceState');
     const route = new ActivatedRouteSnapshot();
     const state: RouterStateSnapshot = {
       url: '/technical-feedback-dashboard',
@@ -99,6 +100,7 @@ describe('TechnicalFeedbackDashboardPageComponentAuthGuard', () => {
       expect(navigateSpy).toHaveBeenCalledWith([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
       ]);
+      expect(replaceStateSpy).toHaveBeenCalledWith(state.url);
       done();
     });
   });

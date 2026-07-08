@@ -1790,7 +1790,7 @@ class TechnicalFeedbackDashboardAccessValidationHandlerTests(
 
         self.add_user_role(
             self.TECH_LEAD_USERNAME,
-            feconf.ROLE_ID_TECH_LEAD,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
         )
 
     def test_guest_user_does_not_pass_validation(self) -> None:
