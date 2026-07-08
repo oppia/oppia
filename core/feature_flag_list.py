@@ -137,7 +137,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
-    FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.STORY_EDITOR_ARCS,
 ]
@@ -156,6 +155,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
+    FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -367,7 +367,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED.value: (
         (
             'This flag enables the feedback entrypoints and their respective modals, allowing learners to provide feedback, report an issue and give suggestion on lessons and on the site. ',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB.value: (
