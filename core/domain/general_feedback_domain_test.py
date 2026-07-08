@@ -123,7 +123,7 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
     def test_to_summary_dict(self) -> None:
         expected_dict: general_feedback_domain.PlatformFeedbackSummaryDict = {
             'id': 'feedback_id',
-            'report_message_preview': 'N' * 97 + '...',
+            'report_message_preview': f'{"N" * 97}...',
             'status': 'open',
             'source': 'lesson',
             'category': 'category',

@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import re
 import types
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -28,7 +29,6 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, List, Set, Union, cast
-from unittest import mock
 
 MYPY = False
 if MYPY:  # pragma: no cover
