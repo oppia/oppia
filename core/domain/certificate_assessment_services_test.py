@@ -762,7 +762,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
     def test_validate_against_maps_returns_expected_result(self) -> None:
         result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
             topic_ids=['topic_1', 'topic_2'],
-            total_questions=4,
+            total_questions=6,
             topic_id_to_info={
                 'topic_1': {
                     'name': 'Topic 1',
@@ -779,16 +779,36 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             },
         )
 
-        self.assertTrue(result['is_valid'])
         self.assertEqual(
-            result['validation_message'], 'Certificate assessment is valid.'
+            result['validation_errors']['topic_1'],
+            {
+                CERTIFICATE_DIFFICULTY_EASY: {'required': 1, 'available': 1},
+                CERTIFICATE_DIFFICULTY_MEDIUM: {'required': 1, 'available': 1},
+                CERTIFICATE_DIFFICULTY_HARD: {'required': 1, 'available': 0},
+            },
+        )
+
+    def test_validate_against_maps_reports_topic_shortage(self) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
+            topic_ids=['topic_1'],
+            total_questions=3,
+            topic_id_to_info={
+                'topic_1': {'name': 'Topic 1', 'skill_ids': ['skill_1']}
+            },
+            skill_id_to_question_ids={'skill_1': ['q1', 'q2']},
+        )
+
+        self.assertFalse(result['is_valid'])
+        self.assertIn(
+            'Topic 1 needs 3 unique questions but only 2 are available.',
+            result['validation_message'],
         )
         self.assertEqual(
             result['validation_errors']['topic_1'],
             {
                 CERTIFICATE_DIFFICULTY_EASY: {'required': 1, 'available': 1},
                 CERTIFICATE_DIFFICULTY_MEDIUM: {'required': 1, 'available': 1},
-                CERTIFICATE_DIFFICULTY_HARD: {'required': 0, 'available': 0},
+                CERTIFICATE_DIFFICULTY_HARD: {'required': 1, 'available': 0},
             },
         )
 
@@ -866,6 +886,43 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertIn(
             'Selected topics topic_1 and topic_2 do not have enough distinct hard questions to satisfy the requested certificate without reusing questions across topics.',
             result['validation_message'],
+        )
+
+    def test_validate_against_preloaded_maps_accepts_valid_assignment(
+        self,
+    ) -> None:
+        result = certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
+            topic_ids=['topic_1', 'topic_2'],
+            total_questions=4,
+            topic_name_to_question_ids_map={
+                'topic_1': ['q1', 'q2', 'q3'],
+                'topic_2': ['q4', 'q5', 'q6'],
+            },
+            topic_id_to_question_ids_by_difficulty={
+                'topic_1': {
+                    CERTIFICATE_DIFFICULTY_EASY: {'q1'},
+                    CERTIFICATE_DIFFICULTY_MEDIUM: {'q2'},
+                    CERTIFICATE_DIFFICULTY_HARD: {'q3'},
+                },
+                'topic_2': {
+                    CERTIFICATE_DIFFICULTY_EASY: {'q4'},
+                    CERTIFICATE_DIFFICULTY_MEDIUM: {'q5'},
+                    CERTIFICATE_DIFFICULTY_HARD: {'q6'},
+                },
+            },
+            topic_id_to_name={
+                'topic_1': 'Topic 1',
+                'topic_2': 'Topic 2',
+            },
+        )
+
+        self.assertEqual(
+            result['validation_errors']['topic_1'],
+            {
+                CERTIFICATE_DIFFICULTY_EASY: {'required': 1, 'available': 1},
+                CERTIFICATE_DIFFICULTY_MEDIUM: {'required': 1, 'available': 1},
+                CERTIFICATE_DIFFICULTY_HARD: {'required': 0, 'available': 1},
+            },
         )
 
     def test_validation_uses_skill_questions_for_available_counts(self) -> None:
