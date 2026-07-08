@@ -22,7 +22,7 @@ import logging
 import os
 from unittest import mock
 
-from core.domain import platform_parameter_domain, platform_parameter_services
+from core.constants import constants
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
@@ -76,11 +76,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
     def test_get_compute_engine_default_service_account_email_from_dev_mode(
         self, logging_warning_mock: mock.Mock
     ) -> None:
-        with self.swap_to_always_return(
-            platform_parameter_services,
-            'get_server_mode',
-            platform_parameter_domain.ServerMode.DEV,
-        ):
+        with self.swap(constants, 'DEV_MODE', True):
             self.assertIsNone(
                 gae_app_identity_services.get_compute_engine_default_service_account_email()
             )
@@ -91,11 +87,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
         self, logging_warning_mock: mock.Mock
     ) -> None:
         with (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_server_mode',
-                platform_parameter_domain.ServerMode.PROD,
-            ),
+            self.swap(constants, 'DEV_MODE', False),
             self.swap_to_always_return(
                 resourcemanager_v3.ProjectsClient,
                 'get_project',
@@ -113,11 +105,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
         self, logging_warning_mock: mock.Mock
     ) -> None:
         with (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_server_mode',
-                platform_parameter_domain.ServerMode.PROD,
-            ),
+            self.swap(constants, 'DEV_MODE', False),
             self.swap_to_always_raise(
                 resourcemanager_v3.ProjectsClient,
                 'get_project',

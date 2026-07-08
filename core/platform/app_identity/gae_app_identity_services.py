@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import os
 
-from core.domain import platform_parameter_domain, platform_parameter_services
+from core.constants import constants
 
 from google.cloud import resourcemanager_v3
 from typing import Optional
@@ -95,25 +95,19 @@ def get_compute_engine_default_service_account_email() -> str | None:
         dev mode or when the request fails for any reason. A warning message
         will also be logged to help with debugging.
     """
-    match platform_parameter_services.get_server_mode():
-        case platform_parameter_domain.ServerMode.DEV:
-            project_number = None
-        case _:
-            try:
-                client = resourcemanager_v3.ProjectsClient()
-                request = resourcemanager_v3.GetProjectRequest(
-                    name=f'projects/{get_application_id()}'
-                )
-                response = client.get_project(request=request)
-                project_number = int(response.name.removeprefix('projects/'))
-            except Exception as err:
-                logging.warning(
-                    'Failed to fetch the numeric project id from the '
-                    'Google Cloud SDK: %s' % err
-                )
-                project_number = None
-    return (
-        f'{project_number}-compute@developer.gserviceaccount.com'
-        if project_number is not None
-        else None
-    )
+    if constants.DEV_MODE:
+        return None
+    try:
+        client = resourcemanager_v3.ProjectsClient()
+        request = resourcemanager_v3.GetProjectRequest(
+            name=f'projects/{get_application_id()}'
+        )
+        response = client.get_project(request=request)
+        project_number = int(response.name.removeprefix('projects/'))
+        return f'{project_number}-compute@developer.gserviceaccount.com'
+    except Exception as err:
+        logging.warning(
+            'Failed to fetch the numeric project id from the '
+            'Google Cloud SDK: %s' % err
+        )
+        return None
