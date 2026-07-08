@@ -27,10 +27,6 @@ on:
         required: false
         type: string
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: true
-
 jobs:
   setup_merge_sha:
     name: Capture develop SHA
@@ -148,15 +144,13 @@ jobs:
 
           SPECS_PREFIX="core/tests/playwright-acceptance-tests/specs/"
 
+          git add -A -- "$SPECS_PREFIX"
+
           # -z for NUL-separated output (safe with any filename), and we
           # match both modified/renamed tracked files and new untracked
           # files (update-snapshots can create brand-new baseline images).
           CHANGED_COUNT=0
           while IFS= read -r -d '' filepath; do
-            echo "Raw filepath: '$filepath'"
-            # git status --porcelain -z prefixes each entry with a 2-char
-            # status code and a space; strip that to get the bare path.
-            filepath="${filepath:3}"
             case "$filepath" in
               *-screenshots/*)
                 # Strip the leading specs/ prefix so the artifact zip is rooted
@@ -168,7 +162,7 @@ jobs:
                 CHANGED_COUNT=$((CHANGED_COUNT + 1))
                 ;;
             esac
-          done < <(git status --porcelain -z --untracked-files=all -- 'core/tests/playwright-acceptance-tests/specs/')
+          done < <(git diff --cached --name-only -z -- "$SPECS_PREFIX")
 
           echo "Staged $CHANGED_COUNT changed/new snapshot file(s)."
           echo "STAGING_DIR=$STAGING_DIR" >> "$GITHUB_OUTPUT"
@@ -200,31 +194,3 @@ jobs:
           name: updated-snapshots-all-${{ github.event.inputs.env-mode }}
           path: merged-snapshots
           if-no-files-found: warn
-
-  delete_individual_snapshot_artifacts:
-    name: Delete individual per-suite snapshot artifacts
-    needs: consolidate_snapshots
-    if: ${{ !cancelled() }}
-    runs-on: ubuntu-22.04
-    permissions:
-      actions: write
-    steps:
-      - name: Delete per-suite artifacts (keep consolidated one)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # List all artifacts for this run, filter to the per-suite ones
-          # (updated-snapshots_<suite>), and delete each by ID. The
-          # consolidated artifact is named updated-snapshots-all-<env-mode>,
-          # so it won't match this prefix and is left intact.
-          gh api \
-            "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts?per_page=100" \
-            --paginate \
-            --jq '.artifacts[] | select(.name | startswith("updated-snapshots_")) | .id' \
-          | while read -r artifact_id; do
-              echo "Deleting artifact ID $artifact_id"
-              gh api \
-                --method DELETE \
-                "repos/${{ github.repository }}/actions/artifacts/$artifact_id" \
-                || echo "Failed to delete artifact $artifact_id (may already be gone)."
-            done
