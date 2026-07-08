@@ -1266,7 +1266,9 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(next_cursor, 'cursor123')
 
-    def test_fetch_page_sets_more_false_when_results_less_than_page_size(self):
+    def test_fetch_page_sets_more_false_when_results_less_than_page_size(
+        self,
+    ) -> None:
         query = mock.Mock()
         cursor = mock.Mock()
 
