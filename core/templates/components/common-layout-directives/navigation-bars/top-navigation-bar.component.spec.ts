@@ -963,6 +963,19 @@ describe('TopNavigationBarComponent', () => {
   );
 
   it(
+    'should return correct value for show technical feedback dashboard page' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.TechnicalFeedbackDashboardEnabled.isEnabled =
+        true;
+
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(true);
+    }
+  );
+
+  it(
     'should return correct value for WebFeedbackModalEnabled' +
       'in profile pic drop down menu feature flag',
     () => {
