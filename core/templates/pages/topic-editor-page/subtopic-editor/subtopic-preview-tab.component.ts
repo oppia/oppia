@@ -17,15 +17,14 @@
  */
 
 import {Component} from '@angular/core';
-import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
-import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {PageContextService} from 'services/page-context.service';
@@ -48,11 +47,8 @@ export class SubtopicPreviewTab {
   editableThumbnailFilename!: string | null;
   // 'null' if there is no thumbnail background color.
   editableThumbnailBgColor!: string | null;
-  subtopicPage!: SubtopicPage;
   studyGuide!: StudyGuide;
-  pageContents!: SubtopicPageContents;
   sections!: StudyGuideSection[];
-  htmlData!: string;
   thumbnailIsShown!: boolean;
   THUMBNAIL: string = 'thumbnail';
   CONTENT: string = 'content';
@@ -61,7 +57,6 @@ export class SubtopicPreviewTab {
     private topicEditorRoutingService: TopicEditorRoutingService,
     private topicEditorStateService: TopicEditorStateService,
     private windowDimensionsService: WindowDimensionsService,
-    private platformFeatureService: PlatformFeatureService,
     private pageContextService: PageContextService
   ) {}
 
@@ -71,22 +66,12 @@ export class SubtopicPreviewTab {
     this.subtopic = this.topic.getSubtopicById(this.subtopicId);
 
     if (this.topic.getId() && this.subtopic) {
-      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-        this.topicEditorStateService.loadStudyGuide(
-          this.topic.getId(),
-          this.subtopicId
-        );
-        this.studyGuide = this.topicEditorStateService.getStudyGuide();
-        this.sections = this.studyGuide.getSections();
-      } else {
-        this.topicEditorStateService.loadSubtopicPage(
-          this.topic.getId(),
-          this.subtopicId
-        );
-        this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-        this.pageContents = this.subtopicPage.getPageContents();
-        this.htmlData = this.pageContents.getHtml();
-      }
+      this.topicEditorStateService.loadStudyGuide(
+        this.topic.getId(),
+        this.subtopicId
+      );
+      this.studyGuide = this.topicEditorStateService.getStudyGuide();
+      this.sections = this.studyGuide.getSections();
       this.editableTitle = this.subtopic.getTitle();
       this.editableThumbnailFilename = this.subtopic.getThumbnailFilename();
       this.editableThumbnailBgColor = this.subtopic.getThumbnailBgColor();
@@ -99,29 +84,14 @@ export class SubtopicPreviewTab {
     );
   }
 
-  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.ShowRestructuredStudyGuides
-      .isEnabled;
-  }
-
   ngOnInit(): void {
     this.pageContextService.setSubtopicPreviewIsOpen();
-    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-      this.directiveSubscriptions.add(
-        this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
-          this.studyGuide = this.topicEditorStateService.getStudyGuide();
-          this.sections = this.studyGuide.getSections();
-        })
-      );
-    } else {
-      this.directiveSubscriptions.add(
-        this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
-          this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-          this.pageContents = this.subtopicPage.getPageContents();
-          this.htmlData = this.pageContents.getHtml();
-        })
-      );
-    }
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
+        this.studyGuide = this.topicEditorStateService.getStudyGuide();
+        this.sections = this.studyGuide.getSections();
+      })
+    );
 
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() =>

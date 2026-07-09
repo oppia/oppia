@@ -40,7 +40,6 @@ export enum FeatureNames {
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
   HighlightSentencesDuringAutomaticVoiceoverPlayback = 'highlight_sentences_during_automatic_voiceover_playback',
   ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
-  ShowRestructuredStudyGuides = 'show_restructured_study_guides',
   EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
   EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
