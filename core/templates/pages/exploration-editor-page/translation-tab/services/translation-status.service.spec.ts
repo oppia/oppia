@@ -829,4 +829,17 @@ describe('Translation status service', () => {
       true
     );
   });
+
+  it('should initialize properties correctly when ngOnInit is called', () => {
+    spyOn(tls, 'getActiveLanguageCode').and.returnValue('en');
+    tss.ngOnInit();
+
+    expect(tss.langCode).toBe('en');
+    expect(tss.stateNeedsUpdateWarnings).toEqual({});
+    expect(tss.stateWiseStatusColor).toEqual({});
+    expect(tss.explorationTranslationContentRequiredCount).toBe(0);
+    expect(tss.explorationVoiceoverContentRequiredCount).toBe(0);
+    expect(tss.explorationTranslationContentNotAvailableCount).toBe(0);
+    expect(tss.explorationVoiceoverContentNotAvailableCount).toBe(0);
+  });
 });
