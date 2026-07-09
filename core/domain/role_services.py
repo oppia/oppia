@@ -172,7 +172,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_VOICEOVER_ADMIN: 'voiceover admin',
     feconf.ROLE_ID_QUESTION_COORDINATOR: 'question coordinator',
     feconf.ROLE_ID_TRANSLATION_COORDINATOR: 'translation coordinator',
-    feconf.ROLE_ID_TECH_TEAM_LEAD: 'tech lead',
+    feconf.ROLE_ID_TECH_TEAM_LEAD: 'tech team lead',
 }
 
 
