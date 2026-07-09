@@ -620,6 +620,7 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
+    this.pageContextService.resetImageSaveDestination();
     this.windowRef.nativeWindow.removeEventListener(
       'beforeunload',
       this.beforeUnloadHandler
