@@ -918,23 +918,28 @@ class BaseHandler(
             self._render_exception(values)
             return
 
-        self._log_exception_message(
-            exception_type, LogType.EXCEPTION, 'Exception raised'
-        )
-
         if isinstance(exception, self.UnauthorizedUserException):
+            self._log_exception_message(
+                exception_type, LogType.WARNING, 'Unauthorized user'
+            )
             self.error(401)
             values = {'error': str(exception), 'status_code': 401}
             self._render_exception(values)
             return
 
         if isinstance(exception, self.InvalidInputException):
+            self._log_exception_message(
+                exception_type, LogType.WARNING, 'Invalid input'
+            )
             self.error(400)
             values = {'error': str(exception), 'status_code': 400}
             self._render_exception(values)
             return
 
         if isinstance(exception, self.InternalErrorException):
+            self._log_exception_message(
+                exception_type, LogType.EXCEPTION, 'Internal error raised'
+            )
             self.error(500)
             values = {'error': str(exception), 'status_code': 500}
             self._render_exception(values)
@@ -950,6 +955,9 @@ class BaseHandler(
             self._render_exception(values)
             return
 
+        self._log_exception_message(
+            exception_type, LogType.EXCEPTION, 'Exception raised'
+        )
         self.error(500)
         values = {'error': str(exception), 'status_code': 500}
         self._render_exception(values)
