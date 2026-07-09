@@ -457,6 +457,13 @@
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
+        <li class="nav-item" *ngIf="isCertificateAssessmentEnabled()">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/certificate-offering-dashboard"
+             class="dropdown-item nav-link">
+            <span>Certificate creator dashboard</span>
+          </a>
+        </li>
         <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/facilitator-dashboard"

@@ -29,7 +29,7 @@
       </div>
       <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
            class="oppia-form-error oppia-unsupported-svg-tag-attribute-error"
-           [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }">
+           [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: getIssueURL(invalidTagsAndAttributes) }">
       </div>
       <div [hidden]="!uploadedImage">
         <div [hidden]="!allowedBgColors">

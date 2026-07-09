@@ -6216,6 +6216,13 @@ export default {
     "Hard": 0.9
   },
 
+  // Certificate assessment question difficulty.
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY": "easy",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM": "medium",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD": "hard",
+
+  "QUESTIONS_PER_TOPIC": 3,
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,

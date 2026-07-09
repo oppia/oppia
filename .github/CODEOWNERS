@@ -371,9 +371,11 @@
 /extensions/domain*.py @oppia/lace-frontend-reviewers
 /extensions/interactions/ @oppia/lace-frontend-reviewers
 /extensions/objects/ @oppia/lace-backend-reviewers
-/extensions/objects/templates/filepath-editor.component*.ts @oppia/lace-frontend-reviewers
-/extensions/objects/templates/filepath-editor.component.html @oppia/lace-frontend-reviewers
+/extensions/objects/templates/*.ts @oppia/lace-frontend-reviewers
+/extensions/objects/templates/*.html @oppia/lace-frontend-reviewers
 /extensions/value_generators/ @oppia/lace-backend-reviewers
+/extensions/value_generators/templates/*.ts @oppia/lace-frontend-reviewers
+/extensions/value_generators/templates/*.html @oppia/lace-frontend-reviewers
 /extensions/__init__.py @oppia/lace-frontend-reviewers
 
 
@@ -409,6 +411,8 @@
 /extensions/answer_summarizers/ @oppia/lace-backend-reviewers
 /extensions/issues/ @oppia/lace-backend-reviewers
 /extensions/visualizations/ @oppia/lace-backend-reviewers
+/extensions/visualizations/*.ts @oppia/lace-frontend-reviewers
+/extensions/visualizations/*.html @oppia/lace-frontend-reviewers
 
 
 # Library page.
