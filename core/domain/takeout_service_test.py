@@ -1067,7 +1067,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS,
         ).put()
-        certificate_assessment_attempt = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
+        certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=self.USER_ID_1,
             total_score=84.5,
             attempt_index=1,
@@ -1088,10 +1088,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             finished_at=datetime.datetime(2026, 1, 2, 3, 11, 5),
             is_submitted=True,
         )
-        self.certificate_assessment_attempt_id = (
-            certificate_assessment_attempt.id
-        )
-
         user_models.UserEmailPreferencesModel(
             id=self.USER_ID_1,
             site_updates=False,
@@ -2037,8 +2033,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        certificate_assessment_attempt_model = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.query(
+            certificate_assessment_offering_models.CertificateAssessmentAttemptModel.learner_id
+            == self.USER_ID_1
+        ).get()
+        self.assertIsNotNone(certificate_assessment_attempt_model)
+        if certificate_assessment_attempt_model is None:
+            raise AssertionError(
+                'Certificate assessment attempt was not created.'
+            )
         expected_certificate_assessment_attempt_data = {
-            self.certificate_assessment_attempt_id: {
+            certificate_assessment_attempt_model.id: {
                 'total_score': 84.5,
                 'attempt_index': 1,
                 'attempt_data': {
