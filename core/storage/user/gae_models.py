@@ -874,6 +874,90 @@ class LearnerGoalsModel(base_models.BaseModel):
         }
 
 
+class LearnerPlaylistModel(base_models.BaseModel):
+    """Keeps track of all the explorations and collections in the playlist of
+    the user.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # IDs of all the explorations in the playlist of the user.
+    exploration_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
+    # IDs of all the collections in the playlist of the user.
+    collection_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            },
+        )
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of LearnerPlaylistModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether LearnerPlaylistModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def export_data(user_id: str) -> Dict[str, List[str]]:
+        """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'playlist_exploration_ids'
+            and 'playlist_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has in their playlist.
+            If the user_id is invalid, returns None instead.
+        """
+        user_model = LearnerPlaylistModel.get(user_id, strict=False)
+        if user_model is None:
+            return {}
+
+        return {
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids,
+        }
+
+
 class UserContributionsModel(base_models.BaseModel):
     """Tracks explorations created/edited for a particular user.
 
