@@ -168,7 +168,9 @@ export class ExplorationDiffService {
         const interactionSpec =
           InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
         oldStateIsTerminal = Boolean(
-          oldState.interaction.id && interactionSpec.is_terminal
+          oldState.interaction.id &&
+            interactionSpec &&
+            interactionSpec.is_terminal
         );
       }
       if (newState) {
@@ -176,7 +178,9 @@ export class ExplorationDiffService {
         const interactionSpec =
           InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
         newStateIsTerminal = Boolean(
-          newState.interaction.id && interactionSpec.is_terminal
+          newState.interaction.id &&
+            interactionSpec &&
+            interactionSpec.is_terminal
         );
       }
       if (oldStateIsTerminal || newStateIsTerminal) {
