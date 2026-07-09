@@ -78,6 +78,13 @@ export class EditThumbnailModalComponent {
     private ngbActiveModal: NgbActiveModal
   ) {}
 
+  // Public wrapper for the SVG sanitizer service's getIssueURL method.
+  // This is needed because Angular strict template checking does not
+  // allow direct access to private class members from templates.
+  getIssueURL(invalidTagsAndAttrs: InvalidTagsAndAttributes): string {
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttrs);
+  }
+
   setImageDimensions(height: number, width: number): void {
     this.dimensions = {
       height: Math.round(height),
