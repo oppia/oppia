@@ -1168,7 +1168,6 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
     def _create_feedback_model(
         self,
         model_id: str,
-        created_on: datetime.datetime,
     ) -> None:
         """Creates a TestBaseFeedbackModel with the given creation time."""
         model = TestBaseFeedbackModel(
@@ -1239,9 +1238,9 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
             base_models.BaseFeedbackModel._generate_new_id()  # pylint: disable=protected-access
 
     def test_fetch_page_returns_cursor_for_next_page(self) -> None:
-        self._create_feedback_model('feedback_1', datetime.datetime(2026, 1, 1))
-        self._create_feedback_model('feedback_2', datetime.datetime(2026, 1, 2))
-        self._create_feedback_model('feedback_3', datetime.datetime(2026, 1, 3))
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
 
         feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
             page_size=2
@@ -1257,9 +1256,9 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
     def test_fetch_page_accepts_cursor_for_later_page(
         self,
     ) -> None:
-        self._create_feedback_model('feedback_1', datetime.datetime(2026, 1, 1))
-        self._create_feedback_model('feedback_2', datetime.datetime(2026, 1, 2))
-        self._create_feedback_model('feedback_3', datetime.datetime(2026, 1, 3))
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
 
         _, next_cursor, _ = TestBaseFeedbackModel.fetch_page(page_size=2)
         assert next_cursor is not None
