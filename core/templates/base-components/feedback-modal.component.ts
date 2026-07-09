@@ -28,11 +28,10 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {PageContextService} from 'services/page-context.service';
 import {LearnerAnswerInfoService} from 'pages/exploration-player-page/services/learner-answer-info.service';
 import {FeedbackSessionInfoService} from 'services/feedback-session-info.service';
-import {TranslateService} from '@ngx-translate/core';
 import {
   ReportAnIssueCategory,
-  IssueReportModel,
-  SendALessonFeedbackModel,
+  PlatformFeedbackModel,
+  LessonFeedbackModel,
   FeedbackModalType,
   LessonFeedbackMetadata,
 } from 'domain/feedback/feedback.model';
@@ -41,6 +40,8 @@ import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
+import {AlertsService} from 'services/alerts.service';
+import {TranslateService} from '@ngx-translate/core';
 import './feedback-modal.component.css';
 
 interface TurnstileApi {
@@ -85,10 +86,13 @@ export class FeedbackModalComponent implements OnInit {
   captchaToken: string = '';
   captchaSiteKey: string | null = null;
   captchaLoadError: string | null = null;
+  captchaSubmitError: string | null = null;
 
   constructor(
     private userService: UserService,
     private windowRef: WindowRef,
+    private alertsService: AlertsService,
+    private translateService: TranslateService,
     private insertScriptService: InsertScriptService,
     private feedbackScreenshotStagingService: FeedbackScreenshotStagingService,
     private playerPositionService: PlayerPositionService,
@@ -96,8 +100,7 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbActiveModal: NgbActiveModal,
-    private translateService: TranslateService
+    private ngbActiveModal: NgbActiveModal
   ) {}
 
   get isLessonFeedbackMode(): boolean {
@@ -180,7 +183,7 @@ export class FeedbackModalComponent implements OnInit {
     }
 
     if (!this.isLessonFeedbackMode) {
-      this.initializeCaptchaIfRequired();
+      await this.initializeCaptchaIfRequired();
     }
   }
 
@@ -191,6 +194,7 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   signIn(): void {
+    window.sessionStorage.setItem('reopenLessonFeedbackModal', 'true');
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         (
@@ -251,17 +255,31 @@ export class FeedbackModalComponent implements OnInit {
       this.formError = this.translateService.instant(
         'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG',
         {
+          length: this.feedbackText.length,
           maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
         }
       );
       return false;
     }
 
+    if (
+      !this.isLessonFeedbackMode &&
+      !this.isUserLoggedIn &&
+      !this.captchaToken
+    ) {
+      this.captchaSubmitError = this.translateService.instant(
+        'I18N_FEEDBACK_CAPTCHA_REQUIRED'
+      );
+      return false;
+    }
     this.formError = null;
     return true;
   }
 
   async submit(): Promise<void> {
+    if (!this.isFormValid()) {
+      return;
+    }
     switch (this.feedbackModalType) {
       case FeedbackModalType.LESSON_FEEDBACK:
         await this.submitLessonFeedback();
@@ -289,15 +307,12 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   private async submitLessonIssue(): Promise<void> {
-    if (!this.isFormValid()) {
-      return;
-    }
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
     const sessionInfo = this.includeTechnicalLogs
       ? this.feedbackSessionInfoService.getSessionInfo()
       : null;
 
-    const feedbackPayload = IssueReportModel.createForSubmission({
+    const feedbackPayload = PlatformFeedbackModel.createForSubmission({
       source: 'lesson',
       reportMessage: this.feedbackText,
       explorationContext: {
@@ -311,6 +326,7 @@ export class FeedbackModalComponent implements OnInit {
       includeTechnicalLogs: this.includeTechnicalLogs,
       sessionInfo: sessionInfo,
       screenshotFilename: this.screenshotFilename,
+      pageUrl: this.windowRef.nativeWindow.location.href,
     });
 
     try {
@@ -318,9 +334,20 @@ export class FeedbackModalComponent implements OnInit {
         feedbackPayload,
         this.captchaToken
       );
-      // Show success toast.
+      const successMessage = this.translateService.instant(
+        this.category === 'broken_layout_or_image' ||
+          this.category === 'other_or_not_sure' ||
+          this.category === null
+          ? 'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
+          : 'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
+      );
+      this.alertsService.addSuccessMessage(successMessage, 7000);
     } catch (error) {
-      // Show error toast.
+      const errorMessage = this.translateService.instant(
+        'I18N_FEEDBACK_SUBMITTED_ERROR'
+      );
+
+      this.alertsService.addWarning(errorMessage);
       console.error('Failed to submit Lesson issue report', error);
       return;
     }
@@ -328,14 +355,10 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   private async submitLessonFeedback(): Promise<void> {
-    if (!this.isFormValid()) {
-      return;
-    }
-
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
-    const feedbackPayload = SendALessonFeedbackModel.createForSubmission({
+    const feedbackPayload = LessonFeedbackModel.createForSubmission({
       feedbackText: this.feedbackText,
-      exploration_context: {
+      lesson_metadata_json: {
         explorationId: lessonFeedbackMetadata.explorationId,
         explorationVersion: lessonFeedbackMetadata.explorationVersion,
         stateName: lessonFeedbackMetadata.stateName,
@@ -349,9 +372,16 @@ export class FeedbackModalComponent implements OnInit {
         feedbackPayload,
         this.captchaToken
       );
-      // Show success toast.
+      const successMessage = this.translateService.instant(
+        'I18N_FEEDBACK_SUBMITTED_SUCCESS'
+      );
+      this.alertsService.addSuccessMessage(successMessage, 7000);
     } catch (error) {
-      // Show error toast.
+      const errorMessage = this.translateService.instant(
+        'I18N_FEEDBACK_SUBMITTED_ERROR'
+      );
+
+      this.alertsService.addWarning(errorMessage);
       console.error('Failed to submit Lesson Feedback', error);
       return;
     }
@@ -359,14 +389,11 @@ export class FeedbackModalComponent implements OnInit {
   }
 
   private async submitSiteIssue(): Promise<void> {
-    if (!this.isFormValid()) {
-      return;
-    }
     const sessionInfo = this.includeTechnicalLogs
       ? this.feedbackSessionInfoService.getSessionInfo()
       : null;
 
-    const feedbackPayload = IssueReportModel.createForSubmission({
+    const feedbackPayload = PlatformFeedbackModel.createForSubmission({
       source: 'site',
       reportMessage: this.feedbackText,
       explorationContext: null,
@@ -374,6 +401,7 @@ export class FeedbackModalComponent implements OnInit {
       includeTechnicalLogs: this.includeTechnicalLogs,
       sessionInfo: sessionInfo,
       screenshotFilename: this.screenshotFilename,
+      pageUrl: this.windowRef.nativeWindow.location.href,
     });
 
     try {
@@ -381,36 +409,45 @@ export class FeedbackModalComponent implements OnInit {
         feedbackPayload,
         this.captchaToken
       );
-      // Show success toast.
+      const successMessage = this.translateService.instant(
+        'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
+      );
+      this.alertsService.addSuccessMessage(successMessage, 7000);
     } catch (error) {
-      // Show error toast.
+      const errorMessage = this.translateService.instant(
+        'I18N_FEEDBACK_SUBMITTED_ERROR'
+      );
+
+      this.alertsService.addWarning(errorMessage);
       console.error('Failed to submit site issue report', error);
       return;
     }
     this.closeModal();
   }
 
-  initializeCaptchaIfRequired(): void {
+  async initializeCaptchaIfRequired(): Promise<void> {
     if (this.isUserLoggedIn) {
       return;
     }
-    this.feedbackBackendApiService
-      .fetchCaptchaConfigAsync()
-      .then(config => {
-        this.captchaSiteKey = config.site_key;
-        if (!this.captchaSiteKey) {
-          this.captchaLoadError =
-            'Captcha is currently unavailable. Please Login to submit feedback.';
-          return;
-        }
-        this.insertScriptService.loadScript(KNOWN_SCRIPTS.TURNSTILE, () => {
-          this.renderTurnstile();
-        });
-      })
-      .catch(() => {
-        this.captchaLoadError =
-          'Captcha is currently unavailable, Please Login to submit feedback.';
+    try {
+      const config =
+        await this.feedbackBackendApiService.fetchCaptchaConfigAsync();
+
+      this.captchaSiteKey = config.site_key;
+      if (!this.captchaSiteKey) {
+        this.captchaLoadError = this.translateService.instant(
+          'I18N_FEEDBACK_CAPTCHA_UNAVAILABLE'
+        );
+        return;
+      }
+      this.insertScriptService.loadScript(KNOWN_SCRIPTS.TURNSTILE, () => {
+        this.renderTurnstile();
       });
+    } catch {
+      this.captchaLoadError = this.translateService.instant(
+        'I18N_FEEDBACK_CAPTCHA_UNAVAILABLE'
+      );
+    }
   }
 
   renderTurnstile(): void {
@@ -423,7 +460,9 @@ export class FeedbackModalComponent implements OnInit {
     }
     const turnstileWindow = this.windowRef.nativeWindow as TurnstileWindow;
     if (!turnstileWindow.turnstile) {
-      this.captchaLoadError = 'Captcha failed to load.';
+      this.captchaLoadError = this.translateService.instant(
+        'I18N_FEEDBACK_CAPTCHA_LOAD_FAILED'
+      );
       return;
     }
     this.turnstileWidgetId = turnstileWindow.turnstile.render(
@@ -436,7 +475,9 @@ export class FeedbackModalComponent implements OnInit {
         },
         'error-callback': () => {
           this.captchaToken = '';
-          this.captchaLoadError = 'Captcha failed to load.';
+          this.captchaLoadError = this.translateService.instant(
+            'I18N_FEEDBACK_CAPTCHA_LOAD_FAILED'
+          );
         },
         'expired-callback': () => {
           this.captchaToken = '';
@@ -450,6 +491,8 @@ export class FeedbackModalComponent implements OnInit {
     this.category = null;
     this.includeTechnicalLogs = true;
     this.formError = null;
+    this.captchaToken = '';
+    this.captchaSubmitError = null;
     this.removeScreenshot();
     this.ngbActiveModal.dismiss();
   }
