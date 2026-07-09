@@ -104,6 +104,19 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
   }
 
+  // Restore the entity context to that of the state before the concept card
+  // editor was initialized. This prevents change of context issues in
+  // calling components once the editor is closed.
+  private _restoreEntityContext(): void {
+    this.pageContextService.removeCustomEntityContext();
+    if (this.entityId && this.entityType) {
+      this.pageContextService.setCustomEntityContext(
+        this.entityType,
+        this.entityId
+      );
+    }
+  }
+
   openConceptCard(event: MouseEvent): void {
     if (this._shouldOpenRTEModal(event)) {
       return;
@@ -122,18 +135,11 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     );
     modalRef.componentInstance.skillId = this.skillId;
     modalRef.result.then(
-      () => {},
+      () => {
+        this._restoreEntityContext();
+      },
       res => {
-        this.pageContextService.removeCustomEntityContext();
-        // Restore the entity context to that of the state before the concept card
-        // editor was initialized. This prevents change of context issues in
-        // calling components once the editor is closed.
-        if (this.entityId && this.entityType) {
-          this.pageContextService.setCustomEntityContext(
-            this.entityType,
-            this.entityId
-          );
-        }
+        this._restoreEntityContext();
         const allowedDismissActions = [
           'cancel',
           'escape key press',

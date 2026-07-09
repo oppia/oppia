@@ -103,31 +103,47 @@ describe('NoninteractiveSkillreview', () => {
     expect(component.linkText).toBeUndefined();
   });
 
-  it('should open concept card when user clicks the link', () => {
-    spyOn(pageContextService, 'removeCustomEntityContext');
-    let e = {
-      currentTarget: {
-        offsetParent: {
-          dataset: {
-            ckeWidgetId: false,
+  it(
+    'should restore the entity context when user closes the concept ' +
+      'card after successfully viewing it',
+    fakeAsync(() => {
+      spyOn(pageContextService, 'setCustomEntityContext');
+      spyOn(pageContextService, 'getEntityId').and.callFake(function () {
+        return 'InitialEntityId';
+      });
+      spyOn(pageContextService, 'getEntityType').and.callFake(function () {
+        return 'InitialEntityType';
+      });
+      spyOn(pageContextService, 'removeCustomEntityContext');
+      let e = {
+        currentTarget: {
+          offsetParent: {
+            dataset: {
+              ckeWidgetId: false,
+            },
           },
         },
-      },
-    } as unknown as MouseEvent;
+      } as unknown as MouseEvent;
 
-    ckEditorCopyContentService.copyModeActive = false;
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+      ckEditorCopyContentService.copyModeActive = false;
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
 
-    component.openConceptCard(e);
+      component.openConceptCard(e);
+      flush();
 
-    expect(modalSpy).toHaveBeenCalled();
-    expect(pageContextService.removeCustomEntityContext).not.toHaveBeenCalled();
-  });
+      expect(modalSpy).toHaveBeenCalled();
+      expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
+      expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
+        'InitialEntityType',
+        'InitialEntityId'
+      );
+    })
+  );
 
   it('should close concept card when user clicks the link', fakeAsync(() => {
     spyOn(pageContextService, 'setCustomEntityContext');
