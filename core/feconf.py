@@ -594,7 +594,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.5.1'
+OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1140,6 +1140,9 @@ CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
 )
 CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
     '/certificate_assessment_offering_handler/<certificate_id>'
+)
+VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/validate_certificate_assessment_offering_handler'
 )
 
 # Event types.

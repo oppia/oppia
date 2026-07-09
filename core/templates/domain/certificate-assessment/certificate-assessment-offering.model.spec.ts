@@ -37,7 +37,7 @@ describe('Certificate Assessment Offering Data Model', () => {
       demonstrates: ['Learn math'],
       total_questions: 15,
       time_limit_in_minutes: 60,
-      async_status: 'Ready',
+      async_status: 'Available',
       version: 1,
     };
   });
@@ -71,7 +71,7 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.totalQuestions).toEqual(15);
     expect(offering.timeLimitInMinutes).toEqual(60);
     expect(offering.demonstrates).toEqual(['Learn math']);
-    expect(offering.asyncStatus).toEqual('Ready');
+    expect(offering.asyncStatus).toEqual('Available');
     expect(offering.version).toEqual(1);
   });
 

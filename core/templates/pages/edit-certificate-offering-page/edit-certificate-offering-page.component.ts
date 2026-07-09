@@ -29,12 +29,14 @@ import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {AlertsService} from 'services/alerts.service';
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
-
-const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
-const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
 import './edit-certificate-offering-page.component.css';
 
 @Component({
@@ -124,28 +126,47 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         CertificateOfferingConfirmationModalComponent,
         {backdrop: 'static'}
       );
-      modalRef.componentInstance.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
+      modalRef.componentInstance.action =
+        CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
       if (
-        action !== CERTIFICATE_OFFERING_NOT_READY_ACTION &&
-        action !== CERTIFICATE_OFFERING_UPDATED_ACTION
+        action !== CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY &&
+        action !== CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE
       ) {
         return;
       }
 
+      const certificateAssessmentOfferingForSave =
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: this.certificateAssessmentOffering.certificateId,
+          title: this.certificateAssessmentOffering.title,
+          description: this.certificateAssessmentOffering.description,
+          classroom_id: this.certificateAssessmentOffering.classroomId,
+          topic_data: this.certificateAssessmentOffering.topicData,
+          demonstrates: this.certificateAssessmentOffering.demonstrates,
+          total_questions: this.certificateAssessmentOffering.totalQuestions,
+          time_limit_in_minutes:
+            this.certificateAssessmentOffering.timeLimitInMinutes,
+          async_status:
+            action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
+              ? 'Not_Ready'
+              : 'Available',
+          version: this.certificateAssessmentOffering.version,
+        });
+
       const certificateId =
         await this.certificateAssessmentOfferingBackendApiService.updateCertificateAssessmentOfferingAsync(
           this.certificateOfferingId,
-          this.certificateAssessmentOffering
+          certificateAssessmentOfferingForSave
         );
 
       if (!certificateId) {
         return;
       }
 
-      if (action === CERTIFICATE_OFFERING_NOT_READY_ACTION) {
+      if (action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY) {
         this.alertsService.addSuccessMessage('Certificate saved as not ready.');
         this.navigateToCertificateOfferingDashboard();
         return;
@@ -160,7 +181,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         }
       );
       postModalRef.componentInstance.action =
-        CERTIFICATE_OFFERING_UPDATED_ACTION;
+        CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED;
       await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {
