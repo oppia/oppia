@@ -1180,7 +1180,6 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
             lesson_metadata_schema_version=1,
             lesson_metadata_json={},
         )
-        model.created_on = created_on
         model.update_timestamps()
         model.put()
 
