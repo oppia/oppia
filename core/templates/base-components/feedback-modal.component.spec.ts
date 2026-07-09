@@ -230,13 +230,13 @@ describe('FeedbackModalComponent', () => {
     translateService = jasmine.createSpyObj('TranslateService', ['instant']);
 
     translateService.instant.and.callFake(
-      (key: string, params?: {maxLength: number}) => {
+      (key: string, params?: {maxLength: number; characterCount: number}) => {
         if (key === 'I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED') {
           return 'Please add a description before submitting.';
         }
 
         if (key === 'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG') {
-          return `Please keep your feedback under ${params?.maxLength} characters.`;
+          return `Your description is a bit too long (${params?.characterCount} characters). Please shorten it slightly so our team can review it quickly!.`;
         }
         if (key === 'I18N_FEEDBACK_CAPTCHA_UNAVAILABLE') {
           return 'Captcha is currently unavailable. Please log in to submit feedback.';
@@ -668,7 +668,9 @@ describe('FeedbackModalComponent', () => {
     );
 
     expect(component.isFormValid()).toBe(false);
-    expect(component.formError).toContain('Please keep your feedback under');
+    expect(component.formError).toBe(
+      'Your description is a bit too long (2501/2500 characters). Please shorten it slightly so our team can review it quickly!.'
+    );
   });
 
   it('should pass validation for valid feedback text', () => {
