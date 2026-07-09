@@ -602,7 +602,7 @@ CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
     '{service_account_id}@{app_id}.iam.gserviceaccount.com'
 )
 
-OPPIA_VERSION = '3.5.1'
+OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
