@@ -60,7 +60,7 @@ class InitializeAndroidTestDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.open_access
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Generates structures for Android end-to-end tests.
 
         This handler generates structures for Android end-to-end tests in
@@ -190,7 +190,7 @@ class AndroidActivityHandler(
     # 'is_from_oppia_android_build' decorator, and here we are getting 'secret'
     # because the decorator always passes every url_path_args to HTTP methods.
     @acl_decorators.is_from_oppia_android_build
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         activities_data = self.normalized_request['activities_data']
@@ -535,7 +535,7 @@ class AndroidPlatformParametersHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Returns platform parameters as a JSON array of objects.
 
         This is a temporary implementation that allows query parameters to override
@@ -582,7 +582,7 @@ class AndroidFeatureFlagsHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Returns Android feature flags as a JSON list of objects.
 
         Each item in the returned list has the structure:

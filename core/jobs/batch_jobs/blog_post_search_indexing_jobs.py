@@ -82,7 +82,7 @@ class IndexBlogPostsInSearchJob(base_jobs.JobBase):
 class IndexBlogPostSummaries(beam.DoFn):  # type: ignore[misc]
     """DoFn to index blog post summaries."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, blog_post_summaries: List[blog_domain.BlogPostSummary]
     ) -> Iterable[result.Result[None, Exception]]:
         """Index blog post summaries and catch any errors.

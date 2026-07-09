@@ -32,7 +32,7 @@ class FractionLandingRedirectPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.redirect('/math/fractions')
 
@@ -46,7 +46,7 @@ class TopicLandingRedirectPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, topic: str) -> None:
+    def get(self, topic: str) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Args:

@@ -91,7 +91,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             % self.language_accent_code,
         )
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         combined_models: Tuple[
             str,

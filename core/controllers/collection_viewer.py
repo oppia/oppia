@@ -33,7 +33,9 @@ class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_collection
-    def get(self, collection_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, collection_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual collection page.
 
         Args:

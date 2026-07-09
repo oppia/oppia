@@ -118,7 +118,7 @@ class TopicEditorStoryHandler(
     }
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str) -> None:
+    def get(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about a topic.
 
         Args:
@@ -263,7 +263,7 @@ class TopicEditorStoryHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_add_new_story_to_topic
-    def post(self, topic_id: str) -> None:
+    def post(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
         Currently, this only adds the story to the canonical story id list of
         the topic.
@@ -380,7 +380,9 @@ class EditableSubtopicPageDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str, subtopic_id: int) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, topic_id: str, subtopic_id: int
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the details of a specific subtopic.
 
         Args:
@@ -434,7 +436,9 @@ class EditableStudyGuideDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str, subtopic_id: int) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, topic_id: str, subtopic_id: int
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the details of a specific subtopic.
 
         Args:
@@ -534,7 +538,7 @@ class EditableTopicDataHandler(
             )
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str) -> None:
+    def get(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual topic page.
 
         Args:
@@ -643,7 +647,7 @@ class EditableTopicDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_topic
-    def put(self, topic_id: str) -> None:
+    def put(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given topic.
         Also, each change_dict given for editing should have an additional
         property called is_topic_change, which would be a boolean. If True, it
@@ -735,7 +739,7 @@ class EditableTopicDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_delete_topic
-    def delete(self, topic_id: str) -> None:
+    def delete(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Deletes a topic.
 
         Args:
@@ -789,7 +793,7 @@ class TopicRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str) -> None:
+    def get(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Fetches the topic rights of a topic.
 
         Args:
@@ -876,7 +880,7 @@ class TopicPublishSendMailHandler(
     }
 
     @acl_decorators.can_view_any_topic_editor
-    def put(self, topic_id: str) -> None:
+    def put(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Requests a review and publication of a topic.
 
         Args:
@@ -935,7 +939,7 @@ class TopicPublishHandler(
     }
 
     @acl_decorators.can_change_topic_publication_status
-    def put(self, topic_id: str) -> None:
+    def put(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Publishes or unpublishes a topic.
 
         Args:
@@ -987,7 +991,9 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self, topic_url_fragment: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, topic_url_fragment: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
 
@@ -1052,7 +1058,7 @@ class TopicIdToTopicNameHandler(
     }
 
     @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Accesses a classroom admin page."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request['comma_separated_topic_ids']

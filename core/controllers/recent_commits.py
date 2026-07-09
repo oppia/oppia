@@ -52,7 +52,7 @@ class RecentCommitsHandler(
     }
 
     @acl_decorators.can_access_moderator_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.user_id is not None
         assert self.normalized_request is not None

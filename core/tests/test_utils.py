@@ -167,7 +167,6 @@ BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES: Final = (
     'BaseSnapshotContentModel',
     'BaseSnapshotMetadataModel',
     'VersionedModel',
-    'BaseFeedbackModel',
 )
 
 _GenericHandlerFunctionReturnType = TypeVar('_GenericHandlerFunctionReturnType')
@@ -1968,7 +1967,7 @@ class TestBase(unittest.TestCase):
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestCase's assertRaisesRegex().
-    def assertRaisesRegex(  # type: ignore[override]
+    def assertRaisesRegex(  # type: ignore[override]  # pylint: disable=arguments-differ
         self,
         expected_exception: Union[
             Type[BaseException], Tuple[Type[BaseException], ...]

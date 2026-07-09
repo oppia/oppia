@@ -51,7 +51,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves data for the topics and skills dashboard."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         # Here we use MyPy ignore because we are explicitly changing
@@ -191,7 +191,7 @@ class CategorizedAndUntriagedSkillsDataHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_ids_assigned_to_some_topic = (
@@ -247,7 +247,7 @@ class TopicAssignmentsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self, skill_id: str) -> None:
+    def get(self, skill_id: str) -> None:  # pylint: disable=arguments-differ
         """Retrieves topic assignments.
 
         Args:
@@ -313,7 +313,7 @@ class SkillsDashboardPageDataHandler(
     }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Filters and fetches skill summaries."""
         assert self.normalized_payload is not None
         classroom_name = self.normalized_payload['classroom_name']
@@ -445,7 +445,7 @@ class NewTopicHandler(
     }
 
     @acl_decorators.can_create_topic
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Creates a new topic.
 
         Raise:
@@ -589,7 +589,7 @@ class NewSkillHandler(
     }
 
     @acl_decorators.can_create_skill
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Creates a new skill.
 
         Raises:
@@ -700,7 +700,7 @@ class MergeSkillHandler(
     }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Merges skills."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -787,7 +787,7 @@ class TopicIdToDiagnosticTestSkillIdsHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves diagnostic test skill IDs."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request['comma_separated_topic_ids']

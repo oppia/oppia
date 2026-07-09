@@ -56,7 +56,9 @@ class ClassroomDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.does_classroom_exist
-    def get(self, classroom_url_fragment: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, classroom_url_fragment: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about a classroom.
 
         Args:
@@ -166,7 +168,7 @@ class ClassroomDisplayInfoHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves a mapping of classroom IDs to classroom name and index."""
         classroom_id_index_mappings: List[ClassroomIdIndexMappingDict] = []
         classrooms = classroom_config_services.get_all_classrooms()
@@ -198,7 +200,7 @@ class UnusedTopicsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves topics not associated with any classroom."""
         all_topics = topic_fetchers.get_all_topics()
         all_classrooms = classroom_config_services.get_all_classrooms()
@@ -223,7 +225,7 @@ class NewClassroomIdHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves the new classroom ID."""
         self.values.update(
             {'classroom_id': classroom_config_services.get_new_classroom_id()}
@@ -276,7 +278,9 @@ class ClassroomHandler(
     }
 
     @acl_decorators.open_access
-    def get(self, classroom_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, classroom_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the classroom details.
 
         Args:
@@ -298,7 +302,9 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
-    def put(self, classroom_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, classroom_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Updates properties of a given classroom.
 
         Args:
@@ -371,7 +377,9 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
-    def delete(self, classroom_id: str) -> None:
+    def delete(  # pylint: disable=arguments-differ
+        self, classroom_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Deletes classroom from the classroom admin page.
 
         Args:
@@ -396,7 +404,9 @@ class ClassroomUrlFragmentHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_classroom_admin_page
-    def get(self, classroom_url_fragment: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, classroom_url_fragment: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Checks whether a classroom with given URL fragment exists.
 
         Args:
@@ -424,7 +434,9 @@ class ClassroomIdHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, classroom_url_fragment: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, classroom_url_fragment: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Retrieves the classroom ID.
 
         Args:
@@ -484,7 +496,7 @@ class NewClassroomHandler(
     }
 
     @acl_decorators.can_access_classroom_admin_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Creates a new classroom.
 
         Raise:
@@ -516,7 +528,7 @@ class TopicsToClassroomsRelationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         topic_dicts = [
             topic.to_dict() for topic in topic_fetchers.get_all_topics()
         ]
@@ -562,7 +574,7 @@ class AllClassroomsSummaryHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         classrooms = classroom_config_services.get_all_classrooms()
         all_classrooms_summary_dicts: List[Dict[str, str | bool | int]] = []
 
@@ -661,7 +673,7 @@ class UpdateClassroomIndexMappingHandler(
     }
 
     @acl_decorators.can_access_classroom_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates the order of classrooms.
 
         Raise:

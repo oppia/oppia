@@ -137,7 +137,6 @@ disable=abstract-method,
         unnecessary-pass,
         wrong-import-order,
 # TODO(#12912): Remove these after the Python 3 migration.
-        arguments-differ,
         consider-using-with,
         # Pylint considers imports to be cyclic even when the cycle is
         # broken by putting imports inside functions so they aren't

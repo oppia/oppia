@@ -92,7 +92,7 @@ class ValidateModelWithUserId(base_validation.ValidateBaseModelId):
 class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):  # type: ignore[misc]
     """DoFn to check for Validates that pseudonymizable_entity_mappings."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, input_model: user_models.PendingDeletionRequestModel
     ) -> Iterator[user_validation_errors.ModelIncorrectKeyError]:
         """Function that check for incorrect key in model.
@@ -379,7 +379,7 @@ def user_contribution_rights_model_relationships(
 class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the last_update of draft change list"""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, input_model: user_models.ExplorationUserDataModel
     ) -> Iterator[
         Union[

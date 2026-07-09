@@ -1072,7 +1072,7 @@ class VersionedModel(BaseModel):
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-    def delete(  # type: ignore[override]
+    def delete(  # type: ignore[override]  # pylint: disable=arguments-differ
         self,
         committer_id: str,
         commit_message: str,
@@ -1155,7 +1155,7 @@ class VersionedModel(BaseModel):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def delete_multi(  # type: ignore[override]
+    def delete_multi(  # type: ignore[override]  # pylint: disable=arguments-differ
         cls,
         entity_ids: List[str],
         committer_id: str,
@@ -1663,14 +1663,14 @@ class VersionedModel(BaseModel):
 
     @overload
     @classmethod
-    def get(
+    def get(  # pylint: disable=arguments-differ
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
     ) -> SELF_VERSIONED_MODEL: ...
 
     @overload
     @classmethod
-    def get(
+    def get(  # pylint: disable=arguments-differ
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         *,
@@ -1680,7 +1680,7 @@ class VersionedModel(BaseModel):
 
     @overload
     @classmethod
-    def get(
+    def get(  # pylint: disable=arguments-differ
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         *,
@@ -2060,157 +2060,3 @@ class BaseMapReduceBatchResultsModel(BaseModel):
 
     _use_cache: bool = False
     _use_memcache: bool = False
-
-
-class BaseFeedbackModel(BaseModel):
-    """Abstract base model shared by LessonFeedbackModel and PlatformFeedbackModel.
-
-    Subclasses MUST implement:
-        get_deletion_policy()
-        get_model_association_to_user()
-        has_reference_to_user_id()
-        export_data()
-
-    Fields:
-        author_id: Optional[str]. User ID of the submitter, or None for
-            reports.
-        feedback_text: str. The main text body submitted by the learner.
-        status: str. Current moderation status of the feedback entry
-            (open | closed | ignored | not_actionable).
-        lesson_metadata_schema_version: Optional[int]. Schema version for the
-            lesson_metadata_json blob. Allows future migrations.
-        lesson_metadata_json: Optional[Dict]. Lesson Metadata at
-            submission time. Contains:
-                exploration_id (str),
-                exploration_version (int),
-                state_name (str),
-                state_index (int),
-                learner_current_answer (str | None).
-            None for site-level (non-lesson) submissions.
-        created_on: datetime. Timestamp of creation (set by BaseModel).
-        last_updated: datetime. Timestamp of last update (set by BaseModel).
-        deleted: bool. Soft-delete flag (set by BaseModel).
-        ID_PREFIX: str. Prefix used when generating IDs. Subclasses must
-            override this with their own value (e.g. 'feedback.lesson' or
-            'feedback.platform'). Generated IDs have the form
-            '<ID_PREFIX>.<timestamp_b64><random_b64>'.
-    """
-
-    ID_IS_USED_AS_TAKEOUT_KEY: bool = True
-
-    author_id = datastore_services.StringProperty(
-        required=False,
-        indexed=True,
-    )
-    feedback_text = datastore_services.TextProperty(required=True)
-    status = datastore_services.StringProperty(
-        required=True,
-        indexed=True,
-        choices=feconf.STATUS_CHOICES,
-    )
-    lesson_metadata_schema_version = datastore_services.IntegerProperty(
-        required=False,
-        indexed=True,
-    )
-    lesson_metadata_json = datastore_services.JsonProperty(
-        required=False,
-        indexed=False,
-    )
-
-    ID_PREFIX: str = ''
-
-    @staticmethod
-    def get_deletion_policy() -> DELETION_POLICY:
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError(
-            'The get_deletion_policy() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """This method should be implemented by subclasses.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError(
-            'The has_reference_to_user_id() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
-
-    # Here we use type Any because the return type of all the export_data
-    # methods in BaseModel's subclasses is a subclass of Dict[str, Any].
-    # Otherwise subclass methods will throw [override] error.
-    @staticmethod
-    def export_data(user_id: str) -> Dict[str, Any]:
-        """This method should be implemented by subclasses.
-
-        Args:
-            user_id: str. The ID of the user whose data should be exported.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError(
-            'The export_data() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
-
-    @staticmethod
-    def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError(
-            'The get_model_association_to_user() method is missing from the '
-            'derived class. It should be implemented in the derived class.'
-        )
-
-    @classmethod
-    def _generate_new_id(cls) -> str:
-        """Generates a unique prefixed model ID.
-
-        The ID has the form:
-            <ID_PREFIX>.<timestamp_base64><random_base64>
-
-        e.g. 'feedback.lesson.MTczNzAwMDAwMDAwMGFi'
-
-        Returns:
-            str. A globally unique ID containing the model's type prefix.
-
-        Raises:
-            Exception. Raised when too many collisions occur while generating
-                a new ID.
-        """
-        if not cls.ID_PREFIX:
-            raise Exception(
-                'Subclasses of BaseFeedbackModel must define a non-empty '
-                'ID_PREFIX. Got empty string for %s.' % cls.__name__
-            )
-        for _ in range(MAX_RETRIES):
-            new_id = '%s.%s%s' % (
-                cls.ID_PREFIX,
-                utils.base64_from_int(
-                    int(utils.get_current_time_in_millisecs())
-                ),
-                utils.base64_from_int(utils.get_random_int(RAND_RANGE)),
-            )
-            if not cls.get_by_id(new_id):
-                return new_id
-        raise Exception(
-            '%s ID generator is producing too many collisions.' % cls.__name__
-        )

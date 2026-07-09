@@ -385,7 +385,7 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
         super().__init__()
         self.is_datastore_change = is_datastore_change
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         entity_translation_model: translation_models.EntityTranslationsModel,
     ) -> Union[
@@ -555,7 +555,7 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
         super().__init__()
         self.is_datastore_change = is_datastore_change
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         entity_translation_model: translation_models.EntityTranslationsModel,
     ) -> Union[
@@ -669,7 +669,7 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
 class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
     """DoFn to compute updated exp opportunity model."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         entity_translation_model: translation_models.EntityTranslationsModel,
     ) -> Iterable[opportunity_models.ExplorationOpportunitySummaryModel]:
@@ -709,7 +709,7 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
 class GetLatestModel(beam.DoFn):  # type: ignore[misc]
     """DoFn to compute latest entity translation model."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         element: Tuple[str, List[translation_models.EntityTranslationsModel]],
     ) -> Iterable[Tuple[str, translation_models.EntityTranslationsModel]]:

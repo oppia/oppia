@@ -125,7 +125,7 @@ class InternetConnectivityHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
@@ -140,7 +140,7 @@ class FrontendErrorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
 
     @acl_decorators.open_access
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Records errors reported by the frontend."""
         assert self.normalized_payload is not None
         logging.error(
@@ -157,7 +157,7 @@ class WarmupPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET warmup requests."""
         pass
 
@@ -170,7 +170,7 @@ class SplashRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         self.redirect('/')
 
 
@@ -1057,16 +1057,21 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.LESSON_FEEDBACK_URL,
-        general_feedback.LessonFeedbackSubmitHandler,
-    ),
-    get_redirect_route(
-        r'%s' % feconf.PLATFORM_FEEDBACK_URL,
-        general_feedback.PlatformFeedbackSubmitHandler,
+        r'%s' % feconf.GENERAL_FEEDBACK_SUBMISSION_URL,
+        general_feedback.GeneralFeedbackSubmitHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
         general_feedback.GeneralFeedbackCaptchaConfigHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.CREATOR_FEEDBACK_HANDLER_URL,
+        general_feedback.CreatorFeedbackListHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>'
+        % feconf.CREATOR_FEEDBACK_HANDLER_URL,
+        general_feedback.CreatorFeedbackDetailHandler,
     ),
     get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler
@@ -1414,10 +1419,6 @@ URLS = [
     get_redirect_route(
         feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER,
         certificate_assessment.CertificateAssessmentOfferingByIdHandler,
-    ),
-    get_redirect_route(
-        feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
-        certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
     ),
 ]
 
