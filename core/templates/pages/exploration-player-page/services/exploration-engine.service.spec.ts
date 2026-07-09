@@ -1878,8 +1878,16 @@ describe('Exploration engine service ', () => {
       id: 'TextInput',
     });
     spyOn(
-      explorationEngineService,
-      '_getInteractionHtmlByStateName'
+      explorationEngineService.exploration,
+      'getInteractionId'
+    ).and.returnValue('TextInput');
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteractionCustomizationArgs'
+    ).and.returnValue({});
+    spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
     ).and.returnValue('<div>interaction</div>');
     spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue('');
 

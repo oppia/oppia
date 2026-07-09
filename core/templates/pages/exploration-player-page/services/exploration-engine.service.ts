@@ -479,7 +479,7 @@ export class ExplorationEngineService {
    * @returns {string} The formatted HTML for the state's interaction.
    * @throws {Error} If the interaction ID or customization arguments are null.
    */
-  _getInteractionHtmlByStateName(
+  private _getInteractionHtmlByStateName(
     labelForFocusTarget: string,
     stateName: string
   ): string {
