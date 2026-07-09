@@ -429,6 +429,12 @@ INVALID_CONTENT_ID = 'invalid_content_id'
 # The default content text for the initial state of an exploration.
 DEFAULT_STATE_CONTENT_STR = ''
 
+# Content IDs and prefixes for exploration metadata.
+EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
+EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
+EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
+EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
+
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
 DEFAULT_AUTO_TTS_ENABLED = False
@@ -594,7 +600,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.5.1'
+OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer

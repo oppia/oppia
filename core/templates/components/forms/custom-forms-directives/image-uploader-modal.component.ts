@@ -66,6 +66,16 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
+  // Public wrapper for the SVG sanitizer service's getIssueURL method.
+  // This is needed because Angular strict template checking does not
+  // allow direct access to private class members from templates.
+  getIssueURL(invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[];
+  }): string {
+    return this.svgSanitizerService.getIssueURL(invalidTagsAndAttributes);
+  }
+
   private _getAspectRatio(): number {
     return (
       parseInt(this.imageUploaderParameters.aspectRatio.split(':')[0]) /
