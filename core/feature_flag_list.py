@@ -135,7 +135,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
-    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
 ]
 
@@ -156,6 +155,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED,
     FeatureNames.STORY_EDITOR_ARCS,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -361,7 +361,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
         (
             'Enables the certificate assessment feature, allowing curriculum admins to create certificate offerings and learners to take certificate assessments.',
-            feature_flag_domain.ServerMode.DEV,
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.WEB_FEEDBACK_MODAL_ENABLED.value: (
