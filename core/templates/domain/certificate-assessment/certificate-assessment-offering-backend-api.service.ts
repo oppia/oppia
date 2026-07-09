@@ -19,7 +19,10 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {CertificateAssessmentOfferingData} from './certificate-assessment-offering.model';
+import {
+  CertificateAssessmentOfferingBackendDict,
+  CertificateAssessmentOfferingData,
+} from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
@@ -28,6 +31,18 @@ interface CreateCertificateOfferingBackendResponse {
 
 interface UpdateCertificateOfferingBackendResponse {
   certificate_id: string;
+}
+
+interface ValidateCertificateAssessmentOfferingBackendResponse {
+  is_valid: boolean;
+  validation_errors: {
+    [topicId: string]: {
+      easy: {required: number; available: number};
+      medium: {required: number; available: number};
+      hard: {required: number; available: number};
+    };
+  };
+  validation_message: string;
 }
 
 interface GetCertificateOfferingBackendResponse {
@@ -47,6 +62,10 @@ interface GetCertificateOfferingBackendResponse {
   };
 }
 
+interface GetCertificateOfferingsBackendResponse {
+  certificate_offerings: CertificateAssessmentOfferingBackendDict[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -60,31 +79,46 @@ export class CertificateAssessmentOfferingBackendApiService {
     );
   }
 
-  async getCertificateAssessmentOfferingAsync(
-    certificateId: string
-  ): Promise<CertificateAssessmentOfferingData> {
+  async getCertificateAssessmentOfferingsAsync(): Promise<
+    CertificateAssessmentOfferingData[]
+  > {
     return new Promise((resolve, reject) => {
       this.http
-        .get<GetCertificateOfferingBackendResponse>(
-          this.getCertificateOfferingByIdHandlerUrl(certificateId)
+        .get<GetCertificateOfferingsBackendResponse>(
+          CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
         )
         .toPromise()
         .then(
           response => {
             resolve(
-              CertificateAssessmentOfferingData.createFromBackendDict({
-                certificate_id: response.certificate_offering.certificate_id,
-                title: response.certificate_offering.title,
-                description: response.certificate_offering.description,
-                classroom_id: response.certificate_offering.classroom_id,
-                topic_data: response.certificate_offering.topic_data,
-                demonstrates: response.certificate_offering.demonstrates,
-                total_questions: response.certificate_offering.total_questions,
-                time_limit_in_minutes:
-                  response.certificate_offering.time_limit_in_minutes,
-                async_status: response.certificate_offering.async_status,
-                version: response.certificate_offering.version,
-              })
+              response.certificate_offerings.map(
+                certificateOfferingBackendDict => {
+                  const topicData: {
+                    [topicId: string]: number;
+                  } = {};
+                  for (const topicId of certificateOfferingBackendDict.topic_ids) {
+                    topicData[topicId] = 1;
+                  }
+                  return CertificateAssessmentOfferingData.createFromBackendDict(
+                    {
+                      certificate_id:
+                        certificateOfferingBackendDict.certificate_id,
+                      title: certificateOfferingBackendDict.title,
+                      description: certificateOfferingBackendDict.description,
+                      classroom_id: certificateOfferingBackendDict.classroom_id,
+                      topic_ids: certificateOfferingBackendDict.topic_ids,
+                      topic_data: topicData,
+                      demonstrates: certificateOfferingBackendDict.demonstrates,
+                      total_questions:
+                        certificateOfferingBackendDict.total_questions,
+                      time_limit_in_minutes:
+                        certificateOfferingBackendDict.time_limit_in_minutes,
+                      async_status: certificateOfferingBackendDict.async_status,
+                      version: certificateOfferingBackendDict.version,
+                    }
+                  );
+                }
+              )
             );
           },
           errorResponse => {
@@ -94,44 +128,61 @@ export class CertificateAssessmentOfferingBackendApiService {
     });
   }
 
+  async getCertificateAssessmentOfferingAsync(
+    certificateId: string
+  ): Promise<CertificateAssessmentOfferingData> {
+    try {
+      const response = await this.http
+        .get<GetCertificateOfferingBackendResponse>(
+          this.getCertificateOfferingByIdHandlerUrl(certificateId)
+        )
+        .toPromise();
+      return CertificateAssessmentOfferingData.createFromBackendDict({
+        certificate_id: response.certificate_offering.certificate_id,
+        title: response.certificate_offering.title,
+        description: response.certificate_offering.description,
+        classroom_id: response.certificate_offering.classroom_id,
+        topic_ids: Object.keys(response.certificate_offering.topic_data),
+        topic_data: response.certificate_offering.topic_data,
+        demonstrates: response.certificate_offering.demonstrates,
+        total_questions: response.certificate_offering.total_questions,
+        time_limit_in_minutes:
+          response.certificate_offering.time_limit_in_minutes,
+        async_status: response.certificate_offering.async_status,
+        version: response.certificate_offering.version,
+      });
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
   async createCertificateAssessmentOfferingAsync(
     certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
     const topicIds = Object.keys(certificateAssessmentOffering.topicData || {});
-    return new Promise((resolve, reject) => {
-      // TODO(#24717-M1.14): Replace this temporary stub payload with the real create
-      // request once the end-to-end certificate offering wiring is in place.
-      this.http
+    try {
+      const response = await this.http
         .post<CreateCertificateOfferingBackendResponse>(
           CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL,
           {
-            title: certificateAssessmentOffering.title || 'Stub Certificate',
-            description:
-              certificateAssessmentOffering.description || 'Stub Description',
-            classroom_id:
-              certificateAssessmentOffering.classroomId || 'math_classroom_01',
-            topics:
-              topicIds.length > 0
-                ? topicIds.map(topicId => ({topic_id: topicId}))
-                : [{topic_id: 'topic_place_values'}],
-            total_questions: certificateAssessmentOffering.totalQuestions || 1,
+            title: certificateAssessmentOffering.title,
+            description: certificateAssessmentOffering.description,
+            classroom_id: certificateAssessmentOffering.classroomId,
+            topics: topicIds.map(topicId => ({
+              topic_id: topicId,
+            })),
+            total_questions: certificateAssessmentOffering.totalQuestions,
             time_limit_in_minutes:
-              certificateAssessmentOffering.timeLimitInMinutes || 1,
-            demonstrates: ['Stub demonstration'],
-            async_status:
-              certificateAssessmentOffering.asyncStatus || 'Available',
+              certificateAssessmentOffering.timeLimitInMinutes,
+            demonstrates: certificateAssessmentOffering.demonstrates,
+            async_status: certificateAssessmentOffering.asyncStatus,
           }
         )
-        .toPromise()
-        .then(
-          response => {
-            resolve(response.certificate_id);
-          },
-          errorResponse => {
-            reject(errorResponse?.error?.error || errorResponse.message);
-          }
-        );
-    });
+        .toPromise();
+      return response.certificate_id;
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
   }
 
   async updateCertificateAssessmentOfferingAsync(
@@ -139,57 +190,60 @@ export class CertificateAssessmentOfferingBackendApiService {
     certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
     const topicIds = Object.keys(certificateAssessmentOffering.topicData || {});
-    return new Promise((resolve, reject) => {
-      // TODO(#24717-M1.14): Replace the temporary stub fallbacks in this
-      // request with the real edit-form values once the M1.14 wiring is done.
-      this.http
+    try {
+      const response = await this.http
         .put<UpdateCertificateOfferingBackendResponse>(
           this.getCertificateOfferingByIdHandlerUrl(certificateId),
           {
-            title: certificateAssessmentOffering.title || 'Stub Certificate',
-            description:
-              certificateAssessmentOffering.description || 'Stub Description',
-            classroom_id:
-              certificateAssessmentOffering.classroomId || 'math_classroom_01',
-            topics:
-              topicIds.length > 0
-                ? topicIds.map(topicId => ({topic_id: topicId}))
-                : [{topic_id: 'topic_place_values'}],
-            total_questions: certificateAssessmentOffering.totalQuestions || 1,
+            title: certificateAssessmentOffering.title,
+            description: certificateAssessmentOffering.description,
+            classroom_id: certificateAssessmentOffering.classroomId,
+            topics: topicIds.map(topicId => ({
+              topic_id: topicId,
+            })),
+            total_questions: certificateAssessmentOffering.totalQuestions,
             time_limit_in_minutes:
-              certificateAssessmentOffering.timeLimitInMinutes || 1,
-            demonstrates: ['Stub demonstration'],
-            async_status:
-              certificateAssessmentOffering.asyncStatus || 'Available',
+              certificateAssessmentOffering.timeLimitInMinutes,
+            demonstrates: certificateAssessmentOffering.demonstrates,
+            async_status: certificateAssessmentOffering.asyncStatus,
           }
         )
-        .toPromise()
-        .then(
-          response => {
-            resolve(response.certificate_id);
-          },
-          errorResponse => {
-            reject(errorResponse?.error?.error || errorResponse.message);
-          }
-        );
-    });
+        .toPromise();
+      return response.certificate_id;
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
   }
 
   async deleteCertificateAssessmentOfferingAsync(
     certificateId: string
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http
+    try {
+      await this.http
         .delete<void>(this.getCertificateOfferingByIdHandlerUrl(certificateId))
-        .toPromise()
-        .then(
-          () => {
-            resolve();
-          },
-          errorResponse => {
-            reject(errorResponse?.error?.error || errorResponse.message);
+        .toPromise();
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
+  async validateCertificateAssessmentOfferingAsync(
+    topicIds: string[],
+    totalQuestions: number
+  ): Promise<ValidateCertificateAssessmentOfferingBackendResponse> {
+    try {
+      const response = await this.http
+        .post<ValidateCertificateAssessmentOfferingBackendResponse>(
+          CertificateAssessmentDomainConstants.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL,
+          {
+            topic_ids: topicIds,
+            total_questions: totalQuestions,
           }
-        );
-    });
+        )
+        .toPromise();
+      return response;
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
   }
 }

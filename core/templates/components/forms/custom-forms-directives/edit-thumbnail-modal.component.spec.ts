@@ -258,6 +258,19 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(dismissSpy).toHaveBeenCalled();
   });
 
+  it('should get issue URL from svg sanitizer service', () => {
+    const invalidTagsAndAttrs = {
+      tags: ['script'],
+      attrs: ['onclick'],
+    };
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue-url');
+
+    expect(component.getIssueURL(invalidTagsAndAttrs)).toBe('issue-url');
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
+    );
+  });
+
   it(
     "should disable 'Add Thumbnail' button unless a new image is" + ' uploaded',
     () => {

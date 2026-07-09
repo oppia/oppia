@@ -195,6 +195,14 @@ describe('Unresolved Answers Overview Component', () => {
     expect(component.isCurrentInteractionTrainable()).toBe(false);
   });
 
+  it('should throw error when interaction id is null in getCurrentInteractionId', () => {
+    stateInteractionIdService.savedMemento = null;
+
+    expect(() => component.getCurrentInteractionId()).toThrowError(
+      'Expected stateInteraction ID to be non-null.'
+    );
+  });
+
   it('should check whenever the current interaction is linear or not', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
