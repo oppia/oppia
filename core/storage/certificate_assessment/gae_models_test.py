@@ -266,10 +266,8 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
                     'total_score': 84.5,
                     'attempt_index': 2,
                     'attempt_data': self._get_sample_attempt_data(),
-                    'started_at_msec': utils.get_time_in_millisecs(started_at),
-                    'finished_at_msec': utils.get_time_in_millisecs(
-                        finished_at
-                    ),
+                    'started_at': utils.get_time_in_millisecs(started_at),
+                    'finished_at': utils.get_time_in_millisecs(finished_at),
                     'is_submitted': True,
                 }
             },
