@@ -1067,6 +1067,30 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS,
         ).put()
+        certificate_assessment_attempt = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
+            learner_id=self.USER_ID_1,
+            total_score=84.5,
+            attempt_index=1,
+            attempt_data={
+                self.TOPIC_ID_1: {
+                    'total_related_questions': 5,
+                    'total_correct_questions': 3,
+                }
+            },
+            version_data={
+                'certificate_id': 'cert_abc123',
+                'certificate_version': 1,
+                'topic_versions': {self.TOPIC_ID_1: 2},
+                'question_versions': {'question_id_1': 1},
+                'question_topic_links': {'question_id_1': [self.TOPIC_ID_1]},
+            },
+            started_at=datetime.datetime(2026, 1, 2, 3, 4, 5),
+            finished_at=datetime.datetime(2026, 1, 2, 3, 11, 5),
+            is_submitted=True,
+        )
+        self.certificate_assessment_attempt_id = (
+            certificate_assessment_attempt.id
+        )
 
         user_models.UserEmailPreferencesModel(
             id=self.USER_ID_1,
@@ -1339,6 +1363,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_certificate_assessment_offering_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_certificate_assessment_attempt_data: Dict[
+            str, Dict[str, Union[float, int, Dict[str, Dict[str, int]], bool]]
+        ] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_user_email_preferences: Dict[str, str] = {}
         expected_blog_post_data: Dict[str, Union[str, float, List[str]]] = {}
@@ -1418,6 +1445,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
             'certificate_assessment_offering_snapshot_metadata': (
                 expected_certificate_assessment_offering_sm
+            ),
+            'certificate_assessment_attempt': (
+                expected_certificate_assessment_attempt_data
             ),
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
@@ -2007,6 +2037,25 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_certificate_assessment_attempt_data = {
+            self.certificate_assessment_attempt_id: {
+                'total_score': 84.5,
+                'attempt_index': 1,
+                'attempt_data': {
+                    self.TOPIC_ID_1: {
+                        'total_related_questions': 5,
+                        'total_correct_questions': 3,
+                    }
+                },
+                'started_at': utils.get_time_in_millisecs(
+                    datetime.datetime(2026, 1, 2, 3, 4, 5)
+                ),
+                'finished_at': utils.get_time_in_millisecs(
+                    datetime.datetime(2026, 1, 2, 3, 11, 5)
+                ),
+                'is_submitted': True,
+            }
+        }
         expected_user_email_preferences: Dict[str, str] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_app_feedback_report = {
@@ -2416,6 +2465,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
             'certificate_assessment_offering_snapshot_metadata': (
                 expected_certificate_assessment_offering_sm
+            ),
+            'certificate_assessment_attempt': (
+                expected_certificate_assessment_attempt_data
             ),
             'user_email_preferences': expected_user_email_preferences,
             'user_auth_details': expected_user_auth_details,

@@ -25,7 +25,16 @@ from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Sequence, TypedDict, Union
+from typing import (
+    Dict,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    TypedDict,
+    Union,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -50,8 +59,8 @@ class CertificateAssessmentAttemptExportDict(TypedDict):
     total_score: float
     attempt_index: int
     attempt_data: Dict[str, Dict[str, int]]
-    started_at_msec: float
-    finished_at_msec: Optional[float]
+    started_at: float
+    finished_at: Optional[float]
     is_submitted: bool
 
 
@@ -311,6 +320,9 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
     The ID of instances of this class are in form of random hash of 12 chars.
     """
 
+    # The ids of certificate assessment attempts are used as Takeout keys.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
+
     # The ID of the learner who made this attempt.
     learner_id = datastore_services.StringProperty(required=True, indexed=True)
     # The total score achieved by the learner in this attempt.
@@ -418,10 +430,10 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
                 'total_score': attempt_model.total_score,
                 'attempt_index': attempt_model.attempt_index,
                 'attempt_data': attempt_model.attempt_data,
-                'started_at_msec': utils.get_time_in_millisecs(
+                'started_at': utils.get_time_in_millisecs(
                     attempt_model.started_at
                 ),
-                'finished_at_msec': (
+                'finished_at': (
                     None
                     if attempt_model.finished_at is None
                     else utils.get_time_in_millisecs(attempt_model.finished_at)
