@@ -2781,7 +2781,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         )
 
     def test_handle_not_logged_in_exception_logs_warning(self) -> None:
-        """Ensures NotLoggedInException logs a warning with the correct format."""
+        """Ensures NotLoggedInException logs a warning with the correct format
+        and without a stack trace."""
         with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.NotLoggedInException('Unauthenticated user'), False
@@ -2789,9 +2790,6 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = f"""
 
 NotLoggedInException: Unauthenticated user
-
-Stack Trace: 
-NoneType: None
 
 URL requested: {self.handler.request.uri}
 Request method: POST
@@ -2802,9 +2800,14 @@ Handler class name: BaseHandler
             self.logged_warnings,
             msg='NotLoggedInException message not match',
         )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='NotLoggedInException should not log a stack trace.',
+        )
 
     def test_not_found_exception_logs_warning(self) -> None:
-        """Ensures NotFoundException logs a warning with the correct format."""
+        """Ensures NotFoundException logs a warning with the correct format
+        and without a stack trace."""
         with self.swap(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.NotFoundException('Invalid URL requested'), False
@@ -2812,9 +2815,6 @@ Handler class name: BaseHandler
         expected_log_message = f"""
 
 NotFoundException: Invalid URL requested
-
-Stack Trace: 
-NoneType: None
 
 URL requested: {self.handler.request.uri}
 Request method: POST
@@ -2824,6 +2824,30 @@ Handler class name: BaseHandler
             expected_log_message,
             self.logged_warnings,
             msg='NotFoundException message not match',
+        )
+        self.assertTrue(
+            all('Stack Trace' not in log for log in self.logged_warnings),
+            msg='NotFoundException should not log a stack trace.',
+        )
+
+    def test_not_found_exception_suppresses_stack_trace_with_active_traceback(
+        self,
+    ) -> None:
+        """Ensures NotFoundException does not log a stack trace even when
+        raised inside an active exception context (i.e. a real traceback is
+        available via traceback.format_exc())."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            try:
+                raise self.handler.NotFoundException('Invalid URL requested')
+            except self.handler.NotFoundException as e:
+                self.handler.handle_exception(e, False)
+
+        self.assertTrue(
+            all('Traceback' not in log for log in self.logged_warnings),
+            msg=(
+                'NotFoundException must not produce a traceback in the logs '
+                'even when raised inside an active exception context.'
+            ),
         )
 
     def test_unauthorized_user_exception_logs_warning(self) -> None:

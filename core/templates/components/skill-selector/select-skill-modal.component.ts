@@ -21,11 +21,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
-export interface CategorizedSkills {
-  [topic: string]: {
-    [subtopic: string]: SkillSummaryBackendDict[];
-  };
-}
+import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+
+import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+export {CategorizedSkills};
 
 @Component({
   selector: 'oppia-select-skill',
@@ -46,12 +46,37 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   errorMessage: string =
     'This skill is already linked to the current question.';
 
+  groupedSkillSummaries: GroupedSkillSummaries = {
+    current: [],
+    others: [],
+  };
+
+  private _untriagedSkillSummariesForSelector: SkillSummary[] = [];
+  private _lastUntriagedSkillSummaries!: SkillSummaryBackendDict[];
+
+  get untriagedSkillSummariesForSelector(): SkillSummary[] {
+    if (!this.untriagedSkillSummaries) {
+      if (this._untriagedSkillSummariesForSelector.length > 0) {
+        this._untriagedSkillSummariesForSelector = [];
+      }
+      return this._untriagedSkillSummariesForSelector;
+    }
+    if (this._lastUntriagedSkillSummaries !== this.untriagedSkillSummaries) {
+      this._lastUntriagedSkillSummaries = this.untriagedSkillSummaries;
+      this._untriagedSkillSummariesForSelector =
+        this.untriagedSkillSummaries.map(dict =>
+          SkillSummary.createFromBackendDict(dict)
+        );
+    }
+    return this._untriagedSkillSummariesForSelector;
+  }
+
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
   confirm(): void {
-    let totalSkills: SkillSummaryBackendDict[] = [];
+    let totalSkills: (SkillSummaryBackendDict | ShortSkillSummary)[] = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];
     }
