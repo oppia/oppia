@@ -5242,7 +5242,7 @@ def can_access_platform_feedback_reports(
 
             return can_edit_exploration(wrapped_handler)(self, dashboard_id)
 
-        if dashboard == feconf.DESTINATION_TECHNICAL:
+        else:
             if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
                 raise self.InvalidInputException(
                     f'Invalid technical feedback team: {dashboard_id}.'
