@@ -21,11 +21,13 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
 import {TechnicalFeedbackDashboardPageRootComponent} from './technical-feedback-dashboard-page-root.component';
 import {TechnicalFeedbackDashboardPageRoutingModule} from './technical-feedback-dashboard-page-routing.module';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 
 @NgModule({
   imports: [
     SharedComponentsModule,
     CommonModule,
+    FeedbackSharedModule,
     TechnicalFeedbackDashboardPageRoutingModule,
   ],
   declarations: [

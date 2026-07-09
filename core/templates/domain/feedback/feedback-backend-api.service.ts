@@ -16,7 +16,7 @@
  * @fileoverview Backend API service for web feedback submission and triage.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -29,6 +29,9 @@ import {
   LessonFeedbackModel,
   PlatformFeedbackModel,
   FeedbackSubmitResponse,
+  DashboardType,
+  PlatformFeedbackBackendResponse,
+  PlatformFeedbackDetailResponse,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
@@ -117,6 +120,66 @@ export class FeedbackBackendApiService {
         ...payload.toBackendDict(),
         screenshot_file: screenshotData.screenshotFile,
         ...(captchaToken ? {captcha_token: captchaToken} : {}),
+      })
+      .toPromise();
+  }
+
+  async fetchPlatformFeedbackListAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    cursor: string | null,
+    statusFilter: string | null,
+    dateFromMsecs: number | null,
+    dateToMsecs: number | null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    let params = new HttpParams();
+    if (cursor) params = params.set('cursor', cursor);
+    if (statusFilter) params = params.set('status_filter', statusFilter);
+    if (dateFromMsecs)
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    if (dateToMsecs) params = params.set('date_to_msecs', String(dateToMsecs));
+
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+    ].join('/');
+    return await this.http
+      .get<PlatformFeedbackBackendResponse>(url, {
+        params,
+      })
+      .toPromise();
+  }
+
+  async fetchPlatformFeedbackDetailAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    reportId: string
+  ): Promise<PlatformFeedbackDetailResponse> {
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+    return await this.http.get<PlatformFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async updatePlatformFeedbackStatusAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    reportId: string,
+    newStatus: string
+  ): Promise<void> {
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+    await this.http
+      .put<void>(url, {
+        status: newStatus,
       })
       .toPromise();
   }

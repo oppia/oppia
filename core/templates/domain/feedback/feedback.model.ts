@@ -81,6 +81,10 @@ export type ReportAnIssueCategory =
 
 export type ReportType = 'lesson' | 'app';
 
+export type DashboardType = 'creator' | 'technical';
+
+export type TechnicalTeamType = 'LEAP' | 'CORE';
+
 export interface PlatformFeedbackBackendDict {
   source: ReportType;
   report_message: string;

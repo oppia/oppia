@@ -1,3 +1,5 @@
+// coding: utf-8
+//
 // Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +15,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Technical feedback dashboard.
+ * @fileoverview Empty state component for feedback dashboards.
+ * Displays when no feedback items match the current filters.
  */
-import {Component} from '@angular/core';
-import './technical-feedback-dashboard-page.component.css';
+
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
+import './feedback-empty-state.component.css';
 
 @Component({
-  selector: 'oppia-technical-feedback-dashboard-page',
-  templateUrl: './technical-feedback-dashboard-page.component.html',
+  selector: 'oppia-feedback-empty-state',
+  templateUrl: './feedback-empty-state.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TechnicalFeedbackDashboardPageComponent {
-  constructor() {}
+export class FeedbackEmptyStateComponent {
+  @Input() title: string = 'No feedback found';
+  @Input() message: string =
+    'There are no feedback items matching your current filters.';
+  @Input() icon: string = 'feedback';
 }
