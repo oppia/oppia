@@ -792,6 +792,8 @@
 	"I18N_JOIN_LEARNER_GROUP_BUTTON": "Unirse al grupo",
 	"I18N_LANGUAGE_BANNER_BUTTON_TEXT": "¡Entendido!",
 	"I18N_LANGUAGE_BANNER_LANG_INFO": "Puedes cambiar el idioma del sitio en cualquier momento en la barra de navegación.",
+	"I18N_LANGUAGE_SELECTOR_TEXT_ARIA_LABEL": "Selector de idioma de texto",
+	"I18N_LANGUAGE_SELECTOR_VOICEOVER_ARIA_LABEL": "Selector de idioma de voz en off",
 	"I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING": "Buenas tardes",
 	"I18N_LEARNER_DASHBOARD_ALL": "Todo",
 	"I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION": "Editar objetivos",
