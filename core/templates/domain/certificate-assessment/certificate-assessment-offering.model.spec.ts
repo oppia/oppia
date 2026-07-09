@@ -30,6 +30,7 @@ describe('Certificate Assessment Offering Data Model', () => {
       title: 'Math Assessment',
       description: 'An assessment covering basic algebra and geometry.',
       classroom_id: 'classroom_id_1',
+      topic_ids: ['topic_1', 'topic_2'],
       topic_data: {
         topic_1: 5,
         topic_2: 10,
