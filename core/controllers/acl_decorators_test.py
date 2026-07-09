@@ -8600,6 +8600,8 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         @acl_decorators.can_access_platform_feedback_reports
         def get(self, dashboard: str, dashboard_id: str) -> None:
+            del dashboard
+            del dashboard_id
             self.render_json({'success': 1})
 
     def setUp(self) -> None:

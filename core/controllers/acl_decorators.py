@@ -5264,8 +5264,4 @@ def can_access_platform_feedback_reports(
                 wrapped_technical_handler
             )(self)
 
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access feedback reports.'
-        )
-
     return test_can_access_platform_feedback_reports

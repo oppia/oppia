@@ -658,7 +658,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=400,
             )
 
-    def test_creator_cannot_update_missing_feedback_detail(self) -> None:
+    def test_creator_cannot_update_missing_feedback(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
@@ -677,6 +677,8 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
     def test_creator_cannot_get_feedback_for_different_exploration(
         self,
     ) -> None:
+        self.save_new_valid_exploration('other_exp_id', self.owner_id)
+
         other_lesson_metadata = self._get_lesson_metadata()
         other_lesson_metadata['exploration_id'] = 'other_exp_id'
         report = general_feedback_services.create_platform_report(
@@ -694,6 +696,42 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         with self.login_context(self.OWNER_EMAIL):
             response = self.get_json(
                 '/platform-feedback/creator/exp_id/%s' % report.id,
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Could not find the resource '
+            'http://localhost/platform-feedback/creator/exp_id/%s.' % report.id,
+        )
+
+    def test_creator_cannot_update_feedback_for_different_exploration(
+        self,
+    ) -> None:
+        self.save_new_valid_exploration('other_exp_id', self.owner_id)
+
+        lesson_metadata = self._get_lesson_metadata()
+        lesson_metadata['exploration_id'] = 'other_exp_id'
+
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            page_url='https://oppia.org/learn',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=lesson_metadata,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+
+            response = self.post_json(
+                '/platform-feedback/creator/exp_id/%s' % report.id,
+                {'status': feconf.STATUS_CHOICES_FIXED},
+                csrf_token=csrf_token,
                 expected_status_int=404,
             )
 

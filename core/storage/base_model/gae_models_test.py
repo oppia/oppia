@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 import re
 import types
-from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -469,6 +468,12 @@ class TestVersionedModel(base_models.VersionedModel):
     COMMIT_LOG_ENTRY_CLASS = TestCommitLogEntryModel
     # Field to seed some content into different versions.
     description = datastore_services.StringProperty(indexed=True)
+
+
+class TestBaseFeedbackModel(base_models.BaseFeedbackModel):
+    """Model that inherits BaseFeedbackModel for testing."""
+
+    ID_PREFIX = 'feedback.test'
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
@@ -1160,6 +1165,25 @@ class BaseModelTests(test_utils.GenericTestBase):
 class BaseFeedbackModelTests(test_utils.GenericTestBase):
     """Tests for BaseFeedbackModel."""
 
+    def _create_feedback_model(
+        self,
+        model_id: str,
+        created_on: datetime.datetime,
+    ) -> None:
+        """Creates a TestBaseFeedbackModel with the given creation time."""
+        model = TestBaseFeedbackModel(
+            id=model_id,
+            author_id='user_id',
+            feedback_text='Feedback text',
+            status=feconf.STATUS_CHOICES_OPEN,
+            exploration_id='exp_id',
+            lesson_metadata_schema_version=1,
+            lesson_metadata_json={},
+        )
+        model.created_on = created_on
+        model.update_timestamps()
+        model.put()
+
     def test_get_deletion_policy(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
@@ -1215,81 +1239,39 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         ):
             base_models.BaseFeedbackModel._generate_new_id()  # pylint: disable=protected-access
 
-    def test_fetch_page_handles_string_cursor(self) -> None:
-        query = mock.Mock()
-        cursor = mock.Mock()
+    def test_fetch_page_returns_cursor_for_next_page(self) -> None:
+        self._create_feedback_model('feedback_1', datetime.datetime(2026, 1, 1))
+        self._create_feedback_model('feedback_2', datetime.datetime(2026, 1, 2))
+        self._create_feedback_model('feedback_3', datetime.datetime(2026, 1, 3))
 
-        cursor.urlsafe.return_value = 'cursor123'
-
-        query.fetch_page.return_value = (
-            [mock.Mock()] * 20,
-            cursor,
-            True,
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2
         )
 
-        with mock.patch.object(
-            base_models.BaseFeedbackModel,
-            '_get_filtered_query',
-            return_value=query,
-        ):
-            query.order.return_value = query
-
-            _, next_cursor, more = base_models.BaseFeedbackModel.fetch_page(
-                page_size=20
-            )
-
-        self.assertEqual(next_cursor, 'cursor123')
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_3', 'feedback_2'],
+        )
+        self.assertIsNotNone(next_cursor)
         self.assertTrue(more)
 
-    def test_fetch_page_decodes_bytes_cursor(self) -> None:
-        query = mock.Mock()
-        cursor = mock.Mock()
-
-        cursor.urlsafe.return_value = b'cursor123'
-
-        query.fetch_page.return_value = (
-            [mock.Mock()] * 20,
-            cursor,
-            True,
-        )
-
-        with mock.patch.object(
-            base_models.BaseFeedbackModel,
-            '_get_filtered_query',
-            return_value=query,
-        ):
-            query.order.return_value = query
-
-            _, next_cursor, _ = base_models.BaseFeedbackModel.fetch_page(
-                page_size=20
-            )
-
-        self.assertEqual(next_cursor, 'cursor123')
-
-    def test_fetch_page_sets_more_false_when_results_less_than_page_size(
+    def test_fetch_page_accepts_cursor_for_later_page(
         self,
     ) -> None:
-        query = mock.Mock()
-        cursor = mock.Mock()
+        self._create_feedback_model('feedback_1', datetime.datetime(2026, 1, 1))
+        self._create_feedback_model('feedback_2', datetime.datetime(2026, 1, 2))
+        self._create_feedback_model('feedback_3', datetime.datetime(2026, 1, 3))
 
-        cursor.urlsafe.return_value = b'cursor'
+        _, next_cursor, _ = TestBaseFeedbackModel.fetch_page(page_size=2)
+        assert next_cursor is not None
 
-        query.fetch_page.return_value = (
-            [mock.Mock()],
-            cursor,
-            True,
+        feedback_models, final_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2, cursor=next_cursor
         )
 
-        with mock.patch.object(
-            base_models.BaseFeedbackModel,
-            '_get_filtered_query',
-            return_value=query,
-        ):
-            query.order.return_value = query
-
-            _, next_cursor, more = base_models.BaseFeedbackModel.fetch_page(
-                page_size=20
-            )
-
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_1'],
+        )
+        self.assertIsNone(final_cursor)
         self.assertFalse(more)
-        self.assertIsNone(next_cursor)

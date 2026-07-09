@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
@@ -208,6 +210,58 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
             NONEXISTENT_USER_ID
         )
         self.assertEqual(export_data, {})
+
+    def test_fetch_page_filters_by_author_exploration_and_date_range(
+        self,
+    ) -> None:
+        matching_feedback_model = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(
+                self.feedback_id1
+            )
+        )
+        assert matching_feedback_model is not None
+        matching_feedback_model.created_on = datetime.datetime(2026, 1, 15)
+        matching_feedback_model.update_timestamps()
+        matching_feedback_model.put()
+
+        other_author_feedback_model = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(
+                self.feedback_id3
+            )
+        )
+        assert other_author_feedback_model is not None
+        other_author_feedback_model.created_on = datetime.datetime(2026, 1, 15)
+        other_author_feedback_model.update_timestamps()
+        other_author_feedback_model.put()
+
+        outside_date_range_feedback_model = (
+            general_feedback_models.LessonFeedbackModel.get_by_id(
+                self.feedback_id2
+            )
+        )
+        assert outside_date_range_feedback_model is not None
+        outside_date_range_feedback_model.created_on = datetime.datetime(
+            2026, 2, 1
+        )
+        outside_date_range_feedback_model.update_timestamps()
+        outside_date_range_feedback_model.put()
+
+        feedback_models, next_cursor, more = (
+            general_feedback_models.LessonFeedbackModel.fetch_page(
+                page_size=10,
+                author_id=self.USER_ID,
+                exploration_id='exp_001',
+                date_from=datetime.datetime(2026, 1, 1),
+                date_to=datetime.datetime(2026, 1, 31),
+            )
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            [self.feedback_id1],
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
 
     def test_create_generates_id_with_correct_prefix(self) -> None:
         self.assertTrue(self.feedback_id1.startswith('feedback.lesson.'))
@@ -491,6 +545,23 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
             general_feedback_models.PlatformFeedbackModel.fetch_page(
                 page_size=10,
                 destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                platform=feconf.PLATFORM_ANDROID,
+                source=feconf.SOURCE_APP,
+            )
+        )
+
+        self.assertEqual(
+            [model.id for model in report_models], [self.report_id_app]
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_filters_without_destination_dashboard(
+        self,
+    ) -> None:
+        report_models, next_cursor, more = (
+            general_feedback_models.PlatformFeedbackModel.fetch_page(
+                page_size=10,
                 platform=feconf.PLATFORM_ANDROID,
                 source=feconf.SOURCE_APP,
             )
