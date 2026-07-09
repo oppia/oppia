@@ -38,12 +38,12 @@ export interface LessonFeedbackMetadataBackendDict {
   learner_current_answer: string | null;
 }
 
-export interface SendALessonFeedbackBackendDict {
+export interface LessonFeedbackBackendDict {
   feedback_text: string;
-  exploration_context: LessonFeedbackMetadataBackendDict;
+  lesson_metadata_json: LessonFeedbackMetadataBackendDict;
 }
 
-export class SendALessonFeedbackModel {
+export class LessonFeedbackModel {
   constructor(
     public readonly feedbackText: string,
     public readonly explorationContext: LessonFeedbackMetadata
@@ -51,18 +51,18 @@ export class SendALessonFeedbackModel {
 
   static createForSubmission(params: {
     feedbackText: string;
-    exploration_context: LessonFeedbackMetadata;
-  }): SendALessonFeedbackModel {
-    return new SendALessonFeedbackModel(
+    lesson_metadata_json: LessonFeedbackMetadata;
+  }): LessonFeedbackModel {
+    return new LessonFeedbackModel(
       params.feedbackText,
-      params.exploration_context
+      params.lesson_metadata_json
     );
   }
 
-  toBackendDict(): SendALessonFeedbackBackendDict {
+  toBackendDict(): LessonFeedbackBackendDict {
     return {
       feedback_text: this.feedbackText,
-      exploration_context: {
+      lesson_metadata_json: {
         exploration_id: this.explorationContext.explorationId,
         exploration_version: this.explorationContext.explorationVersion,
         state_name: this.explorationContext.stateName,
@@ -81,20 +81,22 @@ export type ReportAnIssueCategory =
 
 export type ReportType = 'lesson' | 'site';
 
-export interface IssueReportBackendDict {
+export interface PlatformFeedbackBackendDict {
   source: ReportType;
   report_message: string;
-  exploration_context: LessonFeedbackMetadataBackendDict | null;
+  page_url: string;
+  lesson_metadata_json: LessonFeedbackMetadataBackendDict | null;
   category: ReportAnIssueCategory | null;
   include_technical_logs: boolean;
   session_info: FeedbackSessionInfo | null;
   screenshot_filename: string | null;
 }
 
-export class IssueReportModel {
+export class PlatformFeedbackModel {
   constructor(
     public readonly source: ReportType,
     public readonly reportMessage: string,
+    public readonly pageUrl: string,
     public readonly explorationContext: LessonFeedbackMetadata | null,
     public readonly category: ReportAnIssueCategory | null,
     public readonly includeTechnicalLogs: boolean,
@@ -105,15 +107,17 @@ export class IssueReportModel {
   static createForSubmission(params: {
     source: ReportType;
     reportMessage: string;
+    pageUrl: string;
     explorationContext: LessonFeedbackMetadata | null;
     category: ReportAnIssueCategory | null;
     includeTechnicalLogs: boolean;
     sessionInfo: FeedbackSessionInfo | null;
     screenshotFilename: string | null;
-  }): IssueReportModel {
-    return new IssueReportModel(
+  }): PlatformFeedbackModel {
+    return new PlatformFeedbackModel(
       params.source,
       params.reportMessage,
+      params.pageUrl,
       params.explorationContext,
       params.category,
       params.includeTechnicalLogs,
@@ -122,11 +126,11 @@ export class IssueReportModel {
     );
   }
 
-  toBackendDict(): IssueReportBackendDict {
+  toBackendDict(): PlatformFeedbackBackendDict {
     return {
       source: this.source,
       report_message: this.reportMessage,
-      exploration_context: this.explorationContext
+      lesson_metadata_json: this.explorationContext
         ? {
             exploration_id: this.explorationContext.explorationId,
             exploration_version: this.explorationContext.explorationVersion,
@@ -142,6 +146,7 @@ export class IssueReportModel {
       session_info:
         this.includeTechnicalLogs && this.sessionInfo ? this.sessionInfo : null,
       screenshot_filename: this.screenshotFilename,
+      page_url: this.pageUrl,
     };
   }
 }
@@ -149,9 +154,9 @@ export class IssueReportModel {
 export type FeedbackStatus =
   | 'open'
   | 'fixed'
-  | 'ignored'
   | 'compliment'
-  | 'not_actionable';
+  | 'not_actionable'
+  | 'transferred_to_github';
 
 export interface FeedbackSessionInfo {
   console_logs_json: {

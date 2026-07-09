@@ -29,6 +29,7 @@
     "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.constants.ts",
     "core/templates/pages/topic-editor-page/topic-editor-page.constants.ts",
     "core/templates/pages/topic-viewer-page/deprecations/modals/practice-session-confirmation-modal.component.css",
+    "core/templates/pages/story-editor-page/modal-templates/edit-arc-modal.component.css",
     "core/tests/karma.conf.ts",
     "core/tests/protractor-browserstack.conf.js",
     "core/tests/wdio.conf.js",
@@ -40,6 +41,7 @@
     "core/tests/ci-test-suite-configs/README.md",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
+    "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [

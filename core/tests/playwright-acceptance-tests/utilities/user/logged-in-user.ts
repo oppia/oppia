@@ -131,6 +131,7 @@ const emptyProgressSectionContainerSelector =
 const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
 
 const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
+const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const goalsSectionSelector = '.e2e-test-goals-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
@@ -184,6 +185,7 @@ const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 const commonLessonCardContainerSelector =
   '.e2e-test-redesigned-lesson-card-container';
 const commonlessonTitleSelector = '.e2e-test-lesson-title';
+const lessonTitleSelector = 'p.mb-0';
 
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
@@ -277,25 +279,27 @@ export class LoggedInUser extends BaseUser {
         const iconContainers = await this.page.$$(
           learnerDashboardIconsSelector
         );
-        const dropdownIcon = await iconContainers[lessonIndex].$(
-          mobileLessonCardOptionsDropdownButton
+        const dropdownIcon = await this.getElementInParent(
+          mobileLessonCardOptionsDropdownButton,
+          iconContainers[lessonIndex]
         );
-        await dropdownIcon?.click();
+        if (dropdownIcon) {
+          await this.clickOnElement(dropdownIcon);
+        }
 
-        await iconContainers[lessonIndex].waitForSelector(
-          mobileAddToPlayLaterButton
+        const mobileAddToPlayLaterButtonElement = await this.getElementInParent(
+          mobileAddToPlayLaterButton,
+          iconContainers[lessonIndex]
         );
-        const mobileAddToPlayLaterButtonElement = await iconContainers[
-          lessonIndex
-        ].$(mobileAddToPlayLaterButton);
-
-        await mobileAddToPlayLaterButtonElement?.click();
+        if (mobileAddToPlayLaterButtonElement) {
+          await this.clickOnElement(mobileAddToPlayLaterButtonElement);
+        }
       } else {
         await this.expectElementToBeAttachedInDOM(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
           desktopAddToPlayLaterButton
         );
-        await addToPlayLaterButtons[lessonIndex].click();
+        await this.clickOnElement(addToPlayLaterButtons[lessonIndex]);
       }
 
       // Post-check: Verify if the tooltip appears.
@@ -316,13 +320,30 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Cancels the goal modal without saving changes.
+   */
+  async cancelGoalModalInRedesignedLearnerDashboard(): Promise<void> {
+    // Find the cancel button in the modal.
+    const cancelButton = await this.page.$(
+      '.oppia-learner-dash-button--inverse.outline'
+    );
+    if (cancelButton) {
+      await this.clickOnElement(cancelButton);
+      await this.expectElementToBeVisible(
+        newGoalsListInRedesignedLearnerDashboard,
+        false
+      );
+    }
+  }
+
+  /**
    * Clicks on the given button in the remove activity modal.
    * @param {'Remove' | 'Cancel'} button - The button to click.
    */
   async clickButtonInRemoveActivityModal(
     button: 'Remove' | 'Cancel'
   ): Promise<void> {
-    await this.page.waitForSelector(removeModalContainerSelector);
+    await this.expectElementToBeVisible(removeModalContainerSelector);
 
     if (button === 'Remove') {
       await this.clickOnElementWithSelector(removeModalConfirmButtonSelector);
@@ -330,29 +351,24 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnElementWithSelector(removeModalCancelButtonSelector);
     }
 
-    await this.page.waitForSelector(removeModalContainerSelector, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(removeModalContainerSelector, false);
   }
 
   /**
    * Function to click on the add goals button in the redesigned learner dashboard.
    */
   async clickOnAddGoalsButtonInRedesignedLearnerDashboard(): Promise<void> {
-    await this.page.waitForSelector(
-      addGoalsButtonInRedesignedLearnerDashboard,
-      {
-        state: 'visible',
-      }
+    await this.expectElementToBeVisible(
+      addGoalsButtonInRedesignedLearnerDashboard
     );
     await this.clickOnElementWithSelector(
       addGoalsButtonInRedesignedLearnerDashboard
     );
 
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(
+      newGoalsListInRedesignedLearnerDashboard
+    );
   }
 
   /**
@@ -386,11 +402,8 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (checkboxText === goal) {
-        const goalCheckbox = await checkbox.$('label');
-        if (!goalCheckbox) {
-          throw new Error(`Could not find goal checkbox for ${goal}`);
-        }
-        await goalCheckbox.click();
+        const goalCheckbox = await this.getElementInParent('label', checkbox);
+        await this.clickOnElement(goalCheckbox);
         await this.page.waitForFunction(
           ({element, checked}: {element: Element; checked: boolean}) => {
             const inputElement = (element as HTMLInputElement).querySelector(
@@ -418,10 +431,7 @@ export class LoggedInUser extends BaseUser {
    */
   async deleteAccount(): Promise<void> {
     await this.clickAndWaitForNavigation(deleteAccountButton, true);
-
-    await this.page.waitForSelector(deleteAccountPage, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(deleteAccountPage);
   }
 
   /**
@@ -429,29 +439,27 @@ export class LoggedInUser extends BaseUser {
    * @param {string} username - The username of the account.
    */
   async confirmAccountDeletion(username: string): Promise<void> {
-    await this.page.waitForSelector(accountDeletionButtonInDeleteAccountPage, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(
+      accountDeletionButtonInDeleteAccountPage
+    );
     await this.clickOnElementWithSelector(
       accountDeletionButtonInDeleteAccountPage
     );
     await this.typeInInputField(confirmUsernameField, username);
     await this.clickAndWaitForNavigation(confirmAccountDeletionButton, true);
 
-    await this.page.waitForSelector(deleteMyAcccountButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(deleteMyAcccountButton, false);
     showMessage(`Account deleted for ${username}.`);
   }
 
   /**
    * Function to enter email and proceed to the next page (username page).
    * This will click "Sign In" and verify the username field is visible.
+   * @param {string} email - The email to enter.
    */
   async enterEmailAndProceedToNextPage(email: string): Promise<void> {
-    await this.page.waitForSelector(signUpEmailField, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(signUpEmailField);
+
     await this.clearAllTextFrom(signUpEmailField);
     await this.typeInInputField(signUpEmailField, email);
 
@@ -465,13 +473,9 @@ export class LoggedInUser extends BaseUser {
 
       // Post Check: Check if the login page is closed. We can't check if user
       // is redirected to the home page it is dependent to "redirects" in URL.
-      await this.page.waitForSelector(signUpEmailField, {
-        state: 'hidden',
-      });
+      await this.expectElementToBeVisible(signUpEmailField, false);
 
-      await this.page.waitForSelector(signUpUsernameField, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(signUpUsernameField);
     }
   }
 
@@ -481,7 +485,7 @@ export class LoggedInUser extends BaseUser {
    */
   async expectBioToBe(expectedBio: string): Promise<void> {
     try {
-      await this.page.waitForSelector(bioSelector);
+      await this.expectElementToBeVisible(bioSelector);
       const bioElement = await this.page.$(bioSelector);
 
       if (!bioElement) {
@@ -528,7 +532,7 @@ export class LoggedInUser extends BaseUser {
     selector: string,
     root: Page | ElementHandle | undefined = this.page
   ): Promise<void> {
-    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
+    await this.expectElementToBeVisible(learnerDashSelectors[selector].heading);
 
     const allElements =
       (await root?.$$(learnerDashSelectors[selector].heading)) ?? [];
@@ -566,9 +570,9 @@ export class LoggedInUser extends BaseUser {
    * Verifies that elements with the given texts DO NOT exist (or are not visible)
    * for the given selector group of Learner Dashboard (learnerDashSelectors).
    *
-   * @param expectedTexts - Texts that must NOT appear in the matched elements.
-   * @param selector - Selector type..
-   * @param root - Page or element type we're verifying.
+   * @param {string[]} expectedTexts - Texts that must NOT appear in the matched elements.
+   * @param {string} selectorKey - The key for the selector group.
+   * @param {Page | ElementHandle | undefined} root - Page or element type we're verifying.
    */
   async expectElementsNotToBePresentInRLD(
     expectedTexts: string[],
@@ -658,8 +662,8 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Checks if the profile dropdown contains the given element.
-   * @param item The element to check for.
-   * @param visible - Whether the element should be visible or not.
+   * @param {string} item - The element to check for.
+   * @param {boolean} visible - Whether the element should be visible or not.
    */
   async expectProfileDropdownToContainElementWithContent(
     item: string,
@@ -682,22 +686,17 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Checks if profile photo doesn't work.
+   * @param {string} picturePath - The path to the profile picture to upload.
    */
   async expectProfilePhotoDoNotUpdate(picturePath: string): Promise<void> {
-    await this.page.waitForSelector(editProfilePictureButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(editProfilePictureButton);
     await this.clickOnElementWithSelector(editProfilePictureButton);
     await this.uploadFile(picturePath);
 
     await this.expectElementToBeClickable(addProfilePictureButton, false);
-    await this.page.waitForSelector(photoUploadErrorMessage, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(photoUploadErrorMessage);
     await this.clickOnElementWithSelector(cancelProfileUploadButtonSelector);
-    await this.page.waitForSelector(addProfilePictureButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(addProfilePictureButton, false);
   }
 
   /**
@@ -707,7 +706,7 @@ export class LoggedInUser extends BaseUser {
   async expectSidebarTabToBeActiveAndContainButtonsInOrder(
     activeTab: 'Home' | 'Goals' | 'Progress'
   ): Promise<void> {
-    await this.page.waitForSelector(sidebarSelector, {state: 'visible'});
+    await this.expectElementToBeVisible(sidebarSelector);
 
     await this.isElementVisible(sidebarSelectorPic, true);
     const buttonTexts = await this.page.$$eval(
@@ -730,12 +729,58 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies Skill card titles and their progress inside a subsection.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   *  @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectSkillCardProgressToBe(
+    criteria: string,
+    expectedTitles: string[],
+    progress: number,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresentInRLD(
+      expectedTitles,
+      'skillCard',
+      subsectionElement
+    );
+
+    for (const title of expectedTitles) {
+      const skillCardElement = await this.findChildElementInParent(
+        subsectionElement,
+        learnerDashSelectors.skillCard,
+        title
+      );
+      if (!skillCardElement) {
+        throw new Error(`Skill card with title "${title}" was not found.`);
+      }
+
+      const progressText = await skillCardElement.$eval(
+        learnerDashSelectors.skillCard.progress,
+        el => el.textContent?.trim() || ''
+      );
+
+      const match = progressText.match(/\d+/);
+      const numericProgress = match ? parseInt(match[0], 10) : NaN;
+
+      expect(numericProgress).toBe(progress);
+    }
+  }
+
+  /**
    * Expects the user's subject interests to match a certain list.
    * @param {string[]} expectedInterests - The expected list of interests.
    */
   async expectSubjectInterestsToBe(expectedInterests: string[]): Promise<void> {
     try {
-      await this.page.waitForSelector(subjectInterestSelector);
+      await this.expectElementToBeVisible(subjectInterestSelector);
       const interestElements = await this.page.$$(subjectInterestSelector);
       const actualInterests = await Promise.all(
         interestElements.map(el =>
@@ -783,6 +828,7 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Verifies that the current page URL includes the expected page pathname.
+   * @param {string} expectedPage - The expected page pathname (e.g., 'learner-dashboard').
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
@@ -803,7 +849,7 @@ export class LoggedInUser extends BaseUser {
    */
   async exportAccount(): Promise<void> {
     try {
-      await this.page.waitForSelector(exportButtonSelector);
+      await this.expectElementToBeVisible(exportButtonSelector);
       const exportButton = await this.page.$(exportButtonSelector);
 
       if (!exportButton) {
@@ -811,7 +857,7 @@ export class LoggedInUser extends BaseUser {
       }
 
       await this.waitForPageToFullyLoad();
-      await exportButton.click();
+      await this.clickOnElement(exportButton);
 
       const isTextPresent = await this.isTextPresentOnPage(
         ACCOUNT_EXPORT_CONFIRMATION_MESSAGE
@@ -843,20 +889,14 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(profileDropdown, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 
-    await this.page.waitForSelector(learnerDashboardMenuLink, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(learnerDashboardMenuLink);
     await this.clickOnElementWithSelector(learnerDashboardMenuLink);
 
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-      state: 'attached',
-    });
+    await this.expectElementToBeAttachedInDOM(homeTabSectionInLearnerDashboard);
   }
 
   /**
@@ -895,6 +935,20 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to click on the Or Explore All Lessons in Classroom section in the redesigned learner dashboard
+   */
+  async navigateThroughClassroomButtonOnRLD(): Promise<void> {
+    const goToClassroomButton = await this.page.$(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    if (goToClassroomButton) {
+      await this.clickOnElement(goToClassroomButton);
+    }
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Navigate to any classroom using button in topics available in classroom section.
    * Currently there is only math.
    * @param {string} classroom - Classroom.
@@ -916,7 +970,7 @@ export class LoggedInUser extends BaseUser {
       );
       if (buttonHref?.includes(classroom)) {
         targetHref = buttonHref;
-        await buttonElement.click();
+        await this.clickOnElement(buttonElement);
         await this.page.waitForNavigation({waitUntil: 'networkidle'});
         break;
       }
@@ -962,7 +1016,7 @@ export class LoggedInUser extends BaseUser {
         learnerDashSelectors.lessonCard.button
       );
       if (lessonCardButtonElement) {
-        await lessonCardButtonElement.click();
+        await this.clickOnElement(lessonCardButtonElement);
         await this.page.waitForNavigation({waitUntil: 'networkidle'});
       }
     } else {
@@ -997,10 +1051,47 @@ export class LoggedInUser extends BaseUser {
     );
 
     if (topicCardElement) {
-      await topicCardElement.click();
+      await this.clickOnElement(topicCardElement as ElementHandle<Element>);
       await this.page.waitForNavigation({waitUntil: 'networkidle'});
     } else {
       throw new Error(`${topic} is not a valid topic`);
+    }
+  }
+
+  /**
+   * Navigates to lesson using lesson card.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} skillTitle - Lesson card title expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async navigateToSkillByCard(
+    criteria: string,
+    skillTitle: string,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    const skillCardElement = await this.findChildElementInParent(
+      subsectionElement,
+      learnerDashSelectors.skillCard,
+      skillTitle
+    );
+
+    if (skillCardElement) {
+      const skillCardButtonElement = await skillCardElement.$(
+        learnerDashSelectors.skillCard.button
+      );
+      if (skillCardButtonElement) {
+        await this.clickOnElement(skillCardButtonElement);
+        await this.page.waitForNavigation({waitUntil: 'networkidle'});
+      }
+    } else {
+      throw new Error(
+        `${skillTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
     }
   }
 
@@ -1043,7 +1134,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedGreetings - The expected greetings.
    */
   async expectLearnerGreetingsToBe(expectedGreetings: string): Promise<void> {
-    await this.page.waitForSelector(learnerGreetingsSelector);
+    await this.expectElementToBeVisible(learnerGreetingsSelector);
 
     const greetings = await this.page.$eval(learnerGreetingsSelector, el =>
       el.textContent?.trim()
@@ -1062,40 +1153,6 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(
       addGoalsButtonInRedesignedLearnerDashboard,
       visible
-    );
-  }
-
-  /**
-   * Function to verify that a specific chapter is present in the Learn Something New section.
-   * @param {string} chapterTitle - The title of the chapter to verify.
-   */
-  async expectChapterToBePresentInLearnSomethingNewSection(
-    chapterTitle: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(learnSomethingNewSectionSelector);
-    // Wait for lesson cards to load if they exist.
-    try {
-      await this.page.waitForSelector(lessonCardContainer, {
-        state: 'visible',
-        timeout: 5000,
-      });
-    } catch (error) {
-      // Lesson cards may not be present if section is empty (no untracked topics).
-      // This is expected for new users.
-      showMessage(
-        'Learn Something New section is empty (no lesson cards found). This is expected for new users.'
-      );
-      return;
-    }
-    const learnSomethingNewSection = await this.page.$(
-      learnSomethingNewSectionSelector
-    );
-    if (!learnSomethingNewSection) {
-      throw new Error('Learn Something New section not found.');
-    }
-    await this.expectLessonCardToBePresent(
-      chapterTitle,
-      learnSomethingNewSection
     );
   }
 
@@ -1133,9 +1190,7 @@ export class LoggedInUser extends BaseUser {
   async expectCurrentGoalsInRedesignedDashboardToContain(
     goal: string
   ): Promise<void> {
-    await this.page.waitForSelector(currentGoalsContainerSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(currentGoalsContainerSelector);
     const currentGoalsSection = await this.page.$(
       currentGoalsContainerSelector
     );
@@ -1154,9 +1209,7 @@ export class LoggedInUser extends BaseUser {
     goal: string,
     context: ElementHandle<Element> | Page
   ): Promise<void> {
-    await context.waitForSelector(goalContainerSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(goalContainerSelector);
 
     const goalTitles = await context.$$eval(goalTitleSelector, elements =>
       elements.map(el => el.textContent?.trim())
@@ -1167,6 +1220,7 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Checks if greeting has name of the user.
+   * @param {string} userName - The name of the user to check for in the greeting.
    */
   async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
     // Check for redesigned dashboard greeting first.
@@ -1232,13 +1286,16 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(goalsSectionSelector);
+      await this.expectElementToBeVisible(goalsSectionSelector);
       await this.clickOnElementWithSelector(goalsSectionSelector);
 
       try {
-        await this.page.waitForSelector(currentGoalsSectionSelector, {
-          timeout: 5000,
-        });
+        await this.expectElementToBeVisible(
+          currentGoalsSectionSelector,
+          true,
+          this.page,
+          5000
+        );
       } catch (error) {
         if (error instanceof Error && error.message.includes('Timeout')) {
           // Try clicking again if does not opens the expected page.
@@ -1250,12 +1307,12 @@ export class LoggedInUser extends BaseUser {
 
       await this.expectElementToBeVisible(goalsSectionContainerSelector);
     } else {
-      await this.page.waitForSelector(goalsSectionSelector);
+      await this.expectElementToBeVisible(goalsSectionSelector);
       const goalSectionElement = await this.page.$(goalsSectionSelector);
       if (!goalSectionElement) {
         throw new Error('Progress section not found.');
       }
-      await goalSectionElement.click();
+      await this.clickOnElement(goalSectionElement);
     }
 
     await this.waitForPageToFullyLoad();
@@ -1280,19 +1337,13 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Preferences Page Using Profile Dropdown Menu.
    */
   async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(profileDropdown);
     await this.clickOnElementWithSelector(profileDropdown);
 
-    await this.page.waitForSelector(preferencesMenuLink, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(preferencesMenuLink);
     await this.clickOnElementWithSelector(preferencesMenuLink);
 
-    await this.page.waitForSelector(preferencesContainerSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(preferencesContainerSelector);
   }
 
   /**
@@ -1314,9 +1365,7 @@ export class LoggedInUser extends BaseUser {
     }
     await this.clickOnElementWithText('Sign in');
 
-    await this.page.waitForSelector(loginPage, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(loginPage);
   }
 
   /**
@@ -1334,23 +1383,81 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Check if rating stars are displayed.
+   * Clicks on a lesson card button to start or resume the lesson.
+   * @param {string} lessonTitle - The title of the lesson.
    */
-  async expectRatingStarsToBeVisible(): Promise<void> {
-    await this.page.waitForFunction(
-      ({headerSelector, starSelector, expectedCount}) => {
-        const header = document.querySelector(headerSelector);
-        if (!header) {
-          return false;
+  async clickLessonCardButton(lessonTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonCardContainer);
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const card of lessonCards) {
+      const titles = await card.$$eval(lessonTitleSelector, els =>
+        els.map(el => el.textContent?.trim())
+      );
+
+      if (titles.some(text => text && text.includes(lessonTitle))) {
+        const button = await card.$('a.oppia-learner-dash-button--goals-list');
+
+        if (!button) {
+          throw new Error(`Button not found for lesson "${lessonTitle}".`);
         }
-        return document.querySelectorAll(starSelector).length === expectedCount;
-      },
-      {
-        headerSelector: ratingsHeaderSelector,
-        starSelector: ratingStarSelector,
-        expectedCount: 5,
+
+        await button.evaluate(el => {
+          if (el instanceof HTMLElement) {
+            el.scrollIntoView({behavior: 'auto', block: 'center'});
+          }
+        });
+
+        const href = await button.evaluate(el =>
+          el instanceof HTMLAnchorElement ? el.href : null
+        );
+
+        const waitForExplorationPlayer = async (): Promise<void> => {
+          // Wait for navigation to land on an exploration and for the player to render.
+          await this.page.waitForFunction(
+            () =>
+              window.location.pathname.includes('/explore/') ||
+              document.querySelector(
+                '.e2e-test-conversation-skin-cards-container'
+              ),
+            {
+              timeout: 60000,
+            }
+          );
+
+          await this.expectElementToBeVisible(
+            '.e2e-test-conversation-skin-cards-container',
+            true,
+            this.page,
+            60000
+          );
+        };
+
+        if (!href) {
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: 'networkidle',
+              timeout: 60000,
+            }),
+            this.clickOnElement(button),
+          ]);
+          await waitForExplorationPlayer();
+          return;
+        }
+
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: 'networkidle',
+            timeout: 60000,
+          }),
+          this.page.goto(href),
+        ]);
+        await waitForExplorationPlayer();
+        return;
       }
-    );
+    }
+
+    throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
   }
 
   /**
@@ -1385,17 +1492,18 @@ export class LoggedInUser extends BaseUser {
   /**
    * Expects the remove activity model to be displayed.
    * @param {string} [header] - The header of the modal.
+   * @param {string} [body] - The body of the modal.
    */
   async expectRemoveActivityModelToBeDisplayed(
     header?: string,
     body?: string
   ): Promise<void> {
     // Check for the modal container.
-    await this.page.waitForSelector(removeModalContainerSelector);
+    await this.expectElementToBeVisible(removeModalContainerSelector);
 
     // Check for the header.
     if (header) {
-      await this.page.waitForSelector(removeModalHeaderSelector);
+      await this.expectElementToBeVisible(removeModalHeaderSelector);
       const headerText = await this.page.$eval(
         removeModalHeaderSelector,
         el => el.textContent
@@ -1405,13 +1513,388 @@ export class LoggedInUser extends BaseUser {
 
     // Check for the body.
     if (body) {
-      await this.page.waitForSelector(removeModalBodySelector);
+      await this.expectElementToBeVisible(removeModalBodySelector);
       const bodyText = await this.page.$eval(
         removeModalBodySelector,
         el => el.textContent
       );
       expect(bodyText).toEqual(body);
     }
+  }
+
+  /**
+   * Clicks on a goal card to open the goal details.
+   * @param topicName - The name of the topic.
+   */
+  async clickOnGoalCard(topicName: string): Promise<void> {
+    // Ensure page fully loaded (navigateToGoalsSection already verified container).
+    await this.waitForPageToFullyLoad();
+    // Confirm the goals section container is visible before looking for cards.
+    await this.expectElementToBeVisible(
+      goalsSectionContainerSelector,
+      true,
+      this.page,
+      60000
+    );
+    // Wait for the goal cards to render within the goals section.
+    await this.expectElementToBeVisible(
+      goalContainerSelector,
+      true,
+      this.page,
+      60000
+    );
+
+    const goalCards = await this.page.$$(goalContainerSelector);
+
+    for (const card of goalCards) {
+      const title = await card.$eval(goalTitleSelector, el =>
+        el.textContent?.trim()
+      );
+
+      if (title && title.includes(topicName)) {
+        const toggleButton = await this.getElementInParent(
+          '.content-toggle-button',
+          card
+        );
+        await this.clickOnElement(toggleButton);
+        // Wait for the story nodes to render, up to 30s for slow loads.
+        await this.expectElementToBeVisible('.goal-list-story-nodes');
+        return;
+      }
+    }
+
+    throw new Error(`Goal card for topic "${topicName}" not found.`);
+  }
+
+  /**
+   * Function to verify the goal in the completed goals section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to check for.
+   */
+  async expectCompletedGoalsSectionInRedesignedDashboardToContain(
+    goal: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(completedGoalsContainerSelector);
+    const completedGoalsSection = await this.page.$(
+      completedGoalsContainerSelector
+    );
+    if (!completedGoalsSection) {
+      throw new Error('Completed goals section not found.');
+    }
+    await this.expectGoalToBePresent(goal, completedGoalsSection);
+  }
+
+  /**
+   * Expects the mobile layout to be correct.
+   */
+  async expectMobileLayoutToBeCorrect(): Promise<void> {
+    const viewportSize = this.page.viewportSize();
+    expect(viewportSize?.width).toBeLessThanOrEqual(768);
+  }
+
+  /**
+   * Expects the add goals button to be visible.
+   */
+  async expectAddGoalsButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(
+      addGoalsButtonInRedesignedLearnerDashboard
+    );
+  }
+
+  /**
+   * Expects the add goals modal to be displayed.
+   */
+  async expectAddGoalsModalToBeDisplayed(): Promise<void> {
+    await this.expectElementToBeVisible(
+      newGoalsListInRedesignedLearnerDashboard
+    );
+  }
+
+  /**
+   * Expects the goal card button label to match the expected label.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} expectedLabel - The expected button label (Start, Resume, etc).
+   */
+  async expectGoalCardButtonLabel(
+    topicName: string,
+    expectedLabel: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(goalContainerSelector);
+    const goalCards = await this.page.$$(goalContainerSelector);
+
+    for (const card of goalCards) {
+      const title = await card.$eval(goalTitleSelector, el =>
+        el.textContent?.trim()
+      );
+
+      if (title && title.includes(topicName)) {
+        const button = await card.$(startGoalButtonSelector);
+
+        if (!button) {
+          throw new Error(`Button not found for goal "${topicName}".`);
+        }
+
+        const buttonText = await button.evaluate(el => el.textContent?.trim());
+        expect(buttonText).toBe(expectedLabel);
+        return;
+      }
+    }
+
+    throw new Error(`Goal card for topic "${topicName}" not found.`);
+  }
+
+  /**
+   * Expects a goal card to be visible for the given topic.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldBeVisible - Whether the card should be visible.
+   */
+  async expectGoalCardToBeVisible(
+    topicName: string,
+    shouldBeVisible: boolean = true
+  ): Promise<void> {
+    if (shouldBeVisible) {
+      await this.expectElementToBeVisible(goalContainerSelector);
+    }
+
+    const goalCards = await this.page.$$(goalContainerSelector);
+    let found = false;
+
+    for (const card of goalCards) {
+      const title = await card.$eval(goalTitleSelector, el =>
+        el.textContent?.trim()
+      );
+      // Goal titles are rendered as "<topic>: <story>". We match on topic.
+      if (title && title.includes(topicName)) {
+        found = true;
+        break;
+      }
+    }
+
+    if (shouldBeVisible) {
+      expect(found).toBe(true);
+    } else {
+      expect(found).toBe(false);
+    }
+  }
+
+  /**
+   * Expects the goal checkbox to be visible for the given topic.
+   * @param {string} topicName - The name of the topic.
+   */
+  async expectGoalCheckboxToBeVisible(topicName: string): Promise<void> {
+    const checkboxes = await this.page.$$(
+      goalCheckboxInRedesignedLearnerDashboard
+    );
+
+    for (const checkbox of checkboxes) {
+      const text = await checkbox.$eval(
+        '.oppia-learner-dash-goals-checkbox-text',
+        el => el.textContent?.trim()
+      );
+      if (text === topicName) {
+        return;
+      }
+    }
+
+    throw new Error(`Checkbox for topic "${topicName}" not found.`);
+  }
+
+  /**
+   * Expects goal progress to be displayed for a given topic.
+   * @param {string} topicName - The name of the topic.
+   * @param {number} expectedProgress - The expected progress percentage (0-100).
+   */
+  async expectGoalProgressToBeDisplayed(
+    topicName: string,
+    expectedProgress: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(goalContainerSelector);
+    const goalCards = await this.page.$$(goalContainerSelector);
+
+    for (const card of goalCards) {
+      const title = await card.$eval(goalTitleSelector, el =>
+        el.textContent?.trim()
+      );
+
+      if (title && title.includes(topicName)) {
+        const progressBar = await card.$('.goal-list-progress-bar');
+
+        if (!progressBar) {
+          throw new Error(
+            `Progress element not found for goal "${topicName}".`
+          );
+        }
+
+        const widthStyle = await progressBar.$eval(
+          'div',
+          el => (el as HTMLElement).style.width
+        );
+
+        const actualProgress = Math.round(
+          parseFloat(widthStyle.replace('%', ''))
+        );
+
+        if (Math.abs(actualProgress - expectedProgress) > 0.01) {
+          throw new Error(
+            `Expected progress ${expectedProgress}% for goal "${topicName}", ` +
+              `but found ${actualProgress}%.`
+          );
+        }
+        return;
+      }
+    }
+
+    throw new Error(`Goal card for topic "${topicName}" not found.`);
+  }
+
+  /**
+   * Expects the goal detail page to be displayed.
+   * @param {string} topicName - The name of the topic.
+   */
+  async expectGoalDetailPageToBeDisplayed(topicName: string): Promise<void> {
+    await this.expectElementToBeVisible(goalContainerSelector);
+    await this.expectElementToBeVisible('.goal-list-story-nodes');
+    // Also verify the expanded card title includes the topic name.
+    const expandedTitle = await this.page.$eval(goalTitleSelector, el =>
+      el.textContent?.trim()
+    );
+    expect(expandedTitle).toContain(topicName);
+  }
+
+  /**
+   * Expects the Goals tab button to be active.
+   */
+  async expectGoalsTabButtonToBeActive(): Promise<void> {
+    const goalsTab = await this.page.$('.e2e-test-goals-section');
+
+    if (!goalsTab) {
+      throw new Error('Goals tab button not found.');
+    }
+
+    const isActive = await goalsTab.evaluate(
+      el =>
+        el.classList.contains('oppia-learner-dash-sidebar_btn--active') ||
+        el.classList.contains('oppia-learner-dashboard-section-active')
+    );
+
+    expect(isActive).toBe(true);
+  }
+
+  /**
+   * Expects the Goals tab button to be visible.
+   */
+  async expectGoalsTabButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible('.e2e-test-goals-section');
+  }
+
+  /**
+   * Expects the lesson card button label to match the expected label.
+   * @param {string} lessonTitle - The title of the lesson.
+   * @param {string} expectedLabel - The expected button label.
+   */
+  async expectLessonCardButtonLabel(
+    lessonTitle: string,
+    expectedLabel: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(lessonCardContainer);
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const card of lessonCards) {
+      const titles = await card.$$eval(lessonTitleSelector, els =>
+        els.map(el => el.textContent?.trim())
+      );
+
+      if (titles.some(text => text && text.includes(lessonTitle))) {
+        const button = await card.$('a.oppia-learner-dash-button--goals-list');
+
+        if (!button) {
+          throw new Error(`Button not found for lesson "${lessonTitle}".`);
+        }
+
+        const buttonText = await button.evaluate(el => el.textContent?.trim());
+        expect(buttonText).toBe(expectedLabel);
+        return;
+      }
+    }
+
+    throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
+  }
+
+  /**
+   * Expects a lesson card to be visible.
+   * @param {string} lessonTitle - The title of the lesson card.
+   */
+  async expectLessonCardToBeVisible(lessonTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonCardContainer);
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const card of lessonCards) {
+      const titles = await card.$$eval(lessonTitleSelector, els =>
+        els.map(el => el.textContent?.trim())
+      );
+
+      if (titles.some(text => text && text.includes(lessonTitle))) {
+        return;
+      }
+    }
+
+    throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
+  }
+
+  /**
+   * Function to verify that a specific chapter is present in the Learn Something New section.
+   * @param {string} chapterTitle - The title of the chapter to verify.
+   */
+  async expectChapterToBePresentInLearnSomethingNewSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(learnSomethingNewSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.expectElementToBeVisible(
+        lessonCardContainer,
+        true,
+        this.page,
+        5000
+      );
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Learn Something New section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const learnSomethingNewSection = await this.page.$(
+      learnSomethingNewSectionSelector
+    );
+    if (!learnSomethingNewSection) {
+      throw new Error('Learn Something New section not found.');
+    }
+    await this.expectLessonCardToBePresent(
+      chapterTitle,
+      learnSomethingNewSection
+    );
+  }
+
+  /**
+   * Check if rating stars are displayed.
+   */
+  async expectRatingStarsToBeVisible(): Promise<void> {
+    await this.page.waitForFunction(
+      ({headerSelector, starSelector, expectedCount}) => {
+        const header = document.querySelector(headerSelector);
+        if (!header) {
+          return false;
+        }
+        return document.querySelectorAll(starSelector).length === expectedCount;
+      },
+      {
+        headerSelector: ratingsHeaderSelector,
+        starSelector: ratingStarSelector,
+        expectedCount: 5,
+      }
+    );
   }
 
   /**
@@ -1428,9 +1911,7 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(explorationCard, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(explorationCard);
 
     const lessonCards = await this.page.$$(explorationCard);
     const lessonTitles = await Promise.all(
@@ -1477,7 +1958,7 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Waits for the given number of filled stars to be present on the page.
-   * @param rating The number of filled stars to wait for.
+   * @param {number} rating The number of filled stars to wait for.
    */
   async expectStarRatingToBe(rating: number): Promise<void> {
     await this.page.waitForFunction(
@@ -1501,14 +1982,14 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedError - The expected error message.
    */
   async expectUsernameError(expectedError: string): Promise<void> {
-    await this.page.waitForSelector(invalidUsernameErrorContainer);
+    await this.expectElementToBeVisible(invalidUsernameErrorContainer);
     const errorMessage = await this.page.$eval(
       invalidUsernameErrorContainer,
       el => el.textContent
     );
     if (errorMessage?.trim() !== expectedError) {
       throw new Error(
-        `D error does not match. Expected: ${expectedError}, but got: ${errorMessage}`
+        `Username error does not match. Expected: ${expectedError}, but got: ${errorMessage}`
       );
     }
   }
@@ -1519,7 +2000,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionSelector);
+      await this.expectElementToBeVisible(progressSectionSelector);
       await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
@@ -1535,7 +2016,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnElementWithSelector(mobileCommunityLessonSectionButton);
     } else {
       await this.expectElementToBeVisible(progressSectionSelector);
-      await this.page.click(communityLessonsSectionButton);
+      await this.clickOnElementWithSelector(communityLessonsSectionButton);
     }
 
     await this.expectElementToBeVisible(
@@ -1552,6 +2033,8 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function for navigating to the profile page for a given username.
+   * @param {string} username - The username of the profile to navigate to.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation.
    */
   async navigateToProfilePage(
     username: string,
@@ -1569,7 +2052,7 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToProfilePageFromPreferencePage(): Promise<void> {
     try {
-      await this.page.waitForSelector(goToProfilePageButton);
+      await this.expectElementToBeVisible(goToProfilePageButton);
       const profileTab = await this.page.$(goToProfilePageButton);
 
       if (!profileTab) {
@@ -1595,13 +2078,16 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToProgressSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionSelector);
+      await this.expectElementToBeVisible(progressSectionSelector);
       await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
-        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
-          timeout: 5000,
-        });
+        await this.expectElementToBeVisible(
+          mobileCommunityLessonSectionButton,
+          true,
+          this.page,
+          5000
+        );
       } catch (error) {
         if (error instanceof Error && error.message.includes('Timeout')) {
           // Try clicking again if does not opens the expected page.
@@ -1611,27 +2097,23 @@ export class LoggedInUser extends BaseUser {
         }
       }
 
-      await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(progressTabSectionInLearnerDashboard);
     } else {
-      await this.page.waitForSelector(progressSectionSelector);
+      await this.expectElementToBeVisible(progressSectionSelector);
       const progressSection = await this.page.$(progressSectionSelector);
       if (!progressSection) {
         throw new Error('Progress section not found.');
       }
-      await progressSection.click();
+      await this.clickOnElement(progressSection);
     }
 
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(progressTabSectionInLearnerDashboard);
   }
 
   /**
    * Navigates to the splash page.
-   * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
+   * @param {string} expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
   async navigateToSplashPage(
     expectedURL: string = learnerDashboardUrl
@@ -1670,10 +2152,7 @@ export class LoggedInUser extends BaseUser {
         throw new Error(`Lesson "${lessonName}" not found in search results.`);
       }
 
-      await this.waitForElementToBeClickable(
-        searchResultsElements[lessonIndex]
-      );
-      await searchResultsElements[lessonIndex].click();
+      await this.clickOnElement(searchResultsElements[lessonIndex]);
 
       await this.expectElementToBeVisible(lessonCardTitleSelector, false);
     } catch (error) {
@@ -1698,10 +2177,9 @@ export class LoggedInUser extends BaseUser {
     stayAnonymous: boolean
   ): Promise<void> {
     try {
-      await this.page.waitForSelector(ratingsHeaderSelector);
+      await this.expectElementToBeVisible(ratingsHeaderSelector);
       const ratingStars = await this.page.$$(ratingStarSelector);
-      await this.waitForElementToBeClickable(ratingStars[rating - 1]);
-      await ratingStars[rating - 1].click();
+      await this.clickOnElement(ratingStars[rating - 1]);
 
       await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
@@ -1715,9 +2193,7 @@ export class LoggedInUser extends BaseUser {
       // from the DOM before its text was read. Using textContent is also
       // more reliable than innerText for automated tests.
       // Explicitly wait for the submitted message to be visible on the page.
-      await this.page.waitForSelector(submittedMessageSelector, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(submittedMessageSelector);
       // Now that we know it's visible, we can safely get its text content.
       const submittedMessageText = await this.page.$eval(
         submittedMessageSelector,
@@ -1772,7 +2248,11 @@ export class LoggedInUser extends BaseUser {
       const removeFromPlayLaterButton = await this.page.$(
         removeFromPlayLaterButtonSelector
       );
-      await removeFromPlayLaterButton?.click();
+      if (removeFromPlayLaterButton) {
+        await this.clickOnElement(
+          removeFromPlayLaterButton as ElementHandle<Element>
+        );
+      }
 
       // Confirm removal.
       await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
@@ -1833,17 +2313,12 @@ export class LoggedInUser extends BaseUser {
   /**
    * This function is used to report an exploration. It clicks on the report button,
    * opens the report modal, selects an issue, types a description, and submits the report.
-   * @param {string} issueName - The name of the issue to report.
    * @param {string} issueDescription - The description of the issue.
    */
   async reportExploration(issueDescription: string): Promise<void> {
-    await this.page.waitForSelector(reportExplorationButtonSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(reportExplorationButtonSelector);
     await this.clickOnElementWithSelector(reportExplorationButtonSelector);
-    await this.page.waitForSelector(issueTypeSelector);
-    await this.waitForElementToStabilize(issueTypeSelector);
-    await this.page.click(issueTypeSelector);
+    await this.clickOnElementWithSelector(issueTypeSelector);
     await this.typeInInputField(
       reportExplorationTextAreaSelector,
       issueDescription
@@ -1854,25 +2329,22 @@ export class LoggedInUser extends BaseUser {
     await this.waitForElementToStabilize(closeModalButton);
     await this.clickOnElementWithSelector(closeModalButton);
 
-    await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(
+      explorationSuccessfullyFlaggedMessage,
+      false
+    );
   }
 
   /**
    * Saves the changes made in the preferences page.
    */
   async saveChangesInPreferencesPage(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(saveChangesButtonSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(saveChangesButtonSelector);
     await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
     // Wait for the button to re-appear in the reloaded DOM before querying it.
-    await this.page.waitForSelector(`button${saveChangesButtonSelector}`, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(`button${saveChangesButtonSelector}`);
     const isDisabled = await this.page.$eval(
       `button${saveChangesButtonSelector}`,
       btn => (btn as HTMLButtonElement).disabled
@@ -1886,6 +2358,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Sets the viewport to mobile size.
+   */
+  async setMobileViewport(): Promise<void> {
+    await this.page.setViewportSize({width: 375, height: 667});
+  }
+
+  /**
    * Enters the provided username into the sign up username field and sign in if the username is correct.
    * @param {string} username - The username to enter.
    * @param {boolean} verifyLogin - Whether to verify the login after entering the username.
@@ -1895,9 +2374,7 @@ export class LoggedInUser extends BaseUser {
     verifyLogin: boolean = true
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(signUpUsernameField, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(signUpUsernameField);
     await this.clearAllTextFrom(signUpUsernameField);
     await this.typeInInputField(signUpUsernameField, username);
     // Using blur() to remove focus from signUpUsernameField.
@@ -1911,15 +2388,13 @@ export class LoggedInUser extends BaseUser {
     );
     if (!invalidUsernameErrorContainerElement) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
-      await this.page.waitForSelector(registerNewUserButton);
+      await this.expectElementToBeVisible(registerNewUserButton);
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle'}),
         this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),
       ]);
 
-      await this.page.waitForSelector(learnerDashboardContainerSelector, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(learnerDashboardContainerSelector);
     } else if (verifyLogin) {
       // If the username is invalid, we throw an error.
       throw new Error(
@@ -1936,7 +2411,7 @@ export class LoggedInUser extends BaseUser {
   async startGoalFromGoalsSectionInRedesignedDashboard(
     goal: string
   ): Promise<void> {
-    await this.page.waitForSelector(goalContainerSelector);
+    await this.expectElementToBeVisible(goalContainerSelector);
     const goalContainers = await this.page.$$(goalContainerSelector);
 
     for (const goalContainer of goalContainers) {
@@ -1946,11 +2421,11 @@ export class LoggedInUser extends BaseUser {
 
       if (goalTitle === goal) {
         const startGoalButton = await goalContainer.$(startGoalButtonSelector);
-        await startGoalButton?.click();
+        if (startGoalButton) {
+          await this.clickOnElement(startGoalButton);
+        }
 
-        await this.page.waitForSelector(startGoalButtonSelector, {
-          state: 'hidden',
-        });
+        await this.expectElementToBeVisible(startGoalButtonSelector, false);
         return;
       }
     }
@@ -1962,15 +2437,15 @@ export class LoggedInUser extends BaseUser {
    * Function to submit a goal in the redesigned learner dashboard.
    */
   async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
-    await this.page.waitForSelector(
-      `${addNewGoalButtonSelector}:not([disabled])`,
-      {state: 'visible'}
+    await this.expectElementToBeVisible(
+      `${addNewGoalButtonSelector}:not([disabled])`
     );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
-    await this.page.click(addNewGoalButtonSelector);
-    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      state: 'hidden',
-    });
+    await this.clickOnElementWithSelector(addNewGoalButtonSelector);
+    await this.expectElementToBeVisible(
+      newGoalsListInRedesignedLearnerDashboard,
+      false
+    );
   }
 
   /**
@@ -1997,9 +2472,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} bio - The new bio to set for the user.
    */
   async updateBio(bio: string): Promise<void> {
-    await this.page.waitForSelector(bioTextareaSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(bioTextareaSelector);
     await this.clickOnElementWithSelector(bioTextareaSelector);
     await this.typeInInputField(bioTextareaSelector, bio);
 
@@ -2020,7 +2493,7 @@ export class LoggedInUser extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     try {
-      await this.page.waitForSelector(checkboxesSelector);
+      await this.expectElementToBeVisible(checkboxesSelector);
       const checkboxes = await this.page.$$(checkboxesSelector);
 
       for (const preference of preferences) {
@@ -2029,8 +2502,7 @@ export class LoggedInUser extends BaseUser {
         for (const checkbox of checkboxes) {
           const label = await checkbox.evaluate(el => el.textContent?.trim());
           if (label === preference) {
-            await this.waitForElementToBeClickable(checkbox);
-            await checkbox.click();
+            await this.clickOnElement(checkbox);
             // Check if the checkbox is checked after clicking.
             const isChecked = await checkbox.evaluate(el => {
               const input = el.querySelector(
@@ -2067,26 +2539,30 @@ export class LoggedInUser extends BaseUser {
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredAudioLanguage(language: string): Promise<void> {
-    const select = await this.page.waitForSelector(audioLanguageInputSelector, {
-      state: 'visible',
-    });
-    await select.click();
-
-    const searchInput = await this.page.waitForSelector(
-      audioLanguageSearchInputSelector,
-      {state: 'visible'}
+    const select = await this.expectElementToBeVisible(
+      audioLanguageInputSelector
     );
-    await this.typeInInputField(searchInput, language);
+    if (select) {
+      await this.clickOnElement(select);
+    }
 
-    const targetOption = await this.page.waitForSelector(
-      `mat-option:has-text("${language}")`,
-      {state: 'visible'}
+    const searchInput = await this.expectElementToBeVisible(
+      audioLanguageSearchInputSelector
     );
-    await targetOption.scrollIntoViewIfNeeded();
-    await targetOption.click();
+    if (searchInput) {
+      await this.typeInInputField(searchInput, language);
+    }
+
+    const targetOption = await this.expectElementToBeVisible(
+      `mat-option:has-text("${language}")`
+    );
+    if (targetOption) {
+      await targetOption.scrollIntoViewIfNeeded();
+      await this.clickOnElement(targetOption);
+    }
 
     // Post-check: Ensure the audio language is properly selected.
-    await this.page.waitForSelector(audioLanguageValueSelector);
+    await this.expectElementToBeVisible(audioLanguageValueSelector);
     const audioLanguageValueElement = await this.page.$(
       audioLanguageValueSelector
     );
@@ -2145,18 +2621,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.clickOnElementWithSelector(explorationLanguageInputSelector);
 
-    await this.page.waitForSelector(optionText);
-    const options = await this.page.$$(optionText);
-    for (const option of options) {
-      const optionText = await this.page.evaluate(
-        el => el.textContent.trim(),
-        option
-      );
-      if (optionText === language) {
-        await option.click();
-        break;
-      }
-    }
+    await this.clickOnElementWithSelectorAndText(optionText, language);
 
     const foundExplorationLanguages = await this.page.$$eval(
       explorationLanguagePerferenceChipsSelector,
@@ -2175,16 +2640,12 @@ export class LoggedInUser extends BaseUser {
    * @param {string} picturePath - The path of the picture to upload.
    */
   async updateProfilePicture(picturePath: string): Promise<void> {
-    await this.page.waitForSelector(editProfilePictureButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(editProfilePictureButton);
     await this.clickOnElementWithSelector(editProfilePictureButton);
     await this.uploadFile(picturePath);
     await this.clickOnElementWithSelector(addProfilePictureButton);
 
-    await this.page.waitForSelector(addProfilePictureButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(addProfilePictureButton, false);
   }
 
   /**
@@ -2196,12 +2657,10 @@ export class LoggedInUser extends BaseUser {
   async updateSubjectInterestsWhenBlurringField(
     interests: string[]
   ): Promise<void> {
-    await this.page.waitForSelector(subjectInterestsInputSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(subjectInterestsInputSelector);
     for (const interest of interests) {
       await this.typeInInputField(subjectInterestsInputSelector, interest);
-      await this.page.click(matFormTextSelector);
+      await this.clickOnElementWithSelector(matFormTextSelector);
     }
 
     // Post-check: ensure all interests are present as tags.
@@ -2294,7 +2753,7 @@ export class LoggedInUser extends BaseUser {
    * Verifies if the page is displayed in Right-to-Left (RTL) mode.
    */
   async verifyPageIsRTL(): Promise<void> {
-    await this.page.waitForSelector(angularRootElementSelector);
+    await this.expectElementToBeVisible(angularRootElementSelector);
     const pageDirection = await this.page.evaluate(selector => {
       const oppiaRoot = document.querySelector(selector);
       if (!oppiaRoot) {
@@ -2321,7 +2780,7 @@ export class LoggedInUser extends BaseUser {
    */
   async verifyProfilePicUpdate(): Promise<void> {
     try {
-      await this.page.waitForSelector(profilePictureSelector);
+      await this.expectElementToBeVisible(profilePictureSelector);
       const profilePicture = await this.page.$(profilePictureSelector);
 
       if (!profilePicture) {

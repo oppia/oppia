@@ -402,13 +402,13 @@
     },
     {
       "name": "logged-in-learner/manage-community-lesson-progress-in-home-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-community-lesson-progress-in-home-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-community-lesson-progress-in-home-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/manage-in-progress-and-completed-lessons-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-lessons-and-skill.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-lessons-and-skill.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/play-a-complete-community-lesson",
@@ -467,8 +467,8 @@
     },
     {
       "name": "logged-in-learner/starts-from-beginning-after-completing-a-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/starts-from-beginning-after-completing-a-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/starts-from-beginning-after-completing-a-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/access-the-lesson-player",
@@ -502,13 +502,13 @@
     },
     {
       "name": "logged-in-learner/manage-goals-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-goals-in-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-goals-in-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/interact-with-goals-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/interact-with-goals-in-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/interact-with-goals-in-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "translation-submitter/translate-exploration-in-target-language",
