@@ -1334,6 +1334,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
+        expected_learner_playlist_data: Dict[str, List[str]] = {
+            'exploration_ids': [],
+            'collection_ids': [],
+        }
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1357,6 +1361,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_goals': learner_goals_data,
             'learner_group': expected_learner_group_model_data,
             'learner_groups_user': expected_learner_grp_user_model_data,
+            'learner_playlist': expected_learner_playlist_data,
             'lesson_feedback': lesson_feedback_model_data,
             'exploration_stats_task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
@@ -2029,6 +2034,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'author_name': 'test name',
             'author_bio': '',
         }
+        expected_learner_playlist_data = {
+            'exploration_ids': [],
+            'collection_ids': [],
+        }
         expected_learner_group_data = {
             'title': 'sample title',
             'description': 'sample description',
@@ -2298,6 +2307,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_goals': expected_learner_goals_data,
             'learner_group': expected_learner_group_data,
             'learner_groups_user': expected_learner_groups_user_data,
+            'learner_playlist': expected_learner_playlist_data,
             'lesson_feedback': expected_lesson_feedback_data,
             'exploration_stats_task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
