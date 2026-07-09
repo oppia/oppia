@@ -43,6 +43,12 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
+
+interface MisconceptionOutcome {
+  feedback: SubtitledHtmlBackendDict;
+  labelledAsCorrect: boolean;
+}
 
 interface TaggedMisconception {
   skillId: string | null;
@@ -102,8 +108,54 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.onSaveAnswerGroupCorrectnessLabel.emit(event);
   }
 
-  sendOnSaveAnswerGroupFeedback(event: Outcome): void {
-    this.onSaveAnswerGroupFeedback.emit(event);
+  private _misconceptionOutcome!: MisconceptionOutcome;
+  private _lastOutcomeHtml: string = '';
+  private _lastOutcomeLabelledAsCorrect: boolean = false;
+  private _outcomeIsUndefined: boolean = true;
+
+  get misconceptionOutcome(): MisconceptionOutcome {
+    if (!this.outcome) {
+      if (!this._misconceptionOutcome || !this._outcomeIsUndefined) {
+        this._outcomeIsUndefined = true;
+        this._misconceptionOutcome = {
+          feedback: {
+            html: '',
+            content_id: 'default_outcome',
+          },
+          labelledAsCorrect: false,
+        };
+      }
+      return this._misconceptionOutcome;
+    }
+
+    const currentHtml = this.outcome.feedback.html;
+    const currentLabelledAsCorrect = this.outcome.labelledAsCorrect;
+
+    if (
+      !this._misconceptionOutcome ||
+      this._outcomeIsUndefined ||
+      this._lastOutcomeHtml !== currentHtml ||
+      this._lastOutcomeLabelledAsCorrect !== currentLabelledAsCorrect
+    ) {
+      this._outcomeIsUndefined = false;
+      this._lastOutcomeHtml = currentHtml;
+      this._lastOutcomeLabelledAsCorrect = currentLabelledAsCorrect;
+      this._misconceptionOutcome = {
+        feedback: this.outcome.feedback.toBackendDict(),
+        labelledAsCorrect: this.outcome.labelledAsCorrect,
+      };
+    }
+    return this._misconceptionOutcome;
+  }
+
+  sendOnSaveAnswerGroupFeedback(event: Outcome | MisconceptionOutcome): void {
+    if ('getContentIdToHtml' in event) {
+      this.onSaveAnswerGroupFeedback.emit(event);
+    } else {
+      const outcome = cloneDeep(this.outcome);
+      outcome.feedback.html = event.feedback.html;
+      this.onSaveAnswerGroupFeedback.emit(outcome);
+    }
   }
 
   sendOnSaveAnswerGroupDest(event: Outcome): void {

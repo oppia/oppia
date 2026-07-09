@@ -89,6 +89,32 @@ export class SchemaBasedEditorComponent
     }
   }
 
+  get schemaChoices(): string[] | number[] | undefined {
+    return (this.schema as Schema & {choices?: string[] | number[]}).choices;
+  }
+
+  get schemaValidators(): Validator[] | undefined {
+    return (this.schema as Schema & {validators?: Validator[]}).validators;
+  }
+
+  get schemaUiConfig(): object | undefined {
+    return (this.schema as Schema & {ui_config?: object}).ui_config;
+  }
+
+  get schemaItems(): Schema | Schema[] | string | undefined {
+    return (this.schema as Schema & {items?: Schema | Schema[] | string}).items;
+  }
+
+  get schemaLen(): number | undefined {
+    return (this.schema as Schema & {len?: number}).len;
+  }
+
+  get schemaProperties(): {name: string; schema: Schema}[] | undefined {
+    return (
+      this.schema as Schema & {properties?: {name: string; schema: Schema}[]}
+    ).properties;
+  }
+
   constructor() {}
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: SchemaDefaultValue): void {
