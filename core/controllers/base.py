@@ -829,18 +829,26 @@ class BaseHandler(
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
         url = self.request.uri
-        stack_trace = traceback.format_exc()
+
+        # Stack traces are only included for unexpected server errors
+        # (LogType.EXCEPTION). Expected, user-facing exceptions such as
+        # NotFoundException and NotLoggedInException use LogType.WARNING and
+        # should never produce a full traceback in the logs.
+        if log_type == LogType.EXCEPTION:
+            stack_trace_section = 'Stack Trace: \n%s\n' % traceback.format_exc()
+        else:
+            stack_trace_section = ''
 
         msg = (
             '\n\n%s: %s\n\n'
-            'Stack Trace: \n%s\n'
+            '%s'
             'URL requested: %s\n'
             'Request method: %s\n'
             'Handler class name: %s\n'
             % (
                 exception_type,
                 error_message,
-                stack_trace,
+                stack_trace_section,
                 url,
                 request_method,
                 handler_class_name,

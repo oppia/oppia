@@ -49,9 +49,10 @@ export interface QuestionData {
   usedHints: string[];
 }
 
-interface ActionButton {
+export interface ActionButton {
   type: string;
-  url: string;
+  i18nId: string;
+  url?: string;
 }
 
 export interface Answer {
@@ -79,13 +80,15 @@ interface MasteryPerSkillMapping {
 }
 
 export interface QuestionPlayerConfig {
-  resultActionButtons: string[];
-  questionPlayerMode: {
+  resultActionButtons: ActionButton[];
+  skillList: string[];
+  skillDescriptions: string[];
+  questionCount: number;
+  questionPlayerMode?: {
     modeType: string;
     passCutoff: number;
   };
-  skillDescriptions: string[];
-  skillList: string[];
+  questionsSortedByDifficulty: boolean;
 }
 
 @Component({
@@ -275,7 +278,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
           this.scorePerSkillMapping[skillId].total;
         if (
           correctionRate <
-          this.questionPlayerConfig.questionPlayerMode.passCutoff
+          (this.questionPlayerConfig.questionPlayerMode?.passCutoff ?? 1.0)
         ) {
           testIsPassed = false;
           failedSkillIds.push(skillId);
@@ -300,7 +303,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     }
     let correctionRate = scorePerSkill.score / scorePerSkill.total;
     if (
-      correctionRate >= this.questionPlayerConfig.questionPlayerMode.passCutoff
+      correctionRate >=
+      (this.questionPlayerConfig.questionPlayerMode?.passCutoff ?? 1.0)
     ) {
       return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
     } else {
@@ -314,7 +318,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     }
     let correctionRate = scorePerSkill.score / scorePerSkill.total;
     if (
-      correctionRate >= this.questionPlayerConfig.questionPlayerMode.passCutoff
+      correctionRate >=
+      (this.questionPlayerConfig.questionPlayerMode?.passCutoff ?? 1.0)
     ) {
       return QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_BAR;
     } else {
@@ -403,11 +408,14 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     return this.totalQuestions;
   }
 
+  isSortByDifficulty(): boolean {
+    return this.questionPlayerConfig.questionsSortedByDifficulty ?? false;
+  }
+
   isInPassOrFailMode(): boolean {
     return (
-      this.questionPlayerConfig.questionPlayerMode &&
-      this.questionPlayerConfig.questionPlayerMode.modeType ===
-        QuestionPlayerConstants.QUESTION_PLAYER_MODE.PASS_FAIL_MODE
+      this.questionPlayerConfig.questionPlayerMode?.modeType ===
+      QuestionPlayerConstants.QUESTION_PLAYER_MODE.PASS_FAIL_MODE
     );
   }
 

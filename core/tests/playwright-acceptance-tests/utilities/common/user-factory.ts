@@ -229,7 +229,7 @@ export class UserFactory {
   ): Promise<LoggedInUser & LoggedOutUser> {
     const context = await browser.newContext({
       recordVideo: {
-        dir: `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`,
+        dir: VIDEO_RECORDING_DIR,
       },
     });
     const page = await context.newPage();

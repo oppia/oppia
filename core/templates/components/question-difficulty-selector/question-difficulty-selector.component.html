@@ -3,7 +3,7 @@
                  class="mat-radio-group-questions"
                  [class.single-option]="difficultyCount === 1"
                  *ngIf="difficultyCount !== undefined">
-  <ng-container *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as idx">
+  <ng-container *ngFor="let rubric of getRubricsForSkill(); index as idx">
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
                       class="e2e-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
