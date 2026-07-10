@@ -649,7 +649,7 @@ def convert_string_to_naive_datetime_object(
     return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
 
 
-def get_utc_time_in_millisecs() -> float:
+def get_current_time_in_millisecs() -> float:
     """Returns time in milliseconds since the Epoch.
 
     Returns:

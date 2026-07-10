@@ -1392,7 +1392,7 @@ def _change_activity_status(
         activity_rights.viewer_ids = []
         if activity_rights.first_published_msec is None:
             activity_rights.first_published_msec = (
-                utils.get_utc_time_in_millisecs()
+                utils.get_current_time_in_millisecs()
             )
 
     _save_activity_rights(

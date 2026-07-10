@@ -1106,13 +1106,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             datetime.datetime(2022, 12, 29)
         )
 
-        def _mock_get_utc_time_in_millisecs() -> int:
+        def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
 
         with self.swap(
             utils,
-            'get_utc_time_in_millisecs',
-            _mock_get_utc_time_in_millisecs,
+            'get_current_time_in_millisecs',
+            _mock_get_current_time_in_millisecs,
         ):
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_upcoming(), True
@@ -1135,13 +1135,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             datetime.datetime(2022, 12, 29)
         )
 
-        def _mock_get_utc_time_in_millisecs() -> int:
+        def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
 
         with self.swap(
             utils,
-            'get_utc_time_in_millisecs',
-            _mock_get_utc_time_in_millisecs,
+            'get_current_time_in_millisecs',
+            _mock_get_current_time_in_millisecs,
         ):
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_behind_schedule(),

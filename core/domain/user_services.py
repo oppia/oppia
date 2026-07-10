@@ -2744,7 +2744,7 @@ def log_username_change(
             changed to.
     """
 
-    model_id = '%s.%d' % (committer_id, utils.get_utc_time_in_millisecs())
+    model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
     audit_models.UsernameChangeAuditModel(
         id=model_id,
         committer_id=committer_id,

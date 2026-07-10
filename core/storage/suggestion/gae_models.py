@@ -512,7 +512,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(GeneralSuggestionModel). A list of new suggestions
             matching the criteria.
         """
-        current_time_millisecs = utils.get_utc_time_in_millisecs()
+        current_time_millisecs = utils.get_current_time_in_millisecs()
 
         threshold_datetime = datetime.datetime.utcfromtimestamp(
             current_time_millisecs / 1000.0
