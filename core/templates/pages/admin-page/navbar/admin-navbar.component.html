@@ -89,7 +89,7 @@
                     (mouseleave)="deactivateDropdownMenu()">
                   <li *ngFor="let tab of ADMIN_TAB_URLS | keyvalue">
                     <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab protractor-test-admin-{{ tab.key | lowercase }}-tab-mobile"
-                       [href]="tab.value">
+                       [href]="'/admin' + tab.value">
                       {{ tab.key }}
                     </a>
                   </li>
@@ -101,7 +101,7 @@
             <ul class="nav oppia-navbar-tabs-admin oppia-hide-in-small-width-screens">
               <li class="nav-item oppia-clickable-navbar-element float-end">
                 <a class="nav-link oppia-navbar-tab"
-                   [href]="ADMIN_TAB_URLS.ACTIVITIES"
+                   [href]="'/admin' + ADMIN_TAB_URLS.ACTIVITIES"
                    [ngClass]="{'active': isActivitiesTabOpen()}"
                    ngbTooltip="Activities"
                    container="body"
@@ -111,7 +111,7 @@
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-end">
                 <a class="nav-link oppia-navbar-tab e2e-test-admin-parameters-tab"
-                   [href]="ADMIN_TAB_URLS.PLATFORM_PARAMETERS"
+                   [href]="'/admin' + ADMIN_TAB_URLS.PLATFORM_PARAMETERS"
                    [ngClass]="{'active': isPlatformParamsTabOpen()}"
                    ngbTooltip="Platform Parameters"
                    placement="bottom"
@@ -121,7 +121,7 @@
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-end">
                 <a class="nav-link oppia-navbar-tab e2e-test-admin-roles-tab"
-                   [href]="ADMIN_TAB_URLS.ROLES"
+                   [href]="'/admin' + ADMIN_TAB_URLS.ROLES"
                    [ngClass]="{'active': isRolesTabOpen()}"
                    ngbTooltip="Roles"
                    placement="bottom"
@@ -131,7 +131,7 @@
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-end">
                 <a class="nav-link oppia-navbar-tab"
-                   [href]="ADMIN_TAB_URLS.MISC"
+                   [href]="'/admin' + ADMIN_TAB_URLS.MISC"
                    [ngClass]="{'active': isMiscTabOpen()}"
                    ngbTooltip="Miscellaneous"
                    placement="bottom"
