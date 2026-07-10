@@ -423,9 +423,12 @@
  
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link {
   color: #00645c;
+}
+.oppia-top-navigation-bar .oppia-navbar-dropdown .oppia-navbar-username {
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-word;
+  max-width: 200px;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link:hover {
   color: #333;
