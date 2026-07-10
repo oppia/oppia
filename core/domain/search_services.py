@@ -405,7 +405,7 @@ def _blog_post_summary_to_search_dict(
             'tags': blog_post_summary.tags,
             'summary': blog_post_summary.summary,
             'rank': math.floor(
-                utils.get_time_in_millisecs(blog_post_summary.published_on)
+                utils.get_utc_time_in_millisecs(blog_post_summary.published_on)
             ),
         }
         return doc

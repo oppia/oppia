@@ -134,7 +134,7 @@ class AppFeedbackReport:
             'schema_version': self.schema_version,
             'platform': self.platform,
             'submitted_on_timestamp': utils.get_human_readable_time_string(
-                utils.get_time_in_millisecs(self.submitted_on_timestamp)
+                utils.get_utc_time_in_millisecs(self.submitted_on_timestamp)
             ),
             'local_timezone_offset_hrs': self.local_timezone_offset_hrs,
             'ticket_id': self.ticket_id,

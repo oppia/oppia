@@ -170,7 +170,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                 'url_fragment': 'sample-url-fragment',
                 'tags': self.TAGS,
                 'thumbnail_filename': self.THUMBNAIL,
-                'published_on': utils.get_time_in_millisecs(
+                'published_on': utils.get_utc_time_in_millisecs(
                     self.blog_post_model.published_on
                 ),
             }
@@ -220,7 +220,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         blog_post_model.update_timestamps()
         blog_post_model.put()
         user_data = blog_models.BlogPostModel.export_data(user_id)
-        expected_millis = utils.get_time_in_millisecs(fake_date)
+        expected_millis = utils.get_utc_time_in_millisecs(fake_date)
         test_data = {
             'blog_one': {
                 'title': self.TITLE,
@@ -620,7 +620,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
     USER_2_ROLE: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
     USER_2_NAME: Final = 'user two'
     GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH: Final = utils.get_time_in_millisecs(
+    GENERIC_EPOCH: Final = utils.get_utc_time_in_millisecs(
         datetime.datetime(2019, 5, 20)
     )
     GENERIC_IMAGE_URL: Final = 'www.example.com/example.png'

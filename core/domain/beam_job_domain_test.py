@@ -84,8 +84,12 @@ class BeamJobRunTests(test_utils.TestBase):
                 'job_id': '123',
                 'job_name': 'FooJob',
                 'job_state': 'RUNNING',
-                'job_started_on_msecs': utils.get_time_in_millisecs(self.NOW),
-                'job_updated_on_msecs': utils.get_time_in_millisecs(self.NOW),
+                'job_started_on_msecs': utils.get_utc_time_in_millisecs(
+                    self.NOW
+                ),
+                'job_updated_on_msecs': utils.get_utc_time_in_millisecs(
+                    self.NOW
+                ),
                 'job_is_synchronous': True,
                 'dataflow_job_id': None,
             },

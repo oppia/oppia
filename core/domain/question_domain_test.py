@@ -2382,10 +2382,10 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'id': 'question_1',
             'question_content': '<p>question content</p>',
             'interaction_id': 'TextInput',
-            'last_updated_msec': utils.get_time_in_millisecs(
+            'last_updated_msec': utils.get_utc_time_in_millisecs(
                 self.fake_date_updated
             ),
-            'created_on_msec': utils.get_time_in_millisecs(
+            'created_on_msec': utils.get_utc_time_in_millisecs(
                 self.fake_date_created
             ),
             'misconception_ids': ['skill1-1', 'skill2-2'],

@@ -582,7 +582,7 @@ def base64_from_int(value: int) -> str:
     return base64.b64encode(byte_value).decode('utf-8')
 
 
-def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
+def get_utc_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     """Returns time in milliseconds since the Epoch.
 
     Args:
@@ -655,7 +655,9 @@ def get_current_time_in_millisecs() -> float:
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    return get_time_in_millisecs(datetime.datetime.now(datetime.timezone.utc))
+    return get_utc_time_in_millisecs(
+        datetime.datetime.now(datetime.timezone.utc)
+    )
 
 
 def get_human_readable_time_string(time_msec: float) -> str:

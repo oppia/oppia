@@ -2040,10 +2040,10 @@ class SkillSummary:
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'skill_model_created_on': utils.get_time_in_millisecs(
+            'skill_model_created_on': utils.get_utc_time_in_millisecs(
                 self.skill_model_created_on
             ),
-            'skill_model_last_updated': utils.get_time_in_millisecs(
+            'skill_model_last_updated': utils.get_utc_time_in_millisecs(
                 self.skill_model_last_updated
             ),
         }
@@ -2123,10 +2123,10 @@ class AugmentedSkillSummary:
             'misconception_count': self.misconception_count,
             'topic_names': self.topic_names,
             'classroom_names': self.classroom_names,
-            'skill_model_created_on': utils.get_time_in_millisecs(
+            'skill_model_created_on': utils.get_utc_time_in_millisecs(
                 self.skill_model_created_on
             ),
-            'skill_model_last_updated': utils.get_time_in_millisecs(
+            'skill_model_last_updated': utils.get_utc_time_in_millisecs(
                 self.skill_model_last_updated
             ),
         }

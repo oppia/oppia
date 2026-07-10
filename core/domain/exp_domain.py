@@ -1225,7 +1225,7 @@ class ExplorationCommitLogEntry:
             adding username (derived from user_id).
         """
         return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'last_updated': utils.get_utc_time_in_millisecs(self.last_updated),
             'exploration_id': self.exploration_id,
             'commit_type': self.commit_type,
             'commit_message': self.commit_message,

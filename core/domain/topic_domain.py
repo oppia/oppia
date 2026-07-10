@@ -2652,10 +2652,10 @@ class TopicSummary:
             'published_story_exploration_mapping': (
                 self.published_story_exploration_mapping
             ),
-            'topic_model_created_on': utils.get_time_in_millisecs(
+            'topic_model_created_on': utils.get_utc_time_in_millisecs(
                 self.topic_model_created_on
             ),
-            'topic_model_last_updated': utils.get_time_in_millisecs(
+            'topic_model_last_updated': utils.get_utc_time_in_millisecs(
                 self.topic_model_last_updated
             ),
         }

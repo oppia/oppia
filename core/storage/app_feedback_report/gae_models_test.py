@@ -44,21 +44,21 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     REPORT_SUBMITTED_TIMESTAMP_1: Final = datetime.datetime.fromtimestamp(
         1615151836
     )
-    REPORT_SUBMITTED_TIMESTAMP_1_MSEC: Final = utils.get_time_in_millisecs(
+    REPORT_SUBMITTED_TIMESTAMP_1_MSEC: Final = utils.get_utc_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP_1
     )
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
     REPORT_SUBMITTED_TIMESTAMP_2: Final = datetime.datetime.fromtimestamp(
         1615519337
     )
-    REPORT_SUBMITTED_TIMESTAMP_2_MSEC: Final = utils.get_time_in_millisecs(
+    REPORT_SUBMITTED_TIMESTAMP_2_MSEC: Final = utils.get_utc_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP_2
     )
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
         1616173836
     )
-    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
+    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_utc_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
     )
     TICKET_ID: Final = '%s.%s.%s' % (
@@ -357,7 +357,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             id='%s.%s.%s'
             % (
                 self.PLATFORM_ANDROID,
-                int(utils.get_time_in_millisecs(expired_timestamp)),
+                int(utils.get_utc_time_in_millisecs(expired_timestamp)),
                 'randomInteger123',
             ),
             platform=self.PLATFORM_ANDROID,
@@ -568,7 +568,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     REPORT_SUBMITTED_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
         1615151836
     )
-    REPORT_SUBMITTED_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
+    REPORT_SUBMITTED_TIMESTAMP_MSEC: Final = utils.get_utc_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP
     )
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
@@ -577,7 +577,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
         1616173836
     )
-    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
+    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_utc_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
     )
 
@@ -693,7 +693,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
         1616173836
     )
-    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
+    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_utc_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
     )
     TICKET_ID: Final = '%s.%s.%s' % (

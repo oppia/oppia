@@ -841,7 +841,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_story_node_update_planned_publication_date(self) -> None:
         self.story.story_contents.nodes[0].planned_publication_date = None
         current_time = datetime.datetime.now(datetime.timezone.utc)
-        current_time_msecs = utils.get_time_in_millisecs(current_time)
+        current_time_msecs = utils.get_utc_time_in_millisecs(current_time)
         self.story.update_node_planned_publication_date(
             'node_1', current_time_msecs
         )
@@ -853,7 +853,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_story_node_update_last_modified(self) -> None:
         self.story.story_contents.nodes[0].last_modified = None
         current_time = datetime.datetime.now(datetime.timezone.utc)
-        current_time_msecs = utils.get_time_in_millisecs(current_time)
+        current_time_msecs = utils.get_utc_time_in_millisecs(current_time)
         self.story.update_node_last_modified('node_1', current_time_msecs)
         self.assertEqual(
             self.story.story_contents.nodes[0].last_modified, current_time
@@ -862,7 +862,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_story_node_update_first_publication_date(self) -> None:
         self.story.story_contents.nodes[0].first_publication_date = None
         current_time = datetime.datetime.now(datetime.timezone.utc)
-        current_time_msecs = utils.get_time_in_millisecs(current_time)
+        current_time_msecs = utils.get_utc_time_in_millisecs(current_time)
         self.story.update_node_first_publication_date(
             'node_1', current_time_msecs
         )
@@ -2910,8 +2910,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': '#F8BF74',
             'thumbnail_filename': 'image.svg',
             'url_fragment': 'story-frag-two',
-            'story_model_created_on': utils.get_time_in_millisecs(curr_time),
-            'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
+            'story_model_created_on': utils.get_utc_time_in_millisecs(
+                curr_time
+            ),
+            'story_model_last_updated': utils.get_utc_time_in_millisecs(
+                curr_time
+            ),
         }
 
         self.assertEqual(story_summary.to_dict(), expected_dict)
@@ -2996,7 +3000,7 @@ class StorySummaryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()
-        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        time_in_millisecs = utils.get_utc_time_in_millisecs(current_time)
         self.story_summary_dict = {
             'story_model_created_on': time_in_millisecs,
             'version': 1,

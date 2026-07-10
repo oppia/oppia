@@ -55,7 +55,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     PROFILE_1_ROLE: Final = feconf.ROLE_ID_MOBILE_LEARNER
     GENERIC_USERNAME: Final = 'user'
     GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH: Final = utils.get_time_in_millisecs(
+    GENERIC_EPOCH: Final = utils.get_utc_time_in_millisecs(
         datetime.datetime(2019, 5, 20)
     )
     GENERIC_IMAGE_URL: Final = 'www.example.com/example.png'
@@ -1443,7 +1443,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'collection_ids': self.COLLECTION_IDS,
             'exploration_ids': self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked_msec': utils.get_time_in_millisecs(
+            'last_checked_msec': utils.get_utc_time_in_millisecs(
                 self.GENERIC_DATETIME
             ),
         }
@@ -1789,7 +1789,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     DATETIME_OBJECT: Final = datetime.datetime.strptime(
         '2016-02-16', '%Y-%m-%d'
     )
-    DATETIME_EPOCH: Final = utils.get_time_in_millisecs(DATETIME_OBJECT)
+    DATETIME_EPOCH: Final = utils.get_utc_time_in_millisecs(DATETIME_OBJECT)
     USER_1_ID: Final = 'id_1'
     USER_2_ID: Final = 'id_2'
     EXP_ID_ONE: Final = 'exp_id_one'

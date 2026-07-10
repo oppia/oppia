@@ -182,7 +182,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
-                'created_on_msecs': utils.get_time_in_millisecs(
+                'created_on_msecs': utils.get_utc_time_in_millisecs(
                     messages[0].created_on
                 ),
             }
@@ -202,7 +202,9 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'text': m.text,
                 'updated_status': m.updated_status,
                 'author_username': author_username,
-                'created_on_msecs': utils.get_time_in_millisecs(m.created_on),
+                'created_on_msecs': utils.get_utc_time_in_millisecs(
+                    m.created_on
+                ),
             }
             message_summary_list.append(message_summary)
 

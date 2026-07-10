@@ -83,7 +83,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'tags': ['tag1', 'tag2'],
                             'summary': 'blog_post_summary',
                             'rank': math.floor(
-                                utils.get_time_in_millisecs(
+                                utils.get_utc_time_in_millisecs(
                                     blog_summary.published_on
                                 )
                             ),
@@ -130,7 +130,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'tags': ['tag1', 'tag2'],
                             'summary': 'blog_post_summary',
                             'rank': math.floor(
-                                utils.get_time_in_millisecs(
+                                utils.get_utc_time_in_millisecs(
                                     blog_summary.published_on
                                 )
                             ),
@@ -188,7 +188,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'tags': ['tag1', 'tag2'],
                             'summary': 'blog_post_summary',
                             'rank': math.floor(
-                                utils.get_time_in_millisecs(
+                                utils.get_utc_time_in_millisecs(
                                     blog_summary.published_on
                                 )
                             ),

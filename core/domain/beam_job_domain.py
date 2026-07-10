@@ -142,10 +142,10 @@ class BeamJobRun:
             'job_name': self.job_name,
             'job_state': self.job_state,
             'job_started_on_msecs': (
-                utils.get_time_in_millisecs(self.job_started_on)
+                utils.get_utc_time_in_millisecs(self.job_started_on)
             ),
             'job_updated_on_msecs': (
-                utils.get_time_in_millisecs(self.job_updated_on)
+                utils.get_utc_time_in_millisecs(self.job_updated_on)
             ),
             'job_is_synchronous': self.job_is_synchronous,
             'dataflow_job_id': self.dataflow_job_id,

@@ -189,7 +189,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     @classmethod
@@ -272,7 +272,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     @classmethod
@@ -344,7 +344,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     @classmethod
@@ -456,7 +456,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
@@ -615,7 +615,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
@@ -769,7 +769,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
@@ -891,7 +891,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, user_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, user_id)
         )
 
     @classmethod
@@ -1005,7 +1005,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     # In the type annotation below, Dict[str, str] is used for 'params'.
@@ -1111,7 +1111,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     @classmethod
@@ -1192,7 +1192,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id(
             '%s:%s:%s'
-            % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
+            % (utils.get_utc_time_in_millisecs(timestamp), exp_id, session_id)
         )
 
     @classmethod

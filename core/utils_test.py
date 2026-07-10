@@ -767,9 +767,9 @@ class UtilsTests(test_utils.GenericTestBase):
         filename = 'filename.svg'
         utils.require_valid_image_filename(filename)
 
-    def test_get_time_in_millisecs(self) -> None:
+    def test_get_utc_time_in_millisecs(self) -> None:
         dt = datetime.datetime(2020, 6, 15)
-        msecs = utils.get_time_in_millisecs(dt)
+        msecs = utils.get_utc_time_in_millisecs(dt)
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(
@@ -777,9 +777,9 @@ class UtilsTests(test_utils.GenericTestBase):
             ).replace(tzinfo=None),
         )
 
-    def test_get_time_in_millisecs_with_complicated_time(self) -> None:
+    def test_get_utc_time_in_millisecs_with_complicated_time(self) -> None:
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
-        msecs = utils.get_time_in_millisecs(dt)
+        msecs = utils.get_utc_time_in_millisecs(dt)
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(
@@ -787,9 +787,9 @@ class UtilsTests(test_utils.GenericTestBase):
             ).replace(tzinfo=None),
         )
 
-    def test_get_time_in_millisecs_with_utc_aware_datetime(self) -> None:
+    def test_get_utc_time_in_millisecs_with_utc_aware_datetime(self) -> None:
         dt = datetime.datetime(2020, 6, 15, tzinfo=datetime.timezone.utc)
-        msecs = utils.get_time_in_millisecs(dt)
+        msecs = utils.get_utc_time_in_millisecs(dt)
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(
@@ -797,7 +797,9 @@ class UtilsTests(test_utils.GenericTestBase):
             ),
         )
 
-    def test_get_time_in_millisecs_with_non_utc_aware_datetime(self) -> None:
+    def test_get_utc_time_in_millisecs_with_non_utc_aware_datetime(
+        self,
+    ) -> None:
         # A non-UTC aware datetime should be normalized to UTC correctly,
         # not have tzinfo blindly stripped, which would corrupt the time.
         ist = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
@@ -805,7 +807,7 @@ class UtilsTests(test_utils.GenericTestBase):
         dt_utc = datetime.datetime(
             2020, 6, 15, 0, 0, 0, tzinfo=datetime.timezone.utc
         )
-        msecs = utils.get_time_in_millisecs(dt_ist)
+        msecs = utils.get_utc_time_in_millisecs(dt_ist)
         self.assertEqual(
             dt_utc,
             datetime.datetime.fromtimestamp(

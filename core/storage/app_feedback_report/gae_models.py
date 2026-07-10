@@ -336,7 +336,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Raises:
             Exception. If the id generator is producing too many collisions.
         """
-        submitted_datetime_in_msec = utils.get_time_in_millisecs(
+        submitted_datetime_in_msec = utils.get_utc_time_in_millisecs(
             submitted_on_datetime
         )
         for _ in range(base_models.MAX_RETRIES):
@@ -486,7 +486,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
         )
         for report_model in report_models:
-            submitted_on_msec = utils.get_time_in_millisecs(
+            submitted_on_msec = utils.get_utc_time_in_millisecs(
                 report_model.submitted_on
             )
             if utils.is_user_id_valid(report_model.scrubbed_by):
@@ -643,7 +643,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         Raises:
             Exception. If the id generator is producing too many collisions.
         """
-        current_datetime_in_msec = utils.get_time_in_millisecs(
+        current_datetime_in_msec = utils.get_utc_time_in_millisecs(
             datetime.datetime.utcnow()
         )
         for _ in range(base_models.MAX_RETRIES):

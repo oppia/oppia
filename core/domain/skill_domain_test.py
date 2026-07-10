@@ -1236,7 +1236,7 @@ class SkillSummaryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()
-        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        time_in_millisecs = utils.get_utc_time_in_millisecs(current_time)
         self.skill_summary_dict = {
             'id': 'skill_id',
             'description': 'description',
@@ -1320,7 +1320,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()
-        self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.time_in_millisecs = utils.get_utc_time_in_millisecs(current_time)
 
         self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             'skill_id',

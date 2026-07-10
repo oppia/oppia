@@ -273,36 +273,38 @@ class UserSettingsModel(base_models.BaseModel):
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms_msec': (
-                utils.get_time_in_millisecs(user.last_agreed_to_terms)
+                utils.get_utc_time_in_millisecs(user.last_agreed_to_terms)
                 if user.last_agreed_to_terms
                 else None
             ),
             'last_started_state_editor_tutorial_msec': (
-                utils.get_time_in_millisecs(
+                utils.get_utc_time_in_millisecs(
                     user.last_started_state_editor_tutorial
                 )
                 if user.last_started_state_editor_tutorial
                 else None
             ),
             'last_started_state_translation_tutorial_msec': (
-                utils.get_time_in_millisecs(
+                utils.get_utc_time_in_millisecs(
                     user.last_started_state_translation_tutorial
                 )
                 if user.last_started_state_translation_tutorial
                 else None
             ),
             'last_logged_in_msec': (
-                utils.get_time_in_millisecs(user.last_logged_in)
+                utils.get_utc_time_in_millisecs(user.last_logged_in)
                 if user.last_logged_in
                 else None
             ),
             'last_edited_an_exploration_msec': (
-                utils.get_time_in_millisecs(user.last_edited_an_exploration)
+                utils.get_utc_time_in_millisecs(user.last_edited_an_exploration)
                 if user.last_edited_an_exploration
                 else None
             ),
             'last_created_an_exploration_msec': (
-                utils.get_time_in_millisecs(user.last_created_an_exploration)
+                utils.get_utc_time_in_millisecs(
+                    user.last_created_an_exploration
+                )
                 if user.last_created_an_exploration
                 else None
             ),
@@ -1272,7 +1274,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'last_checked_msec': (
                 None
                 if user_model.last_checked is None
-                else utils.get_time_in_millisecs(user_model.last_checked)
+                else utils.get_utc_time_in_millisecs(user_model.last_checked)
             ),
         }
 
@@ -1802,13 +1804,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
                 'rated_on_msec': (
-                    utils.get_time_in_millisecs(user_model.rated_on)
+                    utils.get_utc_time_in_millisecs(user_model.rated_on)
                     if user_model.rated_on
                     else None
                 ),
                 'draft_change_list': user_model.draft_change_list,
                 'draft_change_list_last_updated_msec': (
-                    utils.get_time_in_millisecs(
+                    utils.get_utc_time_in_millisecs(
                         user_model.draft_change_list_last_updated
                     )
                     if user_model.draft_change_list_last_updated

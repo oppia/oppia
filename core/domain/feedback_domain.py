@@ -140,7 +140,7 @@ class FeedbackThread:
         """
         return {
             'last_updated_msecs': (
-                utils.get_time_in_millisecs(self.last_updated)
+                utils.get_utc_time_in_millisecs(self.last_updated)
             ),
             'original_author_id': self.original_author_id,
             'state_name': self.state_name,
@@ -252,7 +252,9 @@ class FeedbackMessage:
         """
         return {
             'author_id': self.author_id,
-            'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
+            'created_on_msecs': utils.get_utc_time_in_millisecs(
+                self.created_on
+            ),
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
             'message_id': self.message_id,
@@ -417,7 +419,7 @@ class FeedbackThreadSummary:
             'status': self.status,
             'original_author_id': self.original_author_id,
             'last_updated_msecs': (
-                utils.get_time_in_millisecs(self.last_updated)
+                utils.get_utc_time_in_millisecs(self.last_updated)
             ),
             'last_message_text': self.last_message_text,
             'total_message_count': self.total_message_count,

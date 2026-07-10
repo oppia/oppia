@@ -107,7 +107,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                                     and cmd['story_id'] == story_model.id
                                 ):
                                     story_published_on = (
-                                        utils.get_time_in_millisecs(
+                                        utils.get_utc_time_in_millisecs(
                                             topic_metadata.created_on
                                         )
                                     )
@@ -133,7 +133,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                                     and node.get('last_modified_msecs') is None
                                 ):
                                     node['last_modified_msecs'] = (
-                                        utils.get_time_in_millisecs(
+                                        utils.get_utc_time_in_millisecs(
                                             story_metadata.created_on
                                         )
                                     )
@@ -143,7 +143,7 @@ class PopulateStoryNodeJob(base_jobs.JobBase):
                                     and cmd['node_id'] == node['id']
                                 ):
                                     node_created_on = (
-                                        utils.get_time_in_millisecs(
+                                        utils.get_utc_time_in_millisecs(
                                             story_metadata.created_on
                                         )
                                     )

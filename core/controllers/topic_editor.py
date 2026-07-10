@@ -178,7 +178,7 @@ class TopicEditorStoryHandler(
                 if node.planned_publication_date is not None:
                     current_time_msecs = utils.get_current_time_in_millisecs()
                     planned_publication_date_msecs = (
-                        utils.get_time_in_millisecs(
+                        utils.get_utc_time_in_millisecs(
                             node.planned_publication_date
                         )
                     )

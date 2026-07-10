@@ -841,7 +841,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             )
             if old_blog_post_summary.published_on:
                 rank = math.floor(
-                    utils.get_time_in_millisecs(
+                    utils.get_utc_time_in_millisecs(
                         old_blog_post_summary.published_on
                     )
                 )
@@ -868,7 +868,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             )
             if new_blog_post_summary.published_on:
                 rank = math.floor(
-                    utils.get_time_in_millisecs(
+                    utils.get_utc_time_in_millisecs(
                         new_blog_post_summary.published_on
                     )
                 )

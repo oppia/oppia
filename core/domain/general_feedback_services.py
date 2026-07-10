@@ -80,7 +80,7 @@ def _lesson_feedback_model_to_domain(
         parent_feedback_id=model.parent_feedback_id,
         response_list=sanitized_responses,
         unread_response_count=model.unread_response_count,
-        created_on_msecs=utils.get_time_in_millisecs(model.created_on),
+        created_on_msecs=utils.get_utc_time_in_millisecs(model.created_on),
     )
 
 
@@ -119,7 +119,7 @@ def _platform_feedback_model_to_domain(
         include_technical_logs=model.include_technical_logs,
         screenshot_filename=model.screenshot_filename,
         screenshot_entity_id=model.screenshot_entity_id,
-        created_on_msecs=utils.get_time_in_millisecs(model.created_on),
+        created_on_msecs=utils.get_utc_time_in_millisecs(model.created_on),
     )
 
 

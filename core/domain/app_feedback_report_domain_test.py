@@ -47,7 +47,7 @@ USER_1_USERNAME = 'username1'
 REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
 # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
 TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
-TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+TICKET_CREATION_TIMESTAMP_MSEC = utils.get_utc_time_in_millisecs(
     TICKET_CREATION_TIMESTAMP
 )
 
@@ -249,7 +249,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'schema_version': ANDROID_REPORT_INFO_SCHEMA_VERSION,
             'platform': PLATFORM_ANDROID,
             'submitted_on_timestamp': utils.get_human_readable_time_string(
-                utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)
+                utils.get_utc_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)
             ),
             'local_timezone_offset_hrs': 0,
             'ticket_id': TICKET_ID,

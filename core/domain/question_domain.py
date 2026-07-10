@@ -2370,8 +2370,10 @@ class QuestionSummary:
             'id': self.id,
             'question_content': self.question_content,
             'interaction_id': self.interaction_id,
-            'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
-            'created_on_msec': utils.get_time_in_millisecs(self.created_on),
+            'last_updated_msec': utils.get_utc_time_in_millisecs(
+                self.last_updated
+            ),
+            'created_on_msec': utils.get_utc_time_in_millisecs(self.created_on),
             'misconception_ids': self.misconception_ids,
             'version': self.version,
         }
