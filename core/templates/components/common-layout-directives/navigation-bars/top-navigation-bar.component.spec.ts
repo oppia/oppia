@@ -64,6 +64,9 @@ class MockPlatformFeatureService {
     WebFeedbackModalEnabled: {
       isEnabled: false,
     },
+    EnableCertificateAssessment: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -970,6 +973,15 @@ describe('TopNavigationBarComponent', () => {
       expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
     }
   );
+
+  it('should return correct value for certificate assessment feature flag', () => {
+    expect(component.isCertificateAssessmentEnabled()).toBe(false);
+
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      true;
+
+    expect(component.isCertificateAssessmentEnabled()).toBe(true);
+  });
 
   it('should open site feedback modal', () => {
     component.openSiteFeedbackModal();
