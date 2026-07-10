@@ -179,7 +179,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -224,7 +224,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -267,12 +267,21 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
                     'Updated state of CertificateAssessmentOfferingModel '
                     'with ID: offering_insufficient.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'CertificateAssessmentOfferingModel with ID: offering_insufficient '
+                    'failed validation: Only 1 unique question(s) are available across '
+                    'the selected topics, but 5 are required without reusing questions. '
+                    'Insufficient Topic does not have enough questions in every '
+                    'difficulty bucket. Selected topics Insufficient Topic do not have '
+                    'enough distinct easy, medium, and hard questions to satisfy the '
+                    'requested certificate without reusing questions across topics.'
                 ),
             ]
         )
@@ -296,12 +305,21 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
                     'Updated state of CertificateAssessmentOfferingModel '
                     'with ID: offering_missing_topic.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'CertificateAssessmentOfferingModel with ID: offering_missing_topic '
+                    'failed validation: Only 0 unique question(s) are available across '
+                    'the selected topics, but 5 are required without reusing questions. '
+                    'nonexistent_topic_id does not have enough questions in every '
+                    'difficulty bucket. Selected topics nonexistent_topic_id do not have '
+                    'enough distinct easy, medium, and hard questions to satisfy the '
+                    'requested certificate without reusing questions across topics.'
                 ),
             ]
         )
@@ -351,7 +369,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -389,12 +407,22 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
                     'Updated state of CertificateAssessmentOfferingModel '
                     'with ID: offering_unknown_difficulty.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'CertificateAssessmentOfferingModel with ID: '
+                    'offering_unknown_difficulty failed validation: Only 1 unique '
+                    'question(s) are available across the selected topics, but 3 are '
+                    'required without reusing questions. Unknown Difficulty Topic does '
+                    'not have enough questions in every difficulty bucket. Selected '
+                    'topics Unknown Difficulty Topic do not have enough distinct easy, '
+                    'medium, and hard questions to satisfy the requested certificate '
+                    'without reusing questions across topics.'
                 ),
             ]
         )
@@ -418,7 +446,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -445,7 +473,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -512,7 +540,7 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -566,12 +594,21 @@ class BlockInvalidCertificateAssessmentOfferingsJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
                     'Updated state of CertificateAssessmentOfferingModel '
                     'with ID: offering_shared_insufficient.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'CertificateAssessmentOfferingModel with ID: '
+                    'offering_shared_insufficient failed validation: Only 3 unique '
+                    'question(s) are available across the selected topics, but 6 are '
+                    'required without reusing questions. Selected topics Topic C and '
+                    'Topic D do not have enough distinct easy, medium, and hard '
+                    'questions to satisfy the requested certificate without reusing '
+                    'questions across topics.'
                 ),
             ]
         )
@@ -598,7 +635,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -617,12 +654,23 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
-                    'to Blocked: 1.'
+                    'Number of CertificateAssessmentOfferingModels '
+                    'would be updated to Blocked: 1.'
                 ),
                 job_run_result.JobRunResult.as_stdout(
-                    'Updated state of CertificateAssessmentOfferingModel '
-                    'with ID: audit_offering_missing_topic.'
+                    'CertificateAssessmentOfferingModel with ID: '
+                    'audit_offering_missing_topic would be updated to '
+                    'Blocked.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'CertificateAssessmentOfferingModel with ID: '
+                    'audit_offering_missing_topic failed validation: Only 0 unique '
+                    'question(s) are available across the selected topics, but 5 are '
+                    'required without reusing questions. nonexistent_topic_id does not '
+                    'have enough questions in every difficulty bucket. Selected topics '
+                    'nonexistent_topic_id do not have enough distinct easy, medium, and '
+                    'hard questions to satisfy the requested certificate without '
+                    'reusing questions across topics.'
                 ),
             ]
         )
@@ -648,7 +696,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]
@@ -673,7 +721,7 @@ class BlockInvalidCertificateAssessmentOfferingsAuditJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
+                    'Number of CertificateAssessmentOfferingModels would be updated '
                     'to Blocked: 0.'
                 )
             ]

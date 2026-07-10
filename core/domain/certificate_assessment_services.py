@@ -376,9 +376,7 @@ def validate_certificate_assessment_offering_against_preloaded_maps(
     if missing_distinct_difficulties:
         is_valid = False
         message_parts.append(
-            'Selected topics %s do not have enough distinct %s questions '
-            'to satisfy the requested certificate without reusing '
-            'questions across topics.'
+            constants.CERTIFICATE_ASSESSMENT_VALIDATION_MISSING_DISTINCT_DIFFICULTIES_MESSAGE
             % (
                 _format_list(
                     [
@@ -407,7 +405,16 @@ def mark_certificate_assessment_offering_model_as_blocked(
         CertificateAssessmentOfferingValidationResultDict,
     ],
 ) -> gae_models.CertificateAssessmentOfferingModel:
-    """Marks an offering model as blocked and logs the reason."""
+    """Marks the async_status of the model as blocked, making it unavailable and invisible to learners.
+
+    Args:
+        model_and_validation_result: tuple(CertificateAssessmentOfferingModel,
+            ValidationResultDict). The model to block and the validation result
+            that explains why it is invalid.
+
+    Returns:
+        CertificateAssessmentOfferingModel. The updated blocked model.
+    """
     certificate_assessment_offering_model, _ = model_and_validation_result
     certificate_assessment_offering_model.async_status = 'Blocked'
 
@@ -672,9 +679,7 @@ def validate_certificate_assessment_offering(
     if missing_distinct_difficulties:
         is_valid = False
         message_parts.append(
-            'Selected topics %s do not have enough distinct %s questions '
-            'to satisfy the requested certificate without reusing '
-            'questions across topics.'
+            constants.CERTIFICATE_ASSESSMENT_VALIDATION_MISSING_DISTINCT_DIFFICULTIES_MESSAGE
             % (
                 _format_list(
                     [topic_id_to_name[topic_id] for topic_id in topic_ids]
@@ -684,7 +689,7 @@ def validate_certificate_assessment_offering(
         )
 
     validation_message = (
-        'Certificate assessment is valid.'
+        constants.CERTIFICATE_ASSESSMENT_VALIDATION_PASSED_MESSAGE
         if is_valid
         else ' '.join(message_parts)
     )

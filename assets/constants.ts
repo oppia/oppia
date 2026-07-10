@@ -6220,6 +6220,10 @@ export default {
   "CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY": "easy",
   "CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM": "medium",
   "CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD": "hard",
+  "CERTIFICATE_ASSESSMENT_VALIDATION_PASSED_MESSAGE":
+    "Certificate assessment is valid.",
+  "CERTIFICATE_ASSESSMENT_VALIDATION_MISSING_DISTINCT_DIFFICULTIES_MESSAGE":
+    "Selected topics %s do not have enough distinct %s questions to satisfy the requested certificate without reusing questions across topics.",
 
   "QUESTIONS_PER_TOPIC": 3,
 

@@ -228,6 +228,8 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
                     ]:
                         question_ids.add(skill_question_info['question_id'])
                         difficulty_label = certificate_assessment_services._get_difficulty_label(  # pylint: disable=protected-access
+                            # Reuse the shared mapping logic so the job matches
+                            # the service validation buckets exactly.
                             skill_question_info['skill_difficulty']
                         )
                         if difficulty_label is None:
@@ -239,7 +241,6 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             topic_id_to_question_ids_by_difficulty[topic_id] = (
                 question_ids_by_difficulty
             )
-
         validation_result = certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
             topic_ids=list(certificate_assessment_offering_model.topic_ids),
             total_questions=(
@@ -267,7 +268,8 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
 
         Returns:
             JobRunResult. Contains the total number of offerings marked as
-            'Blocked', along with the IDs of those offerings.
+            'Blocked', along with the IDs and validation error messages of
+            those offerings.
         """
         all_offering_models = (
             self.pipeline
@@ -329,6 +331,21 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             )
         )
 
+        validation_error_results = (
+            invalid_offering_models
+            | 'Format validation errors to JobRunResult'
+            >> beam.Map(
+                lambda model_and_result: job_run_result.JobRunResult.as_stdout(
+                    'CertificateAssessmentOfferingModel with ID: %s failed '
+                    'validation: %s'
+                    % (
+                        model_and_result[0].id,
+                        model_and_result[1]['validation_message'],
+                    )
+                )
+            )
+        )
+
         updated_offering_models = (
             invalid_offering_models
             | 'Mark invalid CertificateAssessmentOfferingModels as Blocked'
@@ -337,40 +354,62 @@ class BlockInvalidCertificateAssessmentOfferingsJob(base_jobs.JobBase):
             )
         )
 
-        count_run_result = (
-            updated_offering_models
-            | 'Count updated CertificateAssessmentOfferingModels'
-            >> beam.combiners.Count.Globally()
-            | 'Format count to JobRunResult'
-            >> beam.Map(
-                lambda count: job_run_result.JobRunResult.as_stdout(
-                    'Number of CertificateAssessmentOfferingModels updated '
-                    'to Blocked: %d.' % count
-                )
-            )
-        )
-
-        updated_model_ids_result = (
-            updated_offering_models
-            | 'Adds updated CertificateAssessmentOfferingModel IDs to job run result'
-            >> beam.Map(
-                lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Updated state of CertificateAssessmentOfferingModel '
-                    'with ID: %s.' % model.id
-                )
-            )
-        )
-
         if self.DATASTORE_UPDATES_ALLOWED:
+            count_run_result = (
+                updated_offering_models
+                | 'Count updated CertificateAssessmentOfferingModels'
+                >> beam.combiners.Count.Globally()
+                | 'Format count to JobRunResult'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        'Number of CertificateAssessmentOfferingModels '
+                        'would be updated to Blocked: %d.' % count
+                    )
+                )
+            )
+
+            updated_model_ids_result = (
+                updated_offering_models
+                | 'Adds updated CertificateAssessmentOfferingModel IDs to job run result'
+                >> beam.Map(
+                    lambda model: job_run_result.JobRunResult.as_stdout(
+                        'Updated state of CertificateAssessmentOfferingModel '
+                        'with ID: %s.' % model.id
+                    )
+                )
+            )
             _ = (
                 updated_offering_models
                 | 'Write updated CertificateAssessmentOfferingModels to datastore'
                 >> ndb_io.PutModels()
             )
-
+        else:
+            count_run_result = (
+                updated_offering_models
+                | 'Count dry-run CertificateAssessmentOfferingModels'
+                >> beam.combiners.Count.Globally()
+                | 'Format dry-run count to JobRunResult'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        'Number of CertificateAssessmentOfferingModels '
+                        'would be updated to Blocked: %d.' % count
+                    )
+                )
+            )
+            updated_model_ids_result = (
+                updated_offering_models
+                | 'Adds dry-run CertificateAssessmentOfferingModel IDs to job run result'
+                >> beam.Map(
+                    lambda model: job_run_result.JobRunResult.as_stdout(
+                        'CertificateAssessmentOfferingModel with ID: %s '
+                        'would be updated to Blocked.' % model.id
+                    )
+                )
+            )
         return (
             count_run_result,
             updated_model_ids_result,
+            validation_error_results,
         ) | beam.Flatten()
 
 
