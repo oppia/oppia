@@ -48,6 +48,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {State} from 'domain/state/state.model';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
+import {StateBackendDict} from 'domain/state/state.model';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -840,17 +841,11 @@ describe('Voiceover card component', () => {
   }));
 
   it('should return correct content availability status', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content_0',
         html: 'Hello world!',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_0: {},
-          default_outcome_1: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {
@@ -1035,5 +1030,33 @@ describe('Voiceover card component', () => {
     component.updateAutomaticVoiceoverWithRegenerationStatus();
 
     expect(component.automaticVoiceoverGenerationStatus).toEqual('GENERATING');
+  }));
+
+  it('should correctly update language accent code from translationLanguageService when active accent changes', fakeAsync(() => {
+    // 1. Simulate the bug's race condition where localStorage returns null.
+    spyOn(
+      localStorageService,
+      'getLastSelectedLanguageAccentCode'
+    ).and.returnValue(null);
+
+    // 2. Provide the single source of truth from the correct service.
+    spyOn(
+      translationLanguageService,
+      'getActiveLanguageAccentCode'
+    ).and.returnValue('en-US');
+
+    spyOn(component, 'updateLanguageAccentCode');
+
+    // 3. Initialize the component to start the subscription.
+    component.ngOnInit();
+
+    // 4. Trigger the translation event.
+    translationLanguageService.onActiveLanguageAccentChanged.emit();
+    flush();
+
+    // 5. The component should update with the service's value ('en-US'), NOT localStorage (null).
+    expect(component.updateLanguageAccentCode).toHaveBeenCalledWith('en-US');
+
+    discardPeriodicTasks();
   }));
 });

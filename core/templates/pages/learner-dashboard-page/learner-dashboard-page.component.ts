@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
 import {
   trigger,
   state,
@@ -54,8 +54,6 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
-import './learner-dashboard-page.component.css';
-
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
@@ -67,6 +65,7 @@ interface LearnerDashboardExplorationsData {
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
   styleUrls: ['./learner-dashboard-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('slideInOut', [
       state(

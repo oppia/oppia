@@ -1,0 +1,245 @@
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for general feedback services."""
+
+from __future__ import annotations
+
+from core import feconf
+from core.domain import general_feedback_domain, general_feedback_services
+from core.platform import models
+from core.tests import test_utils
+
+from typing import Dict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import general_feedback_models
+
+(general_feedback_models,) = models.Registry.import_models(
+    [models.Names.GENERAL_FEEDBACK]
+)
+
+
+class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
+    """Tests for general feedback services."""
+
+    def get_lesson_metadata(
+        self,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': 'exp_id',
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': 'answer',
+        }
+
+    def test_create_lesson_feedback_returns_domain_object(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata_json=self.get_lesson_metadata(),
+        )
+
+        self.assertEqual(feedback.author_id, 'user_id')
+        self.assertEqual(feedback.feedback_text, 'This lesson helped.')
+        self.assertEqual(feedback.status, feconf.STATUS_CHOICES_OPEN)
+        self.assertEqual(feedback.lesson_metadata, self.get_lesson_metadata())
+        self.assertEqual(feedback.response_list, [])
+        self.assertEqual(feedback.unread_response_count, 0)
+
+    def test_create_lesson_feedback_preserves_parent_feedback_id(
+        self,
+    ) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='Follow-up feedback.',
+            lesson_metadata_json=self.get_lesson_metadata(),
+            parent_feedback_id='parent_id',
+        )
+
+        self.assertEqual(feedback.parent_feedback_id, 'parent_id')
+
+    def test_create_platform_report_for_lesson_routes_to_creator(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata_json=self.get_lesson_metadata(),
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://example.com',
+        )
+
+        self.assertEqual(report.feedback_text, 'There is a typo.')
+        self.assertEqual(report.source, feconf.SOURCE_LESSON)
+        self.assertEqual(report.platform, feconf.PLATFORM_WEB)
+        self.assertEqual(
+            report.destination_dashboard,
+            feconf.DESTINATION_CREATOR,
+        )
+        self.assertEqual(report.category, feconf.CATEGORY_TYPO)
+        self.assertEqual(report.lesson_metadata, self.get_lesson_metadata())
+        self.assertFalse(report.include_technical_logs)
+
+    def test_create_platform_report_for_site_maps_source_to_app(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='The page is broken.',
+            source='site',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.com/donate',
+        )
+
+        self.assertEqual(report.source, feconf.SOURCE_APP)
+        self.assertEqual(
+            report.destination_dashboard,
+            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+        )
+        self.assertIsNone(report.category)
+        self.assertIsNone(report.lesson_metadata)
+
+    def test_create_platform_report_stores_session_info_when_opted_in(
+        self,
+    ) -> None:
+        session_info = {
+            'console_logs_json': [
+                {
+                    'error_message': 'Console error.',
+                    'timestamp_msecs': 1,
+                    'log_level': 'error',
+                }
+            ],
+            'failed_requests_json': [],
+            'navigation_history_json': [
+                {'path': '/learn', 'timestamp_msecs': 2}
+            ],
+            'environment_json': {'user_agent': 'Mozilla/5.0'},
+        }
+
+        report = general_feedback_services.create_platform_report(
+            feedback_text='The card image is broken.',
+            source='lesson',
+            category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+            lesson_metadata_json=self.get_lesson_metadata(),
+            session_info_json=session_info,
+            screenshot_filename='feedback.png',
+            screenshot_entity_id='entity_id',
+            include_technical_logs=True,
+            page_url='https://oppia.org/learn',
+        )
+        session_model = (
+            general_feedback_models.FeedbackSessionLogModel.get_by_id(report.id)
+        )
+
+        self.assertTrue(report.include_technical_logs)
+        self.assertEqual(report.screenshot_filename, 'feedback.png')
+        self.assertEqual(report.screenshot_entity_id, 'entity_id')
+        self.assertIsNotNone(session_model)
+        assert session_model is not None
+        self.assertEqual(
+            session_model.console_logs_json,
+            session_info['console_logs_json'],
+        )
+        self.assertEqual(
+            session_model.navigation_history_json,
+            session_info['navigation_history_json'],
+        )
+        self.assertEqual(
+            session_model.failed_requests_json,
+            session_info['failed_requests_json'],
+        )
+        self.assertEqual(
+            session_model.environment_json,
+            session_info['environment_json'],
+        )
+
+    def test_create_platform_report_sanitizes_invalid_session_info(
+        self,
+    ) -> None:
+        # Here we use object because session-info diagnostics are heterogeneous
+        # JSON-like payloads (nested dict/list values) from client logs.
+        session_info: Dict[str, object] = {
+            'console_logs_json': 'invalid',
+            'failed_requests_json': 'invalid',
+            'navigation_history_json': 'invalid',
+            'environment_json': 'invalid',
+        }
+
+        report = general_feedback_services.create_platform_report(
+            feedback_text='Broken page',
+            source='lesson',
+            category=(feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE),
+            lesson_metadata_json=self.get_lesson_metadata(),
+            session_info_json=session_info,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=True,
+            page_url='https://oppia.org/learn',
+        )
+
+        session_model = (
+            general_feedback_models.FeedbackSessionLogModel.get_by_id(report.id)
+        )
+
+        self.assertEqual(session_model.console_logs_json, [])
+        self.assertEqual(session_model.failed_requests_json, [])
+        self.assertEqual(session_model.navigation_history_json, [])
+        self.assertEqual(session_model.environment_json, {})
+
+    def test_create_platform_report_raises_for_missing_lesson_metadata(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            ValueError, 'Lesson feedback must include lesson metadata.'
+        ):
+            general_feedback_services.create_platform_report(
+                feedback_text='The card image is broken.',
+                source='lesson',
+                category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+                lesson_metadata_json=None,
+                session_info_json=None,
+                screenshot_filename=None,
+                screenshot_entity_id=None,
+                include_technical_logs=False,
+                page_url='https://oppia.org/learn',
+            )
+
+    def test_create_platform_report_routes_to_core_dashboard(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='Technical issue.',
+            source='site',
+            page_url='https://oppia.org/create/12',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+        )
+
+        self.assertEqual(
+            report.destination_dashboard,
+            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+        )

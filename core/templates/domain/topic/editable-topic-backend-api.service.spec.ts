@@ -325,10 +325,13 @@ describe('Editable topic backend API service', () => {
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
     expect(req.request.method).toEqual('PUT');
-    req.flush("Topic with given id doesn't exist.", {
-      status: 404,
-      statusText: "Topic with given id doesn't exist.",
-    });
+    req.flush(
+      {error: "Topic with given id doesn't exist."},
+      {
+        status: 404,
+        statusText: "Topic with given id doesn't exist.",
+      }
+    );
 
     flushMicrotasks();
 

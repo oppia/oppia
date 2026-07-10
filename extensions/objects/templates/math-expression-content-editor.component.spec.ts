@@ -18,7 +18,7 @@
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   flush,
@@ -27,7 +27,6 @@ import {
 } from '@angular/core/testing';
 import {MathExpressionContentEditorComponent} from './math-expression-content-editor.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import 'mathjaxConfig.ts';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {AlertsService} from 'services/alerts.service';
@@ -83,7 +82,7 @@ describe('MathExpressionContentEditorComponent', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [MathExpressionContentEditorComponent],

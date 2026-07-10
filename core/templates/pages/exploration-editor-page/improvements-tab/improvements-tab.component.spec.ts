@@ -41,13 +41,13 @@ describe('Improvements tab', () => {
   let explorationImprovementsService: ExplorationImprovementsService;
   let routerService: RouterService;
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
-  let expStatsSpy;
-  let hbrTasksSpy;
-  let iflTasksSpy;
-  let ngrTasksSpy;
-  let siaTasksSpy;
-  let stateTasksSpy;
-  let allStateTasksSpy;
+  let expStatsSpy: jasmine.Spy;
+  let hbrTasksSpy: jasmine.Spy;
+  let iflTasksSpy: jasmine.Spy;
+  let ngrTasksSpy: jasmine.Spy;
+  let siaTasksSpy: jasmine.Spy;
+  let stateTasksSpy: jasmine.Spy;
+  let allStateTasksSpy: jasmine.Spy;
 
   class MockNgbModal {
     open() {
@@ -287,7 +287,17 @@ describe('Improvements tab', () => {
           ])
         )
       );
-      const stateTasks = {
+
+      interface StateTaskEntry {
+        stateName: string;
+        ngrTask: NeedsGuidingResponsesTask;
+        siaTask: SuccessiveIncorrectAnswersTask;
+        supportingStats: {
+          stateStats: StateStats;
+        };
+      }
+
+      const stateTasks: Record<string, StateTaskEntry> = {
         Introduction: {
           stateName: 'Introduction',
           ngrTask: newNgrTask(true),
@@ -301,7 +311,10 @@ describe('Improvements tab', () => {
           supportingStats: {stateStats: emptyStateStats},
         },
       };
-      stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
+
+      stateTasksSpy.and.callFake((stateName: string) => {
+        return stateTasks[stateName];
+      });
 
       component.ngOnInit();
       flushMicrotasks();
@@ -342,13 +355,13 @@ describe('Improvements tab', () => {
       component.ngOnInit();
       flushMicrotasks();
 
-      expect(component.isStateTasksVisible('Introduction')).toBeTrue();
-      expect(component.isStateTasksVisible('End')).toBeTrue();
+      expect(component.isStateTasksVisible('Introduction')).toBe(true);
+      expect(component.isStateTasksVisible('End')).toBe(true);
 
       component.toggleStateTasks('End');
 
-      expect(component.isStateTasksVisible('Introduction')).toBeTrue();
-      expect(component.isStateTasksVisible('End')).toBeFalse();
+      expect(component.isStateTasksVisible('Introduction')).toBe(true);
+      expect(component.isStateTasksVisible('End')).toBe(false);
     }));
 
     describe('Exploration-health', () => {

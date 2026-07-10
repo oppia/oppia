@@ -108,6 +108,14 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
+            'arcs': [
+                {
+                    'id': 'arc_default',
+                    'title': 'All Chapters',
+                    'description': '',
+                    'node_ids': ['node_1111'],
+                }
+            ],
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -321,6 +329,14 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             ],
             'initial_node_id': 'node_1111',
             'next_node_id': 'node_2222',
+            'arcs': [
+                {
+                    'id': 'arc_default',
+                    'title': 'All Chapters',
+                    'description': '',
+                    'node_ids': ['node_1111'],
+                }
+            ],
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
         # TODO(#13059): Here we use MyPy ignore because after we fully type

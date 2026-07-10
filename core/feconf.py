@@ -106,15 +106,15 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles')
+    os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('build', 'webpack_bundles')
+    else os.path.join('build')
 )
 # To know more about AOT visit https://angular.io/guide/glossary#aot
 FRONTEND_AOT_DIR = (
     os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('dist', 'oppia-angular-prod')
+    else os.path.join('build')
 )
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
@@ -154,6 +154,7 @@ class ValidModelNames(enum.Enum):
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
+    CERTIFICATE_ASSESSMENT_OFFERING = 'certificate_assessment_offering'
     CLASSROOM = 'classroom'
     CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
@@ -161,6 +162,7 @@ class ValidModelNames(enum.Enum):
     EMAIL = 'email'
     EXPLORATION = 'exploration'
     FEEDBACK = 'feedback'
+    GENERAL_FEEDBACK = 'general_feedback'
     IMPROVEMENTS = 'improvements'
     JOB = 'job'
     LEARNER_GROUP = 'learner_group'
@@ -202,6 +204,36 @@ MAX_CHARS_IN_BLOG_POST_URL = (
     + constants.BLOG_POST_ID_LENGTH
 )
 
+# Maximum lengths for various session info fields.
+MAX_PAGE_URL_LENGTH = 2000
+# This is the maximum limit for console errors
+# and failed requests in session info.
+MAX_SESSION_INFO_LOG_ENTRIES = 25
+MAX_NAVIGATION_HISTORY_ENTRIES = 5
+MAX_SESSION_INFO_USER_AGENT_LENGTH = 1000
+MAX_SESSION_INFO_PAGE_FIELD_LENGTH = 2000
+
+MAX_SESSION_INFO_LOG_MESSAGE_LENGTH = 1000
+MAX_SESSION_INFO_STACK_TRACE_LENGTH = 4000
+MAX_SESSION_INFO_METHOD_LENGTH = 20
+MAX_SESSION_INFO_STATUS_TEXT_LENGTH = 200
+ALLOWED_FEEDBACK_PAGE_HOST_SUFFIXES = (
+    'oppia.org',
+    'oppiatestserver.org',
+    'oppiaserver-backup-migration.appspot.com',
+)
+ALLOWED_FEEDBACK_PAGE_HOSTS = (
+    'localhost',
+    '127.0.0.1',
+    '::1',
+)
+ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
+    'console_logs_json',
+    'failed_requests_json',
+    'navigation_history_json',
+    'environment_json',
+)
+
 # Allowed formats of how HTML is present in rule specs.
 HTML_RULE_VARIABLE_FORMAT_SET = 'set'
 HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
@@ -224,6 +256,7 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_USER = 'user'
 ENTITY_TYPE_CLASSROOM = 'classroom'
+ENTITY_TYPE_FEEDBACK = 'feedback'
 
 DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
 DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
@@ -309,7 +342,7 @@ CURRENT_STATE_SCHEMA_VERSION = 57
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 6
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 7
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 5
@@ -343,6 +376,21 @@ CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 # This value should be updated if the schema of PlatformParameterRule dict
 # schema changes.
 CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of FeedbackSessionLogModel
+# schema changes.
+CURRENT_SESSION_INFO_SCHEMA_VERSION = 1
+
+# This is the minimum version of the FeedbackSessionLogModel schema that is supported.
+MINIMUM_SESSION_INFO_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema Of Lesson Metadata
+# schema changes.
+CURRENT_LESSON_METADATA_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema Of Response List
+# schema changes.
+CURRENT_RESPONSE_LIST_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -380,6 +428,12 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 INVALID_CONTENT_ID = 'invalid_content_id'
 # The default content text for the initial state of an exploration.
 DEFAULT_STATE_CONTENT_STR = ''
+
+# Content IDs and prefixes for exploration metadata.
+EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
+EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
+EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
+EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
@@ -526,6 +580,10 @@ AZURE_TEXT_TO_SPEECH_REGION = 'centralus'
 
 OPPIA_CONTENT_TAG_DELIMITER = '; '
 
+# Azure Translator API configuration for automatic translation suggestions.
+AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
+AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
+
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
@@ -542,7 +600,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.5.1'
+OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -613,7 +671,6 @@ EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
-EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_CD_USER = 'onboard_cd_user'
 EMAIL_INTENT_REMOVE_CD_USER = 'remove_cd_user'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
@@ -636,14 +693,6 @@ EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
 EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
-
-# Possible intents for email sent in bulk.
-BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
-BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
-BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
-BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
-BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
-BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
@@ -893,6 +942,7 @@ CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = (
 )
 COMMUNITY_CONTRIBUTION_STATS_URL = '/community-contribution-stats'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+CONTRIBUTOR_OPPORTUNITIES_DATA_V2_URL = '/opportunitieshandlerv2'
 PINNED_OPPORTUNITIES_URL = '/pinned-opportunities'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
@@ -931,6 +981,7 @@ FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL = '/feedback_captcha_config_handler'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
 IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
@@ -955,6 +1006,7 @@ LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
+LESSON_FEEDBACK_URL = '/feedback'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -976,6 +1028,7 @@ PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice/session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
+PLATFORM_FEEDBACK_URL = '/platform-feedback'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
@@ -994,6 +1047,8 @@ PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
+REVIEWABLE_OPPORTUNITIES_V2_URL = '/getreviewableopportunitieshandlerv2'
+TRANSLATABLE_CONTENTS_V2_URL = '/gettranslatablecontentshandlerv2'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -1084,6 +1139,16 @@ REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
 REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
     '/regenerate_voiceovers_for_exploration/'
     '<exploration_id>/<language_accent_code>'
+)
+
+CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/certificate_assessment_offering_handler'
+)
+CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
+    '/certificate_assessment_offering_handler/<certificate_id>'
+)
+VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/validate_certificate_assessment_offering_handler'
 )
 
 # Event types.
@@ -1646,7 +1711,7 @@ CONTRIBUTION_SUBTYPE_COORDINATE: Final = 'coordinate'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
-TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
+TRANSLATION_TEAM_LEAD = 'Aanuoluwapo Adeoti'
 QUESTION_TEAM_LEAD = 'Ryan Hsiao'
 
 # Suggestion fields that can be queried.
@@ -1735,6 +1800,10 @@ class TranslatableEntityType(enum.Enum):
 
     EXPLORATION = 'exploration'
     QUESTION = 'question'
+    SKILL = 'skill'
+    TOPIC = 'topic'
+    STORY = 'story'
+    CLASSROOM = 'classroom'
 
 
 class TranslatedContentDict(TypedDict):
@@ -1808,3 +1877,76 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
         'regenerate_voiceovers_for_batch_contents'
     ),
 }
+
+# Allowed feedback thread statuses.
+STATUS_CHOICES_OPEN: Final = 'open'
+STATUS_CHOICES_FIXED: Final = 'fixed'
+STATUS_CHOICES_COMPLIMENT: Final = 'compliment'
+STATUS_CHOICES_NOT_ACTIONABLE: Final = 'not_actionable'
+STATUS_CHOICES_TRANSFERED_TO_GITHUB: Final = 'transferred_to_github'
+STATUS_CHOICES: Final = [
+    STATUS_CHOICES_OPEN,
+    STATUS_CHOICES_FIXED,
+    STATUS_CHOICES_COMPLIMENT,
+    STATUS_CHOICES_NOT_ACTIONABLE,
+    STATUS_CHOICES_TRANSFERED_TO_GITHUB,
+]
+
+# Allowed Report category choices.
+CATEGORY_TYPO: Final = 'typo'
+CATEGORY_BROKEN_LAYOUT_OR_IMAGE: Final = 'broken_layout_or_image'
+CATEGORY_CONFUSING_OR_INCORRECT_ANSWER: Final = 'confusing_or_incorrect_answer'
+CATEGORY_OTHER_OR_NOT_SURE: Final = 'other_or_not_sure'
+CATEGORY_CHOICES: Final = [
+    CATEGORY_TYPO,
+    CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
+    CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
+    CATEGORY_OTHER_OR_NOT_SURE,
+]
+
+# Categories that route to the Creator Dashboard.
+CREATOR_DASHBOARD_CATEGORIES: Final = frozenset(
+    [
+        CATEGORY_TYPO,
+        CATEGORY_CONFUSING_OR_INCORRECT_ANSWER,
+    ]
+)
+
+# Report source choices.
+SOURCE_LESSON: Final = 'lesson'
+SOURCE_APP: Final = 'app'
+SOURCE_CHOICES: Final = [SOURCE_LESSON, SOURCE_APP]
+
+# Platform choices.
+PLATFORM_WEB: Final = 'web'
+PLATFORM_ANDROID: Final = 'android'
+PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
+
+# Destination choices.
+DESTINATION_CREATOR: Final = 'creator'
+DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
+DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
+DESTINATION_CHOICES: Final = [
+    DESTINATION_CREATOR,
+    DESTINATION_TECHNICAL_LEAP_TEAM,
+    DESTINATION_TECHNICAL_CORE_TEAM,
+]
+
+LEAP_DASHBOARD_PATHS = frozenset(
+    [
+        'about',
+        'community-library',
+        'contact',
+        'explore',
+        'learn',
+        'learner-dashboard',
+        'lesson',
+        'profile',
+        'partnerships',
+        'preferences',
+        'volunteer',
+        'teach',
+        'blog',
+        'donate',
+    ]
+)

@@ -33,20 +33,16 @@ class MockActiveModal {
   }
 }
 
-class MockHtmlLengthService {
-  computeHtmlLength(html: string, calculationType: string): number {
-    return html.length;
-  }
-}
-
 describe('Add Study Guide Section Modal Component', () => {
   let component: AddStudyGuideSectionModalComponent;
   let fixture: ComponentFixture<AddStudyGuideSectionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let htmlLengthService: HtmlLengthService;
+  let htmlLengthService: jasmine.SpyObj<HtmlLengthService>;
 
   beforeEach(waitForAsync(() => {
-    htmlLengthService = new MockHtmlLengthService();
+    htmlLengthService = jasmine.createSpyObj('HtmlLengthService', [
+      'computeHtmlLength',
+    ]);
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -133,12 +129,12 @@ describe('Add Study Guide Section Modal Component', () => {
 
   it('should check if section content length is exceeded', () => {
     component.tempSectionContentHtml = 'short content';
-    let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
-    computeHtmlLengthSpy.and.returnValue(500);
+
+    htmlLengthService.computeHtmlLength.and.returnValue(500);
     let isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(false);
 
-    computeHtmlLengthSpy.and.returnValue(6500);
+    htmlLengthService.computeHtmlLength.and.returnValue(6500);
     isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(true);
   });

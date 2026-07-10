@@ -49,6 +49,7 @@ import {FetchExplorationBackendResponse} from './read-only-exploration-backend-a
 export interface ExplorationBackendDict {
   auto_tts_enabled: boolean;
   draft_changes: ExplorationChange[];
+  exploration_id?: string;
   is_version_of_draft_valid: boolean;
   init_state_name: string;
   param_changes: ParamChangeBackendDict[];
@@ -57,7 +58,7 @@ export interface ExplorationBackendDict {
   title: string;
   language_code: string;
   draft_change_list_id: number;
-  version?: number;
+  version: number;
   next_content_id_index: number;
   edits_allowed?: boolean;
   exploration_metadata: ExplorationMetadataBackendDict;
@@ -232,6 +233,7 @@ export class Exploration extends BaseTranslatableObject {
       exploration_metadata: explorationBackendResponse.exploration_metadata,
       is_version_of_draft_valid: false,
       draft_change_list_id: explorationBackendResponse.draft_change_list_id,
+      version: explorationBackendResponse.version,
     };
     return Exploration.createFromBackendDict(
       explorationBackendDict,

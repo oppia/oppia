@@ -574,51 +574,6 @@ def can_edit_collection(
     return test_can_edit
 
 
-def can_manage_email_dashboard(
-    handler: Callable[..., _GenericHandlerFunctionReturnType],
-) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Decorator to check whether user can access email dashboard.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now checks if the user has
-        permission to access the email dashboard.
-    """
-
-    # Here we use type Any because this method can accept arbitrary number of
-    # arguments with different types.
-    @functools.wraps(handler)
-    def test_can_manage_emails(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
-        """Checks if the user is logged in and can access email dashboard.
-
-        Args:
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException. The user is not logged in.
-            UnauthorizedUserException. The user does not have credentials to
-                access the email dashboard.
-        """
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        if self.current_user_is_super_admin:
-            return handler(self, **kwargs)
-
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to access email dashboard.'
-        )
-
-    return test_can_manage_emails
-
-
 def can_access_blog_admin_page(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -5143,3 +5098,36 @@ def is_from_oppia_android_build(
         return handler(self, **kwargs)
 
     return test_is_from_oppia_android_build
+
+
+def can_access_certificate_dashboard(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether the user can access the certificate
+    dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_certificate_dashboard(
+        self: _SelfBaseHandlerType,
+        **kwargs: Any,
+    ) -> _GenericHandlerFunctionReturnType:
+        """Stub handler for certificate dashboard access checks.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        return handler(self, **kwargs)
+
+    return test_can_access_certificate_dashboard

@@ -42,6 +42,7 @@ import 'components/code-mirror/codemirror.component';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {Subscription} from 'rxjs';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -91,8 +92,9 @@ export class SchemaBasedUnicodeEditor
     extraKeys: {Tab: (cm: CodeMirror.Editor) => void};
     indentWithTabs: boolean;
     lineNumbers: boolean;
-    readOnly?: string;
-    mode?: string;
+    readOnly: boolean;
+    mode: string;
+    viewportMargin: number;
   } = {
     // Convert tabs to spaces.
     extraKeys: {
@@ -112,11 +114,15 @@ export class SchemaBasedUnicodeEditor
     },
     indentWithTabs: false,
     lineNumbers: true,
+    readOnly: false,
+    mode: '',
+    viewportMargin: Infinity,
   };
 
   constructor(
     private deviceInfoService: DeviceInfoService,
     private focusManagerService: FocusManagerService,
+    private numberConversionService: NumberConversionService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private translateService: TranslateService
@@ -139,7 +145,7 @@ export class SchemaBasedUnicodeEditor
   registerOnTouched(fn: SchemaDefaultValue): void {}
 
   validate(control: AbstractControl): ValidationErrors | null {
-    return validate(control, this.validators);
+    return validate(control, this.validators, this.numberConversionService);
   }
 
   ngOnInit(): void {
@@ -151,7 +157,7 @@ export class SchemaBasedUnicodeEditor
       var CODING_MODE_NONE = 'none';
 
       if (this.disabled) {
-        this.codemirrorOptions.readOnly = 'nocursor';
+        this.codemirrorOptions.readOnly = true;
       }
       // Note that only 'coffeescript', 'javascript', 'lua', 'python',
       // 'ruby' and 'scheme' have CodeMirror-supported syntax
