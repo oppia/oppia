@@ -23,7 +23,11 @@ import {
   Warning,
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
-import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {
+  MusicNotesInputCustomizationArgs,
+  ReadableMusicNote,
+} from 'extensions/interactions/customization-args-defs';
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 
@@ -31,6 +35,13 @@ import {AppConstants} from 'app.constants';
   providedIn: 'root',
 })
 export class MusicNotesInputValidationService {
+  // The music staff can display at most this many notes, so longer
+  // sequences can neither be rendered nor entered by the learner. This
+  // must be kept in sync with MAXIMUM_NOTES_POSSIBLE in
+  // oppia-interactive-music-notes-input.component.ts and with
+  // MusicPhrase._MAX_NOTES_IN_PHRASE in extensions/objects/models/objects.py.
+  static readonly MAX_NOTES_IN_PHRASE = 8;
+
   constructor(
     private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
@@ -38,8 +49,53 @@ export class MusicNotesInputValidationService {
   getCustomizationArgsWarnings(
     customizationArgs: MusicNotesInputCustomizationArgs
   ): Warning[] {
-    // TODO(#20442): Implement customization args validations.
-    return [];
+    var warningsList: Warning[] = [];
+
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs,
+      ['sequenceToGuess', 'initialSequence']
+    );
+
+    const validNoteNames: string[] = Object.keys(
+      InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
+    );
+    const sequences: [string, ReadableMusicNote[]][] = [
+      ['sequence of notes to guess', customizationArgs.sequenceToGuess.value],
+      ['initial sequence of notes', customizationArgs.initialSequence.value],
+    ];
+
+    for (const [sequenceLabel, notes] of sequences) {
+      if (notes.length > MusicNotesInputValidationService.MAX_NOTES_IN_PHRASE) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.CRITICAL,
+          message:
+            `Please make sure that the ${sequenceLabel} has at most ` +
+            `${MusicNotesInputValidationService.MAX_NOTES_IN_PHRASE} notes.`,
+        });
+      }
+      if (notes.some(note => !validNoteNames.includes(note.readableNoteName))) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.CRITICAL,
+          message:
+            `Please make sure that all notes in the ${sequenceLabel} are ` +
+            'notes that can be placed on the staff (C4 through A5).',
+        });
+      }
+      if (
+        notes.some(
+          note => note.noteDuration.num < 1 || note.noteDuration.den < 1
+        )
+      ) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.CRITICAL,
+          message:
+            'Please make sure that all note durations in the ' +
+            `${sequenceLabel} are positive.`,
+        });
+      }
+    }
+
+    return warningsList;
   }
 
   getAllWarnings(

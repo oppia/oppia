@@ -24,7 +24,10 @@ import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
-import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {
+  MusicNotesInputCustomizationArgs,
+  ReadableMusicNote,
+} from 'extensions/interactions/customization-args-defs';
 import cloneDeep from 'lodash/cloneDeep';
 
 describe('MusicNotesInputValidationService', () => {
@@ -36,12 +39,35 @@ describe('MusicNotesInputValidationService', () => {
     goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
 
+  const createNotes = function (
+    numNotes: number,
+    readableNoteName: string = 'C4'
+  ): ReadableMusicNote[] {
+    const notes: ReadableMusicNote[] = [];
+    for (let i = 0; i < numNotes; i++) {
+      notes.push({
+        readableNoteName: readableNoteName,
+        noteDuration: {num: 1, den: 1},
+      });
+    }
+    return notes;
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [MusicNotesInputValidationService],
     });
 
     validatorService = TestBed.inject(MusicNotesInputValidationService);
+
+    customizationArgs = {
+      sequenceToGuess: {
+        value: [],
+      },
+      initialSequence: {
+        value: [],
+      },
+    };
 
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -62,18 +88,84 @@ describe('MusicNotesInputValidationService', () => {
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState,
-      {
-        sequenceToGuess: {
-          value: [],
-        },
-        initialSequence: {
-          value: [],
-        },
-      },
+      customizationArgs,
       goodAnswerGroups,
       goodDefaultOutcome
     );
     expect(warnings).toEqual([]);
+  });
+
+  it('should not raise warnings for valid customization arguments', () => {
+    customizationArgs.sequenceToGuess.value = createNotes(8);
+    customizationArgs.initialSequence.value = createNotes(8, 'A5');
+
+    var warnings =
+      validatorService.getCustomizationArgsWarnings(customizationArgs);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should raise a warning when the sequence to guess is too long', () => {
+    customizationArgs.sequenceToGuess.value = createNotes(9);
+
+    var warnings =
+      validatorService.getCustomizationArgsWarnings(customizationArgs);
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message:
+          'Please make sure that the sequence of notes to guess has at ' +
+          'most 8 notes.',
+      },
+    ]);
+  });
+
+  it('should raise a warning when the initial sequence is too long', () => {
+    customizationArgs.initialSequence.value = createNotes(9);
+
+    var warnings =
+      validatorService.getCustomizationArgsWarnings(customizationArgs);
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message:
+          'Please make sure that the initial sequence of notes has at ' +
+          'most 8 notes.',
+      },
+    ]);
+  });
+
+  it('should raise a warning when a sequence has an invalid note', () => {
+    customizationArgs.sequenceToGuess.value = createNotes(1, 'B5');
+
+    var warnings =
+      validatorService.getCustomizationArgsWarnings(customizationArgs);
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message:
+          'Please make sure that all notes in the sequence of notes to ' +
+          'guess are notes that can be placed on the staff (C4 through A5).',
+      },
+    ]);
+  });
+
+  it('should raise a warning when a note duration is not positive', () => {
+    customizationArgs.initialSequence.value = createNotes(1);
+    customizationArgs.initialSequence.value[0].noteDuration = {
+      num: 0,
+      den: 1,
+    };
+
+    var warnings =
+      validatorService.getCustomizationArgsWarnings(customizationArgs);
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message:
+          'Please make sure that all note durations in the initial ' +
+          'sequence of notes are positive.',
+      },
+    ]);
   });
 
   it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
