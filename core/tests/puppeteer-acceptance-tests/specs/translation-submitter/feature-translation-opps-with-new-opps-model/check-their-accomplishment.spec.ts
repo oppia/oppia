@@ -104,7 +104,13 @@ describe('Translation Submitter V2', function () {
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
+    await translationSubmitter.closeTranslateTextModal();
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );

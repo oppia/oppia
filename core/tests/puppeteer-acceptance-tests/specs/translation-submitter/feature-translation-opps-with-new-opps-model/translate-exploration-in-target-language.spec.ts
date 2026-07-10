@@ -332,7 +332,14 @@ describe('Translation Submitter V2', function () {
   });
 
   it('should be able to submit the translation', async function () {
-    await translationSubmitter.clickOnElementWithText('Save and close');
+    // With the V2 feature flag enabled, exploration metadata (title,
+    // objective, category) are also returned as translatable content.
+    // This means there are more items after the previous test's skip
+    // sequence, so the button shows "Save and translate another"
+    // instead of "Save and close".
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );

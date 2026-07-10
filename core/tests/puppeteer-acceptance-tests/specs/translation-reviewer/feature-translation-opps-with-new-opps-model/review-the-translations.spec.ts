@@ -126,7 +126,13 @@ describe('Translation Reviewer V2', function () {
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 3');
-    await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
+    await translationSubmitter.closeTranslateTextModal();
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
@@ -140,7 +146,13 @@ describe('Translation Reviewer V2', function () {
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
+    await translationSubmitter.closeTranslateTextModal();
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {
