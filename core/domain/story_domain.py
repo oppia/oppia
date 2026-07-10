@@ -1151,7 +1151,7 @@ class StoryNode:
         Returns:
             bool. True if the chapter is upcoming else false.
         """
-        current_time_msecs = utils.get_current_time_in_millisecs()
+        current_time_msecs = utils.get_utc_time_in_millisecs()
         planned_publication_date_msecs = (
             utils.get_utc_time_in_millisecs(self.planned_publication_date)
             if self.planned_publication_date
@@ -1178,7 +1178,7 @@ class StoryNode:
         Returns:
             bool. True if the chapter is behind-schedule else false.
         """
-        current_time_msecs = utils.get_current_time_in_millisecs()
+        current_time_msecs = utils.get_utc_time_in_millisecs()
         planned_publication_date_msecs = (
             utils.get_utc_time_in_millisecs(self.planned_publication_date)
             if self.planned_publication_date

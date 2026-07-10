@@ -1852,12 +1852,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         creation_time_in_millisecs = int(creation_time.timestamp() * 1000)
         mock_value = creation_time_in_millisecs
 
-        mock_get_current_time_in_millisecs = lambda: mock_value
+        mock_get_utc_time_in_millisecs = lambda: mock_value
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
                 suggestion_models.GeneralSuggestionModel.create(

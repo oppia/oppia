@@ -1066,10 +1066,10 @@ class UtilsTests(test_utils.GenericTestBase):
             ),
         )
 
-    def test_get_current_time_in_millisecs_with_current_time(self) -> None:
-        time_instance1 = utils.get_current_time_in_millisecs()
+    def test_get_utc_time_in_millisecs_with_current_time(self) -> None:
+        time_instance1 = utils.get_utc_time_in_millisecs()
         time.sleep(2)
-        time_instance2 = utils.get_current_time_in_millisecs()
+        time_instance2 = utils.get_utc_time_in_millisecs()
         self.assertLess(time_instance1, time_instance2)
 
     def test_get_require_valid_name_with_empty_string(self) -> None:

@@ -1223,7 +1223,7 @@ def publish_collection_and_update_user_profiles(
         Exception. No collection summary model exists for the given id.
     """
     rights_manager.publish_collection(committer, collection_id)
-    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contribution_time_msec = utils.get_utc_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
     if collection_summary is None:
         raise Exception(
@@ -1291,7 +1291,7 @@ def update_collection(
         user_settings = user_services.get_user_settings(committer_id)
         if user_settings is not None:
             user_settings.update_first_contribution_msec(
-                utils.get_current_time_in_millisecs()
+                utils.get_utc_time_in_millisecs()
             )
             user_services.save_user_settings(user_settings)
 

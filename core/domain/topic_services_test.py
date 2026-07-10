@@ -4309,13 +4309,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID, canonical_story_id_1
         )
 
-        def mock_get_current_time_in_millisecs() -> int:
+        def mock_get_utc_time_in_millisecs() -> int:
             return 1690555400000
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             topic_summary = topic_fetchers.get_topic_summary_by_id(
                 self.TOPIC_ID
@@ -4392,13 +4392,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_model.canonical_story_references = [invalid_story_reference_dict]
         topic_model.commit(self.user_id, 'reference invalid story id', [])
 
-        def mock_get_current_time_in_millisecs() -> int:
+        def mock_get_utc_time_in_millisecs() -> int:
             return 1690555400000
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             with self.capture_logging(min_level=logging.ERROR) as logs:
                 topic_summary = topic_fetchers.get_topic_summary_by_id(

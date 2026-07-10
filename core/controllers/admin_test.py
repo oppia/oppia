@@ -4243,19 +4243,19 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
-        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        creation_time_in_millisecs = utils.get_utc_time_in_millisecs()
+        mock_get_utc_time_in_millisecs = lambda: creation_time_in_millisecs
         # Since the UsernameChangeAuditModel's ID is formed from the user ID and
         # a millisecond timestamp we need to make sure that
-        # get_current_time_in_millisecs returns the same value as we have saved
+        # get_utc_time_in_millisecs returns the same value as we have saved
         # into current_time_in_millisecs. If we don't force the same value via
         # swap flakes can occur, since as the time flows the saved milliseconds
         # can differ from the milliseconds saved into the
         # UsernameChangeAuditModel's ID.
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             self.put_json(
                 '/updateusernamehandler',

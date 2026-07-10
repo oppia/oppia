@@ -326,13 +326,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             topic_id, canonical_story_id_2, self.admin_id
         )
 
-        def mock_get_current_time_in_millisecs() -> int:
+        def mock_get_utc_time_in_millisecs() -> int:
             return 1690555400000
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id)

@@ -3632,13 +3632,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             topic_rights, self.USER_ID, 'Published the topic', commit_cmds
         )
 
-        def mock_get_current_time_in_millisecs() -> int:
+        def mock_get_utc_time_in_millisecs() -> int:
             return 1690555400000
 
         with self.swap(
             utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs,
+            'get_utc_time_in_millisecs',
+            mock_get_utc_time_in_millisecs,
         ):
             chapter_notifications = (
                 story_services.get_chapter_notifications_stories_list()

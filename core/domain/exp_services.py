@@ -1988,7 +1988,7 @@ def publish_exploration_and_update_user_profiles(
     email_subscription_services.inform_subscribers(
         committer.user_id, exp_id, exp_title
     )
-    contribution_time_msec = utils.get_current_time_in_millisecs()
+    contribution_time_msec = utils.get_utc_time_in_millisecs()
     contributor_ids = exp_fetchers.get_exploration_summary_by_id(
         exp_id
     ).contributor_ids
@@ -2380,7 +2380,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             user_settings.record_user_edited_an_exploration()
             if not rights_manager.is_exploration_private(exploration_id):
                 user_settings.update_first_contribution_msec(
-                    utils.get_current_time_in_millisecs()
+                    utils.get_utc_time_in_millisecs()
                 )
 
             models_to_put.append(

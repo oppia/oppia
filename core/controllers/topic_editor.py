@@ -176,7 +176,7 @@ class TopicEditorStoryHandler(
                 if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
                 if node.planned_publication_date is not None:
-                    current_time_msecs = utils.get_current_time_in_millisecs()
+                    current_time_msecs = utils.get_utc_time_in_millisecs()
                     planned_publication_date_msecs = (
                         utils.get_utc_time_in_millisecs(
                             node.planned_publication_date
