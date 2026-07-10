@@ -25,6 +25,7 @@ import {
   QuestionBackendDict,
 } from '../../../domain/question/question.model';
 import {StateCard} from '../../../domain/state_card/state-card.model';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
@@ -34,7 +35,7 @@ import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
-import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {State} from '../../../domain/state/state.model';
 
@@ -62,6 +63,7 @@ describe('Question player engine service', () => {
         classifier_model_id: null,
         param_changes: [],
         solicit_answer_details: false,
+        inapplicable_skill_misconception_ids: [],
         content: {
           content_id: '1',
           html: 'Question 1',
@@ -87,7 +89,8 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              training_data: null,
+              // training_data is always an array (never null) in the type definition.
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
             {
@@ -109,7 +112,8 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              training_data: null,
+              // training_data is always an array (never null) in the type definition.
+              training_data: [],
               tagged_skill_misconception_id: 'misconceptionId',
             },
           ],
@@ -229,6 +233,8 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          // Required by StateBackendDict interface.
+          inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
         language_code: 'en',
@@ -296,6 +302,8 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          // Required by StateBackendDict interface.
+          inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
         language_code: 'br',
@@ -363,6 +371,8 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          // Required by StateBackendDict interface.
+          inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
         language_code: 'ab',
@@ -398,7 +408,9 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = TestBed.inject(
+      TextInputRulesService
+    ) as unknown as InteractionRulesService;
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -552,7 +564,7 @@ describe('Question player engine service', () => {
     );
 
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-      multipleQuestionsObjects[0]._id
+      multipleQuestionsObjects[0].getId()!
     );
   });
 
@@ -698,7 +710,12 @@ describe('Question player engine service', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
 
-      singleQuestionBackendDict.question_state_data.content.html = null;
+      (
+        singleQuestionBackendDict.question_state_data.content as {
+          content_id: string;
+          html: string | null;
+        }
+      ).html = null;
       let alertsServiceSpy = spyOn(
         alertsService,
         'addWarning'
@@ -819,7 +836,7 @@ describe('Question player engine service', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', null, null, []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -838,8 +855,13 @@ describe('Question player engine service', () => {
           (html, envs) => html
         );
 
-        singleQuestionBackendDict.question_state_data.interaction.default_outcome.feedback.html =
-          null;
+        // default_outcome is typed as OutcomeBackendDict | null; the non-null
+        // assertion is safe here because singleQuestionBackendDict always has
+        // a default_outcome.
+        const feedbackObj =
+          singleQuestionBackendDict.question_state_data.interaction
+            .default_outcome!.feedback;
+        (feedbackObj as {content_id: string; html: string | null}).html = null;
         questionPlayerEngineService.init(
           [Question.createFromBackendDict(singleQuestionBackendDict)],
           initSuccessCb,
@@ -871,7 +893,12 @@ describe('Question player engine service', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      singleQuestionBackendDict.question_state_data.content.html = null;
+      (
+        singleQuestionBackendDict.question_state_data.content as {
+          content_id: string;
+          html: string | null;
+        }
+      ).html = null;
       let sampleQuestion = Question.createFromBackendDict(
         singleQuestionBackendDict
       );
@@ -926,8 +953,7 @@ describe('Question player engine service', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          null as unknown as Interaction,
           'content_id'
         );
 
@@ -966,7 +992,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[0]._id
+          multipleQuestionsObjects[0].getId()!
         );
         expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
@@ -979,7 +1005,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[1]._id
+          multipleQuestionsObjects[1].getId()!
         );
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
@@ -992,7 +1018,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[2]._id
+          multipleQuestionsObjects[2].getId()!
         );
         // Please note that after submitting answer to the final question,
         // a new card was not created, hence createNewCardSpy was not called.

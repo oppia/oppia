@@ -186,8 +186,10 @@ export class SkillEditorPageComponent implements OnInit {
       );
 
     if (this.skillIsInitialized) {
-      skillEditorBrowserTabsInfo?.setLatestVersion(skill.getVersion());
-      skillEditorBrowserTabsInfo?.setSomeTabHasUnsavedChanges(false);
+      if (skillEditorBrowserTabsInfo !== null) {
+        skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
+        skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+      }
     } else {
       if (skillEditorBrowserTabsInfo !== null) {
         skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());

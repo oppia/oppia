@@ -178,7 +178,7 @@ export class QuestionPlayerEngineService {
       errorCallback?.();
       return;
     }
-    this.loadInitialQuestion(successCallback, errorCallback ?? (() => {}));
+    this.loadInitialQuestion(successCallback, errorCallback);
   }
 
   /**
@@ -212,7 +212,10 @@ export class QuestionPlayerEngineService {
    * @returns {string} The ID of the current question.
    */
   getCurrentQuestionId(): string {
-    return this.questions[this.currentIndex].getId() ?? '';
+    const id = this.questions[this.currentIndex].getId();
+    // getId() returns string | null; the question player always has an id set
+    // once questions are loaded, so this assertion is safe.
+    return id!;
   }
 
   /**
@@ -401,12 +404,17 @@ export class QuestionPlayerEngineService {
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
+      const nextContentId = this.getNextStateData().content.contentId;
+      if (nextContentId === null) {
+        this.alertsService.addWarning('Content id should not be empty.');
+        return false;
+      }
       nextCard = StateCard.createNewCard(
         'true',
         questionHtml,
         nextInteractionHtml,
         this.getNextStateData().interaction,
-        this.getNextStateData().content.contentId ?? ''
+        nextContentId
       );
     }
     successCallback(
@@ -603,23 +611,27 @@ export class QuestionPlayerEngineService {
    * @param {(initialCard: StateCard, nextFocusLabel: string) => void} successCallback
    *    A callback to execute once the initial question is successfully loaded.
    *    It receives the constructed StateCard and a focus label for accessibility.
-   * @param {() => void} errorCallback
-   *    A callback to execute if the question fails to load (e.g., invalid data).
+   * @param {() => void} [errorCallback]
+   *    An optional callback to execute if the question fails to load (e.g., invalid data).
    */
   private loadInitialQuestion(
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback: () => void
+    errorCallback?: () => void
   ): void {
+    // getId() returns string | null; questions always have ids assigned before
+    // this method is called, so the non-null assertion is safe here.
     this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
-      this.questions[0].getId() ?? ''
+      this.questions[0].getId()!
     );
     const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
-      errorCallback();
+      if (errorCallback) {
+        errorCallback();
+      }
       return;
     }
 
@@ -630,7 +642,7 @@ export class QuestionPlayerEngineService {
     const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
     const interactionId = interaction.id;
-    let interactionHtml = null;
+    let interactionHtml: string = '';
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
@@ -641,12 +653,20 @@ export class QuestionPlayerEngineService {
         null
       );
     }
+    const initialContentId = initialState.content.contentId;
+    if (initialContentId === null) {
+      this.alertsService.addWarning('Content id should not be empty.');
+      if (errorCallback) {
+        errorCallback();
+      }
+      return;
+    }
     const initialCard = StateCard.createNewCard(
       '',
       questionHtml,
-      interactionHtml ?? '',
+      interactionHtml,
       interaction,
-      initialState.content.contentId ?? ''
+      initialContentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -679,7 +699,10 @@ export class QuestionPlayerEngineService {
    * @returns {string} The HTML string representing the interaction.
    */
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    const interactionId = this.getNextStateData().interaction.id ?? '';
+    const interactionId = this.getNextStateData().interaction.id;
+    if (!interactionId) {
+      return '';
+    }
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,

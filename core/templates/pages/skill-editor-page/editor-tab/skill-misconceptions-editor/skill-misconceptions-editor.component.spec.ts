@@ -209,7 +209,7 @@ describe('Skill Misconceptions Editor Component', () => {
           },
         }),
       } as NgbModalRef);
-      spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
+      spyOn(skillUpdateService, 'deleteMisconception').and.stub();
 
       component.ngOnInit();
       component.openDeleteMisconceptionModal(1, '1');

@@ -408,26 +408,26 @@ describe('Search bar component', () => {
     () => {
       spyOn(searchService, 'executeSearchQuery');
       spyOn(searchService, 'getSearchUrlQueryString').and.returnValue('');
-      spyOn(windowRef.nativeWindow.history, 'pushState');
+      const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
 
       component.searchQuery = '';
 
       windowRef.nativeWindow.location = new URL('http://localhost/search/find');
       component.onSearchQueryChangeExec();
 
-      expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+      expect(pushStateSpy).not.toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.href).toEqual(
         'http://localhost/search/find'
       );
 
-      (windowRef.nativeWindow.history.pushState as jasmine.Spy).calls.reset();
+      pushStateSpy.calls.reset();
 
       windowRef.nativeWindow.location = new URL(
         'http://localhost/not/search/find'
       );
       component.onSearchQueryChangeExec();
 
-      expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+      expect(pushStateSpy).not.toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.href).toEqual(
         'http://localhost/not/search/find'
       );

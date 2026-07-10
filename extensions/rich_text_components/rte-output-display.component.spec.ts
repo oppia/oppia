@@ -1070,12 +1070,12 @@ describe('RTE display component', () => {
   });
 
   it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {
-    const mockNode = new OppiaRteNode('oppia-noninteractive-image');
-    Object.defineProperty(mockNode, 'selector', {
-      value: 'oppia-noninteractive-unknown',
-      configurable: true,
-    });
-    mockNode.children = [];
+    const mockNode = {
+      selector: 'oppia-noninteractive-unknown',
+      children: [],
+      nodeType: 'component',
+      portal: undefined,
+    } as unknown as OppiaRteNode;
 
     spyOn(rteParserService, 'constructFromDomParser').and.returnValue(mockNode);
     spyOn(component, 'isHighlightSentencesFeatureEnabled').and.returnValue(

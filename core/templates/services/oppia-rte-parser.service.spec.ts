@@ -27,8 +27,19 @@ import {
 describe('RTE parser service', () => {
   let rteParserService: OppiaRteParserService;
 
-  const compareRteNodeToObject = (node: OppiaRteNode, dom) => {
-    const dfs = (n: OppiaRteNode | TextNode, d) => {
+  // Defines the shape of test DOM objects used in compareRteNodeToObject.
+  interface RteTestNode {
+    tag?: string;
+    value?: string;
+    attrs?: Record<string, string | undefined>;
+    children?: RteTestNode[];
+  }
+
+  const compareRteNodeToObject = (
+    node: OppiaRteNode,
+    dom: RteTestNode
+  ): boolean => {
+    const dfs = (n: OppiaRteNode | TextNode, d: RteTestNode): boolean => {
       if ('value' in n) {
         if (!d.value) {
           return false;
@@ -61,11 +72,13 @@ describe('RTE parser service', () => {
         }
       }
 
-      if (n.children.length !== d.children.length) {
+      const nChildren = n.children ?? [];
+      const dChildren = d.children ?? [];
+      if (nChildren.length !== dChildren.length) {
         return false;
       }
-      for (let childIndex = 0; childIndex < n.children.length; childIndex++) {
-        if (!dfs(n.children[childIndex], d.children[childIndex])) {
+      for (let childIndex = 0; childIndex < nChildren.length; childIndex++) {
+        if (!dfs(nChildren[childIndex], dChildren[childIndex])) {
           return false;
         }
       }
@@ -129,14 +142,24 @@ describe('RTE parser service', () => {
         super();
       }
 
-      get tagName() {
-        return undefined;
+      // tagName is shadowed to return undefined at runtime to test error
+      // handling. Cast to string satisfies the HTMLElement interface contract.
+      get tagName(): string {
+        return undefined as unknown as string;
       }
     }
-    customElements.define('dummy-element', DummyHtmlElement);
+    // Type assertions are needed because DummyHtmlElement overrides tagName
+    // to return undefined at runtime (to test error handling), which conflicts
+    // with the TypeScript HTMLElement interface requiring tagName: string.
+    customElements.define(
+      'dummy-element',
+      DummyHtmlElement as unknown as CustomElementConstructor
+    );
 
     expect(() => {
-      rteParserService.constructFromDomParser(new DummyHtmlElement());
+      rteParserService.constructFromDomParser(
+        new DummyHtmlElement() as unknown as HTMLElement
+      );
     }).toThrowError(
       'tagName is undefined.\n' +
         'body: <dummy-element></dummy-element>\n ' +
