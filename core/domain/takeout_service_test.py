@@ -2034,7 +2034,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'author_name': 'test name',
             'author_bio': '',
         }
-        expected_learner_playlist_data = {
+        expected_learner_playlist_data: Dict[str, List[str]] = {
             'exploration_ids': [],
             'collection_ids': [],
         }
