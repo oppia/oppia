@@ -31,6 +31,8 @@ import {ServicesConstants} from 'services/services.constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {UnicodeSchema} from 'services/schema-default-value.service';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -150,10 +152,27 @@ export class RteHelperModalComponent {
     private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService,
-    private htmlLengthService: HtmlLengthService
+    private htmlLengthService: HtmlLengthService,
+    private translationLanguageService: TranslationLanguageService
   ) {}
 
   ngOnInit(): void {
+    const activeLanguageCode =
+      this.translationLanguageService.getActiveLanguageCode();
+    const activeLanguageDirection = activeLanguageCode
+      ? this.translationLanguageService.getActiveLanguageDirection()
+      : 'auto';
+
+    this.customizationArgSpecs.forEach(spec => {
+      if (spec.schema) {
+        const schema = spec.schema as UnicodeSchema;
+        if (!schema.ui_config) {
+          schema.ui_config = {};
+        }
+        schema.ui_config.languageDirection = activeLanguageDirection;
+      }
+    });
+
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {

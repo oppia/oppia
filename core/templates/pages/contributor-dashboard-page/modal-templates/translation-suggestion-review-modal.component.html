@@ -340,6 +340,15 @@
     padding: 10px;
     position: relative;
   }
+  /* ::ng-deep is used to bypass style encapsulation to target dynamic list items
+     rendered by the child rte-output-display component, overriding the inherited
+     text-align: left style from the modal body. */
+  /* stylelint-disable selector-pseudo-element-no-unknown */
+  ::ng-deep .oppia-suggestion-review-panel ul,
+  ::ng-deep .oppia-suggestion-review-panel li {
+    text-align: start;
+  }
+  /* stylelint-enable selector-pseudo-element-no-unknown */
   .oppia-suggestion-review-message {
     margin-top: 20px;
   }

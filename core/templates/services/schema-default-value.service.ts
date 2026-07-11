@@ -32,6 +32,10 @@ export interface UnicodeSchema {
   type: 'unicode';
   // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
+  // 'ui_config' is optional because it may not be present in the schema.
+  ui_config?: {
+    languageDirection?: string;
+  };
 }
 
 interface HtmlSchema {
@@ -54,7 +58,12 @@ interface FloatSchema {
 
 export interface ListSchema {
   type: 'list';
-  items: Schema | Schema[] | string;
+  // 'ui_config' is optional because it may not be present in the items schema.
+  items: (Schema | Schema[] | string) & {
+    ui_config?: {
+      languageDirection?: string;
+    };
+  };
 }
 
 export interface DictSchema {

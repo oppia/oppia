@@ -270,6 +270,22 @@ export class TranslationModalComponent {
       },
     };
 
+    const activeLanguageDirection =
+      this.translationLanguageService.getActiveLanguageDirection();
+
+    const unicodeSchema = this.UNICODE_SCHEMA;
+    if (!unicodeSchema.ui_config) {
+      unicodeSchema.ui_config = {};
+    }
+    unicodeSchema.ui_config.languageDirection = activeLanguageDirection;
+
+    const setOfStringsSchemaItems = this.SET_OF_STRINGS_SCHEMA.items;
+    if (!setOfStringsSchemaItems.ui_config) {
+      setOfStringsSchemaItems.ui_config = {};
+    }
+    setOfStringsSchemaItems.ui_config.languageDirection =
+      activeLanguageDirection;
+
     this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
       if (
         this.activeWrittenTranslation &&
