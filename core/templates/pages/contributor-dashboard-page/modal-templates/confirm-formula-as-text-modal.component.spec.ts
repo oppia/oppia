@@ -114,7 +114,7 @@ describe('Confirm Formula As Text Modal Component without modals', () => {
   });
 
   it('should not throw when confirm or cancel is called without active modals', () => {
-    expect(() => component.confirm()).not.toThrow();
-    expect(() => component.cancel()).not.toThrow();
+    expect(() => component.confirm()).not.toThrowError();
+    expect(() => component.cancel()).not.toThrowError();
   });
 });
