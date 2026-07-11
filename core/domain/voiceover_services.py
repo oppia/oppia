@@ -33,6 +33,7 @@ from core.domain import (
     state_domain,
     suggestion_services,
     taskqueue_services,
+    topic_fetchers,
     translation_domain,
     translation_fetchers,
     user_services,
@@ -47,13 +48,14 @@ from typing import Dict, List, Optional, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models, voiceover_models
+    from mypy_imports import exp_models, opportunity_models, voiceover_models
 
 (
     exp_models,
+    opportunity_models,
     voiceover_models,
 ) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.VOICEOVER]
+    [models.Names.EXPLORATION, models.Names.OPPORTUNITY, models.Names.VOICEOVER]
 )
 
 
@@ -974,6 +976,7 @@ def regenerate_voiceovers_for_given_contents(
     exploration_version: int,
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     task_run_id: str,
+    additional_contextual_information: Dict[str, str],
     specific_language_accent_code: Optional[str] = None,
 ) -> None:
     """Helper method to regenerate voiceovers for specified contents
@@ -989,6 +992,8 @@ def regenerate_voiceovers_for_given_contents(
             that require voiceover regeneration.
         task_run_id: str. The unique identifier for the voiceover
             regeneration task.
+        additional_contextual_information: dict. A dictionary containing additional
+            contextual information related to the voiceover regeneration process.
         specific_language_accent_code: Optional[str]. The specific language
             accent code to use for voiceover regeneration, if provided.
     """
@@ -1032,6 +1037,18 @@ def regenerate_voiceovers_for_given_contents(
     voiceover_cloud_task_services.save_voiceover_regeneration_job(
         voiceover_regeneration_job
     )
+
+    parent_cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+        task_run_id
+    )
+    # Ruling out the possibility of None for mypy type checking.
+    assert parent_cloud_task_run is not None
+
+    parent_cloud_task_run.additional_contextual_information = (
+        additional_contextual_information
+    )
+
+    taskqueue_services.update_cloud_task_run_model(parent_cloud_task_run)
 
     # Voiceover regeneration for a large number of contents within a single
     # Cloud Task run (deferred request) significantly increases the workload and
@@ -1391,6 +1408,9 @@ def wrap_up_voiceover_regeneration_task(
         )
         parent_cloud_task_run.latest_job_state = 'PERMANENTLY_FAILED'
         taskqueue_services.update_cloud_task_run_model(parent_cloud_task_run)
+    else:
+        parent_cloud_task_run.latest_job_state = 'SUCCEEDED'
+        taskqueue_services.update_cloud_task_run_model(parent_cloud_task_run)
 
     voiceover_regeneration_job_status.update_remaining_content_status_as_succeeded()
     voiceover_cloud_task_services.save_voiceover_regeneration_job(
@@ -1522,11 +1542,25 @@ def regenerate_voiceovers_on_exploration_update(
     logging.info(
         'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
     )
+
+    try:
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
+            exploration_id
+        )
+        exploration_title = exploration_summary.title
+
+        additional_contextual_information = {
+            'exploration_title': exploration_title
+        }
+    except Exception as _:
+        additional_contextual_information = {}
+
     regenerate_voiceovers_for_given_contents(
         exploration_id,
         exploration_version,
         language_code_to_contents_mapping,
         task_run_id,
+        additional_contextual_information,
     )
 
 
@@ -1551,6 +1585,7 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         'Voiceover regeneration logs: Started regenerating voiceovers for '
         'exploration with ID: %s when it is added to topic.' % exploration_id
     )
+
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
@@ -1560,6 +1595,24 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
     assert exploration is not None
 
     exploration_version = exploration.version
+
+    try:
+        exp_opportuinity_summary_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                exploration_id
+            )
+        )
+        topic_id = exp_opportuinity_summary_model.topic_id
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        topic_name = topic.name
+        exploration_title = exploration.title
+
+        additional_contextual_information = {
+            'exploration_title': exploration_title,
+            'topic_name': topic_name,
+        }
+    except Exception as _:
+        additional_contextual_information = {}
 
     # Retrieve all English-language contents from the exploration.
     language_code_to_contents_mapping.update(
@@ -1588,6 +1641,7 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         exploration_version,
         language_code_to_contents_mapping,
         task_run_id,
+        additional_contextual_information,
     )
 
 
@@ -1621,6 +1675,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
             language_accent_code,
         )
     )
+
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
@@ -1639,6 +1694,19 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     assert exploration is not None
 
     exploration_version = exploration.version
+
+    try:
+        exploration_title = exploration.title
+        language_accent = get_language_accent_codes_to_descriptions().get(
+            language_accent_code, ''
+        )
+
+        additional_contextual_information = {
+            'exploration_title': exploration_title,
+            'language_accent': language_accent,
+        }
+    except Exception as _:
+        additional_contextual_information = {}
 
     if language_code == constants.constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
@@ -1667,8 +1735,28 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         exploration_version,
         language_code_to_contents_mapping,
         cloud_task_run_id,
+        additional_contextual_information,
         specific_language_accent_code=language_accent_code,
     )
+
+
+def get_language_description_from_code(language_code: str) -> Optional[str]:
+    """Returns the language description for the given language code.
+
+    Args:
+        language_code: str. The language code for which the description is to be
+            retrieved.
+
+    Returns:
+        str|None. The language description corresponding to the given language
+        code, or None if not found.
+    """
+    for language_map in constants.constants.SUPPORTED_CONTENT_LANGUAGES:
+        if language_map['code'] == language_code:
+            description = language_map.get('description')
+            if isinstance(description, str):
+                return description
+    return None
 
 
 def regenerate_voiceovers_after_accepting_suggestion(
@@ -1695,6 +1783,20 @@ def regenerate_voiceovers_after_accepting_suggestion(
     language_code_to_contents_mapping = {
         language_code: {content_id: translated_html_content}
     }
+    try:
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
+            exploration_id
+        )
+        exploration_title = exploration_summary.title
+
+        additional_contextual_information = {
+            'exploration_title': exploration_title,
+            'language': get_language_description_from_code(language_code)
+            or language_code,
+        }
+    except Exception as _:
+        additional_contextual_information = {}
+
     logging.info(
         'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
     )
@@ -1703,4 +1805,5 @@ def regenerate_voiceovers_after_accepting_suggestion(
         exploration_version,
         language_code_to_contents_mapping,
         task_run_id,
+        additional_contextual_information,
     )

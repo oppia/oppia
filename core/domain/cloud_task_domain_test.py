@@ -58,6 +58,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             0,
             last_updated,
             created_on,
+            {},
         )
 
         self.assertEqual(cloud_task_run.task_run_id, cloud_task_run_id)
@@ -99,6 +100,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             'current_retry_attempt': 0,
             'last_updated': last_updated.isoformat(),
             'created_on': created_on.isoformat(),
+            'additional_contextual_information': {},
         }
 
         cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(
@@ -120,6 +122,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             current_retry_attempt=0,
             last_updated=datetime.datetime(2026, 1, 2, 3, 4, 5),
             created_on=datetime.datetime(2026, 1, 2, 3, 4, 6),
+            additional_contextual_information={},
         )
 
         cloud_task_run_dict = cloud_task_run.to_dict_with_timezone_info()
