@@ -157,6 +157,7 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: 'networkidle'});
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -222,6 +223,58 @@ export class BaseUser {
     const locator = this.page.locator(selector).filter({hasText: text});
     await locator.first().waitFor({state: 'visible'});
     await locator.first().click();
+  }
+
+  /**
+   * Clicks on an anchor element with the given inner text and verifies that the
+   * target page URL contains the given URL.
+   * @param {string} anchorInnerText The inner text of the anchor element.
+   * @param {string} targetPageUrl The URL of the target page.
+   * @param {Page} context The context in which the anchor element is located.
+   */
+  async clickAndVerifyAnchorWithInnerText(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: Page = this.page
+  ): Promise<void> {
+    // Get an anchor element with the given inner text.
+    await context.waitForSelector('a');
+    const anchorElements = await context.$$('a');
+    let element: ElementHandle<Element> | null = null;
+    for (const anchorElement of anchorElements) {
+      const innerText = await anchorElement.evaluate(el =>
+        (el as HTMLAnchorElement).innerText.trim()
+      );
+      if (innerText === anchorInnerText) {
+        element = anchorElement;
+        break;
+      }
+    }
+    if (!element) {
+      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+    }
+
+    // Check if anchor target is the same as the current page.
+    const isTargetSamePage = await element.evaluate(el => {
+      return (el as HTMLAnchorElement).target !== '_blank';
+    });
+    if (!isTargetSamePage) {
+      showMessage('Anchor target is not the same as the current page.');
+      const newTabPromise = context.context().waitForEvent('page');
+      await this.clickOnElement(element);
+      const newTabPage = await newTabPromise;
+      await newTabPage.waitForLoadState();
+      expect(newTabPage).toBeDefined();
+      // Use startsWith instead of exact match because external sites may add
+      // query parameters (e.g., UTM params, Cloudflare challenge tokens, etc.).
+      expect(newTabPage.url().startsWith(targetPageUrl)).toBe(true);
+      await newTabPage.close();
+    } else {
+      showMessage('Anchor target is the same as the current page.');
+      await this.clickOnElement(element);
+      await this.expectPageURLToContain(targetPageUrl, context);
+      await context.goBack();
+    }
   }
 
   /**
@@ -358,6 +411,31 @@ export class BaseUser {
     await this.page.keyboard.press('A');
     await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
+  }
+
+  /**
+   * Verify text content inside an element, waiting until it matches expected text.
+   * @param selector - The selector of the element to get text from.
+   * @param expectedText - The expected text content.
+   */
+  async expectElementContentToContain(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        ({selector, text}: {selector: string; text: string}) => {
+          const el = document.querySelector(selector);
+          return el && el.textContent?.includes(text);
+        },
+        {selector, text: expectedText}
+      );
+    } catch (err) {
+      const currentText = await this.getTextContent(selector);
+      throw new Error(
+        `Text did not match within timeout.\nSelector: "${selector}"\nExpected: "${expectedText}"\nActual: "${currentText}"`
+      );
+    }
   }
 
   /**
@@ -523,6 +601,24 @@ export class BaseUser {
   }
 
   /**
+   * Function to expect the page to have no translation ids.
+   */
+  async expectPageHasNoTranslationIds(): Promise<void> {
+    const translationIds = await this.page.$$eval('[translate]', elements =>
+      elements
+        .map(el => el.getAttribute('translate'))
+        .filter(val => val && val.startsWith('I18N'))
+    );
+
+    if (translationIds.length > 0) {
+      throw new Error(
+        `Page has untranslated strings: ${translationIds.join(', ')}`
+      );
+    }
+    showMessage('Success: Page has no translation ids.');
+  }
+
+  /**
    * This function checks if the page URL contains the given URL.
    * @param {string} url - The URL to check.
    * @param {Page} context - The page on which the URL should be checked.
@@ -644,6 +740,19 @@ export class BaseUser {
       throw new Error(`Element with selector ${selector} not found.`);
     }
     return element;
+  }
+
+  /**
+   * Returns text in nested element
+   * @param {string} selector - The selector of the element to get text from.
+   */
+  async getTextContent(selector: string): Promise<string> {
+    const element = await this.page.$(selector);
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent,
+      element as ElementHandle<Element>
+    );
+    return text?.trim() ?? '';
   }
 
   /**
@@ -972,9 +1081,11 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to click on.
    * @param {ElementHandle<Element>} parentElement - The parent element to search within.
    * @param {number} elementPlace - 1-based index to select nth element with the given selector.
+   * @param {Parameters<ElementHandle['click']>[0]} options - Click options.
    */
   async clickOnElementWithSelector(
     selector: string,
+    options: Parameters<ElementHandle['click']>[0] = {},
     parentElement?: ElementHandle | null,
     elementPlace?: number
   ): Promise<void> {
@@ -999,7 +1110,7 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for selector ${selector}`);
     }
-    await this.clickOnElement(element);
+    await this.clickOnElement(element, options);
     showMessage(`Element (selector: ${selector}) clicked.`);
   }
 
