@@ -703,6 +703,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
+            totalCount: opportunity.getContentCount(),
+            translationsCount: opportunity.getTranslationsCount(
+              this.languageCode
+            ),
+            inReviewCount: opportunity.getTranslationsInReviewCount(
+              this.languageCode
+            ),
+            progressPercentage: opportunity
+              .getTranslationProgressPercentage(this.languageCode)
+              .toFixed(2),
           };
           opportunitiesDicts.push(opportunityDict);
         });

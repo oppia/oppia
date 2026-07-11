@@ -114,6 +114,8 @@
                                 (clickPinButton)="pinReviewableTranslationOpportunity($event)"
                                 (clickUnpinButton)="unpinReviewableTranslationOpportunity($event)"
                                 [labelRequired]="!activeReviewTab"
+                                [progressBarRequired]="true"
+                                [opportunityType]="'translation'"
                                 [showOpportunityButton]="true"
                                 [showPinUnpinButton]="true"
                                 #opportunitiesList>
