@@ -143,6 +143,17 @@ export class SchemaBasedListEditorComponent
     }
   }
 
+  hasLastElementNonZeroLength(): boolean {
+    if (!this.localValue || this.localValue.length === 0) {
+      return false;
+    }
+    const lastElement = this.localValue[this.localValue.length - 1];
+    if (typeof lastElement === 'string' || Array.isArray(lastElement)) {
+      return lastElement.length > 0;
+    }
+    return false;
+  }
+
   hasDuplicates(): boolean {
     let valuesSoFar: Record<string | number, SchemaDefaultValue> = {};
     for (let i = 0; i < this.localValue.length; i++) {
