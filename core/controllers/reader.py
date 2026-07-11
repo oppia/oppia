@@ -1979,7 +1979,7 @@ class QuestionPlayerHandler(
 
         question_dicts = [question.to_dict() for question in questions]
         self.values.update(
-            {'question_dicts': question_dicts[: feconf.QUESTION_BATCH_SIZE]}
+            {'question_dicts': question_dicts[: int(question_count)]}
         )
         self.render_json(self.values)
 
