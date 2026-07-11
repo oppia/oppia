@@ -31,10 +31,7 @@ import {TextInputRulesService} from '../../../../../extensions/interactions/Text
 import {AlertsService} from '../../../services/alerts.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
-import {
-  AnswerClassificationService,
-  InteractionRulesService,
-} from './answer-classification.service';
+import {AnswerClassificationService} from './answer-classification.service';
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {State} from '../../../domain/state/state.model';
@@ -51,7 +48,7 @@ describe('Question player engine service', () => {
   let singleQuestionObject: Question;
   let multipleQuestionsObjects: Question[];
   let questionBackendApiService: QuestionBackendApiService;
-  let textInputService: InteractionRulesService;
+  let textInputService: TextInputRulesService;
 
   let questionId = 'question_id';
   let question: Question;
@@ -408,9 +405,7 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(
-      TextInputRulesService
-    ) as unknown as InteractionRulesService;
+    textInputService = TestBed.inject(TextInputRulesService);
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -570,6 +565,46 @@ describe('Question player engine service', () => {
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
       firstQuestionId
     );
+  });
+
+  it('should throw an error in getCurrentQuestionId if question id is null', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
+
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
+
+    questionPlayerEngineService.init(
+      multipleQuestionsObjects,
+      initSuccessCb,
+      initErrorCb
+    );
+
+    // Simulate the question returning a null ID to trigger the null guard.
+    spyOn(multipleQuestionsObjects[0], 'getId').and.returnValue(null);
+
+    expect(() => {
+      questionPlayerEngineService.getCurrentQuestionId();
+    }).toThrowError('Current question ID is null.');
+  });
+
+  it('should throw an error in loadInitialQuestion if first question id is null', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
+
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    // Simulate the first question returning a null ID to trigger the null guard
+    // inside loadInitialQuestion before the entity context is set.
+    spyOn(multipleQuestionsObjects[0], 'getId').and.returnValue(null);
+
+    expect(() => {
+      questionPlayerEngineService.init(
+        multipleQuestionsObjects,
+        initSuccessCb,
+        initErrorCb
+      );
+    }).toThrowError('First question ID is null.');
   });
 
   it('should init question player', fakeAsync(() => {
@@ -967,7 +1002,23 @@ describe('Question player engine service', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null as unknown as Interaction,
+          Interaction.createFromBackendDict({
+            id: 'TextInput',
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: {
+              dest: 'dest',
+              dest_if_really_stuck: null,
+              feedback: {content_id: 'feedback', html: ''},
+              param_changes: [],
+              labelled_as_correct: false,
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+            },
+            hints: [],
+            solution: null,
+          }),
           'content_id'
         );
 

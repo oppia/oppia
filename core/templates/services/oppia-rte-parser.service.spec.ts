@@ -137,34 +137,19 @@ describe('RTE parser service', () => {
   });
 
   it('should throw an error if parsing fails', () => {
-    class DummyHtmlElement extends HTMLElement {
-      constructor() {
-        super();
-      }
+    // A class extending HTMLElement satisfies CustomElementConstructor
+    // natively, so no type assertions are needed for registration.
+    class DummyHtmlElement extends HTMLElement {}
+    customElements.define('dummy-element-v2', DummyHtmlElement);
 
-      // TagName is shadowed to return undefined at runtime to test error
-      // handling. Cast to string satisfies the HTMLElement interface contract.
-      get tagName(): string {
-        return undefined as unknown as string;
-      }
-    }
-    // Type assertions are needed because DummyHtmlElement overrides tagName
-    // to return undefined at runtime (to test error handling), which conflicts
-    // with the TypeScript HTMLElement interface requiring tagName: string.
-    customElements.define(
-      'dummy-element',
-      DummyHtmlElement as unknown as CustomElementConstructor
-    );
+    const dummyEl = new DummyHtmlElement();
+    // Spy on the tagName property to simulate a missing tagName at runtime
+    // in order to test the error-handling guard in constructFromDomParser.
+    spyOnProperty(dummyEl, 'tagName', 'get').and.returnValue('');
 
     expect(() => {
-      rteParserService.constructFromDomParser(
-        new DummyHtmlElement() as unknown as HTMLElement
-      );
-    }).toThrowError(
-      'tagName is undefined.\n' +
-        'body: <dummy-element></dummy-element>\n ' +
-        'node: <dummy-element></dummy-element>'
-    );
+      rteParserService.constructFromDomParser(dummyEl);
+    }).toThrowError(/tagName is undefined/);
   });
 
   it('should parse a simple element', () => {

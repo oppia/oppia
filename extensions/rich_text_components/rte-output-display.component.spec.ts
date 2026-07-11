@@ -232,7 +232,7 @@ describe('RTE display component', () => {
   }));
 
   it('should return early when rteString is null', () => {
-    component.rteString = null as unknown as string;
+    (component as {rteString: string | null}).rteString = null;
 
     expect(() => {
       // This throws "Property '_updateNode' is private". We need to
@@ -1070,12 +1070,15 @@ describe('RTE display component', () => {
   });
 
   it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {
-    const mockNode = {
-      selector: 'oppia-noninteractive-unknown',
-      children: [],
-      nodeType: 'component',
-      portal: undefined,
-    } as unknown as OppiaRteNode;
+    const mockNode = new OppiaRteNode('oppia-noninteractive-image');
+    // Override the readonly selector property to simulate an unknown
+    // component selector that is not in the supported component map.
+    Object.defineProperty(mockNode, 'selector', {
+      value: 'oppia-noninteractive-unknown',
+      writable: false,
+      configurable: true,
+    });
+    mockNode.children = [];
 
     spyOn(rteParserService, 'constructFromDomParser').and.returnValue(mockNode);
     spyOn(component, 'isHighlightSentencesFeatureEnabled').and.returnValue(
