@@ -99,6 +99,12 @@
       </div>
     </div>
     <div class="oppia-translation-error-section">
+      <div *ngIf="isFormulaAsText(activeWrittenTranslation)" class="alert alert-warning e2e-test-formula-as-text-warning">
+        <i class="fas fa-exclamation-triangle mr-1"></i>
+        <span>
+          <strong>Warning:</strong> Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using the <strong>Math Formula (x²)</strong> tool from the editor toolbar above.
+        </span>
+      </div>
       <p *ngIf="hasImgCopyError">
         All images should be copied.
       </p>

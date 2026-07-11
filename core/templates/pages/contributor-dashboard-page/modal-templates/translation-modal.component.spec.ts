@@ -54,6 +54,7 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -67,6 +68,13 @@ class MockChangeDetectorRef {
 }
 
 class MockConfirmTranslationExitModal {
+  componentInstance = {};
+  result = Promise.resolve();
+  close(): void {}
+  dismiss(): void {}
+}
+
+class MockConfirmFormulaAsTextModal {
   componentInstance = {};
   result = Promise.resolve();
   close(): void {}
@@ -164,6 +172,7 @@ describe('Translation Modal Component', () => {
         TranslationModalComponent,
         WrapTextWithEllipsisPipe,
         ConfirmTranslationExitModalComponent,
+        ConfirmFormulaAsTextModalComponent,
       ],
       providers: [
         NgbActiveModal,
@@ -180,6 +189,10 @@ describe('Translation Modal Component', () => {
         {
           provide: ConfirmTranslationExitModalComponent,
           useClass: MockConfirmTranslationExitModal,
+        },
+        {
+          provide: ConfirmFormulaAsTextModalComponent,
+          useClass: MockConfirmFormulaAsTextModal,
         },
         {
           provide: WindowRef,
@@ -1425,6 +1438,127 @@ describe('Translation Modal Component', () => {
 
         expect(ngbModal.open).not.toHaveBeenCalled();
         expect(component.activeModal.close).toHaveBeenCalled();
+      }));
+    });
+
+    describe('isFormulaAsText', () => {
+      it('should return true when formula is written as plain text in RTL language', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('rtl');
+        expect(component.isFormulaAsText('3 + 6 = 9')).toBeTrue();
+        expect(component.isFormulaAsText('<p>x - y = z</p>')).toBeTrue();
+      });
+
+      it('should return false when formula is inside noninteractive math component', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('rtl');
+        const mathHtml =
+          '<oppia-noninteractive-math></oppia-noninteractive-math>';
+        expect(component.isFormulaAsText(mathHtml)).toBeFalse();
+      });
+
+      it('should return false when language direction is not rtl', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('ltr');
+        expect(component.isFormulaAsText('3 + 6 = 9')).toBeFalse();
+      });
+
+      it('should return true when any line in multi-line text contains a math formula in RTL', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('rtl');
+        expect(component.isFormulaAsText('Addition\n9 = 6 + 3')).toBeTrue();
+        expect(
+          component.isFormulaAsText('<p>Addition</p><p>9 = 6 + 3</p>')
+        ).toBeTrue();
+        expect(
+          component.isFormulaAsText('First line normal\nSecond line normal')
+        ).toBeFalse();
+      });
+    });
+
+    describe('when saving or submitting formula as text in RTL', () => {
+      beforeEach(() => {
+        component.loadingData = false;
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageDirection'
+        ).and.returnValue('rtl');
+      });
+
+      it('should open confirmation modal and proceed on confirm during suggestTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        const suggestSpy = spyOn(translateTextService, 'suggestTranslatedText');
+
+        mockModalRef.result = Promise.resolve();
+        component.suggestTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(suggestSpy).toHaveBeenCalled();
+      }));
+
+      it('should open confirmation modal and not proceed on cancel during suggestTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        const suggestSpy = spyOn(translateTextService, 'suggestTranslatedText');
+
+        mockModalRef.result = Promise.reject();
+        component.suggestTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(suggestSpy).not.toHaveBeenCalled();
+      }));
+
+      it('should open confirmation modal and close on confirm during updateTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        spyOn(component.activeModal, 'close');
+
+        mockModalRef.result = Promise.resolve();
+        component.updateTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(component.activeModal.close).toHaveBeenCalledWith('2 + 2 = 4');
+      }));
+
+      it('should open confirmation modal and not close on cancel during updateTranslatedText', fakeAsync(() => {
+        component.activeWrittenTranslation = '2 + 2 = 4';
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        spyOn(component.activeModal, 'close');
+
+        mockModalRef.result = Promise.reject();
+        component.updateTranslatedText();
+        tick();
+
+        expect(ngbModal.open).toHaveBeenCalledWith(
+          ConfirmFormulaAsTextModalComponent,
+          {backdrop: 'static'}
+        );
+        flushMicrotasks();
+        expect(component.activeModal.close).not.toHaveBeenCalled();
       }));
     });
   });

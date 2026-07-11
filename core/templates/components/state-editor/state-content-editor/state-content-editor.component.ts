@@ -35,6 +35,8 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 
 interface HTMLSchema {
   type: string;
@@ -71,7 +73,8 @@ export class StateContentEditorComponent implements OnInit {
     private externalRteSaveService: ExternalRteSaveService,
     public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
-    private editabilityService: EditabilityService
+    private editabilityService: EditabilityService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -139,10 +142,50 @@ export class StateContentEditorComponent implements OnInit {
     this.contentEditorIsOpen = true;
   }
 
+  isFormulaAsText(htmlString: string | string[]): boolean {
+    if (
+      !htmlString ||
+      typeof htmlString !== 'string' ||
+      htmlString.includes('oppia-noninteractive-math')
+    ) {
+      return false;
+    }
+
+    const textWithNewlines = htmlString
+      .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+      .replace(/<br\s*[\/]?>/gi, '\n')
+      .replace(/<[^>]*>/g, '')
+      .trim();
+
+    const lines = textWithNewlines
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    return lines.some(line => /[+\-*/=]/.test(line));
+  }
+
   onSaveContentButtonClicked(): void {
     this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
     this.externalRteSaveService.onExternalRteSave.emit();
-    this.saveContent();
+    if (this.isFormulaAsText(this.stateContentService.displayed._html)) {
+      this.ngbModal
+        .open(ConfirmFormulaAsTextModalComponent, {
+          backdrop: 'static',
+        })
+        .result.then(
+          () => {
+            this.saveContent();
+          },
+          () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          }
+        );
+    } else {
+      this.saveContent();
+    }
   }
 
   cancelEdit(): void {
