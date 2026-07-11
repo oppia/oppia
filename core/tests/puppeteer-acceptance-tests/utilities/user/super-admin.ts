@@ -836,7 +836,7 @@ export class SuperAdmin extends BaseUser {
       await this.expectElementToBeVisible(prodModeActivitiesTab);
       const activitiesTabText = await this.page.$eval(
         prodModeActivitiesTab,
-        element => element.textContent
+        element => element.textContent ?? ''
       );
       const expectedText =
         "The 'Activities' tab is not available in the production environment.";
