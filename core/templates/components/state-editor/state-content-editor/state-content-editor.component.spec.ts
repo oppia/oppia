@@ -30,8 +30,6 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 
 describe('StateHintsEditorComponent', () => {
   let component: StateContentEditorComponent;
@@ -40,7 +38,6 @@ describe('StateHintsEditorComponent', () => {
   let externalSaveService: ExternalSaveService;
   let externalRteSaveService: ExternalRteSaveService;
   let stateContentService: StateContentService;
-  let ngbModal: NgbModal;
 
   let _getContent = function (contentId: string, contentString: string) {
     return SubtitledHtml.createFromBackendDict({
@@ -66,7 +63,6 @@ describe('StateHintsEditorComponent', () => {
     externalSaveService = TestBed.inject(ExternalSaveService);
     externalRteSaveService = TestBed.inject(ExternalRteSaveService);
     stateContentService = TestBed.inject(StateContentService);
-    ngbModal = TestBed.inject(NgbModal);
 
     fixture.detectChanges();
   });
@@ -216,38 +212,10 @@ describe('StateHintsEditorComponent', () => {
   });
 
   describe('when saving or submitting formula as text', () => {
-    it('should open confirmation modal when isFormulaAsText is true and save when confirmed', fakeAsync(() => {
-      spyOn(component, 'isFormulaAsText').and.returnValue(true);
+    it('should save content directly when onSaveContentButtonClicked is called', () => {
       spyOn(component, 'saveContent');
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(),
-      } as NgbModalRef);
-
       component.onSaveContentButtonClicked();
-      tick();
-
-      expect(ngbModal.open).toHaveBeenCalledWith(
-        ConfirmFormulaAsTextModalComponent,
-        {backdrop: 'static'}
-      );
       expect(component.saveContent).toHaveBeenCalled();
-    }));
-
-    it('should open confirmation modal when isFormulaAsText is true and not save when canceled', fakeAsync(() => {
-      spyOn(component, 'isFormulaAsText').and.returnValue(true);
-      spyOn(component, 'saveContent');
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject(),
-      } as NgbModalRef);
-
-      component.onSaveContentButtonClicked();
-      tick();
-
-      expect(ngbModal.open).toHaveBeenCalledWith(
-        ConfirmFormulaAsTextModalComponent,
-        {backdrop: 'static'}
-      );
-      expect(component.saveContent).not.toHaveBeenCalled();
-    }));
+    });
   });
 });

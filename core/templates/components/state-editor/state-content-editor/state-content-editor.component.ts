@@ -35,8 +35,6 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmFormulaAsTextModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirm-formula-as-text-modal.component';
 
 interface HTMLSchema {
   type: string;
@@ -73,8 +71,7 @@ export class StateContentEditorComponent implements OnInit {
     private externalRteSaveService: ExternalRteSaveService,
     public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
-    private editabilityService: EditabilityService,
-    private ngbModal: NgbModal
+    private editabilityService: EditabilityService
   ) {}
 
   ngOnInit(): void {
@@ -168,24 +165,7 @@ export class StateContentEditorComponent implements OnInit {
   onSaveContentButtonClicked(): void {
     this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
     this.externalRteSaveService.onExternalRteSave.emit();
-    if (this.isFormulaAsText(this.stateContentService.displayed._html)) {
-      this.ngbModal
-        .open(ConfirmFormulaAsTextModalComponent, {
-          backdrop: 'static',
-        })
-        .result.then(
-          () => {
-            this.saveContent();
-          },
-          () => {
-            // Note to developers:
-            // This callback is triggered when the Cancel button is clicked.
-            // No further action is needed.
-          }
-        );
-    } else {
-      this.saveContent();
-    }
+    this.saveContent();
   }
 
   cancelEdit(): void {
