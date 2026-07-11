@@ -114,6 +114,48 @@ const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
 const outcomeDestWhenStuckSelector =
   '.protractor-test-open-outcome-dest-if-stuck-editor';
 
+const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
+const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
+const mainTabButton = '.e2e-test-main-tab';
+const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
+const editTranslationSelector = 'div.e2e-test-edit-translation';
+const stateTranslationEditorSelector =
+  'div.e2e-test-state-translation-editor schema-based-editor';
+const saveTranslationButton = 'button.e2e-test-save-translation';
+const activeTranslationTab = '.e2e-test-active-translation-tab';
+const translationTabButton = '.e2e-test-translation-tab';
+const translationTabContainer = '.e2e-test-translation-tab-container';
+const translationModeButton = 'button.e2e-test-translation-mode';
+const dismissTranslationWelcomeModalSelector =
+  'button.e2e-test-translation-tab-dismiss-welcome-modal';
+
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
+const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
+const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
+const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+const voiceoverLanguageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+
+const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+const skillNameInput = '.e2e-test-skill-name-input';
+
+const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
+const uploadImageButton = '.e2e-test-upload-image';
+const useTheUploadImageButton = '.e2e-test-use-image';
+const rteHelperModalSelector = 'oppia-rte-helper-modal';
+const descriptionBoxSelector = 'textarea.e2e-test-description-box';
+const textInputSelector = 'input.e2e-test-text-input';
+const textInputField = '.e2e-test-text-input';
+
+const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
+const oppiaWebURL = 'https://www.oppia.org';
+
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
@@ -163,6 +205,11 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 } as const;
 
+interface TabContent {
+  title: string;
+  content: string;
+}
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Navigate to creator dashboard page.
@@ -170,6 +217,122 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Adds a default collapsible block RTE element.
+   */
+  async addCollapsibleBlockRTE(): Promise<void> {
+    await this.clickOnRTEOptionWithTitle('collapsible block');
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+  }
+
+  /**
+   * Updates an exploration description containing all RTE elements.
+   */
+  async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
+    // Click on RTE.
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
+
+    // Add Bold text.
+    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.typeInInputField(stateContentInputField, 'Bold text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Bold');
+
+    // Add Italic text.
+    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.typeInInputField(stateContentInputField, 'Italic text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Italic');
+
+    // Add Numbered List.
+    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Bulleted List.
+    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Pre formatted Text.
+    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.typeInInputField(stateContentInputField, 'Pre formatted text');
+    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.press('Enter');
+
+    // Add Block Quote.
+    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.typeInInputField(stateContentInputField, 'Block Quote text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Block Quote');
+
+    // Add Collapsible Block.
+    await this.addCollapsibleBlockRTE();
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('ArrowRight');
+
+    // Add Image.
+    await this.addImageRTE(
+      testConstants.data.profilePicture,
+      'Test Image',
+      'Test Image Caption'
+    );
+    await this.waitForNetworkIdle();
+
+    await this.page.keyboard.press('ArrowRight');
+
+    // Video.
+    await this.addVideoRTE(oppiaYouTubeVideoUrl);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('ArrowRight');
+
+    // Add Link.
+    await this.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Math Formula.
+    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    if (textareaElement) {
+      await this.typeInInputField(textareaElement, 'x^2 + y^2 = z^2');
+    }
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Concept Card.
+    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.waitForNetworkIdle();
+    const skillSearchElement = await this.page.$(skillNameInput);
+    if (skillSearchElement) {
+      await this.typeInInputField(skillSearchElement, 'Math');
+    }
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Tab Contents.
+    await this.addTabContentsRTE();
+    await this.page.keyboard.press('ArrowRight');
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
   }
 
   /**
@@ -182,6 +345,147 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(stateContentInputField, hint);
     await this.clickOnElementWithSelector(saveHintButton);
     await this.expectElementToBeVisible(saveHintButton, false);
+  }
+
+  /**
+   * Adds an Image RTE element.
+   * @param {string} imageFilePath - Path of Image file to add.
+   * @param {string} imageDescription - Image Description to add.
+   * @param {string | null} imageCaption - Caption to add with image.
+   */
+  async addImageRTE(
+    imageFilePath: string,
+    imageDescription: string,
+    imageCaption: string | null
+  ): Promise<void> {
+    await this.clickOnRTEOptionWithTitle('Insert image');
+
+    await this.waitForNetworkIdle();
+    const helperModel = await this.page.$(rteHelperModalSelector);
+
+    // Get Fields.
+    const imageDescriptionInput = await helperModel?.$(descriptionBoxSelector);
+    const imageCaptionInput = await helperModel?.$(textInputSelector);
+
+    if (imageDescriptionInput) {
+      await this.typeInInputField(imageDescriptionInput, imageDescription);
+    } else {
+      throw new Error('Image description input not found in the helper modal');
+    }
+    if (imageCaptionInput && imageCaption) {
+      await this.typeInInputField(imageCaptionInput, imageCaption);
+    }
+
+    await this.clickOnElementWithSelector(uploadImageButton);
+    await this.uploadFile(imageFilePath);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+  }
+
+  /**
+   * Creates a Tab Element In RTE.
+   * @param {TabContent[]} tabContents - A list of tab contents to add.
+   */
+  async addTabContentsRTE(tabContents: TabContent[] = []): Promise<void> {
+    await this.clickOnRTEOptionWithTitle('Insert tabs');
+
+    await this.waitForNetworkIdle();
+    const helperModel = await this.page.$(rteHelperModalSelector);
+
+    let tabTitleInputElements: ElementHandle<Element>[] = [];
+    let tabContentInputElements: ElementHandle<Element>[] = [];
+
+    if (helperModel) {
+      tabTitleInputElements = await helperModel.$$(textInputSelector);
+      tabContentInputElements = await helperModel.$$(stateContentInputField);
+    }
+
+    showMessage(tabContentInputElements?.length + ' tab contents found.');
+    showMessage(tabTitleInputElements?.length + ' tab titles found.');
+
+    for (let i = 0; i < tabContents.length; i++) {
+      if (i > 1) {
+        await this.clickOnElementWithSelector('.e2e-test-add-list-entry');
+      }
+      await this.clearAllTextFrom(
+        `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
+      );
+      await this.clearAllTextFrom(
+        `oppia-rte-helper-model ${stateContentInputField}:nth-child(${i + 1})`
+      );
+      if (tabTitleInputElements[i]) {
+        await this.typeInInputField(
+          tabTitleInputElements[i],
+          tabContents[i].title
+        );
+      }
+      if (tabContentInputElements[i]) {
+        await this.typeInInputField(
+          tabContentInputElements[i],
+          tabContents[i].content
+        );
+      }
+    }
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+  }
+
+  /**
+   * Adds text with link in RTE editor.
+   * @param {string} text - The text that should be displayed
+   * @param {string} url - The URL to which the text should redirect to.
+   */
+  async addTextWithLinkRTE(text: string, url: string): Promise<void> {
+    await this.clickOnRTEOptionWithTitle('Insert link');
+    await this.waitForNetworkIdle();
+
+    const helperModel = await this.page.$(rteHelperModalSelector);
+
+    let linkInput: ElementHandle<Element> | undefined;
+    let linkTextInput: ElementHandle<Element> | undefined;
+
+    // Get Fields.
+    if (helperModel) {
+      const inputs = await helperModel.$$(textInputSelector);
+      linkInput = inputs[0];
+      linkTextInput = inputs[1];
+    }
+
+    if (linkInput && linkTextInput) {
+      await this.typeInInputField(linkInput, url);
+      await this.typeInInputField(linkTextInput, text);
+    } else {
+      throw new Error('Link input fields not found in the helper modal');
+    }
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+  }
+
+  /**
+   * Adds Video RTE element.
+   * @param {string} videoUrl - Youtube Video URL
+   */
+  async addVideoRTE(videoUrl: string): Promise<void> {
+    await this.clickOnRTEOptionWithTitle('Insert video');
+
+    await this.expectElementToBeVisible(rteHelperModalSelector);
+    const helperModel = await this.page.$(rteHelperModalSelector);
+
+    // Get Fields.
+    const videoUrlInput = await helperModel?.$(textInputField);
+
+    if (!videoUrlInput) {
+      throw new Error('Video URL input not found in the helper modal');
+    }
+    await this.waitForElementToStabilize(videoUrlInput);
+    await this.typeInInputField(videoUrlInput, videoUrl);
+
+    await this.expectElementToBeVisible(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -354,6 +658,52 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to add a voiceover for specific content of the current card.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
+   */
+  async addVoiceoverToContent(
+    language: string,
+    languageAccent: string,
+    contentType: string,
+    voiceoverFilePath: string
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOnElementWithText(contentType);
+    }
+
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelectorAndText(
+      voiceoverLanguageOptionSelector,
+      language
+    );
+
+    await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
+    await this.clickOnElementWithSelectorAndText(
+      voiceoverLanguageAccentOptionSelector,
+      languageAccent
+    );
+
+    await this.clickOnElementWithSelector(addManualVoiceoverButton);
+    await this.uploadFile(voiceoverFilePath);
+    await this.waitForElementToStabilize(saveUploadedAudioButton);
+    await this.clickOnElementWithSelector(saveUploadedAudioButton);
+    await this.waitForNetworkIdle();
+
+    await this.expectElementToBeVisible(saveUploadedAudioButton, false);
+  }
+
+  /**
    * Changes tab in interaction selection modal.
    * @param {INTERACTION_TYPES} interactionType - Interaction type to change tab.
    */
@@ -384,6 +734,19 @@ export class ExplorationEditor extends BaseUser {
         showMessage(`Switched to ${interaction} tab.`);
         break;
       }
+    }
+  }
+
+  /**
+   * Clicks on the RTE option with the given title.
+   * @param {string} title - The title of RTE option.
+   */
+  async clickOnRTEOptionWithTitle(title: string): Promise<void> {
+    const optionSelector = `a.cke_button[title*="${title}"]`;
+    await this.expectElementToBeVisible(optionSelector);
+    const optionElement = await this.page.$(optionSelector);
+    if (optionElement) {
+      await this.clickOnElement(optionElement);
     }
   }
 
@@ -489,6 +852,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to dismiss translation tab welcome modal.
+   */
+  async dismissTranslationTabWelcomeModal(): Promise<void> {
+    await this.expectElementToBeVisible(dismissTranslationWelcomeModalSelector);
+    await this.clickOnElementWithSelector(
+      dismissTranslationWelcomeModalSelector
+    );
+    await this.expectElementToBeVisible(
+      dismissTranslationWelcomeModalSelector,
+      false
+    );
+    showMessage('Translation tutorial pop-up closed successfully.');
+  }
+
+  /**
    * Function to dismiss exploration editor welcome modal.
    * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
@@ -541,6 +919,74 @@ export class ExplorationEditor extends BaseUser {
         false
       );
     }
+  }
+
+  /**
+   * Function to edit a translation for specific content of the current card.
+   * @param {string} language - Language for which the translation has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} translation - The translation which will be added for the content.
+   * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
+   */
+  async editTranslationOfContent(
+    language: string,
+    contentType: string,
+    translation: string,
+    feedbackIndex?: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
+
+    await this.expectElementToBeVisible(voiceoverLanguageOptionSelector);
+    await this.clickOnElementWithSelectorAndText(
+      voiceoverLanguageOptionSelector,
+      language
+    );
+
+    await this.expectElementToBeVisible(translationModeButton);
+    await this.clickOnElementWithSelector(translationModeButton);
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOnElementWithText(contentType);
+    }
+    await this.clickOnElementWithSelector(editTranslationSelector);
+    switch (contentType) {
+      case 'Content':
+      case 'Hint':
+      case 'Solution':
+        await this.clickOnElementWithSelector(stateContentInputField);
+        await this.typeInInputField(stateContentInputField, translation);
+        break;
+      case 'Interaction':
+        await this.clickOnElementWithSelector(stateTranslationEditorSelector);
+        await this.typeInInputField(
+          stateTranslationEditorSelector,
+          translation
+        );
+        break;
+      case 'Feedback':
+        await this.clickOnElementWithSelector(
+          `.e2e-test-feedback-${feedbackIndex}`
+        );
+        await this.clickOnElementWithSelector(editTranslationSelector);
+        await this.clickOnElementWithSelector(stateContentInputField);
+        await this.typeInInputField(stateContentInputField, translation);
+        break;
+      default:
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+    await this.page.evaluate(() =>
+      window.scrollTo(0, document.body.scrollHeight)
+    );
+    await this.clickOnElementWithSelector(saveTranslationButton, {force: true});
+
+    await this.waitForNetworkIdle();
+    await this.expectElementToBeVisible(saveTranslationButton, false);
   }
 
   /**
@@ -677,6 +1123,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to the editor tab.
+   */
+  async navigateToEditorTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown, {
+        force: true,
+      });
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileMainTabButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.page.click(dropdownToggleIcon, {force: true});
+      }
+    } else {
+      await this.expectElementToBeVisible(mainTabButton);
+      await this.clickOnElementWithSelector(mainTabButton);
+    }
+
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
@@ -696,6 +1179,40 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+  }
+
+  /**
+   * Function to navigate to the translations tab.
+   */
+  async navigateToTranslationsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickAndWaitForNavigation(mobileTranslationTabButton, true);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.clickOnElementWithSelector(dropdownToggleIcon);
+      }
+    } else {
+      await this.expectElementToBeVisible(translationTabButton);
+      await this.clickAndWaitForNavigation(translationTabButton, true);
+    }
+
+    await this.expectElementToBeVisible(translationTabContainer);
   }
 
   /**
@@ -733,7 +1250,9 @@ export class ExplorationEditor extends BaseUser {
       await this.expectElementToBeVisible(
         `${mobileSaveChangesButtonSelector}:not([disabled])`
       );
-      await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector);
+      await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector, {
+        force: true,
+      });
     } else {
       await this.expectElementToBeVisible(saveChangesButton);
       await this.clickOnElementWithSelector(saveChangesButton);
