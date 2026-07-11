@@ -452,6 +452,7 @@ class NewClassroomDataHandlerNormalizedPayloadDict(TypedDict):
 
     name: str
     url_fragment: str
+    feedback_recipient_email: str
 
 
 class NewClassroomHandler(
@@ -480,6 +481,17 @@ class NewClassroomHandler(
                 }
             },
             'url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+            'feedback_recipient_email': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.EMAIL_REGEX,
+                        }
+                    ],
+                }
+            },
         }
     }
 
@@ -495,10 +507,13 @@ class NewClassroomHandler(
 
         name = self.normalized_payload['name']
         url_fragment = self.normalized_payload['url_fragment']
+        feedback_recipient_email = self.normalized_payload[
+            'feedback_recipient_email'
+        ]
 
         new_classroom_id = classroom_config_services.get_new_classroom_id()
         classroom_config_services.create_new_default_classroom(
-            new_classroom_id, name, url_fragment
+            new_classroom_id, name, url_fragment, feedback_recipient_email
         )
 
         self.render_json({'new_classroom_id': new_classroom_id})

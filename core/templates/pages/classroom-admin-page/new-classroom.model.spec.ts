@@ -27,7 +27,12 @@ describe('Classroom admin model', () => {
       providers: [],
     });
 
-    classroomData = new NewClassroomData('classroomId', 'math', 'math');
+    classroomData = new NewClassroomData(
+      'classroomId',
+      'math',
+      'math',
+      'user@email.com'
+    );
   });
 
   it('should return error messgage when classroom name exceeds max len', () => {

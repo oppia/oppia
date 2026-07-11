@@ -32,6 +32,7 @@ class ClassroomDict(TypedDict):
     classroom_id: str
     name: str
     url_fragment: str
+    feedback_recipient_email: str
     course_details: str
     teaser_text: str
     topic_list_intro: str
@@ -58,6 +59,7 @@ class Classroom:
         classroom_id: str,
         name: str,
         url_fragment: str,
+        feedback_recipient_email: str,
         course_details: str,
         teaser_text: str,
         topic_list_intro: str,
@@ -74,6 +76,7 @@ class Classroom:
             classroom_id: str. The ID of the classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            feedback_recipient_email: str. The email of the feedback recipient.
             course_details: str. Course details for the classroom.
             teaser_text: str. A text to provide a summary of the classroom.
             topic_list_intro: str. Topic list introduction for the classroom.
@@ -91,6 +94,7 @@ class Classroom:
         self.classroom_id = classroom_id
         self.name = name
         self.url_fragment = url_fragment
+        self.feedback_recipient_email = feedback_recipient_email
         self.course_details = course_details
         self.teaser_text = teaser_text
         self.topic_list_intro = topic_list_intro
@@ -118,6 +122,7 @@ class Classroom:
             classroom_dict['classroom_id'],
             classroom_dict['name'],
             classroom_dict['url_fragment'],
+            classroom_dict['feedback_recipient_email'],
             classroom_dict['course_details'],
             classroom_dict['teaser_text'],
             classroom_dict['topic_list_intro'],
@@ -139,6 +144,7 @@ class Classroom:
             'classroom_id': self.classroom_id,
             'name': self.name,
             'url_fragment': self.url_fragment,
+            'feedback_recipient_email': self.feedback_recipient_email,
             'course_details': self.course_details,
             'teaser_text': self.teaser_text,
             'topic_list_intro': self.topic_list_intro,

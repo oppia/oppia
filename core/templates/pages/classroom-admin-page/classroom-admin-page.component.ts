@@ -319,6 +319,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     const classroomUrlIsChanged =
       this.tempClassroomData.getClassroomUrlFragment() !==
       this.classroomData.getClassroomUrlFragment();
+    const classroomFeedbackRecipientEmailIsChanged =
+      this.tempClassroomData.getFeedbackRecipientEmail() !==
+      this.classroomData.getFeedbackRecipientEmail();
     const classroomTopicListIntroIsChanged =
       this.tempClassroomData.getTopicListIntro() !==
       this.classroomData.getTopicListIntro();
@@ -358,6 +361,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (
       classroomNameIsChanged ||
       classroomUrlIsChanged ||
+      classroomFeedbackRecipientEmailIsChanged ||
       classroomCourseDetailsIsChanged ||
       classroomTopicListIntroIsChanged ||
       topicDependencyIsChanged ||
@@ -380,6 +384,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroom_id: classroomDict.classroomId,
       name: classroomDict.name,
       url_fragment: classroomDict.urlFragment,
+      feedback_recipient_email: classroomDict.feedbackRecipientEmail,
       course_details: classroomDict.courseDetails,
       teaser_text: classroomDict.teaserText,
       topic_list_intro: classroomDict.topicListIntro,

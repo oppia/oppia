@@ -35,6 +35,7 @@ export class ClassroomAdminDataService {
   nameValidationError: string = '';
   urlValidationError: string = '';
   topicsGraphValidationError: string = '';
+  FeedbackRecipientEmailValidationError: string = '';
   classroomValidationErrors: string[] = [];
 
   onClassroomNameChange(classroom: ClassroomData): void {
@@ -76,6 +77,11 @@ export class ClassroomAdminDataService {
       });
   }
 
+  onFeedbackRecipientEmailChange(classroom: ClassroomData): void {
+    this.FeedbackRecipientEmailValidationError =
+      classroom.getFeedbackRecipientEmailValidationErrors();
+  }
+
   onTopicDependencyChange(classroom: ExistingClassroomData): void {
     this.topicsGraphValidationError = classroom.validateDependencyGraph();
   }
@@ -89,6 +95,7 @@ export class ClassroomAdminDataService {
       tempClassroom,
       existingClassroom.getClassroomUrlFragment()
     );
+    this.onFeedbackRecipientEmailChange(tempClassroom);
     if (tempClassroom instanceof ExistingClassroomData) {
       this.onTopicDependencyChange(tempClassroom);
       this.classroomValidationErrors = tempClassroom.getAllValidationErrors();
@@ -115,6 +122,7 @@ export class ClassroomAdminDataService {
     this.classroomValidationErrors = [];
     this.nameValidationError = '';
     this.urlValidationError = '';
+    this.FeedbackRecipientEmailValidationError = '';
     this.topicsGraphValidationError = '';
   }
 }
