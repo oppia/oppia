@@ -58,7 +58,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN + datetime.timedelta(days=2)
     )
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
-    TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+    TICKET_CREATION_TIMESTAMP_MSEC = utils.get_utc_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP
     )
     TICKET_NAME = 'a ticket name'

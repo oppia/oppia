@@ -43,7 +43,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'original_author_id': self.viewer_id,
             'message_count': 1,
             'subject': 'a subject',
-            'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
+            'last_updated_msecs': utils.get_utc_time_in_millisecs(fake_date),
             'last_nonempty_message_text': 'last message',
             'last_nonempty_message_author_id': self.viewer_id,
         }
@@ -134,7 +134,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message_dict: feedback_domain.FeedbackMessageDict = {
             'author_id': self.owner_id,
-            'created_on_msecs': utils.get_time_in_millisecs(fake_date),
+            'created_on_msecs': utils.get_utc_time_in_millisecs(fake_date),
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.EXP_ID,
             'message_id': self.MESSAGE_ID,

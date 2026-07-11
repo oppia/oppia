@@ -1800,7 +1800,9 @@ class VersionedModel(BaseModel):
                 'commit_cmds': model.commit_cmds,
                 'commit_type': model.commit_type,
                 'version_number': version_numbers[ind],
-                'created_on_ms': utils.get_time_in_millisecs(model.created_on),
+                'created_on_ms': utils.get_utc_time_in_millisecs(
+                    model.created_on
+                ),
             }
             for (ind, model) in enumerate(returned_models_without_none)
         ]

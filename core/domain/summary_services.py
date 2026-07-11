@@ -587,12 +587,12 @@ def get_displayable_exp_summary_dicts(
                 'title': exploration_summary.title,
                 'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
                 'category': exploration_summary.category,
-                'created_on_msec': utils.get_time_in_millisecs(
+                'created_on_msec': utils.get_utc_time_in_millisecs(
                     exploration_summary.exploration_model_created_on
                 ),
                 'objective': exploration_summary.objective,
                 'language_code': exploration_summary.language_code,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_utc_time_in_millisecs(
                     exploration_summary.exploration_model_last_updated
                 ),
                 'human_readable_contributors_summary': (
@@ -667,7 +667,7 @@ def _get_displayable_collection_summary_dicts(
                     'language_code': collection_summary.language_code,
                     'tags': collection_summary.tags,
                     'node_count': collection_summary.node_count,
-                    'last_updated_msec': utils.get_time_in_millisecs(
+                    'last_updated_msec': utils.get_utc_time_in_millisecs(
                         collection_summary.collection_model_last_updated
                     ),
                     'thumbnail_icon_url': (

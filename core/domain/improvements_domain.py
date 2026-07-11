@@ -187,6 +187,6 @@ class TaskEntry:
             'resolved_on_msecs': (
                 None
                 if not self.resolved_on
-                else utils.get_time_in_millisecs(self.resolved_on)
+                else utils.get_utc_time_in_millisecs(self.resolved_on)
             ),
         }

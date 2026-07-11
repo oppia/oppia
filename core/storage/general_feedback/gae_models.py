@@ -186,10 +186,10 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
                 'parent_feedback_id': feedback_model.parent_feedback_id,
                 'response_list': sanitized_response_list,
                 'unread_response_count': feedback_model.unread_response_count,
-                'created_on_msec': utils.get_time_in_millisecs(
+                'created_on_msec': utils.get_utc_time_in_millisecs(
                     feedback_model.created_on
                 ),
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_utc_time_in_millisecs(
                     feedback_model.last_updated
                 ),
             }

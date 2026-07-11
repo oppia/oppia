@@ -237,30 +237,30 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         self.assertEqual(story_1_nodes[0]['unpublishing_reason'], None)
         self.assertEqual(
             story_1_nodes[0]['first_publication_date_msecs'],
-            (utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)),
+            (utils.get_utc_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)),
         )
         self.assertEqual(
             story_1_nodes[0]['planned_publication_date_msecs'],
-            (utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)),
+            (utils.get_utc_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)),
         )
         self.assertEqual(
             story_1_nodes[0]['last_modified_msecs'],
-            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+            (utils.get_utc_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
         )
 
         self.assertEqual(story_1_nodes[1]['status'], 'Published')
         self.assertEqual(story_1_nodes[1]['unpublishing_reason'], None)
         self.assertEqual(
             story_1_nodes[1]['first_publication_date_msecs'],
-            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+            (utils.get_utc_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
         )
         self.assertEqual(
             story_1_nodes[1]['planned_publication_date_msecs'],
-            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+            (utils.get_utc_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
         )
         self.assertEqual(
             story_1_nodes[1]['last_modified_msecs'],
-            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+            (utils.get_utc_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
         )
 
         updated_story_model_2 = story_models.StoryModel.get(self.STORY_2_ID)
@@ -276,7 +276,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(
             story_2_nodes[0]['last_modified_msecs'],
-            (utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)),
+            (utils.get_utc_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)),
         )
 
     def test_topic_with_no_story_reference_raises_error(self) -> None:

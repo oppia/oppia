@@ -635,7 +635,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 'issue_description': 'issue description',
                 'status': 'resolved',
                 'resolver_username': None,
-                'resolved_on_msecs': utils.get_time_in_millisecs(
+                'resolved_on_msecs': utils.get_utc_time_in_millisecs(
                     self.MOCK_DATE
                 ),
             },

@@ -167,10 +167,10 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
             'parent_feedback_id': None,
             'response_list': [],
             'unread_response_count': 0,
-            'created_on_msec': utils.get_time_in_millisecs(
+            'created_on_msec': utils.get_utc_time_in_millisecs(
                 feedback_model.created_on
             ),
-            'last_updated_msec': utils.get_time_in_millisecs(
+            'last_updated_msec': utils.get_utc_time_in_millisecs(
                 feedback_model.last_updated
             ),
         }
@@ -193,7 +193,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             export_data[self.feedback_id2]['created_on_msec'],
-            utils.get_time_in_millisecs(feedback_model.created_on),
+            utils.get_utc_time_in_millisecs(feedback_model.created_on),
         )
 
     def test_export_data_returns_empty_dict_for_nonexistent_user(

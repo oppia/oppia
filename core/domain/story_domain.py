@@ -832,17 +832,17 @@ class StoryNode:
             'exploration_id': self.exploration_id,
             'status': self.status,
             'planned_publication_date_msecs': (
-                utils.get_time_in_millisecs(self.planned_publication_date)
+                utils.get_utc_time_in_millisecs(self.planned_publication_date)
                 if self.planned_publication_date
                 else None
             ),
             'last_modified_msecs': (
-                utils.get_time_in_millisecs(self.last_modified)
+                utils.get_utc_time_in_millisecs(self.last_modified)
                 if self.last_modified
                 else None
             ),
             'first_publication_date_msecs': (
-                utils.get_time_in_millisecs(self.first_publication_date)
+                utils.get_utc_time_in_millisecs(self.first_publication_date)
                 if self.first_publication_date
                 else None
             ),
@@ -1153,7 +1153,7 @@ class StoryNode:
         """
         current_time_msecs = utils.get_current_time_in_millisecs()
         planned_publication_date_msecs = (
-            utils.get_time_in_millisecs(self.planned_publication_date)
+            utils.get_utc_time_in_millisecs(self.planned_publication_date)
             if self.planned_publication_date
             else None
         )
@@ -1180,7 +1180,7 @@ class StoryNode:
         """
         current_time_msecs = utils.get_current_time_in_millisecs()
         planned_publication_date_msecs = (
-            utils.get_time_in_millisecs(self.planned_publication_date)
+            utils.get_utc_time_in_millisecs(self.planned_publication_date)
             if self.planned_publication_date
             else None
         )
@@ -3054,10 +3054,10 @@ class StorySummary:
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'url_fragment': self.url_fragment,
-            'story_model_created_on': utils.get_time_in_millisecs(
+            'story_model_created_on': utils.get_utc_time_in_millisecs(
                 self.story_model_created_on
             ),
-            'story_model_last_updated': utils.get_time_in_millisecs(
+            'story_model_last_updated': utils.get_utc_time_in_millisecs(
                 self.story_model_last_updated
             ),
         }

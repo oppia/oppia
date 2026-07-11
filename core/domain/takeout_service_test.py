@@ -121,7 +121,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
     USER_1_EMAIL: Final = 'user1@example.com'
     GENERIC_USERNAME: Final = 'user'
     GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH: Final = utils.get_time_in_millisecs(GENERIC_DATE)
+    GENERIC_EPOCH: Final = utils.get_utc_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL: Final = 'www.example.com/example.png'
     GENERIC_USER_BIO: Final = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS: Final = ['Math', 'Science']
@@ -332,7 +332,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     GENERIC_USERNAME: Final = 'user'
     GENERIC_PIN: Final = '12345'
     GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH: Final = utils.get_time_in_millisecs(GENERIC_DATE)
+    GENERIC_EPOCH: Final = utils.get_utc_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL: Final = 'www.example.com/example.png'
     GENERIC_USER_BIO: Final = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS: Final = ['Math', 'Science']
@@ -1815,7 +1815,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': self.THREAD_HAS_SUGGESTION,
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_utc_time_in_millisecs(
                     feedback_thread_model.last_updated
                 ),
             },
@@ -1827,7 +1827,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_utc_time_in_millisecs(
                     feedback_models.GeneralFeedbackThreadModel.get_by_id(
                         thread_id
                     ).last_updated
@@ -2037,7 +2037,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_post_data = {
             'content': 'content sample',
             'title': 'sample title',
-            'published_on': utils.get_time_in_millisecs(
+            'published_on': utils.get_utc_time_in_millisecs(
                 blog_post_model.published_on
             ),
             'url_fragment': 'sample-url-fragment',
@@ -2078,10 +2078,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'parent_feedback_id': self.PARENT_FEEDBACK_ID_1,
                 'response_list': self.LESSON_FEEDBACK_RESPONSE_LIST,
                 'unread_response_count': self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,
-                'created_on_msec': utils.get_time_in_millisecs(
+                'created_on_msec': utils.get_utc_time_in_millisecs(
                     lesson_feedback_model.created_on
                 ),
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_utc_time_in_millisecs(
                     lesson_feedback_model.last_updated
                 ),
             }

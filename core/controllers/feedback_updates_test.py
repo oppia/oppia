@@ -377,7 +377,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
             messages_summary['author_username'], self.EDITOR_USERNAME
         )
         self.assertEqual(
-            utils.get_time_in_millisecs(first_suggestion.created_on),
+            utils.get_utc_time_in_millisecs(first_suggestion.created_on),
             messages_summary['created_on_msecs'],
         )
         self.assertEqual(

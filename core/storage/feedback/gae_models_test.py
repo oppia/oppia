@@ -151,7 +151,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 'has_suggestion': self.HAS_SUGGESTION,
                 'summary': self.SUMMARY,
                 'message_count': self.MESSAGE_COUNT,
-                'last_updated_msec': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_utc_time_in_millisecs(
                     self.feedback_thread_model.last_updated
                 ),
             }

@@ -156,8 +156,8 @@ class BaseSuggestion:
             'change_cmd': self.change_cmd.to_dict(),
             'score_category': self.score_category,
             'language_code': self.language_code,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'created_on': utils.get_time_in_millisecs(self.created_on),
+            'last_updated': utils.get_utc_time_in_millisecs(self.last_updated),
+            'created_on': utils.get_utc_time_in_millisecs(self.created_on),
             'edited_by_reviewer': self.edited_by_reviewer,
         }
 
