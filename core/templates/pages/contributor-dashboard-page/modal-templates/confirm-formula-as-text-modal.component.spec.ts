@@ -18,10 +18,11 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmFormulaAsTextModalComponent} from './confirm-formula-as-text-modal.component';
 
-describe('Confirm Formula As Text Modal Component', () => {
+describe('Confirm Formula As Text Modal Component with NgbActiveModal', () => {
   let component: ConfirmFormulaAsTextModalComponent;
   let fixture: ComponentFixture<ConfirmFormulaAsTextModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -29,7 +30,7 @@ describe('Confirm Formula As Text Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ConfirmFormulaAsTextModalComponent],
-      providers: [NgbActiveModal],
+      providers: [NgbActiveModal, {provide: MatBottomSheetRef, useValue: null}],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -54,5 +55,66 @@ describe('Confirm Formula As Text Modal Component', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
     component.cancel();
     expect(dismissSpy).toHaveBeenCalledWith('cancel');
+  });
+});
+
+describe('Confirm Formula As Text Modal Component with MatBottomSheetRef', () => {
+  let component: ConfirmFormulaAsTextModalComponent;
+  let fixture: ComponentFixture<ConfirmFormulaAsTextModalComponent>;
+  let bottomSheetRef: jasmine.SpyObj<
+    MatBottomSheetRef<ConfirmFormulaAsTextModalComponent>
+  >;
+
+  beforeEach(waitForAsync(() => {
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
+    TestBed.configureTestingModule({
+      declarations: [ConfirmFormulaAsTextModalComponent],
+      providers: [
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {provide: NgbActiveModal, useValue: null},
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ConfirmFormulaAsTextModalComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should dismiss bottomSheetRef when confirm is called', () => {
+    component.confirm();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith();
+  });
+
+  it('should dismiss bottomSheetRef when cancel is called', () => {
+    component.cancel();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  });
+});
+
+describe('Confirm Formula As Text Modal Component without modals', () => {
+  let component: ConfirmFormulaAsTextModalComponent;
+  let fixture: ComponentFixture<ConfirmFormulaAsTextModalComponent>;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ConfirmFormulaAsTextModalComponent],
+      providers: [
+        {provide: MatBottomSheetRef, useValue: null},
+        {provide: NgbActiveModal, useValue: null},
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ConfirmFormulaAsTextModalComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should not throw when confirm or cancel is called without active modals', () => {
+    expect(() => component.confirm()).not.toThrow();
+    expect(() => component.cancel()).not.toThrow();
   });
 });
