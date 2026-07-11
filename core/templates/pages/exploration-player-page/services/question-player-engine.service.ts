@@ -213,9 +213,12 @@ export class QuestionPlayerEngineService {
    */
   getCurrentQuestionId(): string {
     const id = this.questions[this.currentIndex].getId();
-    // getId() returns string | null; the question player always has an id set
+    // GetId() returns string | null; the question player always has an ID set
     // once questions are loaded, so this assertion is safe.
-    return id!;
+    if (id === null) {
+      throw new Error('Current question ID is null.');
+    }
+    return id;
   }
 
   /**
@@ -618,11 +621,15 @@ export class QuestionPlayerEngineService {
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback?: () => void
   ): void {
-    // getId() returns string | null; questions always have ids assigned before
+    const firstQuestionId = this.questions[0].getId();
+    // GetId() returns string | null; questions always have IDs assigned before
     // this method is called, so the non-null assertion is safe here.
+    if (firstQuestionId === null) {
+      throw new Error('First question ID is null.');
+    }
     this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
-      this.questions[0].getId()!
+      firstQuestionId
     );
     const initialState = this.questions[0].getStateData();
 

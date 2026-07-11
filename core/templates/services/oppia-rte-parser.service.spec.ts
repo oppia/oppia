@@ -142,7 +142,7 @@ describe('RTE parser service', () => {
         super();
       }
 
-      // tagName is shadowed to return undefined at runtime to test error
+      // TagName is shadowed to return undefined at runtime to test error
       // handling. Cast to string satisfies the HTMLElement interface contract.
       get tagName(): string {
         return undefined as unknown as string;

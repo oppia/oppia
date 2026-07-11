@@ -765,7 +765,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     if (node.nodeType === 'component') {
       const portalName = (node.selector.split('oppia-noninteractive-')[1] +
         'TagPortal') as TemplatePortalName;
-      if (portalName in templatePortals) {
+      if (
+        portalName in templatePortals &&
+        templatePortals[portalName] !== undefined
+      ) {
         return new TemplatePortal(
           templatePortals[portalName],
           this._viewContainerRef,
@@ -775,7 +778,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return undefined;
     }
     const portalName = (node.selector + 'TagPortal') as TemplatePortalName;
-    if (portalName in templatePortals) {
+    if (
+      portalName in templatePortals &&
+      templatePortals[portalName] !== undefined
+    ) {
       return new TemplatePortal(
         templatePortals[portalName],
         this._viewContainerRef,

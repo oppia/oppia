@@ -89,7 +89,7 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              // training_data is always an array (never null) in the type definition.
+              // Training_data is always an array (never null) in the type definition.
               training_data: [],
               tagged_skill_misconception_id: null,
             },
@@ -112,7 +112,7 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              // training_data is always an array (never null) in the type definition.
+              // Training_data is always an array (never null) in the type definition.
               training_data: [],
               tagged_skill_misconception_id: 'misconceptionId',
             },
@@ -563,8 +563,12 @@ describe('Question player engine service', () => {
       initErrorCb
     );
 
+    const firstQuestionId = multipleQuestionsObjects[0].getId();
+    if (firstQuestionId === null) {
+      throw new Error('First question ID is null.');
+    }
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-      multipleQuestionsObjects[0].getId()!
+      firstQuestionId
     );
   });
 
@@ -841,6 +845,12 @@ describe('Question player engine service', () => {
           0,
           'default_outcome'
         );
+        (
+          answerClassificationResult.outcome.feedback as {
+            contentId: string | null;
+            html: string | null;
+          }
+        ).html = null;
         answerClassificationResult.outcome.labelledAsCorrect = true;
 
         spyOn(
@@ -855,12 +865,16 @@ describe('Question player engine service', () => {
           (html, envs) => html
         );
 
-        // default_outcome is typed as OutcomeBackendDict | null; the non-null
+        // Default_outcome is typed as OutcomeBackendDict | null; the non-null
         // assertion is safe here because singleQuestionBackendDict always has
         // a default_outcome.
-        const feedbackObj =
+        const defaultOutcome =
           singleQuestionBackendDict.question_state_data.interaction
-            .default_outcome!.feedback;
+            .default_outcome;
+        if (defaultOutcome === null) {
+          throw new Error('Default outcome is null.');
+        }
+        const feedbackObj = defaultOutcome.feedback;
         (feedbackObj as {content_id: string; html: string | null}).html = null;
         questionPlayerEngineService.init(
           [Question.createFromBackendDict(singleQuestionBackendDict)],
@@ -991,9 +1005,11 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[0].getId()!
-        );
+        const q1Id = multipleQuestionsObjects[0].getId();
+        if (q1Id === null) {
+          throw new Error('First question ID is null.');
+        }
+        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(q1Id);
         expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
         questionPlayerEngineService.recordNewCardAdded();
@@ -1004,9 +1020,11 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[1].getId()!
-        );
+        const q2Id = multipleQuestionsObjects[1].getId();
+        if (q2Id === null) {
+          throw new Error('Second question ID is null.');
+        }
+        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(q2Id);
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
         questionPlayerEngineService.recordNewCardAdded();
@@ -1017,9 +1035,11 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[2].getId()!
-        );
+        const q3Id = multipleQuestionsObjects[2].getId();
+        if (q3Id === null) {
+          throw new Error('Third question ID is null.');
+        }
+        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(q3Id);
         // Please note that after submitting answer to the final question,
         // a new card was not created, hence createNewCardSpy was not called.
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
