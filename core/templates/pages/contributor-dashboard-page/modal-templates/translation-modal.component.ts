@@ -87,7 +87,7 @@ export interface ModifyTranslationOpportunity {
   subheading: string;
   textToTranslate: string;
   currentContentTranslation: TranslatedContent;
-  interactionId?: string;
+  interactionId?: string | null;
 }
 export interface HTMLSchema {
   type: string;
