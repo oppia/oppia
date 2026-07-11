@@ -80,6 +80,9 @@ class PlatformFeedbackDict(TypedDict):
     category: Optional[str]
     lesson_metadata: Optional[LessonMetadataDict]
     include_technical_logs: bool
+    # Here we use object because session-info diagnostics are heterogeneous
+    # JSON-like payloads (nested dict/list values) from client logs.
+    session_info: Optional[Dict[str, object]]
     screenshot_filename: Optional[str]
     screenshot_entity_id: Optional[str]
     created_on_msecs: float
@@ -213,6 +216,8 @@ class PlatformFeedback:
         lesson_metadata: Optional[LessonMetadataDict]. Lesson context snapshot;
             present for lesson reports, None for site reports.
         include_technical_logs: bool. Whether session diagnostics are attached.
+        session_info: Optional[Dict[str, object]]. Session diagnostics; present
+            if include_technical_logs is True.
         screenshot_filename: Optional[str]. GCS filename of the screenshot.
         screenshot_entity_id: Optional[str]. GCS entity ID for the screenshot.
         created_on_msecs: float. Creation timestamp in milliseconds.
@@ -230,6 +235,9 @@ class PlatformFeedback:
         include_technical_logs: bool,
         created_on_msecs: float,
         page_url: str,
+        # Here we use object because session-info diagnostics are heterogeneous
+        # JSON-like payloads (nested dict/list values) from client logs.
+        session_info: Optional[Dict[str, object]] = None,
         category: Optional[str] = None,
         lesson_metadata: Optional[LessonMetadataDict] = None,
         screenshot_filename: Optional[str] = None,
@@ -245,6 +253,7 @@ class PlatformFeedback:
         self.category = category
         self.lesson_metadata = lesson_metadata
         self.include_technical_logs = include_technical_logs
+        self.session_info = session_info
         self.screenshot_filename = screenshot_filename
         self.screenshot_entity_id = screenshot_entity_id
         self.created_on_msecs = created_on_msecs
@@ -266,6 +275,7 @@ class PlatformFeedback:
             'category': self.category,
             'lesson_metadata': self.lesson_metadata,
             'include_technical_logs': self.include_technical_logs,
+            'session_info': self.session_info,
             'screenshot_filename': self.screenshot_filename,
             'screenshot_entity_id': self.screenshot_entity_id,
             'created_on_msecs': self.created_on_msecs,

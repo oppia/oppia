@@ -1,0 +1,127 @@
+<div class="oppia-feedback-session-info">
+  <!-- Environment summary -->
+  <div class="oppia-feedback-session-info-env">
+    <oppia-feedback-detail-field label="Client time">
+      {{ clientTime }}
+    </oppia-feedback-detail-field>
+    <oppia-feedback-detail-field label="Viewport">
+      {{ viewportLabel }}
+    </oppia-feedback-detail-field>
+    <oppia-feedback-detail-field label="Language">
+      {{ languageLabel }}
+    </oppia-feedback-detail-field>
+    <oppia-feedback-detail-field
+      *ngIf="pageTitle"
+      label="Page">
+      {{ pageTitle }}
+    </oppia-feedback-detail-field>
+    <oppia-feedback-detail-field label="User agent">
+      <span class="oppia-feedback-session-info-ua">
+        {{ userAgent }}
+      </span>
+    </oppia-feedback-detail-field>
+  </div>
+
+  <!-- Log summary row -->
+  <div *ngIf="hasAnyLogs" class="oppia-feedback-session-info-log-summary">
+    <button
+      *ngIf="consoleLogCount > 0"
+      class="oppia-feedback-session-info-log-btn"
+      [class.oppia-feedback-session-info-log-btn-active]="showConsoleLogs"
+      (click)="toggleConsoleLogs()">
+      <i class="fas fa-terminal"></i>
+      Console
+      <span class="oppia-feedback-session-info-count">
+        {{ consoleLogCount }}
+      </span>
+      <span
+        *ngIf="consoleErrorCount > 0"
+        class="oppia-feedback-session-info-count oppia-feedback-session-info-count-error">
+        {{ consoleErrorCount }} errors
+      </span>
+    </button>
+    <button
+      *ngIf="failedRequestCount > 0"
+      class="oppia-feedback-session-info-log-btn"
+      [class.oppia-feedback-session-info-log-btn-active]="showFailedRequests"
+      (click)="toggleFailedRequests()">
+      <i class="fas fa-exclamation-triangle"></i>
+      Failed requests
+      <span class="oppia-feedback-session-info-count">
+        {{ failedRequestCount }}
+      </span>
+    </button>
+    <button
+      *ngIf="navigationEntryCount > 0"
+      class="oppia-feedback-session-info-log-btn"
+      [class.oppia-feedback-session-info-log-btn-active]="showNavigation"
+      (click)="toggleNavigation()">
+      <i class="fas fa-route"></i>
+      Navigation
+      <span class="oppia-feedback-session-info-count">
+        {{ navigationEntryCount }}
+      </span>
+    </button>
+  </div>
+
+  <!-- Expandable console logs -->
+  <div *ngIf="showConsoleLogs" class="oppia-feedback-session-info-log-block">
+    <div
+      *ngFor="let log of sessionInfo.console_logs_json; let i = index"
+      class="oppia-feedback-session-info-log-entry"
+      [class.oppia-feedback-session-info-log-entry-error]="log.log_level === 'error'">
+      <span class="oppia-feedback-session-info-log-time">
+        {{ formatLogTimestamp(log.timestamp_msecs) }}
+      </span>
+      <span
+        class="oppia-feedback-session-info-log-level"
+        [class.oppia-feedback-session-info-log-level-error]="log.log_level === 'error'"
+        [class.oppia-feedback-session-info-log-level-warn]="log.log_level === 'warn'">
+        {{ log.log_level }}
+      </span>
+      <span class="oppia-feedback-session-info-log-msg">
+        {{ log.error_message }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Expandable failed requests -->
+  <div *ngIf="showFailedRequests" class="oppia-feedback-session-info-log-block">
+    <div
+      *ngFor="let req of sessionInfo.failed_requests_json; let i = index"
+      class="oppia-feedback-session-info-req-entry">
+      <span class="oppia-feedback-session-info-req-method">
+        {{ req.method }}
+      </span>
+      <span class="oppia-feedback-session-info-req-url">
+        {{ req.url }}
+      </span>
+      <span class="oppia-feedback-session-info-req-status">
+        {{ req.status_code }}
+      </span>
+      <span class="oppia-feedback-session-info-req-time">
+        {{ formatLogTimestamp(req.timestamp_msecs) }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Expandable navigation -->
+  <div *ngIf="showNavigation" class="oppia-feedback-session-info-log-block">
+    <div
+      *ngFor="let nav of sessionInfo.navigation_history_json; let i = index"
+      class="oppia-feedback-session-info-nav-entry">
+      <span class="oppia-feedback-session-info-nav-time">
+        {{ formatLogTimestamp(nav.timestamp_msecs) }}
+      </span>
+      <span class="oppia-feedback-session-info-nav-path">
+        {{ nav.path }}
+      </span>
+    </div>
+  </div>
+
+  <!-- No logs -->
+  <div *ngIf="!hasAnyLogs" class="oppia-feedback-session-info-no-logs">
+    <i class="fas fa-check-circle"></i>
+    No errors or warnings detected in this session.
+  </div>
+</div>

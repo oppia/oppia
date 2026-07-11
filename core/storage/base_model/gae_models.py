@@ -2248,7 +2248,6 @@ class BaseFeedbackModel(BaseModel):
         query = cls.query()
         # Ignoring deleted threads as they are not relevant for operations.
         query = query.filter(cls.deleted.IN([False]))
-
         if author_id is not None:
             query = query.filter(cls.author_id == author_id)
         if status_filter and status_filter in feconf.STATUS_CHOICES:
@@ -2258,7 +2257,7 @@ class BaseFeedbackModel(BaseModel):
         if date_from is not None:
             query = query.filter(cls.created_on >= date_from)
         if date_to is not None:
-            query = query.filter(cls.created_on <= date_to)
+            query = query.filter(cls.created_on < date_to)
 
         return query
 

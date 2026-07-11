@@ -32,6 +32,7 @@ import {
   DashboardType,
   PlatformFeedbackBackendResponse,
   PlatformFeedbackDetailResponse,
+  FeedbackFilterState,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
@@ -124,7 +125,7 @@ export class FeedbackBackendApiService {
       .toPromise();
   }
 
-  async fetchPlatformFeedbackListAsync(
+  private async fetchPlatformFeedbackListAsync(
     dashboardType: DashboardType,
     dashboardId: string,
     cursor: string | null,
@@ -134,7 +135,7 @@ export class FeedbackBackendApiService {
   ): Promise<PlatformFeedbackBackendResponse> {
     let params = new HttpParams();
     if (cursor) params = params.set('cursor', cursor);
-    if (statusFilter) params = params.set('status_filter', statusFilter);
+    if (statusFilter) params = params.set('status', statusFilter);
     if (dateFromMsecs)
       params = params.set('date_from_msecs', String(dateFromMsecs));
     if (dateToMsecs) params = params.set('date_to_msecs', String(dateToMsecs));
@@ -149,6 +150,40 @@ export class FeedbackBackendApiService {
         params,
       })
       .toPromise();
+  }
+
+  async fetchTechnicalDashboardFeedbackListAsync(
+    filterState: FeedbackFilterState,
+    cursor: string | null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+    return await this.fetchPlatformFeedbackListAsync(
+      'technical',
+      filterState.technicalTeam,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchCreatorDashboardFeedbackListAsync(
+    explorationId: string,
+    filterState: FeedbackFilterState,
+    cursor: string | null = null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+
+    return await this.fetchPlatformFeedbackListAsync(
+      'creator',
+      explorationId,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
   }
 
   async fetchPlatformFeedbackDetailAsync(

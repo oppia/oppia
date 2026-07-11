@@ -464,7 +464,6 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration('exp_id', self.owner_id)
-
         self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
         self.add_user_role(
             self.TECH_LEAD_USERNAME,
@@ -552,6 +551,11 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration('exp_id', self.owner_id)
+        self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
+        self.add_user_role(
+            self.TECH_LEAD_USERNAME,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
+        )
 
     def _get_lesson_metadata(
         self,
@@ -702,3 +706,40 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
             'Could not find the resource '
             'http://localhost/platform-feedback/creator/exp_id/%s.' % report.id,
         )
+
+    def test_tech_lead_can_get_feedback_detail_with_session_info(
+        self,
+    ) -> None:
+        session_info = {
+            'console_logs_json': [
+                {
+                    'error_message': 'Console error.',
+                    'timestamp_msecs': 1,
+                    'log_level': 'error',
+                }
+            ],
+            'failed_requests_json': [],
+            'navigation_history_json': [
+                {'path': '/learn', 'timestamp_msecs': 2}
+            ],
+            'environment_json': {'user_agent': 'Mozilla/5.0'},
+        }
+        report = general_feedback_services.create_platform_report(
+            feedback_text='The lesson page is broken.',
+            source='app',
+            page_url='https://oppia.org/learn',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=session_info,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=True,
+        )
+
+        with self.login_context(self.TECH_LEAD_EMAIL):
+            response = self.get_json(
+                '/platform-feedback/technical/LEAP/%s' % report.id
+            )
+
+        self.assertEqual(response['id'], report.id)
+        self.assertEqual(response['session_info'], session_info)

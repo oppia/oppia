@@ -365,6 +365,43 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_report.id, report.id)
         self.assertEqual(retrieved_report.report_message, 'There is a typo.')
 
+    def test_get_platform_feedback_returns_serializable_session_info(
+        self,
+    ) -> None:
+        session_info = {
+            'console_logs_json': [
+                {
+                    'error_message': 'Console error.',
+                    'timestamp_msecs': 1,
+                    'log_level': 'error',
+                }
+            ],
+            'failed_requests_json': [],
+            'navigation_history_json': [
+                {'path': '/learn', 'timestamp_msecs': 2}
+            ],
+            'environment_json': {'user_agent': 'Mozilla/5.0'},
+        }
+        report = general_feedback_services.create_platform_report(
+            feedback_text='The lesson page is broken.',
+            source='app',
+            category=None,
+            lesson_metadata_json=None,
+            session_info_json=session_info,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=True,
+            page_url='https://oppia.org/learn',
+        )
+
+        retrieved_report = general_feedback_services.get_platform_feedback(
+            report.id
+        )
+
+        self.assertIsNotNone(retrieved_report)
+        assert retrieved_report is not None
+        self.assertEqual(retrieved_report.session_info, session_info)
+
     def test_get_platform_feedback_returns_none_for_missing_report(
         self,
     ) -> None:

@@ -1,0 +1,62 @@
+.oppia-feedback-detail-field {
+  align-items: flex-start;
+  border-bottom: 1px solid #f5f5f5;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(120px, 165px) minmax(0, 1fr);
+  padding: 9px 0;
+}
+
+.oppia-feedback-detail-field:last-child {
+  border-bottom: none;
+}
+
+.oppia-feedback-detail-field-key {
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.oppia-feedback-detail-field-value {
+  color: #333;
+  font-size: 14px;
+  line-height: 21px;
+  margin: 0;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.oppia-feedback-detail-field-value code {
+  background-color: #f7f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  color: #333;
+  display: inline-block;
+  font-size: 13px;
+  line-height: 19px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 2px 6px;
+}
+
+.oppia-feedback-detail-field-value a {
+  color: #00645c;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.oppia-feedback-detail-field-value a:hover,
+.oppia-feedback-detail-field-value a:focus {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .oppia-feedback-detail-field {
+    gap: 4px;
+    grid-template-columns: 1fr;
+  }
+}

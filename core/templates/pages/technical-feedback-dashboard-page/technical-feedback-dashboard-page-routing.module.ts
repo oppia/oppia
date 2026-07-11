@@ -25,6 +25,10 @@ const routes: Route[] = [
     path: '',
     component: TechnicalFeedbackDashboardPageRootComponent,
   },
+  {
+    path: ':team/:reportId',
+    component: TechnicalFeedbackDashboardPageRootComponent,
+  },
 ];
 
 @NgModule({

@@ -1,0 +1,220 @@
+/*
+  Copyright 2026 The Oppia Authors. All Rights Reserved.
+  Licensed under the Apache License, Version 2.0.
+*/
+
+.oppia-feedback-detail-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  margin: 32px auto;
+  max-height: 78vh;
+  max-width: 1120px;
+  padding: 22px;
+  width: calc(100% - 32px);
+}
+
+.oppia-feedback-detail-header {
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+}
+
+.oppia-feedback-detail-header-left,
+.oppia-feedback-detail-header-right {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.oppia-feedback-detail-back {
+  min-width: 32px;
+}
+
+.oppia-feedback-detail-thread-title {
+  color: #333;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.oppia-feedback-detail-body {
+  flex: 1 1 auto;
+  margin-top: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.oppia-feedback-detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: sticky;
+  top: 12px;
+}
+
+.oppia-feedback-detail-message {
+  color: #333;
+  font-size: 15px;
+  line-height: 23px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.oppia-feedback-detail-empty {
+  color: #777;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
+}
+
+.oppia-feedback-detail-json-group {
+  margin-bottom: 12px;
+}
+
+.oppia-feedback-detail-json-group:last-child {
+  margin-bottom: 0;
+}
+
+.oppia-feedback-detail-json-heading {
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 19px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.oppia-feedback-detail-json-group pre {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 13px;
+  line-height: 19px;
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
+.oppia-feedback-detail-screenshot-preview {
+  background-color: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 6px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+.oppia-feedback-detail-screenshot-preview:hover,
+.oppia-feedback-detail-screenshot-preview:focus {
+  border-color: #00645c;
+  outline: none;
+}
+
+.oppia-feedback-detail-screenshot-preview img {
+  display: block;
+  max-height: 360px;
+  max-width: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.oppia-feedback-detail-screenshot-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  bottom: 8px;
+  color: #424242;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 2px 8px;
+  position: absolute;
+  right: 8px;
+}
+
+.oppia-feedback-detail-screenshot-meta {
+  color: #999;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 4px;
+}
+
+/* Status action buttons */
+
+.oppia-feedback-detail-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.oppia-feedback-detail-status-actions .btn {
+  margin-bottom: 2px;
+}
+
+.badge-typo {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge-broken_layout_or_image {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-confusing_or_incorrect_answer {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge-other_or_not_sure {
+  background-color: #f8f9fa;
+  color: #555;
+}
+
+.oppia-feedback-detail-modal-image {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 75vh;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 992px) {
+  .oppia-feedback-detail-card {
+    max-height: none;
+  }
+
+  .oppia-feedback-detail-body {
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .oppia-feedback-detail-side {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .oppia-feedback-detail-card {
+    margin: 16px auto;
+    padding: 16px;
+    width: calc(100% - 16px);
+  }
+}
