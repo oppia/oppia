@@ -834,13 +834,9 @@ export class SuperAdmin extends BaseUser {
   async expectControlsNotAvailable(): Promise<void> {
     try {
       await this.expectElementToBeVisible(prodModeActivitiesTab);
-      const activitiesTabElement = await this.page.$(prodModeActivitiesTab);
-      if (!activitiesTabElement) {
-        throw new Error('Activities tab element not found');
-      }
-      const activitiesTabText = await this.page.evaluate(
-        element => element.textContent,
-        activitiesTabElement
+      const activitiesTabText = await this.page.$eval(
+        prodModeActivitiesTab,
+        element => element.textContent
       );
       const expectedText =
         "The 'Activities' tab is not available in the production environment.";
