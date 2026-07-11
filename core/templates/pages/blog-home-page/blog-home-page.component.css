@@ -12,7 +12,7 @@
 
 @media (max-width: 550px) {
   oppia-blog-home-page .blog-home-page-search-column {
-    width: 335px
+    width: 335px;
   }
 
   
@@ -61,7 +61,7 @@ oppia-blog-home-page .oppia-blog-home-page-card {
   max-width: 1400px;
   padding-left: 3rem;
   padding-right: 3rem;
-  width: 100%
+  width: 100%;
 }
 
 oppia-blog-home-page .oppia-blog-home-page-card-avatar {
@@ -116,7 +116,6 @@ oppia-blog-home-page .search-heading {
   border-right-width: 1px;
   color: #333;
   width: 100%;
-
 }
 
 .input-group-addon.oppia-search-bar-icon {
@@ -129,7 +128,7 @@ oppia-blog-home-page .search-heading {
 }
 
 .input-group {
-  width: unset
+  width: unset;
 }
 
 ngb-pagination .page-link {
@@ -148,6 +147,11 @@ ngb-pagination .page-link:hover {
   border-color: unset;
 }
 
+ngb-pagination .page-item .page-link {
+  background: transparent;
+  border-radius: 0;
+}
+
 ngb-pagination .page-item:last-child .page-link {
   border-bottom-right-radius: 100%;
   border-top-right-radius: 100%;
@@ -160,7 +164,12 @@ ngb-pagination .page-item:first-child .page-link {
 
 ngb-pagination .page-item.active .page-link {
   background: rgba(65, 152, 137, 0.2);
+  border-radius: 100%;
   color: #333;
+}
+
+ngb-pagination .page-item.disabled .page-link {
+  color: #aaa;
 }
 
 ngb-pagination ul li:last-child.page-item {
@@ -246,4 +255,29 @@ oppia-blog-home-page .blog-post-card {
 .mobile-navbar-blog-homepage:hover {
   color: inherit;
   text-decoration: none;
+}
+
+.primary-button {
+  background-color: #00645c;
+  color: rgba(255, 255, 255, 1.0);
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+}
+
+.primary-button:hover,
+.primary-button:focus {
+  background-color: #3d9991;
+  color: rgba(255, 255, 255, 1);
+}
+
+a.primary-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.primary-button:disabled {
+  background: rgba(0, 0, 0, .2);
+  opacity: 0.65;
 }

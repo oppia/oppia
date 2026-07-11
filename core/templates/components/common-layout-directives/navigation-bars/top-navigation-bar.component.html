@@ -37,7 +37,7 @@
           <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
                class="oppia-logo"
                alt="Oppia Home"
-               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-left': !menuIconIsShown ? '25px' : '0px'}">
+               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-inline-start': !menuIconIsShown ? '25px' : '0px'}">
         </picture>
       </a>
     </ng-template>
@@ -457,6 +457,13 @@
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
+        <li class="nav-item" *ngIf="isCertificateAssessmentEnabled()">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/certificate-offering-dashboard"
+             class="dropdown-item nav-link">
+            <span>Certificate creator dashboard</span>
+          </a>
+        </li>
         <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/facilitator-dashboard"
@@ -526,6 +533,14 @@
              class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_FEEDBACK_UPDATES' | translate"></span>
             <span *ngIf="unreadThreadsCount !== 0">({{ unreadThreadsCount }})</span>
+          </a>
+        </li>
+        <hr class="oppia-top-right-menu-item-separator" *ngIf="isWebFeedbackModalEnabled">
+        <li class="nav-item"
+            *ngIf="isWebFeedbackModalEnabled">
+          <a (click)="openSiteFeedbackModal()"
+             class="dropdown-item nav-link e2e-test-report-site-problem-link">
+              {{'I18N_FOOTER_REPORT_WEBSITE_ISSUE' | translate}}
           </a>
         </li>
         <hr class="oppia-top-right-menu-item-separator">

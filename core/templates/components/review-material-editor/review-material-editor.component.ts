@@ -26,6 +26,7 @@ import {
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface HtmlSchema {
   type: 'html';
@@ -76,9 +77,10 @@ export class ReviewMaterialEditorComponent implements OnInit {
     return this.HTML_SCHEMA;
   }
 
-  updateLocalExp($event: string): void {
-    if (this.editableExplanation !== $event) {
-      this.editableExplanation = $event;
+  updateLocalExp($event: SchemaDefaultValue | string): void {
+    const eventString = String($event);
+    if (this.editableExplanation !== eventString) {
+      this.editableExplanation = eventString;
       this.changeDetectorRef.detectChanges();
     }
   }

@@ -19,13 +19,36 @@
           "options": {
             "allowedCommonJsDependencies": ["path", "stream", "zlib"],
             "outputPath": "dist/oppia-angular",
-            "index": "src/index.html",
+            "deployUrl": "/dist/oppia-angular/",
+            "index": {
+              "input": "src/index.html",
+              "output": "oppia-root.mainpage.html"
+            },
             "main": "src/main.ts",
             "polyfills": "core/templates/Polyfills.ts",
             "tsConfig": "tsconfig.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "assets/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "extensions/",
+                "output": "/extensions/"
+              },
+              {
+                "glob": "**/*",
+                "input": "third_party/static/",
+                "output": "/third_party/static/",
+                "ignore": [
+                "**/*.py",
+                "**/*.pyc",
+                "**/__pycache__/**"
+                ]
+              },
               {
                 "glob": "**/*",
                 "input": "node_modules/mathjax",
@@ -58,11 +81,20 @@
                 "bundleName": "vendor-styles",
                 "inject": true
               },
+              {
+                "input": "node_modules/charts.css/dist/charts.css",
+                "bundleName": "charts-library",
+                "inject": true
+              },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "core/templates/css/shepherd-overrides.css"
+              "core/templates/css/shepherd-overrides.css",
+              "node_modules/guppy-dev/build/guppy-default.min.css",
+              "node_modules/cropperjs/dist/cropper.min.css",
+              "node_modules/codemirror/lib/codemirror.css",
+              "node_modules/codemirror/addon/merge/merge.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
@@ -78,10 +110,10 @@
               ],
               "index": {
                 "input": "src/index.prod.html",
-                "output": "index.html"
+                "output": "oppia-root.mainpage.html"
               },
-              "baseHref": "/dist/oppia-angular-prod/",
-              "outputPath": "dist/oppia-angular-prod",
+              "deployUrl": "/build/",
+              "outputPath": "build",
               "aot": true,
               "optimization": true,
               "outputHashing": "all",
@@ -99,7 +131,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "6kb",
-                  "maximumError": "28kb"
+                  "maximumError": "29kb"
                 }
               ]
             }

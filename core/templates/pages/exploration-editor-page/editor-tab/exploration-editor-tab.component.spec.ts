@@ -65,6 +65,7 @@ import {
 import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
+import {InteractionData} from 'interactions/customization-args-defs';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
@@ -175,7 +176,7 @@ describe('Exploration editor tab component', () => {
       providers: [
         {
           provide: Router,
-          useClas: MockRouter,
+          useClass: MockRouter,
         },
         {
           provide: WindowRef,
@@ -601,7 +602,7 @@ describe('Exploration editor tab component', () => {
         },
       });
 
-      let newInteractionData = {
+      let newInteractionData: InteractionData = {
         interactionId: 'TextInput',
         customizationArgs: {
           placeholder: {
@@ -671,7 +672,7 @@ describe('Exploration editor tab component', () => {
 
     expect(() => {
       component.saveInteractionData({
-        interactionId: firstStateInteraction.id || '',
+        interactionId: firstStateInteraction.id || null,
         customizationArgs: firstStateInteraction.customizationArgs,
       });
     }).toThrowError('Expected active state name to be non-null.');
@@ -1034,7 +1035,7 @@ describe('Exploration editor tab component', () => {
           {} as Interaction['customizationArgs'],
           null,
           [],
-          'id',
+          'TextInput',
           null
         ),
         [],
@@ -1073,7 +1074,7 @@ describe('Exploration editor tab component', () => {
         {} as Interaction['customizationArgs'],
         null,
         [],
-        'id',
+        'TextInput',
         null
       ),
       [],

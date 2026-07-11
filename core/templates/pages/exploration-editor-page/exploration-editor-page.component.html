@@ -20,7 +20,7 @@
     <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <a href="#"
+        <a href="javascript:void(0)"
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
            placement="{{countWarnings() ? 'left' : 'bottom'}}"
@@ -149,7 +149,7 @@
 
       <li [ngClass]="{'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item" (click)="!connectedToInternet || showUserHelpModal()"
           [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
-        <a href="#"
+        <a href="javascript:void(0)"
            [ngbTooltip]="'Help'"
            tabindex="0"
            (keydown.enter)="!connectedToInternet || showUserHelpModal()"

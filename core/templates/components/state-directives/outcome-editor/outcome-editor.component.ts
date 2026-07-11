@@ -143,7 +143,7 @@ export class OutcomeEditorComponent implements OnInit {
     );
   }
 
-  getCurrentInteractionId(): string {
+  getCurrentInteractionId(): InteractionSpecsKey | null {
     return this.stateInteractionIdService.savedMemento;
   }
 

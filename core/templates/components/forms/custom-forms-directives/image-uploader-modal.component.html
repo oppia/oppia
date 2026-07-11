@@ -48,15 +48,15 @@
           </button>
           <div>
             <oppia-thumbnail-display *ngIf="uploadedImage" [classes]="['oppia-thumbnail-image']"
-              [imgSrc]="uploadedImage" [aspectRatio]="'16:9'" [background]="bgColor">
+              [imgSrc]="$any(uploadedImage)" [aspectRatio]="'16:9'" [background]="imageUploaderParameters.bgColor">
             </oppia-thumbnail-display>
-            <div *ngIf="previewTitle" class="oppia-thumbnail-preview-title">
+            <div *ngIf="imageUploaderParameters.previewTitle" class="oppia-thumbnail-preview-title">
               {{ imageUploaderParameters.previewTitle }}
             </div>
-            <div *ngIf="previewDescription" class="oppia-thumbnail-preview-description">
+            <div *ngIf="imageUploaderParameters.previewDescription" class="oppia-thumbnail-preview-description">
               {{ imageUploaderParameters.previewDescription }}
             </div>
-            <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
+            <div *ngIf="imageUploaderParameters.previewFooter" class="oppia-thumbnail-preview-footer">
               {{ imageUploaderParameters.previewFooter }}
             </div>
           </div>
@@ -75,7 +75,7 @@
         <div *ngIf="hasMoreThanOneBgColor()">
           <div class="bg-color-text">
             Choose background color:
-            <div class="oppia-bg-color-container" [ngStyle]="{'background': bgColor}"></div>
+            <div class="oppia-bg-color-container" [ngStyle]="{'background': imageUploaderParameters.bgColor}"></div>
           </div>
           <div class="oppia-thumbnail-colour-select">
             <div *ngFor="let color of imageUploaderParameters.allowedBgColors" [ngStyle]="{'background': color}"
@@ -85,7 +85,7 @@
         </div>
         <div *ngIf="areInvalidTagsOrAttrsPresent()"
              class="oppia-unsupported-svg-tag-attribute-error"
-             [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }">
+             [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: getIssueURL(invalidTagsAndAttributes) }">
         </div>
       </div>
     </div>

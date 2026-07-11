@@ -2162,7 +2162,7 @@ describe('State translation component', () => {
 
       it('should isDisabled return true when stateinteractionId is null', () => {
         component.TAB_ID_CONTENT = 'some_id';
-        component.stateInteractionId = '';
+        component.stateInteractionId = null;
 
         expect(component.isDisabled('any')).toBe(true);
       });

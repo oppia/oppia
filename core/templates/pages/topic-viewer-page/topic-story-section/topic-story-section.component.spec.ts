@@ -19,16 +19,20 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
+import {EventEmitter} from '@angular/core';
 
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
 import {UrlService} from 'services/contextual/url.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
+import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 
 describe('TopicStorySectionComponent', () => {
   let component: TopicStorySectionComponent;
@@ -36,7 +40,12 @@ describe('TopicStorySectionComponent', () => {
   let urlService: jasmine.SpyObj<UrlService>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
-  let i18nLanguageCodeService: jasmine.SpyObj<I18nLanguageCodeService>;
+  let i18nLanguageCodeService: {
+    isCurrentLanguageRTL: jasmine.Spy;
+    onI18nLanguageCodeChange: EventEmitter<string>;
+  };
+  let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
+  let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
@@ -56,6 +65,21 @@ describe('TopicStorySectionComponent', () => {
     i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
       'isCurrentLanguageRTL',
     ]);
+    i18nLanguageCodeService.onI18nLanguageCodeChange =
+      new EventEmitter<string>();
+    chapterProgressLoaderService = jasmine.createSpyObj(
+      'ChapterProgressLoaderService',
+      [
+        'getChapterProgressSummary',
+        'getLessonProgress',
+        'loadChapterProgressForStory',
+      ]
+    );
+    chapterProgressLoaderService.loadChapterProgressForStory.and.resolveTo();
+    topicSessionFallbackLanguageService = jasmine.createSpyObj(
+      'TopicSessionFallbackLanguageService',
+      ['clearSelection']
+    );
 
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent, MockTranslatePipe],
@@ -64,6 +88,14 @@ describe('TopicStorySectionComponent', () => {
         {provide: UrlInterpolationService, useValue: urlInterpolationService},
         {provide: AssetsBackendApiService, useValue: assetsBackendApiService},
         {provide: I18nLanguageCodeService, useValue: i18nLanguageCodeService},
+        {
+          provide: ChapterProgressLoaderService,
+          useValue: chapterProgressLoaderService,
+        },
+        {
+          provide: TopicSessionFallbackLanguageService,
+          useValue: topicSessionFallbackLanguageService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -97,16 +129,23 @@ describe('TopicStorySectionComponent', () => {
       '/thumbnail/story/story_id/thumb.png'
     );
 
-    i18nLanguageCodeService.isCurrentLanguageRTL.and.returnValue(false);
+    (
+      i18nLanguageCodeService.isCurrentLanguageRTL as jasmine.Spy
+    ).and.returnValue(false);
 
     component.storySummary = createStorySummarySpy([], []);
+
+    chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
+      null
+    );
 
     fixture.detectChanges();
   });
 
   const createStorySummarySpy = (
     nodeTitles: string[],
-    nodes: jasmine.SpyObj<StoryNode>[]
+    nodes: jasmine.SpyObj<StoryNode>[],
+    arcs: object[] = []
   ): jasmine.SpyObj<StorySummary> => {
     const storySummarySpy = jasmine.createSpyObj('StorySummary', [
       'getTitle',
@@ -115,6 +154,10 @@ describe('TopicStorySectionComponent', () => {
       'getAllNodes',
       'getId',
       'getUrlFragment',
+      'getArcs',
+      'isNodeCompleted',
+      'getCompletedNodeTitles',
+      'getVisitedChapterTitles',
     ]);
 
     storySummarySpy.getTitle.and.returnValue('Story Title');
@@ -123,6 +166,10 @@ describe('TopicStorySectionComponent', () => {
     storySummarySpy.getAllNodes.and.returnValue(nodes);
     storySummarySpy.getId.and.returnValue('story_id_1');
     storySummarySpy.getUrlFragment.and.returnValue('story-url-fragment');
+    storySummarySpy.getArcs.and.returnValue(arcs);
+    storySummarySpy.isNodeCompleted.and.returnValue(false);
+    storySummarySpy.getCompletedNodeTitles.and.returnValue([]);
+    storySummarySpy.getVisitedChapterTitles.and.returnValue([]);
 
     return storySummarySpy as jasmine.SpyObj<StorySummary>;
   };
@@ -150,6 +197,77 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
+  it('should build arc groups when story has arcs', () => {
+    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy1.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy1.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy1.getId.and.returnValue('node_1');
+
+    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy2.getTitle.and.returnValue('Node title 2');
+    storyNodeSpy2.getDescription.and.returnValue('Node description 2');
+    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
+    storyNodeSpy2.getId.and.returnValue('node_2');
+
+    const arcs = [
+      {
+        id: 'arc_1',
+        title: 'Arc 1',
+        description: 'First arc',
+        node_ids: ['node_1'],
+      },
+      {
+        id: 'arc_2',
+        title: 'Arc 2',
+        description: 'Second arc',
+        node_ids: ['node_2'],
+      },
+    ];
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1', 'Node title 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      arcs
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.arcGroups.length).toBe(2);
+    expect(component.arcGroups[0].arcTitle).toBe('Arc 1');
+    expect(component.arcGroups[0].lessonCards.length).toBe(1);
+    expect(component.arcGroups[0].lessonCards[0].lessonTitle).toContain(
+      'Node title 1'
+    );
+    expect(component.arcGroups[1].arcTitle).toBe('Arc 2');
+    expect(component.arcGroups[1].lessonCards.length).toBe(1);
+    expect(component.arcGroups[1].lessonCards[0].lessonTitle).toContain(
+      'Node title 2'
+    );
+  });
+
   it('should build lesson cards from storySummary and not create practice card', () => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
@@ -157,12 +275,21 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -178,7 +305,174 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].thumbnailUrl).toBe(
       '/thumbnail/story/story_id/thumb.png'
     );
-    expect(component.isPracticeCardVisible).toBeFalse();
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
+    expect(component.isPracticeCardVisible).toBe(false);
+  });
+
+  it('should mark lesson as completed when node is completed', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    storySummary.isNodeCompleted.and.callFake(
+      (title: string) => title === 'Node title 1'
+    );
+    storySummary.getCompletedNodeTitles.and.returnValue(['Node title 1']);
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('completed');
+  });
+
+  it('should mark lesson as in_progress when node is visited but not completed', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    storySummary.getVisitedChapterTitles.and.returnValue(['Node title 1']);
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('in_progress');
+  });
+
+  it('should load checkpoint counts from chapter progress service on init', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const mockSummary = new ChapterProgressSummary('exp_1', 5, 3, false);
+    chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
+      mockSummary
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].totalCheckpointsCount).toBe(5);
+    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(3);
+  });
+
+  it('should not create practice card when lesson cards exist', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.lessonCount = 1;
+    component.practiceCount = 1;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.isPracticeCardVisible).toBe(false);
   });
 
   it('should create practice card only when there are zero lessons', () => {
@@ -192,7 +486,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.studyUrl).toBe(
       '/learn/math/place-values/studyguide'
     );
@@ -211,7 +505,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.practiceUrl).toBe('#');
   });
 
@@ -226,7 +520,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.practiceUrl).toBe('#');
   });
 
@@ -237,12 +531,21 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue(null);
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -269,12 +572,21 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue(null);
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -304,8 +616,26 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should respect RTL language flag', () => {
-    i18nLanguageCodeService.isCurrentLanguageRTL.and.returnValue(true);
-    expect(component.isLanguageRTL()).toBeTrue();
+    (
+      i18nLanguageCodeService.isCurrentLanguageRTL as jasmine.Spy
+    ).and.returnValue(true);
+    expect(component.isLanguageRTL()).toBe(true);
+  });
+
+  it('should clear fallback selection when language changes', () => {
+    topicSessionFallbackLanguageService.clearSelection.calls.reset();
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit('es');
+
+    expect(
+      topicSessionFallbackLanguageService.clearSelection
+    ).toHaveBeenCalledTimes(1);
+
+    component.ngOnDestroy();
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit('fr');
+    expect(
+      topicSessionFallbackLanguageService.clearSelection
+    ).toHaveBeenCalledTimes(1);
   });
 
   it('should correctly singularize lesson and practice counts', () => {
@@ -332,7 +662,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.practiceUrl).toContain('practice/session');
   });
 
@@ -347,7 +677,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeFalse();
+    expect(component.isPracticeCardVisible).toBe(false);
   });
 
   it('should use empty string when story description is missing', () => {
@@ -384,5 +714,171 @@ describe('TopicStorySectionComponent', () => {
     });
 
     expect(component.studyGuideUrl).toBe('unchanged-value');
+  });
+
+  it('should toggle arc expansion state', () => {
+    expect(component.isArcExpanded(0)).toBe(false);
+
+    component.toggleArc(0);
+    expect(component.isArcExpanded(0)).toBe(true);
+
+    component.toggleArc(0);
+    expect(component.isArcExpanded(0)).toBe(false);
+  });
+
+  it('should ignore arc node ids not present in all nodes', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+
+    const arcs = [
+      {
+        id: 'arc_1',
+        title: 'Arc 1',
+        description: 'First arc',
+        node_ids: ['missing_node_id'],
+      },
+    ];
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy],
+      arcs
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.arcGroups.length).toBe(1);
+    expect(component.arcGroups[0].lessonCards).toEqual([]);
+  });
+
+  it('should return # as startUrl when exploration id is null', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue(null);
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].startUrl).toBe('#');
+  });
+
+  it('should handle chapter progress loader failure gracefully', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    chapterProgressLoaderService.loadChapterProgressForStory.and.rejectWith(
+      new Error('Network error')
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].lessonTitle).toBe('Lesson 1: Node title 1');
+  });
+
+  it('should handle loadChapterProgress with no exploration IDs gracefully', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue(null);
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].totalCheckpointsCount).toBe(0);
   });
 });

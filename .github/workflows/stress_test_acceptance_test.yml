@@ -29,10 +29,6 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: true
-
 jobs:
   setup_merge_sha:
     name: Capture develop SHA

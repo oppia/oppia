@@ -20,18 +20,22 @@ import {
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
 } from '@angular/core';
+import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
+import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 import './topic-story-section.component.css';
 
@@ -45,6 +49,23 @@ interface LessonCardData {
   lessonDescription: string;
   thumbnailUrl: string;
   startUrl: string;
+  nodeId: string;
+  lessonProgressStatus:
+    | 'not_started'
+    | 'in_progress'
+    | 'completed'
+    | 'coming_soon';
+  totalCheckpointsCount: number;
+  visitedCheckpointsCount: number;
+  availableTextLanguageCodes: string[];
+  availableVoiceoverLanguageCodes: string[];
+  availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
+}
+
+interface ArcGroupData {
+  arcTitle: string;
+  arcDescription: string;
+  lessonCards: LessonCardData[];
 }
 
 interface PracticeCardData {
@@ -61,7 +82,9 @@ interface PracticeCardData {
   templateUrl: './topic-story-section.component.html',
   styleUrls: ['./topic-story-section.component.css'],
 })
-export class TopicStorySectionComponent implements OnInit, OnChanges {
+export class TopicStorySectionComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   @Input() storySummary!: StorySummary;
   @Input() storyTitle!: string;
   @Input() storyDescription!: string;
@@ -75,18 +98,46 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
+  arcGroups: ArcGroupData[] = [];
   practiceCard!: PracticeCardData;
   isPracticeCardVisible: boolean = false;
+  _expandedArcIndices: Set<number> = new Set();
+
+  private directiveSubscriptions: Subscription = new Subscription();
+
+  isArcExpanded(index: number): boolean {
+    return this._expandedArcIndices.has(index);
+  }
+
+  toggleArc(index: number): void {
+    if (this._expandedArcIndices.has(index)) {
+      this._expandedArcIndices.delete(index);
+    } else {
+      this._expandedArcIndices.add(index);
+    }
+  }
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private chapterProgressLoaderService: ChapterProgressLoaderService,
+    private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService
   ) {}
 
   ngOnInit(): void {
     this.populateFromInputs();
+    void this.loadChapterProgress();
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.topicSessionFallbackLanguageService.clearSelection();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -100,6 +151,9 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
       changes.practiceCount
     ) {
       this.populateFromInputs();
+    }
+    if (changes.storySummary && !changes.storySummary.firstChange) {
+      void this.loadChapterProgress();
     }
   }
 
@@ -138,6 +192,111 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  private getLessonProgressStatus(
+    node: StoryNode
+  ): 'not_started' | 'in_progress' | 'completed' | 'coming_soon' {
+    const nodeTitle = node.getTitle();
+    if (this.storySummary.isNodeCompleted(nodeTitle)) {
+      return 'completed';
+    }
+
+    const visitedChapterTitles = this.storySummary.getVisitedChapterTitles();
+    if (
+      visitedChapterTitles &&
+      visitedChapterTitles.indexOf(nodeTitle) !== -1
+    ) {
+      return 'in_progress';
+    }
+
+    return 'not_started';
+  }
+
+  private async loadChapterProgress(): Promise<void> {
+    const explorationIds = this.storySummary
+      .getAllNodes()
+      .map(node => node.getExplorationId())
+      .filter(id => id !== null) as string[];
+
+    if (explorationIds.length === 0) {
+      return;
+    }
+
+    try {
+      await this.chapterProgressLoaderService.loadChapterProgressForStory(
+        this.storySummary.getId(),
+        explorationIds
+      );
+    } catch {
+      return;
+    }
+
+    this.lessonCards = this.storySummary
+      .getAllNodes()
+      .map((node: StoryNode, index: number) => {
+        const explorationId = node.getExplorationId();
+        let totalCheckpoints = 0;
+        let visitedCheckpoints = 0;
+
+        if (explorationId) {
+          const summary =
+            this.chapterProgressLoaderService.getChapterProgressSummary(
+              explorationId
+            );
+          if (summary) {
+            totalCheckpoints = summary.totalCheckpoints;
+            visitedCheckpoints = summary.visitedCheckpoints;
+          }
+        }
+
+        return {
+          lessonNumber: index + 1,
+          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+          lessonDescription: node.getDescription(),
+          thumbnailUrl: this.getLessonThumbnailUrl(node),
+          startUrl: this.getLessonStartUrl(node),
+          lessonProgressStatus: this.getLessonProgressStatus(node),
+          totalCheckpointsCount: totalCheckpoints,
+          visitedCheckpointsCount: visitedCheckpoints,
+          nodeId: node.getId(),
+          availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
+          availableVoiceoverLanguageCodes:
+            node.getAvailableVoiceoverLanguageCodes(),
+          availableVoiceoverLanguageAccentDescriptions:
+            node.getAvailableVoiceoverLanguageAccentDescriptions(),
+        };
+      });
+
+    const allNodes = this.storySummary.getAllNodes();
+    this.arcGroups = this.buildArcGroups(allNodes);
+  }
+
+  private buildArcGroups(allNodes: StoryNode[]): ArcGroupData[] {
+    const arcs = this.storySummary.getArcs();
+    if (!arcs || arcs.length === 0) {
+      return [];
+    }
+
+    const nodeIndexMap = new Map<string, number>();
+    allNodes.forEach((node, index) => {
+      nodeIndexMap.set(node.getId(), index);
+    });
+
+    return arcs.map(arc => {
+      const arcLessonCards: LessonCardData[] = [];
+      arc.node_ids.forEach(nodeId => {
+        const nodeIndex = nodeIndexMap.get(nodeId);
+        if (nodeIndex !== undefined && this.lessonCards[nodeIndex]) {
+          arcLessonCards.push(this.lessonCards[nodeIndex]);
+        }
+      });
+      return {
+        arcTitle: arc.title,
+        arcDescription: arc.description,
+        lessonCards: arcLessonCards,
+      };
+    });
+  }
+
   private populateFromInputs(): void {
     if (!this.classroomUrlFragment) {
       this.classroomUrlFragment =
@@ -154,17 +313,27 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     this.storyTitle = this.storySummary.getTitle();
     this.storyDescription = this.storySummary.getDescription() || '';
     this.lessonCount = this.storySummary.getNodeTitles().length;
-    this.lessonCards = this.storySummary
-      .getAllNodes()
-      .map((node: StoryNode, index: number) => {
-        return {
-          lessonNumber: index + 1,
-          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
-          lessonDescription: node.getDescription(),
-          thumbnailUrl: this.getLessonThumbnailUrl(node),
-          startUrl: this.getLessonStartUrl(node),
-        };
-      });
+    const allNodes = this.storySummary.getAllNodes();
+    this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
+      return {
+        lessonNumber: index + 1,
+        lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+        lessonDescription: node.getDescription(),
+        thumbnailUrl: this.getLessonThumbnailUrl(node),
+        startUrl: this.getLessonStartUrl(node),
+        nodeId: node.getId(),
+        lessonProgressStatus: this.getLessonProgressStatus(node),
+        totalCheckpointsCount: 0,
+        visitedCheckpointsCount: 0,
+        availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
+        availableVoiceoverLanguageCodes:
+          node.getAvailableVoiceoverLanguageCodes(),
+        availableVoiceoverLanguageAccentDescriptions:
+          node.getAvailableVoiceoverLanguageAccentDescriptions(),
+      };
+    });
+
+    this.arcGroups = this.buildArcGroups(allNodes);
 
     this.isPracticeCardVisible =
       this.lessonCards.length === 0 && this.practiceCount >= 1;
