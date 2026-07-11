@@ -45,7 +45,7 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from '../../../../domain/exploration/read-only-exploration-backend-api.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {State} from '../../../../domain/state/state.model';
+import {State, StateBackendDict} from '../../../../domain/state/state.model';
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
@@ -504,7 +504,7 @@ describe('ExplorationFooterComponent', () => {
       'content'
     );
 
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -592,7 +592,7 @@ describe('ExplorationFooterComponent', () => {
       'content'
     );
 
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
       interaction: {
@@ -973,14 +973,9 @@ describe('ExplorationFooterComponent', () => {
   it('should trigger function to open concept card modal', fakeAsync(() => {
     spyOn(component, 'openConceptCardModal');
 
-    const endState = {
+    const endState: StateBackendDict = {
       classifier_model_id: null,
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-        },
-      },
       interaction: {
         solution: null,
         confirmed_unclassified_answers: [],
@@ -995,7 +990,6 @@ describe('ExplorationFooterComponent', () => {
         default_outcome: null,
       },
       param_changes: [],
-      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: 'Id',
       content: {
