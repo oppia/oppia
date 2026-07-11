@@ -225,7 +225,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
-        current_time = utils.get_current_time()
+        current_time = utils.get_current_utc_datetime()
 
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
@@ -274,8 +274,8 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 123,
-                'created_on': utils.get_current_time(),
-                'last_updated': utils.get_current_time(),
+                'created_on': utils.get_current_utc_datetime(),
+                'last_updated': utils.get_current_utc_datetime(),
                 'deleted': False,
             }
         )

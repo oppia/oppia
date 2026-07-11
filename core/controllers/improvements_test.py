@@ -527,10 +527,10 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self,
     ) -> None:
         login_context = self.login_context(self.OWNER_EMAIL)
-        mock_get_current_time = self.swap(
-            utils, 'get_current_time', lambda: self.MOCK_DATE
+        mock_get_current_utc_datetime = self.swap(
+            utils, 'get_current_utc_datetime', lambda: self.MOCK_DATE
         )
-        with login_context, mock_get_current_time:
+        with login_context, mock_get_current_utc_datetime:
             self.post_json(
                 self.get_url(),
                 {

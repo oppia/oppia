@@ -50,7 +50,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.admin_user_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL
         )
-        self.curr_time = utils.get_current_time()
+        self.curr_time = utils.get_current_utc_datetime()
         self.completed_activities_model = user_models.CompletedActivitiesModel(
             id=self.admin_user_id,
             exploration_ids=[],

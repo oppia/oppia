@@ -1517,7 +1517,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    utils.get_current_time(),
+                    utils.get_current_utc_datetime(),
                 )
             elif can_voiceover:
                 exp_services.create_or_update_draft(
@@ -1525,7 +1525,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     self.user_id,
                     change_list,
                     version,
-                    utils.get_current_time(),
+                    utils.get_current_utc_datetime(),
                     is_by_voice_artist=True,
                 )
         except utils.ValidationError as e:

@@ -90,7 +90,7 @@ def assign_rating_to_exploration(
                 user_id, exploration_id
             )
         exp_user_data_model.rating = new_rating
-        exp_user_data_model.rated_on = utils.get_current_time()
+        exp_user_data_model.rated_on = utils.get_current_utc_datetime()
         exp_user_data_model.update_timestamps()
         exp_user_data_model.put()
         return old_rating

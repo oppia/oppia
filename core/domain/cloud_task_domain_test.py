@@ -38,8 +38,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = utils.get_current_time()
-        created_on = utils.get_current_time()
+        last_updated = utils.get_current_utc_datetime()
+        created_on = utils.get_current_utc_datetime()
         task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
             project_id,
             location_id,
@@ -79,8 +79,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = utils.get_current_time()
-        created_on = utils.get_current_time()
+        last_updated = utils.get_current_utc_datetime()
+        created_on = utils.get_current_utc_datetime()
         task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
             project_id,
             location_id,

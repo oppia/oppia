@@ -345,15 +345,15 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             to the datastore.
             """
             self._last_updated_timestamp_is_fresh = True
-            self.last_updated_by_human = utils.get_current_time()
+            self.last_updated_by_human = utils.get_current_utc_datetime()
 
             # These if conditions can be removed once the auto_now property
             # is set True to these attributes.
             if self.created_on is None:
-                self.created_on = utils.get_current_time()
+                self.created_on = utils.get_current_utc_datetime()
 
             if self.last_updated is None:
-                self.last_updated = utils.get_current_time()
+                self.last_updated = utils.get_current_utc_datetime()
 
             # We are using BaseModel.put() to save the changes to the datastore
             # since the put() method which TestBaseHumanMaintainedModel class

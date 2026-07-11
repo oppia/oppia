@@ -60,8 +60,8 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             node_titles=['title1', 'title2'],
-            story_model_last_updated=utils.get_current_time(),
-            story_model_created_on=utils.get_current_time(),
+            story_model_last_updated=utils.get_current_utc_datetime(),
+            story_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         topic_model = self.create_model(
@@ -281,8 +281,8 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             description='description',
             node_titles=['title1', 'title2'],
-            story_model_last_updated=utils.get_current_time(),
-            story_model_created_on=utils.get_current_time(),
+            story_model_last_updated=utils.get_current_utc_datetime(),
+            story_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         topic_model = self.create_model(

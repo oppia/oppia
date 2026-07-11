@@ -485,7 +485,9 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                         suggestion.final_reviewer_id = (
                             feconf.SUGGESTION_BOT_USER_ID
                         )
-                        suggestion.last_updated = utils.get_current_time()
+                        suggestion.last_updated = (
+                            utils.get_current_utc_datetime()
+                        )
                         updated_suggestion_dicts.append(
                             {
                                 'updated_suggestion': suggestion,

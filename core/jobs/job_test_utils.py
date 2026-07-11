@@ -53,7 +53,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     RUNTIME_TYPE_CHECK = True
 
     # Helpful constants used by tests to create models.
-    NOW = utils.get_current_time()
+    NOW = utils.get_current_utc_datetime()
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 

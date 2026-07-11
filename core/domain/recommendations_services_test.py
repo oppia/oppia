@@ -354,7 +354,9 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         exp_summaries = exp_services.get_all_exploration_summaries()
         # Test case where time_delta_days > 7.
-        time_in_past = utils.get_current_time() - datetime.timedelta(days=10)
+        time_in_past = utils.get_current_utc_datetime() - datetime.timedelta(
+            days=10
+        )
         exp_summaries['exp_id_2'].exploration_model_last_updated = time_in_past
         self.assertEqual(
             recommendations_services.get_item_similarity(

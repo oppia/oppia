@@ -147,7 +147,7 @@ class ExplorationImprovementsHandler(
                     issue_description,
                     status,
                     self.user_id,
-                    utils.get_current_time(),
+                    utils.get_current_utc_datetime(),
                 )
             )
         improvements_services.put_tasks(task_entries_to_put)

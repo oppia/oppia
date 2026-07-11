@@ -8513,7 +8513,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         self,
     ) -> None:
         with self.swap(
-            utils, 'get_current_time', lambda: self.mocked_current_time
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
         ):
             self._create_translation_suggestion()
             self._create_question_suggestion()
@@ -8524,7 +8524,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: mocked_datetime_less_than_review_wait_time_threshold,
         ):
             with self.swap(
@@ -8557,7 +8557,9 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             mock_get_current_time_in_millisecs,
         ):
             with self.swap(
-                utils, 'get_current_time', lambda: self.mocked_current_time
+                utils,
+                'get_current_utc_datetime',
+                lambda: self.mocked_current_time,
             ):
 
                 # Create and save new suggestion models.
@@ -8585,7 +8587,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         self,
     ) -> None:
         with self.swap(
-            utils, 'get_current_time', lambda: self.mocked_current_time
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
         ):
             self._create_translation_suggestion()
         mocked_threshold_review_wait_time_in_days = 2
@@ -8596,7 +8598,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: mocked_datetime_eq_review_wait_time_threshold,
         ):
             with self.swap(
@@ -8616,7 +8618,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         self,
     ) -> None:
         with self.swap(
-            utils, 'get_current_time', lambda: self.mocked_current_time
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
         ):
             translation_suggestion = self._create_translation_suggestion()
         # Give the question suggestion a slightly different review submission
@@ -8624,7 +8626,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         # their review submission time.
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: self.mocked_current_time + datetime.timedelta(minutes=5),
         ):
             question_suggestion = self._create_question_suggestion()
@@ -8640,7 +8642,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: mocked_datetime_past_review_wait_time_threshold,
         ):
             with self.swap(
@@ -8664,12 +8666,12 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         self,
     ) -> None:
         with self.swap(
-            utils, 'get_current_time', lambda: self.mocked_current_time
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
         ):
             translation_suggestion = self._create_translation_suggestion()
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: self.mocked_current_time + datetime.timedelta(days=2),
         ):
             self._create_question_suggestion()
@@ -8685,7 +8687,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: mocked_datetime_past_review_wait_time_threshold,
         ):
             with self.swap(

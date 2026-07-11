@@ -1500,7 +1500,7 @@ def record_learner_answer_info(
         learner_answer_info_id,
         answer,
         answer_details,
-        utils.get_current_time(),
+        utils.get_current_utc_datetime(),
     )
     learner_answer_details.add_learner_answer_info(learner_answer_info)
     save_learner_answer_details(

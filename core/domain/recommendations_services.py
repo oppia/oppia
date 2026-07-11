@@ -359,7 +359,7 @@ def get_item_similarity(
     ):
         similarity_score += 2.0
 
-    time_now = utils.get_current_time()
+    time_now = utils.get_current_utc_datetime()
     time_delta_days = int(
         (time_now - compared_exp_summary.exploration_model_last_updated).days
     )

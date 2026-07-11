@@ -108,8 +108,8 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
             model.id,
             'FooJob',
             'CANCELLING',
-            utils.get_current_time(),
-            utils.get_current_time(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
             False,
             'abc-123',
         )

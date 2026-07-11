@@ -319,7 +319,7 @@ class UtilsTests(test_utils.GenericTestBase):
         """Tests to make sure converting a naive datetime object to a string and
         back doesn't alter the naive datetime object data.
         """
-        now = utils.get_current_time()
+        now = utils.get_current_utc_datetime()
         self.assertEqual(
             utils.convert_string_to_naive_datetime_object(
                 utils.convert_naive_datetime_to_string(now)
@@ -950,7 +950,9 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_number_of_days_since_date(self) -> None:
         mock_current_date = datetime.date(2025, 1, 1)
 
-        with self.swap(utils, 'get_current_date', lambda: mock_current_date):
+        with self.swap(
+            utils, 'get_current_utc_date', lambda: mock_current_date
+        ):
             self.assertEqual(
                 90,
                 utils.get_number_of_days_since_date(
@@ -1101,10 +1103,10 @@ class UtilsTests(test_utils.GenericTestBase):
             ),
         )
 
-    def test_get_current_time_returns_naive_utc_datetime(self) -> None:
+    def test_get_current_utc_datetime_returns_naive_utc_datetime(self) -> None:
         # TODO(#26624): This will be updated to assertIsNotNone after
         # AwareDateTimeProperty is implemented in PR 3.
-        current_time = utils.get_current_time()
+        current_time = utils.get_current_utc_datetime()
         self.assertIsNone(current_time.tzinfo)
 
     def test_get_current_time_in_millisecs_with_current_time(self) -> None:

@@ -4522,7 +4522,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         (
             self.checker_test_object.checker.config.disallowed_functions_and_replacements_str
         ) = [
-            'datetime.datetime.utcnow=>utils.get_current_time',
+            'datetime.datetime.utcnow=>utils.get_current_utc_datetime',
             'self.assertEquals=>self.assertEqual',
         ]
         self.checker_test_object.checker.open()
@@ -4538,7 +4538,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         message_replace_disallowed_datetime = testutils.MessageTest(
             msg_id='replace-disallowed-function-calls',
             node=call1,
-            args=('datetime.datetime.utcnow', 'utils.get_current_time'),
+            args=('datetime.datetime.utcnow', 'utils.get_current_utc_datetime'),
             confidence=interfaces.UNDEFINED,
         )
 

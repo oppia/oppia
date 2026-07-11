@@ -185,7 +185,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -268,7 +268,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -340,7 +340,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -452,7 +452,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -611,7 +611,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -765,7 +765,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -887,7 +887,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity instance.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, user_id)
@@ -1001,7 +1001,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -1107,7 +1107,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)
@@ -1188,7 +1188,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = utils.get_current_time()
+        timestamp = utils.get_current_utc_datetime()
         return cls.get_new_id(
             '%s:%s:%s'
             % (utils.get_time_in_millisecs(timestamp), exp_id, session_id)

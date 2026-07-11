@@ -1139,7 +1139,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = utils.get_current_time()
+        current_time = utils.get_current_utc_datetime()
         self.collection_summary_dict = {
             'category': 'category',
             'status': constants.ACTIVITY_STATUS_PRIVATE,
@@ -1265,8 +1265,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            utils.get_current_time(),
-            utils.get_current_time(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_private())
 
@@ -1289,8 +1289,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            utils.get_current_time(),
-            utils.get_current_time(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_editable_by('other_id'))
 
@@ -1317,8 +1317,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            utils.get_current_time(),
-            utils.get_current_time(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')
@@ -1350,8 +1350,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            utils.get_current_time(),
-            utils.get_current_time(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')

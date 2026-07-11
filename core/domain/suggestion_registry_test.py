@@ -4298,7 +4298,7 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
     suggestion_type: str = feconf.SUGGESTION_TYPE_ADD_QUESTION
     language_code: str = 'en'
     suggestion_content: str = 'sample question'
-    submission_datetime: datetime.datetime = utils.get_current_time()
+    submission_datetime: datetime.datetime = utils.get_current_utc_datetime()
 
     def test_initial_object_with_valid_arguments_has_correct_properties(
         self,
@@ -4662,8 +4662,10 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = utils.get_current_date()
-    LAST_CONTRIBUTION_DATE = utils.get_current_date() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
@@ -4771,8 +4773,10 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 1
     REJECTED_TRANSLATIONS_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = utils.get_current_date()
-    LAST_CONTRIBUTION_DATE = utils.get_current_date() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
@@ -4871,8 +4875,10 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     ACCEPTED_QUESTION_WORD_COUNT: Final = 50
     REJECTED_QUESTIONS_COUNT: Final = 0
     REJECTED_QUESTION_WORD_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = utils.get_current_date()
-    LAST_CONTRIBUTION_DATE = utils.get_current_date() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
@@ -4964,8 +4970,10 @@ class QuestionReviewerTotalContributionStatsUnitTests(
     ACCEPTED_QUESTIONS_COUNT: Final = 1
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     REJECTED_QUESTIONS_COUNT: Final = 0
-    FIRST_CONTRIBUTION_DATE = utils.get_current_date()
-    LAST_CONTRIBUTION_DATE = utils.get_current_date() - datetime.timedelta(25)
+    FIRST_CONTRIBUTION_DATE = utils.get_current_utc_date()
+    LAST_CONTRIBUTION_DATE = utils.get_current_utc_date() - datetime.timedelta(
+        25
+    )
     user_id: str = 'user_id'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'

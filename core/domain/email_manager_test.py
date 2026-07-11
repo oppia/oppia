@@ -1402,7 +1402,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                     feconf.EMAIL_INTENT_SIGNUP,
                     self.new_email_subject,
                     cleaned_plaintext_body,
-                    utils.get_current_time(),
+                    utils.get_current_utc_datetime(),
                 )
 
                 # Check that the content of this email was recorded in
@@ -1539,7 +1539,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 self.new_email_subject,
                 self.new_email_html_body,
-                utils.get_current_time(),
+                utils.get_current_utc_datetime(),
             )
 
             # Check that the content of this email was recorded in
@@ -1615,7 +1615,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 '%s%s' % (self.new_email_subject, 1),
                 self.new_email_html_body,
-                utils.get_current_time(),
+                utils.get_current_utc_datetime(),
             )
 
             # Check that the content of this email was recorded in
@@ -1691,7 +1691,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SIGNUP,
                 self.new_email_subject,
                 '%s%s' % (self.new_email_html_body, 1),
-                utils.get_current_time(),
+                utils.get_current_utc_datetime(),
             )
 
             # Check that the content of this email was recorded in
@@ -1760,8 +1760,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             )
             self.assertEqual(len(all_models), 0)
 
-            email_sent_time = utils.get_current_time() - datetime.timedelta(
-                minutes=4
+            email_sent_time = (
+                utils.get_current_utc_datetime() - datetime.timedelta(minutes=4)
             )
 
             email_models.SentEmailModel.create(
@@ -1780,8 +1780,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_sent_time = utils.get_current_time() - datetime.timedelta(
-                minutes=2
+            email_sent_time = (
+                utils.get_current_utc_datetime() - datetime.timedelta(minutes=2)
             )
 
             email_models.SentEmailModel.create(
@@ -3542,7 +3542,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3624,7 +3624,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3706,7 +3706,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3788,7 +3788,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3870,7 +3870,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -3952,7 +3952,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4034,7 +4034,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4130,7 +4130,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4275,7 +4275,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4374,7 +4374,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4457,7 +4457,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4543,7 +4543,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4629,7 +4629,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4715,7 +4715,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4801,7 +4801,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4887,7 +4887,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -4985,7 +4985,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -5134,7 +5134,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -5294,7 +5294,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 (
                     email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
@@ -5368,7 +5368,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'data_format': 'html',
         }
 
-        with self.swap(utils, 'get_current_time', lambda: submission_datetime):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: submission_datetime
+        ):
             translation_suggestion = suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -5415,7 +5417,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'skill_difficulty': 0.3,
             }
 
-        with self.swap(utils, 'get_current_time', lambda: submission_datetime):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: submission_datetime
+        ):
             question_suggestion = suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 feconf.ENTITY_TYPE_SKILL,
@@ -5765,7 +5769,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 0,
             ):
                 with self.swap(
-                    utils, 'get_current_time', lambda: mocked_current_time
+                    utils,
+                    'get_current_utc_datetime',
+                    lambda: mocked_current_time,
                 ):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
@@ -5876,7 +5882,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 0,
             ):
                 with self.swap(
-                    utils, 'get_current_time', lambda: mocked_current_time
+                    utils,
+                    'get_current_utc_datetime',
+                    lambda: mocked_current_time,
                 ):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
@@ -5975,7 +5983,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 0,
             ):
                 with self.swap(
-                    utils, 'get_current_time', lambda: mocked_current_time
+                    utils,
+                    'get_current_utc_datetime',
+                    lambda: mocked_current_time,
                 ):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
@@ -6089,7 +6099,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 0,
             ):
                 with self.swap(
-                    utils, 'get_current_time', lambda: mocked_current_time
+                    utils,
+                    'get_current_utc_datetime',
+                    lambda: mocked_current_time,
                 ):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
@@ -6213,7 +6225,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 0,
             ):
                 with self.swap(
-                    utils, 'get_current_time', lambda: mocked_current_time
+                    utils,
+                    'get_current_utc_datetime',
+                    lambda: mocked_current_time,
                 ):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
@@ -6373,7 +6387,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 0,
             ):
                 with self.swap(
-                    utils, 'get_current_time', lambda: mocked_current_time
+                    utils,
+                    'get_current_utc_datetime',
+                    lambda: mocked_current_time,
                 ):
                     (
                         email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
@@ -6666,7 +6682,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
         with self.log_new_error_ctx:
             with self.swap(
-                utils, 'get_current_time', lambda: mocked_current_time
+                utils, 'get_current_utc_datetime', lambda: mocked_current_time
             ):
                 reviewer_ids_by_language: DefaultDict[str, List[str]] = (
                     DefaultDict(list)

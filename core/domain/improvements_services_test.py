@@ -512,7 +512,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         created_on = datetime.datetime(2020, 6, 15, 5)
         updated_on = created_on + datetime.timedelta(minutes=5)
 
-        with self.swap(utils, 'get_current_time', lambda: created_on):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: created_on):
             improvements_services.put_tasks([task_entry])
 
         model = improvements_models.ExplorationStatsTaskEntryModel.get(
@@ -524,7 +524,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
 
         task_entry = self._new_resolved_task()
 
-        with self.swap(utils, 'get_current_time', lambda: updated_on):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: updated_on):
             improvements_services.put_tasks([task_entry])
 
         model = improvements_models.ExplorationStatsTaskEntryModel.get(
@@ -541,7 +541,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         created_on = datetime.datetime(2020, 6, 15, 5)
         updated_on = created_on + datetime.timedelta(minutes=5)
 
-        with self.swap(utils, 'get_current_time', lambda: created_on):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: created_on):
             improvements_services.put_tasks([task_entry])
 
         model = improvements_models.ExplorationStatsTaskEntryModel.get(
@@ -551,7 +551,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
-        with self.swap(utils, 'get_current_time', lambda: updated_on):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: updated_on):
             improvements_services.put_tasks([task_entry])
 
         model = improvements_models.ExplorationStatsTaskEntryModel.get(
@@ -568,7 +568,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         created_on = datetime.datetime(2020, 6, 15, 5)
         updated_on = created_on + datetime.timedelta(minutes=5)
 
-        with self.swap(utils, 'get_current_time', lambda: created_on):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: created_on):
             improvements_services.put_tasks([task_entry])
 
         model = improvements_models.ExplorationStatsTaskEntryModel.get(
@@ -580,7 +580,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
 
         task_entry = self._new_resolved_task()
 
-        with self.swap(utils, 'get_current_time', lambda: updated_on):
+        with self.swap(utils, 'get_current_utc_datetime', lambda: updated_on):
             improvements_services.put_tasks(
                 [task_entry], update_last_updated_time=False
             )

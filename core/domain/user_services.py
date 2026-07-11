@@ -363,7 +363,7 @@ def get_users_settings(
                     banned=False,
                     username='admin',
                     has_viewed_lesson_info_modal_once=False,
-                    last_agreed_to_terms=utils.get_current_time(),
+                    last_agreed_to_terms=utils.get_current_utc_datetime(),
                 )
             )
         else:
@@ -1636,7 +1636,7 @@ def record_agreement_to_terms(user_id: str) -> None:
         user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.last_agreed_to_terms = utils.get_current_time()
+    user_settings.last_agreed_to_terms = utils.get_current_utc_datetime()
     save_user_settings(user_settings)
 
 
@@ -1813,7 +1813,9 @@ def record_user_started_state_editor_tutorial(user_id: str) -> None:
         user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.last_started_state_editor_tutorial = utils.get_current_time()
+    user_settings.last_started_state_editor_tutorial = (
+        utils.get_current_utc_datetime()
+    )
     save_user_settings(user_settings)
 
 
@@ -1826,7 +1828,7 @@ def record_user_started_state_translation_tutorial(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_translation_tutorial = (
-        utils.get_current_time()
+        utils.get_current_utc_datetime()
     )
     save_user_settings(user_settings)
 
@@ -1840,7 +1842,7 @@ def record_user_logged_in(user_id: str) -> None:
     """
 
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.last_logged_in = utils.get_current_time()
+    user_settings.last_logged_in = utils.get_current_utc_datetime()
     save_user_settings(user_settings)
 
 
@@ -1853,7 +1855,9 @@ def record_user_created_an_exploration(user_id: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is not None:
-        user_settings.last_created_an_exploration = utils.get_current_time()
+        user_settings.last_created_an_exploration = (
+            utils.get_current_utc_datetime()
+        )
         save_user_settings(user_settings)
 
 
@@ -2279,7 +2283,7 @@ def get_current_date_as_string() -> str:
     Returns:
         str. Current date as a string of format 'YYYY-MM-DD'.
     """
-    return utils.get_current_time().strftime(
+    return utils.get_current_utc_datetime().strftime(
         feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT
     )
 

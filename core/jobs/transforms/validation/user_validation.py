@@ -403,7 +403,7 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
             yield user_validation_errors.DraftChangeListLastUpdatedNoneError(
                 model
             )
-        current_time = utils.get_current_time()
+        current_time = utils.get_current_utc_datetime()
         if (
             model.draft_change_list_last_updated
             and model.draft_change_list_last_updated > current_time

@@ -641,14 +641,14 @@ def convert_string_to_naive_datetime_object(
     return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
 
 
-def get_current_time() -> datetime.datetime:
+def get_current_utc_datetime() -> datetime.datetime:
     """Returns the current UTC datetime."""
     return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
 
-def get_current_date() -> datetime.date:
-    """Returns the current date."""
-    return get_current_time().date()
+def get_current_utc_date() -> datetime.date:
+    """Returns the current UTC date."""
+    return get_current_utc_datetime().date()
 
 
 def get_current_local_datetime() -> datetime.datetime:
@@ -706,7 +706,7 @@ def get_number_of_days_since_date(date: datetime.date) -> int:
     Returns:
         int. The number of days past since a given date.
     """
-    return int((utils.get_current_date() - date).days)
+    return int((utils.get_current_utc_date() - date).days)
 
 
 def create_string_from_largest_unit_in_timedelta(

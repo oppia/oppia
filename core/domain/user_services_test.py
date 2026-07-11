@@ -617,13 +617,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_VOICEOVER_ADMIN,
         ]
 
-        less_than_time = utils.get_current_time()
+        less_than_time = utils.get_current_utc_datetime()
 
         users_settings = user_services.get_users_settings(user_ids)
         self.assertEqual(len(users_settings), 1)
         admin_settings = users_settings[0]
 
-        greater_than_time = utils.get_current_time()
+        greater_than_time = utils.get_current_utc_datetime()
 
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
@@ -3712,9 +3712,11 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         ).last_logged_in
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = utils.get_current_time()
+        current_datetime = utils.get_current_utc_datetime()
         mocked_current_time = current_datetime - datetime.timedelta(days=1)
-        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             user_services.record_user_logged_in(self.viewer_id)
 
         user_settings = user_services.get_user_settings(self.viewer_id)
@@ -3743,10 +3745,12 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         ).last_logged_in
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = utils.get_current_time()
+        current_datetime = utils.get_current_utc_datetime()
 
         mocked_current_time = current_datetime + datetime.timedelta(hours=11)
-        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -3756,7 +3760,9 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             self.logout()
 
         mocked_current_time = current_datetime + datetime.timedelta(hours=13)
-        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
 
@@ -3837,7 +3843,9 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
             user_settings.last_edited_an_exploration
             - datetime.timedelta(hours=13)
         )
-        with self.swap(utils, 'get_current_time', lambda: mocked_current_time):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: mocked_current_time
+        ):
             user_settings.record_user_edited_an_exploration()
             user_services.save_user_settings(user_settings)
 
@@ -3912,7 +3920,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         assert user_settings.last_created_an_exploration is not None
         with self.swap(
             utils,
-            'get_current_time',
+            'get_current_utc_datetime',
             lambda: (
                 user_settings.last_created_an_exploration
                 - datetime.timedelta(hours=13)

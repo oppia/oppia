@@ -1245,7 +1245,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             author_id='user_1',
             content='content',
             title='title',
-            published_on=utils.get_current_time(),
+            published_on=utils.get_current_utc_datetime(),
             url_fragment='sample-url',
             tags=['news'],
             thumbnail_filename='thumbnail.svg',

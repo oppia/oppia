@@ -51,8 +51,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             description='description',
             misconception_count=0,
             language_code='cs',
-            skill_model_last_updated=utils.get_current_time(),
-            skill_model_created_on=utils.get_current_time(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         skill_summary_model.update_timestamps()
@@ -416,8 +416,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             description='description',
             misconception_count=0,
             language_code='cs',
-            skill_model_last_updated=utils.get_current_time(),
-            skill_model_created_on=utils.get_current_time(),
+            skill_model_last_updated=utils.get_current_utc_datetime(),
+            skill_model_created_on=utils.get_current_utc_datetime(),
             version=1,
         )
         skill_summary_model.update_timestamps()

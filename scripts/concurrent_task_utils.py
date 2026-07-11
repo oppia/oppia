@@ -40,7 +40,9 @@ def log(message: str, show_time: bool = False) -> None:
     """
     with LOG_LOCK:
         if show_time:
-            print(utils.get_current_time().strftime('%H:%M:%S'), message)
+            print(
+                utils.get_current_utc_datetime().strftime('%H:%M:%S'), message
+            )
         else:
             print(message)
 

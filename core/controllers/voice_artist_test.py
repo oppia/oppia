@@ -170,7 +170,9 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     EXP_ID: Final = 'expId'
     # 30 days into the future.
-    NEWER_DATETIME: Final = utils.get_current_time() + datetime.timedelta(30)
+    NEWER_DATETIME: Final = (
+        utils.get_current_utc_datetime() + datetime.timedelta(30)
+    )
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     manual_voiceover_1: state_domain.VoiceoverDict = {

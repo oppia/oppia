@@ -63,7 +63,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -89,7 +89,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -102,7 +102,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
@@ -146,7 +146,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PRIVATE,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -159,7 +159,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PRIVATE,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
@@ -193,7 +193,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -206,7 +206,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang2',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
@@ -238,7 +238,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -251,7 +251,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_2.update_timestamps()
         exp_summary_3 = self.create_model(
@@ -264,7 +264,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=utils.get_current_time(),
+            exploration_model_last_updated=utils.get_current_utc_datetime(),
         )
         exp_summary_3.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2, exp_summary_3])

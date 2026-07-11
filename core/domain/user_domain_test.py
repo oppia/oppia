@@ -817,7 +817,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_initialization(self) -> None:
         """Testing init method."""
-        current_time = utils.get_current_time()
+        current_time = utils.get_current_utc_datetime()
         exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
             'user_id0', 'exp_id0', 0, current_time, 'state0'
         )
@@ -830,7 +830,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_update_last_played_information(self) -> None:
         """Testing update_last_played_information."""
-        current_time = utils.get_current_time()
+        current_time = utils.get_current_utc_datetime()
         exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
             'user_id0', 'exp_id0', 0, current_time, 'state0'
         )

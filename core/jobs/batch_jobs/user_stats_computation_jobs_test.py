@@ -48,7 +48,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.formated_datetime = utils.get_current_time().strftime(
+        self.formated_datetime = utils.get_current_utc_datetime().strftime(
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT
         )
 

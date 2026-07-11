@@ -1191,7 +1191,9 @@ def update_feedback_email_retries_transactional(user_id: str) -> None:
         user_id: str. The id of the given user.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
-    time_since_buffered = (utils.get_current_time() - model.created_on).seconds
+    time_since_buffered = (
+        utils.get_current_utc_datetime() - model.created_on
+    ).seconds
 
     if (
         time_since_buffered

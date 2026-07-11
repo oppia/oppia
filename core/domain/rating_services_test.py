@@ -132,11 +132,11 @@ class RatingServicesTests(test_utils.GenericTestBase):
         assert first_rating_time is not None
         assert second_rating_time is not None
         self.assertLess(
-            utils.get_current_time(),
+            utils.get_current_utc_datetime(),
             first_rating_time + time_allowed_for_computation,
         )
         self.assertLess(first_rating_time, second_rating_time)
-        self.assertLess(second_rating_time, utils.get_current_time())
+        self.assertLess(second_rating_time, utils.get_current_utc_datetime())
 
     def test_rating_assignations_do_not_conflict(self) -> None:
         """Check that ratings of different explorations are independent."""
