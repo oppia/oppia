@@ -42,7 +42,14 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
+
+interface MisconceptionOutcome {
+  feedback: SubtitledHtmlBackendDict;
+  labelledAsCorrect: boolean;
+}
 
 interface TaggedMisconception {
   skillId: string | null;
@@ -77,7 +84,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   // specific interaction and rule.
   originalContentIdToContent!: Record<string, unknown>;
   activeRuleIndex!: number;
-  answerChoices!: AnswerChoice[];
+  answerChoices!: AnswerChoice[] | null;
   // The 'unknown' type is used here because 'editAnswerGroupForm' is a
   // generic container for form state, where keys are form control names
   // and values can be any type corresponding to the interaction's inputs.
@@ -102,8 +109,54 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.onSaveAnswerGroupCorrectnessLabel.emit(event);
   }
 
-  sendOnSaveAnswerGroupFeedback(event: Outcome): void {
-    this.onSaveAnswerGroupFeedback.emit(event);
+  private _misconceptionOutcome!: MisconceptionOutcome;
+  private _lastOutcomeHtml: string = '';
+  private _lastOutcomeLabelledAsCorrect: boolean = false;
+  private _outcomeIsUndefined: boolean = true;
+
+  get misconceptionOutcome(): MisconceptionOutcome {
+    if (!this.outcome) {
+      if (!this._misconceptionOutcome || !this._outcomeIsUndefined) {
+        this._outcomeIsUndefined = true;
+        this._misconceptionOutcome = {
+          feedback: {
+            html: '',
+            content_id: 'default_outcome',
+          },
+          labelledAsCorrect: false,
+        };
+      }
+      return this._misconceptionOutcome;
+    }
+
+    const currentHtml = this.outcome.feedback.html;
+    const currentLabelledAsCorrect = this.outcome.labelledAsCorrect;
+
+    if (
+      !this._misconceptionOutcome ||
+      this._outcomeIsUndefined ||
+      this._lastOutcomeHtml !== currentHtml ||
+      this._lastOutcomeLabelledAsCorrect !== currentLabelledAsCorrect
+    ) {
+      this._outcomeIsUndefined = false;
+      this._lastOutcomeHtml = currentHtml;
+      this._lastOutcomeLabelledAsCorrect = currentLabelledAsCorrect;
+      this._misconceptionOutcome = {
+        feedback: this.outcome.feedback.toBackendDict(),
+        labelledAsCorrect: this.outcome.labelledAsCorrect,
+      };
+    }
+    return this._misconceptionOutcome;
+  }
+
+  sendOnSaveAnswerGroupFeedback(event: Outcome | MisconceptionOutcome): void {
+    if ('getContentIdToHtml' in event) {
+      this.onSaveAnswerGroupFeedback.emit(event);
+    } else {
+      const outcome = cloneDeep(this.outcome);
+      outcome.feedback.html = event.feedback.html;
+      this.onSaveAnswerGroupFeedback.emit(outcome);
+    }
   }
 
   sendOnSaveAnswerGroupDest(event: Outcome): void {
@@ -118,11 +171,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  getAnswerChoices(): AnswerChoice[] {
+  getAnswerChoices(): AnswerChoice[] | null {
     return this.responsesService.getAnswerChoices();
   }
 
-  getCurrentInteractionId(): string {
+  getCurrentInteractionId(): InteractionSpecsKey | null {
     return this.stateInteractionIdService.savedMemento;
   }
 
@@ -227,6 +280,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
+    if (interactionId === null) {
+      throw new Error('Cannot add a rule before an interaction is selected.');
+    }
     // The 'unknown' type is used here because the structure of rule
     // descriptions varies across different interactions, and we only
     // access the 'rule_descriptions' property here.
@@ -236,6 +292,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         {rule_descriptions: Record<string, string>}
       >
     )[interactionId].rule_descriptions;
+
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {
       // This should never happen. An interaction must have at least
@@ -349,7 +406,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   isCurrentInteractionTrainable(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+    if (
+      interactionId === null ||
+      !INTERACTION_SPECS.hasOwnProperty(interactionId)
+    ) {
       throw new Error(
         'Invalid interaction id - ' +
           interactionId +
@@ -364,7 +424,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
       INTERACTION_SPECS as unknown as Record<string, {is_trainable: boolean}>
     )[interactionId].is_trainable;
   }
-
   openTrainingDataEditor(): void {
     this.trainingDataEditorPanelService.openTrainingDataEditor();
   }

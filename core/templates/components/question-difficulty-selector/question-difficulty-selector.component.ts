@@ -33,7 +33,7 @@ export class QuestionDifficultySelectorComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+  @Input() skillIdToRubricsObject!: Record<string, Rubric[]> | object;
   @Input() skillWithDifficulty!: SkillDifficulty;
   @Input() difficultyCount: number = 0;
   @Output() skillWithDifficultyChange: EventEmitter<SkillDifficulty> =
@@ -51,8 +51,15 @@ export class QuestionDifficultySelectorComponent {
     }
   }
 
-  updateSkillWithDifficulty(event: MatRadioChange): void {
-    this.skillWithDifficulty.setDifficulty(event.value);
+  getRubricsForSkill(): Rubric[] {
+    return (this.skillIdToRubricsObject as Record<string, Rubric[]>)[
+      this.skillWithDifficulty.getId()
+    ];
+  }
+
+  updateSkillWithDifficulty(event: MatRadioChange | Event): void {
+    const radioChange = event as MatRadioChange;
+    this.skillWithDifficulty.setDifficulty(radioChange.value);
     this.skillWithDifficultyChange.emit(this.skillWithDifficulty);
   }
 }
