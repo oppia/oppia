@@ -79,7 +79,6 @@ describe('Practice Question Coordinator', function () {
     await questionSubmitter.createAndPublishClassroom(
       'Math',
       'math',
-      'user@email.com',
       'Arithmetic Operations'
     );
 

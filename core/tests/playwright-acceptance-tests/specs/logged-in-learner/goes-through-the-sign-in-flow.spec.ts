@@ -77,7 +77,6 @@ test.describe('Logged In Learner', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'user@email.com',
       'Test Topic'
     );
 

@@ -1067,24 +1067,28 @@ class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
                 'topic_name': 'public_topic_1_name',
                 'classroom_name': 'math',
                 'classroom_url_fragment': 'math',
+                'feedback_recipient_email': 'user@email.com',
             },
             {
                 'topic_id': self.public_topic_id_2,
                 'topic_name': 'public_topic_2_name',
                 'classroom_name': 'history',
                 'classroom_url_fragment': 'history',
+                'feedback_recipient_email': 'user@email.com',
             },
             {
                 'topic_id': self.public_topic_id_3,
                 'topic_name': 'public_topic_3_name',
                 'classroom_name': None,
                 'classroom_url_fragment': None,
+                'feedback_recipient_email': None,
             },
             {
                 'topic_id': self.private_topic_id,
                 'topic_name': 'private_topic_name',
                 'classroom_name': None,
                 'classroom_url_fragment': None,
+                'feedback_recipient_email': None,
             },
         ]
 
@@ -1108,7 +1112,11 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
 
         self.post_json(
             new_classroom_handler,
-            {'name': 'geography', 'url_fragment': 'geography'},
+            {
+                'name': 'geography',
+                'url_fragment': 'geography',
+                'feedback_recipient_email': 'user@email.com',
+            },
             csrf_token=csrf_token,
         )
 
@@ -1118,6 +1126,9 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
         if new_classroom:
             self.assertEqual(new_classroom.name, 'geography')
             self.assertEqual(new_classroom.url_fragment, 'geography')
+            self.assertEqual(
+                new_classroom.feedback_recipient_email, 'user@email.com'
+            )
             self.assertFalse(new_classroom.is_published)
 
     def test_fail_to_create_new_classroom_if_validation_fails(self) -> None:
@@ -1127,7 +1138,11 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
 
         response = self.post_json(
             new_classroom_handler,
-            {'name': '', 'url_fragment': 'geography'},
+            {
+                'name': '',
+                'url_fragment': 'geography',
+                'feedback_recipient_email': 'user@email.com',
+            },
             csrf_token=csrf_token,
             expected_status_int=400,
         )

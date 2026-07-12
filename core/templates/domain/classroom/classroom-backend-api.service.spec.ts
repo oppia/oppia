@@ -659,6 +659,7 @@ describe('Classroom backend API service', function () {
           topic_id: 'topic1',
           classroom_name: 'math',
           classroom_url_fragment: 'math',
+          feedback_recipient_email: 'user@email.com',
         },
       ],
     });

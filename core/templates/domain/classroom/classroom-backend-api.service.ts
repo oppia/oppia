@@ -114,6 +114,7 @@ export interface TopicClassroomRelationDict {
   topic_id: string;
   classroom_name: string | null;
   classroom_url_fragment: string | null;
+  feedback_recipient_email: string | null;
 }
 
 interface TopicsClassroomRelationBackendDict {

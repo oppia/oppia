@@ -101,7 +101,6 @@ describe('Translation Coordinator', function () {
     await translationSubmitter.createAndPublishClassroom(
       'Math',
       'math',
-      'user@email.com',
       'Fractions'
     );
 

@@ -62,7 +62,6 @@ describe('Community Library Browser', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'user@email.com',
       'Fractions'
     );
   }, 500000);

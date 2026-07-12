@@ -115,7 +115,6 @@ describe('Practice Question Submitter', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math-classroom',
-      'user@email.com',
       'Arithmetic Operations'
     );
   }, 600000);

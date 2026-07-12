@@ -133,6 +133,9 @@ class ClassroomDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'course_details': classroom.course_details,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
+                'feedback_recipient_email': (
+                    classroom.feedback_recipient_email
+                ),
                 'teaser_text': classroom.teaser_text,
                 'is_published': classroom.is_published,
                 'diagnostic_test_is_enabled': classroom.diagnostic_test_is_enabled,
@@ -545,6 +548,7 @@ class TopicsToClassroomsRelationHandler(
                 'topic_name': topic_dict['name'],
                 'classroom_name': None,
                 'classroom_url_fragment': None,
+                'feedback_recipient_email': None,
             }
 
         for classroom in classrooms:
@@ -553,6 +557,9 @@ class TopicsToClassroomsRelationHandler(
                     {
                         'classroom_name': classroom.name,
                         'classroom_url_fragment': classroom.url_fragment,
+                        'feedback_recipient_email': (
+                            classroom.feedback_recipient_email
+                        ),
                     }
                 )
 

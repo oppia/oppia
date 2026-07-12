@@ -62,7 +62,6 @@ describe('Logged-out User', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'user@email.com',
       'Arithmetic'
     );
 

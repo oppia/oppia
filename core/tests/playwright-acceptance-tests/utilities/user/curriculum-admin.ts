@@ -572,8 +572,8 @@ export class CurriculumAdmin extends TopicManager {
   async createAndPublishClassroom(
     classroomName: string,
     urlFragment: string,
-    feedbackRecipientEmail: string,
-    topicToBeAssigned: string
+    topicToBeAssigned: string,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.createNewClassroom(
       classroomName,

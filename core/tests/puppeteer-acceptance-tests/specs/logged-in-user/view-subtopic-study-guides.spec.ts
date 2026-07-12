@@ -60,7 +60,6 @@ describe('Logged-in User', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'user@email.com',
       'Addition and Subtraction'
     );
 
