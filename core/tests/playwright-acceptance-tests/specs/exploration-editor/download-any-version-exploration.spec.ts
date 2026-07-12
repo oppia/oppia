@@ -64,6 +64,11 @@ test.describe('Exploration Creator', function () {
     // oppia-unpublished_exploration-v{versionNumber} (numberOfDownloadsSameFile).zip.
     await explorationEditor.downloadExploration(5, false);
     await explorationEditor.downloadExploration(2, false);
+
+    // Navigate back to the editor tab before publishing, otherwise the
+    // history tab content blocks the publish button on mobile.
+    await explorationEditor.navigateToEditorTab();
+
     // Publish Exploration.
     await explorationEditor.publishExplorationWithMetadata(
       'Publish with an interaction',

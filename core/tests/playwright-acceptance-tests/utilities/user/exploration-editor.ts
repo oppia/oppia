@@ -127,6 +127,9 @@ const historyListOptions = '.e2e-test-history-table-option';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
 
+const mainTabButton = '.e2e-test-main-tab';
+const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
@@ -1037,6 +1040,20 @@ export class ExplorationEditor extends BaseUser {
     }
 
     throw new Error(`Version ${explorationVersion} not found in history list.`);
+  }
+
+  /**
+   * Function to navigate back to the editor (main) tab.
+   */
+  async navigateToEditorTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileMainTabButton);
+      await this.clickOnElementWithSelector(mobileMainTabButton);
+    } else {
+      await this.clickOnElementWithSelector(mainTabButton);
+    }
+    await this.expectElementToBeVisible(stateEditSelector);
   }
 }
 
