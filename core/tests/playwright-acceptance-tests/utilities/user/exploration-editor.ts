@@ -984,7 +984,6 @@ export class ExplorationEditor extends BaseUser {
     isExplorationPublished: boolean,
     duplicateCount: number
   ): Promise<string> {
-    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
     if (isExplorationPublished) {
       const prefix = 'oppia-Publishwithaninteraction-v';
       return duplicateCount === 0
@@ -1008,7 +1007,6 @@ export class ExplorationEditor extends BaseUser {
     isExplorationPublished: boolean
   ): Promise<string[]> {
     const fs = await import('fs');
-    const path = await import('path');
     const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
     const prefix = isExplorationPublished
       ? `oppia-Publishwithaninteraction-v${explorationVersion}`
