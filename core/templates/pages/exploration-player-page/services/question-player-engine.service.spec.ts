@@ -594,9 +594,12 @@ describe('Question player engine service', () => {
 
     spyOn(pageContextService, 'setQuestionPlayerIsOpen');
     spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    // Simulate the first question returning a null ID to trigger the null guard
-    // inside loadInitialQuestion before the entity context is set.
-    spyOn(multipleQuestionsObjects[0], 'getId').and.returnValue(null);
+    // Spy on all question objects so that regardless of how init() shuffles the
+    // array, every question returns a null ID, triggering the null guard inside
+    // loadInitialQuestion.
+    for (const q of multipleQuestionsObjects) {
+      spyOn(q, 'getId').and.returnValue(null);
+    }
 
     expect(() => {
       questionPlayerEngineService.init(
@@ -1003,7 +1006,7 @@ describe('Question player engine service', () => {
           'Content html',
           'Interaction text',
           Interaction.createFromBackendDict({
-            id: 'TextInput',
+            id: null,
             answer_groups: [],
             confirmed_unclassified_answers: [],
             customization_args: {},
