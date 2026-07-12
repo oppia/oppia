@@ -70,6 +70,9 @@ const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
+const createNewSkillButton = '.e2e-test-create-skill-button-circle';
 
 const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
 const confirmSkillAssignationButton =
@@ -1042,6 +1045,24 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Create a skill from the skills dashboard.
+   */
+  async createSkillFromSkillsDashboard(
+    skillName: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    const skillButtonSelector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : createNewSkillButton;
+    await this.page.bringToFront();
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOnElementWithSelector(skillsTab);
+    await this.expectElementToBeVisible(skillButtonSelector);
+    await this.clickOnElementWithSelector(skillButtonSelector);
+    await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
   }
 
   /**

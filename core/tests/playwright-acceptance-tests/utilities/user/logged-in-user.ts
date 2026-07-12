@@ -111,6 +111,10 @@ const filledRatingStarSelector = '.fas.fa-star';
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
 const profileDropdown = '.e2e-test-profile-dropdown';
+const topicAndSkillsOptionInProfileMenu =
+  '.e2e-test-topics-and-skills-dashboard-link';
+const topicAndSkillsDashboardPageSelector =
+  '.e2e-test-topics-and-skills-dashboard';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 const progressTabSectionInLearnerDashboard =
@@ -335,6 +339,15 @@ export class LoggedInUser extends BaseUser {
   async clickOnProfileDropdown(): Promise<void> {
     await this.expectElementToBeVisible(profileDropdownToggleSelector);
     await this.clickOnElementWithSelector(profileDropdownToggleSelector);
+  }
+
+  /**
+   * Clicks on Topics and Skills Dashboard option in the profile menu.
+   */
+  async clickOnTopicAndSkillsOptionInProfileMenu(): Promise<void> {
+    await this.expectElementToBeVisible(topicAndSkillsOptionInProfileMenu);
+    await this.clickOnElementWithSelector(topicAndSkillsOptionInProfileMenu);
+    await this.expectElementToBeVisible(topicAndSkillsDashboardPageSelector);
   }
 
   /**
