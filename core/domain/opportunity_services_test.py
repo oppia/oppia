@@ -2400,3 +2400,24 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'exp_1')
         self.assertEqual(cards[0].entity_description, '')
+
+    def test_get_translation_opportunities_by_entity_ids(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_EXPLORATION: ['exp_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_EXPLORATION, ['exp_1', 'exp_nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        exp_1_opp = opportunities['exp_1']
+        self.assertIsNotNone(exp_1_opp)
+        assert exp_1_opp is not None
+        self.assertEqual(exp_1_opp.entity_id, 'exp_1')
+        self.assertIsNone(opportunities['exp_nonexistent'])
