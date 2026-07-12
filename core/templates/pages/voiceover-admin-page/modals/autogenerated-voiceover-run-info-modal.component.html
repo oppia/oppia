@@ -47,14 +47,11 @@
     </div>
   </div>
 
-  <div>
+  <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
     <div class="data-type-title">
       <span>Error messages:</span>
     </div>
-    <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length === 0" class="error-messages-container">
-      <i>No error messages.</i>
-    </div>
-    <div class="content-container" *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
+    <div class="content-container">
       <mat-tab-group>
         <mat-tab *ngFor="let error of cloudTaskRun.exceptionMessagesForFailedRuns; index as index" label="Error {{index + 1}}">
           <div class="error-messages-container">
