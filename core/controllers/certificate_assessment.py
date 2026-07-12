@@ -368,7 +368,7 @@ class CertificateAssessmentOfferingsForClassroomHandler(
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, _classroom_id: str) -> None:
+    def get(self, classroom_id: str) -> None:  # pylint: disable=unused-argument
         """Returns a stub response for certificate offerings."""
 
         # TODO(#24717-M2.12): Replace this stub implementation by calling
