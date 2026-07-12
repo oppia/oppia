@@ -1139,6 +1139,7 @@ export class ExplorationEditor extends BaseUser {
         force: true,
       });
       await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.waitForDropdownToOpen(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobileMainTabButton);
 
       // Close dropdown if it doesn't automatically close.
@@ -1467,6 +1468,38 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
+  }
+
+  /**
+   * Waits for the dropdown menu to be fully open: 'show' class applied,
+   * positioned by Popper ('x-placement' set), and opacity fade complete.
+   * @param {string} dropdownMenuSelector - The CSS selector for the dropdown menu.
+   * @param {number} timeout - The maximum time to wait for the dropdown to open (in milliseconds).
+   */
+  async waitForDropdownToOpen(
+    dropdownMenuSelector: string,
+    timeout = 5000
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      selector => {
+        const menu = document.querySelector(selector);
+        if (!menu) {
+          return false;
+        }
+        if (!menu.classList.contains('show')) {
+          return false;
+        }
+        if (!menu.hasAttribute('x-placement')) {
+          return false;
+        }
+
+        const style = window.getComputedStyle(menu);
+        // Require the fade transition to have fully completed, not just started.
+        return parseFloat(style.opacity) >= 0.99;
+      },
+      dropdownMenuSelector,
+      {timeout}
+    );
   }
 }
 

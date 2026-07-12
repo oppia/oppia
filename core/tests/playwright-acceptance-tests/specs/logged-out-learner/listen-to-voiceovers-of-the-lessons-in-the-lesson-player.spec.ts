@@ -46,7 +46,7 @@ test.describe('Logged-Out Learner', function () {
   let voiceoverAdmin: VoiceoverAdmin;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(1000000); // Setup takes longer than default timeout.
+    test.setTimeout(1200000); // Setup takes longer than default timeout.
     loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     releaseCoordinator = await UserFactory.createNewUser(
