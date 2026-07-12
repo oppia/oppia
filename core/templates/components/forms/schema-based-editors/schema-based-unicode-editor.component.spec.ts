@@ -126,7 +126,7 @@ describe('Schema Based Unicode Editor', () => {
     expect(component.codemirrorOptions.indentWithTabs).toBeFalse();
     expect(component.codemirrorOptions.lineNumbers).toBeTrue();
     expect(cm.replaceSelection).toHaveBeenCalled();
-    expect(component.codemirrorOptions.readOnly).toBe('nocursor');
+    expect(component.codemirrorOptions.readOnly).toBeTrue();
     expect(component.codemirrorOptions.mode).toBe('python');
     expect(component.codemirrorStatus).toBeTrue();
   }));

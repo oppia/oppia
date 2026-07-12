@@ -4602,7 +4602,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(target_opp['topic_name'], 'topic')
         self.assertEqual(target_opp['entity_description'], 'Node1')
-        self.assertEqual(target_opp['content_count'], 1)
+        self.assertEqual(target_opp['content_count'], 4)
         self.assertEqual(target_opp['is_pinned'], False)
         self.assertEqual(target_opp['currently_available_to_learners'], True)
         self.assertEqual(target_opp['translation_counts'], {})

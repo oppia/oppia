@@ -215,7 +215,8 @@
         "core.jobs.batch_jobs.reject_invalid_suggestion_and_delete_invalid_translation_jobs_test",
         "core.domain.voiceover_cloud_task_services_test",
         "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test",
-        "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test"
+        "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test",
+        "core.jobs.batch_jobs.translation_opportunity_backfill_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
@@ -281,6 +282,7 @@
         "core.jobs.batch_jobs.math_interactions_audit_jobs_test",
         "core.jobs.batch_jobs.number_with_units_audit_jobs_test",
         "core.jobs.batch_jobs.opportunity_management_jobs_test",
+        "core.jobs.batch_jobs.pinned_opportunity_backfill_jobs_test",
         "core.jobs.batch_jobs.translation_audit_jobs_test",
         "core.jobs.batch_jobs.collection_info_jobs_test",
         "core.domain.image_validation_services_test",

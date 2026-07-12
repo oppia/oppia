@@ -34,6 +34,7 @@ import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 
 class MockNgbModal {
   open() {
@@ -70,7 +71,7 @@ describe('Translation status service', () => {
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
-  let statesWithAudioDict = null;
+  let statesWithAudioDict: StateObjectsBackendDict = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
