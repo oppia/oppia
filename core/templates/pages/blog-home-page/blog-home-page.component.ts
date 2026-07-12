@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the blog home page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
@@ -40,11 +40,11 @@ import {UrlService} from 'services/contextual/url.service';
 import {BlogHomePageConstants} from './blog-home-page.constants';
 import {Router, ActivatedRoute} from '@angular/router';
 
-import './blog-home-page.component.css';
-
 @Component({
   selector: 'oppia-blog-home-page',
   templateUrl: './blog-home-page.component.html',
+  styleUrls: ['./blog-home-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class BlogHomePageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
