@@ -53,4 +53,18 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
     ).toBe('Available certificate offering');
   });
+
+  it('should link assessment buttons to the certificate assessment page', () => {
+    fixture.detectChanges();
+
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('button')
+    ) as HTMLButtonElement[];
+    expect(buttons[1].getAttribute('ng-reflect-router-link')).toContain(
+      '/certificate-assessment'
+    );
+    expect(buttons[2].getAttribute('ng-reflect-router-link')).toContain(
+      '/certificate-assessment'
+    );
+  });
 });

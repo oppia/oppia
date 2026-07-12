@@ -6824,6 +6824,24 @@ export default {
         }
       ]
     },
+    "CERTIFICATE_ASSESSMENT_PLAYER": {
+      "ROUTE": "certificate-assessment/:certificate_id",
+      "TITLE": "Certificate Assessment Player | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        }
+      ]
+    },
     "FACILITATOR_DASHBOARD": {
       "ROUTE": "facilitator-dashboard",
       "TITLE": "Facilitator Dashboard - Oppia",
