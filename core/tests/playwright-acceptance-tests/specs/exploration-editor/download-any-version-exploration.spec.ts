@@ -75,6 +75,10 @@ test.describe('Exploration Creator', function () {
       'This is the goal of exploration.',
       'Algebra'
     );
+
+    // Navigate back to the history tab to download post-publish versions.
+    await explorationEditor.navigateToHistoryTab();
+
     // After publishing, the Exploration zip file name would be
     // oppia-{explorationTitle}-v{versionNumber}.zip or
     // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip.

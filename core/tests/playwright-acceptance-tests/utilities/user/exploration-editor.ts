@@ -1047,7 +1047,12 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToEditorTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      // On mobile, history table items may block the navbar dropdown click.
+      // Use a direct JavaScript click to bypass the blocking element.
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        el?.click();
+      }, mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileMainTabButton);
       await this.clickOnElementWithSelector(mobileMainTabButton);
     } else {
