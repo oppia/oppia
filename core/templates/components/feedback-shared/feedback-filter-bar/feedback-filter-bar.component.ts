@@ -20,19 +20,21 @@
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {
-  FeedbackFilterConfig,
-  FeedbackFilterState,
   FeedbackStatus,
   TechnicalTeamType,
   FEEDBACK_STATUS_LABELS,
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
+import type {
+  FeedbackFilterConfig,
+  FeedbackFilterState,
+} from 'domain/feedback/feedback.model';
 import {AlertsService} from 'services/alerts.service';
-import './feedback-filter-bar.component.css';
 
 @Component({
   selector: 'oppia-feedback-filter-bar',
   templateUrl: './feedback-filter-bar.component.html',
+  styleUrls: ['./feedback-filter-bar.component.css'],
 })
 export class FeedbackFilterBarComponent {
   constructor(private alertsService: AlertsService) {}

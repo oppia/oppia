@@ -16,21 +16,65 @@
  * @fileoverview Unit tests for TechnicalFeedbackDashboardPageComponent.
  */
 
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ActivatedRoute, Router} from '@angular/router';
+import {BehaviorSubject} from 'rxjs';
+import {convertToParamMap} from '@angular/router';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {FeedbackSharedModule} from 'components/feedback-shared/feedback-shared.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
+
+class MockFeedbackBackendApiService {
+  fetchTechnicalDashboardFeedbackListAsync(): Promise<{
+    summaries: [];
+    next_cursor: null;
+    more: false;
+  }> {
+    return Promise.resolve({
+      summaries: [],
+      next_cursor: null,
+      more: false,
+    });
+  }
+}
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
   let fixture: ComponentFixture<TechnicalFeedbackDashboardPageComponent>;
+  let paramMapSubject: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
 
   beforeEach(async () => {
+    paramMapSubject = new BehaviorSubject(convertToParamMap({}));
+
     await TestBed.configureTestingModule({
+      imports: [FeedbackSharedModule],
       declarations: [
         TechnicalFeedbackDashboardPageComponent,
         MockTranslatePipe,
       ],
-      providers: [],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: paramMapSubject.asObservable(),
+          },
+        },
+        {
+          provide: Router,
+          useValue: {
+            navigateByUrl: jasmine
+              .createSpy('navigateByUrl')
+              .and.returnValue(Promise.resolve(true)),
+          },
+        },
+        {
+          provide: FeedbackBackendApiService,
+          useClass: MockFeedbackBackendApiService,
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 

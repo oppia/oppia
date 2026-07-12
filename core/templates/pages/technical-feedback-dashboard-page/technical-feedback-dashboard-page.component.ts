@@ -17,25 +17,27 @@
  */
 import {Component} from '@angular/core';
 import {
-  FeedbackFilterConfig,
-  FeedbackCardConfig,
-  FeedbackFilterState,
-  PlatformFeedbackSummary,
   TECHNICAL_DASHBOARD_FILTER_CONFIG,
   TECHNICAL_DASHBOARD_CARD_CONFIG,
   FeedbackStatus,
   TechnicalTeamType,
+} from '../../domain/feedback/feedback.model';
+import type {
+  FeedbackFilterConfig,
+  FeedbackCardConfig,
+  FeedbackFilterState,
+  PlatformFeedbackSummary,
   PlatformFeedbackBackendResponse,
   PlatformFeedbackDetailResponse,
 } from '../../domain/feedback/feedback.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
-import './technical-feedback-dashboard-page.component.css';
 import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-technical-feedback-dashboard-page',
   templateUrl: './technical-feedback-dashboard-page.component.html',
+  styleUrls: ['./technical-feedback-dashboard-page.component.css'],
 })
 export class TechnicalFeedbackDashboardPageComponent {
   constructor(

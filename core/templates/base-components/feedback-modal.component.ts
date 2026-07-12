@@ -43,7 +43,6 @@ import {
 } from 'services/insert-script.service';
 import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
-import './feedback-modal.component.css';
 
 interface TurnstileApi {
   render: (
@@ -65,6 +64,7 @@ interface TurnstileWindow extends Window {
 @Component({
   selector: 'oppia-feedback-modal',
   templateUrl: './feedback-modal.component.html',
+  styleUrls: ['./feedback-modal.component.css'],
 })
 export class FeedbackModalComponent implements OnInit {
   @Input() feedbackModalType!: FeedbackModalType;

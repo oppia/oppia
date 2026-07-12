@@ -13,7 +13,7 @@
  */
 
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
-import {FeedbackSessionInfo} from 'domain/feedback/feedback.model';
+import type {FeedbackSessionInfo} from 'domain/feedback/feedback.model';
 
 @Component({
   selector: 'oppia-feedback-detail-session-info',

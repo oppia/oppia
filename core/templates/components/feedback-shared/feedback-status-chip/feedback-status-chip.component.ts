@@ -24,11 +24,11 @@ import {
   FeedbackStatus,
   FEEDBACK_STATUS_LABELS,
 } from '../../../domain/feedback/feedback.model';
-import './feedback-status-chip.component.css';
 
 @Component({
   selector: 'oppia-feedback-status-chip',
   templateUrl: './feedback-status-chip.component.html',
+  styleUrls: ['./feedback-status-chip.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackStatusChipComponent {

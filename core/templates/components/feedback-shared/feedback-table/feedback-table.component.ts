@@ -27,17 +27,16 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import {
+import {CATEGORY_LABELS, SOURCE_LABELS} from 'domain/feedback/feedback.model';
+import type {
   PlatformFeedbackSummary,
   FeedbackCardConfig,
-  CATEGORY_LABELS,
-  SOURCE_LABELS,
 } from 'domain/feedback/feedback.model';
-import './feedback-table.component.css';
 
 @Component({
   selector: 'oppia-feedback-table',
   templateUrl: './feedback-table.component.html',
+  styleUrls: ['./feedback-table.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackTableComponent {

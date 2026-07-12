@@ -17,11 +17,11 @@
  */
 
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import './feedback-detail-field.component.css';
 
 @Component({
   selector: 'oppia-feedback-detail-field',
   templateUrl: './feedback-detail-field.component.html',
+  styleUrls: ['./feedback-detail-field.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackDetailFieldComponent {

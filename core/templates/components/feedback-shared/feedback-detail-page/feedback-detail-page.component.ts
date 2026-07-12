@@ -26,7 +26,6 @@ import {
   Output,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import './feedback-detail-page.component.css';
 import {
   CATEGORY_LABELS,
   FeedbackStatus,
@@ -43,6 +42,7 @@ import type {
 @Component({
   selector: 'oppia-feedback-detail-page',
   templateUrl: './feedback-detail-page.component.html',
+  styleUrls: ['./feedback-detail-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackDetailPageComponent {
