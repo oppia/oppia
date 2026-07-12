@@ -38,6 +38,7 @@ let existingClassroom = new ExistingClassroomData(
   'classroomID',
   'physics',
   'physics',
+  'user@email.com',
   'Curated math foundations course.',
   'Learn math through fun stories!',
   'Start from the basics with our first topic.',
@@ -67,6 +68,7 @@ describe('Classroom Admin Data Service', () => {
       'classroomId',
       'math',
       'math',
+      'user@email.com',
       'Curated math foundations course.',
       'Learn math through fun stories!',
       'Start from the basics with our first topic.',
@@ -152,6 +154,7 @@ describe('Classroom Admin Data Service', () => {
       '',
       '',
       '',
+      '',
       {},
       true,
       false,
@@ -164,7 +167,7 @@ describe('Classroom Admin Data Service', () => {
     );
     expect(
       classroomAdminDataService.getAllClassroomValidationErrors().length
-    ).toEqual(9);
+    ).toEqual(10);
     expect(
       classroomAdminDataService.getSaveClassroomValidationErrors().length
     ).toEqual(2);

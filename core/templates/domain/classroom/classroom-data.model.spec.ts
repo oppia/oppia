@@ -61,6 +61,7 @@ describe('Classroom data model', () => {
       'mathid',
       'Math',
       'math',
+      'user@email.com',
       topicSummaryDicts,
       'Course Details',
       'Topics Covered',
