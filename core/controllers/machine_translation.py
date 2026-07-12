@@ -169,7 +169,7 @@ class TranslationProviderMappingHandler(
             raise self.NotFoundException()
 
         # TODO(#24714): In Milestone 2 (PR 2.1), replace can_access_admin_page with strict
-        # role-based access control to verify the user is a Translation Admin.
+        # role-based access control to verify the user is a Translation  Admin.
 
         assert self.normalized_payload is not None
         new_translation_provider_mapping = self.normalized_payload[
