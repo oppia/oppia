@@ -48,15 +48,15 @@ export class OppiaVisualizationEnumeratedFrequencyTableComponent
     this.answerVisible[i] = !this.answerVisible[i];
   }
 
-  getAnswerAsArray(row: AnswerStats): InteractionAnswer[] {
-    if (!row.answer) {
+  getAnswerAsArray(row: AnswerStats | null | undefined): InteractionAnswer[] {
+    if (!row || !row.answer) {
       return [];
     }
     return Array.isArray(row.answer) ? row.answer : [row.answer];
   }
 
   getAnswerAsString(item: InteractionAnswer): string {
-    return typeof item === 'string' ? item : JSON.stringify(item);
+    return item as string;
   }
 
   ngOnInit(): void {

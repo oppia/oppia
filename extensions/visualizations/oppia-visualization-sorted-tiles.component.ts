@@ -48,7 +48,7 @@ export class VisualizationSortedTilesComponent implements OnInit {
   percentages!: number[];
 
   getAnswerAsString(item: InteractionAnswer): string {
-    return typeof item === 'string' ? item : JSON.stringify(item);
+    return item as string;
   }
 
   constructor(
