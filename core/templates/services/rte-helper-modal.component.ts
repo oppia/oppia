@@ -213,7 +213,7 @@ export class RteHelperModalComponent {
     const formGroupControls: {
       [key: string]: AbstractControl;
     } = {};
-    this.customizationArgSpecs.forEach((_, index: number) => {
+    this.customizationArgSpecs.forEach((_: unknown, index: number) => {
       formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
