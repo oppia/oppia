@@ -430,6 +430,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         action: string;
         reviewMessage: string;
         skillDifficulty: string;
+        targetId: string;
+        suggestionId: string;
       }) => {
         this.contributionAndReviewService.reviewSkillSuggestion(
           result.targetId,
