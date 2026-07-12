@@ -80,7 +80,7 @@ class GetAllOpenIssuesTests(unittest.TestCase):
         mock_response = mock.MagicMock()
         mock_response.__enter__ = mock.Mock(return_value=mock_response)
         mock_response.__exit__ = mock.Mock(return_value=False)
-        mock_response.read.return_value = b'[{"number": 1, "title": "Bug"}]'
+        mock_response.read.return_value = b'[{"number": 1, "title": "Bug"}, {"number": 2, "pull_request": {}}]'
 
         empty_response = mock.MagicMock()
         empty_response.__enter__ = mock.Mock(return_value=empty_response)
@@ -127,27 +127,37 @@ class GetTemplateLinesTests(unittest.TestCase):
         mock_isdir.assert_called()
         mock_isfile.assert_called()
 
-    @mock.patch('os.walk')
+    @mock.patch('os.listdir')
     @mock.patch('os.path.isdir')
-    @mock.patch('os.path.isfile', return_value=False)
+    @mock.patch('os.path.isfile')
     def test_get_template_lines_with_dir(
         self,
         mock_isfile: mock.MagicMock,
         mock_isdir: mock.MagicMock,
-        mock_walk: mock.MagicMock,
+        mock_listdir: mock.MagicMock,
     ) -> None:
         """Test that get_template_lines parses directory."""
-        mock_isdir.side_effect = lambda path: 'ISSUE_TEMPLATE' in path
-        # Add 'ignore.txt' to hit the 51->50 branch (files that don't end in .md or .yml)
-        mock_walk.return_value = [
-            (
-                '/fake/ISSUE_TEMPLATE',
-                [],
-                ['bug.md', 'feature.yml', 'ignore.txt'],
-            )
-        ]
 
-        file_contents = 'name: bug\ntitle: bug\n### Description\nThis is a template line that is very long.'
+        def isdir_side_effect(path: str) -> bool:
+            return (
+                'ISSUE_TEMPLATE' in path
+                and not path.endswith('.md')
+                and not path.endswith('.yml')
+                and not path.endswith('.txt')
+            )
+
+        def isfile_side_effect(path: str) -> bool:
+            return (
+                path.endswith('.md')
+                or path.endswith('.yml')
+                or path.endswith('.txt')
+            )
+
+        mock_isdir.side_effect = isdir_side_effect
+        mock_isfile.side_effect = isfile_side_effect
+        mock_listdir.return_value = ['bug.md', 'feature.yml', 'ignore.txt']
+
+        file_contents = 'name: bug\ntitle: bug\n\n### Description\nThis is a template line that is very long.'
         m = mock.mock_open(read_data=file_contents)
         with mock.patch('builtins.open', m):
             result = duplicate_detector.get_template_lines('/fake')
@@ -173,8 +183,166 @@ class GetTemplateLinesTests(unittest.TestCase):
         mock_isdir.assert_called()
 
 
+class LoadEventTests(unittest.TestCase):
+    """Tests for _load_event."""
+
+    @mock.patch('os.path.exists', return_value=True)
+    def test_load_event_success(
+        self, unused_mock_exists: mock.MagicMock
+    ) -> None:
+        """Test successful event load."""
+        m = mock.mock_open(read_data='{"issue": {"number": 1}}')
+        with mock.patch('builtins.open', m):
+            result = duplicate_detector.load_event('/fake/path.json')
+            self.assertEqual(result, {'issue': {'number': 1}})
+
+    @mock.patch('os.path.exists', return_value=False)
+    def test_load_event_no_file(
+        self, unused_mock_exists: mock.MagicMock
+    ) -> None:
+        """Test event load when file missing."""
+        result = duplicate_detector.load_event('/fake/path.json')
+        self.assertEqual(result, {})
+
+    def test_load_event_empty_path(self) -> None:
+        """Test event load with empty path."""
+        result = duplicate_detector.load_event('')
+        self.assertEqual(result, {})
+
+
+class GetIssuesToClassifyTests(unittest.TestCase):
+    """Tests for _get_issues_to_classify."""
+
+    def test_manual_trigger_with_valid_range(self) -> None:
+        """Test manual trigger correctly filters issues by range."""
+        open_issues = [{'number': 1}, {'number': 2}, {'number': 3}]
+        result = duplicate_detector.get_issues_to_classify(
+            open_issues, {}, True, '1', '2'
+        )
+        self.assertEqual(result, [{'number': 1}, {'number': 2}])
+
+    def test_manual_trigger_no_start_issue(self) -> None:
+        """Test manual trigger fails without start issue."""
+        open_issues = [{'number': 1}]
+        with self.assertRaisesRegex(
+            ValueError, 'start_issue_number is required'
+        ):
+            duplicate_detector.get_issues_to_classify(
+                open_issues, {}, True, '', ''
+            )
+
+    def test_automatic_trigger_with_issue(self) -> None:
+        """Test automatic trigger returns issue from payload."""
+        result = duplicate_detector.get_issues_to_classify(
+            [], {'issue': {'number': 5}}, False, '', ''
+        )
+        self.assertEqual(result, [{'number': 5}])
+
+    def test_automatic_trigger_no_issue(self) -> None:
+        """Test automatic trigger returns empty list when no issue."""
+        result = duplicate_detector.get_issues_to_classify(
+            [], {}, False, '', ''
+        )
+        self.assertEqual(result, [])
+
+
+class GenerateEmbeddingsTests(unittest.TestCase):
+    """Tests for _generate_embeddings."""
+
+    @mock.patch('scripts.duplicate_detector.clean_text')
+    def test_generate_embeddings(self, mock_clean_text: mock.MagicMock) -> None:
+        """Test embeddings are generated correctly."""
+        mock_clean_text.side_effect = lambda text, tmpl: text.strip()
+        mock_model = mock.MagicMock()
+        mock_model.encode.return_value = 'embedding_tensor'
+
+        issues = [{'number': 1, 'title': 'T', 'body': 'B'}]
+        result = duplicate_detector.generate_embeddings(
+            issues, mock_model, set()
+        )
+
+        self.assertIn(1, result)
+        self.assertEqual(result[1], 'embedding_tensor')
+        mock_model.encode.assert_called_once_with('T B', convert_to_tensor=True)
+
+
+class FindBestMatchTests(unittest.TestCase):
+    """Tests for _find_best_match."""
+
+    @mock.patch('scripts.duplicate_detector.sentence_transformers.util.cos_sim')
+    def test_find_best_match(self, mock_cos_sim: mock.MagicMock) -> None:
+        """Test best match is found correctly."""
+        mock_tensor = mock.MagicMock()
+        mock_tensor.item.return_value = 0.9
+        mock_cos_sim.return_value = mock_tensor
+
+        target_issue = {'number': 5}
+        open_issues = [{'number': 1}, {'number': 6}]
+        embeddings = {1: 'emb1', 5: 'emb5', 6: 'emb6'}
+
+        best_num, best_score = duplicate_detector.find_best_match(
+            target_issue, open_issues, embeddings
+        )
+        self.assertEqual(best_num, 1)
+        self.assertEqual(best_score, 0.9)
+
+
+class LabelAndCommentTests(unittest.TestCase):
+    """Tests for _label_and_comment."""
+
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    def test_label_and_comment_success(
+        self, mock_urlopen: mock.MagicMock
+    ) -> None:
+        """Test labels and comments are posted successfully."""
+        target_issue = {'user': {'login': 'testuser'}}
+        duplicate_detector.label_and_comment(
+            'oppia/repo', {}, 5, 1, target_issue
+        )
+        self.assertEqual(mock_urlopen.call_count, 2)
+
+    @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
+    def test_label_and_comment_error(
+        self, mock_urlopen: mock.MagicMock
+    ) -> None:
+        """Test label and comment handles exceptions."""
+        mock_urlopen.side_effect = Exception('API Error')
+        target_issue = {'user': {'login': 'testuser'}}
+        # Should not raise an exception.
+        duplicate_detector.label_and_comment(
+            'oppia/repo', {}, 5, 1, target_issue
+        )
+        self.assertEqual(mock_urlopen.call_count, 2)
+
+
 class MainTests(unittest.TestCase):
     """Tests for the main function."""
+
+    @mock.patch('scripts.duplicate_detector.get_all_open_issues')
+    @mock.patch('scripts.duplicate_detector.get_template_lines')
+    @mock.patch('os.environ.get')
+    def test_main_manual_trigger_missing_start_issue(
+        self,
+        mock_environ_get: mock.MagicMock,
+        mock_get_template_lines: mock.MagicMock,
+        mock_get_all_open_issues: mock.MagicMock,
+    ) -> None:
+        """Test main raises error when start_issue_number is missing."""
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'workflow_dispatch',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
+        mock_get_template_lines.return_value = set()
+        mock_get_all_open_issues.return_value = []
+
+        with self.assertRaisesRegex(
+            ValueError, 'start_issue_number is required for manual trigger.'
+        ):
+            duplicate_detector.main()
 
     @mock.patch('scripts.duplicate_detector.get_all_open_issues')
     @mock.patch('scripts.duplicate_detector.get_template_lines')
@@ -186,16 +354,22 @@ class MainTests(unittest.TestCase):
         mock_get_all_open_issues: mock.MagicMock,
     ) -> None:
         """Test main gracefully returning when no issues found."""
-        mock_environ_get.side_effect = lambda k, d='': (
-            'workflow_dispatch' if k == 'GITHUB_EVENT_NAME' else d
-        )
+
+        def env_mock(k: str, d: str = '') -> str:
+            env_vars = {
+                'GITHUB_EVENT_NAME': 'workflow_dispatch',
+                'START_ISSUE_NUMBER': '1',
+            }
+            return env_vars.get(k, d)
+
+        mock_environ_get.side_effect = env_mock
         mock_get_template_lines.return_value = set()
         mock_get_all_open_issues.return_value = []
 
         duplicate_detector.main()
         mock_get_all_open_issues.assert_called()
 
-    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.sentence_transformers.util.cos_sim')
     @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
     @mock.patch('scripts.duplicate_detector.get_all_open_issues')
     @mock.patch('scripts.duplicate_detector.get_template_lines')
@@ -266,7 +440,7 @@ class MainTests(unittest.TestCase):
         duplicate_detector.main()
         self.assertEqual(mock_urlopen.call_count, 4)
 
-    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.sentence_transformers.util.cos_sim')
     @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
     @mock.patch('scripts.duplicate_detector.get_all_open_issues')
     @mock.patch('scripts.duplicate_detector.get_template_lines')
@@ -349,12 +523,12 @@ class MainTests(unittest.TestCase):
         mock_open.side_effect = m
 
         duplicate_detector.main()
-        mock_get_all_open_issues.assert_not_called()
+        mock_get_all_open_issues.assert_called_once()
         mock_get_template_lines.assert_called_once()
 
     @mock.patch('builtins.open')
     @mock.patch('os.path.exists')
-    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.sentence_transformers.util.cos_sim')
     @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
     @mock.patch('scripts.duplicate_detector.get_all_open_issues')
     @mock.patch('scripts.duplicate_detector.get_template_lines')
@@ -400,7 +574,7 @@ class MainTests(unittest.TestCase):
 
     @mock.patch('builtins.open')
     @mock.patch('os.path.exists')
-    @mock.patch('scripts.duplicate_detector.util.cos_sim')
+    @mock.patch('scripts.duplicate_detector.sentence_transformers.util.cos_sim')
     @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
     @mock.patch('scripts.duplicate_detector.get_all_open_issues')
     @mock.patch('scripts.duplicate_detector.get_template_lines')

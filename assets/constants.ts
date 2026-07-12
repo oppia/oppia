@@ -18,6 +18,8 @@
  */
 
 export default {
+  "DUPLICATE_ISSUE_LABEL": "potential-duplicate",
+
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL and classroom name for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
