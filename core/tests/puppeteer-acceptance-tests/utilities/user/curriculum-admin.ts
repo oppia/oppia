@@ -3059,24 +3059,17 @@ export class CurriculumAdmin extends TopicManager {
    * Creates, updates, and publishes a new classroom with a topic.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
-   * @param {string} feedbackRecipientEmailOrTopicToBeAssigned - The feedback
-   * recipient email of the classroom, or the name of the topic for legacy
-   * callers.
+   * @param {string} feedbackRecipientEmail - The feedback
+   * recipient email of the classroom
    * @param {string} topicToBeAssigned - The name of the topic to be assigned
    * to the classroom.
    */
   async createAndPublishClassroom(
     classroomName: string,
     urlFragment: string,
-    feedbackRecipientEmailOrTopicToBeAssigned: string,
-    topicToBeAssigned?: string
+    topicToBeAssigned: string,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
-    const feedbackRecipientEmail = topicToBeAssigned
-      ? feedbackRecipientEmailOrTopicToBeAssigned
-      : 'user@email.com';
-    const assignedTopic =
-      topicToBeAssigned ?? feedbackRecipientEmailOrTopicToBeAssigned;
-
     await this.createNewClassroom(
       classroomName,
       urlFragment,
@@ -3088,7 +3081,7 @@ export class CurriculumAdmin extends TopicManager {
       'This course covers basic algebra and trigonometry.',
       'In this course, you will learn the following topics: algbera and trigonometry,'
     );
-    await this.addTopicToClassroom(classroomName, assignedTopic);
+    await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);
   }
 

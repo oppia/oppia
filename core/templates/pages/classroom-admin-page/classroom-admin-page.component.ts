@@ -744,6 +744,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       topic_id: topicIdToDelete,
       classroom_name: null,
       classroom_url_fragment: null,
+      feedback_recipient_email: null,
     });
     let childTopicNodes = [];
     for (let topicName in this.topicNameToPrerequisiteTopicNames) {
