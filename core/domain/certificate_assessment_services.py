@@ -37,7 +37,7 @@ from typing import Dict, List, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import skill_models
+    from mypy_imports import skill_models, topic_models
 
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
@@ -65,6 +65,19 @@ class CertificateAssessmentOfferingTopicInfoDict(TypedDict):
 
     name: str
     skill_ids: List[str]
+
+
+def _get_topic_skill_ids(topic_model: 'topic_models.TopicModel') -> List[str]:
+    """Returns all skill ids attached to a topic model.
+
+    This mirrors ``Topic.get_all_skill_ids()`` using only raw model fields so
+    callers that already have a ``TopicModel`` do not need to construct a
+    domain object.
+    """
+    skill_ids = list(topic_model.uncategorized_skill_ids)
+    for subtopic_dict in topic_model.subtopics:
+        skill_ids.extend(subtopic_dict.get('skill_ids', []))
+    return skill_ids
 
 
 def _get_topic_name_to_question_ids_map(

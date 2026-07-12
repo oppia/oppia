@@ -38,9 +38,11 @@ from typing import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import skill_models
+    from mypy_imports import skill_models, topic_models
 
-(skill_models,) = models.Registry.import_models([models.Names.SKILL])
+(skill_models, topic_models) = models.Registry.import_models(
+    [models.Names.SKILL, models.Names.TOPIC]
+)
 
 CERTIFICATE_DIFFICULTY_EASY = (
     certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
@@ -407,6 +409,48 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         self.assertEqual(result[0], {'topic_1': ['question_1']})
 
+    def test_get_topic_skill_ids_uses_uncategorized_and_subtopic_skills(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_topic(
+            'topic_1',
+            owner_id,
+            name='Topic 1',
+            abbreviated_name='Topic 1',
+            url_fragment='topic-one',
+            uncategorized_skill_ids=['skill_1', 'skill_2'],
+            subtopics=[
+                topic_domain.Subtopic(
+                    1,
+                    'Subtopic 1',
+                    ['skill_3'],
+                    None,
+                    None,
+                    None,
+                    'subtopic-one',
+                ),
+                topic_domain.Subtopic(
+                    2,
+                    'Subtopic 2',
+                    [],
+                    None,
+                    None,
+                    None,
+                    'subtopic-two',
+                ),
+            ],
+            next_subtopic_id=3,
+        )
+        topic_model = topic_models.TopicModel.get('topic_1')
+
+        self.assertEqual(
+            getattr(certificate_assessment_services, '_get_topic_skill_ids')(
+                topic_model
+            ),
+            ['skill_1', 'skill_2', 'skill_3'],
+        )
+
     def test_format_list_formats_short_lists(self) -> None:
         format_list = getattr(certificate_assessment_services, '_format_list')
         self.assertEqual(format_list(['one']), 'one')
@@ -759,7 +803,9 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                         total_questions=test_case['total_questions'],
                     )
 
-    def test_validate_against_maps_returns_expected_result(self) -> None:
+    def test_validate_against_maps_reports_difficulty_shortage(
+        self,
+    ) -> None:
         result = certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
             topic_ids=['topic_1', 'topic_2'],
             total_questions=6,
@@ -812,7 +858,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             },
         )
 
-    def test_validate_against_maps_rejects_invalid_inputs(self) -> None:
+    def test_validate_against_maps_rejects_empty_topic_ids(self) -> None:
         self.assertEqual(
             certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
                 topic_ids=[],
@@ -824,6 +870,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             ],
             'topic_ids must contain at least one topic.',
         )
+
+    def test_validate_against_maps_rejects_non_positive_total_questions(
+        self,
+    ) -> None:
         self.assertEqual(
             certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
                 topic_ids=['topic_1'],
@@ -837,6 +887,8 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             ],
             'total_questions must be a positive integer.',
         )
+
+    def test_validate_against_maps_rejects_missing_topics(self) -> None:
         self.assertEqual(
             certificate_assessment_services.validate_certificate_assessment_offering_against_maps(
                 topic_ids=['topic_1'],
@@ -925,7 +977,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             },
         )
 
-    def test_validate_against_preloaded_maps_rejects_invalid_inputs(
+    def test_validate_against_preloaded_maps_rejects_empty_topic_ids(
         self,
     ) -> None:
         self.assertEqual(
@@ -940,6 +992,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             ],
             'topic_ids must contain at least one topic.',
         )
+
+    def test_validate_against_preloaded_maps_rejects_non_positive_total_questions(
+        self,
+    ) -> None:
         self.assertEqual(
             certificate_assessment_services.validate_certificate_assessment_offering_against_preloaded_maps(
                 topic_ids=['topic_1'],
