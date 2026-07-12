@@ -37,7 +37,7 @@
           <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
                class="oppia-logo"
                alt="Oppia Home"
-               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-left': !menuIconIsShown ? '25px' : '0px'}">
+               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-inline-start': !menuIconIsShown ? '25px' : '0px'}">
         </picture>
       </a>
     </ng-template>
@@ -455,6 +455,13 @@
              href="/contributor-dashboard"
              class="dropdown-item nav-link e2e-test-contributor-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="isCertificateAssessmentEnabled()">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/certificate-offering-dashboard"
+             class="dropdown-item nav-link">
+            <span>Certificate creator dashboard</span>
           </a>
         </li>
         <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">

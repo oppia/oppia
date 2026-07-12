@@ -16,7 +16,7 @@
  * @fileoverview Component for the topic viewer stories list.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 
 import {StorySummary} from 'domain/story/story-summary.model';
 import {
@@ -25,13 +25,13 @@ import {
 } from 'services/i18n-language-code.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
-import './topic-viewer-stories-list.component.css';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
   styleUrls: ['./topic-viewer-stories-list.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class StoriesListComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

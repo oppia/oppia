@@ -6216,6 +6216,13 @@ export default {
     "Hard": 0.9
   },
 
+  // Certificate assessment question difficulty.
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY": "easy",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM": "medium",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD": "hard",
+
+  "QUESTIONS_PER_TOPIC": 3,
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
@@ -6622,6 +6629,25 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "CERTIFICATE_OFFERING_AVAILABLE": {
+      "ROUTE": "learn/:classroomUrlFragment/certificate-offering-available",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "TITLE": "Certificate Offering Available | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
         }
       ]
     },
