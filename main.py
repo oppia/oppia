@@ -1419,6 +1419,10 @@ URLS = [
         feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
         certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
     ),
+    get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler,
+    ),
 ]
 
 # Adding redirects for topic landing pages.

@@ -17,18 +17,36 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {RouterTestingModule} from '@angular/router/testing';
-import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {RouterTestingModule} from '@angular/router/testing';
+
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 
 describe('AvailableCertificateOfferingPageComponent', () => {
   let component: AvailableCertificateOfferingPageComponent;
   let fixture: ComponentFixture<AvailableCertificateOfferingPageComponent>;
+  let certificateAssessmentOfferingBackendApiService: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+  let alertsService: jasmine.SpyObj<AlertsService>;
 
   beforeEach(async () => {
+    certificateAssessmentOfferingBackendApiService = jasmine.createSpyObj(
+      'CertificateAssessmentOfferingBackendApiService',
+      ['getAvailableCertificateOfferingsForClassroomAsync']
+    );
+    alertsService = jasmine.createSpyObj('AlertsService', ['addWarning']);
+
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [AvailableCertificateOfferingPageComponent],
+      providers: [
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: certificateAssessmentOfferingBackendApiService,
+        },
+        {provide: AlertsService, useValue: alertsService},
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
@@ -41,16 +59,73 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     component.classroomUrlFragment = 'math';
   });
 
-  it('should render the certificate offering content', () => {
+  it('should load and render certificate offerings', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        {
+          certificateId: 'certificate-2',
+          title: 'Zoology',
+          attemptStatus: 'Passed',
+        },
+        {
+          certificateId: 'certificate-1',
+          title: 'Arithmetic',
+          attemptStatus: 'Not Attempted',
+        },
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
 
-    const buttons = Array.from(
-      fixture.nativeElement.querySelectorAll('button')
-    ).map(button => (button as HTMLButtonElement).textContent?.trim() || '');
+    const tiles = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.oppia-certificate-offering-available-page-tile'
+      )
+    );
 
-    expect(buttons.includes('Continue to assessment')).toBe(true);
     expect(
-      fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
-    ).toBe('Available certificate offering');
+      certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync
+    ).toHaveBeenCalledWith('math');
+    expect(tiles.length).toBe(2);
+    expect(tiles[0].querySelector('h3')?.textContent?.trim()).toBe(
+      'Arithmetic'
+    );
+    expect(tiles[1].querySelector('h3')?.textContent?.trim()).toBe('Zoology');
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'No certificates available yet.'
+    );
+  });
+
+  it('should show an empty state when no offerings are returned', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      'No certificates available yet.'
+    );
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  });
+
+  it('should show an error message when the API call fails', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.reject('API error')
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to load certificate assessment offerings.'
+    );
+    expect(component.isLoading).toBeFalse();
+    expect(component.availableCertificateOfferings).toEqual([]);
   });
 });

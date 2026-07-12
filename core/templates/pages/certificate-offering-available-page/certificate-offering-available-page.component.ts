@@ -16,12 +16,46 @@
  * @fileoverview Certificate offering available page component
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+
+import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 import './certificate-offering-available-page.component.css';
 @Component({
   selector: 'oppia-available-certificate-offering-page',
   templateUrl: './certificate-offering-available-page.component.html',
 })
-export class AvailableCertificateOfferingPageComponent {
+export class AvailableCertificateOfferingPageComponent implements OnInit {
   @Input() classroomUrlFragment: string = '';
+  availableCertificateOfferings: AvailableCertificateAssessmentOfferingData[] =
+    [];
+  isLoading = true;
+
+  constructor(
+    private alertsService: AlertsService,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+  ) {}
+
+  async ngOnInit(): Promise<void> {
+    await this.loadAvailableCertificateOfferings();
+  }
+
+  private async loadAvailableCertificateOfferings(): Promise<void> {
+    try {
+      this.availableCertificateOfferings =
+        await this.certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync(
+          this.classroomUrlFragment
+        );
+      this.availableCertificateOfferings.sort((first, second) =>
+        first.title.localeCompare(second.title)
+      );
+    } catch {
+      this.alertsService.addWarning(
+        'Failed to load certificate assessment offerings.'
+      );
+    } finally {
+      this.isLoading = false;
+    }
+  }
 }

@@ -14,19 +14,25 @@
   </div>
 
   <section class="oppia-certificate-offering-available-page-panel">
+    <p *ngIf="isLoading" class="oppia-certificate-offering-available-page-empty-state">
+      Loading certificates...
+    </p>
+    <p *ngIf="!isLoading && availableCertificateOfferings.length === 0"
+       class="oppia-certificate-offering-available-page-empty-state">
+      No certificates available yet.
+    </p>
     <div class="oppia-certificate-offering-available-page-tiles">
-      <!-- TODO(#24717-M1.19): Wire these CTAs to the learner flow once the
-           available certificate assessment page has real navigation targets. -->
-      <article class="oppia-certificate-offering-available-page-tile">
+      <article *ngFor="let offering of availableCertificateOfferings"
+               class="oppia-certificate-offering-available-page-tile">
         <div class="oppia-certificate-offering-available-page-tile-top">
           <div>
-            <h3>Everyday Arithmetic</h3>
+            <h3>{{offering.title}}</h3>
             <p class="oppia-certificate-offering-available-page-tile-subtitle">
-              Number Confidence
+              Certificate offering
             </p>
           </div>
           <span class="oppia-certificate-offering-available-page-status">
-            Not attempted
+            {{offering.attemptStatus}}
           </span>
         </div>
 
@@ -37,28 +43,6 @@
         </div>
       </article>
 
-      <article class="oppia-certificate-offering-available-page-tile">
-        <div class="oppia-certificate-offering-available-page-tile-top">
-          <div>
-            <h3>Everyday Arithmetic</h3>
-            <p class="oppia-certificate-offering-available-page-tile-subtitle">
-              Number Confidence
-            </p>
-          </div>
-          <span class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
-            Passed
-          </span>
-        </div>
-
-        <div class="oppia-certificate-offering-available-page-actions">
-          <button type="button" class="btn btn-secondary">
-            Check score
-          </button>
-          <button type="button" class="btn btn-primary">
-            Retry assessment
-          </button>
-        </div>
-      </article>
     </div>
   </section>
 </div>

@@ -53,6 +53,11 @@
   text-align: left;
 }
 
+.oppia-certificate-offering-available-page-empty-state {
+  color: #5b6472;
+  margin: 0 0 20px;
+}
+
 .oppia-certificate-offering-available-page-panel h2 {
   margin-bottom: 20px;
 }
