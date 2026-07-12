@@ -625,7 +625,6 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     CommonElementsModule,
     CodeMirrorModule,
     DragDropModule,
-    DynamicComponentModule,
     DynamicContentModule,
     FormsModule,
     MaterialModule,
