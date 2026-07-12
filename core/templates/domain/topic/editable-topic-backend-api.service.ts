@@ -317,7 +317,7 @@ export class EditableTopicBackendApiService {
           }
         },
         errorResponse => {
-          errorCallback(errorResponse.error);
+          errorCallback(errorResponse.error.error);
         }
       );
   }

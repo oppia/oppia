@@ -1860,6 +1860,46 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
+    def test_create_translation_opportunity_with_topic_ids(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_EXPLORATION: ['exp_1'],
+        }
+
+        # Create with direct topic_ids mapping, bypassing datastore lookup.
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids, topic_ids=['topic_id_other']
+        )
+
+        model_id = 'exploration.exp_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_other'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_regenerate_opportunities_related_to_topic_with_new_models(
+        self,
+    ) -> None:
+        # Regenerate opportunities.
+        opportunity_services.regenerate_opportunities_related_to_topic(
+            'topic_id_1', delete_existing_opportunities=True
+        )
+
+        model_id = 'exploration.exp_1'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_1'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
     def test_get_translation_opportunities_with_nonexistent_topic_name_returns_empty(
         self,
     ) -> None:
@@ -1904,10 +1944,8 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             'exp_1', 'hi', entity_type=feconf.ENTITY_TYPE_EXPLORATION
         )
 
-        cards, _, _ = (
-            opportunity_services.get_translation_opportunities_with_new_models(
-                feconf.ENTITY_TYPE_EXPLORATION, 'hi'
-            )
+        cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+            feconf.ENTITY_TYPE_EXPLORATION, ['exp_1'], 'hi'
         )
         self.assertEqual(cards[0].translation_counts, {'hi': 1})
 
@@ -2259,6 +2297,9 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(cards[0].entity_id, 'exp_1')
         self.assertEqual(cards[0].entity_description, 'Node 1Title')
         self.assertTrue(cards[0].currently_available_to_learners)
+        self.assertEqual(cards[0].story_title, 'Story 1')
+        self.assertEqual(cards[0].language_code, 'en')
+        self.assertEqual(cards[0].reviewer_only_content_count, 0)
 
         # 2. Test Story entity type.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
@@ -2421,3 +2462,122 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         assert exp_1_opp is not None
         self.assertEqual(exp_1_opp.entity_id, 'exp_1')
         self.assertIsNone(opportunities['exp_nonexistent'])
+
+    def test_delete_translation_opportunities_with_empty_ids(self) -> None:
+        # This covers the edge case where entity_ids is empty.
+        opportunity_services.delete_translation_opportunities(
+            {feconf.ENTITY_TYPE_EXPLORATION: []}
+        )
+
+    def test_get_translation_opportunities_by_entity_ids_story(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_STORY: ['story_id_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_STORY, ['story_id_1', 'nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        story_opp = opportunities['story_id_1']
+        self.assertIsNotNone(story_opp)
+        assert story_opp is not None
+        self.assertEqual(story_opp.entity_id, 'story_id_1')
+        self.assertIsNone(opportunities['nonexistent'])
+
+    def test_get_translation_opportunities_by_entity_ids_skill(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_SKILL: ['skill_id_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_SKILL, ['skill_id_1', 'nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        skill_opp = opportunities['skill_id_1']
+        self.assertIsNotNone(skill_opp)
+        assert skill_opp is not None
+        self.assertEqual(skill_opp.entity_id, 'skill_id_1')
+        self.assertIsNone(opportunities['nonexistent'])
+
+    def test_get_translation_opportunities_by_entity_ids_topic(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_TOPIC: ['topic_id_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_TOPIC, ['topic_id_1', 'nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        topic_opp = opportunities['topic_id_1']
+        self.assertIsNotNone(topic_opp)
+        assert topic_opp is not None
+        self.assertEqual(topic_opp.entity_id, 'topic_id_1')
+        self.assertIsNone(opportunities['nonexistent'])
+
+    def test_update_translation_opp_for_legacy_skill_or_exp_with_untracked_language(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_1']}
+        )
+        # Delete the translation counts cache.
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        model.translation_counts = {}
+        model.update_timestamps()
+        model.put()
+        with self.swap(
+            translation_services, 'get_translation_counts', lambda *args: {}
+        ):
+            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+
+    def test_update_translation_opp_for_legacy_skill_or_exp_with_completed_language(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_1']}
+        )
+        # Delete the translation counts cache.
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        model.translation_counts = {}
+        model.update_timestamps()
+        model.put()
+
+        self.assertIn('hi', model.incomplete_translation_language_codes)
+
+        with self.swap(
+            translation_services,
+            'get_translation_counts',
+            lambda *args: {'hi': 1},
+        ):
+            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        self.assertNotIn('hi', model.incomplete_translation_language_codes)

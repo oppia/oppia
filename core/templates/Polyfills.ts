@@ -16,6 +16,7 @@
  * @fileoverview Polyfills for Oppia.
  */
 
+import 'reflect-metadata';
 import 'globalthis/auto';
 import 'proxy-polyfill';
 import '@webcomponents/custom-elements';
