@@ -83,18 +83,21 @@ let dummyTopicToClassroomRelations = [
     topic_name: 'topic1',
     classroom_name: 'math',
     classroom_url_fragment: 'math',
+    feedback_recipient_email: 'user@email.com',
   },
   {
     topic_id: 'topicid2',
     topic_name: 'topic2',
     classroom_name: null,
     classroom_url_fragment: null,
+    feedback_recipient_email: 'user@email.com',
   },
   {
     topic_id: 'topicid3',
     topic_name: 'topic3',
     classroom_name: null,
     classroom_url_fragment: null,
+    feedback_recipient_email: 'user@email.com',
   },
 ];
 

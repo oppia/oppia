@@ -88,6 +88,10 @@ export class NewClassroomData implements NewClassroom {
     this._urlFragment = urlFragment;
   }
 
+  setFeedbackEmail(feedbackEmail: string): void {
+    this._feedbackRecipientEmail = feedbackEmail;
+  }
+
   getClassroomNameValidationErrors(): string {
     let errorMsg = '';
     if (this._name === '') {
