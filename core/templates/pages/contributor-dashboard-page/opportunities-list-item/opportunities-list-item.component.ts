@@ -55,6 +55,7 @@ export class OpportunitiesListItemComponent {
   @Input() opportunityType!: string;
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
+  @Input() disableButtonOnComplete: boolean = true;
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
 
@@ -160,9 +161,10 @@ export class OpportunitiesListItemComponent {
             width: inReviewTranslationsPercentage + '%',
           };
           this.opportunityButtonDisabled =
+            this.disableButtonOnComplete &&
             this.opportunity.translationsCount +
               this.opportunity.inReviewCount ===
-            this.opportunity.totalCount;
+              this.opportunity.totalCount;
         } else {
           this.progressBarStyle = {width: this.progressPercentage};
         }
