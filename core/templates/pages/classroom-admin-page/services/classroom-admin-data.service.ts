@@ -104,7 +104,8 @@ export class ClassroomAdminDataService {
     tempClassroom.setClassroomValidityFlag(
       this.nameValidationError === '' &&
         this.urlValidationError === '' &&
-        this.topicsGraphValidationError === ''
+        this.topicsGraphValidationError === '' &&
+        this.FeedbackRecipientEmailValidationError === ''
     );
   }
 

@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import classroom_migration_jobs
 from core.jobs.types import job_run_result
@@ -71,16 +70,10 @@ class MigrateClassroomFeedbackRecipientEmailJobTests(
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stdout=(
-                        'MIGRATED CLASSROOM FEEDBACK RECIPIENT EMAIL: '
-                        'classroom_id'
-                    )
+                    stdout='Migrated ClassroomModel: id=classroom_id'
                 ),
                 job_run_result.JobRunResult(
-                    stdout=(
-                        'MIGRATED CLASSROOM FEEDBACK RECIPIENT EMAIL COUNT '
-                        'SUCCESS: 1'
-                    )
+                    stdout='migrated_classroom_feedback_recipient_email_count: 1'
                 ),
             ]
         )
@@ -91,7 +84,7 @@ class MigrateClassroomFeedbackRecipientEmailJobTests(
         self.assertIsNotNone(fetched_model)
         self.assertEqual(
             fetched_model.feedback_recipient_email,
-            feconf.SYSTEM_EMAIL_ADDRESS,
+            'lesson-creation-leads@oppia.org',
         )
 
     def test_skips_classrooms_with_feedback_recipient_email(self) -> None:
@@ -165,14 +158,13 @@ class AuditClassroomFeedbackRecipientEmailJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stdout=(
-                        'MIGRATED CLASSROOM FEEDBACK RECIPIENT EMAIL: '
-                        'classroom_id'
+                        'ClassroomModel missing feedback_recipient_email: '
+                        'id=classroom_id'
                     )
                 ),
                 job_run_result.JobRunResult(
                     stdout=(
-                        'MIGRATED CLASSROOM FEEDBACK RECIPIENT EMAIL COUNT '
-                        'SUCCESS: 1'
+                        'classrooms_missing_feedback_recipient_email_count: 1'
                     )
                 ),
             ]
@@ -183,3 +175,35 @@ class AuditClassroomFeedbackRecipientEmailJobTests(job_test_utils.JobTestBase):
         )
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.feedback_recipient_email, '')
+
+    def test_skips_classrooms_with_feedback_recipient_email(self) -> None:
+        model = self.create_model(
+            classroom_models.ClassroomModel,
+            id='classroom_id',
+            name='math',
+            url_fragment='math',
+            feedback_recipient_email='user@email.com',
+            course_details='Course details',
+            teaser_text='Teaser text',
+            topic_list_intro='Topic list intro',
+            topic_id_to_prerequisite_topic_ids={},
+            is_published=False,
+            diagnostic_test_is_enabled=False,
+            thumbnail_filename='',
+            thumbnail_bg_color='',
+            thumbnail_size_in_bytes=0,
+            banner_filename='',
+            banner_bg_color='',
+            banner_size_in_bytes=0,
+            index=0,
+        )
+        self.put_multi([model])
+
+        self.assert_job_output_is_empty()
+
+        fetched_model = classroom_models.ClassroomModel.get_by_id(
+            'classroom_id'
+        )
+        self.assertEqual(
+            fetched_model.feedback_recipient_email, 'user@email.com'
+        )
