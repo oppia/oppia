@@ -118,6 +118,15 @@ const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
+const historyTabButton = '.e2e-test-history-tab';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const historyTabContentContainerSelector = '.e2e-test-exploration-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const historyTableIndex = '.e2e-test-history-table-index';
+const historyListOptions = '.e2e-test-history-table-option';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
@@ -948,6 +957,161 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
+  }
+
+  /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileHistoryTabButton);
+      await this.clickOnElementWithSelector(mobileHistoryTabButton);
+    } else {
+      await this.clickOnElementWithSelector(historyTabButton);
+    }
+    await this.expectElementToBeVisible(historyTabContentContainerSelector);
+  }
+
+  /**
+   * Returns the expected filename for a downloaded exploration version.
+   * @param {number} explorationVersion - The version number.
+   * @param {boolean} isExplorationPublished - Whether the exploration is published.
+   * @param {number} duplicateCount - How many files with the same name already exist.
+   */
+  private async getExpectedFileName(
+    explorationVersion: number,
+    isExplorationPublished: boolean,
+    duplicateCount: number
+  ): Promise<string> {
+    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+    if (isExplorationPublished) {
+      const prefix = 'oppia-Publishwithaninteraction-v';
+      return duplicateCount === 0
+        ? `${prefix}${explorationVersion}.zip`
+        : `${prefix}${explorationVersion} (${duplicateCount}).zip`;
+    } else {
+      const prefix = 'oppia-unpublished_exploration-v';
+      return duplicateCount === 0
+        ? `${prefix}${explorationVersion}.zip`
+        : `${prefix}${explorationVersion} (${duplicateCount}).zip`;
+    }
+  }
+
+  /**
+   * Returns existing downloaded files matching the given version.
+   * @param {number} explorationVersion - The version number.
+   * @param {boolean} isExplorationPublished - Whether the exploration is published.
+   */
+  private async getExistingVersionFiles(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<string[]> {
+    const fs = await import('fs');
+    const path = await import('path');
+    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+    const prefix = isExplorationPublished
+      ? `oppia-Publishwithaninteraction-v${explorationVersion}`
+      : `oppia-unpublished_exploration-v${explorationVersion}`;
+
+    if (!fs.existsSync(downloadDir)) {
+      return [];
+    }
+    return fs
+      .readdirSync(downloadDir)
+      .filter(f => f.startsWith(prefix) && f.endsWith('.zip'));
+  }
+
+  /**
+   * Waits for a downloaded file to appear in the download directory.
+   * @param {string} expectedFileName - The expected filename.
+   */
+  private async waitForExplorationDownload(
+    expectedFileName: string
+  ): Promise<string | null> {
+    const fs = await import('fs');
+    const path = await import('path');
+    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+    const expectedPath = path.join(downloadDir, expectedFileName);
+    const maxWaitMs = 30000;
+    const pollIntervalMs = 500;
+    const start = Date.now();
+
+    while (Date.now() - start < maxWaitMs) {
+      if (fs.existsSync(expectedPath)) {
+        return expectedFileName;
+      }
+      await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
+    }
+    return null;
+  }
+
+  /**
+   * Function to download a specific version of an Exploration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
+   */
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<void> {
+    await this.expectElementToBeVisible(historyListContent);
+    const historyItems = await this.page.$$(historyListContent);
+
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await historyItem.$(historyTableIndex);
+      if (!versionNumberElement) {
+        continue;
+      }
+      const versionText = await versionNumberElement.evaluate(
+        el => el.textContent
+      );
+      if (parseInt(versionText ?? '', 10) !== explorationVersion) {
+        continue;
+      }
+
+      const existingFiles = await this.getExistingVersionFiles(
+        explorationVersion,
+        isExplorationPublished
+      );
+      const nextNumber = existingFiles.length;
+      const expectedFileName = await this.getExpectedFileName(
+        explorationVersion,
+        isExplorationPublished,
+        nextNumber
+      );
+
+      const dropdownButton = await historyItem.$(historyListOptions);
+      if (!dropdownButton) {
+        throw new Error(
+          `Dropdown button not found for version ${explorationVersion}`
+        );
+      }
+      await dropdownButton.evaluate(el => (el as HTMLElement).click());
+      await this.page.waitForTimeout(1000);
+
+      const downloadButton = await historyItem.$(downloadExplorationButton);
+      if (!downloadButton) {
+        throw new Error(
+          `Download button not found for version ${explorationVersion}`
+        );
+      }
+      await downloadButton.evaluate(el => (el as HTMLElement).click());
+      await this.page.waitForTimeout(5000);
+
+      const downloadedFile =
+        await this.waitForExplorationDownload(expectedFileName);
+      if (downloadedFile) {
+        showMessage(`${downloadedFile} file is successfully downloaded`);
+        return;
+      } else {
+        throw new Error(
+          `Download failed for Exploration version: ${explorationVersion}`
+        );
+      }
+    }
+
+    throw new Error(`Version ${explorationVersion} not found in history list.`);
   }
 }
 
