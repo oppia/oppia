@@ -125,6 +125,7 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
           title: this.certificateAssessmentOffering.title,
           description: this.certificateAssessmentOffering.description,
           classroom_id: this.certificateAssessmentOffering.classroomId,
+          topic_ids: Object.keys(this.certificateAssessmentOffering.topicData),
           topic_data: this.certificateAssessmentOffering.topicData,
           demonstrates: this.certificateAssessmentOffering.demonstrates,
           total_questions: this.certificateAssessmentOffering.totalQuestions,
