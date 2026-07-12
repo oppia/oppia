@@ -129,7 +129,7 @@ export class NewClassroomData implements NewClassroom {
       return 'The feedback recipient email should not be empty.';
     }
 
-    const emailRegex = AppConstants.EMAIL_REGEX;
+    const emailRegex = new RegExp(AppConstants.EMAIL_REGEX);
 
     if (!emailRegex.test(this._feedbackRecipientEmail.trim())) {
       return 'Please enter a valid email address.';
