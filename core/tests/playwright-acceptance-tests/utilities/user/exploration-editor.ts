@@ -974,78 +974,9 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Returns the expected filename for a downloaded exploration version.
-   * @param {number} explorationVersion - The version number.
-   * @param {boolean} isExplorationPublished - Whether the exploration is published.
-   * @param {number} duplicateCount - How many files with the same name already exist.
-   */
-  private async getExpectedFileName(
-    explorationVersion: number,
-    isExplorationPublished: boolean,
-    duplicateCount: number
-  ): Promise<string> {
-    if (isExplorationPublished) {
-      const prefix = 'oppia-Publishwithaninteraction-v';
-      return duplicateCount === 0
-        ? `${prefix}${explorationVersion}.zip`
-        : `${prefix}${explorationVersion} (${duplicateCount}).zip`;
-    } else {
-      const prefix = 'oppia-unpublished_exploration-v';
-      return duplicateCount === 0
-        ? `${prefix}${explorationVersion}.zip`
-        : `${prefix}${explorationVersion} (${duplicateCount}).zip`;
-    }
-  }
-
-  /**
-   * Returns existing downloaded files matching the given version.
-   * @param {number} explorationVersion - The version number.
-   * @param {boolean} isExplorationPublished - Whether the exploration is published.
-   */
-  private async getExistingVersionFiles(
-    explorationVersion: number,
-    isExplorationPublished: boolean
-  ): Promise<string[]> {
-    const fs = await import('fs');
-    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
-    const prefix = isExplorationPublished
-      ? `oppia-Publishwithaninteraction-v${explorationVersion}`
-      : `oppia-unpublished_exploration-v${explorationVersion}`;
-
-    if (!fs.existsSync(downloadDir)) {
-      return [];
-    }
-    return fs
-      .readdirSync(downloadDir)
-      .filter(f => f.startsWith(prefix) && f.endsWith('.zip'));
-  }
-
-  /**
-   * Waits for a downloaded file to appear in the download directory.
-   * @param {string} expectedFileName - The expected filename.
-   */
-  private async waitForExplorationDownload(
-    expectedFileName: string
-  ): Promise<string | null> {
-    const fs = await import('fs');
-    const path = await import('path');
-    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
-    const expectedPath = path.join(downloadDir, expectedFileName);
-    const maxWaitMs = 30000;
-    const pollIntervalMs = 500;
-    const start = Date.now();
-
-    while (Date.now() - start < maxWaitMs) {
-      if (fs.existsSync(expectedPath)) {
-        return expectedFileName;
-      }
-      await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
-    }
-    return null;
-  }
-
-  /**
    * Function to download a specific version of an Exploration.
+   * Uses Playwright's download event to reliably capture the file,
+   * regardless of the download directory configuration.
    * @param {number} explorationVersion - The version of the exploration to download.
    * @param {boolean} isExplorationPublished - Whether the Exploration is published.
    */
@@ -1068,17 +999,6 @@ export class ExplorationEditor extends BaseUser {
         continue;
       }
 
-      const existingFiles = await this.getExistingVersionFiles(
-        explorationVersion,
-        isExplorationPublished
-      );
-      const nextNumber = existingFiles.length;
-      const expectedFileName = await this.getExpectedFileName(
-        explorationVersion,
-        isExplorationPublished,
-        nextNumber
-      );
-
       const dropdownButton = await historyItem.$(historyListOptions);
       if (!dropdownButton) {
         throw new Error(
@@ -1094,19 +1014,26 @@ export class ExplorationEditor extends BaseUser {
           `Download button not found for version ${explorationVersion}`
         );
       }
-      await downloadButton.evaluate(el => (el as HTMLElement).click());
-      await this.page.waitForTimeout(5000);
 
-      const downloadedFile =
-        await this.waitForExplorationDownload(expectedFileName);
-      if (downloadedFile) {
-        showMessage(`${downloadedFile} file is successfully downloaded`);
-        return;
-      } else {
-        throw new Error(
-          `Download failed for Exploration version: ${explorationVersion}`
-        );
+      // Use Playwright's download event to reliably capture the file.
+      const downloadPromise = this.page.waitForEvent('download');
+      await downloadButton.evaluate(el => (el as HTMLElement).click());
+      const download = await downloadPromise;
+
+      const suggestedFilename = download.suggestedFilename();
+      const fs = await import('fs');
+      const path = await import('path');
+      const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+      if (!fs.existsSync(downloadDir)) {
+        fs.mkdirSync(downloadDir, {recursive: true});
       }
+
+      const savePath = path.join(downloadDir, suggestedFilename);
+      await download.saveAs(savePath);
+
+      showMessage(`${suggestedFilename} file is successfully downloaded`);
+      return;
     }
 
     throw new Error(`Version ${explorationVersion} not found in history list.`);
