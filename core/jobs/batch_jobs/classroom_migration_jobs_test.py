@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import classroom_migration_jobs
 from core.jobs.types import job_run_result
@@ -32,8 +33,48 @@ if MYPY:  # pragma: no cover
 (classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
 
 
+class ClassroomFeedbackRecipientEmailJobTestsBase(job_test_utils.JobTestBase):
+    """Base class for Classroom feedback recipient email job tests."""
+
+    def save_legacy_classroom_model_without_feedback_recipient_email(
+        self,
+    ) -> None:
+        """Saves a ClassroomModel stored without feedback_recipient_email."""
+        classroom_model = classroom_models.ClassroomModel
+        legacy_classroom_properties = dict(
+            classroom_model._properties  # pylint: disable=protected-access
+        )
+        del legacy_classroom_properties['feedback_recipient_email']
+
+        with self.swap(
+            classroom_model,
+            '_properties',
+            legacy_classroom_properties,
+        ):
+            model = self.create_model(
+                classroom_model,
+                id='classroom_id',
+                name='math',
+                url_fragment='math',
+                course_details='Course details',
+                teaser_text='Teaser text',
+                topic_list_intro='Topic list intro',
+                topic_id_to_prerequisite_topic_ids={},
+                is_published=False,
+                diagnostic_test_is_enabled=False,
+                thumbnail_filename='',
+                thumbnail_bg_color='',
+                thumbnail_size_in_bytes=0,
+                banner_filename='',
+                banner_bg_color='',
+                banner_size_in_bytes=0,
+                index=0,
+            )
+            self.put_multi([model])
+
+
 class MigrateClassroomFeedbackRecipientEmailJobTests(
-    job_test_utils.JobTestBase
+    ClassroomFeedbackRecipientEmailJobTestsBase
 ):
     """Tests for MigrateClassroomFeedbackRecipientEmailJob."""
 
@@ -45,27 +86,7 @@ class MigrateClassroomFeedbackRecipientEmailJobTests(
         self.assert_job_output_is_empty()
 
     def test_migrates_classrooms_missing_feedback_recipient_email(self) -> None:
-        model = self.create_model(
-            classroom_models.ClassroomModel,
-            id='classroom_id',
-            name='math',
-            url_fragment='math',
-            feedback_recipient_email='',
-            course_details='Course details',
-            teaser_text='Teaser text',
-            topic_list_intro='Topic list intro',
-            topic_id_to_prerequisite_topic_ids={},
-            is_published=False,
-            diagnostic_test_is_enabled=False,
-            thumbnail_filename='',
-            thumbnail_bg_color='',
-            thumbnail_size_in_bytes=0,
-            banner_filename='',
-            banner_bg_color='',
-            banner_size_in_bytes=0,
-            index=0,
-        )
-        self.put_multi([model])
+        self.save_legacy_classroom_model_without_feedback_recipient_email()
 
         self.assert_job_output_is(
             [
@@ -84,7 +105,7 @@ class MigrateClassroomFeedbackRecipientEmailJobTests(
         self.assertIsNotNone(fetched_model)
         self.assertEqual(
             fetched_model.feedback_recipient_email,
-            'lesson-creation-leads@oppia.org',
+            feconf.DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL,
         )
 
     def test_skips_classrooms_with_feedback_recipient_email(self) -> None:
@@ -121,7 +142,9 @@ class MigrateClassroomFeedbackRecipientEmailJobTests(
         )
 
 
-class AuditClassroomFeedbackRecipientEmailJobTests(job_test_utils.JobTestBase):
+class AuditClassroomFeedbackRecipientEmailJobTests(
+    ClassroomFeedbackRecipientEmailJobTestsBase
+):
     """Tests for AuditClassroomFeedbackRecipientEmailJob."""
 
     JOB_CLASS: Type[
@@ -132,27 +155,7 @@ class AuditClassroomFeedbackRecipientEmailJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_audits_classrooms_missing_feedback_recipient_email(self) -> None:
-        model = self.create_model(
-            classroom_models.ClassroomModel,
-            id='classroom_id',
-            name='math',
-            url_fragment='math',
-            feedback_recipient_email='',
-            course_details='Course details',
-            teaser_text='Teaser text',
-            topic_list_intro='Topic list intro',
-            topic_id_to_prerequisite_topic_ids={},
-            is_published=False,
-            diagnostic_test_is_enabled=False,
-            thumbnail_filename='',
-            thumbnail_bg_color='',
-            thumbnail_size_in_bytes=0,
-            banner_filename='',
-            banner_bg_color='',
-            banner_size_in_bytes=0,
-            index=0,
-        )
-        self.put_multi([model])
+        self.save_legacy_classroom_model_without_feedback_recipient_email()
 
         self.assert_job_output_is(
             [
@@ -174,7 +177,7 @@ class AuditClassroomFeedbackRecipientEmailJobTests(job_test_utils.JobTestBase):
             'classroom_id'
         )
         self.assertIsNotNone(fetched_model)
-        self.assertEqual(fetched_model.feedback_recipient_email, '')
+        self.assertIsNone(fetched_model.feedback_recipient_email)
 
     def test_skips_classrooms_with_feedback_recipient_email(self) -> None:
         model = self.create_model(

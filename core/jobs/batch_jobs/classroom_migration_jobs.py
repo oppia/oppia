@@ -21,7 +21,6 @@ from __future__ import annotations
 from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -52,7 +51,9 @@ class MigrateClassroomFeedbackRecipientEmailJob(base_jobs.JobBase):
             bool. Whether the classroom needs its feedback recipient email
             backfilled.
         """
-        return not getattr(classroom_model, 'feedback_recipient_email', None)
+        return (
+            getattr(classroom_model, 'feedback_recipient_email', None) is None
+        )
 
     def _backfill_feedback_recipient_email(
         self, classroom_model: classroom_models.ClassroomModel
@@ -70,7 +71,7 @@ class MigrateClassroomFeedbackRecipientEmailJob(base_jobs.JobBase):
                 # We are using the lesson creation leads email for now.
                 # After the successfull run of this job this will be changed to
                 # the respective classroom creation email.
-                'lesson-creation-leads@oppia.org'
+                feconf.DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL
             )
             classroom_model.update_timestamps()
 

@@ -1154,9 +1154,9 @@ export class CurriculumAdmin extends TopicManager {
     topicListIntro: string,
     courseDetails: string,
     url?: string,
-    feedbackRecipientEmail: string = 'user@email.com',
     thumbnailImage: string = curriculumAdminThumbnailImage,
-    bannerImage: string = classroomBannerImage
+    bannerImage: string = classroomBannerImage,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);

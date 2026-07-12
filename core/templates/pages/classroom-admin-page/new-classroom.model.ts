@@ -129,7 +129,7 @@ export class NewClassroomData implements NewClassroom {
       return 'The feedback recipient email should not be empty.';
     }
 
-    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailRegex = AppConstants.EMAIL_REGEX;
 
     if (!emailRegex.test(this._feedbackRecipientEmail.trim())) {
       return 'Please enter a valid email address.';

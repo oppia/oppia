@@ -1950,3 +1950,5 @@ LEAP_DASHBOARD_PATHS = frozenset(
         'donate',
     ]
 )
+
+DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'
