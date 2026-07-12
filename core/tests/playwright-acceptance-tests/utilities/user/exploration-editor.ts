@@ -16,11 +16,12 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {Page, ElementHandle, Locator} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {ImageAreaSelection} from '../common/image-area-selection';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -90,6 +91,13 @@ const multipleChoiceResponseDropdown =
   'mat-select.e2e-test-main-html-select-selector';
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const responseModalBodySelector = '.e2e-test-response-modal-body';
+const uploadImageButton = '.e2e-test-upload-image';
+const useTheUploadImageButton = '.e2e-test-use-image';
+const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
+const solutionModal = 'oppia-add-or-update-solution-modal';
+const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
+const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
+const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 const floatFormInput = '.e2e-test-float-form-input';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
 const textInputInteractionOption =
@@ -948,6 +956,302 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
+  }
+
+  async addImageInteraction(
+    feedback: string = 'Correct!',
+    nextCard?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.expectModalTitleToBe('Choose Interaction');
+
+    const imageRegionOption = this.page.locator(
+      'xpath=//*[contains(normalize-space(text()), "Image Region")]'
+    );
+    await imageRegionOption.waitFor({state: 'visible'});
+    await imageRegionOption.click();
+
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Image Region)'
+    );
+    await this.clickOnElementWithSelector(uploadImageButton);
+    await this.uploadFile(imageToUpload);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
+    await this.waitForPageToFullyLoad();
+
+    await this.expectElementToBeVisible('.btn-danger');
+    const imageRegionHelper = new ImageAreaSelection(this.page);
+    await imageRegionHelper.selectArea(5, 50, 90, 45);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  async customizeItemSelectionInteraction(
+    options: string[],
+    minimumNumberOfSelections?: number,
+    maximumNumberOfSelections?: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    const inputSelector = `${customizeInteractionBodySelector} input`;
+    const inputElements = this.page.locator(inputSelector);
+
+    if (minimumNumberOfSelections) {
+      const inputElement = inputElements.nth(0);
+      await inputElement.click();
+      await this.page.keyboard.press('Backspace');
+      await inputElement.fill(String(minimumNumberOfSelections));
+      await expect(inputElement).toHaveValue(String(minimumNumberOfSelections));
+    }
+
+    if (maximumNumberOfSelections) {
+      const inputElement = inputElements.nth(1);
+      await inputElement.click();
+      await this.page.keyboard.press('Backspace');
+      await inputElement.fill(String(maximumNumberOfSelections));
+      await expect(inputElement).toHaveValue(String(maximumNumberOfSelections));
+    }
+
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+    }
+
+    const responseInputs = this.page.locator(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs.nth(i).fill(options[i]);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Item Selection interaction has been customized successfully.');
+  }
+
+  async updateItemSelectionLearnersAnswerInResponseModal(
+    rule:
+      | 'is equal to'
+      | 'is proper subset of'
+      | 'contains at least one of'
+      | 'omits atleast on of',
+    optionsSelections: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(responseModalBodySelector);
+    await this.updateRuleInResponseModalTo(rule);
+
+    const checkboxes = this.page.locator(
+      `${responseModalBodySelector} mat-checkbox`
+    );
+    const count = await checkboxes.count();
+    for (let i = 0; i < count; i++) {
+      const checkbox = checkboxes.nth(i);
+      const optionText = (await checkbox.textContent())?.trim() ?? '';
+      if (optionsSelections.includes(optionText)) {
+        const innerContainer = checkbox.locator(
+          '.mat-checkbox-inner-container'
+        );
+        await innerContainer.click();
+        const inputElement = checkbox.locator('input');
+        await expect(inputElement).toBeChecked();
+      }
+    }
+  }
+
+  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+    await this.addInteraction('Multiple Choice', false);
+
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+    }
+
+    const responseInputs = this.page.locator(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs.nth(i).fill(options[i]);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Multiple Choice interaction has been added successfully.');
+  }
+
+  async updateMultipleChoiceLearnersAnswerInResponseModal(
+    rule: 'is equal to',
+    answer: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    await this.expectElementToBeVisible(multipleChoiceResponseDropdown);
+    await this.clickOnElementWithSelector(multipleChoiceResponseDropdown);
+
+    const option = this.page.locator('mat-option', {hasText: answer});
+    await option.waitFor({state: 'visible'});
+    await option.click();
+    await this.expectElementToBeVisible('mat-option', false);
+    await this.expectTextContentToBe(multipleChoiceResponseDropdown, answer);
+  }
+
+  async addTextInputInteraction(): Promise<void> {
+    await this.addInteraction('Text Input');
+  }
+
+  async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
+    }
+
+    const responseInputs = this.page.locator(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs.nth(i).click({clickCount: 3});
+      await responseInputs.nth(i).fill(options[i]);
+    }
+
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+  }
+
+  async updateDragAndDropSortLearnersAnswerInResponseModal(
+    rule: string,
+    optionsSelections: string[] | number[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+    await this.expectElementToBeVisible(ruleEditorInResponseModalSeclector);
+    const ruleBox = this.page.locator(ruleEditorInResponseModalSeclector);
+
+    const ruleType =
+      typeof optionsSelections[0] === 'number' ? 'ordering' : 'comparasion';
+
+    if (ruleType === 'ordering') {
+      const selectBoxes = ruleBox.locator('select');
+      const count = await selectBoxes.count();
+      if (count !== optionsSelections.length) {
+        throw new Error(
+          `Expected ${optionsSelections.length} select boxes, but found ${count}.`
+        );
+      }
+
+      for (let i = 0; i < count; i++) {
+        await selectBoxes.nth(i).selectOption(optionsSelections[i].toString());
+      }
+    } else {
+      throw new Error('Rule currently not supported');
+    }
+  }
+
+  async addDragAndDropSortSolution(
+    sortedOptions: string[],
+    explaination: string
+  ): Promise<void> {
+    await this.clickOnAddSolutionButton();
+    await this.expectElementToBeVisible(dragAndDropItemSelector);
+
+    const solutionModalLocator = this.page.locator(solutionModal);
+    const itemLocators = solutionModalLocator.locator(dragAndDropItemSelector);
+
+    for (let i = 0; i < sortedOptions.length - 1; i++) {
+      const option = sortedOptions[i];
+      const count = await itemLocators.count();
+      const destinationElement = itemLocators.nth(i);
+
+      let sourceElement: Locator | null = null;
+      for (let j = i; j < count; j++) {
+        const item = itemLocators.nth(j);
+        const text = (await item.textContent())?.trim();
+        if (text === option) {
+          sourceElement = item;
+          break;
+        }
+      }
+
+      if (!sourceElement) {
+        throw new Error(`Option "${option}" not found.`);
+      }
+
+      const isSame = await sourceElement.evaluate(
+        (el1: HTMLElement, el2: HTMLElement) => el1 === el2,
+        await destinationElement.elementHandle()
+      );
+      if (isSame) {
+        continue;
+      }
+
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
+      const sourceBox = await sourceElement.boundingBox();
+      const destBox = await destinationElement.boundingBox();
+
+      if (!sourceBox || !destBox) {
+        throw new Error(
+          'Could not get bounding box for drag-and-drop operation.'
+        );
+      }
+
+      await this.dragAndDropItem(
+        sourceBox.x + sourceBox.width / 2,
+        sourceBox.y + sourceBox.height / 2,
+        destBox.x + destBox.width / 2,
+        destBox.y + destBox.height / 2
+      );
+    }
+
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  async dragAndDropItem(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number
+  ): Promise<void> {
+    await this.page.mouse.move(startX, startY);
+    await this.page.waitForTimeout(1000);
+    await this.page.mouse.down();
+    await this.page.waitForTimeout(1000);
+    await this.page.mouse.move(endX, endY, {steps: 10});
+    await this.page.waitForTimeout(1000);
+    await this.page.mouse.up();
+    await this.page.waitForTimeout(1000);
+  }
+
+  async clickOnAddSolutionButton(): Promise<void> {
+    await this.clickOnElementWithSelector(addSolutionButton);
+  }
+
+  async getSolutionModal(): Promise<Locator> {
+    const modal = this.page.locator(solutionModal);
+    await modal.waitFor({state: 'visible'});
+    return modal;
+  }
+
+  async updateRuleInResponseModalTo(rule: string): Promise<void> {
+    await this.expectElementToBeVisible(responseModalBodySelector);
+    const select = this.page.locator(`${responseModalBodySelector} mat-select`);
+    await select.click();
+
+    await this.expectElementToBeVisible('mat-option');
+    const option = this.page.locator('mat-option', {hasText: rule});
+    await option.click();
+    await this.expectElementToBeVisible('mat-option', false);
+  }
+
+  async fillValueInInteractionResponseModal(
+    value: string,
+    inputType: 'input' | 'textarea',
+    index: number = 0
+  ): Promise<void> {
+    const selector = `${responseModalBodySelector} ${inputType}`;
+    await this.expectElementToBeVisible(selector);
+
+    const elements = this.page.locator(selector);
+    const count = await elements.count();
+    if (count <= index) {
+      throw new Error(`Element ${index} not found.`);
+    }
+
+    const element = elements.nth(index);
+    await element.fill(value);
+    await expect(element).toHaveValue(value);
   }
 }
 
