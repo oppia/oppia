@@ -1814,6 +1814,7 @@ class TechnicalFeedbackDashboardAccessValidationHandlerTests(
 
         self.get_html_response(
             '%s/can_access_technical_feedback_dashboard'
-            % ACCESS_VALIDATION_HANDLER_PREFIX
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=200,
         )
         self.logout()

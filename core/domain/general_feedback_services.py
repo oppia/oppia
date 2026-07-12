@@ -481,8 +481,10 @@ def update_platform_feedback_status_for_dashboard(
     if new_status not in feconf.STATUS_CHOICES:
         raise ValueError('Invalid status: %s' % new_status)
 
-    model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
-    if model is None or model.deleted:
+    model = general_feedback_models.PlatformFeedbackModel.get(
+        report_id, strict=False
+    )
+    if model is None:
         return None
 
     validate_platform_feedback_belongs_to_dashboard(
