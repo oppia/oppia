@@ -126,6 +126,13 @@ class MockQuestionBackendApiService {
   async fetchQuestionsAsync() {
     return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
   }
+
+  async fetchQuestionsForSkillPreviewPageAsync() {
+    return Promise.resolve({
+      questionDicts: [questionDict as unknown as QuestionBackendDict],
+      more: false,
+    });
+  }
 }
 
 describe('Skill Preview Tab Component', () => {

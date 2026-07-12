@@ -483,6 +483,85 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
+    def test_paginated_fetch_returns_all_questions_across_pages(
+        self,
+    ) -> None:
+        # The setUp method already links 2 questions to self.skill_id. Add a 3rd so
+        # a page size of 2 forces a second page.
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_id_3 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_3,
+            'user',
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.skill_id],
+            content_id_generator.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_3, self.skill_id, 0.5
+        )
+
+        # First page: request 2, expect 2 back and more=True.
+        url = (
+            '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s'
+            '&offset=%s'
+            % (
+                feconf.QUESTIONS_URL_PREFIX,
+                '2',
+                self.skill_id,
+                'false',
+                '0',
+            )
+        )
+        first_page = self.get_json(url)
+        self.assertEqual(len(first_page['question_dicts']), 2)
+        self.assertTrue(first_page['more'])
+
+        # Second page: offset past the first 2, expect the 1 remaining
+        # question and more=False.
+        url = (
+            '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s'
+            '&offset=%s'
+            % (
+                feconf.QUESTIONS_URL_PREFIX,
+                '2',
+                self.skill_id,
+                'false',
+                '2',
+            )
+        )
+        second_page = self.get_json(url)
+        self.assertEqual(len(second_page['question_dicts']), 1)
+        self.assertFalse(second_page['more'])
+
+        # No question should appear on both pages, and together they
+        # should cover every question linked to the skill.
+        first_page_ids = {q['id'] for q in first_page['question_dicts']}
+        second_page_ids = {q['id'] for q in second_page['question_dicts']}
+        self.assertEqual(len(first_page_ids & second_page_ids), 0)
+        self.assertEqual(
+            first_page_ids | second_page_ids,
+            {self.question_id, self.question_id_2, question_id_3},
+        )
+
+    def test_paginated_fetch_rejects_multiple_skill_ids(self) -> None:
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', description='Description')
+
+        url = (
+            '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s'
+            '&offset=%s'
+            % (
+                feconf.QUESTIONS_URL_PREFIX,
+                '2',
+                self.skill_id,
+                skill_id_2,
+                'false',
+                '0',
+            )
+        )
+        self.get_json(url, expected_status_int=400)
+
     def test_multiple_skill_id_returns_questions(self) -> None:
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_2, 'user', description='Description')

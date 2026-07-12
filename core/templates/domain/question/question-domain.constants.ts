@@ -29,6 +29,14 @@ export const QuestionDomainConstants = {
     '/question_player_handler?skill_ids=<skill_ids>&question_count' +
     '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>',
 
+  // Used by the Skill Editor's Preview tab to deterministically page
+  // through *all* questions linked to a skill (see #23453), rather than
+  // the random practice sample that QUESTION_PLAYER_URL_TEMPLATE returns
+  // when no offset is given.
+  QUESTION_PLAYER_PAGINATED_URL_TEMPLATE:
+    '/question_player_handler?skill_ids=<skill_ids>&question_count' +
+    '=<question_count>&fetch_by_difficulty=false&offset=<offset>',
+
   QUESTIONS_LIST_URL_TEMPLATE:
     '/questions_list_handler/<comma_separated_skill_ids>?offset=<offset>',
 

@@ -34,6 +34,16 @@ interface QuestionsBackendResponse {
   question_dicts: QuestionBackendDict[];
 }
 
+interface PaginatedQuestionsBackendResponse {
+  question_dicts: QuestionBackendDict[];
+  more: boolean;
+}
+
+export interface PaginatedQuestionsResponse {
+  questionDicts: QuestionBackendDict[];
+  more: boolean;
+}
+
 interface QuestionSummariesBackendResponse {
   question_summary_dicts: QuestionSummaryForOneSkillBackendDict[];
   more: boolean;
@@ -228,6 +238,37 @@ export class QuestionBackendApiService {
         reject
       );
     });
+  }
+
+  /**
+   * Returns one deterministic page of questions linked to a single skill,
+   * along with whether more questions are available beyond this page. Used
+   * by the Skill Editor's Preview tab, which needs to reliably page through
+   * *all* questions for a skill (see #23453) rather than a random practice
+   * sample.
+   */
+  async fetchQuestionsForSkillPreviewPageAsync(
+    skillId: string,
+    questionCount: number,
+    offset: number
+  ): Promise<PaginatedQuestionsResponse> {
+    var questionDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.QUESTION_PLAYER_PAGINATED_URL_TEMPLATE,
+      {
+        skill_ids: skillId,
+        question_count: questionCount.toString(),
+        offset: offset.toString(),
+      }
+    );
+    return this.http
+      .get<PaginatedQuestionsBackendResponse>(questionDataUrl)
+      .toPromise()
+      .then(response => {
+        return {
+          questionDicts: cloneDeep(response.question_dicts),
+          more: response.more,
+        };
+      });
   }
 
   async fetchTotalQuestionCountForSkillIdsAsync(

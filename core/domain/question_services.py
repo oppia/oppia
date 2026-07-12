@@ -337,6 +337,52 @@ def get_questions_by_skill_ids(
     return questions
 
 
+def get_paginated_questions_by_skill_id(
+    question_count: int, skill_id: str, offset: int
+) -> Tuple[List[question_domain.Question], bool]:
+    """Returns a deterministic, paginated batch of questions linked to a
+    single skill, ordered by last updated time. Unlike
+    get_questions_by_skill_ids, this does not use random sampling, so
+    repeated calls with increasing offsets will not skip or duplicate
+    questions. This is intended for use cases (like the Skill Editor's
+    Preview tab) that need to reliably page through *all* questions linked
+    to a skill, rather than a random practice sample.
+
+    Args:
+        question_count: int. The number of questions to return for this
+            page.
+        skill_id: str. The id of the skill for which linked questions
+            should be retrieved.
+        offset: int. Number of results to skip (i.e. which page to fetch).
+
+    Returns:
+        Tuple(list(Question), bool). The list of questions for this page
+        (at most question_count of them), and a boolean indicating whether
+        more questions are available beyond this page.
+    """
+    question_skill_link_models = question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids(
+        # Fetch one extra so we can tell whether there's a next page,
+        # without needing a separate count query.
+        question_count + 1,
+        [skill_id],
+        offset,
+    )
+
+    more = len(question_skill_link_models) > question_count
+    if more:
+        question_skill_link_models = question_skill_link_models[:question_count]
+
+    question_ids = [model.question_id for model in question_skill_link_models]
+    questions_with_none = question_fetchers.get_questions_by_ids(question_ids)
+    questions = []
+    for question in questions_with_none:
+        # Ruling out the possibility of None for mypy type checking.
+        assert question is not None
+        questions.append(question)
+
+    return questions, more
+
+
 def get_new_question_id() -> str:
     """Returns a new question id.
 

@@ -1922,6 +1922,7 @@ class QuestionPlayerHandlerNormalizedRequestDict(TypedDict):
     skill_ids: str
     question_count: int
     fetch_by_difficulty: bool
+    offset: Optional[int]
 
 
 class QuestionPlayerHandler(
@@ -1952,6 +1953,13 @@ class QuestionPlayerHandler(
                 }
             },
             'fetch_by_difficulty': {'schema': {'type': 'bool'}},
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
+                },
+                'default_value': None,
+            },
         }
     }
 
@@ -1964,6 +1972,7 @@ class QuestionPlayerHandler(
         skill_ids = self.normalized_request['skill_ids'].split(',')
         question_count = self.normalized_request['question_count']
         fetch_by_difficulty = self.normalized_request['fetch_by_difficulty']
+        offset = self.normalized_request.get('offset')
 
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             skill_ids = (
@@ -1971,6 +1980,27 @@ class QuestionPlayerHandler(
                 if self.user_id
                 else skill_ids
             )
+
+        # If an offset is supplied, the caller (currently, only the Skill
+        # Editor's Preview tab) wants a deterministic, gap-free/duplicate-free
+        # page of *all* questions linked to the skill, rather than a random
+        # practice sample - so we use a dedicated deterministic fetch instead
+        # of the random-sampling path used by practice sessions. See #23453.
+        if offset is not None:
+            if len(skill_ids) != 1:
+                raise self.InvalidInputException(
+                    'Paginated fetches are only supported for a single '
+                    'skill id.'
+                )
+            questions, more = (
+                question_services.get_paginated_questions_by_skill_id(
+                    int(question_count), skill_ids[0], int(offset)
+                )
+            )
+            question_dicts = [question.to_dict() for question in questions]
+            self.values.update({'question_dicts': question_dicts, 'more': more})
+            self.render_json(self.values)
+            return
 
         questions = question_services.get_questions_by_skill_ids(
             int(question_count), skill_ids, fetch_by_difficulty

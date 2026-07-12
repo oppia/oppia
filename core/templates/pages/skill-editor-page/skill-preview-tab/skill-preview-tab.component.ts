@@ -17,6 +17,7 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import shuffle from 'lodash/shuffle';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {Skill} from 'domain/skill/skill.model.ts';
@@ -90,22 +91,48 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       ? this.skill.getConceptCard().getExplanation().html
       : 'loading review material';
 
-    this.questionBackendApiService
-      .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false)
-      .then(response => {
-        this.questionsFetched = true;
-        this.questionDicts = response;
-        this.displayedQuestions = response;
-        if (this.questionDicts.length) {
-          this.selectQuestionToPreview(0);
-        }
-      });
+    this.fetchAllQuestionsForPreview();
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
     );
     this.currentInteractionService.setOnSubmitFn(() => {
       this.conversationFlowService.onOppiaFeedbackAvailable.emit();
     });
+  }
+
+  /**
+   * Fetches every question linked to this skill by paging through the
+   * results (see #23453 - previously this used a single fixed-size fetch,
+   * which silently dropped questions once a skill had more than the
+   * backend's serving cap).
+   */
+  fetchAllQuestionsForPreview(
+    offset: number = 0,
+    questionsSoFar: QuestionBackendDict[] = []
+  ): void {
+    this.questionBackendApiService
+      .fetchQuestionsForSkillPreviewPageAsync(
+        this.skillId,
+        this.QUESTION_COUNT,
+        offset
+      )
+      .then(response => {
+        const allQuestionsSoFar = questionsSoFar.concat(response.questionDicts);
+        if (response.more) {
+          this.fetchAllQuestionsForPreview(
+            offset + this.QUESTION_COUNT,
+            allQuestionsSoFar
+          );
+          return;
+        }
+        this.questionsFetched = true;
+        const shuffledQuestions = shuffle(allQuestionsSoFar);
+        this.questionDicts = shuffledQuestions;
+        this.displayedQuestions = shuffledQuestions;
+        if (this.questionDicts.length) {
+          this.selectQuestionToPreview(0);
+        }
+      });
   }
 
   initializeQuestionCard(card: StateCard): void {
