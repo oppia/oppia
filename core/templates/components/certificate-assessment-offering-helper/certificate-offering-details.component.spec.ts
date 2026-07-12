@@ -159,6 +159,7 @@ describe('Certificate Offering Details Component', () => {
         title: 'Loaded title',
         description: 'Loaded description',
         classroom_id: 'science',
+        topic_ids: [],
         topic_data: {},
         demonstrates: ['Loaded outcome'],
         total_questions: 6,
@@ -244,7 +245,7 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should validate the form only when required fields are present', () => {
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
 
     component.title = 'Certificate title';
     component.description = 'Certificate description';
@@ -253,7 +254,7 @@ describe('Certificate Offering Details Component', () => {
     component.totalQuestions = 5;
     component.demonstratesList = ['Learn math'];
 
-    expect(component.isFormValid()).toBeTrue();
+    expect(component.isFormValid()).toBe(true);
   });
 
   it('should disable the next button when numeric values exceed limits', () => {
@@ -264,9 +265,9 @@ describe('Certificate Offering Details Component', () => {
     component.totalQuestions = 51;
     component.demonstratesList = ['Learn math'];
 
-    expect(component.isTimeLimitInvalid()).toBeTrue();
-    expect(component.isTotalQuestionsInvalid()).toBeTrue();
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isTimeLimitInvalid()).toBe(true);
+    expect(component.isTotalQuestionsInvalid()).toBe(true);
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should return an empty classroom name when the classroom is not found', () => {
@@ -285,7 +286,7 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getTotalQuestionsValidationError()).toContain(
       'at most 50'
     );
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should not show threshold errors for empty numeric fields', () => {
@@ -299,7 +300,7 @@ describe('Certificate Offering Details Component', () => {
 
     expect(component.getTimeLimitValidationError()).toEqual('');
     expect(component.getTotalQuestionsValidationError()).toEqual('');
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should not emit events when the form is invalid', () => {

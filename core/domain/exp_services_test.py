@@ -5859,23 +5859,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     SECOND_EMAIL: Final = 'abc123@gmail.com'
 
     def test_get_last_updated_by_human_ms(self) -> None:
-        original_timestamp = (
-            datetime.datetime.now(datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .timestamp()
-            * 1000
-        )
+        original_timestamp = utils.get_current_time_in_millisecs()
 
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End'
         )
 
-        timestamp_after_first_edit = (
-            datetime.datetime.now(datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .timestamp()
-            * 1000
-        )
+        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID,

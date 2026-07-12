@@ -21,6 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {ImprovementsService} from 'services/improvements.service';
 import {State} from 'domain/state/state.model';
+import {StateBackendDict} from 'domain/state/state.model';
 
 describe('ImprovementsService', () => {
   let improvementsService: ImprovementsService;
@@ -35,7 +36,7 @@ describe('ImprovementsService', () => {
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
     it('should return true for states with TextInput interactions', () => {
-      let mockStateBackendDict = {
+      let mockStateBackendDict: StateBackendDict = {
         classifier_model_id: null,
         content: {
           html: '',
@@ -94,7 +95,7 @@ describe('ImprovementsService', () => {
     });
 
     it('should return false for states with FractionInput interactions', () => {
-      let mockStateBackendDict = {
+      let mockStateBackendDict: StateBackendDict = {
         classifier_model_id: null,
         content: {
           html: '',
@@ -150,7 +151,7 @@ describe('ImprovementsService', () => {
     });
 
     it('should return false if Interaction Id or State is null', () => {
-      let mockStateBackendDict = {
+      let mockStateBackendDict: StateBackendDict = {
         classifier_model_id: null,
         content: {
           html: '',
