@@ -1319,6 +1319,39 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+    def test_validate_suggestion_with_too_long_exploration_title_fails(
+        self,
+    ) -> None:
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        change_cmd = dict(expected_suggestion_dict['change_cmd'])
+        change_cmd['content_id'] = 'exploration_title'
+        change_cmd['translation_html'] = (
+            'This exploration title is way longer than thirty six characters limit'
+        )
+        expected_suggestion_dict['change_cmd'] = change_cmd
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Translation exceeds the allowed character limit. The translation '
+            'for the above content must be 36 characters or fewer.',
+        ):
+            suggestion.validate()
+
     def test_get_score_part_helper_methods(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 

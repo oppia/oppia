@@ -142,6 +142,8 @@ export class TranslationModalComponent {
   hadCopyParagraphError: boolean = false;
   hasImgTextError: boolean = false;
   hasIncompleteTranslationError: boolean = false;
+  hasLengthValidationError: boolean = false;
+  lengthValidationErrorMessage: string = '';
   editorIsShown: boolean = true;
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
@@ -528,7 +530,11 @@ export class TranslationModalComponent {
   }
 
   hasSubmitValidationErrors(): boolean {
-    return this.hasImgTextError || this.hasIncompleteTranslationError;
+    return (
+      this.hasImgTextError ||
+      this.hasIncompleteTranslationError ||
+      this.hasLengthValidationError
+    );
   }
 
   suggestTranslatedText(): void {
@@ -591,6 +597,7 @@ export class TranslationModalComponent {
     ) {
       this.hasImgTextError = false;
       this.hasIncompleteTranslationError = false;
+      this.hasLengthValidationError = false;
       return;
     }
 
@@ -605,6 +612,17 @@ export class TranslationModalComponent {
       translationError.hasDuplicateDescriptions;
     this.hasIncompleteTranslationError =
       translationError.hasUntranslatedElements;
+
+    this.hasLengthValidationError = false;
+    this.lengthValidationErrorMessage = '';
+    const activeContentId = this.translateTextService.activeContentId;
+    if (activeContentId === 'exploration_title') {
+      if (this.activeWrittenTranslation.length > 36) {
+        this.hasLengthValidationError = true;
+        this.lengthValidationErrorMessage =
+          'Translation exceeds the allowed character limit. The translation for the above content must be 36 characters or fewer.';
+      }
+    }
   }
 
   private closeWithoutUnsavedCheck(): void {
