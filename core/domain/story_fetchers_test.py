@@ -116,6 +116,10 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story_model = story_models.StoryModel.get(self.story_id)
         story_model.story_contents_schema_version = schema_version
         story = story_fetchers.get_story_from_model(story_model)
+        node_ids = [node.id for node in self.story.story_contents.nodes]
+        self.story.story_contents.arcs = [
+            story_domain.Arc('arc_default', 'All Chapters', '', node_ids)
+        ]
         self.assertEqual(story.to_dict(), self.story.to_dict())
 
     def test_get_story_summary_from_model(self) -> None:
@@ -203,7 +207,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story_fetchers._migrate_story_contents_to_latest_schema(  # pylint: disable=protected-access
             versioned_story_contents, story_id
         )
-        versioned_story_contents['schema_version'] = 7
+        versioned_story_contents['schema_version'] = (
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION + 1
+        )
         with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '

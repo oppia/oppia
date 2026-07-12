@@ -30,6 +30,9 @@ export class ValidModal {
   ) {}
 
   open() {
-    this.ngbModal.open(null, {backdrop: 'static'});
+    this.ngbModal.open(null, {
+      backdrop: 'static',
+      size: (this.ngbModal ? 'lg' : 'sm')
+    });
   }
 }

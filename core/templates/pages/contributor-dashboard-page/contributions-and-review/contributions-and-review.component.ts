@@ -391,7 +391,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     question: Question,
     misconceptionsBySkill: MisconceptionSkillMap
   ): void {
-    const targetId = suggestion.target_id;
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
@@ -433,8 +432,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         skillDifficulty: string;
       }) => {
         this.contributionAndReviewService.reviewSkillSuggestion(
-          targetId,
-          suggestionId,
+          result.targetId,
+          result.suggestionId,
           result.action,
           result.reviewMessage,
           result.skillDifficulty,

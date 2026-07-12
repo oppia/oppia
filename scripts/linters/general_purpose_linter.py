@@ -82,7 +82,6 @@ EXCLUDED_PATHS: Final = (
     '*.ico',
     '*.jpg',
     '*.min.js',
-    'backend_prod_files/*',
     'assets/scripts/*',
     'core/domain/proto/*.py',
     'core/tests/data/*',
@@ -92,7 +91,6 @@ EXCLUDED_PATHS: Final = (
     'node_modules/*',
     'typings/*',
     'local_compiled_js/*',
-    'webpack_bundles/*',
     'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip',
     'scripts/linters/test_files/*',
@@ -104,6 +102,7 @@ EXCLUDED_PATHS: Final = (
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
     'core/tests/puppeteer-acceptance-tests/data/*',
+    'core/tests/playwright-acceptance-tests/data/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
 )
 
@@ -116,9 +115,6 @@ CONFIG_FILE_PATHS: Final = (
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
     'assets/rich_text_components_definitions.ts',
-    'webpack.config.ts',
-    'webpack.dev.config.ts',
-    'webpack.prod.config.ts',
 )
 
 ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(
@@ -713,6 +709,41 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
+    @staticmethod
+    def _extract_ngb_modal_open_calls(content: str) -> List[str]:
+        """Extracts the argument text of every ngbModal.open(...) call.
+
+        Instead of a simple regex count across the whole file, this method
+        locates each 'ngbModal.open(' in the content and then walks forward
+        character-by-character, tracking parenthesis depth, to collect the
+        exact substring between the opening and closing parentheses of that
+        call.  This prevents unrelated occurrences of 'backdrop: \'static\''
+        elsewhere in the file from masking a missing backdrop option inside
+        an actual ngbModal.open() call.
+
+        Args:
+            content: str. The file content (with comments removed).
+
+        Returns:
+            list(str). A list of argument substrings, one per ngbModal.open()
+            call found in the content.
+        """
+        calls = []
+        for match in re.finditer(r'\bngbModal\.open\(', content):
+            # Start just after the opening parenthesis.
+            start = match.end()
+            depth = 1
+            idx = start
+            while idx < len(content) and depth > 0:
+                if content[idx] == '(':
+                    depth += 1
+                elif content[idx] == ')':
+                    depth -= 1
+                idx += 1
+            # Slice out the content between the parentheses (excluding them).
+            calls.append(content[start : idx - 1])
+        return calls
+
     def check_modal_component_patterns(
         self,
     ) -> concurrent_task_utils.TaskResult:
@@ -785,13 +816,20 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                     )
 
                 # Check 3: Backdrop static.
-                num_static_backdrops = len(
-                    re.findall(
-                        r'backdrop\s*:\s*[\'"]static[\'"]',
-                        file_content_without_comments,
-                    )
+                # Extract each ngbModal.open(...) call individually and
+                # verify backdrop: 'static' is present within that specific
+                # call.  A file-wide count of 'backdrop: \'static\'' is
+                # insufficient because unrelated occurrences elsewhere in
+                # the file can satisfy the count while the actual open()
+                # calls still lack the option.
+                open_calls = self._extract_ngb_modal_open_calls(
+                    file_content_without_comments
                 )
-                if len(modal_open_matches) > num_static_backdrops:
+                backdrop_re = re.compile(r'backdrop\s*:\s*[\'"]static[\'"]')
+                missing_backdrop = any(
+                    not backdrop_re.search(call) for call in open_calls
+                )
+                if missing_backdrop:
                     failed = True
                     error_messages.append(
                         '%s --> ngbModal.open must be called with {backdrop: \'static\'} '

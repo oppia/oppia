@@ -36,6 +36,8 @@ from typing import List, Optional, Sequence
 # NOTE TO DEVELOPERS: do not add any new files to this list.
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
+    'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
+    'core/tests/build_sources/extensions/plugin.ts',
     'core/templates/base-components/base-content.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
@@ -74,14 +76,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/splash-page/splash-page.module.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.spec.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',
-    'core/templates/pages/story-editor-page/editor-tab/story-editor.component.spec.ts',
-    'core/templates/pages/story-editor-page/editor-tab/story-editor.component.ts',
-    'core/templates/pages/story-editor-page/editor-tab/story-node-editor.component.spec.ts',
-    'core/templates/pages/story-editor-page/editor-tab/story-node-editor.component.ts',
-    'core/templates/pages/story-editor-page/story-editor-page.component.spec.ts',
-    'core/templates/pages/story-editor-page/story-editor-page.component.ts',
-    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.spec.ts',
-    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',

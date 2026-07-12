@@ -61,8 +61,9 @@ _PARSER.add_argument(
     default='error',
     choices=['critical', 'error', 'warning', 'info'],
 )
+
 _PARSER.add_argument(
-    '--source_maps', help='Build webpack with source maps.', action='store_true'
+    '--source_maps', help='Build Angular with source maps.', action='store_true'
 )
 
 _PARSER.add_argument(
@@ -71,6 +72,12 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--mobile', help='Run the tests in mobile mode.', action='store_true'
+)
+
+_PARSER.add_argument(
+    '--update_snapshots',
+    help='Update screenshot baselines instead of comparing against them.',
+    action='store_true',
 )
 
 
@@ -222,6 +229,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
                 headless=args.headless,
                 mobile=args.mobile,
                 prod_env=args.prod_env,
+                update_snapshots=args.update_snapshots,
                 stdout=subprocess.PIPE,
             )
         )

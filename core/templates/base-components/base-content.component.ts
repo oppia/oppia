@@ -30,7 +30,6 @@ import {SidebarStatusService} from 'services/sidebar-status.service';
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NavigationEnd, Router} from '@angular/router';
-import './base-content.component.css';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
@@ -46,6 +45,7 @@ export class BaseContentComponent {
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
   directiveSubscriptions = new Subscription();
+  isRtl: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -98,14 +98,16 @@ export class BaseContentComponent {
     this.windowRef.nativeWindow.document.addEventListener('click', () => {
       this.sidebarStatusService.onDocumentClick();
     });
+    this.isRtl = this.i18nLanguageCodeService.isCurrentLanguageRTL();
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.isRtl = this.i18nLanguageCodeService.isCurrentLanguageRTL();
+      })
+    );
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getHeaderText(): string {

@@ -17,12 +17,11 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
   tick,
-  waitForAsync,
 } from '@angular/core/testing';
 import {InteractiveFractionInputComponent} from './oppia-interactive-fraction-input.component';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -80,7 +79,7 @@ describe('InteractiveFractionInputComponent', () => {
     },
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveFractionInputComponent],
       imports: [
@@ -200,7 +199,7 @@ describe('InteractiveFractionInputComponent', () => {
       expect(component.errorMessageI18nKey).toBe(
         ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
       );
-      expect(component.isValid).toBeFalse();
+      expect(component.isValid).toBe(false);
     }
   );
 
@@ -216,7 +215,7 @@ describe('InteractiveFractionInputComponent', () => {
       expect(component.errorMessageI18nKey).toBe(
         ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
       );
-      expect(component.isValid).toBeFalse();
+      expect(component.isValid).toBe(false);
     }
   );
 
@@ -256,7 +255,7 @@ describe('InteractiveFractionInputComponent', () => {
     component.answerValueChanged();
     tick(150);
 
-    expect(component.isValid).toBeTrue();
+    expect(component.isValid).toBe(true);
   }));
 
   it(
