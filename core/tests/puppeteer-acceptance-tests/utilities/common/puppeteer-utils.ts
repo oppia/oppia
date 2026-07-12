@@ -61,17 +61,6 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
 
-interface ClickDetails {
-  position: {x: number; y: number};
-  timeInMilliseconds: number;
-}
-
-declare global {
-  interface Window {
-    logClick: (clickDetails: ClickDetails) => void;
-  }
-}
-
 export type ModalUserInteractions = (
   _this: BaseUser,
   container: string
@@ -321,7 +310,13 @@ export class BaseUser {
   private async setupClickLogger(): Promise<void> {
     await this.page.exposeFunction(
       'logClick',
-      ({position: {x, y}, timeInMilliseconds}: ClickDetails) => {
+      ({
+        position: {x, y},
+        timeInMilliseconds,
+      }: {
+        position: {x: number; y: number};
+        timeInMilliseconds: number;
+      }) => {
         // eslint-disable-next-line no-console
         console.log(
           `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
