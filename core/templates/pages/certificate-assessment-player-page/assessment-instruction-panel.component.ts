@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Component for the assessment instruction panel.
+ */
+
 import {Component, EventEmitter, Output} from '@angular/core';
 
 @Component({

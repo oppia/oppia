@@ -10,16 +10,10 @@
     <ul>
       <li *ngFor="let choice of currentQuestion.choices">{{choice}}</li>
     </ul>
-    <button
-      *ngIf="!isLastQuestion"
-      class="btn btn-primary"
-      (click)="nextQuestion.emit()">
+    <button *ngIf="!isLastQuestion" class="btn btn-primary" (click)="nextQuestion.emit()">
       Next
     </button>
-    <button
-      *ngIf="isLastQuestion"
-      class="btn btn-primary"
-      (click)="submitAssessment.emit()">
+    <button *ngIf="isLastQuestion" class="btn btn-primary" (click)="submitAssessment.emit()">
       Submit
     </button>
   </div>

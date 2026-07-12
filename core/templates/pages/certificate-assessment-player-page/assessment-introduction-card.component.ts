@@ -13,6 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Component for the assessment introduction card.
+ */
+
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({

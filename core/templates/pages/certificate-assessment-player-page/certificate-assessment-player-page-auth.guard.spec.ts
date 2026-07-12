@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Guard that redirects to 404 when the certificate assessment feature is disabled.
+ */
+
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {Router} from '@angular/router';

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Component for the certificate assessment result card.
+ */
+
 import {Component, Input} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 
