@@ -127,6 +127,7 @@ describe('Exploration Editor', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
+      'user@email.com',
       'Algebra I'
     );
 

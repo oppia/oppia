@@ -36,10 +36,10 @@
       <input [(ngModel)]="tempClassroom._feedbackRecipientEmail"
              rows="1"
              type="email"
-             class="form-control required"
+             class="e2e-test-new-classroom-feedback-recipient form-control required"
              (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
-      <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
-        {{ classroomAdminDataService.nameValidationError }}
+      <p *ngIf="classroomAdminDataService.FeedbackRecipientEmailValidationError.length > 0" class="oppia-warning-text">
+        {{ classroomAdminDataService.FeedbackRecipientEmailValidationError }}
       </p>
     </div>
   </div>

@@ -61,6 +61,7 @@ describe('Topic Manager', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Maths',
       'maths',
+      'user@email.com',
       'Arithmetic Operations'
     );
 

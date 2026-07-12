@@ -142,6 +142,7 @@ describe('Curriculum Admin', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Science',
       'science',
+      'user@email.com',
       'Test Topic 1'
     );
     await curriculumAdmin.clickOnElementWithText('Change Order');

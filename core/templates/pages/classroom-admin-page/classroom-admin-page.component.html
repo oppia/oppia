@@ -86,11 +86,11 @@
               <strong>Feedback Recipient Email</strong>
             </span>
             <div class="classroom-field">
-              <span *ngIf="classroomViewerMode" class="e2e-test-classroom-url-view">
+              <span *ngIf="classroomViewerMode" class="e2e-test-classroom-feedback-recipient-view">
                 {{tempClassroomData.getFeedbackRecipientEmail()}}
               </span>
               <input *ngIf="classroomEditorMode"
-                     class="form-control"
+                     class="form-control e2e-update-classroom-feedback-recipient"
                      [(ngModel)]="tempClassroomData._feedbackRecipientEmail"
                      (blur)="updateClassroomField()"
                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"

@@ -110,6 +110,7 @@ describe('Practice Question Reviewer', function () {
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math-classroom',
+      'user@email.com',
       'Arithmetic Operations'
     );
 

@@ -166,6 +166,8 @@ const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
 const newClassroomNameInputField = '.e2e-test-new-classroom-name';
 const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
+const newClassroomFeedbackRecipientInputField =
+  '.e2e-test-new-classroom-feedback-recipient';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
 const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
@@ -178,6 +180,8 @@ const editClassroomCourseDetailsInputField =
 const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
 const editClassroomUrlFragmentInputField = '.e2e-update-classroom-url-fragment';
+const editClassroomFeedbackRecipientInputField =
+  '.e2e-update-classroom-feedback-recipient';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer =
@@ -283,6 +287,8 @@ const createNewSkillButtonInSkillDashboardSelector =
   '.e2e-test-create-skill-button-circle';
 const classroomNameSelector = '.e2e-test-classroom-name-view';
 const classroomURLSelector = '.e2e-test-classroom-url-view';
+const classroomFeedbackRecipientEmailSelector =
+  '.e2e-test-classroom-feedback-recipient-view';
 const classroomTeaserSelector = '.e2e-test-classroom-teaser-view';
 const classroomTopicListIntroSelector =
   '.e2e-test-classroom-topic-list-intro-view';
@@ -496,6 +502,7 @@ export class CurriculumAdmin extends TopicManager {
    * Checks if the classroom details are as expected.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} classroomURL - The URL of the classroom.
+   * @param {string} classroomFeedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} classroomTeaser - The teaser of the classroom.
    * @param {string} classroomTopicListIntro - The topic list intro of the classroom.
    * @param {string} classroomCourseDetails - The course details of the classroom.
@@ -503,6 +510,7 @@ export class CurriculumAdmin extends TopicManager {
   async expectClassroomDetailsToBe(
     classroomName: string,
     classroomURL: string,
+    classroomFeedbackRecipientEmail: string,
     classroomTeaser: string,
     classroomTopicListIntro: string,
     classroomCourseDetails: string
@@ -511,6 +519,10 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.expectTextContentToBe(classroomNameSelector, classroomName);
     await this.expectTextContentToBe(classroomURLSelector, classroomURL);
+    await this.expectTextContentToBe(
+      classroomFeedbackRecipientEmailSelector,
+      classroomFeedbackRecipientEmail
+    );
     await this.expectTextContentToBe(classroomTeaserSelector, classroomTeaser);
     await this.expectTextContentToBe(
       classroomTopicListIntroSelector,
@@ -2316,13 +2328,18 @@ export class CurriculumAdmin extends TopicManager {
    */
   async createNewClassroom(
     classroomName: string,
-    urlFragment: string
+    urlFragment: string,
+    feedbackRecipientEmail: string
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.clickOnElementWithSelector(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
     await this.page.type(newClassroomNameInputField, classroomName);
     await this.page.type(newClassroomUrlFragmentInputField, urlFragment);
+    await this.page.type(
+      newClassroomFeedbackRecipientInputField,
+      feedbackRecipientEmail
+    );
     await this.clickOnElementWithSelector(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
     showMessage(`Created ${classroomName} classroom.`);
@@ -2335,6 +2352,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} topicListIntro - The topic list intro of the classroom.
    * @param {string} courseDetails - The course details of the classroom.
    * @param {string} url - The URL of the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} thumbnailImage - The thumbnail image of the classroom.
    * @param {string} bannerImage - The banner image of the classroom.
    */
@@ -2344,6 +2362,7 @@ export class CurriculumAdmin extends TopicManager {
     topicListIntro: string,
     courseDetails: string,
     url?: string,
+    feedbackRecipientEmail: string = 'user@email.com',
     thumbnailImage: string = curriculumAdminThumbnailImage,
     bannerImage: string = classroomBannerImage
   ): Promise<void> {
@@ -2358,6 +2377,12 @@ export class CurriculumAdmin extends TopicManager {
       await this.clearAllTextFrom(editClassroomUrlFragmentInputField);
       await this.page.type(editClassroomUrlFragmentInputField, url);
     }
+
+    await this.clearAllTextFrom(editClassroomFeedbackRecipientInputField);
+    await this.page.type(
+      editClassroomFeedbackRecipientInputField,
+      feedbackRecipientEmail
+    );
 
     await this.clearAllTextFrom(editClassroomTeaserTextInputField);
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
@@ -3034,14 +3059,20 @@ export class CurriculumAdmin extends TopicManager {
    * Creates, updates, and publishes a new classroom with a topic.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
    */
   async createAndPublishClassroom(
     classroomName: string,
     urlFragment: string,
+    feedbackRecipientEmail: string = 'user@email.com',
     topicToBeAssigned: string
   ): Promise<void> {
-    await this.createNewClassroom(classroomName, urlFragment);
+    await this.createNewClassroom(
+      classroomName,
+      urlFragment,
+      feedbackRecipientEmail
+    );
     await this.updateClassroom(
       classroomName,
       'Welcome to Math classroom!',
