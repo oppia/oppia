@@ -1075,10 +1075,18 @@ describe('Question player engine service', () => {
         (html, envs) => html
       );
 
-      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
-      const originalContentId =
-        nextQuestionBackendDict.question_state_data.content.content_id;
-      nextQuestionBackendDict.question_state_data.content.content_id = null;
+      const originalContentIds = multipleQuestionsBackendDict.map(
+        q => q.question_state_data.content.content_id
+      );
+      for (const q of multipleQuestionsBackendDict) {
+        q.question_state_data.content.content_id = null;
+      }
+
+      multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+        function (questionDict) {
+          return Question.createFromBackendDict(questionDict);
+        }
+      );
 
       questionPlayerEngineService.init(
         multipleQuestionsObjects,
@@ -1093,8 +1101,14 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
       } finally {
-        nextQuestionBackendDict.question_state_data.content.content_id =
-          originalContentId;
+        multipleQuestionsBackendDict.forEach((q, idx) => {
+          q.question_state_data.content.content_id = originalContentIds[idx];
+        });
+        multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+          function (questionDict) {
+            return Question.createFromBackendDict(questionDict);
+          }
+        );
       }
 
       expect(alertsServiceSpy).toHaveBeenCalledWith(
@@ -1127,10 +1141,18 @@ describe('Question player engine service', () => {
         (html, envs) => html
       );
 
-      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
-      const originalInteractionId =
-        nextQuestionBackendDict.question_state_data.interaction.id;
-      nextQuestionBackendDict.question_state_data.interaction.id = null;
+      const originalInteractionIds = multipleQuestionsBackendDict.map(
+        q => q.question_state_data.interaction.id
+      );
+      for (const q of multipleQuestionsBackendDict) {
+        q.question_state_data.interaction.id = null;
+      }
+
+      multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+        function (questionDict) {
+          return Question.createFromBackendDict(questionDict);
+        }
+      );
 
       questionPlayerEngineService.init(
         multipleQuestionsObjects,
@@ -1145,8 +1167,14 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
       } finally {
-        nextQuestionBackendDict.question_state_data.interaction.id =
-          originalInteractionId;
+        multipleQuestionsBackendDict.forEach((q, idx) => {
+          q.question_state_data.interaction.id = originalInteractionIds[idx];
+        });
+        multipleQuestionsObjects = multipleQuestionsBackendDict.map(
+          function (questionDict) {
+            return Question.createFromBackendDict(questionDict);
+          }
+        );
       }
 
       expect(createNewCardSpy).toHaveBeenCalledWith(
