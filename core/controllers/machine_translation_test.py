@@ -38,7 +38,6 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
-        self.set_super_admins([self.CONTRIBUTOR_USERNAME])
         self.contributor_id = self.get_user_id_from_email(
             self.CONTRIBUTOR_EMAIL
         )
@@ -62,7 +61,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_post_fails_if_feature_flag_disabled(self) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
+        self.login(self.CONTRIBUTOR_EMAIL, is_super_admin=True)
 
         flag_swap = self.swap(
             feature_flag_services,
@@ -182,7 +181,6 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
-        self.set_super_admins([self.ADMIN_USERNAME])
         self.valid_payload = {
             'provider_mapping': {'hi': 'azure', 'es': 'google'}
         }
@@ -194,7 +192,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_get_mapping_successfully(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         domain_swap = self.swap(
             machine_translation_services,
@@ -226,7 +224,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_fails_if_feature_flag_disabled(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         flag_swap = self.swap(
             feature_flag_services,
@@ -242,7 +240,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_mapping_successfully(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         saved_mapping = {}
 
@@ -268,7 +266,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_fails_with_validation_error(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         def mock_update_mapping_fails(new_mapping: Dict[str, str]) -> None:
             raise utils.ValidationError('Invalid provider specified.')
@@ -292,7 +290,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_fails_if_feature_flag_disabled(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         flag_swap = self.swap(
             feature_flag_services,
@@ -312,7 +310,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_updates_toggle_when_provided(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         toggle_calls = []
 
@@ -348,7 +346,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_does_not_update_toggle_when_not_provided(self) -> None:
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         toggle_calls = []
 

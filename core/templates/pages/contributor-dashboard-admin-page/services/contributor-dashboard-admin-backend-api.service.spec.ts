@@ -26,7 +26,7 @@ import {ContributorDashboardAdminBackendApiService} from './contributor-dashboar
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('Contributor dashboard admin backend api service', () => {
-  let cdabas: ContributorDashboardAdminBackendApiService;
+  let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
   let successHandler: jasmine.Spy<jasmine.Func>;
@@ -37,7 +37,9 @@ describe('Contributor dashboard admin backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    cdabas = TestBed.inject(ContributorDashboardAdminBackendApiService);
+    contributorDashboardAdminBackendApiService = TestBed.inject(
+      ContributorDashboardAdminBackendApiService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
@@ -63,7 +65,7 @@ describe('Contributor dashboard admin backend api service', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .addContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -92,7 +94,7 @@ describe('Contributor dashboard admin backend api service', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .addContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -121,7 +123,7 @@ describe('Contributor dashboard admin backend api service', () => {
       let category = 'translation';
       let languageCode = 'en';
       let result = ['validUsername'];
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(category, languageCode)
         .then(successHandler, failHandler);
 
@@ -138,7 +140,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
       category = 'question';
 
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(category, null)
         .then(successHandler, failHandler);
 
@@ -161,7 +163,7 @@ describe('Contributor dashboard admin backend api service', () => {
     fakeAsync(() => {
       let category = 'InvalidCategory';
       let languageCode = 'en';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(category, languageCode)
         .then(successHandler, failHandler);
 
@@ -195,7 +197,7 @@ describe('Contributor dashboard admin backend api service', () => {
         can_review_questions: false,
         can_submit_questions: false,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
@@ -226,7 +228,7 @@ describe('Contributor dashboard admin backend api service', () => {
       'not exist when calling contributionReviewerRightsAsync',
     fakeAsync(() => {
       let username = 'InvalidUsername';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
@@ -264,7 +266,7 @@ describe('Contributor dashboard admin backend api service', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -292,7 +294,7 @@ describe('Contributor dashboard admin backend api service', () => {
         username: username,
         language_code: languageCode,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
@@ -329,7 +331,7 @@ describe('Contributor dashboard admin backend api service', () => {
       let payload = {
         username: username,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .removeContributionReviewerAsync(category, username, null)
         .then(successHandler, failHandler);
 
@@ -367,7 +369,7 @@ describe('Contributor dashboard admin backend api service', () => {
           },
         ],
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewTranslationContributionStatsAsync(username)
         .then(successHandler, failHandler);
 
@@ -391,7 +393,7 @@ describe('Contributor dashboard admin backend api service', () => {
       ' when calling viewTranslationContributionStatsAsync',
     fakeAsync(() => {
       const username = 'InvalidUsername';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .viewTranslationContributionStatsAsync(username)
         .then(successHandler, failHandler);
 
@@ -421,7 +423,7 @@ describe('Contributor dashboard admin backend api service', () => {
       'when calling updateQuestionRightsAsync',
     fakeAsync(() => {
       let username = 'validUser';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, true, true, false)
         .then(successHandler, failHandler);
 
@@ -444,7 +446,7 @@ describe('Contributor dashboard admin backend api service', () => {
       let payload = {
         username: username,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, false, true, true)
         .then(successHandler, failHandler);
       const query = new URLSearchParams(payload);
@@ -465,7 +467,7 @@ describe('Contributor dashboard admin backend api service', () => {
       'when calling updateQuestionRightsAsync',
     fakeAsync(() => {
       let username = 'validUser';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, true, false, true)
         .then(successHandler, failHandler);
 
@@ -488,7 +490,7 @@ describe('Contributor dashboard admin backend api service', () => {
       let payload = {
         username: username,
       };
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, false, true, true, true)
         .then(successHandler, failHandler);
       const query = new URLSearchParams(payload);
@@ -512,7 +514,7 @@ describe('Contributor dashboard admin backend api service', () => {
       'when calling updateQuestionRightsAsync',
     fakeAsync(() => {
       let username = 'validUser';
-      cdabas
+      contributorDashboardAdminBackendApiService
         .updateQuestionRightsAsync(username, true, true, false, false)
         .then(successHandler, failHandler);
 
