@@ -242,30 +242,6 @@ class AndroidActivityHandler(
                     }
                 )
 
-        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            # Subtopic pages are now backed by StudyGuide models. We fetch
-            # from StudyGuide but return data in the SubtopicPage format so
-            # that existing Android clients receive the shape they expect.
-            for activity_data in activities_data:
-                topic_id, study_guide_id = activity_data['id'].split('-')
-                study_guide = study_guide_services.get_study_guide_by_id(
-                    topic_id,
-                    int(study_guide_id),
-                    strict=False,
-                    version=activity_data.get('version'),
-                )
-                activities.append(
-                    {
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': (
-                            study_guide.to_subtopic_page_dict_for_android()
-                            if study_guide is not None
-                            else None
-                        ),
-                    }
-                )
-
         elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
             # Questions require special handling as they are fetched in bulk.
             # With a fixed limit of questions per request,
@@ -290,9 +266,13 @@ class AndroidActivityHandler(
                 ]
             )
 
-        elif activity_type == (
-            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
+        elif activity_type in (
+            constants.ACTIVITY_TYPE_SUBTOPIC,
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
         ):
+            # Subtopic pages are now backed by StudyGuide models. We fetch
+            # from StudyGuide but return data in the SubtopicPage format so
+            # that existing Android clients receive the shape they expect.
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
                 study_guide = study_guide_services.get_study_guide_by_id(
