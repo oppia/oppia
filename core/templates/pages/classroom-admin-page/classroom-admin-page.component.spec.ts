@@ -33,6 +33,7 @@ import {ClassroomAdminPageComponent} from 'pages/classroom-admin-page/classroom-
 import {ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExistingClassroomData} from './existing-classroom.model';
+import {ClassroomAdminDataService} from './services/classroom-admin-data.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -109,6 +110,7 @@ describe('Classroom Admin Page component ', () => {
   let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
+  let classroomAdminDataService: ClassroomAdminDataService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -145,6 +147,7 @@ describe('Classroom Admin Page component ', () => {
     );
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
+    classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -1617,5 +1620,46 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(component.existingClassroomNames).toEqual(['Classroom 1']);
+  }));
+
+  it('should return the topics graph validation error from the service', () => {
+    classroomAdminDataService.topicsGraphValidationError =
+      'Cycle detected in topic dependencies.';
+
+    expect(component.topicsGraphValidationError).toBe(
+      'Cycle detected in topic dependencies.'
+    );
+  });
+
+  it('should delegate validateClassroom to the data service', () => {
+    const tempClassroomData =
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
+    const classroomData =
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
+    spyOn(classroomAdminDataService, 'validateClassroom');
+
+    component.validateClassroom(tempClassroomData, classroomData);
+
+    expect(classroomAdminDataService.validateClassroom).toHaveBeenCalledWith(
+      tempClassroomData,
+      classroomData
+    );
+  });
+
+  it('should handle modal dismissal when changing classrooms order', fakeAsync(() => {
+    const modalRef = {
+      componentInstance: {},
+      result: Promise.reject(),
+    };
+
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+
+    component.changeClassroomsOrder();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      UpdateClassroomsOrderModalComponent,
+      {backdrop: 'static'}
+    );
   }));
 });

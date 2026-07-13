@@ -19,7 +19,7 @@
            class="e2e-test-classroom-tile-container">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.classroom_id)">
-          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
+          <span *ngIf="!(classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
             {{ classroom.classroom_name }}
           </span>
           <span *ngIf="classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
@@ -59,7 +59,7 @@
                      class="form-control e2e-update-classroom-name"
                      [(ngModel)]="tempClassroomData._name"
                      (blur)="updateClassroomField()"
-                     (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                     (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
                     >
             </div>
           </div>
@@ -76,7 +76,7 @@
                      class="form-control e2e-update-classroom-url-fragment"
                      [(ngModel)]="tempClassroomData._urlFragment"
                      (blur)="updateClassroomField()"
-                     (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                     (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
                     >
             </div>
           </div>
@@ -108,7 +108,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._teaserText"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                      (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
                       rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-teaser-text">
             </textarea>
@@ -124,7 +124,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                      (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
                       rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-topic-list-intro">
             </textarea>
@@ -140,7 +140,7 @@
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
-                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                      (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
                       rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-course-details">
             </textarea>
@@ -296,9 +296,9 @@
                     </div>
                   </div>
 
-                  <p *ngIf="classroomAdminDataService.topicsGraphValidationError.length > 0 && currentTopicOnEdit === topicName"
+                  <p *ngIf="topicsGraphValidationError.length > 0 && currentTopicOnEdit === topicName"
                      class="oppia-warning-text cyclic-check-error">
-                    {{ classroomAdminDataService.topicsGraphValidationError }}
+                    {{ topicsGraphValidationError }}
                   </p>
                 </div>
               </div>

@@ -30,10 +30,25 @@ import {ClassroomAdminDataService} from '../services/classroom-admin-data.servic
 export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
-    public classroomAdminDataService: ClassroomAdminDataService,
+    private classroomAdminDataService: ClassroomAdminDataService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
+  }
+
+  get nameValidationError(): string {
+    return this.classroomAdminDataService.nameValidationError;
+  }
+
+  get urlValidationError(): string {
+    return this.classroomAdminDataService.urlValidationError;
+  }
+
+  validateClassroom(
+    tempClassroom: NewClassroomData,
+    classroom: NewClassroomData
+  ): void {
+    this.classroomAdminDataService.validateClassroom(tempClassroom, classroom);
   }
 
   existingClassroomNames: string[] = [];

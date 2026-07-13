@@ -10,9 +10,9 @@
       <input [(ngModel)]="tempClassroom._name"
              rows="1"
              class="e2e-test-new-classroom-name form-control required"
-             (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
-      <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
-        {{ classroomAdminDataService.nameValidationError }}
+             (ngModelChange)="validateClassroom(tempClassroom, classroom)">
+      <p *ngIf="nameValidationError.length > 0" class="oppia-warning-text">
+        {{ nameValidationError }}
       </p>
     </div>
   </div>
@@ -23,9 +23,9 @@
       <input [(ngModel)]="tempClassroom._urlFragment"
              rows="1"
              class="e2e-test-new-classroom-url-fragment form-control required"
-             (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
-      <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
-        {{ classroomAdminDataService.urlValidationError }}
+             (ngModelChange)="validateClassroom(tempClassroom, classroom)">
+      <p *ngIf="urlValidationError.length > 0" class="oppia-warning-text">
+        {{ urlValidationError }}
       </p>
     </div>
   </div>
