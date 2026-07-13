@@ -93,6 +93,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   collectionSummary;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
+  activeHighlightedIconIndex: number = -1;
   elementToScrollTo: string;
 
   constructor(
@@ -118,6 +119,9 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   togglePreviewCard(): void {
     this.explorationCardIsShown = !this.explorationCardIsShown;
+    if (!this.explorationCardIsShown) {
+      this.activeHighlightedIconIndex = -1;
+    }
   }
 
   getCollectionNodeForExplorationId(explorationId: string): CollectionNode {
@@ -158,6 +162,15 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
       this.getCollectionNodeForExplorationId(
         explorationId
       ).getExplorationSummaryObject();
+    if (this.collection) {
+      let nodes = this.collection.getCollectionNodes();
+      for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].getExplorationId() === explorationId) {
+          this.activeHighlightedIconIndex = i;
+          break;
+        }
+      }
+    }
   }
 
   // Calculates the SVG parameters required to draw the curved path.
@@ -272,6 +285,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   closeOnClickingOutside(): void {
     this.explorationCardIsShown = false;
+    this.activeHighlightedIconIndex = -1;
     this.scrollToLocation(this.elementToScrollTo);
   }
 
