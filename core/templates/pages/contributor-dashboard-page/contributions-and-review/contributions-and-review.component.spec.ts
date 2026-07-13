@@ -2983,9 +2983,12 @@ describe('Contributions and review component', () => {
             target_id: '1',
             suggestion_type: 'translate_content',
             change_cmd: {
+              skill_id: 'skill_1',
               content_html: 'Translation',
               translation_html: 'Tradução',
-            } as any,
+              question_dict: {} as QuestionBackendDict,
+              skill_difficulty: [],
+            },
             status: 'review',
             author_name: 'author_1',
             exploration_content_html: null,
