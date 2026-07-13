@@ -60,11 +60,18 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
     ) as HTMLButtonElement[];
-    expect(buttons[1].getAttribute('ng-reflect-router-link')).toContain(
-      '/certificate-assessment'
+
+    const assessmentButtons = buttons.filter(b =>
+      ['Continue to assessment', 'Retry assessment'].includes(
+        b.textContent?.trim() || ''
+      )
     );
-    expect(buttons[2].getAttribute('ng-reflect-router-link')).toContain(
-      '/certificate-assessment'
-    );
+
+    expect(assessmentButtons.length).toBe(2);
+    assessmentButtons.forEach(button => {
+      expect(button.getAttribute('ng-reflect-router-link')).toContain(
+        '/certificate-assessment'
+      );
+    });
   });
 });
