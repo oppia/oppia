@@ -61,7 +61,7 @@
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing e2e-test-section-content-edit-icon"
+        <div class="oppia-click-to-start-editing e2e-test-section-content-edit-icon e2e-test-edit-html-content"
              (click)="openContentEditor()"
              aria-label="Edit section content"
              role="button"
@@ -80,7 +80,7 @@
     </div>
   </div>
 
-  <div *ngIf="isEditable && contentEditorIsOpen" class="section-content-part">
+  <div *ngIf="isEditable && contentEditorIsOpen" class="section-content-part e2e-test-edit-subtopic-page-contents">
     <form class="d-flex align-items-center"
           (submit)="saveSection(false)">
       <div class="oppia-rule-details-header">
@@ -105,7 +105,7 @@
           Cancel
         </button>
         <button type="submit"
-                class="btn btn-success"
+                class="btn btn-success e2e-test-save-subtopic-content-button"
                 [disabled]="!container.sectionContentHtml || isSectionContentLengthExceeded()"
                 (click)="saveSection(false)">
           Save

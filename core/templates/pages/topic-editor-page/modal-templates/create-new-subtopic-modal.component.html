@@ -50,7 +50,7 @@
                  placeholder="Enter heading of the section"
                  [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
         </div>
-        <div class="section-content-box">
+        <div class="section-content-box e2e-test-subtopic-description-editor e2e-test-show-schema-editor">
           <h4>Content*</h4>
           <div class="description-editor e2e-test-subtopic-study-guide-section-content-editor oppia-editor-card-body" >
             <schema-based-editor [schema]="getSchema()"

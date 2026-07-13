@@ -5829,6 +5829,20 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'],
             )
 
+    def test_cannot_access_subtopic_data_when_study_guide_does_not_exist(
+        self,
+    ) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        study_guide_swap = self.swap_to_always_return(
+            study_guide_services, 'get_study_guide_by_id', None
+        )
+        with testapp_swap, study_guide_swap:
+            self.get_json(
+                '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
+                expected_status_int=404,
+            )
+
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
         self,
     ) -> None:

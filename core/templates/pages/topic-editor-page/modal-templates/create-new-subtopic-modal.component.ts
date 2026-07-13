@@ -96,7 +96,7 @@ export class CreateNewSubtopicModalComponent
       },
     };
     this.htmlData = '';
-    this.sectionHeadingPlaintext = '';
+    this.sectionHeadingPlaintext = 'Section 1';
     this.sectionContentHtml = '';
     this.schemaEditorIsShown = false;
     this.editableThumbnailFilename = '';

@@ -215,7 +215,7 @@ describe('create new subtopic modal', function () {
     expect(component.subtopicUrlFragmentExists).toBe(false);
     expect(component.errorMsg).toBe(null);
     expect(component.htmlData).toBe('');
-    expect(component.sectionHeadingPlaintext).toBe('');
+    expect(component.sectionHeadingPlaintext).toBe('Section 1');
     expect(component.sectionContentHtml).toBe('');
     expect(component.editableThumbnailFilename).toBe('');
     expect(component.editableThumbnailBgColor).toBe('');
