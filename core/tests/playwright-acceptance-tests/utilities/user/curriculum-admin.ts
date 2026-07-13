@@ -801,6 +801,8 @@ export class CurriculumAdmin extends TopicManager {
         10000
       );
     } catch {
+      // TODO: This requires test to halt for 10 seconds in case the element
+      // isn't present. Use a better approach.
       // Element didn't appear in 10 seconds — treat as not present.
     }
 

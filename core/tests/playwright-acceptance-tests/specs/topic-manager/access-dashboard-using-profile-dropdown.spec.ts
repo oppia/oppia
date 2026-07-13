@@ -39,6 +39,7 @@ test.describe('Topic Manager', function () {
     LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
+    test.setTimeout(600_000);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_adm@example.com',
