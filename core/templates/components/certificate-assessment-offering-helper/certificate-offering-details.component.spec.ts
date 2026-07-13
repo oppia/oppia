@@ -261,8 +261,8 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'Certificate title';
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.timeLimitInMinutes = 4;
+    component.totalQuestions = 2;
     component.demonstratesList = ['Learn math'];
 
     expect(component.isTimeLimitInvalid()).toBe(true);
@@ -277,14 +277,14 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should mark time limit and question count as invalid when out of range', () => {
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.timeLimitInMinutes = 4;
+    component.totalQuestions = 2;
 
     expect(component.getTimeLimitValidationError()).toContain(
-      'at most 60 minutes'
+      'at least 5 minutes'
     );
     expect(component.getTotalQuestionsValidationError()).toContain(
-      'at most 50'
+      'at least 3'
     );
     expect(component.isFormValid()).toBe(false);
   });
@@ -424,6 +424,25 @@ describe('Certificate Offering Details Component', () => {
 
     expect(component.getClassroomValidationError()).toEqual('');
   });
+
+  it('should set loading state while classrooms are fetched', fakeAsync(() => {
+    let resolveClassrooms: (value: never[]) => void = () => {};
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveClassrooms = resolve;
+      })
+    );
+
+    void component.loadClassrooms();
+    expect(component.isLoadingClassrooms).toBeTrue();
+    resolveClassrooms([]);
+    flushMicrotasks();
+
+    expect(component.isLoadingClassrooms).toBeFalse();
+  }));
 
   it('should return a demonstrates validation error when outcomes exceed the limit', () => {
     component.demonstratesList = ['a'.repeat(201)];

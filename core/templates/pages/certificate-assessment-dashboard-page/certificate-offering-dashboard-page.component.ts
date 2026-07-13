@@ -56,6 +56,7 @@ export class CertificateOfferingDashboardPageComponent implements OnInit {
   }
 
   private async loadCertificateOfferings(): Promise<void> {
+    this.isLoading = true;
     try {
       const certificateOfferings =
         await this.certificateAssessmentOfferingBackendApiService.getCertificateAssessmentOfferingsAsync();

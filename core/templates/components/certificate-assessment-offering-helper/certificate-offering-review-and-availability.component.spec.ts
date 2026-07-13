@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
+import {ValidationResponse} from './certificate-offering-review-and-availability.component';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
@@ -227,6 +228,7 @@ describe('Certificate Offering Review And Availability Component', () => {
         mediumRequired: 10,
         hardRequired: 3,
         totalQuestions: 8,
+        totalRequiredQuestions: 8,
         isReady: false,
         easySufficient: true,
         mediumSufficient: false,
@@ -274,4 +276,55 @@ describe('Certificate Offering Review And Availability Component', () => {
 
     expect(navigateSpy).toHaveBeenCalled();
   });
+
+  it('should set loading state while refreshing validation', fakeAsync(() => {
+    let resolveValidation: (value: ValidationResponse) => void = () => {};
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'math_classroom_id',
+          name: 'Math',
+          url_fragment: 'math',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'fetchClassroomDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        getName: () => 'Math',
+        getTopicSummaries: () => [],
+      } as never)
+    );
+    spyOn(
+      TestBed.inject(CertificateAssessmentOfferingBackendApiService),
+      'validateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveValidation = resolve;
+      })
+    );
+
+    component.certificateAssessmentOffering.classroomId = 'math_classroom_id';
+    component.certificateAssessmentOffering.topicData = {topic_1: 1};
+    component.certificateAssessmentOffering.totalQuestions = 3;
+    void component.refreshValidationState();
+
+    expect(component.isLoadingValidation).toBeTrue();
+    resolveValidation({
+      is_valid: true,
+      validation_errors: {},
+      validation_message: '',
+    });
+    flushMicrotasks();
+    expect(component.isLoadingValidation).toBeFalse();
+  }));
 });

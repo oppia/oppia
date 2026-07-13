@@ -50,7 +50,9 @@ interface CertificateOfferingDetailsFormData {
 export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   readonly TITLE_MAX_LENGTH = 80;
   readonly DESCRIPTION_MAX_LENGTH = 500;
+  readonly MIN_TIME_LIMIT_IN_MINUTES = 5;
   readonly TIME_LIMIT_MAX_VALUE = 60;
+  readonly MIN_TOTAL_QUESTIONS = 3;
   readonly TOTAL_QUESTIONS_MAX_VALUE = 50;
   readonly DEMONSTRATES_MAX_LENGTH = 200;
 
@@ -69,6 +71,7 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   classroomId: string = '';
   classroomOptions: ClassroomSummaryDict[] = [];
   classroomLoadErrorMessage: string = '';
+  isLoadingClassrooms: boolean = false;
   timeLimitInMinutes: number | null = null;
   totalQuestions: number | null = null;
   demonstratesList: string[] = [''];
@@ -90,6 +93,7 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   }
 
   async loadClassrooms(): Promise<void> {
+    this.isLoadingClassrooms = true;
     try {
       this.classroomOptions =
         await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
@@ -99,6 +103,8 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
       this.classroomOptions = [];
       this.classroomLoadErrorMessage =
         'Unable to load classrooms. Please try again.';
+    } finally {
+      this.isLoadingClassrooms = false;
     }
   }
 
@@ -157,10 +163,10 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
         this.description.length <= this.DESCRIPTION_MAX_LENGTH &&
         this.classroomId &&
         this.timeLimitInMinutes &&
-        this.timeLimitInMinutes > 0 &&
+        this.timeLimitInMinutes >= this.MIN_TIME_LIMIT_IN_MINUTES &&
         this.timeLimitInMinutes <= this.TIME_LIMIT_MAX_VALUE &&
         this.totalQuestions &&
-        this.totalQuestions > 0 &&
+        this.totalQuestions >= this.MIN_TOTAL_QUESTIONS &&
         this.totalQuestions <= this.TOTAL_QUESTIONS_MAX_VALUE &&
         normalizedDemonstrates.length > 0 &&
         normalizedDemonstrates.join('\n').length <= this.DEMONSTRATES_MAX_LENGTH
@@ -206,6 +212,13 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     if (
       this.timeLimitInMinutes !== null &&
       this.timeLimitInMinutes !== undefined &&
+      this.timeLimitInMinutes < this.MIN_TIME_LIMIT_IN_MINUTES
+    ) {
+      return `Time limit should be at least ${this.MIN_TIME_LIMIT_IN_MINUTES} minutes.`;
+    }
+    if (
+      this.timeLimitInMinutes !== null &&
+      this.timeLimitInMinutes !== undefined &&
       this.timeLimitInMinutes > this.TIME_LIMIT_MAX_VALUE
     ) {
       return `Time limit should be at most ${this.TIME_LIMIT_MAX_VALUE} minutes.`;
@@ -214,6 +227,13 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   }
 
   getTotalQuestionsValidationError(): string {
+    if (
+      this.totalQuestions !== null &&
+      this.totalQuestions !== undefined &&
+      this.totalQuestions < this.MIN_TOTAL_QUESTIONS
+    ) {
+      return `Total number of questions should be at least ${this.MIN_TOTAL_QUESTIONS}.`;
+    }
     if (
       this.totalQuestions !== null &&
       this.totalQuestions !== undefined &&
@@ -228,7 +248,7 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     return (
       this.timeLimitInMinutes === null ||
       this.timeLimitInMinutes === undefined ||
-      this.timeLimitInMinutes <= 0 ||
+      this.timeLimitInMinutes < this.MIN_TIME_LIMIT_IN_MINUTES ||
       this.timeLimitInMinutes > this.TIME_LIMIT_MAX_VALUE
     );
   }
@@ -237,7 +257,7 @@ export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
     return (
       this.totalQuestions === null ||
       this.totalQuestions === undefined ||
-      this.totalQuestions <= 0 ||
+      this.totalQuestions < this.MIN_TOTAL_QUESTIONS ||
       this.totalQuestions > this.TOTAL_QUESTIONS_MAX_VALUE
     );
   }

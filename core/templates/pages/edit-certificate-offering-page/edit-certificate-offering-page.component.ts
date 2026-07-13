@@ -49,6 +49,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   isCertificateValid: boolean = true;
+  isLoadingCertificateOffering: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -77,6 +78,8 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         'The certificate offering could not be loaded.'
       );
       this.router.navigate(['/certificate-offering-dashboard']);
+    } finally {
+      this.isLoadingCertificateOffering = false;
     }
   }
 

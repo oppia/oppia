@@ -35,7 +35,7 @@
 
     <div class="oppia-certificate-offering-search">
       <input class="oppia-certificate-offering-search-input" type="text" placeholder="Search for topics e.g. Fractions, Geometry"
-             [(ngModel)]="searchQuery" aria-label="Search topics">
+             [(ngModel)]="searchQuery" [disabled]="isLoadingTopics" aria-label="Search topics">
     </div>
 
     <div class="oppia-certificate-offering-topic-list-wrap">
@@ -45,7 +45,10 @@
       <p *ngIf="classroomLoadErrorMessage" class="oppia-certificate-offering-no-results">
         {{ classroomLoadErrorMessage }}
       </p>
-
+      <div *ngIf="isLoadingTopics" class="text-center py-3 text-muted">
+        <mat-spinner class="mx-auto mb-2" diameter="24"></mat-spinner>
+        Loading topics...
+      </div>
       <div class="oppia-certificate-offering-topic-list">
         <ng-container *ngIf="filteredTopics.length > 0; else noTopics">
           <div *ngFor="let topic of filteredTopics" class="oppia-certificate-offering-topic-row">
@@ -61,6 +64,7 @@
             </div>
             <button type="button" class="oppia-certificate-offering-topic-toggle"
                     [class.oppia-certificate-offering-topic-toggle--added]="selectedTopicIds.has(topic.id)"
+                    [disabled]="isLoadingTopics"
                     (click)="toggleTopic(topic)">
               {{ selectedTopicIds.has(topic.id) ? 'Added' : 'Add' }}
             </button>
@@ -74,11 +78,14 @@
     </div>
 
     <div class="oppia-certificate-offering-actions">
-      <button type="button" class="oppia-certificate-offering-secondary-button" (click)="onBackClicked()">
+      <button type="button" class="oppia-certificate-offering-secondary-button" [disabled]="isLoadingTopics"
+              (click)="onBackClicked()">
         &lt; Back
       </button>
-      <button type="button" class="oppia-certificate-offering-primary-button" [disabled]="selectedTopics.length === 0"
-              [attr.aria-disabled]="selectedTopics.length === 0" (click)="onNextClicked()">
+      <button type="button" class="oppia-certificate-offering-primary-button"
+              [disabled]="selectedTopics.length === 0 || isLoadingTopics"
+              [attr.aria-disabled]="selectedTopics.length === 0 || isLoadingTopics"
+              (click)="onNextClicked()">
         Next
       </button>
     </div>

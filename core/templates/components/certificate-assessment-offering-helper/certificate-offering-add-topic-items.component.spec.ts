@@ -442,4 +442,47 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(component.selectedTopicIds.has('topic_1')).toBeTrue();
     expect(component.selectedTopics).toEqual([]);
   }));
+
+  it('should show loading state while topics are fetched', fakeAsync(() => {
+    let resolveClassroomData: (value: ClassroomData) => void = () => {};
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      Promise.resolve([
+        {
+          classroom_id: 'math_classroom_id',
+          name: 'Math',
+          url_fragment: 'math',
+          teaser_text: '',
+          is_published: true,
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+        },
+      ])
+    );
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveClassroomData = resolve;
+      })
+    );
+
+    component.classroomId = 'math_classroom_id';
+    component.ngOnChanges({
+      classroomId: {
+        currentValue: 'math_classroom_id',
+        previousValue: '',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.isLoadingTopics).toBeTrue();
+    resolveClassroomData(classroomData);
+    flushMicrotasks();
+    expect(component.isLoadingTopics).toBeFalse();
+  }));
 });

@@ -56,6 +56,7 @@ export interface TopicReadinessRow {
   mediumRequired: number;
   hardRequired: number;
   totalQuestions: number;
+  totalRequiredQuestions: number;
   isReady: boolean;
   easySufficient: boolean;
   mediumSufficient: boolean;
@@ -103,6 +104,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   validationMessage: string = '';
   topicReadinessRows: TopicReadinessRow[] = [];
   errorMessages: ReadinessErrorMessage[] = [];
+  isLoadingValidation: boolean = false;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
@@ -121,7 +123,12 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     await this._loadValidationState();
   }
 
+  async refreshValidationState(): Promise<void> {
+    await this._loadValidationState();
+  }
+
   private async _loadValidationState(): Promise<void> {
+    this.isLoadingValidation = true;
     try {
       const classroomSummaries =
         await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
@@ -167,6 +174,8 @@ export class CertificateOfferingReviewAndAvailabilityComponent
           : 'Unable to validate this certificate.';
       this._buildDisplayData();
       this.isCertificateValidChange.emit(this.isValid);
+    } finally {
+      this.isLoadingValidation = false;
     }
   }
 
@@ -186,6 +195,8 @@ export class CertificateOfferingReviewAndAvailabilityComponent
 
       const totalQuestions =
         result.easy.available + result.medium.available + result.hard.available;
+      const totalRequiredQuestions =
+        result.easy.required + result.medium.required + result.hard.required;
 
       this.topicReadinessRows.push({
         topicId,
@@ -197,6 +208,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
         mediumRequired: result.medium.required,
         hardRequired: result.hard.required,
         totalQuestions,
+        totalRequiredQuestions,
         isReady,
         easySufficient,
         mediumSufficient,

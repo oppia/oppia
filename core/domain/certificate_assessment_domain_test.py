@@ -155,10 +155,10 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_invalid_total_questions(self) -> None:
         offering = self._get_sample_offering()
-        offering.total_questions = 0
+        offering.total_questions = 2
 
         with self.assertRaisesRegex(
-            Exception, 'total_questions must be a positive integer'
+            Exception, 'total_questions must be greater than or equal to 3'
         ):
             offering.validate()
 
@@ -173,10 +173,11 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
     def test_validate_rejects_invalid_time_limit(self) -> None:
         offering = self._get_sample_offering()
-        offering.time_limit_in_minutes = 0
+        offering.time_limit_in_minutes = 4
 
         with self.assertRaisesRegex(
-            Exception, 'time_limit_in_minutes must be a positive integer'
+            Exception,
+            'time_limit_in_minutes must be greater than or equal to 5',
         ):
             offering.validate()
 
