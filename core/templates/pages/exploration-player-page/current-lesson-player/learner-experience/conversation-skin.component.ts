@@ -27,7 +27,10 @@ import {
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
-import {CurrentInteractionService} from '../../services/current-interaction.service';
+import {
+  CurrentInteractionService,
+  OnSubmitFn,
+} from '../../services/current-interaction.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
 import {
@@ -64,6 +67,9 @@ import {CurrentEngineService} from 'pages/exploration-player-page/services/curre
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
+import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -72,24 +78,24 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
   encapsulation: ViewEncapsulation.None,
 })
 export class ConversationSkinComponent {
-  @Input() questionPlayerConfig;
-  @Input() diagnosticTestTopicTrackerModel;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig | null;
+  @Input() diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  _editorPreviewMode;
+  _editorPreviewMode!: boolean;
 
-  isLoggedIn: boolean;
+  isLoggedIn: boolean = false;
   voiceoversAreLoaded: boolean = false;
-  collectionTitle: string;
-  explorationId: string;
-  isIframed: boolean;
-  OPPIA_AVATAR_IMAGE_URL: string;
+  collectionTitle: string | null = null;
+  explorationId!: string;
+  isIframed!: boolean;
+  OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary;
-  moveToExploration: boolean;
+  collectionSummary: LearnerExplorationSummary | string | null = null;
+  moveToExploration: boolean = false;
 
-  pidInUrl: string;
+  pidInUrl: string | null = null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
@@ -313,9 +319,17 @@ export class ConversationSkinComponent {
       this.cardAnimationService.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
-        this.conversationFlowService.submitAnswer.bind(
-          this.conversationFlowService
-        )
+        (
+          answer: InteractionAnswer,
+          interactionRulesService: Parameters<OnSubmitFn>[1]
+        ) => {
+          const submitFn: Function = this.conversationFlowService.submitAnswer;
+          submitFn.call(
+            this.conversationFlowService,
+            answer,
+            interactionRulesService
+          );
+        }
       );
       this.initializePage();
 
@@ -463,9 +477,13 @@ export class ConversationSkinComponent {
       return false;
     }
     let interaction = displayedCard.getInteraction();
+    if (!interaction.id) {
+      return false;
+    }
     return (
-      Boolean(interaction.id) &&
-      INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
+      interaction.id in INTERACTION_SPECS &&
+      INTERACTION_SPECS[interaction.id as keyof typeof INTERACTION_SPECS]
+        .show_generic_submit_button &&
       this.isCurrentCardAtEndOfTranscript()
     );
   }
@@ -482,9 +500,10 @@ export class ConversationSkinComponent {
       .getStateName();
     this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
-    this.conversationFlowService.setNextStateCard(
-      this.conversationFlowService.getNextCardIfStuck()
-    );
+    const nextStateCard = this.conversationFlowService.getNextCardIfStuck();
+    if (nextStateCard) {
+      this.conversationFlowService.setNextStateCard(nextStateCard);
+    }
     this.showInteraction = false;
     this.conversationFlowService.showPendingCard();
   }

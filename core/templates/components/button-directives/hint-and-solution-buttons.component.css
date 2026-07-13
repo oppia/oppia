@@ -131,9 +131,11 @@ oppia-hint-and-solution-buttons .hint-box::before {
     bottom: 80px;
     font-size: 15px;
     left: 5px;
+    pointer-events: auto;
   }
 
   oppia-hint-and-solution-buttons .hint-container {
+    pointer-events: none;
     width: 100%;
   }
 
