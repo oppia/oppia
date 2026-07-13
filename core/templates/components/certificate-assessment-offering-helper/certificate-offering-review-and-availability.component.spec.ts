@@ -228,7 +228,7 @@ describe('Certificate Offering Review And Availability Component', () => {
         mediumRequired: 10,
         hardRequired: 3,
         totalQuestions: 8,
-        totalRequiredQuestions: 8,
+        totalRequiredQuestions: 18,
         isReady: false,
         easySufficient: true,
         mediumSufficient: false,
