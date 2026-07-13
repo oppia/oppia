@@ -51,4 +51,4 @@ jobs:
           START_ISSUE_NUMBER: ${{ github.event.inputs.start_issue_number }}
           END_ISSUE_NUMBER: ${{ github.event.inputs.end_issue_number }}
           THRESHOLD_SCORE: ${{ github.event.inputs.threshold_score }}
-        run: python scripts/duplicate_detector.py
+        run: python -m scripts.duplicate_detector
