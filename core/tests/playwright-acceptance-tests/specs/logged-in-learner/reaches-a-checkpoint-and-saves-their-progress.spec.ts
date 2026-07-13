@@ -46,6 +46,7 @@ test.describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
 
   test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000); // Setup taking longer than default timeout.
     const releaseCoordinator: ReleaseCoordinator =
       await UserFactory.createNewUser(
         'releaseCoord',
@@ -167,6 +168,10 @@ test.describe('Logged-in User', function () {
   });
 
   test('should be able to track the checkpoint progress', async function () {
+    // A freshly signed-up user lands on the splash page, not the learner
+    // dashboard, so it must be navigated to directly first.
+    await loggedInUser.navigateToLearnerDashboard();
+
     // Visit the Math classroom page.
     await loggedInUser.navigateToClassroomFromLearnerDashboard(
       CLASSROOM_URL_FRAGMENT
@@ -182,18 +187,16 @@ test.describe('Logged-in User', function () {
       CHAPTER_NAME
     );
 
-    // Continue to the next card (Test Question, the first checkpoint) and
-    // submit the correct answer.
+    // Continue to the next card (Test Question, the first checkpoint). The
+    // checkpoint modal appears immediately on arrival and overlaps the
+    // input field, so it must be verified (and dismissed) before the answer
+    // can be submitted.
     await loggedInUser.continueToNextCard();
-    await loggedInUser.submitAnswer('-25');
-
-    // Verify that the checkpoint modal appears while still on the Test
-    // Question card. This indicator is only shown while exactly this
-    // checkpoint is the most recently reached one, so it must be checked
-    // before continuing on to the next checkpoint (Study Guide).
     await loggedInUser.verifyCheckpointModalAppears();
 
-    // Continue to the next card (Study Guide, the second checkpoint).
+    // Submit the correct answer and continue to the next card (Study
+    // Guide, the second checkpoint).
+    await loggedInUser.submitAnswer('-25');
     await loggedInUser.continueToNextCard();
   });
 
