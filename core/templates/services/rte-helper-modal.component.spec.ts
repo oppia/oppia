@@ -353,7 +353,7 @@ describe('RteHelperModalComponent', () => {
           value: {
             raw_latex: 'x^2',
             svg_filename: 'mathImage.svg',
-            svgFile: null,
+            svgFile: 'Svg Data',
             mathExpressionSvgIsBeingProcessed: false,
           },
         },
