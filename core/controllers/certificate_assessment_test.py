@@ -19,7 +19,8 @@ from __future__ import annotations
 from unittest import mock
 
 from core import feconf, utils
-from core.domain import certificate_assessment_services
+from core.controllers import certificate_assessment
+from core.domain import certificate_assessment_services, topic_fetchers
 from core.tests import test_utils
 
 
@@ -298,13 +299,11 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             demonstrates=['Scientific reasoning'],
             async_status='Available',
         )
-
         response = self.delete_json(
             feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
                 '<certificate_id>', created_offering.certificate_id
             )
         )
-
         self.assertEqual(response, {})
         with self.assertRaisesRegex(
             certificate_assessment_services.CertificateAssessmentOfferingNotFoundException,
@@ -321,3 +320,80 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             ),
             expected_status_int=404,
         )
+
+
+class ValidateCertificateAssessmentOfferingHandlerTest(
+    test_utils.GenericTestBase
+):
+    """Tests class for ValidateCertificateAssessmentOfferingHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, 'Place Values', abbreviated_name='place_values'
+        )
+
+    def test_post_returns_validation_result_for_valid_offering(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            {
+                'topic_ids': [self.topic_id],
+                'total_questions': 3,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertIn('is_valid', response)
+        self.assertIn('validation_errors', response)
+        self.assertIn('validation_message', response)
+
+    def test_create_empty_validation_payload(self) -> None:
+        empty_payload = (
+            certificate_assessment.create_empty_validate_certificate_assessment_offering_handler_normalized_payload()
+        )
+        self.assertEqual(
+            empty_payload,
+            {
+                'topic_ids': [],
+                'total_questions': 0,
+            },
+        )
+
+    def test_post_uses_empty_validation_payload_when_missing(self) -> None:
+        handler = certificate_assessment.ValidateCertificateAssessmentOfferingHandler.__new__(
+            certificate_assessment.ValidateCertificateAssessmentOfferingHandler
+        )
+        handler.normalized_payload = None
+
+        validation_result = {
+            'is_valid': True,
+            'validation_errors': [],
+            'validation_message': 'Valid.',
+        }
+        with mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value=validation_result,
+        ) as validate_mock, mock.patch.object(
+            certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        validate_mock.assert_called_once_with(topic_ids=[], total_questions=0)
+        render_json_mock.assert_called_once_with(validation_result)
+
+    def test_post_returns_invalid_result_for_insufficient_questions(
+        self,
+    ) -> None:
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            {
+                'topic_ids': [self.topic_id],
+                'total_questions': 1,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertFalse(response['is_valid'])

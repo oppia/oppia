@@ -1,18 +1,11 @@
-<ul class="nav navbar-nav d-none d-md-block oppia-navbar-breadcrumb ng-cloak">
-  <li>
+<ul class="nav navbar-nav d-none d-md-block oppia-navbar-breadcrumb">
+  <li *ngIf="navbarTitle !== null">
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <span *ngIf="navbarTitle">
-      <[navbarTitle]>
-      <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-icon"></span>
-      <span>
-        <[getCurrentTabName()]>
-      </span>
+      {{navbarTitle}}
     </span>
     <span *ngIf="navbarTitle === ''" (click)="editTitle()" class="oppia-untitled-exploration-text">
       Untitled Exploration
-    </span>
-    <span class="e2e-test-loading-message" *ngIf="navbarTitle === null">
-      Loading...
     </span>
   </li>
 </ul>

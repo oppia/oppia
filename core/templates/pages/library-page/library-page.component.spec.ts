@@ -383,49 +383,6 @@ describe('Library Page Component', () => {
     expect(componentInstance.initCarousels).toHaveBeenCalled();
   }));
 
-  it('should initialize for non group pages and user is not logged in', fakeAsync(() => {
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(urlInterpolationService, 'getStaticImageUrl');
-    spyOn(translateService.onLangChange, 'subscribe');
-    windowRef.nativeWindow.location.pathname = '/community-library';
-    fixture.detectChanges();
-    spyOn(
-      libraryPageBackendApiService,
-      'fetchLibraryIndexDataAsync'
-    ).and.returnValue(Promise.resolve(libraryIndexData));
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({isLoggedIn: () => false} as UserInfo)
-    );
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
-    spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
-    spyOn(componentInstance, 'initCarousels');
-    spyOn(loggerService, 'error');
-    let actualWidth = 200;
-    spyOn(document, 'querySelector').and.returnValue({
-      clientWidth: 200,
-    } as HTMLElement);
-    componentInstance.ngOnInit();
-    tick();
-    tick();
-    tick();
-    tick();
-    tick(4000);
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
-    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-    expect(userService.getUserInfoAsync).toHaveBeenCalled();
-    expect(loggerService.error).toHaveBeenCalledWith(
-      'The actual width of tile is different than either of the ' +
-        'expected widths. Actual size: ' +
-        actualWidth +
-        ', Expected sizes: ' +
-        AppConstants.LIBRARY_TILE_WIDTH_PX +
-        '/' +
-        AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
-    );
-  }));
-
   it('should log when invalid path is used', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl');

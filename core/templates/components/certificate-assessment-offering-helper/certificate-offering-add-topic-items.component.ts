@@ -26,63 +26,21 @@ import {
   SimpleChanges,
 } from '@angular/core';
 
+import {AppConstants} from 'app.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingTopicData,
 } from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 import './certificate-offering-add-topic-items.component.css';
 export interface TopicOption {
   id: string;
   title: string;
   classroomName: string;
-  thumbnailBgColor?: string;
+  thumbnailUrl: string;
 }
-
-const STUB_TOPICS: TopicOption[] = [
-  {
-    id: 'topic_1',
-    title: 'Place Values',
-    classroomName: 'Grade 5 Math',
-    thumbnailBgColor: '#fde68a',
-  },
-  {
-    id: 'topic_2',
-    title: 'Addition & Subtraction',
-    classroomName: 'Grade 5 Math',
-    thumbnailBgColor: '#bfdbfe',
-  },
-  {
-    id: 'topic_3',
-    title: 'Multiplication',
-    classroomName: 'Grade 5 Math',
-    thumbnailBgColor: '#d9f99d',
-  },
-  {
-    id: 'topic_4',
-    title: 'Fractions',
-    classroomName: 'Grade 5 Math',
-    thumbnailBgColor: '#fecdd3',
-  },
-  {
-    id: 'topic_5',
-    title: 'Geometry',
-    classroomName: 'Grade 5 Math',
-    thumbnailBgColor: '#ddd6fe',
-  },
-  {
-    id: 'topic_6',
-    title: 'Plant Cells',
-    classroomName: 'Grade 6 Science',
-    thumbnailBgColor: '#d9f99d',
-  },
-  {
-    id: 'topic_7',
-    title: 'Simple Machines',
-    classroomName: 'Grade 6 Science',
-    thumbnailBgColor: '#fde68a',
-  },
-];
 
 @Component({
   selector: 'oppia-certificate-offering-add-topic-items',
@@ -94,9 +52,7 @@ export class CertificateOfferingAddTopicItemsComponent
 {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
-  // TODO(#24717 - M1.11): Replace this display name input with classroomId once step 1
-  // starts passing the actual classroom identifier to this component.
-  @Input() classroomName: string = 'Math Grade 5';
+  @Input() classroomId: string = '';
   @Output() topicDataChange =
     new EventEmitter<CertificateAssessmentOfferingTopicData>();
   @Output() navigateToReviewAndAvailabilitySection = new EventEmitter<void>();
@@ -105,23 +61,77 @@ export class CertificateOfferingAddTopicItemsComponent
   searchQuery: string = '';
   selectedTopics: TopicOption[] = [];
   selectedTopicIds: Set<string> = new Set();
+  availableTopics: TopicOption[] = [];
+  classroomName: string = '';
+  classroomLoadErrorMessage: string = '';
 
-  // TODO(#24717 - M1.11): Replace this stub with the classroom-backed fetch once the flow
-  // passes classroomId from the first step.
-  availableTopics: TopicOption[] = STUB_TOPICS;
+  constructor(
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private assetsBackendApiService: AssetsBackendApiService
+  ) {}
 
   ngOnInit(): void {
-    this.syncSelectedFromOffering();
+    this.loadTopicsForClassroom();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes.classroomId && !changes.classroomId.firstChange) {
+      this.loadTopicsForClassroom();
+    }
     if (changes.certificateAssessmentOffering) {
       this.syncSelectedFromOffering();
     }
   }
 
-  // TODO(#24717 - M1.11): When the real classroomId is available, fetch the classroom data
-  // here and map classroomData.getTopicSummaries() into TopicOption values.
+  private async loadTopicsForClassroom(): Promise<void> {
+    if (!this.classroomId) {
+      this.availableTopics = [];
+      this.classroomName = '';
+      this.classroomLoadErrorMessage = '';
+      this.syncSelectedFromOffering();
+      return;
+    }
+
+    try {
+      const classroomSummaries =
+        await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
+      const selectedClassroom = classroomSummaries.find(
+        classroom => classroom.classroom_id === this.classroomId
+      );
+
+      if (!selectedClassroom) {
+        throw new Error('Selected classroom not found.');
+      }
+
+      const classroomData =
+        await this.classroomBackendApiService.fetchClassroomDataAsync(
+          selectedClassroom.url_fragment
+        );
+      this.classroomName = classroomData.getName();
+      this.availableTopics = classroomData.getTopicSummaries().map(topic => {
+        return {
+          id: topic.getId(),
+          title: topic.getName(),
+          classroomName: classroomData.getName(),
+          thumbnailUrl: this.assetsBackendApiService.getThumbnailUrlForPreview(
+            AppConstants.ENTITY_TYPE.TOPIC,
+            topic.getId(),
+            topic.getThumbnailFilename()
+          ),
+        };
+      });
+      this.classroomLoadErrorMessage = '';
+    } catch (error: unknown) {
+      console.error('Failed to load classroom topics.', error);
+      this.availableTopics = [];
+      this.classroomName = '';
+      this.classroomLoadErrorMessage =
+        'Unable to load topics for this classroom.';
+    }
+
+    this.syncSelectedFromOffering();
+  }
+
   private syncSelectedFromOffering(): void {
     const topicData = this.certificateAssessmentOffering.topicData ?? {};
     const selectedIds = Object.entries(topicData)

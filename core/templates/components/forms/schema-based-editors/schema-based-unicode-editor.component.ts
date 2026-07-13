@@ -92,8 +92,9 @@ export class SchemaBasedUnicodeEditor
     extraKeys: {Tab: (cm: CodeMirror.Editor) => void};
     indentWithTabs: boolean;
     lineNumbers: boolean;
-    readOnly?: string;
-    mode?: string;
+    readOnly: boolean;
+    mode: string;
+    viewportMargin: number;
   } = {
     // Convert tabs to spaces.
     extraKeys: {
@@ -113,6 +114,9 @@ export class SchemaBasedUnicodeEditor
     },
     indentWithTabs: false,
     lineNumbers: true,
+    readOnly: false,
+    mode: '',
+    viewportMargin: Infinity,
   };
 
   constructor(
@@ -153,7 +157,7 @@ export class SchemaBasedUnicodeEditor
       var CODING_MODE_NONE = 'none';
 
       if (this.disabled) {
-        this.codemirrorOptions.readOnly = 'nocursor';
+        this.codemirrorOptions.readOnly = true;
       }
       // Note that only 'coffeescript', 'javascript', 'lua', 'python',
       // 'ruby' and 'scheme' have CodeMirror-supported syntax
