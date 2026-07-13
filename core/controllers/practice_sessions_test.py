@@ -107,11 +107,15 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
-    def test_get_fails_when_both_params_absent(self) -> None:
-        self.get_json(
+    def test_get_returns_all_subtopic_skills_when_no_params(self) -> None:
+        json_response = self.get_json(
             '%s/staging/%s'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
-            expected_status_int=400,
+        )
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(
+            json_response['skill_ids_to_descriptions_map'],
+            {'skill_id_1': 'Skill 1', 'skill_id_2': 'Skill 2'},
         )
 
     def test_get_fails_when_skill_ids_dont_exist(self) -> None:

@@ -116,10 +116,9 @@ class PracticeSessionsPageDataHandler(
         elif arc_id is not None:
             selected_skill_ids = self._get_skill_ids_for_arc(topic, arc_id)
         else:
-            raise self.InvalidInputException(
-                'Expected skill_ids, selected_subtopic_ids, node_id, '
-                'or arc_id'
-            )
+            # Mastery challenge: collect all skills from all subtopics.
+            for subtopic in topic.subtopics:
+                selected_skill_ids.extend(subtopic.skill_ids)
 
         try:
             skills = skill_fetchers.get_multi_skills(selected_skill_ids)
