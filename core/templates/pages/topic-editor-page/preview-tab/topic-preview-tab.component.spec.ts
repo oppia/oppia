@@ -25,12 +25,13 @@ import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicPreviewTabComponent} from './topic-preview-tab.component';
-import {EventEmitter} from '@angular/core';
+import {Subject} from 'rxjs';
 
 describe('Topic Preview Tab Component', () => {
   let fixture: ComponentFixture<TopicPreviewTabComponent>;
   let componentInstance: TopicPreviewTabComponent;
   let mockTranslateService: jasmine.SpyObj<TranslateService>;
+  let topicEditorStateService: MockTopicEditorStateService;
   let testName = 'test_name';
   let mockUrl = 'mock_url';
   let topicUrl = 'topic_1';
@@ -49,12 +50,14 @@ describe('Topic Preview Tab Component', () => {
       '',
       '',
       '',
+      '',
       0,
       0,
       0,
       [],
       0,
-      []
+      [],
+      undefined
     ),
   ];
 
@@ -101,10 +104,13 @@ describe('Topic Preview Tab Component', () => {
   }
 
   beforeEach(waitForAsync(() => {
-    mockTranslateService = jasmine.createSpyObj('TranslateService', [
-      'instant',
-    ]);
-    mockTranslateService.onLangChange = new EventEmitter();
+    mockTranslateService = jasmine.createSpyObj(
+      'TranslateService',
+      ['instant'],
+      {
+        onLangChange: new Subject(),
+      }
+    );
 
     TestBed.configureTestingModule({
       imports: [
@@ -114,9 +120,10 @@ describe('Topic Preview Tab Component', () => {
       ],
       declarations: [TopicPreviewTabComponent],
       providers: [
+        MockTopicEditorStateService,
         {
           provide: TopicEditorStateService,
-          useClass: MockTopicEditorStateService,
+          useExisting: MockTopicEditorStateService,
         },
         {
           provide: UrlInterpolationService,
@@ -134,6 +141,9 @@ describe('Topic Preview Tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicPreviewTabComponent);
     componentInstance = fixture.componentInstance;
+
+    topicEditorStateService = TestBed.inject(MockTopicEditorStateService);
+
     componentInstance.ngOnInit();
   });
 
@@ -165,25 +175,21 @@ describe('Topic Preview Tab Component', () => {
   });
 
   it('should return true when practiceTabIsDisplayed is true', () => {
-    (
-      componentInstance.topicEditorStateService as MockTopicEditorStateService
-    ).setPracticeTabDisplayed(true);
+    topicEditorStateService.setPracticeTabDisplayed(true);
     componentInstance.ngOnInit();
-    expect(componentInstance.isPracticeTabEnabled()).toBeTrue();
+    expect(componentInstance.isPracticeTabEnabled()).toBe(true);
   });
 
   it('should return false when practiceTabIsDisplayed is false', () => {
-    (
-      componentInstance.topicEditorStateService as MockTopicEditorStateService
-    ).setPracticeTabDisplayed(false);
+    topicEditorStateService.setPracticeTabDisplayed(false);
     componentInstance.ngOnInit();
-    expect(componentInstance.isPracticeTabEnabled()).toBeFalse();
+    expect(componentInstance.isPracticeTabEnabled()).toBe(false);
   });
 
   it('should update page title on language change', () => {
     spyOn(componentInstance, 'setPageTitle');
     componentInstance.subscribeToOnLangChange();
-    mockTranslateService.onLangChange.emit();
+    mockTranslateService.onLangChange.next();
     expect(componentInstance.setPageTitle).toHaveBeenCalled();
   });
 });

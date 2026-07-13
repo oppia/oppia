@@ -55,6 +55,7 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -93,8 +94,19 @@ interface MockBeforeUnloadEvent {
   returnValue: string;
 }
 
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
@@ -138,6 +150,7 @@ describe('Translation Modal Component', () => {
   };
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     mockModalRef = new MockConfirmTranslationExitModal();
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -175,6 +188,10 @@ describe('Translation Modal Component', () => {
         {
           provide: ImageLocalStorageService,
           useClass: MockImageLocalStorageService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -224,6 +241,26 @@ describe('Translation Modal Component', () => {
     );
   });
 
+  it('should wrap text with ellipsis when text is too long', () => {
+    expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
+  });
+
+  it('should return empty string for empty input', () => {
+    expect(component.wrapTextWithEllipsis('', 10)).toBe('');
+  });
+
+  it('should return input unchanged for short strings', () => {
+    expect(component.wrapTextWithEllipsis('Hi', 10)).toBe('Hi');
+  });
+
+  it('should return input unchanged when characterCount is less than 3', () => {
+    expect(component.wrapTextWithEllipsis('Hello', 2)).toBe('Hello');
+  });
+
+  it('should return input unchanged when length equals characterCount', () => {
+    expect(component.wrapTextWithEllipsis('Hello', 5)).toBe('Hello');
+  });
+
   it('should invoke change detection when html is updated', () => {
     component.activeWrittenTranslation = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
@@ -237,6 +274,73 @@ describe('Translation Modal Component', () => {
     component.updateHtml('old');
     expect(component.activeWrittenTranslation).toEqual('old');
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
+  });
+
+  it('should invoke change detection when set of strings is updated', () => {
+    component.activeWrittenTranslation = ['old value'];
+    component.updateHtml(['new value']);
+
+    expect(component.activeWrittenTranslation).toEqual(['new value']);
+  });
+
+  it('should return early when $event is neither string nor array', () => {
+    component.activeWrittenTranslation = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateHtml(null);
+    expect(component.activeWrittenTranslation).toEqual('old');
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
+  });
+
+  it('should set validation errors and disable save when translation has missing custom tags', () => {
+    spyOn(component, 'ngOnInit').and.stub();
+    spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    component.activeDataFormat = 'html';
+    component.loadingData = false;
+    component.textToTranslate =
+      '<p>Original text</p><oppia-noninteractive-skillreview>' +
+      '</oppia-noninteractive-skillreview>';
+
+    component.updateHtml('<p>Translated text</p>');
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.e2e-test-save-button'
+    );
+
+    expect(saveButton).toBeTruthy();
+
+    expect(component.hasIncompleteTranslationError).toBe(true);
+    expect(component.hasSubmitValidationErrors()).toBe(true);
+    expect(saveButton.disabled).toBe(true);
+  });
+
+  it('should clear validation errors and enable save after translated custom tags are added', () => {
+    spyOn(component, 'ngOnInit').and.stub();
+    spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    component.activeDataFormat = 'html';
+    component.loadingData = false;
+    component.textToTranslate =
+      '<p>Original text</p><oppia-noninteractive-skillreview>' +
+      '</oppia-noninteractive-skillreview>';
+    component.updateHtml('<p>Translated text</p>');
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.e2e-test-save-button'
+    );
+
+    expect(saveButton).toBeTruthy();
+    expect(saveButton.disabled).toBe(true);
+
+    component.updateHtml(
+      '<p>Translated text</p><oppia-noninteractive-skillreview>' +
+        '</oppia-noninteractive-skillreview>'
+    );
+    fixture.detectChanges();
+
+    expect(component.hasIncompleteTranslationError).toBe(false);
+    expect(component.hasSubmitValidationErrors()).toBe(false);
+    expect(saveButton.disabled).toBe(false);
   });
 
   it('should return the ExoansionTabType enum', () => {
@@ -508,6 +612,36 @@ describe('Translation Modal Component', () => {
           type: 'unicode',
         },
       });
+    });
+
+    it('should return activeWrittenTranslation as string when it is a string', () => {
+      component.activeWrittenTranslation = 'test string';
+      expect(component.activeWrittenTranslationAsString).toBe('test string');
+    });
+
+    it('should return first element when activeWrittenTranslation is an array', () => {
+      component.activeWrittenTranslation = ['first', 'second'];
+      expect(component.activeWrittenTranslationAsString).toBe('first');
+    });
+
+    it('should return empty string when activeWrittenTranslation is an empty array', () => {
+      component.activeWrittenTranslation = [];
+      expect(component.activeWrittenTranslationAsString).toBe('');
+    });
+
+    it('should return textToTranslate as string when it is a string', () => {
+      component.textToTranslate = 'test text';
+      expect(component.textToTranslateAsString).toBe('test text');
+    });
+
+    it('should return first element when textToTranslate is an array', () => {
+      component.textToTranslate = ['first', 'second'];
+      expect(component.textToTranslateAsString).toBe('first');
+    });
+
+    it('should return empty string when textToTranslate is an empty array', () => {
+      component.textToTranslate = [];
+      expect(component.textToTranslateAsString).toBe('');
     });
 
     it('should utilize the modify translations opportunity when available', () => {
@@ -1151,6 +1285,7 @@ describe('Translation Modal Component', () => {
       let translationLanguageService: TranslationLanguageService;
 
       beforeEach(() => {
+        mockPlatformFeatureService = new MockPlatformFeatureService();
         TestBed.resetTestingModule();
         mockWindow = {
           addEventListener: jasmine.createSpy('addEventListener'),
@@ -1242,6 +1377,10 @@ describe('Translation Modal Component', () => {
                 getEntityId: () => '1',
                 getImageSaveDestination: () => 'localStorage',
               },
+            },
+            {
+              provide: PlatformFeatureService,
+              useValue: mockPlatformFeatureService,
             },
           ],
           schemas: [NO_ERRORS_SCHEMA],

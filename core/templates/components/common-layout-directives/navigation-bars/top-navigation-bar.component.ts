@@ -26,6 +26,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  ViewEncapsulation,
 } from '@angular/core';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -51,19 +52,23 @@ import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import './top-navigation-bar.component.css';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
+import {FeedbackModalType} from 'domain/feedback/feedback.model';
 
 interface LanguageInfo {
   id: string;
   text: string;
   direction: string;
+  ariaLabelInEnglish?: string;
 }
 @Component({
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
   styleUrls: ['./top-navigation-bar.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -146,6 +151,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   profilePictureWebpDataUrl!: string;
   unreadThreadsCount: number = 0;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
+  isWebFeedbackModalEnabled: boolean = false;
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -205,6 +211,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
+    private ngbModal: NgbModal,
     private siteAnalyticsService: SiteAnalyticsService,
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
@@ -263,6 +270,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
+
+    this.isWebFeedbackModalEnabled =
+      this.isWebFeedbackModalFeatureFlagEnabled();
 
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
@@ -500,16 +510,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (aboutMenu,profileMenu).
    */
-  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu(evt: Event, menuName: string): void {
     // Focus on the current target before opening its submenu.
-    this.navigationService.openSubmenu(evt, menuName);
+    this.navigationService.openSubmenu(evt as KeyboardEvent, menuName);
   }
 
-  closeSubmenu(evt: KeyboardEvent): void {
-    this.navigationService.closeSubmenu(evt);
+  closeSubmenu(evt: Event): void {
+    this.navigationService.closeSubmenu(evt as KeyboardEvent);
   }
 
-  closeSubmenuIfNotMobile(evt: KeyboardEvent): void {
+  closeSubmenuIfNotMobile(evt: Event): void {
     if (this.deviceInfoService.isMobileDevice()) {
       return;
     }
@@ -530,9 +540,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   onMenuKeypress(
     evt: KeyboardEvent,
     menuName: string,
-    eventsTobeHandled: EventToCodes
+    eventsTobeHandled: Record<string, string>
   ): void {
-    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+    this.navigationService.onMenuKeypress(
+      evt,
+      menuName,
+      eventsTobeHandled as unknown as EventToCodes
+    );
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 
@@ -657,5 +671,22 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
     return this.platformFeatureService.status
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
+  }
+
+  isWebFeedbackModalFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.WebFeedbackModalEnabled.isEnabled;
+  }
+
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platformFeatureService.status.EnableCertificateAssessment
+      .isEnabled;
+  }
+
+  openSiteFeedbackModal(): void {
+    const modalRef = this.ngbModal.open(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.feedbackModalType = FeedbackModalType.SITE_ISSUE;
   }
 }

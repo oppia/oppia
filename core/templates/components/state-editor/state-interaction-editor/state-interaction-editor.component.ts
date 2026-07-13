@@ -48,6 +48,7 @@ import {
   InteractionData,
 } from 'interactions/customization-args-defs';
 import {Solution} from 'domain/exploration/solution.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {State} from 'domain/state/state.model';
@@ -57,9 +58,9 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 export interface InitializeAnswerGroups {
-  interactionId: string;
+  interactionId: InteractionSpecsKey | null;
   answerGroups: AnswerGroup[];
-  defaultOutcome: Outcome;
+  defaultOutcome: Outcome | null;
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
 }
 
@@ -74,25 +75,25 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   @Output() onSaveInteractionData = new EventEmitter<InteractionData>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
-  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveSolution = new EventEmitter<Solution | null>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
 
   @ViewChild('customizeInteractionButton')
-  customizeInteractionButton!: ElementRef;
+  customizeInteractionButton!: ElementRef<HTMLButtonElement>;
 
   @ViewChild('collapseAnswersAndResponsesButton')
-  collapseAnswersAndResponsesButton!: ElementRef;
+  collapseAnswersAndResponsesButton!: ElementRef<HTMLButtonElement>;
 
-  customizationModalReopened: boolean;
-  DEFAULT_TERMINAL_STATE_CONTENT: string;
+  customizationModalReopened!: boolean;
+  DEFAULT_TERMINAL_STATE_CONTENT!: string;
   directiveSubscriptions = new Subscription();
-  hasLoaded: boolean;
-  interactionEditorIsShown: boolean;
-  interactionId: string;
-  interactionIsDisabled: boolean;
-  interactionPreviewHtml: string;
-  windowIsNarrow: boolean;
+  hasLoaded!: boolean;
+  interactionEditorIsShown!: boolean;
+  interactionId!: InteractionSpecsKey | null;
+  interactionIsDisabled!: boolean;
+  interactionPreviewHtml!: string;
+  windowIsNarrow!: boolean;
 
   constructor(
     private alertsService: AlertsService,
@@ -201,6 +202,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.savedMemento;
     if (hasInteractionIdChanged) {
       if (
+        this.stateInteractionIdService.displayed &&
         INTERACTION_SPECS[this.stateInteractionIdService.displayed].is_terminal
       ) {
         this.updateDefaultTerminalStateContentIfEmpty();
@@ -215,12 +217,17 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     };
     this.onSaveInteractionData.emit(interactionData);
 
-    this.onSaveNextContentIdIndex.emit();
-    this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento,
-      this.stateCustomizationArgsService.savedMemento
-    );
-
+    // We emit 'undefined' as an unknown number because the nextContentIdIndex
+    // is not yet determined at this stage of the customization modal save
+    // process, but the emitter expects a value.
+    this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
+    const savedInteractionId = this.stateInteractionIdService.savedMemento;
+    if (savedInteractionId !== null) {
+      this.interactionDetailsCacheService.set(
+        savedInteractionId,
+        this.stateCustomizationArgsService.savedMemento
+      );
+    }
     // This must be called here so that the rules are updated before the
     // state graph is recomputed.
     if (hasInteractionIdChanged) {
@@ -273,23 +280,32 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed = null;
+          this.stateInteractionIdService.displayed =
+            // When an interaction is deleted, the interactionId is set to null
+            // to indicate its absence. We use 'unknown' to bypass the
+            // strict type check for 'InteractionSpecsKey'.
+            null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
-          this.interactionDetailsCacheService.removeDetails(
-            this.stateInteractionIdService.savedMemento
-          );
+          const savedInteractionId =
+            this.stateInteractionIdService.savedMemento;
+          if (savedInteractionId !== null) {
+            this.interactionDetailsCacheService.removeDetails(
+              savedInteractionId
+            );
+          }
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
 
-          let interactionData: InteractionData = {
+          this.onSaveInteractionData.emit({
             interactionId: this.stateInteractionIdService.displayed,
             customizationArgs: this.stateCustomizationArgsService.displayed,
-          };
-          this.onSaveInteractionData.emit(interactionData);
+          });
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          this.onSaveSolution.emit(
+            this.stateSolutionService.displayed as unknown as Solution
+          );
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento
@@ -341,7 +357,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.responsesService.onInitializeAnswerGroups.emit({
           interactionId: stateData.interaction.id,
           answerGroups: stateData.interaction.answerGroups,
-          defaultOutcome: stateData.interaction.defaultOutcome,
+          defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
             stateData.interaction.confirmedUnclassifiedAnswers,
         });

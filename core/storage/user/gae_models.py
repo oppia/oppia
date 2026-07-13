@@ -2255,231 +2255,6 @@ class StoryProgressModel(base_models.BaseModel):
         return user_data
 
 
-class UserQueryModel(base_models.BaseModel):
-    """Model for storing result of queries.
-
-    The id of each instance of this model is alphanumeric id of length 12
-    unique to each model instance.
-
-    This model turns off caching, because this results in stale data being
-    shown after each UserQueryOneOffJob.
-    """
-
-    _use_cache: bool = False
-    _use_memcache: bool = False
-    # Options for a query specified by query submitter.
-    # Query option to specify whether user has created or edited one or more
-    # explorations in last n days. This only returns users who have ever
-    # created or edited at least one exploration.
-    inactive_in_last_n_days = datastore_services.IntegerProperty(default=None)
-    # Query option to check whether given user has logged in
-    # since last n days.
-    has_not_logged_in_for_n_days = datastore_services.IntegerProperty(
-        default=None
-    )
-    # Query option to check whether user has created at least
-    # n explorations.
-    created_at_least_n_exps = datastore_services.IntegerProperty(default=None)
-    # Query option to check whether user has created fewer than
-    # n explorations.
-    created_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
-    # Query option to check if user has edited at least n explorations.
-    edited_at_least_n_exps = datastore_services.IntegerProperty(default=None)
-    # Query option to check if user has edited fewer than n explorations.
-    edited_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
-    # Query option to check if user has created collection.
-    created_collection = datastore_services.BooleanProperty(default=False)
-    # List of all user_ids who satisfy all parameters given in above query.
-    # This list will be empty initially. Once query has completed its execution
-    # this list will be populated with all qualifying user ids.
-    user_ids = datastore_services.JsonProperty(default=[], compressed=True)
-    # ID of the user who submitted the query.
-    submitter_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
-    # ID of the instance of BulkEmailModel which stores information
-    # about sent emails.
-    sent_email_model_id = datastore_services.StringProperty(
-        default=None, indexed=True
-    )
-    # Current status of the query.
-    query_status = datastore_services.StringProperty(
-        indexed=True, choices=feconf.ALLOWED_USER_QUERY_STATUSES
-    )
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data to delete corresponding to a user:
-        user_ids and submitter_id fields.
-
-        This model is marked as deleted after a period of time after its
-        creation. See MODEL_CLASSES_TO_MARK_AS_DELETED and
-        mark_outdated_models_as_deleted() in cron_services.py.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
-        """Model is not exported since this is a computed model
-        and the information already exists in other exported models.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model contains data corresponding to a user, but model is not
-        exported since this is a computed model and because noteworthy details
-        that belong to this model have already been exported.
-        """
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'has_not_logged_in_for_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'created_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'created_fewer_than_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'edited_fewer_than_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'sent_email_model_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'query_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            },
-        )
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of UserQueryModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        keys = cls.query(cls.submitter_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether UserQueryModel exists for user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether the model for user_id exists.
-        """
-        return (
-            cls.query(cls.submitter_id == user_id).get(keys_only=True)
-            is not None
-        )
-
-    # TODO(#13523): Change the return value of the function below from
-    # tuple(list, str|None, bool) to a domain object.
-    @classmethod
-    def fetch_page(
-        cls, page_size: int, cursor: Optional[str]
-    ) -> Tuple[Sequence[UserQueryModel], Optional[str], bool]:
-        """Fetches a list of all query_models sorted by creation date.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            cursor: str or None. The list of returned entities starts from this
-                datastore cursor.
-
-        Returns:
-            3-tuple of (query_models, cursor, more). As described in
-            fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                query_models: List of UserQueryModel instances.
-                next_cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are probably more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
-
-        created_on_query = cls.query().order(-cls.created_on)
-        fetch_result: Tuple[
-            Sequence[UserQueryModel], datastore_services.Cursor, bool
-        ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
-        query_models, next_cursor, _ = fetch_result
-        # TODO(#13462): Refactor this so that we don't do the lookup.
-        # Do a forward lookup so that we can know if there are more values.
-        fetch_result = created_on_query.fetch_page(
-            page_size + 1, start_cursor=start_cursor
-        )
-        plus_one_query_models, _, _ = fetch_result
-        more_results = len(plus_one_query_models) == page_size + 1
-        # The urlsafe returns bytes and we need to decode them to string.
-        next_cursor_str = (
-            next_cursor.urlsafe().decode('utf-8')
-            if (next_cursor and more_results)
-            else None
-        )
-        return (query_models, next_cursor_str, more_results)
-
-
-class UserBulkEmailsModel(base_models.BaseModel):
-    """Model to store IDs BulkEmailModel sent to a user.
-
-    Instances of this class are keyed by the user id.
-    """
-
-    # IDs of all BulkEmailModels that correspond to bulk emails sent to this
-    # user.
-    sent_email_model_ids = datastore_services.StringProperty(
-        indexed=True, repeated=True
-    )
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: id field."""
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether UserBulkEmailsModel exists for user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether the model for user_id exists.
-        """
-        return cls.get_by_id(user_id) is not None
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instance of UserBulkEmailsModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        cls.delete_by_id(user_id)
-
-    @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
-        """Model does not contain user data."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return dict(
-            super(cls, cls).get_export_policy(),
-            **{
-                'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
-            },
-        )
-
-
 class UserGroupModel(base_models.BaseModel):
     """Model for storing user-groups and the users associated.
 
@@ -3481,6 +3256,19 @@ class PinnedOpportunityModel(base_models.BaseModel):
     )
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
+    # TODO(#24933): A Beam job (BackfillPinnedOpportunityModelJob) is planned
+    # in Milestone 1.10 to backfill this field to the default value
+    # ('exploration') for all existing datastore entities, ensuring they are
+    # properly indexed for future entity-type based queries.
+    entity_type = datastore_services.StringProperty(
+        indexed=True, default=feconf.ENTITY_TYPE_EXPLORATION
+    )
+
+    def _pre_put_hook(self) -> None:
+        """Validates the model before it is put into the datastore."""
+        super()._pre_put_hook()
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
+            raise Exception('Invalid entity_type: %s' % self.entity_type)
 
     @classmethod
     def _generate_id(
@@ -3506,6 +3294,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         language_code: str,
         topic_id: str,
         opportunity_id: str,
+        entity_type: str,
     ) -> PinnedOpportunityModel:
         """Creates a new PinnedOpportunityModel instance. Fails if the
         model already exists.
@@ -3515,6 +3304,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             language_code: str. The code of the language.
             topic_id: str. The ID of the topic.
             opportunity_id: str. The ID of the pinned opportunity.
+            entity_type: str. The type of the entity.
 
         Returns:
             PinnedOpportunityModel. The created instance.
@@ -3536,6 +3326,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=opportunity_id,
+            entity_type=entity_type,
         )
         instance.update_timestamps()
         instance.put()
@@ -3599,6 +3390,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
                 'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,
+                'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -3626,6 +3418,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             )
             user_data[key] = {
                 'opportunity_id': model.opportunity_id,
+                'entity_type': model.entity_type,
             }
         return user_data
 

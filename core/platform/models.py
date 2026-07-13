@@ -41,10 +41,12 @@ Names = feconf.ValidModelNames
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     Names.APP_FEEDBACK_REPORT,
     Names.BLOG,
+    Names.CERTIFICATE_ASSESSMENT_OFFERING,
     Names.COLLECTION,
     Names.CONFIG,
     Names.EXPLORATION,
     Names.FEEDBACK,
+    Names.GENERAL_FEEDBACK,
     Names.QUESTION,
     Names.SKILL,
     Names.STORY,
@@ -172,6 +174,12 @@ class _Gae(Platform):
                 from core.storage.feedback import gae_models as feedback_models
 
                 returned_models.append(feedback_models)
+            elif name == Names.GENERAL_FEEDBACK:
+                from core.storage.general_feedback import (
+                    gae_models as general_feedback_models,
+                )
+
+                returned_models.append(general_feedback_models)
             elif name == Names.IMPROVEMENTS:
                 from core.storage.improvements import (
                     gae_models as improvements_models,
@@ -248,6 +256,12 @@ class _Gae(Platform):
                 )
 
                 returned_models.append(voiceover_models)
+            elif name == Names.CERTIFICATE_ASSESSMENT_OFFERING:
+                from core.storage.certificate_assessment import (
+                    gae_models as certificate_assessment_offering_models,
+                )
+
+                returned_models.append(certificate_assessment_offering_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
@@ -473,6 +487,22 @@ class _Gae(Platform):
             return cloud_translate_services
 
     @classmethod
+    def import_machine_translate_services(cls) -> ModuleType:
+        """Imports and returns the machine translation services module.
+
+        Returns:
+            module. The machine translation services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.translate import translate_emulator
+
+            return translate_emulator
+        else:
+            from core.platform.translate import azure_translate_services
+
+            return azure_translate_services
+
+    @classmethod
     def import_storage_services(cls) -> ModuleType:
         """Imports and returns cloud_translate_services module.
 
@@ -516,6 +546,15 @@ class Registry:
     _PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
     }
+
+    @classmethod
+    def import_machine_translate_services(cls) -> ModuleType:
+        """Imports and returns machine_translate_services module.
+
+        Returns:
+            module. The machine_translate_services module.
+        """
+        return cls._get().import_machine_translate_services()
 
     @classmethod
     def _get(cls) -> Type[_Gae]:
