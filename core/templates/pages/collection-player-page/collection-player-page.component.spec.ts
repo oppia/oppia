@@ -529,6 +529,24 @@ describe('Collection player page component', () => {
     expect(component.explorationCardIsShown).toBe(false);
   });
 
+  it('should reset activeHighlightedIconIndex when togglePreviewCard closes', () => {
+    component.explorationCardIsShown = true;
+    component.activeHighlightedIconIndex = 2;
+
+    component.togglePreviewCard();
+
+    expect(component.activeHighlightedIconIndex).toBe(-1);
+  });
+
+  it('should reset activeHighlightedIconIndex when explorationCardIsShown is already false', () => {
+    component.explorationCardIsShown = false;
+    component.activeHighlightedIconIndex = -1;
+
+    component.togglePreviewCard();
+
+    expect(component.activeHighlightedIconIndex).toBe(-1);
+  });
+
   it('should return collecton node from exploration id', () => {
     component.collection = sampleCollection;
 
@@ -542,12 +560,14 @@ describe('Collection player page component', () => {
       "'updateExplorationPreview'",
     () => {
       component.explorationCardIsShown = false;
+      component.activeHighlightedIconIndex = -1;
 
       component.collection = sampleCollection;
       component.updateExplorationPreview('exp_id');
 
       expect(component.explorationCardIsShown).toBe(true);
       expect(component.currentExplorationId).toBe('exp_id');
+      expect(component.activeHighlightedIconIndex).toBe(0);
     }
   );
 
@@ -669,7 +689,8 @@ describe('Collection player page component', () => {
 
       expect(component.closeOnClickingOutside).toHaveBeenCalled();
       expect(component.scrollToLocation).toHaveBeenCalled();
-      expect(component.explorationCardIsShown).toBe(false);
+      expect(component.explorationCardIsShown).toBeFalse();
+      expect(component.activeHighlightedIconIndex).toBe(-1);
     })
   );
 

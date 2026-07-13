@@ -99,6 +99,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   collectionSummary!: CollectionSummaryBackendDict;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
+  activeHighlightedIconIndex: number = -1;
   elementToScrollTo: string = '';
 
   constructor(
@@ -124,6 +125,9 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   togglePreviewCard(): void {
     this.explorationCardIsShown = !this.explorationCardIsShown;
+    if (!this.explorationCardIsShown) {
+      this.activeHighlightedIconIndex = -1;
+    }
   }
 
   getCollectionNodeForExplorationId(explorationId: string): CollectionNode {
@@ -178,6 +182,15 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
       ).getExplorationSummaryObject();
     if (explorationSummary) {
       this.summaryToPreview = explorationSummary;
+    }
+    if (this.collection) {
+      let nodes = this.collection.getCollectionNodes();
+      for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].getExplorationId() === explorationId) {
+          this.activeHighlightedIconIndex = i;
+          break;
+        }
+      }
     }
   }
 
@@ -303,6 +316,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   closeOnClickingOutside(): void {
     this.explorationCardIsShown = false;
+    this.activeHighlightedIconIndex = -1;
     this.scrollToLocation(this.elementToScrollTo);
   }
 
