@@ -1,5 +1,3 @@
-// coding: utf-8
-//
 // Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +17,16 @@
  */
 
 import {
+  ChangeDetectorRef,
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
 } from '@angular/core';
+import type {StateBackendDict} from 'domain/state/state.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   CATEGORY_LABELS,
@@ -38,6 +40,9 @@ import type {
   FeedbackSessionInfo,
   PlatformFeedbackDetailResponse,
 } from 'domain/feedback/feedback.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-feedback-detail-page',
@@ -45,19 +50,20 @@ import type {
   styleUrls: ['./feedback-detail-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FeedbackDetailPageComponent {
+export class FeedbackDetailPageComponent implements OnChanges {
+  constructor(
+    private windowRef: WindowRef,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
   @Input() feedbackDetailResponse: PlatformFeedbackDetailResponse | null = null;
   @Input() feedbackDetailPageConfig!: FeedbackCardConfig;
   @Input() screenshotDataUrl: string | null = null;
 
   @Output() goBack = new EventEmitter<void>();
   @Output() statusChange = new EventEmitter<FeedbackStatus>();
-  @Output() loadScreenshot = new EventEmitter<{
-    entityId: string;
-    filename: string;
-  }>();
-
-  isScreenshotModalOpen: boolean = false;
 
   readonly categoryLabels = CATEGORY_LABELS;
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
@@ -78,7 +84,17 @@ export class FeedbackDetailPageComponent {
     FeedbackStatus.NOT_ACTIONABLE,
   ];
 
-  constructor(private windowRef: WindowRef) {}
+  reportedCardState: StateBackendDict | null = null;
+  reportedCardIsLoading = false;
+  reportedCardLoadError: string | null = null;
+  private reportedCardRequestId = 0;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.feedbackDetailResponse) {
+      this.onLoadScreenshot();
+      this.loadReportedCard();
+    }
+  }
 
   get statusOptions(): FeedbackStatus[] {
     const config = this.feedbackDetailPageConfig;
@@ -104,6 +120,30 @@ export class FeedbackDetailPageComponent {
     return (
       this.feedbackDetailResponse?.lesson_metadata !== null &&
       this.feedbackDetailResponse?.lesson_metadata !== undefined
+    );
+  }
+
+  getReportedLessonUrl(): string | null {
+    const metadata = this.feedbackDetailResponse?.lesson_metadata;
+    if (!metadata) {
+      return null;
+    }
+
+    return (
+      `/explore/${encodeURIComponent(metadata.exploration_id)}` +
+      `?v=${metadata.exploration_version}`
+    );
+  }
+
+  getReportedStateEditorUrl(): string | null {
+    const metadata = this.feedbackDetailResponse?.lesson_metadata;
+    if (!metadata) {
+      return null;
+    }
+
+    return (
+      `/create/${encodeURIComponent(metadata.exploration_id)}` +
+      `#/gui/${encodeURIComponent(metadata.state_name)}`
     );
   }
 
@@ -177,20 +217,60 @@ export class FeedbackDetailPageComponent {
 
   onLoadScreenshot(): void {
     const response = this.feedbackDetailResponse;
-    if (response?.screenshot_entity_id && response?.screenshot_filename) {
-      this.loadScreenshot.emit({
-        entityId: response.screenshot_entity_id,
-        filename: response.screenshot_filename,
-      });
+    if (!response?.screenshot_entity_id || !response?.screenshot_filename) {
+      return;
     }
+
+    this.screenshotDataUrl = this.assetsBackendApiService.getImageUrlForPreview(
+      AppConstants.ENTITY_TYPE.FEEDBACK,
+      response.screenshot_entity_id,
+      response.screenshot_filename
+    );
   }
 
-  openScreenshotModal(): void {
-    this.isScreenshotModalOpen = true;
-  }
+  loadReportedCard(): void {
+    const metadata = this.feedbackDetailResponse?.lesson_metadata;
+    const requestId = ++this.reportedCardRequestId;
+    this.reportedCardState = null;
+    this.reportedCardLoadError = null;
 
-  closeScreenshotModal(): void {
-    this.isScreenshotModalOpen = false;
+    if (!metadata) {
+      this.reportedCardIsLoading = false;
+      return;
+    }
+
+    this.reportedCardIsLoading = true;
+    this.readOnlyExplorationBackendApiService
+      .loadExplorationAsync(
+        metadata.exploration_id,
+        metadata.exploration_version
+      )
+      .then(
+        response => {
+          if (requestId !== this.reportedCardRequestId) {
+            return;
+          }
+
+          const reportedState =
+            response.exploration.states[metadata.state_name];
+          this.reportedCardState = reportedState ?? null;
+          this.reportedCardLoadError = reportedState
+            ? null
+            : 'The reported state was not found in this lesson version.';
+          this.reportedCardIsLoading = false;
+          this.changeDetectorRef.markForCheck();
+        },
+        () => {
+          if (requestId !== this.reportedCardRequestId) {
+            return;
+          }
+
+          this.reportedCardLoadError =
+            'Unable to load the reported lesson version.';
+          this.reportedCardIsLoading = false;
+          this.changeDetectorRef.markForCheck();
+        }
+      );
   }
 
   getGithubIssueUrl(): string {

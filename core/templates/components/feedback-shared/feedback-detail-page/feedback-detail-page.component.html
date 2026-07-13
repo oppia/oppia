@@ -2,10 +2,7 @@
   <div class="oppia-feedback-detail-card">
     <div class="oppia-feedback-detail-header">
       <div class="oppia-feedback-detail-header-left">
-        <button
-          type="button"
-          class="btn btn-secondary btn-sm oppia-feedback-detail-back"
-          (click)="goBack.emit()">
+        <button type="button" class="btn btn-secondary btn-sm oppia-feedback-detail-back" (click)="goBack.emit()">
           <i class="fas fa-angle-left" aria-hidden="true"></i>
         </button>
         <span class="oppia-feedback-detail-thread-title">
@@ -13,10 +10,7 @@
         </span>
       </div>
       <div class="oppia-feedback-detail-header-right">
-        <span
-          *ngIf="feedback.category"
-          class="badge"
-          [ngClass]="getCategoryBadgeClass(feedback.category)">
+        <span *ngIf="feedback.category" class="badge" [ngClass]="getCategoryBadgeClass(feedback.category)">
           {{ getCategoryLabel(feedback.category) }}
         </span>
         <oppia-feedback-status-chip [status]="feedback.status">
@@ -24,89 +18,81 @@
       </div>
     </div>
 
-    <div class="oppia-feedback-detail-body row g-3">
-      <div class="col-xl-7 col-lg-7 col-md-12">
-        <oppia-feedback-detail-section
-          heading="Details"
-          iconClass="fas fa-info-circle">
-          <oppia-feedback-detail-field label="Submitted">
-            {{ formatDate(feedback.created_on_msecs) }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field label="Status">
-            {{ statusLabels[feedback.status] }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedbackDetailPageConfig.showCategory"
-            label="Category">
-            {{ getCategoryLabel(feedback.category) }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedbackDetailPageConfig.showSource"
-            label="Source">
-            {{ getSourceLabel(feedback.source) }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedbackDetailPageConfig.showPlatform"
-            label="Platform">
-            {{ getPlatformLabel(feedback.platform) }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedbackDetailPageConfig.showTeam"
-            label="Team">
-            {{ getDestinationLabel(feedback.destination_dashboard) }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field label="Dashboard">
-            {{ getDestinationLabel(feedback.destination_dashboard) }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field label="Session logs">
-            {{ hasTechnicalLogs ? 'Included' : 'Not included' }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedbackDetailPageConfig.showScreenshot"
-            label="Screenshot">
-            {{ hasScreenshot ? feedback.screenshot_filename : 'Not included' }}
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedbackDetailPageConfig.showScreenshot && feedback.screenshot_entity_id"
-            label="Screenshot ID">
-            <code>{{ feedback.screenshot_entity_id }}</code>
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field
-            *ngIf="feedback.page_url"
-            label="Page URL">
-            <a
-              [href]="feedback.page_url"
-              target="_blank"
-              rel="noopener noreferrer">
+    <div class="oppia-feedback-detail-body">
+      <div class="oppia-feedback-detail-column">
+        <oppia-feedback-detail-section heading="Details" iconClass="fas fa-info-circle" [isCollapsible]="true">
+          <div>
+            Submitted: {{ formatDate(feedback.created_on_msecs) }}
+          </div>
+          <div>
+            Status: {{ statusLabels[feedback.status] }}
+          </div>
+          <div *ngIf="feedback.category">
+            Category: {{ getCategoryLabel(feedback.category) }}
+          </div>
+          <div *ngIf="feedbackDetailPageConfig.showSource">
+            Source: {{ getSourceLabel(feedback.source) }}
+          </div>
+          <div *ngIf="feedbackDetailPageConfig.showPlatform">
+            Platform: {{ getPlatformLabel(feedback.platform) }}
+          </div>
+          <div *ngIf="feedbackDetailPageConfig.showTeam">
+            Team: {{ getDestinationLabel(feedback.destination_dashboard) }}
+          </div>
+          <div *ngIf="feedback.page_url">
+            Page URL:
+            <a [href]="feedback.page_url" target="_blank" rel="noopener noreferrer">
               {{ feedback.page_url }}
             </a>
-          </oppia-feedback-detail-field>
-          <oppia-feedback-detail-field label="Report ID">
-            <code>{{ feedback.id }}</code>
-          </oppia-feedback-detail-field>
+          </div>
         </oppia-feedback-detail-section>
 
-        <oppia-feedback-detail-section
-          *ngIf="feedbackDetailPageConfig.showLessonMetadata"
-          heading="Lesson Context"
-          iconClass="fas fa-map-marker-alt">
-          <ng-container
-            *ngIf="feedback.lesson_metadata as lessonMetadata; else noLessonContext">
-            <oppia-feedback-detail-field label="Exploration">
+        <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showLessonMetadata" heading="Lesson Context" iconClass="fas fa-map-marker-alt">
+          <ng-container *ngIf="feedback.lesson_metadata as lessonMetadata; else noLessonContext">
+            <div label="Exploration">
               <code>{{ lessonMetadata.exploration_id }}</code>
-            </oppia-feedback-detail-field>
-            <oppia-feedback-detail-field label="Version">
+            </div>
+            <div label="Version">
               {{ lessonMetadata.exploration_version }}
-            </oppia-feedback-detail-field>
-            <oppia-feedback-detail-field label="State">
+            </div>
+            <div label="State">
               {{ lessonMetadata.state_name }}
-            </oppia-feedback-detail-field>
-            <oppia-feedback-detail-field label="State index">
+            </div>
+            <div label="State index">
               {{ lessonMetadata.state_index }}
-            </oppia-feedback-detail-field>
-            <oppia-feedback-detail-field label="Learner answer">
+            </div>
+            <div label="Learner answer">
               {{ getOptionalText(lessonMetadata.learner_current_answer) }}
-            </oppia-feedback-detail-field>
+            </div>
+            <div class="oppia-feedback-detail-link-row">
+              <a *ngIf="getReportedLessonUrl() as reportedLessonUrl" [href]="reportedLessonUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                Open reported lesson version
+              </a>
+              <a *ngIf="getReportedStateEditorUrl() as reportedStateEditorUrl" [href]="reportedStateEditorUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">
+                Open current state in editor
+              </a>
+            </div>
+            <div class="oppia-feedback-reported-card">
+              <div class="oppia-feedback-reported-card-heading">
+                Reported Card
+              </div>
+              <p *ngIf="reportedCardIsLoading" class="oppia-feedback-detail-empty">
+                Loading reported card...
+              </p>
+              <p *ngIf="!reportedCardIsLoading && reportedCardLoadError" class="oppia-feedback-detail-empty">
+                {{ reportedCardLoadError }}
+              </p>
+              <ng-container *ngIf="!reportedCardIsLoading && reportedCardState">
+                <div class="oppia-feedback-reported-card-content">
+                  <oppia-rte-output-display [rteString]="reportedCardState.content.html" [rteStringContext]="'content'" class="oppia-rte-viewer">
+                  </oppia-rte-output-display>
+                </div>
+                <div class="oppia-feedback-reported-card-meta">
+                  Interaction:
+                  {{ getOptionalText(reportedCardState.interaction.id) }}
+                </div>
+              </ng-container>
+            </div>
           </ng-container>
           <ng-template #noLessonContext>
             <p class="oppia-feedback-detail-empty">
@@ -115,11 +101,7 @@
           </ng-template>
         </oppia-feedback-detail-section>
 
-        <oppia-feedback-detail-section
-          *ngIf="feedbackDetailPageConfig.showSessionInfo"
-          heading="Session Information"
-          iconClass="fas fa-file-alt"
-          [isCollapsible]="true">
+        <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showSessionInfo" heading="Session Information" iconClass="fas fa-file-alt" [isCollapsible]="true">
           <ng-container *ngIf="sessionInfo as logs; else noSessionInfo">
             <div class="oppia-feedback-detail-json-group">
               <div class="oppia-feedback-detail-json-heading">
@@ -154,43 +136,20 @@
         </oppia-feedback-detail-section>
       </div>
 
-      <div class="col-xl-5 col-lg-5 col-md-12">
+      <div class="oppia-feedback-detail-column">
         <div class="oppia-feedback-detail-side">
-          <oppia-feedback-detail-section
-            heading="Feedback Message"
-            iconClass="fas fa-comment">
+          <oppia-feedback-detail-section heading="Feedback Message" iconClass="fas fa-comment">
             <div class="oppia-feedback-detail-message">
               {{ feedback.report_message }}
             </div>
           </oppia-feedback-detail-section>
 
-          <oppia-feedback-detail-section
-            *ngIf="feedbackDetailPageConfig.showScreenshot"
-            heading="Screenshot"
-            iconClass="fas fa-camera">
+          <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showScreenshot" heading="Screenshot" iconClass="fas fa-camera">
             <ng-container *ngIf="hasScreenshot; else noScreenshot">
-              <button
-                *ngIf="!screenshotDataUrl"
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                (click)="onLoadScreenshot()">
-                <i class="fas fa-eye" aria-hidden="true"></i>
-                View screenshot
-              </button>
-              <button
-                *ngIf="screenshotDataUrl"
-                type="button"
-                class="oppia-feedback-detail-screenshot-preview"
-                (click)="openScreenshotModal()"
-                aria-label="Open screenshot preview">
-                <img [src]="screenshotDataUrl" alt="Feedback screenshot">
-                <span class="oppia-feedback-detail-screenshot-overlay">
-                  Click to enlarge
-                </span>
-              </button>
-              <div class="oppia-feedback-detail-screenshot-meta">
-                {{ feedback.screenshot_filename }}
-              </div>
+              <img [src]="screenshotDataUrl" alt="Screenshot">
+              <a [href]="screenshotDataUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                Open screenshot in new tab
+              </a>
             </ng-container>
             <ng-template #noScreenshot>
               <p class="oppia-feedback-detail-empty">
@@ -199,15 +158,9 @@
             </ng-template>
           </oppia-feedback-detail-section>
 
-          <oppia-feedback-detail-section
-            heading="Actions"
-            iconClass="fas fa-check-square">
+          <oppia-feedback-detail-section heading="Actions" iconClass="fas fa-check-square">
             <div class="oppia-feedback-detail-status-actions">
-              <button
-                *ngFor="let statusOption of statusOptions"
-                type="button"
-                [ngClass]="getStatusButtonClass(statusOption, feedback.status)"
-                (click)="onStatusChange(statusOption)">
+              <button *ngFor="let statusOption of statusOptions" type="button" [ngClass]="getStatusButtonClass(statusOption, feedback.status)" (click)="onStatusChange(statusOption)">
                 {{ statusLabels[statusOption] }}
               </button>
             </div>
@@ -216,55 +169,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div
-    *ngIf="isScreenshotModalOpen && screenshotDataUrl"
-    class="modal d-block"
-    tabindex="-1"
-    role="dialog">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            {{ feedback.screenshot_filename }}
-          </h5>
-          <button
-            type="button"
-            class="close"
-            aria-label="Close"
-            (click)="closeScreenshotModal()">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body text-center">
-          <img
-            [src]="screenshotDataUrl"
-            [alt]="feedback.screenshot_filename || 'Feedback screenshot'"
-            class="oppia-feedback-detail-modal-image">
-        </div>
-        <div class="modal-footer">
-          <a
-            [href]="screenshotDataUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-outline-primary btn-sm">
-            Open Original
-          </a>
-          <button
-            type="button"
-            class="btn btn-secondary btn-sm"
-            (click)="closeScreenshotModal()">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    *ngIf="isScreenshotModalOpen && screenshotDataUrl"
-    class="modal-backdrop fade show"
-    (click)="closeScreenshotModal()">
   </div>
 </ng-container>
 
