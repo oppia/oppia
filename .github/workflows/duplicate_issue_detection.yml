@@ -1,4 +1,4 @@
-name: Duplicate Issue and PR Detection
+name: Duplicate Issue Detection
 
 permissions: read-all
 
