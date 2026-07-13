@@ -31,7 +31,10 @@ import {TextInputRulesService} from '../../../../../extensions/interactions/Text
 import {AlertsService} from '../../../services/alerts.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
-import {AnswerClassificationService} from './answer-classification.service';
+import {
+  AnswerClassificationService,
+  InteractionRulesService,
+} from './answer-classification.service';
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {State} from '../../../domain/state/state.model';
@@ -86,7 +89,6 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              // Training_data is always an array (never null) in the type definition.
               training_data: [],
               tagged_skill_misconception_id: null,
             },
@@ -109,7 +111,6 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              // Training_data is always an array (never null) in the type definition.
               training_data: [],
               tagged_skill_misconception_id: 'misconceptionId',
             },
@@ -161,6 +162,7 @@ describe('Question player engine service', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: [],
       },
       question_state_data_schema_version: 45,
       next_content_id_index: 5,
@@ -230,7 +232,6 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          // Required by StateBackendDict interface.
           inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
@@ -299,7 +300,6 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          // Required by StateBackendDict interface.
           inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
@@ -368,7 +368,6 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          // Required by StateBackendDict interface.
           inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
@@ -405,7 +404,7 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = jasmine.createSpyObj('InteractionRulesService', ['']);
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -506,7 +505,7 @@ describe('Question player engine service', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
+        Outcome.createNew('default', 'feedback_id', 'feedback', []),
         1,
         0,
         'default_outcome'
@@ -519,7 +518,8 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -563,21 +563,7 @@ describe('Question player engine service', () => {
       throw new Error('First question ID is null.');
     }
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-      firstQuestionId
-    );
-  });
-
-  it('should throw an error in getCurrentQuestionId if question id is null', () => {
-    let initSuccessCb = jasmine.createSpy('success');
-    let initErrorCb = jasmine.createSpy('fail');
-
-    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
-    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-
-    questionPlayerEngineService.init(
-      multipleQuestionsObjects,
-      initSuccessCb,
-      initErrorCb
+      multipleQuestionsObjects[0].getId() ?? ''
     );
 
     // Simulate the question returning a null ID to trigger the null guard.
@@ -698,7 +684,7 @@ describe('Question player engine service', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
+        Outcome.createNew('default', 'feedback_id', 'feedback', []),
         1,
         0,
         'default_outcome'
@@ -711,7 +697,8 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -752,18 +739,14 @@ describe('Question player engine service', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
 
-      (
-        singleQuestionBackendDict.question_state_data.content as {
-          content_id: string;
-          html: string | null;
-        }
-      ).html = null;
+      singleQuestionBackendDict.question_state_data.content.html = '';
       let alertsServiceSpy = spyOn(
         alertsService,
         'addWarning'
       ).and.callThrough();
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -794,21 +777,29 @@ describe('Question player engine service', () => {
   });
 
   describe('on submitting answer ', () => {
+    let submitAnswerSuccessCb: jasmine.Spy;
+    let initSuccessCb: jasmine.Spy;
+    let initErrorCb: jasmine.Spy;
+    let answer: string;
+    let answerClassificationResult: AnswerClassificationResult;
+
+    beforeEach(() => {
+      submitAnswerSuccessCb = jasmine.createSpy('success');
+      initSuccessCb = jasmine.createSpy('success');
+      initErrorCb = jasmine.createSpy('fail');
+      answer = 'answer';
+      answerClassificationResult = new AnswerClassificationResult(
+        Outcome.createNew('default', 'feedback_id', 'feedback', []),
+        1,
+        0,
+        'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+    });
+
     it(
       'should call success callback if the submitted ' + 'answer is correct',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let initSuccessCb = jasmine.createSpy('success');
-        let initErrorCb = jasmine.createSpy('fail');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
-          1,
-          0,
-          'default_outcome'
-        );
-        answerClassificationResult.outcome.labelledAsCorrect = true;
-
         spyOn(
           answerClassificationService,
           'getMatchingClassificationResult'
@@ -833,15 +824,6 @@ describe('Question player engine service', () => {
       'should not submit answer again if the answer ' +
         'is already being processed',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
-          1,
-          0,
-          'default_outcome'
-        );
-
         spyOn(
           answerClassificationService,
           'getMatchingClassificationResult'
@@ -873,23 +855,7 @@ describe('Question player engine service', () => {
     it(
       'should show warning message if the feedback ' + 'content is empty',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let initSuccessCb = jasmine.createSpy('success');
-        let initErrorCb = jasmine.createSpy('fail');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
-          1,
-          0,
-          'default_outcome'
-        );
-        (
-          answerClassificationResult.outcome.feedback as {
-            contentId: string | null;
-            html: string | null;
-          }
-        ).html = null;
-        answerClassificationResult.outcome.labelledAsCorrect = true;
+        answerClassificationResult.outcome.feedback.html = '';
 
         spyOn(
           answerClassificationService,
@@ -900,20 +866,19 @@ describe('Question player engine service', () => {
           'addWarning'
         ).and.callThrough();
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html, envs) => html
+          (html, envs) =>
+            html === ''
+              ? jasmine.createSpy('null').and.returnValue(null)()
+              : html
         );
 
-        // Default_outcome is typed as OutcomeBackendDict | null; the non-null
-        // assertion is safe here because singleQuestionBackendDict always has
-        // a default_outcome.
-        const defaultOutcome =
+        if (
           singleQuestionBackendDict.question_state_data.interaction
-            .default_outcome;
-        if (defaultOutcome === null) {
-          throw new Error('Default outcome is null.');
+            .default_outcome
+        ) {
+          singleQuestionBackendDict.question_state_data.interaction.default_outcome.feedback.html =
+            '';
         }
-        const feedbackObj = defaultOutcome.feedback;
-        (feedbackObj as {content_id: string; html: string | null}).html = null;
         questionPlayerEngineService.init(
           [Question.createFromBackendDict(singleQuestionBackendDict)],
           initSuccessCb,
@@ -933,24 +898,7 @@ describe('Question player engine service', () => {
     );
 
     it('should show warning message if the question ' + 'name is empty', () => {
-      let submitAnswerSuccessCb = jasmine.createSpy('success');
-      let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
-        1,
-        0,
-        'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      (
-        singleQuestionBackendDict.question_state_data.content as {
-          content_id: string;
-          html: string | null;
-        }
-      ).html = null;
+      singleQuestionBackendDict.question_state_data.content.html = '';
       let sampleQuestion = Question.createFromBackendDict(
         singleQuestionBackendDict
       );
@@ -968,7 +916,8 @@ describe('Question player engine service', () => {
       });
 
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) =>
+          html === '' ? jasmine.createSpy('null').and.returnValue(null)() : html
       );
 
       questionPlayerEngineService.init(
@@ -991,48 +940,23 @@ describe('Question player engine service', () => {
     it(
       'should not create next card if the existing ' + 'card is the last one',
       () => {
-        let submitAnswerSuccessCb = jasmine.createSpy('success');
-        let initSuccessCb = jasmine.createSpy('success');
-        let initErrorCb = jasmine.createSpy('fail');
-        let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
-          1,
-          0,
-          'default_outcome'
-        );
         let sampleCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
           'Interaction text',
-          Interaction.createFromBackendDict({
-            id: null,
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: {
-              dest: 'dest',
-              dest_if_really_stuck: null,
-              feedback: {content_id: 'feedback', html: ''},
-              param_changes: [],
-              labelled_as_correct: false,
-              missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
-            },
-            hints: [],
-            solution: null,
-          }),
+          jasmine.createSpyObj('Interaction', ['']),
           'content_id'
         );
-
-        answerClassificationResult.outcome.labelledAsCorrect = true;
 
         spyOn(
           answerClassificationService,
           'getMatchingClassificationResult'
         ).and.returnValue(answerClassificationResult);
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html, envs) => html
+          (html, envs) =>
+            html === ''
+              ? jasmine.createSpy('null').and.returnValue(null)()
+              : html
         );
         spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
           'focusLabel'
@@ -1059,11 +983,9 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        const q1Id = multipleQuestionsObjects[0].getId();
-        if (q1Id === null) {
-          throw new Error('First question ID is null.');
-        }
-        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(q1Id);
+        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
+          multipleQuestionsObjects[0].getId() ?? ''
+        );
         expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
         questionPlayerEngineService.recordNewCardAdded();
@@ -1074,11 +996,9 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        const q2Id = multipleQuestionsObjects[1].getId();
-        if (q2Id === null) {
-          throw new Error('Second question ID is null.');
-        }
-        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(q2Id);
+        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
+          multipleQuestionsObjects[1].getId() ?? ''
+        );
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
         questionPlayerEngineService.recordNewCardAdded();
@@ -1089,11 +1009,9 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        const q3Id = multipleQuestionsObjects[2].getId();
-        if (q3Id === null) {
-          throw new Error('Third question ID is null.');
-        }
-        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(q3Id);
+        expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
+          multipleQuestionsObjects[2].getId() ?? ''
+        );
         // Please note that after submitting answer to the final question,
         // a new card was not created, hence createNewCardSpy was not called.
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
