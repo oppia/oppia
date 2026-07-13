@@ -78,7 +78,7 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
         exp_model_1.states['graph_state']['interaction']['id'] = 'GraphInput'
         exp_model_1.update_timestamps()
 
-        # Exploration 2 without deprecated interactions
+        # Exploration 2 without deprecated interactions.
         exp_model_2 = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_2_ID,
@@ -107,7 +107,7 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
         exp_model_2.states['text_state']['interaction']['id'] = 'TextInput'
         exp_model_2.update_timestamps()
 
-        # State Answers Model for exp 1
+        # State Answers Model for exp 1.
         answers_model_1 = self.create_model(
             stats_models.StateAnswersModel,
             id='exp_1_id:1:init_state:0',
