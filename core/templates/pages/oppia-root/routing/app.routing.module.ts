@@ -38,6 +38,15 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CERTIFICATE_OFFERING_AVAILABLE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/certificate-offering-available-page/certificate-offering-available-page.module'
+      ).then(m => m.CertificateOfferingAvailablePageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.ROUTE,
     loadChildren: () =>
       import('pages/maintenance-page/maintenance-page.module').then(
@@ -134,14 +143,6 @@ const routes: Route[] = [
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
       ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
-    loadChildren: () =>
-      import('pages/email-dashboard-pages/email-dashboard-page.module').then(
-        m => m.EmailDashboardPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER

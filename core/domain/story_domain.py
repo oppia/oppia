@@ -69,6 +69,7 @@ STORY_NODE_PROPERTY_UNPUBLISHING_REASON: Final = 'unpublishing_reason'
 
 INITIAL_NODE_ID: Final = 'initial_node_id'
 NODE: Final = 'node'
+ARC: Final = 'arc'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION: Final = 'migrate_schema_to_latest_version'
 
@@ -82,6 +83,17 @@ CMD_UPDATE_STORY_CONTENTS_PROPERTY: Final = 'update_story_contents_property'
 CMD_ADD_STORY_NODE: Final = 'add_story_node'
 CMD_DELETE_STORY_NODE: Final = 'delete_story_node'
 CMD_UPDATE_STORY_NODE_OUTLINE_STATUS: Final = 'update_story_node_outline_status'
+
+# Arc commands.
+CMD_CREATE_ARC: Final = 'create_arc'
+CMD_DELETE_ARC: Final = 'delete_arc'
+CMD_RENAME_ARC: Final = 'rename_arc'
+CMD_REARRANGE_ARCS: Final = 'rearrange_arcs'
+CMD_MOVE_NODE_TO_ARC: Final = 'move_node_to_arc'
+CMD_UPDATE_ARC_PROPERTY: Final = 'update_arc_property'
+
+ARC_PROPERTY_TITLE: Final = 'title'
+ARC_PROPERTY_DESCRIPTION: Final = 'description'
 
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW: Final = 'create_new'
@@ -147,7 +159,7 @@ class StoryChange(change_domain.BaseChange):
 
     # The allowed list of story content properties which can be used in
     # update_story_contents_property command.
-    STORY_CONTENTS_PROPERTIES: List[str] = [INITIAL_NODE_ID, NODE]
+    STORY_CONTENTS_PROPERTIES: List[str] = [INITIAL_NODE_ID, NODE, ARC]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
         {
@@ -227,6 +239,66 @@ class StoryChange(change_domain.BaseChange):
             'allowed_values': {},
             'deprecated_values': {},
         },
+        {
+            'name': CMD_CREATE_ARC,
+            'required_attribute_names': [
+                'arc_id',
+                'title',
+                'description',
+                'node_ids',
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_DELETE_ARC,
+            'required_attribute_names': ['arc_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_RENAME_ARC,
+            'required_attribute_names': ['arc_id', 'new_title'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_REARRANGE_ARCS,
+            'required_attribute_names': ['arc_ids_order'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_MOVE_NODE_TO_ARC,
+            'required_attribute_names': ['node_id', 'to_arc_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_UPDATE_ARC_PROPERTY,
+            'required_attribute_names': [
+                'arc_id',
+                'property_name',
+                'new_value',
+                'old_value',
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {
+                'property_name': [ARC_PROPERTY_TITLE, ARC_PROPERTY_DESCRIPTION]
+            },
+            'deprecated_values': {},
+        },
     ]
 
 
@@ -294,6 +366,62 @@ class UpdateStoryContentsPropertyNodeCmd(StoryChange):
     property_name: Literal['node']
     new_value: int
     old_value: int
+
+
+class CreateArcCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_CREATE_ARC command.
+    """
+
+    arc_id: str
+    title: str
+    description: str
+    node_ids: List[str]
+
+
+class DeleteArcCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_DELETE_ARC command.
+    """
+
+    arc_id: str
+
+
+class RenameArcCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_RENAME_ARC command.
+    """
+
+    arc_id: str
+    new_title: str
+
+
+class RearrangeArcsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_REARRANGE_ARCS command.
+    """
+
+    arc_ids_order: List[str]
+
+
+class MoveNodeToArcCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_MOVE_NODE_TO_ARC command.
+    """
+
+    node_id: str
+    to_arc_id: str
+
+
+class UpdateArcPropertyCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_ARC_PROPERTY command.
+    """
+
+    arc_id: str
+    property_name: str
+    new_value: str
+    old_value: str
 
 
 class UpdateStoryNodePropertyDestinationNodeIdsCmd(StoryChange):
@@ -1065,12 +1193,107 @@ class StoryNode:
         return False
 
 
-class StoryContentsDict(TypedDict):
+class ArcDict(TypedDict):
+    """Dictionary representing the Arc object."""
+
+    id: str
+    title: str
+    description: str
+    node_ids: List[str]
+
+
+class Arc:
+    """Domain object representing an arc within a story."""
+
+    def __init__(
+        self,
+        arc_id: str,
+        title: str,
+        description: str,
+        node_ids: List[str],
+    ) -> None:
+        """Initializes the Arc object.
+
+        Args:
+            arc_id: str. The unique ID of the arc.
+            title: str. The title of the arc.
+            description: str. The description of the arc.
+            node_ids: list(str). The list of node IDs in this arc.
+        """
+        self.id = arc_id
+        self.title = title
+        self.description = description
+        self.node_ids = node_ids
+
+    def validate(self) -> None:
+        """Validates the arc object."""
+        if not isinstance(self.id, str):
+            raise utils.ValidationError(
+                'Expected arc id to be a string, received %s' % self.id
+            )
+        if self.id == '':
+            raise utils.ValidationError('Arc id field should not be empty')
+        if not isinstance(self.title, str):
+            raise utils.ValidationError(
+                'Expected arc title to be a string, received %s' % self.title
+            )
+        if self.title == '':
+            raise utils.ValidationError('Arc title field should not be empty')
+        if not isinstance(self.description, str):
+            raise utils.ValidationError(
+                'Expected arc description to be a string, received %s'
+                % self.description
+            )
+        if not isinstance(self.node_ids, list):
+            raise utils.ValidationError(
+                'Expected arc node_ids to be a list, received %s'
+                % self.node_ids
+            )
+        for node_id in self.node_ids:
+            if not isinstance(node_id, str):
+                raise utils.ValidationError(
+                    'Expected each arc node_id to be a string, received %s'
+                    % node_id
+                )
+
+    def to_dict(self) -> ArcDict:
+        """Returns a dict representation of the Arc.
+
+        Returns:
+            ArcDict. A dict representation of the Arc instance.
+        """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'node_ids': self.node_ids,
+        }
+
+    @classmethod
+    def from_dict(cls, arc_dict: ArcDict) -> Arc:
+        """Creates an Arc from a dict.
+
+        Args:
+            arc_dict: ArcDict. The dict representation of the Arc.
+
+        Returns:
+            Arc. The corresponding Arc instance.
+        """
+        return cls(
+            arc_id=arc_dict['id'],
+            title=arc_dict['title'],
+            description=arc_dict['description'],
+            node_ids=arc_dict['node_ids'],
+        )
+
+
+class StoryContentsDict(TypedDict, total=False):
     """Dictionary representing the StoryContents object."""
 
     nodes: List[StoryNodeDict]
     initial_node_id: Optional[str]
     next_node_id: str
+    arcs: List[ArcDict]
 
 
 class StoryContents:
@@ -1081,6 +1304,7 @@ class StoryContents:
         story_nodes: List[StoryNode],
         initial_node_id: Optional[str],
         next_node_id: str,
+        arcs: Optional[List[Arc]] = None,
     ) -> None:
         """Constructs a StoryContents domain object.
 
@@ -1091,10 +1315,12 @@ class StoryContents:
                 story and None if there is only one node(or the starting node).
             next_node_id: str. The id for the next node to be added to the
                 story.
+            arcs: list(Arc)|None. The arcs defining chapter groupings.
         """
         self.initial_node_id = initial_node_id
         self.nodes = story_nodes
         self.next_node_id = next_node_id
+        self.arcs = arcs if arcs is not None else []
 
     def validate(self) -> None:
         """Validates various properties of the story contents object.
@@ -1165,6 +1391,46 @@ class StoryContents:
             if len(node_title_list) > len(set(node_title_list)):
                 raise utils.ValidationError(
                     'Expected all chapter titles to be distinct.'
+                )
+
+        if not isinstance(self.arcs, list):
+            raise utils.ValidationError(
+                'Expected arcs field to be a list, received %s' % self.arcs
+            )
+
+        arc_ids_list = []
+        covered_node_ids = set()
+        for arc in self.arcs:
+            if not isinstance(arc, Arc):
+                raise utils.ValidationError(
+                    'Expected each arc to be an Arc object, received %s' % arc
+                )
+            arc.validate()
+            arc_ids_list.append(arc.id)
+            for node_id in arc.node_ids:
+                if node_id in covered_node_ids:
+                    raise utils.ValidationError(
+                        'Node %s is covered by multiple arcs.' % node_id
+                    )
+                covered_node_ids.add(node_id)
+
+        if len(arc_ids_list) > len(set(arc_ids_list)):
+            raise utils.ValidationError('Expected all arc ids to be distinct.')
+
+        # It is valid for a story to have nodes and no arcs. If arcs are
+        # present, further validation below ensures they cover nodes.
+
+        if len(self.arcs) > 0:
+            all_node_ids = set(node_id_list)
+            for node_id in covered_node_ids:
+                if node_id not in all_node_ids:
+                    raise utils.ValidationError(
+                        'Arc refers to non-existent node %s.' % node_id
+                    )
+            uncovered = all_node_ids - covered_node_ids
+            if uncovered:
+                raise utils.ValidationError(
+                    'Nodes %s are not covered by any arc.' % sorted(uncovered)
                 )
 
     @overload
@@ -1238,6 +1504,89 @@ class StoryContents:
             ordered_nodes_list.append(current_node)
         return ordered_nodes_list
 
+    def get_arc_index(self, arc_id: str) -> int:
+        """Returns the index of the arc with the given ID.
+
+        Args:
+            arc_id: str. The ID of the arc.
+
+        Returns:
+            int. The index of the arc.
+
+        Raises:
+            ValueError. If the arc is not found.
+        """
+        for ind, arc in enumerate(self.arcs):
+            if arc.id == arc_id:
+                return ind
+        raise ValueError(
+            'The arc with id %s is not part of this story.' % arc_id
+        )
+
+    def get_arc(self, arc_id: str) -> Arc:
+        """Returns the arc with the given ID.
+
+        Args:
+            arc_id: str. The ID of the arc.
+
+        Returns:
+            Arc. The arc with the given ID.
+        """
+        return self.arcs[self.get_arc_index(arc_id)]
+
+    def add_arc(self, arc: Arc) -> None:
+        """Adds a new arc to the story.
+
+        Args:
+            arc: Arc. The arc to add.
+        """
+        self.arcs.append(arc)
+
+    def delete_arc(self, arc_id: str) -> None:
+        """Deletes the arc with the given ID.
+
+        Args:
+            arc_id: str. The ID of the arc to delete.
+        """
+        index = self.get_arc_index(arc_id)
+        del self.arcs[index]
+
+    def rearrange_arcs(self, arc_ids_order: List[str]) -> None:
+        """Rearranges the arcs according to the given order of IDs.
+
+        Args:
+            arc_ids_order: list(str). The ordered list of arc IDs.
+
+        Raises:
+            ValueError. If an arc ID is not found or the list is not a full
+                permutation of existing arc IDs.
+        """
+        old_arcs = {arc.id: arc for arc in self.arcs}
+        if (
+            len(arc_ids_order) != len(self.arcs)
+            or len(set(arc_ids_order)) != len(self.arcs)
+            or set(arc_ids_order) != set(old_arcs.keys())
+        ):
+            raise ValueError(
+                'Expected arc_ids_order to contain each existing arc '
+                'exactly once.'
+            )
+        new_arcs = [old_arcs[arc_id] for arc_id in arc_ids_order]
+        self.arcs = new_arcs
+
+    def move_node_to_arc(self, node_id: str, to_arc_id: str) -> None:
+        """Moves a node from its current arc to the specified arc.
+
+        Args:
+            node_id: str. The ID of the node to move.
+            to_arc_id: str. The ID of the destination arc.
+        """
+        for arc in self.arcs:
+            if node_id in arc.node_ids:
+                arc.node_ids.remove(node_id)
+        target_arc = self.get_arc(to_arc_id)
+        target_arc.node_ids.append(node_id)
+
     def get_all_linked_exp_ids(self) -> List[str]:
         """Returns a list of exploration id linked to each of the nodes of
         story content.
@@ -1301,6 +1650,7 @@ class StoryContents:
             'nodes': [node.to_dict() for node in self.nodes],
             'initial_node_id': self.initial_node_id,
             'next_node_id': self.next_node_id,
+            'arcs': [arc.to_dict() for arc in self.arcs],
         }
 
     @classmethod
@@ -1321,6 +1671,10 @@ class StoryContents:
             ],
             story_contents_dict['initial_node_id'],
             story_contents_dict['next_node_id'],
+            arcs=[
+                Arc.from_dict(arc_dict)
+                for arc_dict in story_contents_dict.get('arcs', [])
+            ],
         )
 
         return story_contents
@@ -1962,6 +2316,31 @@ class Story:
         return story_contents_dict
 
     @classmethod
+    def _convert_story_contents_v6_dict_to_v7_dict(
+        cls, story_contents_dict: StoryContentsDict
+    ) -> StoryContentsDict:
+        """Converts v6 Story Contents schema to the modern v7 schema.
+        v7 schema introduces the arcs field for chapter groupings.
+
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        node_ids = [node['id'] for node in story_contents_dict['nodes']]
+        story_contents_dict['arcs'] = [
+            {
+                'id': 'arc_default',
+                'title': 'All Chapters',
+                'description': '',
+                'node_ids': node_ids,
+            }
+        ]
+        return story_contents_dict
+
+    @classmethod
     def update_story_contents_from_model(
         cls,
         versioned_story_contents: VersionedStoryContentsDict,
@@ -2445,6 +2824,39 @@ class Story:
             self.update_node_destination_node_ids(
                 story_node_to_move.id, [right_neighbour.id]
             )
+
+    def add_arc(self, arc: Arc) -> None:
+        """Adds an arc to the story contents.
+
+        Args:
+            arc: Arc. The arc to add.
+        """
+        self.story_contents.add_arc(arc)
+
+    def delete_arc(self, arc_id: str) -> None:
+        """Deletes an arc from the story contents.
+
+        Args:
+            arc_id: str. The id of the arc to delete.
+        """
+        self.story_contents.delete_arc(arc_id)
+
+    def rearrange_arcs(self, arc_ids_order: List[str]) -> None:
+        """Rearranges the arcs in the story contents.
+
+        Args:
+            arc_ids_order: list(str). The new order of arc IDs.
+        """
+        self.story_contents.rearrange_arcs(arc_ids_order)
+
+    def move_node_to_arc(self, node_id: str, to_arc_id: str) -> None:
+        """Moves a node to a different arc.
+
+        Args:
+            node_id: str. The id of the node to move.
+            to_arc_id: str. The id of the target arc.
+        """
+        self.story_contents.move_node_to_arc(node_id, to_arc_id)
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str

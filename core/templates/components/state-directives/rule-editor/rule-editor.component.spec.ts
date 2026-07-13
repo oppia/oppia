@@ -187,6 +187,16 @@ describe('Rule Editor Component', () => {
     expect(component.editRuleForm).toEqual({});
   });
 
+  it('should throw error when interaction id is null on initialization', () => {
+    component.rule = new Rule('', {}, {});
+
+    stateInteractionIdService.savedMemento = null;
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Cannot load rule editor without interaction.');
+  });
+
   it(
     'should set change validity on form valid' + ' change event',
     fakeAsync(() => {

@@ -222,4 +222,71 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       done();
     });
   });
+  it('should redirect to error/400 for invalid exploration ID without calling backend', done => {
+    const validateSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToExplorationPlayerPage'
+    );
+
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'learning!&url'}),
+      queryParams: {},
+    } as ActivatedRouteSnapshot;
+
+    const state = createMockState('/explore/learning!&url');
+
+    guard.canActivate(route, state).then(result => {
+      expect(result).toBeFalse();
+      expect(validateSpy).not.toHaveBeenCalled();
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/400`,
+      ]);
+      expect(location.replaceState).toHaveBeenCalledWith(state.url);
+      done();
+    });
+  });
+
+  it('should redirect to embed error page for invalid exploration ID in embed URL without calling backend', done => {
+    const validateSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToExplorationPlayerPage'
+    );
+
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'learning!&url'}),
+      queryParams: {},
+    } as ActivatedRouteSnapshot;
+
+    const state = createMockState('/embed/explore/learning!&url');
+
+    guard.canActivate(route, state).then(result => {
+      expect(result).toBeFalse();
+      expect(validateSpy).not.toHaveBeenCalled();
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+      ]);
+      expect(location.replaceState).toHaveBeenCalledWith(state.url);
+      done();
+    });
+  });
+
+  it('should reject if router.navigate fails for invalid exploration ID', done => {
+    spyOn(router, 'navigate').and.returnValue(Promise.reject('nav error'));
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'learning!&url'}),
+      queryParams: {},
+    } as ActivatedRouteSnapshot;
+
+    const state = createMockState('/explore/learning!&url');
+
+    guard.canActivate(route, state).catch(err => {
+      expect(err).toBe('nav error');
+      done();
+    });
+  });
 });

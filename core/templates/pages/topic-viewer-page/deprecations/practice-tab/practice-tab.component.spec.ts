@@ -18,7 +18,7 @@
 
 import {
   TestBed,
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   flushMicrotasks,
@@ -69,7 +69,7 @@ describe('Practice tab component', function () {
   let loaderService: LoaderService;
   let translateService: TranslateService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

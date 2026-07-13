@@ -2323,6 +2323,17 @@ oppia-parameter {
   width: 80%;
 }
 
+.oppia-certificate-result-modal .modal-content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.oppia-certificate-result-modal .modal-body {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
 .oppia-modal-lesson-information-card .modal-dialog {
   margin: 25px auto;
   max-width: 400px;
@@ -2522,8 +2533,11 @@ div#ng-curtain {
   float: right;
   height: 56px;
   line-height: 20px;
-  margin-left: -10px;
+  margin-inline-start: -10px;
   padding: 0;
+}
+[dir="rtl"] .oppia-navbar-brand-name {
+  float: left;
 }
 
 .oppia-logo {
@@ -2580,7 +2594,6 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  background-color: #fff;
   color: #00645c;
 }
 .oppia-navbar-profile-picture {

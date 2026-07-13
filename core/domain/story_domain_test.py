@@ -525,6 +525,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'nodes': [],
                 'initial_node_id': None,
                 'next_node_id': self.NODE_ID_1,
+                'arcs': [],
             },
             'story_contents_schema_version': (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
@@ -2580,6 +2581,309 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.title = ''
         self._assert_validation_error('Title field should not be empty')
 
+    def test_arc_validate_invalid_arc_id(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Title', 'Desc', ['node_1'])
+        )
+        # Here we use MyPy ignore because we are intentionally assigning an
+        # invalid type to test validation.
+        self.story.story_contents.arcs[0].id = 123  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected arc id to be a string, received 123'
+        )
+
+    def test_arc_validate_empty_arc_id(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('', 'Title', 'Desc', ['node_1'])
+        )
+        self._assert_validation_error('Arc id field should not be empty')
+
+    def test_arc_validate_invalid_title(self) -> None:
+        self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing an
+            # invalid title type to test validation.
+            story_domain.Arc('arc_1', 123, 'Desc', ['node_1'])  # type: ignore[arg-type]
+        )
+        self._assert_validation_error(
+            'Expected arc title to be a string, received 123'
+        )
+
+    def test_arc_validate_empty_title(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', '', 'Desc', ['node_1'])
+        )
+        self._assert_validation_error('Arc title field should not be empty')
+
+    def test_arc_validate_invalid_description(self) -> None:
+        self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing an
+            # invalid description type to test validation.
+            story_domain.Arc('arc_1', 'Title', 456, ['node_1'])  # type: ignore[arg-type]
+        )
+        self._assert_validation_error(
+            'Expected arc description to be a string, received 456'
+        )
+
+    def test_arc_validate_invalid_node_ids(self) -> None:
+        self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing a
+            # non-list value for node_ids to test validation.
+            story_domain.Arc('arc_1', 'Title', 'Desc', 'not_a_list')  # type: ignore[arg-type]
+        )
+        self._assert_validation_error(
+            'Expected arc node_ids to be a list, received not_a_list'
+        )
+
+    def test_arc_validate_non_string_node_id(self) -> None:
+        self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing a
+            # list with non-string items to test validation.
+            story_domain.Arc('arc_1', 'Title', 'Desc', [123])  # type: ignore[list-item]
+        )
+        self._assert_validation_error(
+            'Expected each arc node_id to be a string, received 123'
+        )
+
+    def test_non_list_arcs_field(self) -> None:
+        # Here we use MyPy ignore because we are intentionally assigning an
+        # invalid type to arcs to test validation.
+        self.story.story_contents.arcs = 'invalid'  # type: ignore[assignment]
+        self._assert_validation_error(
+            'Expected arcs field to be a list, received invalid'
+        )
+
+    def test_arc_not_arc_object(self) -> None:
+        # Here we use MyPy ignore because we are intentionally assigning a
+        # list with non-Arc items to test validation.
+        self.story.story_contents.arcs = ['not_an_arc']  # type: ignore[list-item]
+        self._assert_validation_error(
+            'Expected each arc to be an Arc object, received not_an_arc'
+        )
+
+    def test_node_covered_by_multiple_arcs(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_1'])
+        )
+        self._assert_validation_error(
+            'Node node_1 is covered by multiple arcs.'
+        )
+
+    def test_duplicate_arc_ids(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1 dup', '', ['node_1'])
+        )
+        self._assert_validation_error('Expected all arc ids to be distinct.')
+
+    def test_arc_refers_to_non_existent_node(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['nonexistent_node'])
+        )
+        self._assert_validation_error(
+            'Arc refers to non-existent node nonexistent_node.'
+        )
+
+    def test_nodes_not_covered_by_any_arc(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
+        )
+        self._assert_validation_error(
+            'Nodes \\[\'node_1\'\\] are not covered by any arc.'
+        )
+
+    def test_get_arc_index(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
+        )
+        self.assertEqual(self.story.story_contents.get_arc_index('arc_1'), 0)
+        self.assertEqual(self.story.story_contents.get_arc_index('arc_2'), 1)
+
+    def test_get_arc_index_with_nonexistent_arc(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            'The arc with id nonexistent_arc is not part of this story.',
+        ):
+            self.story.story_contents.get_arc_index('nonexistent_arc')
+
+    def test_get_arc(self) -> None:
+        arc = story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        self.story.story_contents.add_arc(arc)
+        self.assertEqual(self.story.story_contents.get_arc('arc_1'), arc)
+
+    def test_add_arc(self) -> None:
+        arc = story_domain.Arc('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
+        self.story.story_contents.add_arc(arc)
+        self.assertIn(arc, self.story.story_contents.arcs)
+        self.assertEqual(len(self.story.story_contents.arcs), 1)
+
+    def test_delete_arc(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
+        )
+        self.story.story_contents.delete_arc('arc_1')
+        self.assertEqual(len(self.story.story_contents.arcs), 1)
+        self.assertEqual(self.story.story_contents.arcs[0].id, 'arc_2')
+
+    def test_rearrange_arcs(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
+        )
+        self.story.story_contents.rearrange_arcs(['arc_2', 'arc_1'])
+        self.assertEqual(
+            [a.id for a in self.story.story_contents.arcs], ['arc_2', 'arc_1']
+        )
+
+    def test_rearrange_arcs_with_invalid_arc_list(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            'Expected arc_ids_order to contain each existing arc exactly once.',
+        ):
+            self.story.story_contents.rearrange_arcs(['arc_1', 'nonexistent'])
+
+    def test_rearrange_arcs_with_unknown_arc_id(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            'Expected arc_ids_order to contain each existing arc exactly once.',
+        ):
+            self.story.story_contents.rearrange_arcs(['arc_1', 'nonexistent'])
+
+    def test_move_node_to_arc(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
+        )
+        self.story.story_contents.move_node_to_arc('node_1', 'arc_2')
+        self.assertNotIn(
+            'node_1', self.story.story_contents.get_arc('arc_1').node_ids
+        )
+        self.assertIn(
+            'node_1', self.story.story_contents.get_arc('arc_2').node_ids
+        )
+
+    def test_story_delete_arc(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.delete_arc('arc_1')
+        self.assertEqual(len(self.story.story_contents.arcs), 0)
+
+    def test_story_rearrange_arcs(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
+        )
+        self.story.rearrange_arcs(['arc_2', 'arc_1'])
+        self.assertEqual(
+            [a.id for a in self.story.story_contents.arcs], ['arc_2', 'arc_1']
+        )
+
+    def test_convert_story_contents_v5_dict_to_v6_dict(self) -> None:
+        v5_dict = {
+            'nodes': [
+                {
+                    'id': 'node_3',
+                    'destination_node_ids': [],
+                    'title': 'Title 3',
+                },
+                {
+                    'id': 'node_2',
+                    'destination_node_ids': [],
+                    'title': 'Title 2',
+                },
+                {
+                    'id': 'node_1',
+                    'destination_node_ids': [],
+                    'title': 'Title 1',
+                },
+            ],
+            'next_node_id': 'node_4',
+        }
+        result = story_domain.Story._convert_story_contents_v5_dict_to_v6_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v5_dict doesn't match the
+            # v6 dict type, which is exactly what we're converting from.
+            v5_dict  # type: ignore[arg-type]
+        )
+        self.assertEqual(result['nodes'][0]['destination_node_ids'], ['node_2'])
+        self.assertEqual(result['nodes'][1]['destination_node_ids'], ['node_1'])
+        self.assertEqual(result['nodes'][2]['destination_node_ids'], [])
+
+    def test_convert_story_contents_v6_dict_to_v7_dict(self) -> None:
+        v6_dict = {
+            'nodes': [
+                {
+                    'id': 'node_1',
+                    'title': 'Chapter 1',
+                },
+                {
+                    'id': 'node_2',
+                    'title': 'Chapter 2',
+                },
+            ],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_3',
+        }
+        result = story_domain.Story._convert_story_contents_v6_dict_to_v7_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v6_dict doesn't match the
+            # v7 dict type, which is exactly what we're converting from.
+            v6_dict  # type: ignore[arg-type]
+        )
+        self.assertIn('arcs', result)
+        self.assertEqual(len(result['arcs']), 1)
+        self.assertEqual(result['arcs'][0]['id'], 'arc_default')
+        self.assertEqual(result['arcs'][0]['title'], 'All Chapters')
+        self.assertEqual(result['arcs'][0]['description'], '')
+        self.assertEqual(result['arcs'][0]['node_ids'], ['node_1', 'node_2'])
+
+    def test_delete_node_with_destination_ids_merge(self) -> None:
+        self.story.add_node('node_3', 'Title 3')
+        self.story.story_contents.nodes[0].destination_node_ids = ['node_2']
+        self.story.story_contents.nodes[1].destination_node_ids = ['node_3']
+        self.story.story_contents.nodes[2].destination_node_ids = []
+        self.story.delete_node('node_2')
+        self.assertIn(
+            'node_3', self.story.story_contents.nodes[0].destination_node_ids
+        )
+
+    def test_delete_node_with_duplicate_destination_ids_merge(self) -> None:
+        self.story.add_node('node_3', 'Title 3')
+        self.story.story_contents.nodes[0].destination_node_ids = [
+            'node_2',
+            'node_3',
+        ]
+        self.story.story_contents.nodes[1].destination_node_ids = ['node_3']
+        self.story.story_contents.nodes[2].destination_node_ids = []
+        self.story.delete_node('node_2')
+        self.assertIn(
+            'node_3', self.story.story_contents.nodes[0].destination_node_ids
+        )
+
     def test_story_summary_creation(self) -> None:
         curr_time = datetime.datetime.utcnow()
         story_summary = story_domain.StorySummary(
@@ -2625,6 +2929,66 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_dict, story_version=0
         )
         self.assertEqual(story_from_dict.to_dict(), story_dict)
+
+    def test_validate_arc(self) -> None:
+        arc = story_domain.Arc('arc_1', 'Title', 'Description', ['node_1'])
+        arc.validate()
+
+    def test_validate_arc_with_duplicate_node_ids(self) -> None:
+        arc = story_domain.Arc(
+            'arc_1', 'Title', 'Description', ['node_1', 'node_1']
+        )
+        arc.validate()
+
+    def test_move_node_to_arc_when_node_not_in_any_arc(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
+        )
+        self.story.story_contents.move_node_to_arc('node_1', 'arc_1')
+        self.assertIn(
+            'node_1', self.story.story_contents.get_arc('arc_1').node_ids
+        )
+        self.assertIn(
+            'node_2', self.story.story_contents.get_arc('arc_1').node_ids
+        )
+
+    def test_move_node_to_arc_with_invalid_arc_id(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            'The arc with id nonexistent_arc is not part of this story.',
+        ):
+            self.story.story_contents.move_node_to_arc(
+                'node_1', 'nonexistent_arc'
+            )
+
+    def test_delete_node_removes_from_arc(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
+        )
+        self.story.delete_node(self.NODE_ID_2)
+        self.assertEqual(len(self.story.story_contents.nodes), 1)
+
+    def test_create_arc(self) -> None:
+        arc = story_domain.Arc('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
+        self.story.add_arc(arc)
+        self.assertIn(arc, self.story.story_contents.arcs)
+        self.assertEqual(len(self.story.story_contents.arcs), 1)
+
+    def test_update_arc_property(self) -> None:
+        self.story.story_contents.add_arc(
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
+        )
+        self.story.story_contents.get_arc('arc_1').title = 'Updated Title'
+        self.story.story_contents.get_arc('arc_1').description = (
+            'Updated Description'
+        )
+        self.assertEqual(
+            self.story.story_contents.get_arc('arc_1').title, 'Updated Title'
+        )
+        self.assertEqual(
+            self.story.story_contents.get_arc('arc_1').description,
+            'Updated Description',
+        )
 
 
 class StorySummaryTests(test_utils.GenericTestBase):

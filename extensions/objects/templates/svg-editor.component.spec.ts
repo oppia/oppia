@@ -41,7 +41,11 @@ import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.se
 import {of} from 'rxjs';
 
 var initializeMockDocument = (svgFilenameCtrl: SvgEditorComponent) => {
+  document
+    .querySelectorAll('.oppia-svg-editor-mock-doc')
+    .forEach(el => el.remove());
   var mockDocument = document.createElement('div');
+  mockDocument.className = 'oppia-svg-editor-mock-doc';
   var colors = ['stroke', 'fill', 'bg'];
   for (var i = 0; i < 3; i++) {
     var colorDiv = document.createElement('div');
@@ -76,7 +80,7 @@ describe('SvgEditor', () => {
   var component: SvgEditorComponent;
   let svgSanitizerService: SvgSanitizerService;
   const mockilss = {
-    getRawImageData: filename => {
+    getRawImageData: (filename: string) => {
       return dataUrl;
     },
   };
@@ -150,28 +154,36 @@ describe('SvgEditor', () => {
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
-    getImageUrlForPreview: (contentType, contentId, filepath) => {
+    getImageUrlForPreview: (
+      contentType: string,
+      contentId: string,
+      filepath: string
+    ) => {
       return dataUrl;
     },
   };
 
   var mockImageUploadHelperService = {
-    convertImageDataToImageFile: svgDataUri => {
+    convertImageDataToImageFile: (svgDataUri: string) => {
       return new Blob();
     },
-    generateImageFilename: (height, width, extension) => {
+    generateImageFilename: (
+      height: number,
+      width: number,
+      extension: string
+    ) => {
       return height + '_' + width + '.' + extension;
     },
   };
 
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: dataUri => {
+    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri: string) => {
       return {tags: [], attrs: []};
     },
-    getTrustedSvgResourceUrl: data => {
+    getTrustedSvgResourceUrl: (data: string) => {
       return data;
     },
-    convertBase64ToUnicodeString: base64 => {
+    convertBase64ToUnicodeString: (base64: string) => {
       return decodeURIComponent(atob(base64));
     },
   };
@@ -186,31 +198,31 @@ describe('SvgEditor', () => {
   };
 
   class mockReaderObject {
-    result = null;
-    onload = null;
+    result: string | null = null;
+    onload: (() => string) | null = null;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
 
-    readAsDataURL(file) {
-      this.onload();
+    readAsDataURL(file: Blob): string {
+      this.onload?.();
       return 'The file is loaded';
     }
   }
 
   class mockImageObject {
-    source = null;
-    onload = null;
+    source: string | null = null;
+    onload: (() => string) | null = null;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
 
-    set src(url) {
-      this.onload();
+    set src(url: string) {
+      this.onload?.();
     }
   }
 
@@ -259,18 +271,12 @@ describe('SvgEditor', () => {
     svgFileFetcherBackendApiService = TestBed.inject(
       SvgFileFetcherBackendApiService
     );
-    // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this error
-    // because 'HTMLImageElement' has around 250 more properties.
-    // We have only defined the properties we need in 'mockImageObject'.
-    // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this error
-    // because 'HTMLImageElement' has around 250 more properties.
-    // We have only defined the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+    spyOn(window, 'Image').and.returnValue(
+      new mockImageObject() as Partial<HTMLImageElement> as HTMLImageElement
+    );
+    spyOn(window, 'FileReader').and.returnValue(
+      new mockReaderObject() as Partial<FileReader> as FileReader
+    );
     fixture = TestBed.createComponent(SvgEditorComponent);
     component = fixture.componentInstance;
     initializeMockDocument(component);
@@ -278,7 +284,7 @@ describe('SvgEditor', () => {
     component.canvas = new fabric.Canvas(component.canvasID);
     component.initializeMouseEvents();
     var mockPicker = {
-      setOptions: data => {
+      setOptions: (data: object) => {
         return 'The value is set.';
       },
     };
@@ -295,7 +301,7 @@ describe('SvgEditor', () => {
       });
       component.ngOnInit();
       tick(10);
-      component.bgPicker.onOpen();
+      component.bgPicker?.onOpen?.();
       var WIDTH = 100;
       var HEIGHT = 100;
       component.diagramWidth = WIDTH;
@@ -376,7 +382,7 @@ describe('SvgEditor', () => {
       spyOnProperty(document, 'readyState').and.returnValue('loaded');
       component.ngOnInit();
       tick(100);
-      component.bgPicker.onOpen();
+      component.bgPicker?.onOpen?.();
       var WIDTH = 100;
       var HEIGHT = 100;
       component.diagramWidth = WIDTH;
@@ -428,7 +434,7 @@ describe('SvgEditor', () => {
       return {tags: [], attrs: ['width']};
     });
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
-      data => data
+      (data: string) => data
     );
     var invalidWidthAttribute =
       '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -448,7 +454,7 @@ describe('SvgEditor', () => {
       return {tags: ['script'], attrs: []};
     });
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
-      data => data
+      (data: string) => data
     );
     var invalidSvgTag =
       '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -695,7 +701,7 @@ describe('SvgEditor', () => {
     });
     domReady.then(() => {
       fixture.detectChanges();
-      component.bgPicker.onOpen();
+      component.bgPicker?.onOpen?.();
       let alphaSliders = document.querySelectorAll(
         '.picker_alpha .picker_selector'
       );
@@ -728,7 +734,7 @@ describe('SvgEditor', () => {
       fixture.detectChanges();
       tick(1);
       expect(component.data.savedSvgFileName).toBe('imageFile1.svg');
-      expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+      expect(component.data.savedSvgUrl?.toString()).toBe(dataUrl);
       expect(component.validate()).toBe(true);
     })
   ));
@@ -760,7 +766,7 @@ describe('SvgEditor', () => {
       component.savedSvgDiagram = samplesvg;
       component.continueDiagramEditing();
       tick(100);
-      var mocktoSVG = arg => {
+      var mocktoSVG = (arg: object) => {
         return '<path></path>';
       };
       var customToSVG = component.createCustomToSVG(
@@ -781,15 +787,15 @@ describe('SvgEditor', () => {
       fakeAsync(() => {
         spyOnProperty(document, 'readyState').and.returnValue('loading');
         spyOn(document, 'addEventListener').and.callFake(
-          (eventName, handler) => {
-            setTimeout(() => handler());
+          (eventName: string, handler: EventListener) => {
+            setTimeout(() => handler(new Event(eventName)));
           }
         );
         component.savedSvgDiagram = 'saved';
         component.savedSvgDiagram = samplesvg;
         component.continueDiagramEditing();
         tick(10);
-        var mocktoSVG = arg => {
+        var mocktoSVG = (arg: object) => {
           return '<path></path>';
         };
         var customToSVG = component.createCustomToSVG(
@@ -803,6 +809,308 @@ describe('SvgEditor', () => {
       })
     )
   );
+
+  it('should show warning when image data conversion fails', () => {
+    component.createRect();
+    const imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+    component.saveSvgFile();
+    expect(alertSpy).toHaveBeenCalledWith('Custom Diagram could not be saved.');
+  });
+
+  it('should throw error when svg tag is missing in generated SVG', () => {
+    spyOn(component.canvas, 'toSVG').and.returnValue('<html></html>');
+    expect(() => {
+      // This throws "Property 'getSvgString' is private". We need to
+      // suppress this error because we are testing the private method.
+      // @ts-ignore
+      component.getSvgString();
+    }).toThrowError('No svg tag found in generated SVG string.');
+  });
+
+  it('should handle null parentG in createCustomToSVG', () => {
+    var mocktoSVG = () => '<path></path>';
+    var customToSVG = component.createCustomToSVG(
+      mocktoSVG,
+      'nonexistent',
+      'group1',
+      component
+    );
+    var result = customToSVG();
+    expect(result).toContain('<path');
+  });
+
+  it('should handle undefined bezier curve in onStrokeChange', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.onStrokeChange();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should handle undefined bezier curve in onFillChange', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.onFillChange();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should handle undefined bezier curve in onSizeChange', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.onSizeChange();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should return early when color picker parent element is missing', () => {
+    spyOn(document, 'getElementById')
+      .withArgs('stroke-color')
+      .and.returnValue(null);
+    // This throws "Property 'createColorPicker' is private". We need to
+    // suppress this error because we are testing the private method.
+    // @ts-ignore
+    component.createColorPicker('stroke');
+  });
+
+  it('should handle uploaded SVG file with valid data URL', () => {
+    var svgContent =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">' +
+      '</svg>';
+    var b64Content = btoa(svgContent);
+    var dataUrl = 'data:image/svg+xml;base64,' + b64Content;
+    var customReader = {
+      result: null,
+      onload: null,
+      readAsDataURL: function (
+        this: {result: string | null; onload: (() => void) | null},
+        file: Blob
+      ) {
+        this.result = dataUrl;
+        if (this.onload) {
+          this.onload();
+        }
+      },
+    };
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
+      customReader as unknown as FileReader
+    );
+    var file = new File([svgContent], 'test.svg', {type: 'image/svg'});
+    component.onFileChanged(file, 'test.svg');
+    expect(component.uploadedSvgDataUrl).not.toBeNull();
+    expect(component.uploadedSvgDataUrl?.unsafeUrl).toBe(dataUrl);
+  });
+
+  it('should handle null safeUrl in setUploadedFile', () => {
+    var svgContent =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">' +
+      '</svg>';
+    var b64Content = btoa(svgContent);
+    var dataUrl = 'data:image/svg+xml;base64,' + b64Content;
+    var customReader = {
+      result: null,
+      onload: null,
+      readAsDataURL: function (
+        this: {result: string | null; onload: (() => void) | null},
+        file: Blob
+      ) {
+        this.result = dataUrl;
+        if (this.onload) {
+          this.onload();
+        }
+      },
+    };
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
+      customReader as unknown as FileReader
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null
+    );
+    var file = new File([svgContent], 'test.svg', {type: 'image/svg'});
+    component.onFileChanged(file, 'test.svg');
+    expect(component.uploadedSvgDataUrl).toBeNull();
+  });
+
+  it('should handle undefined activePathObject in createQuadraticBezier', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.createQuadraticBezier();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should handle non-array path in createQuadraticBezier', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.createRect();
+    component.createRect();
+    component.createRect();
+    component.createRect();
+    component.createQuadraticBezier();
+    expect(component.drawMode).toBe(component.DRAW_MODE_NONE);
+  });
+
+  it('should handle various undefined states in bezier object:moving', () => {
+    component.createQuadraticBezier();
+    component.canvas.fire('object:moving', {
+      target: undefined,
+    });
+    component.canvas.clear();
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0', left: 100, top: 100},
+    });
+    component.drawMode = component.DRAW_MODE_BEZIER;
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0'},
+    });
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0', left: 100},
+    });
+  });
+
+  it('should handle undefined element in continueDiagramEditing', fakeAsync(() => {
+    component.savedSvgDiagram = '<svg></svg>';
+    // This throws "Property 'loadSVGFromString' does not exist on type
+    // 'typeof import("fabric")'". We need to suppress this error because
+    // this method exists at runtime.
+    // @ts-expect-error
+    spyOn(fabric, 'loadSVGFromString').and.callFake(
+      (svgString: string, callback: Function) => {
+        callback([new fabric.Rect()], {}, []);
+      }
+    );
+    component.continueDiagramEditing();
+    tick();
+  }));
+
+  it('should handle undefined undoObj in onUndo', () => {
+    component.createRect();
+    // This throws "Property 'objectUndoStack' is private". We need to
+    // suppress this error because we are accessing it for testing.
+    // @ts-expect-error
+    component.objectUndoStack.pop = () => undefined;
+    component.onUndo();
+  });
+
+  it('should handle undefined shape in onUndo', () => {
+    component.createRect();
+    spyOn(component.canvasObjects, 'pop').and.returnValue(undefined);
+    component.onUndo();
+  });
+
+  it('should handle undefined redoObj in onRedo', () => {
+    component.createRect();
+    component.onUndo();
+    // This throws "Property 'objectRedoStack' is private". We need to
+    // suppress this error because we are accessing it for testing.
+    // @ts-expect-error
+    component.objectRedoStack.pop = () => undefined;
+    component.onRedo();
+  });
+
+  it('should handle non-numeric type values in scaling event', () => {
+    component.createText();
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    var text = component.canvas.getActiveObject();
+    if (text) {
+      spyOn(text, 'get').and.callFake((prop: string) => {
+        if (prop === 'type') {
+          return 'textbox';
+        }
+        if (prop === 'scaleX' || prop === 'scaleY') {
+          return undefined;
+        }
+        if (prop === 'width') {
+          return 100;
+        }
+        if (prop === 'height') {
+          return 50;
+        }
+        // This throws "Property 'get' does not exist on type
+        // 'Object'".
+        // We need to suppress this error because we need to call the get
+        // method on the prototype.
+        // @ts-expect-error
+        return (
+          fabric.Object.prototype as unknown as Record<string, Function>
+        ).get.call(text, prop);
+      });
+    }
+    component.canvas.fire('object:scaling');
+  });
+
+  it('should handle undefined shape on selection', () => {
+    spyOn(component.canvas, 'getActiveObject').and.returnValue(undefined);
+    component.canvas.fire('selection:created');
+  });
+
+  it('should handle undefined strokeWidth on selection', () => {
+    component.createRect();
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    var rect = component.canvas.getActiveObject();
+    if (rect) {
+      spyOn(rect, 'get').and.callFake((prop: string) => {
+        if (prop === 'strokeWidth') {
+          return undefined;
+        }
+        if (prop === 'type') {
+          return 'rect';
+        }
+        if (prop === 'fill') {
+          return 'rgba(0,0,0,0)';
+        }
+        if (prop === 'stroke') {
+          return 'rgba(0,0,0,1)';
+        }
+        return 1;
+      });
+    }
+    component.canvas.fire('selection:created');
+  });
+
+  it('should handle undefined fontSize on selection', () => {
+    component.createText();
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    var text = component.canvas.getActiveObject();
+    if (text) {
+      spyOn(text, 'get').and.callFake((prop: string) => {
+        if (prop === 'fontSize') {
+          return undefined;
+        }
+        if (prop === 'type') {
+          return 'textbox';
+        }
+        if (prop === 'fill') {
+          return '#000';
+        }
+        if (prop === 'stroke') {
+          return '#000';
+        }
+        if (prop === 'fontFamily') {
+          return 'Arial';
+        }
+        return 1;
+      });
+    }
+    component.canvas.fire('selection:created');
+  });
+
+  it('should handle null alpha squares in createColorPicker onChange', () => {
+    // This throws "Property 'createColorPicker' is private". We need to
+    // suppress this error because we are testing the private method.
+    // @ts-ignore
+    component.createColorPicker('stroke');
+    const originalGetElementById = document.getElementById.bind(document);
+    spyOn(document, 'getElementById').and.callFake((id: string) => {
+      if (id === 'top-stroke-alpha' || id === 'bottom-stroke-alpha') {
+        return null;
+      }
+      return originalGetElementById(id);
+    });
+    component.strokePicker?.setOptions({
+      color: 'rgba(255, 0, 0, 1)',
+    });
+  });
 });
 
 describe('SvgEditor initialized with value attribute', () => {
@@ -816,7 +1124,11 @@ describe('SvgEditor initialized with value attribute', () => {
     ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
     'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>';
   var mockAssetsBackendApiService = {
-    getImageUrlForPreview: (contentType, contentId, filepath) => {
+    getImageUrlForPreview: (
+      contentType: string,
+      contentId: string,
+      filepath: string
+    ) => {
       return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
     },
   };
@@ -892,7 +1204,7 @@ describe('SvgEditor initialized with value attribute', () => {
 describe('SvgEditor with image save destination as local storage', () => {
   var pageContextService: PageContextService;
   let fixture: ComponentFixture<SvgEditorComponent>;
-  var component: SvgEditorComponent = null;
+  var component: SvgEditorComponent;
   var samplesvg =
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
     'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
@@ -901,34 +1213,38 @@ describe('SvgEditor with image save destination as local storage', () => {
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockilss = {
-    getRawImageData: filename => {
+    getRawImageData: (filename: string) => {
       return dataUrl;
     },
-    saveImage: (filename, imageData) => {
+    saveImage: (filename: string, imageData: string) => {
       return 'Image file save.';
     },
-    deleteImage: filename => {
+    deleteImage: (filename: string) => {
       return 'Image file is deleted.';
     },
-    isInStorage: filename => {
+    isInStorage: (filename: string) => {
       return true;
     },
   };
 
   var mockImageUploadHelperService = {
-    convertImageDataToImageFile: svgDataUri => {
+    convertImageDataToImageFile: (svgDataUri: string) => {
       return new Blob();
     },
-    generateImageFilename: (height, widht, extension) => {
+    generateImageFilename: (
+      height: number,
+      widht: number,
+      extension: string
+    ) => {
       return height + '_' + widht + '.' + extension;
     },
   };
 
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: dataUri => {
+    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri: string) => {
       return {tags: [], attrs: []};
     },
-    getTrustedSvgResourceUrl: data => {
+    getTrustedSvgResourceUrl: (data: string) => {
       return data;
     },
   };
@@ -943,31 +1259,31 @@ describe('SvgEditor with image save destination as local storage', () => {
   };
 
   class mockReaderObject {
-    result = null;
-    onload = null;
+    result: string | null = null;
+    onload: (() => string) | null = null;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
 
-    readAsDataURL(file) {
-      this.onload();
+    readAsDataURL(file: Blob): string {
+      this.onload?.();
       return 'The file is loaded';
     }
   }
 
   class mockImageObject {
-    source = null;
-    onload = null;
+    source: string | null = null;
+    onload: (() => string) | null = null;
     constructor() {
       this.onload = () => {
         return 'Fake onload executed';
       };
     }
 
-    set src(url) {
-      this.onload();
+    set src(url: string) {
+      this.onload?.();
     }
   }
 
@@ -1005,18 +1321,12 @@ describe('SvgEditor with image save destination as local storage', () => {
     );
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
 
-    // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". We need to suppress this error
-    // because 'HTMLImageElement' has around 250 more properties. We have only
-    // defined the properties we need in 'mockImageObject'.
-    // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // This throws "Argument of type 'mockReaderObject' is not assignable
-    // to parameter of type 'FileReader'.". We need to suppress this error
-    // because 'FileReader' has around 15 more properties. We have only
-    // defined the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+    spyOn(window, 'Image').and.returnValue(
+      new mockImageObject() as Partial<HTMLImageElement> as HTMLImageElement
+    );
+    spyOn(window, 'FileReader').and.returnValue(
+      new mockReaderObject() as Partial<FileReader> as FileReader
+    );
     fixture = TestBed.createComponent(SvgEditorComponent);
     component = fixture.componentInstance;
     initializeMockDocument(component);
@@ -1029,7 +1339,7 @@ describe('SvgEditor with image save destination as local storage', () => {
     component.createRect();
     component.saveSvgFile();
     expect(component.data.savedSvgFileName).toBe('350_450.svg');
-    expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+    expect(component.data.savedSvgUrl?.toString()).toBe(dataUrl);
     expect(component.validate()).toBe(true);
   });
 
@@ -1082,6 +1392,7 @@ describe('SvgEditor with image save destination as local storage', () => {
           style: {fill: '', stroke: '', strokeWidth: ''},
         },
       ],
+      getAttribute: (attr: string) => null,
     } as unknown as Element;
     const mockObj = {
       toObject: () => ({
@@ -1104,5 +1415,25 @@ describe('SvgEditor with image save destination as local storage', () => {
     ] as fabric.Textbox;
     expect(addedText.left).toBe(450 - (addedText.width || 0));
     expect(addedText.fill).toBe('#000');
+  });
+
+  it('should handle null imageUrl from getTrustedResourceUrlForSvgFileName', () => {
+    var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(null);
+    component.setSavedSvgFilename('test.svg', false);
+    expect(component.data.savedSvgUrl).toBe('');
+  });
+
+  it('should handle null safeUrl in setSavedSvgFilename', () => {
+    var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(dataUrl);
+    var svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null
+    );
+    component.setSavedSvgFilename('test.svg', true);
+    expect(component.uploadedSvgDataUrl).toBeNull();
   });
 });

@@ -75,6 +75,7 @@ import {UserService} from '../../../services/user.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('Conversation flow service', () => {
   let conversationFlowService: ConversationFlowService;
@@ -110,7 +111,9 @@ describe('Conversation flow service', () => {
   let playerPositionService: PlayerPositionService;
   let explorationEngineService: ExplorationEngineService;
 
-  const createInteraction = (interactionType: string | null): Interaction =>
+  const createInteraction = (
+    interactionType: InteractionSpecsKey | null
+  ): Interaction =>
     new Interaction(
       [],
       [],
@@ -120,9 +123,12 @@ describe('Conversation flow service', () => {
       interactionType,
       null
     );
-  let createCard = function (interactionType: string | null): StateCard {
+  let createCard = function (
+    stateName: string,
+    interactionType: InteractionSpecsKey | null = null
+  ): StateCard {
     return new StateCard(
-      '',
+      stateName,
       '',
       '',
       createInteraction(interactionType),
@@ -224,12 +230,12 @@ describe('Conversation flow service', () => {
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
     ).toBe(false);
 
-    let textInputCard = createCard('TextInput');
+    let textInputCard = createCard('', 'TextInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(textInputCard)
     ).toBe(false);
 
-    let supplementaryImageInputCard = createCard('ImageClickInput');
+    let supplementaryImageInputCard = createCard('', 'ImageClickInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(
         supplementaryImageInputCard
@@ -989,7 +995,7 @@ describe('Conversation flow service', () => {
         ''
       );
       explorationModeSpy.and.returnValue(true);
-      conversationFlowService.displayedCard = createCard('TextInput');
+      conversationFlowService.displayedCard = createCard('', 'TextInput');
       spyOn(
         explorationModeService,
         'isInDiagnosticTestPlayerMode'
@@ -1008,7 +1014,7 @@ describe('Conversation flow service', () => {
         null,
         ''
       );
-      conversationFlowService.displayedCard = createCard('ImageClickInput');
+      conversationFlowService.displayedCard = createCard('', 'ImageClickInput');
       explorationModeSpy.and.returnValue(false);
       successCallback(
         stateCard,
@@ -1164,7 +1170,7 @@ describe('Conversation flow service', () => {
   });
 
   it('should initialize directive components and set focus, scroll and emit', fakeAsync(() => {
-    const card = createCard('TextInput');
+    const card = createCard('', 'TextInput');
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
       () => {}
     );
@@ -1209,7 +1215,7 @@ describe('Conversation flow service', () => {
   }));
 
   it('should set i18nLanguageCode to URL lang if iframe and lang is valid', fakeAsync(() => {
-    const card = createCard('TextInput');
+    const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
       () => {}
@@ -1232,7 +1238,7 @@ describe('Conversation flow service', () => {
   }));
 
   it('should set i18nLanguageCode to en if iframe and lang is missing or unsupported', fakeAsync(() => {
-    const card = createCard('TextInput');
+    const card = createCard('', 'TextInput');
     conversationFlowService.displayedCard = card;
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
       () => {}
@@ -1441,7 +1447,7 @@ describe('Conversation flow service', () => {
   });
 
   it('should set and get nextCardIfStuck', () => {
-    const mockCard = createCard('TextInput');
+    const mockCard = createCard('', 'TextInput');
     conversationFlowService.setNextCardIfStuck(mockCard);
     expect(conversationFlowService.getNextCardIfStuck()).toBe(mockCard);
   });
@@ -1469,7 +1475,7 @@ describe('Conversation flow service', () => {
     );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
-      createCard('TextInput')
+      createCard('', 'TextInput')
     );
     spyOn(hintsAndSolutionManagerService, 'releaseSolution');
 
@@ -1508,7 +1514,7 @@ describe('Conversation flow service', () => {
       'CurrentCard',
       '',
       '',
-      createInteraction(''),
+      createInteraction(null),
       [],
       ''
     );

@@ -39,7 +39,11 @@ import {TranslationLanguageService} from 'pages/exploration-editor-page/translat
 import {UserService} from 'services/user.service';
 import {TranslationValidationService} from 'services/translation-validation.service';
 import {AppConstants} from 'app.constants';
-import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
+import {
+  ListSchema,
+  SchemaDefaultValue,
+  UnicodeSchema,
+} from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -52,6 +56,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -86,7 +91,7 @@ export interface ModifyTranslationOpportunity {
   subheading: string;
   textToTranslate: string;
   currentContentTranslation: TranslatedContent;
-  interactionId?: string;
+  interactionId?: InteractionSpecsKey | null;
 }
 export interface HTMLSchema {
   type: string;
@@ -122,7 +127,7 @@ export class TranslationModalComponent {
   activeStatus!: Status;
   activeLanguageCode!: string;
   HTML_SCHEMA!: {
-    type: string;
+    type: 'html';
     ui_config: UiConfig;
   };
 
@@ -139,6 +144,7 @@ export class TranslationModalComponent {
   TRANSLATION_TIPS = AppConstants.TRANSLATION_TIPS;
   isActiveLanguageReviewer: boolean = false;
   hadCopyParagraphError: boolean = false;
+  hasImgCopyError: boolean = false;
   hasImgTextError: boolean = false;
   hasIncompleteTranslationError: boolean = false;
   editorIsShown: boolean = true;
@@ -189,6 +195,16 @@ export class TranslationModalComponent {
 
   public get expansionTabType(): typeof ExpansionTabType {
     return ExpansionTabType;
+  }
+
+  wrapTextWithEllipsis(input: string, characterCount: number): string {
+    if (!input) {
+      return '';
+    }
+    if (input.length <= characterCount || characterCount < 3) {
+      return input;
+    }
+    return input.substring(0, characterCount - 3).trim() + '...';
   }
 
   ngOnInit(): void {
@@ -369,6 +385,18 @@ export class TranslationModalComponent {
     return this.SET_OF_STRINGS_SCHEMA;
   }
 
+  get activeWrittenTranslationAsString(): string {
+    return typeof this.activeWrittenTranslation === 'string'
+      ? this.activeWrittenTranslation
+      : this.activeWrittenTranslation[0] || '';
+  }
+
+  get textToTranslateAsString(): string {
+    return typeof this.textToTranslate === 'string'
+      ? this.textToTranslate
+      : this.textToTranslate[0] || '';
+  }
+
   updateActiveState(translatableItem: TranslatableItem): void {
     ({
       text: this.textToTranslate = '',
@@ -425,9 +453,17 @@ export class TranslationModalComponent {
     return this.ckEditorCopyContentService.copyModeActive;
   }
 
-  updateHtml($event: string | string[]): void {
+  updateHtml($event: SchemaDefaultValue): void {
     if ($event !== this.activeWrittenTranslation) {
-      this.activeWrittenTranslation = $event;
+      if (typeof $event === 'string') {
+        this.activeWrittenTranslation = $event;
+      } else if (Array.isArray($event)) {
+        this.activeWrittenTranslation = $event.filter(
+          (item): item is string => typeof item === 'string'
+        );
+      } else {
+        return;
+      }
       this.changeDetectorRef.detectChanges();
       this.updateTranslationErrors();
     }

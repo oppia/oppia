@@ -27,11 +27,11 @@
                  title="Edit Rubric Explanation">
               </i>
             </div>
-            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated()"
+            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated"
                   class="oppia-placeholder">
             The skill description will be autofilled here
             </span>
-            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && idx !== 0) || !this.newSkillBeingCreated())"
+            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && idx !== 0) || !this.newSkillBeingCreated)"
                   class="oppia-placeholder">
             This rubric has not yet been specified
             </span>
