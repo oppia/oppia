@@ -1,0 +1,35 @@
+.oppia-feedback-detail-card {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  max-height: 78vh;
+}
+
+.oppia-feedback-detail-header {
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+}
+
+.oppia-feedback-detail-header-left{
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.oppia-feedback-detail-back {
+  min-width: 32px;
+}
+
+.oppia-feedback-detail-thread-title {
+  color: #333;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}

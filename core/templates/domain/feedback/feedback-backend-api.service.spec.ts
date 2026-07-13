@@ -66,6 +66,50 @@ describe('Feedback backend api service', () => {
     screenshotFilename: null,
   });
 
+  const filterState1 = {
+    status: 'open',
+    dateRange: {
+      start: new Date('2021-01-01'),
+      end: new Date('2021-02-01'),
+    },
+    technicalTeam: 'LEAP',
+  };
+
+  const filterState2 = {
+    status: 'open',
+    dateRange: {
+      start: new Date('2021-01-01'),
+      end: new Date('2021-02-01'),
+    },
+    technicalTeam: 'CORE',
+  };
+
+  const filterState3 = {
+    status: 'open',
+    dateRange: {
+      start: new Date('2021-01-01'),
+      end: null,
+    },
+    technicalTeam: null,
+  };
+
+  const detailedReportResponse = {
+    id: 'test_report_id',
+    report_message: 'Test report',
+    source: 'lesson',
+    status: 'open',
+    platform: 'web',
+    destination_dashboard: 'LEAP',
+    page_url: 'http://localhost',
+    category: null,
+    lesson_metadata_json: null,
+    include_technical_logs: false,
+    session_info: null,
+    screenshot_filename: null,
+    screenshot_entity_id: null,
+    created_on_msecs: 123456,
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -243,5 +287,158 @@ describe('Feedback backend api service', () => {
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalledWith({id: 'thread_id'});
+  }));
+
+  it('should fetch LEAP technical dashboard report list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchTechnicalDashboardFeedbackListAsync(filterState1, 'cursor')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url ===
+          `/platform-feedback/technical/${filterState1.technicalTeam}`
+    );
+    expect(req.request.params.get('status')).toBe(filterState1.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState1.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBe(
+      String(filterState1.dateRange.end.getTime())
+    );
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+    flushMicrotasks();
+
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
+
+  it('should fetch CORE technical dashboard report list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchTechnicalDashboardFeedbackListAsync(filterState2, 'cursor')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url ===
+          `/platform-feedback/technical/${filterState2.technicalTeam}`
+    );
+    expect(req.request.params.get('status')).toBe(filterState2.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState2.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBe(
+      String(filterState2.dateRange.end.getTime())
+    );
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
+
+  it('should fetch creator feedback tab report list', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchCreatorDashboardFeedbackListAsync(
+        'test_exploration_id',
+        filterState3,
+        'cursor'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/platform-feedback/creator/test_exploration_id'
+    );
+    expect(req.request.params.get('status')).toBe(filterState3.status);
+    expect(req.request.params.get('cursor')).toBe('cursor');
+    expect(req.request.params.get('date_from_msecs')).toBe(
+      String(filterState3.dateRange.start.getTime())
+    );
+
+    expect(req.request.params.get('date_to_msecs')).toBeNull();
+
+    req.flush({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({
+      summaries: [],
+      next_cursor: 'cursor',
+      more: false,
+    });
+  }));
+
+  it('should fetch details of a Platform Feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchPlatformFeedbackDetailAsync('technical', 'LEAP', 'test_report_id')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/platform-feedback/technical/LEAP/test_report_id'
+    );
+
+    req.flush(detailedReportResponse);
+
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith(detailedReportResponse);
+  }));
+
+  it('should update status of a Platform Feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .updatePlatformFeedbackStatusAsync(
+        'technical',
+        'LEAP',
+        'test_report_id',
+        'fixed'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'POST' &&
+        request.url === '/platform-feedback/technical/LEAP/test_report_id'
+    );
+
+    expect(req.request.body).toEqual({
+      status: 'fixed',
+    });
+
+    req.flush({success: true});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({success: true});
   }));
 });

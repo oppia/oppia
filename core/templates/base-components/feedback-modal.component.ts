@@ -34,6 +34,7 @@ import {
   LessonFeedbackModel,
   FeedbackModalType,
   LessonFeedbackMetadata,
+  ReportType,
 } from 'domain/feedback/feedback.model';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
@@ -313,7 +314,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'lesson',
+      source: ReportType.LESSON,
       reportMessage: this.feedbackText,
       explorationContext: {
         explorationId: lessonFeedbackMetadata.explorationId,
@@ -394,7 +395,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'app',
+      source: ReportType.APP,
       reportMessage: this.feedbackText,
       explorationContext: null,
       category: null,

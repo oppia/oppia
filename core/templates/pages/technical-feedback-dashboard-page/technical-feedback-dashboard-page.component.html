@@ -1,6 +1,32 @@
-<div>
-  <!-- TODO(#24716): Create UI components for
-   Technical Feedback Dashboard and wire up with the backend.
-   Once the UI components are created, remove this comment and the below code.-->
-  {{ 'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate }}
+<background-banner></background-banner>
+
+<div class=" oppia-technical-feedback-dashboard-page">
+  <ng-container *ngIf="selectedReportId === null; else detailView">
+    <div class="oppia-technical-feedback-dashboard-page-header">
+      <h2>
+        {{ 'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate }}
+      </h2>
+    </div>
+
+    <oppia-feedback-filter-bar [config]="filterConfig"
+                               (filterChange)="onFilterChange($event)">
+    </oppia-feedback-filter-bar>
+
+    <oppia-feedback-table class="oppia-feedback-table"
+                          [feedbackCardConfig]="cardConfig"
+                          [feedbackSummaries]="displayedFeedbackSummaries"
+                          [currentPage]="currentPage"
+                          [moreFeedbackAvailable]="moreFeedbackAvailable"
+                          (rowClick)="onRowClick($event)"
+                          (nextPage)="onNextPage()"
+                          (previousPage)="onPreviousPage()">
+    </oppia-feedback-table>
+
+  </ng-container>
+
+  <ng-template #detailView>
+    <oppia-feedback-detail-page [feedbackDetailResponse]="feedbackDetailResponse" 
+                                (goBack)="navigateBackToDashboard()">
+    </oppia-feedback-detail-page>
+  </ng-template>
 </div>
