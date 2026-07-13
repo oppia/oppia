@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {FrontendErrorBackendApiService} from 'services/frontend-error-backend-api.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ErrorModalComponent} from './error-modal.component';
 
 class MockActiveModal {
@@ -55,7 +56,7 @@ describe('Error Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ErrorModalComponent],
+      declarations: [ErrorModalComponent, MockTranslatePipe],
       providers: [
         {
           provide: NgbActiveModal,

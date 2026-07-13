@@ -135,12 +135,12 @@ describe('Warnings and Alert Component', () => {
     );
   }));
 
-  it('should not open error modal if there is already an open modal', () => {
+  it('should open error modal regardless of other open modals', () => {
     (modalService.hasOpenModals as jasmine.Spy).and.returnValue(true);
 
     componentInstance.openErrorModal('Incoming Warning');
 
-    expect(modalService.open).not.toHaveBeenCalled();
+    expect(modalService.open).toHaveBeenCalled();
   });
 
   it('should process sequential warnings queue when modal settles', fakeAsync(() => {

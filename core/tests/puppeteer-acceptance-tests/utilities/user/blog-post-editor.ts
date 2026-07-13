@@ -34,7 +34,6 @@ const confirmButtonSelector = 'button.e2e-test-confirm-button';
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 const blogPostThumbnailImage = testConstants.data.blogPostThumbnailImage;
-const toastMessage = 'div.e2e-test-toast-warning-message';
 const blogPostTitlePage = '.e2e-test-blog-post-title';
 const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
@@ -636,6 +635,12 @@ export class BlogPostEditor extends BaseUser {
     await this.expectPublishButtonToBeDisabled();
 
     await this.updateBlogPostTitle(newBlogPostTitle);
+  }
+
+  /**
+   * Fills the remaining blog post fields and saves the changes after the error modal is closed.
+   */
+  async fillRemainingBlogPostFieldsAndSave(): Promise<void> {
     await this.updateBodyTextTo('test blog post body content - duplicate');
     await this.selectTag('News');
     await this.selectTag('International');
@@ -735,17 +740,7 @@ export class BlogPostEditor extends BaseUser {
     }
   }
 
-  /**
-   * This function checks that the user is unable to publish a blog post.
-   */
-  async expectUserUnableToPublishBlogPost(
-    expectedWarningMessage: string
-  ): Promise<void> {
-    const toastMessageBox = await this.page.$(toastMessage);
-    const toastMessageWarning = await this.page.evaluate(
-      (element: HTMLDivElement) => element.textContent,
-      toastMessageBox
-    );
+  async expectUserUnableToPublishBlogPost(): Promise<void> {
     const isPublishButtonDisabled = await this.page.$eval(
       publishBlogPostButton,
       button => (button as HTMLButtonElement).disabled
@@ -754,17 +749,8 @@ export class BlogPostEditor extends BaseUser {
     if (!isPublishButtonDisabled) {
       throw new Error('User is able to publish the blog post');
     }
-    if (expectedWarningMessage !== toastMessageWarning) {
-      throw new Error(
-        'Expected warning message is not same as the actual warning message\n' +
-          `Expected warning: ${expectedWarningMessage}\n` +
-          `Displayed warning: ${toastMessageWarning}\n`
-      );
-    }
 
-    showMessage(
-      'User is unable to publish the blog post because ' + toastMessageWarning
-    );
+    showMessage('User is unable to publish the blog post as expected.');
   }
 
   /**

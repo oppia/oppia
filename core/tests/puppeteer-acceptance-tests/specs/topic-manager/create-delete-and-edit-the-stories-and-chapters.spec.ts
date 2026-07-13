@@ -240,10 +240,11 @@ describe('Topic Manager', function () {
 
       // Add a prerequisite skill that is already a prerequisite skill and expect warning.
       await topicManager.addPrerequisiteSkill('Addition');
-      await topicManager.expectToastMessageToBe(
+      await topicManager.expectErrorModalToBeVisible();
+      await topicManager.expectErrorModalMessageToBe(
         'The given skill id is already a prerequisite skill.'
       );
-      await topicManager.closeToastMessage();
+      await topicManager.closeErrorModal();
 
       // Remove the duplicate prerequisite skill and verify it is gone.
       await topicManager.removePrerequisiteSkillFromChapter('Addition');

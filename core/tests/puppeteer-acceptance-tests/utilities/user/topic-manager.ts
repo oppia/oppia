@@ -95,8 +95,6 @@ const chapterEditorBreadcrumbChapterNameSelector =
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
-const toastWarningContainerSelector = '.e2e-test-toast-warning';
-const closeToastMessageButtonSelector = 'button.e2e-test-close-toast-warning';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
 const removeQuestionConfirmationButtonSelector =
@@ -624,24 +622,6 @@ export class TopicManager extends BaseUser {
           `Expected message: "${expectedMessage}"\n`
       );
     }
-  }
-
-  /**
-   * Closes the currently visible toast warning.
-   */
-  async closeToastMessage(): Promise<void> {
-    const toastVisible = await this.isElementVisible(
-      toastWarningContainerSelector,
-      true,
-      3000
-    );
-    if (!toastVisible) {
-      showMessage('No toast warning is visible to close.');
-      return;
-    }
-
-    await this.clickOnElementWithSelector(closeToastMessageButtonSelector);
-    await this.expectElementToBeVisible(toastWarningContainerSelector, false);
   }
 
   /**

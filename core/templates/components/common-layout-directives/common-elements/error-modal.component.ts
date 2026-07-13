@@ -22,6 +22,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {FrontendErrorBackendApiService} from 'services/frontend-error-backend-api.service';
 import {ConfirmOrCancelModal} from './confirm-or-cancel-modal.component';
 
+import './error-modal.component.css';
+
 @Component({
   selector: 'oppia-error-modal',
   templateUrl: './error-modal.component.html',

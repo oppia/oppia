@@ -1,23 +1,23 @@
 <div class="modal-body oppia-error-modal-body">
-  <h3 class="oppia-error-modal-title">Error has occurred</h3>
+  <h3 class="oppia-error-modal-title">{{ 'I18N_ERROR_MODAL_TITLE' | translate }}</h3>
 
   <div *ngIf="!reportSentSuccessfully">
     <p class="oppia-error-modal-message">
-      We are sorry for the inconvenience. You can help us prevent this error from occurring by reporting it to Oppia.
+      {{ 'I18N_ERROR_MODAL_MESSAGE' | translate }}
     </p>
 
     <div class="oppia-error-details-container">
-      <a class="oppia-error-details-toggle-link" (click)="toggleDetails()" role="button" tabindex="0">
+      <button class="oppia-error-details-toggle-link e2e-test-error-details-toggle-link" (click)="toggleDetails()" type="button">
         <i class="fa oppia-error-details-arrow" [ngClass]="showDetails ? 'fa-caret-down' : 'fa-caret-right'"></i>
-        {{ showDetails ? 'Hide Details' : 'Show Details' }}
-      </a>
+        {{ showDetails ? ('I18N_ERROR_MODAL_HIDE_DETAILS' | translate) : ('I18N_ERROR_MODAL_SHOW_DETAILS' | translate) }}
+      </button>
       <div class="oppia-error-details-content" *ngIf="showDetails">
-        <pre>{{ errorMessage }}</pre>
+        <pre class="e2e-test-error-details-content">{{ errorMessage }}</pre>
       </div>
     </div>
 
     <div class="form-group oppia-error-description-group">
-      <p class="oppia-error-description-label">Please describe what happened before the error occurred:</p>
+      <label class="oppia-error-description-label">{{ 'I18N_ERROR_MODAL_DESCRIPTION_LABEL' | translate }}</label>
       <textarea id="errorDescription"
                 class="form-control oppia-error-description-textarea"
                 rows="4"
@@ -27,16 +27,16 @@
   </div>
 
   <div *ngIf="reportSentSuccessfully" class="oppia-error-success-message">
-    <p>Thank you! Your error report has been successfully sent to Oppia.</p>
+    <p>{{ 'I18N_ERROR_MODAL_SUCCESS_MESSAGE' | translate }}</p>
   </div>
 </div>
 
 <div class="modal-footer oppia-error-modal-footer">
-  <button class="btn btn-secondary" (click)="close()">
-    CLOSE
+  <button class="btn btn-secondary e2e-test-close-button" (click)="close()">
+    {{ 'I18N_ERROR_MODAL_CLOSE_BUTTON' | translate }}
   </button>
   <oppia-primary-button *ngIf="!reportSentSuccessfully"
-                        [buttonText]="isSubmitting ? 'SENDING...' : 'SEND REPORT'"
+                        [buttonText]="isSubmitting ? ('I18N_ERROR_MODAL_SENDING_BUTTON' | translate) : ('I18N_ERROR_MODAL_SEND_REPORT_BUTTON' | translate)"
                         (onClickPrimaryButton)="sendReport()"
                         [disabled]="isSubmitting">
   </oppia-primary-button>

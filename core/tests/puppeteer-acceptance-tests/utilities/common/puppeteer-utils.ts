@@ -36,12 +36,14 @@ const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
 const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+const errorModalSelector = '.oppia-error-modal-window';
+const errorModalToggleDetailsSelector = '.e2e-test-error-details-toggle-link';
+const errorModalDetailsContentSelector = '.e2e-test-error-details-content';
+const errorModalCloseButtonSelector = '.e2e-test-close-button';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.e2e-test-toast-message';
-const warningToastMessageSelector = '.e2e-test-toast-warning-message';
-const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
 const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
@@ -2098,6 +2100,34 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the error modal is visible on the screen.
+   */
+  async expectErrorModalToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(errorModalSelector, {visible: true});
+  }
+
+  /**
+   * Toggles the details on the warning modal and checks if the warning message matches expected message.
+   * @param expectedMessage The expected warning message.
+   */
+  async expectErrorModalMessageToBe(expectedMessage: string): Promise<void> {
+    await this.clickOnElementWithSelector(errorModalToggleDetailsSelector);
+    await this.expectElementToBeVisible(errorModalDetailsContentSelector);
+    await this.expectTextContentToContain(
+      errorModalDetailsContentSelector,
+      expectedMessage
+    );
+  }
+
+  /**
+   * Closes the error modal.
+   */
+  async closeErrorModal(): Promise<void> {
+    await this.clickOnElementWithSelector(errorModalCloseButtonSelector);
+    await this.page.waitForSelector(errorModalSelector, {hidden: true});
+  }
+
+  /**
    * Checks if the current mat tab header matches the expected header.
    * @param expectedHeader The expected header of the mat tab.
    */
@@ -2278,29 +2308,6 @@ export class BaseUser {
       uploadErrorMessageDivSelector,
       expectedErrorMessage
     );
-  }
-
-  /**
-   * Checks if the toast warning message matches the expected warning message.
-   * @param {string} expectedWarningMessage - The expected warning message.
-   */
-  async expectToastWarningMessageToBe(
-    expectedWarningMessage: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(warningToastMessageSelector);
-    await this.expectTextContentToContain(
-      warningToastMessageSelector,
-      expectedWarningMessage
-    );
-  }
-
-  /**
-   * Clicks on the close button in the toast warning message.
-   */
-  async closeToastWarningMessage(): Promise<void> {
-    await this.expectElementToBeVisible(warningToastCloseButtonSelector);
-    await this.clickOnElementWithSelector(warningToastCloseButtonSelector);
-    await this.expectElementToBeVisible(warningToastMessageSelector, false);
   }
 
   /**

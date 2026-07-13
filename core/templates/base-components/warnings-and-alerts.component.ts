@@ -50,12 +50,9 @@ export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
   }
 
   openErrorModal(warningMessage: string): void {
-    if (this.modalService.hasOpenModals()) {
-      return;
-    }
-
     const modalRef = this.modalService.open(ErrorModalComponent, {
       backdropClass: 'oppia-error-modal-backdrop',
+      windowClass: 'oppia-error-modal-window',
       backdrop: 'static',
       keyboard: false,
     });
