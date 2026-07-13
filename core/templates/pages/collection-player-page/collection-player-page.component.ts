@@ -33,6 +33,7 @@ import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 
 import './collection-player-page.component.css';
 
@@ -74,12 +75,7 @@ export interface CollectionHandler {
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   collection!: Collection;
-  collectionPlaythrough?: {
-    getNextExplorationId: () => string | null;
-    getCompletedExplorationIds: () => string[];
-    getNextRecommendedCollectionNodeCount: () => number;
-    getCompletedExplorationNodeCount: () => number;
-  };
+  collectionPlaythrough?: CollectionPlaythrough;
   currentExplorationId!: string;
   summaryToPreview!: LearnerExplorationSummaryBackendDict;
   pathSvgParameters!: string;

@@ -926,12 +926,12 @@ describe('Contributions and review component', () => {
 
       it('should return true when activeTabType is reviews', () => {
         component.activeTabType = component.TAB_TYPE_REVIEWS;
-        expect(component.activeReviewTab).toBeTrue();
+        expect(component.activeReviewTab).toBe(true);
       });
 
       it('should return false when activeTabType is not reviews', () => {
         component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
-        expect(component.activeReviewTab).toBeFalse();
+        expect(component.activeReviewTab).toBe(false);
       });
     });
 
@@ -1271,11 +1271,11 @@ describe('Contributions and review component', () => {
       spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
       let question = Question.createFromBackendDict({
-        question_state_data_schema_version: null,
+        question_state_data_schema_version: 1,
         id: 'question_1',
         question_state_data: {
           classifier_model_id: null,
-          card_is_checkpoint: null,
+          card_is_checkpoint: false,
           linked_skill_id: null,
           content: {
             html: 'Question 1',
@@ -1296,7 +1296,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   refresher_exploration_id: null,
                 },
-                training_data: null,
+                training_data: [],
                 rule_specs: [
                   {
                     rule_type: 'Equals',
@@ -1350,16 +1350,8 @@ describe('Contributions and review component', () => {
             id: 'TextInput',
           },
           param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {},
-            },
-          },
           solicit_answer_details: false,
+          inapplicable_skill_misconception_ids: ['abc-2'],
         },
         language_code: 'en',
         version: 1,
@@ -1378,6 +1370,7 @@ describe('Contributions and review component', () => {
               id: null,
               question_state_data: {
                 classifier_model_id: null,
+                card_is_checkpoint: false,
                 param_changes: [],
                 solicit_answer_details: false,
                 content: {content_id: '', html: ''},
@@ -1392,11 +1385,14 @@ describe('Contributions and review component', () => {
                     missing_prerequisite_skill_id: null,
                     labelled_as_correct: false,
                   },
-                  id: '',
+                  confirmed_unclassified_answers: [],
+                  hints: [],
+                  solution: null,
+                  id: null,
                   customization_args: {},
                 },
                 linked_skill_id: null,
-                next_content_id_index: 0,
+                inapplicable_skill_misconception_ids: [],
               },
               question_state_data_schema_version: 0,
               language_code: '',
@@ -1417,7 +1413,7 @@ describe('Contributions and review component', () => {
         {},
         false,
         question,
-        null
+        {}
       );
       tick();
 
@@ -2989,8 +2985,10 @@ describe('Contributions and review component', () => {
             change_cmd: {
               content_html: 'Translation',
               translation_html: 'Tradução',
-            },
+            } as any,
             status: 'review',
+            author_name: 'author_1',
+            exploration_content_html: null,
           },
           details: {
             skill_description: 'skill_description',

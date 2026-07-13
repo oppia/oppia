@@ -689,30 +689,20 @@ describe('Collection player page component', () => {
 
       expect(component.closeOnClickingOutside).toHaveBeenCalled();
       expect(component.scrollToLocation).toHaveBeenCalled();
-      expect(component.explorationCardIsShown).toBeFalse();
+      expect(component.explorationCardIsShown).toBe(false);
       expect(component.activeHighlightedIconIndex).toBe(-1);
     })
   );
 
   it('should throw error if next exploration ID is not available', () => {
-    component.collectionPlaythrough = {
-      getNextExplorationId: () => null,
-      getCompletedExplorationIds: () => [],
-      getNextRecommendedCollectionNodeCount: () => 0,
-      getCompletedExplorationNodeCount: () => 0,
-    };
+    component.collectionPlaythrough = CollectionPlaythrough.create(null, []);
     expect(() => {
       component.getNextRecommendedCollectionNodes();
     }).toThrowError('No next exploration ID available');
   });
 
   it('should throw error if completed exploration IDs are not available', () => {
-    component.collectionPlaythrough = {
-      getNextExplorationId: () => null,
-      getCompletedExplorationIds: () => [],
-      getNextRecommendedCollectionNodeCount: () => 0,
-      getCompletedExplorationNodeCount: () => 0,
-    };
+    component.collectionPlaythrough = CollectionPlaythrough.create(null, []);
     expect(() => {
       component.getCompletedExplorationNodes();
     }).toThrowError('No completed exploration IDs available');
