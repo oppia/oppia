@@ -205,7 +205,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       })
     );
 
-    this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+    this.newStateNamePattern = /^[a-zA-Z0-9.\s\-]+$/;
     this.destinationChoices = [];
   }
 
