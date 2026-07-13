@@ -578,37 +578,37 @@ export class RteHelperModalComponent {
       }
       const entityType = this.pageContextService.getEntityType();
       const entityId = this.pageContextService.getEntityId();
-      if (svgFileName && entityType && entityId) {
-        this.assetsBackendApiService
-          .saveMathExpressionImage(
-            resampledFile,
-            svgFileName,
-            entityType,
-            entityId
-          )
-          .then(
-            response => {
-              const mathContentDict = {
-                raw_latex: tmpCustomizationArgs[0].value.raw_latex,
-                svg_filename: response.filename,
-              };
-              const caName = tmpCustomizationArgs[0].name;
-              customizationArgsDict[caName] = mathContentDict;
-              this.ngbActiveModal.close(customizationArgsDict);
-            },
-            errorResponse => {
-              this.alertsService.addWarning(
-                errorResponse.error || 'Error communicating with server.'
-              );
-              this.ngbActiveModal.dismiss('cancel');
-            }
-          );
-      } else {
+      if (!entityType || !entityId) {
         this.alertsService.addWarning(
           'Error: Could not retrieve entity type or entity ID.'
         );
         this.ngbActiveModal.dismiss('cancel');
+        return;
       }
+      this.assetsBackendApiService
+        .saveMathExpressionImage(
+          resampledFile,
+          svgFileName,
+          entityType,
+          entityId
+        )
+        .then(
+          response => {
+            const mathContentDict = {
+              raw_latex: tmpCustomizationArgs[0].value.raw_latex,
+              svg_filename: response.filename,
+            };
+            const caName = tmpCustomizationArgs[0].name;
+            customizationArgsDict[caName] = mathContentDict;
+            this.ngbActiveModal.close(customizationArgsDict);
+          },
+          errorResponse => {
+            this.alertsService.addWarning(
+              errorResponse.error || 'Error communicating with server.'
+            );
+            this.ngbActiveModal.dismiss('cancel');
+          }
+        );
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
