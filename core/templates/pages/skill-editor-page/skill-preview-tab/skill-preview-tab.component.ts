@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import shuffle from 'lodash/shuffle';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {Skill} from 'domain/skill/skill.model.ts';
@@ -63,6 +62,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
   QUESTION_COUNT: number = 20;
+  page: number = 1;
+  totalQuestionCount: number = 0;
   INTERACTION_TYPES = {
     ALL: 'All',
     TEXT_INPUT: 'Text Input',
@@ -91,7 +92,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       ? this.skill.getConceptCard().getExplanation().html
       : 'loading review material';
 
-    this.fetchAllQuestionsForPreview();
+    this.loadTotalQuestionCountAndPage();
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
     );
@@ -101,15 +102,29 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Fetches every question linked to this skill by paging through the
-   * results (see #23453 - previously this used a single fixed-size fetch,
-   * which silently dropped questions once a skill had more than the
-   * backend's serving cap).
+   * Fetches the total number of questions linked to this skill, then loads
+   * page 1. The total count drives ngb-pagination's page-number display
+   * (see #23453 - this replaced an earlier version that auto-fetched and
+   * concatenated every page, since the maintainers asked for visible
+   * Next/Previous page controls matching the Blog page's pagination UI
+   * instead).
    */
-  fetchAllQuestionsForPreview(
-    offset: number = 0,
-    questionsSoFar: QuestionBackendDict[] = []
-  ): void {
+  loadTotalQuestionCountAndPage(): void {
+    this.questionBackendApiService
+      .fetchTotalQuestionCountForSkillIdsAsync([this.skillId])
+      .then(totalCount => {
+        this.totalQuestionCount = totalCount;
+        this.loadPage(this.page);
+      });
+  }
+
+  /**
+   * Loads a single page (QUESTION_COUNT questions) of the skill's linked
+   * questions, using the deterministic paginated backend endpoint.
+   */
+  loadPage(page: number): void {
+    this.questionsFetched = false;
+    const offset = (page - 1) * this.QUESTION_COUNT;
     this.questionBackendApiService
       .fetchQuestionsForSkillPreviewPageAsync(
         this.skillId,
@@ -117,22 +132,29 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         offset
       )
       .then(response => {
-        const allQuestionsSoFar = questionsSoFar.concat(response.questionDicts);
-        if (response.more) {
-          this.fetchAllQuestionsForPreview(
-            offset + this.QUESTION_COUNT,
-            allQuestionsSoFar
-          );
-          return;
-        }
         this.questionsFetched = true;
-        const shuffledQuestions = shuffle(allQuestionsSoFar);
-        this.questionDicts = shuffledQuestions;
-        this.displayedQuestions = shuffledQuestions;
+        this.questionDicts = response.questionDicts;
+        this.applyFilters();
         if (this.questionDicts.length) {
           this.selectQuestionToPreview(0);
         }
       });
+  }
+
+  onPageChange(page: number): void {
+    this.page = page;
+    this.loadPage(page);
+  }
+
+  get firstQuestionOnPageNum(): number {
+    if (this.totalQuestionCount === 0) {
+      return 0;
+    }
+    return (this.page - 1) * this.QUESTION_COUNT + 1;
+  }
+
+  get lastQuestionOnPageNum(): number {
+    return Math.min(this.page * this.QUESTION_COUNT, this.totalQuestionCount);
   }
 
   initializeQuestionCard(card: StateCard): void {

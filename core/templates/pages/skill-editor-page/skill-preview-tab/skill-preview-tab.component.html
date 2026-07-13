@@ -7,23 +7,20 @@
           <div><span class="heading-secondary">Questions</span></div>
           <div *ngIf="questionsFetched">
             <div class="question-filters">
-              <input type="text"
-                     class="e2e-test-question-text-input"
-                     [(ngModel)]="questionTextFilter"
+              <input type="text" class="e2e-test-question-text-input" [(ngModel)]="questionTextFilter"
                      (change)="applyFilters()">
-              <select [(ngModel)]="interactionFilter"
-                      class="form-select"
-                      (change)="applyFilters()">
+              <select [(ngModel)]="interactionFilter" class="form-select" (change)="applyFilters()">
                 <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">
                   {{ interaction }}
                 </option>
               </select>
             </div>
-            <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item e2e-test-preview-question">
+            <div *ngFor="let question of displayedQuestions; index as idx"
+                 class="question-list-item e2e-test-preview-question">
               <div (click)="selectQuestionToPreview(idx)">
                 <div class="question-data">
                   <oppia-rte-output-display class="question-text"
-                                            [rteString]="question.question_state_data.content.html">
+                    [rteString]="question.question_state_data.content.html">
                   </oppia-rte-output-display>
                   <span *ngIf="question.question_state_data.interaction.id==='TextInput'">
                     {{"Text Input"}}
@@ -41,6 +38,24 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="question-pagination-box" *ngIf="questionsFetched && totalQuestionCount > 0">
+          <span class="question-pagination-display">
+            Displaying {{ firstQuestionOnPageNum }} - {{ lastQuestionOnPageNum }} of {{ totalQuestionCount }}
+            questions
+          </span>
+          <ngb-pagination [collectionSize]="totalQuestionCount" [(page)]="page" [maxSize]="2"
+            [pageSize]="QUESTION_COUNT" [rotate]="true" (pageChange)="onPageChange($event)" class="ms-auto me-auto">
+            <ng-template ngbPaginationPrevious>
+              <i class="fa fa-angle-left text-center w-100" aria-hidden="true"></i>
+            </ng-template>
+            <ng-template ngbPaginationNumber let-p>
+              <button class="pagination-button">{{ p }}</button>
+            </ng-template>
+            <ng-template ngbPaginationNext>
+              <i class="fa fa-angle-right text-center w-100" aria-hidden="true"></i>
+            </ng-template>
+          </ngb-pagination>
         </div>
         <div class="skill-description-box">
           <div class="skill-description">
@@ -62,8 +77,7 @@
       <div class="skill-question-container">
         <div><span class="headings">Preview</span></div>
         <div class="preview-box" *ngIf="displayCardIsInitialized">
-          <oppia-tutor-card [displayedCard]="displayedCard"
-                            [avatarImageIsShown]="false">
+          <oppia-tutor-card [displayedCard]="displayedCard" [avatarImageIsShown]="false">
           </oppia-tutor-card>
           <div *ngIf="isCurrentSupplementalCardNonEmpty() && !canWindowShowTwoCards()">
             <oppia-supplemental-card [displayedCard]="displayedCard">
@@ -181,6 +195,93 @@
     margin: 12px 0;
   }
 
+  .question-pagination-box {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  .question-pagination-display {
+    font-size: 1.17em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-link {
+    border: unset;
+    border-radius: 100%;
+    color: #333;
+    font-size: 22px;
+    font-weight: bold;
+    height: 3rem;
+    padding: 0;
+    width: 3rem;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-link:hover {
+    background-color: unset;
+    border-color: unset;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-item .page-link {
+    background: transparent;
+    border-radius: 0;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-item:last-child .page-link {
+    border-bottom-right-radius: 100%;
+    border-top-right-radius: 100%;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-item:first-child .page-link {
+    border-bottom-left-radius: 100%;
+    border-top-left-radius: 100%;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-item.active .page-link {
+    background: rgba(65, 152, 137, 0.2);
+    border-radius: 100%;
+    color: #333;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-item.disabled .page-link {
+    color: #aaa;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination ul li:last-child.page-item {
+    margin-left: 4px;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination ul li:first-child.page-item {
+    margin-right: 4px;
+  }
+
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .question-pagination-box ngb-pagination .page-item .pagination-button {
+    background: none;
+    border: none;
+    border-radius: 100%;
+    color: #333;
+    font-size: 22px;
+    font-weight: bold;
+    height: 100%;
+    justify-content: center;
+    letter-spacing: 0;
+    line-height: 25px;
+    padding: 0;
+    width: 100%;
+  }
+
   .headings {
     font-size: 30px;
     font-weight: bold;
@@ -223,7 +324,7 @@
       display: inline-block;
       height: 2px;
       width: 90%;
-   }
+    }
 
     .skill-question-container {
       margin: 0;

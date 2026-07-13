@@ -43,6 +43,7 @@ import {SkillEditorPageRootComponent} from './skill-editor-page-root.component';
 import {SkillEditorStalenessDetectionService} from './services/skill-editor-staleness-detection.service';
 import {RteHelperService} from 'services/rte-helper.service';
 import {toastrConfig} from 'pages/oppia-root/app.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -50,6 +51,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     DragDropModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
+    NgbModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

@@ -133,6 +133,10 @@ class MockQuestionBackendApiService {
       more: false,
     });
   }
+
+  async fetchTotalQuestionCountForSkillIdsAsync() {
+    return Promise.resolve(1);
+  }
 }
 
 describe('Skill Preview Tab Component', () => {
