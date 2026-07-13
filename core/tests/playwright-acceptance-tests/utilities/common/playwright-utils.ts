@@ -16,7 +16,7 @@
  * @fileoverview Utility File for Playwright Acceptance Tests.
  */
 
-import {ViewportSize} from '@playwright/test';
+import {Locator, ViewportSize} from '@playwright/test';
 import test, {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
@@ -1108,6 +1108,25 @@ export class BaseUser {
 
     showMessage(
       `Element ${elementDesc} did not stabilize within ${timeout} ms`
+    );
+  }
+
+  /**
+   * Gets select element by label and selects option by the label.
+   * @param {string} selectMenuLabel The label used for select element.
+   * @param {string} optionLabel The label used for option element.
+   */
+  async selectOption(selectMenuLabel: string, optionLabel: string) {
+    const selectElement = this.page.getByLabel(selectMenuLabel);
+    await selectElement.selectOption({label: optionLabel});
+    await expect(selectElement).toHaveValue(
+      await selectElement.evaluate(
+        (el, label) =>
+          Array.from((el as HTMLSelectElement).options).find(
+            option => option.text === label
+          )?.value ?? '',
+        optionLabel
+      )
     );
   }
 }
