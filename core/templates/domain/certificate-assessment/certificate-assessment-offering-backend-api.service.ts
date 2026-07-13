@@ -19,7 +19,10 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {CertificateAssessmentOfferingData} from './certificate-assessment-offering.model';
+import {
+  CertificateAssessmentOfferingBackendDict,
+  CertificateAssessmentOfferingData,
+} from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
@@ -59,6 +62,10 @@ interface GetCertificateOfferingBackendResponse {
   };
 }
 
+interface GetCertificateOfferingsBackendResponse {
+  certificate_offerings: CertificateAssessmentOfferingBackendDict[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -70,6 +77,55 @@ export class CertificateAssessmentOfferingBackendApiService {
       '<certificate_id>',
       certificateId
     );
+  }
+
+  async getCertificateAssessmentOfferingsAsync(): Promise<
+    CertificateAssessmentOfferingData[]
+  > {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<GetCertificateOfferingsBackendResponse>(
+          CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              response.certificate_offerings.map(
+                certificateOfferingBackendDict => {
+                  const topicData: {
+                    [topicId: string]: number;
+                  } = {};
+                  for (const topicId of certificateOfferingBackendDict.topic_ids) {
+                    topicData[topicId] = 1;
+                  }
+                  return CertificateAssessmentOfferingData.createFromBackendDict(
+                    {
+                      certificate_id:
+                        certificateOfferingBackendDict.certificate_id,
+                      title: certificateOfferingBackendDict.title,
+                      description: certificateOfferingBackendDict.description,
+                      classroom_id: certificateOfferingBackendDict.classroom_id,
+                      topic_ids: certificateOfferingBackendDict.topic_ids,
+                      topic_data: topicData,
+                      demonstrates: certificateOfferingBackendDict.demonstrates,
+                      total_questions:
+                        certificateOfferingBackendDict.total_questions,
+                      time_limit_in_minutes:
+                        certificateOfferingBackendDict.time_limit_in_minutes,
+                      async_status: certificateOfferingBackendDict.async_status,
+                      version: certificateOfferingBackendDict.version,
+                    }
+                  );
+                }
+              )
+            );
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error || errorResponse.message);
+          }
+        );
+    });
   }
 
   async getCertificateAssessmentOfferingAsync(
@@ -86,6 +142,7 @@ export class CertificateAssessmentOfferingBackendApiService {
         title: response.certificate_offering.title,
         description: response.certificate_offering.description,
         classroom_id: response.certificate_offering.classroom_id,
+        topic_ids: Object.keys(response.certificate_offering.topic_data),
         topic_data: response.certificate_offering.topic_data,
         demonstrates: response.certificate_offering.demonstrates,
         total_questions: response.certificate_offering.total_questions,

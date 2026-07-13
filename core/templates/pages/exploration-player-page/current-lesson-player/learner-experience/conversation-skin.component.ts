@@ -18,7 +18,12 @@
 
 import {Subscription} from 'rxjs';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {ChangeDetectorRef, Component, Input} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  ViewEncapsulation,
+} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
@@ -51,7 +56,6 @@ import {EditableExplorationBackendApiService} from 'domain/exploration/editable-
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
-import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -65,6 +69,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
   styleUrls: ['./conversation-skin.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;

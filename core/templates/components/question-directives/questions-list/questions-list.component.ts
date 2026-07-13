@@ -85,7 +85,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() groupedSkillSummaries!: GroupedSkillSummaries;
   @Input() selectedSkillId!: string;
   @Input() selectSkillModalIsShown!: boolean;
-  @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+  @Input() skillIdToRubricsObject!: Record<string, Rubric[]>;
   @Input() skillsCategorizedByTopics!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() skillDescriptionsAreShown!: boolean;
@@ -125,7 +125,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private ngbModal: NgbModal,
     private questionsListService: QuestionsListService,
     private questionUndoRedoService: QuestionUndoRedoService,
-    private questionValidationService: QuestionValidationService,
+    public questionValidationService: QuestionValidationService,
     private skillBackendApiService: SkillBackendApiService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private utilsService: UtilsService,

@@ -106,15 +106,15 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles')
+    os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('build', 'webpack_bundles')
+    else os.path.join('build')
 )
 # To know more about AOT visit https://angular.io/guide/glossary#aot
 FRONTEND_AOT_DIR = (
     os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('dist', 'oppia-angular-prod')
+    else os.path.join('build')
 )
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
@@ -428,6 +428,12 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 INVALID_CONTENT_ID = 'invalid_content_id'
 # The default content text for the initial state of an exploration.
 DEFAULT_STATE_CONTENT_STR = ''
+
+# Content IDs and prefixes for exploration metadata.
+EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
+EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
+EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
+EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
