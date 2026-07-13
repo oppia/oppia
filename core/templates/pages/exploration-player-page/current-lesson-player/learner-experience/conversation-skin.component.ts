@@ -67,6 +67,7 @@ import {CurrentEngineService} from 'pages/exploration-player-page/services/curre
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -92,7 +93,11 @@ export class ConversationSkinComponent {
   OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary: LearnerExplorationSummary | string | null = null;
+  collectionSummary:
+    | LearnerExplorationSummary
+    | CollectionSummaryBackendDict
+    | string
+    | null = null;
   moveToExploration: boolean = false;
 
   pidInUrl: string | null = null;
