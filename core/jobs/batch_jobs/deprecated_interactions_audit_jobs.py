@@ -24,7 +24,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Dict, Iterable, Tuple
+from typing import Dict, Iterable, List, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -103,14 +103,14 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
 
     def extract_deprecated_interactions_info(
         self, model: exp_models.ExplorationModel
-    ) -> Iterable[Tuple[str, Dict[str, Any]]]:
+    ) -> Iterable[Tuple[str, Dict[str, Union[str, List[str]]]]]:
         """Extracts deprecated interactions used in an exploration.
 
         Args:
             model: ExplorationModel. The exploration model.
 
         Yields:
-            Tuple[str, Dict[str, Any]]. A tuple of exploration_id and a dict
+            Tuple[str, Dict[str, Union[str, List[str]]]]. A tuple of exploration_id and a dict
             containing the deprecated interactions used and the last_updated time.
         """
         used_deprecated_interactions = set()
@@ -133,12 +133,13 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
             )
 
     def format_output(
-        self, grouped_data: Tuple[str, Dict[str, Iterable[Any]]]
+        self,
+        grouped_data: Tuple[str, Dict[str, Iterable[Union[str, List[str]]]]],
     ) -> Iterable[str]:
         """Formats the grouped data into a human-readable string.
 
         Args:
-            grouped_data: Tuple[str, Dict[str, Iterable[Any]]].
+            grouped_data: Tuple[str, Dict[str, Iterable[Union[str, List[str]]]]].
                 The CoGroupByKey output.
 
         Yields:
