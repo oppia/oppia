@@ -20,14 +20,96 @@
 import {StoryEditorPageConstants} from 'pages/story-editor-page/story-editor-page.constants';
 import {StoryNodeBackendDict, StoryNode} from 'domain/story/story-node.model';
 
+export interface ArcBackendDict {
+  id: string;
+  title: string;
+  description: string;
+  node_ids: string[];
+}
+
 export interface StoryContentsBackendDict {
   initial_node_id: string;
   next_node_id: string;
   nodes: StoryNodeBackendDict[];
+  arcs?: ArcBackendDict[];
 }
 
 interface NodeTitles {
   [title: string]: string;
+}
+
+export class ArcModel {
+  _id: string;
+  _title: string;
+  _description: string;
+  _nodeIds: string[];
+
+  constructor(
+    id: string,
+    title: string,
+    description: string,
+    nodeIds: string[]
+  ) {
+    this._id = id;
+    this._title = title;
+    this._description = description;
+    this._nodeIds = nodeIds;
+  }
+
+  getId(): string {
+    return this._id;
+  }
+
+  getTitle(): string {
+    return this._title;
+  }
+
+  setTitle(title: string): void {
+    this._title = title;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+
+  setDescription(description: string): void {
+    this._description = description;
+  }
+
+  getNodeIds(): string[] {
+    return this._nodeIds;
+  }
+
+  setNodeIds(nodeIds: string[]): void {
+    this._nodeIds = nodeIds;
+  }
+
+  static createNew(
+    id: string,
+    title: string,
+    description: string,
+    nodeIds: string[]
+  ): ArcModel {
+    return new ArcModel(id, title, description, nodeIds);
+  }
+
+  static createFromBackendDict(backendDict: ArcBackendDict): ArcModel {
+    return new ArcModel(
+      backendDict.id,
+      backendDict.title,
+      backendDict.description,
+      backendDict.node_ids
+    );
+  }
+
+  toBackendDict(): ArcBackendDict {
+    return {
+      id: this._id,
+      title: this._title,
+      description: this._description,
+      node_ids: this._nodeIds,
+    };
+  }
 }
 
 export class StoryContents {
@@ -37,10 +119,17 @@ export class StoryContents {
   _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
-  constructor(initialNodeId: string, nodes: StoryNode[], nextNodeId: string) {
+  _arcs: ArcModel[];
+  constructor(
+    initialNodeId: string,
+    nodes: StoryNode[],
+    nextNodeId: string,
+    arcs: ArcModel[] = []
+  ) {
     this._initialNodeId = initialNodeId;
     this._nodes = nodes;
     this._nextNodeId = nextNodeId;
+    this._arcs = arcs;
   }
 
   getIncrementedNodeId(nodeId: string): string {
@@ -65,6 +154,82 @@ export class StoryContents {
 
   getNodes(): StoryNode[] {
     return this._nodes;
+  }
+
+  getArcs(): ArcModel[] {
+    return this._arcs;
+  }
+
+  getArcIndex(arcId: string): number {
+    for (let i = 0; i < this._arcs.length; i++) {
+      if (this._arcs[i].getId() === arcId) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  addArc(arc: ArcModel): void {
+    this._arcs.push(arc);
+  }
+
+  insertArcAt(index: number, arc: ArcModel): void {
+    this._arcs.splice(index, 0, arc);
+  }
+
+  deleteArc(arcId: string): void {
+    const index = this.getArcIndex(arcId);
+    if (index === -1) {
+      throw new Error('The arc with id ' + arcId + ' does not exist');
+    }
+    this._arcs.splice(index, 1);
+  }
+
+  rearrangeArcs(arcIdsOrder: string[]): void {
+    if (arcIdsOrder.length !== this._arcs.length) {
+      throw new Error('Arc order must include each arc exactly once');
+    }
+    const oldArcs: {[id: string]: ArcModel} = {};
+    for (const arc of this._arcs) {
+      oldArcs[arc.getId()] = arc;
+    }
+    const seenArcIds = new Set<string>();
+    const newArcs: ArcModel[] = [];
+    for (const arcId of arcIdsOrder) {
+      if (seenArcIds.has(arcId)) {
+        throw new Error('Duplicate arc id in arc order: ' + arcId);
+      }
+      if (!Object.prototype.hasOwnProperty.call(oldArcs, arcId)) {
+        throw new Error('Arc with id ' + arcId + ' is not part of this story');
+      }
+      seenArcIds.add(arcId);
+      newArcs.push(oldArcs[arcId]);
+    }
+    this._arcs = newArcs;
+  }
+
+  moveNodeToArc(nodeId: string, toArcId: string, positionIndex?: number): void {
+    const targetArcIndex = this.getArcIndex(toArcId);
+    if (targetArcIndex === -1) {
+      throw new Error('Arc with id ' + toArcId + ' does not exist');
+    }
+    // Remove the node from any arc that contains it, using setNodeIds to
+    // avoid mutating copies returned by getters and ensure a single source
+    // of truth for arc node lists.
+    for (const arc of this._arcs) {
+      const nodeIds = arc.getNodeIds();
+      if (nodeIds.indexOf(nodeId) !== -1) {
+        arc.setNodeIds(nodeIds.filter(id => id !== nodeId));
+      }
+    }
+
+    const currentNodeIds = this._arcs[targetArcIndex].getNodeIds();
+    if (positionIndex !== undefined && positionIndex <= currentNodeIds.length) {
+      currentNodeIds.splice(positionIndex, 0, nodeId);
+      this._arcs[targetArcIndex].setNodeIds(currentNodeIds);
+    } else {
+      this._arcs[targetArcIndex].setNodeIds([...currentNodeIds, nodeId]);
+    }
   }
 
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
@@ -384,10 +549,18 @@ export class StoryContents {
         StoryNode.createFromBackendDict(storyContentsBackendObject.nodes[i])
       );
     }
+    var arcs = [];
+    const arcsData = storyContentsBackendObject.arcs;
+    if (arcsData) {
+      for (var i = 0; i < arcsData.length; i++) {
+        arcs.push(ArcModel.createFromBackendDict(arcsData[i]));
+      }
+    }
     return new StoryContents(
       storyContentsBackendObject.initial_node_id,
       nodes,
-      storyContentsBackendObject.next_node_id
+      storyContentsBackendObject.next_node_id,
+      arcs
     );
   }
 }

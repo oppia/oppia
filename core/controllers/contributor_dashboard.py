@@ -33,6 +33,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -82,6 +83,7 @@ class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     cursor: Optional[str]
     language_code: Optional[str]
     topic_name: Optional[str]
+    search_query: Optional[str]
 
 
 class ContributionOpportunitiesHandler(
@@ -109,6 +111,10 @@ class ContributionOpportunitiesHandler(
                 'schema': {'type': 'basestring'},
                 'default_value': None,
             },
+            'search_query': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -129,11 +135,12 @@ class ContributionOpportunitiesHandler(
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
+        search_query = self.normalized_request.get('search_query')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
-                    search_cursor
+                    search_cursor, search_query
                 )
             )
 
@@ -161,7 +168,7 @@ class ContributionOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(
-        self, cursor: Optional[str]
+        self, cursor: Optional[str], search_query: Optional[str] = None
     ) -> Tuple[List[ClientSideSkillOpportunityDict], Optional[str], bool]:
         """Returns a list of skill opportunities available for questions with
         a corresponding topic name.
@@ -170,6 +177,9 @@ class ContributionOpportunitiesHandler(
             cursor: str or None. If provided, the list of returned entities
                 starts from this datastore cursor. Otherwise, the returned
                 entities start from the beginning of the full list of entities.
+            search_query: str or None. An optional string to filter skill
+                opportunities by. It is a case-insensitive substring match
+                for skill description or topic name.
 
         Returns:
             3-tuple(opportunities, cursor, more). where:
@@ -212,23 +222,33 @@ class ContributionOpportunitiesHandler(
                     in classroom_topic_skill_id_to_topic_name
                 ):
                     skill_opportunity_dict = skill_opportunity.to_dict()
-                    client_side_skill_opportunity_dict: (
-                        ClientSideSkillOpportunityDict
-                    ) = {
-                        'id': skill_opportunity_dict['id'],
-                        'skill_description': skill_opportunity_dict[
-                            'skill_description'
-                        ],
-                        'question_count': skill_opportunity_dict[
-                            'question_count'
-                        ],
-                        'topic_name': (
-                            classroom_topic_skill_id_to_topic_name[
-                                skill_opportunity.id
-                            ]
-                        ),
-                    }
-                    opportunities.append(client_side_skill_opportunity_dict)
+                    topic_name = classroom_topic_skill_id_to_topic_name[
+                        skill_opportunity.id
+                    ]
+                    skill_description = skill_opportunity_dict[
+                        'skill_description'
+                    ]
+
+                    # We filter here in the controller rather than the service/model layer because:
+                    # 1. Datastore does not natively support case-insensitive substring matching.
+                    # 2. SkillOpportunityModel does not store topic_name, so we must fetch the
+                    #    paginated batch, map the topics, and filter them in memory.
+                    # This performs a case-insensitive match on both the skill description and topic name.
+                    if search_query is None or (
+                        search_query.lower() in skill_description.lower()
+                        or search_query.lower() in topic_name.lower()
+                    ):
+                        client_side_skill_opportunity_dict: (
+                            ClientSideSkillOpportunityDict
+                        ) = {
+                            'id': skill_opportunity_dict['id'],
+                            'skill_description': skill_description,
+                            'question_count': skill_opportunity_dict[
+                                'question_count'
+                            ],
+                            'topic_name': topic_name,
+                        }
+                        opportunities.append(client_side_skill_opportunity_dict)
             if (
                 not more
                 or len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE
@@ -652,6 +672,7 @@ class TranslatableContentsHandlerV2(
 
         entity_type = self.normalized_request['entity_type']
         entity_id = self.normalized_request['entity_id']
+        language_code = self.normalized_request['language_code']
 
         domain_object = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -669,24 +690,78 @@ class TranslatableContentsHandlerV2(
                 'Invalid entity_id: %s' % entity_id
             )
 
-        translatable_contents_collection = (
-            domain_object.get_translatable_contents_collection()
+        suggestions = []
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            suggestions = suggestion_services.get_translation_suggestions_in_review_by_exploration(
+                entity_id, language_code
+            )
+
+        entity_translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(entity_type),
+            entity_id,
+            domain_object.version,
+            language_code,
         )
 
-        translatable_contents = []
-        for (
-            content
-        ) in (
-            translatable_contents_collection.content_id_to_translatable_content.values()
-        ):
-            translatable_contents.append(
-                {
-                    'content_id': content.content_id,
-                    'content_type': content.content_type.value,
-                    'content_format': content.content_format.value,
-                    'content_value': content.content_value,
-                }
+        reviewable_language_codes = []
+        if self.user_id:
+            contribution_rights = user_services.get_user_contribution_rights(
+                self.user_id
             )
+            reviewable_language_codes = (
+                contribution_rights.can_review_translation_for_language_codes
+            )
+
+        contents_which_need_translation = (
+            domain_object.get_all_contents_which_need_translations(
+                entity_translations
+            )
+        )
+
+        content_id_to_grouping_key = {}
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            for state_name, state in domain_object.states.items():
+                translatable_contents_collection = (
+                    state.get_translatable_contents_collection()
+                )
+                for (
+                    content_id
+                ) in (
+                    translatable_contents_collection.content_id_to_translatable_content
+                ):
+                    content_id_to_grouping_key[content_id] = state_name
+
+        translatable_contents = []
+        for content in contents_which_need_translation.values():
+            # Skip list-format content if the user does not have reviewer
+            # rights for the selected language. Translating list contents
+            # (such as answer choices) requires reviewer privileges.
+            if (
+                language_code not in reviewable_language_codes
+                and content.is_data_format_list()
+            ):
+                continue
+
+            # Skip content that already has a suggestion in review to
+            # prevent duplicate translation submissions.
+            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if any(
+                    s.change_cmd.content_id == content.content_id
+                    for s in suggestions
+                ):
+                    continue
+
+            content_dict = {
+                'content_id': content.content_id,
+                'content_type': content.content_type.value,
+                'content_format': content.content_format.value,
+                'content_value': content.content_value,
+                'grouping_key': (
+                    content_id_to_grouping_key.get(content.content_id)
+                ),
+            }
+
+            translatable_contents.append(content_dict)
 
         self.values = {
             'version': domain_object.version,

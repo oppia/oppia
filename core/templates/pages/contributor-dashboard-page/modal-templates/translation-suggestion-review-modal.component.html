@@ -9,10 +9,10 @@
           aria-hidden="false">
       {{ subheading }}
     </span>
-    <span title="{{ activeContribution.details.chapter_title }}"
+    <span title="{{ chapterTitle }}"
           class="oppia-translation-modal-subheading-lesson protractor-translation-suggestion-review-subheading"
           aria-hidden="false">
-      {{ activeContribution.details.chapter_title }}
+      {{ chapterTitle }}
     </span>
     <button type="button"
             class="btn-close oppia-close-button-position"
@@ -50,7 +50,7 @@
           </li>
         </ul>
         <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
-                                  [rteString]="contentHtml"
+                                  [rteString]="contentHtmlAsString"
                                   #contentPanel>
         </oppia-rte-output-display>
       </div>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-end">
-      <div dir="auto"
+      <div [attr.dir]="'auto'"
            class="oppia-suggestion-review-panel-header-container oppia-translation-panel">
         <strong> Translation:</strong>
         <button class="btn btn-sm btn-secondary float-end"
@@ -74,7 +74,7 @@
       <div class="oppia-suggestion-review-panel oppia-content e2e-test-translated-content"
            [ngClass]="isTranslationExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #translationContainer>
-        <div dir="auto">
+        <div [attr.dir]="'auto'">
           <oppia-rte-output-display [rteString]="translationHtml"
                                     *ngIf="!startedEditing"
                                     #translationPanel>
@@ -142,7 +142,7 @@
         </li>
       </ul>
       <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
-                                [rteString]="explorationContentHtml">
+                                [rteString]="explorationContentHtmlAsString">
       </oppia-rte-output-display>
     </div>
   </section>

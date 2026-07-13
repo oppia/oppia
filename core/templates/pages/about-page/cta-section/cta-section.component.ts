@@ -16,7 +16,14 @@
  * @fileoverview Component for the CTA section on the About page.
  */
 
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -54,6 +61,7 @@ interface PartnerCtaBoxData {
   selector: 'oppia-about-cta-section',
   templateUrl: './cta-section.component.html',
   styleUrls: ['./cta-section.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class CtaSectionComponent {
   @Input() screenType!: 'desktop' | 'tablet' | 'mobile';

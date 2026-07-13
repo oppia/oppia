@@ -15,7 +15,6 @@
 /**
  * @fileoverview Module for the shared components.
  */
-import 'core-js/es7/reflect';
 import 'zone.js';
 
 // Modules.
@@ -230,6 +229,7 @@ import {CheckpointBarComponent} from './checkpoint-bar/checkpoint-bar.component'
 import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
 import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
+
 @NgModule({
   imports: [
     BackgroundBannerModule,

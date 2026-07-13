@@ -16,7 +16,7 @@
  * @fileoverview Component for the attribution guide.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {AttributionService} from 'services/attribution.service';
@@ -31,6 +31,7 @@ import './attribution-guide.component.css';
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',
   styleUrls: ['./attribution-guide.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;

@@ -17,7 +17,7 @@
  */
 
 import {DOCUMENT} from '@angular/common';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NavigationEnd, Router} from '@angular/router';
 import {AppConstants} from 'app.constants';
@@ -35,13 +35,11 @@ import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BaseContentComponent} from './base-content.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 class MockPlatformFeatureService {
   status = {
     NewLessonPlayer: {
-      isEnabled: false,
-    },
-    WebGeneralFeedbackModalEnabled: {
       isEnabled: false,
     },
   };
@@ -68,6 +66,7 @@ describe('Base Content Component', () => {
   let keyboardShortcutService: KeyboardShortcutService;
   let sidebarStatusService: SidebarStatusService;
   let cookieService: CookieService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let oldDate = Date;
 
   class MockUrlService {
@@ -178,6 +177,7 @@ describe('Base Content Component', () => {
     backgroundMaskService =
       backgroundMaskService as jasmine.SpyObj<BackgroundMaskService>;
     cookieService = TestBed.inject(CookieService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   afterEach(() => {
@@ -207,15 +207,6 @@ describe('Base Content Component', () => {
     mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
     const result = componentInstance.isNewLessonPlayerEnabled();
-    expect(result).toBe(true);
-  });
-
-  it('should return true for isWebGeneralFeedbackModalEnabled when feature is enabled', () => {
-    const preResult = componentInstance.isWebGeneralFeedbackModalEnabled();
-    expect(preResult).toBe(false);
-    mockPlatformFeatureService.status.WebGeneralFeedbackModalEnabled.isEnabled =
-      true;
-    const result = componentInstance.isWebGeneralFeedbackModalEnabled();
     expect(result).toBe(true);
   });
 
@@ -267,15 +258,6 @@ describe('Base Content Component', () => {
     );
   });
 
-  it('should dismiss the Feedback floater', () => {
-    componentInstance.dismissFeedbackFloater();
-    expect(componentInstance.isFeedbackFloaterDismissed).toBe(true);
-  });
-
-  it('should open the Feedback modal', () => {
-    expect(() => componentInstance.openFeedbackModal()).not.toThrowError();
-  });
-
   it('should show the cookie banner if there is no cookie set', () => {
     spyOn(cookieService, 'get').and.returnValue('');
     expect(componentInstance.hasAcknowledgedCookies()).toBe(false);
@@ -316,5 +298,23 @@ describe('Base Content Component', () => {
         sameSite: 'none',
       }
     );
+  });
+
+  it('should initialize isRtl and update it when language direction changes', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValues(
+      true,
+      false
+    );
+    const changeEmitter = new EventEmitter<string>();
+    spyOnProperty(
+      i18nLanguageCodeService,
+      'onI18nLanguageCodeChange'
+    ).and.returnValue(changeEmitter);
+
+    componentInstance.ngOnInit();
+    expect(componentInstance.isRtl).toBe(true);
+
+    changeEmitter.emit('en');
+    expect(componentInstance.isRtl).toBe(false);
   });
 });

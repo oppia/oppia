@@ -12,6 +12,15 @@ inputs:
     options:
       - mobile
       - desktop
+  prod-env:
+    description: "Whether to run in prod mode (adds --prod_env)."
+    required: false
+    default: "true"
+  update-snapshots:
+    description: Whether to update the snapshots instead of comparing them.
+    required: false
+    default: false
+    type: boolean
   enable-screen-recording:
     description: Whether to record the screen during the test.
     required: true
@@ -29,6 +38,24 @@ runs:
           echo "The modified suite name should contain only the following characters: letters, digits, underscore and hyphen."
           exit 1
         fi
+    - name: Clean up stale Oppia server process before rerun
+      shell: bash
+      run: |
+        for i in 1 2 3; do
+          if ! fuser 8181/tcp >/dev/null 2>&1; then
+            echo "Port 8181 is free."
+            break
+          fi
+          echo "Attempt $i: Port 8181 occupied. Killing stale process..."
+          fuser -KILL -k 8181/tcp
+          sleep 5
+        done
+
+        if fuser 8181/tcp >/dev/null 2>&1; then
+          echo "Port 8181 is still occupied after cleanup."
+          exit 1
+        fi
+        echo "Port 8181 successfully freed."
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
       shell: bash
@@ -42,7 +69,8 @@ runs:
         --skip_build
         --suite=${{ inputs.test-suite }}
         ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
-        --prod_env
+        ${{ inputs.prod-env != 'false' && '--prod_env' || '' }}
+        ${{ inputs.update-snapshots && '--update_snapshots' || '' }}
         --server_log_level=info
         | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
 
