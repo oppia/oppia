@@ -63,7 +63,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   editableUrlFragment!: string;
   subtopicPage!: SubtopicPage;
   studyGuide!: StudyGuide;
-  activeSectionIndex: number = 0;
+  activeSectionIndex: number = -1;
   allowedBgColors!: readonly string[];
 
   sections!: StudyGuideSection[];
