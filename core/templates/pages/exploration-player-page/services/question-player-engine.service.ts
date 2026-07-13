@@ -213,8 +213,6 @@ export class QuestionPlayerEngineService {
    */
   getCurrentQuestionId(): string {
     const id = this.questions[this.currentIndex].getId();
-    // GetId() returns string | null; the question player always has an ID set
-    // once questions are loaded, so this assertion is safe.
     if (id === null) {
       throw new Error('Current question ID is null.');
     }
@@ -622,8 +620,6 @@ export class QuestionPlayerEngineService {
     errorCallback?: () => void
   ): void {
     const firstQuestionId = this.questions[0].getId();
-    // GetId() returns string | null; questions always have IDs assigned before
-    // this method is called, so the non-null assertion is safe here.
     if (firstQuestionId === null) {
       throw new Error('First question ID is null.');
     }

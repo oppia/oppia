@@ -51,7 +51,7 @@ describe('Question player engine service', () => {
   let singleQuestionObject: Question;
   let multipleQuestionsObjects: Question[];
   let questionBackendApiService: QuestionBackendApiService;
-  let textInputService: TextInputRulesService;
+  let textInputService: InteractionRulesService;
 
   let questionId = 'question_id';
   let question: Question;
@@ -63,7 +63,6 @@ describe('Question player engine service', () => {
         classifier_model_id: null,
         param_changes: [],
         solicit_answer_details: false,
-        inapplicable_skill_misconception_ids: [],
         content: {
           content_id: '1',
           html: 'Question 1',
@@ -1017,5 +1016,146 @@ describe('Question player engine service', () => {
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
       }
     );
+
+    it('should show warning message if initial content id is null', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
+
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
+
+      const originalContentId =
+        singleQuestionBackendDict.question_state_data.content.content_id;
+      singleQuestionBackendDict.question_state_data.content.content_id = null;
+
+      let alertsServiceSpy = spyOn(
+        alertsService,
+        'addWarning'
+      ).and.callThrough();
+
+      try {
+        questionPlayerEngineService.init(
+          [Question.createFromBackendDict(singleQuestionBackendDict)],
+          initSuccessCb,
+          initErrorCb
+        );
+      } finally {
+        singleQuestionBackendDict.question_state_data.content.content_id =
+          originalContentId;
+      }
+
+      expect(alertsServiceSpy).toHaveBeenCalledWith(
+        'Content id should not be empty.'
+      );
+      expect(initErrorCb).toHaveBeenCalled();
+    });
+
+    it('should show warning message if next content id is null', () => {
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        Outcome.createNew('default', '', '', []),
+        1,
+        0,
+        'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
+      let alertsServiceSpy = spyOn(
+        alertsService,
+        'addWarning'
+      ).and.callThrough();
+      spyOn(expressionInterpolationService, 'processHtml').and.callFake(
+        (html, envs) => html
+      );
+
+      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
+      const originalContentId =
+        nextQuestionBackendDict.question_state_data.content.content_id;
+      nextQuestionBackendDict.question_state_data.content.content_id = null;
+
+      questionPlayerEngineService.init(
+        multipleQuestionsObjects,
+        initSuccessCb,
+        initErrorCb
+      );
+
+      try {
+        questionPlayerEngineService.submitAnswer(
+          answer,
+          textInputService,
+          submitAnswerSuccessCb
+        );
+      } finally {
+        nextQuestionBackendDict.question_state_data.content.content_id =
+          originalContentId;
+      }
+
+      expect(alertsServiceSpy).toHaveBeenCalledWith(
+        'Content id should not be empty.'
+      );
+    });
+
+    it('should return empty string if next interaction id is null', () => {
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        Outcome.createNew('default', '', '', []),
+        1,
+        0,
+        'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+
+      spyOn(
+        answerClassificationService,
+        'getMatchingClassificationResult'
+      ).and.returnValue(answerClassificationResult);
+      let createNewCardSpy = spyOn(
+        StateCard,
+        'createNewCard'
+      ).and.callThrough();
+      spyOn(expressionInterpolationService, 'processHtml').and.callFake(
+        (html, envs) => html
+      );
+
+      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
+      const originalInteractionId =
+        nextQuestionBackendDict.question_state_data.interaction.id;
+      nextQuestionBackendDict.question_state_data.interaction.id = null;
+
+      questionPlayerEngineService.init(
+        multipleQuestionsObjects,
+        initSuccessCb,
+        initErrorCb
+      );
+
+      try {
+        questionPlayerEngineService.submitAnswer(
+          answer,
+          textInputService,
+          submitAnswerSuccessCb
+        );
+      } finally {
+        nextQuestionBackendDict.question_state_data.interaction.id =
+          originalInteractionId;
+      }
+
+      expect(createNewCardSpy).toHaveBeenCalledWith(
+        'true',
+        jasmine.any(String),
+        '',
+        jasmine.any(Object),
+        jasmine.any(String)
+      );
+    });
   });
 });
