@@ -10,7 +10,7 @@
             attr.placeholder="{{getPlaceholder()}}"
             applyValidation [validators]="validators"
             (keydown)="onKeypress($event)"
-            [dir]="getLanguageDirection()"
+            [attr.dir]="getLanguageDirection()"
             rows="{{getRows()}}">
   </textarea>
 
@@ -26,7 +26,7 @@
            attr.placeholder="{{getPlaceholder()}}"
            applyValidation [validators]="validators"
            (keydown)="onKeypress($event)"
-           [dir]="getLanguageDirection()"
+           [attr.dir]="getLanguageDirection()"
            aria-label="text input">
   </span>
 
