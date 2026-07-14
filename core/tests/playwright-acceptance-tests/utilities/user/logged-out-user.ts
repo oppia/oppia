@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import {expect, Page} from '@playwright/test';
+import {errors, expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
@@ -110,6 +110,17 @@ const audioSliderSelector = 'oppia-audio-slider mat-slider';
 const playVoiceoverButton = '.e2e-test-play-circle';
 const voiceoverDropdown = '.e2e-test-audio-bar';
 const pauseVoiceoverButton = '.e2e-test-pause-circle';
+
+// Topic page.
+const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
+const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
+const practiceTabLink = '.e2e-test-practice-tab-link';
+const practiceContainer = '.e2e-test-practice-tab-container';
+const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
+const practiceSessionContainerSelector = 'practice-session-page';
+const startPracticeButtonSelector = '.e2e-test-practice-start-button';
+const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
+const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -401,6 +412,40 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Continue to next practice question
+   */
+  async continueToNextPracticeQuestion(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    await this.expectElementToBeVisible(currentCardContentSelector);
+
+    const initialHeading = await this.page.$eval(
+      practiceQuestionHeaderSelector,
+      el => el?.textContent?.trim() ?? ''
+    );
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        await this.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    await this.page.waitForFunction(
+      ({selector, heading}: {selector: string; heading: string}) => {
+        const element = document.querySelector(selector);
+        // In case of last question, the element should be hidden,
+        // else it should have different heading.
+        return !element || element.textContent?.trim() !== heading;
+      },
+      {selector: practiceQuestionHeaderSelector, heading: initialHeading},
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Expands the voiceover bar by clicking on the dropdown.
    */
   async expandVoiceoverBar(): Promise<void> {
@@ -587,6 +632,24 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expects the subtopics in the practice tab to contain the expected subtopics.
+   * @param {string[]} subtopicNames The expected subtopics.
+   */
+  async expectSubtopicListInPracticeTabToContain(
+    subtopicNames: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(subtopicListItemInPracticeTabSelector);
+    const subtopicsInList = await this.page.$$eval(
+      subtopicListItemInPracticeTabSelector,
+      subtopics => subtopics.map(subtopic => subtopic.textContent?.trim())
+    );
+
+    for (const subtopicName of subtopicNames) {
+      expect(subtopicsInList).toContain(subtopicName);
+    }
+  }
+
+  /**
    * Checks if non-interactive tab with given heading contains expected content in lesson card.
    * @param {string} tabHeading - The tab heading to check content for.
    * @param {string} tabContent - The content of tab
@@ -621,6 +684,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expects the tab title in the topic page to be the expected tab title.
+   * @param {string} expectedTabTitle The expected tab title.
+   */
+  async expectTabTitleInTopicPageToBe(expectedTabTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(tabTitleInTopicPageSelector);
+
+    await this.page.waitForFunction(
+      ({
+        selector,
+        expectedTabTitle,
+      }: {
+        selector: string;
+        expectedTabTitle: string;
+      }) => {
+        const tabTitle = document.querySelector(selector)?.textContent?.trim();
+        return tabTitle === expectedTabTitle;
+      },
+      {selector: tabTitleInTopicPageSelector, expectedTabTitle},
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Checks if the text content of an element matches the expected value.
    * @param {string} selector - The CSS selector to find the element.
    * @param {string} value - The expected text content value.
@@ -647,6 +733,15 @@ export class LoggedOutUser extends BaseUser {
         `Expected text content to be ${value}, but found ${actualTextContent}`
       );
     }
+  }
+
+  /**
+   * Verifies that the user is currently in a practice session.
+   */
+  async expectToBeInPracticeSession(): Promise<void> {
+    expect(await this.isElementVisible(practiceSessionContainerSelector)).toBe(
+      true
+    );
   }
 
   /**
@@ -982,6 +1077,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the practice tab in the topic page.
+   */
+  async navigateToPracticeTabInTopic(): Promise<void> {
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.reloadPage();
+      await this.expectElementToBeVisible(practiceTabLink);
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.expectElementToBeVisible(practiceContainer);
+    await this.expectElementToBeVisible(practiceTabButtonSelector);
+    await this.clickOnElementWithSelector(practiceTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(practiceTabContainerSelector);
+
+    showMessage('Navigated to practice tab in topic page.');
+  }
+
+  /**
    * Opens the lesson info modal.
    */
   async openLessonInfoModal(): Promise<void> {
@@ -1281,6 +1399,47 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.expectElementToBeVisible(loginPromptContainer, false);
+  }
+
+  /**
+   * Starts a practice session for the given subtopics.
+   * @param {string[]} subtopicNames - The names of the subtopics to start a practice session for.
+   */
+  async startPracticeSession(subtopicNames: string[]): Promise<void> {
+    await this.expectElementToBeVisible(subtopicListItemInPracticeTabSelector);
+
+    const subtopicElements = await this.page.$$(
+      subtopicListItemInPracticeTabSelector
+    );
+
+    const subtopicsAdded = new Set<string>();
+
+    for (const subtopicElement of subtopicElements) {
+      const subtopicName = await subtopicElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (!subtopicName) {
+        continue;
+      }
+      if (subtopicNames.includes(subtopicName)) {
+        const labelElement = await subtopicElement.$('label');
+
+        if (labelElement) {
+          await this.clickOnElement(labelElement);
+          await this.page.waitForFunction(
+            (element: HTMLInputElement | null) => element?.checked === true,
+            await labelElement.$('input'),
+            {timeout: 60000}
+          );
+
+          subtopicsAdded.add(subtopicName);
+        }
+      }
+    }
+
+    await this.expectElementToBeVisible(startPracticeButtonSelector);
+    await this.clickOnElementWithSelector(startPracticeButtonSelector);
+    await this.expectElementToBeVisible(startPracticeButtonSelector, false);
   }
 
   /**
