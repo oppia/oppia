@@ -226,9 +226,7 @@ export class SchemaBasedUnicodeEditor
   }
 
   getLanguageDirection(): string {
-    return this.uiConfig && this.uiConfig.languageDirection
-      ? this.uiConfig.languageDirection
-      : 'auto';
+    return this.uiConfig?.languageDirection ?? 'auto';
   }
 
   ngOnDestroy(): void {

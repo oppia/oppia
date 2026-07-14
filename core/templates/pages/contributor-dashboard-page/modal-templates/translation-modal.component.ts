@@ -295,7 +295,8 @@ export class TranslationModalComponent {
     }
     unicodeSchema.ui_config.languageDirection = activeLanguageDirection;
 
-    const setOfStringsSchemaItems = this.SET_OF_STRINGS_SCHEMA.items;
+    const setOfStringsSchemaItems = this.SET_OF_STRINGS_SCHEMA
+      .items as UnicodeSchema;
     if (!setOfStringsSchemaItems.ui_config) {
       setOfStringsSchemaItems.ui_config = {};
     }

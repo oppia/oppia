@@ -58,12 +58,7 @@ interface FloatSchema {
 
 export interface ListSchema {
   type: 'list';
-  // 'ui_config' is optional because it may not be present in the items schema.
-  items: (Schema | Schema[] | string) & {
-    ui_config?: {
-      languageDirection?: string;
-    };
-  };
+  items: Schema | Schema[] | string;
 }
 
 export interface DictSchema {
