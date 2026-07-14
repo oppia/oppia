@@ -204,10 +204,12 @@ test.describe('Logged-in User', function () {
     // Click on the profile menu in the navbar, then the learner dashboard.
     await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
 
-    // Use the navbar to visit the math classroom.
-    await loggedInUser.navigateToClassroomFromLearnerDashboard(
-      CLASSROOM_URL_FRAGMENT
-    );
+    // Use the navbar to visit the math classroom. The learner already has
+    // progress in this topic at this point, so it no longer appears as an
+    // "untracked" topic on the dashboard's classroom button — the navbar's
+    // Learn menu is used instead, since it's available regardless of
+    // progress state.
+    await loggedInUser.navigateToClassroomFromNavbar(CLASSROOM_NAME);
     await loggedInUser.expectToBeOnPage('learn/math');
     await loggedInUser.selectAndOpenTopic(TOPIC_NAME);
     await loggedInUser.selectChapterWithinStoryToLearn(
@@ -232,10 +234,12 @@ test.describe('Logged-in User', function () {
     // Click on the profile menu in the navbar, then the learner dashboard.
     await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
 
-    // Use the navbar to visit the math classroom.
-    await loggedInUser.navigateToClassroomFromLearnerDashboard(
-      CLASSROOM_URL_FRAGMENT
-    );
+    // Use the navbar to visit the math classroom. The learner already has
+    // progress in this topic at this point, so it no longer appears as an
+    // "untracked" topic on the dashboard's classroom button — the navbar's
+    // Learn menu is used instead, since it's available regardless of
+    // progress state.
+    await loggedInUser.navigateToClassroomFromNavbar(CLASSROOM_NAME);
     await loggedInUser.expectToBeOnPage('learn/math');
     await loggedInUser.selectAndOpenTopic(TOPIC_NAME);
     await loggedInUser.selectChapterWithinStoryToLearn(

@@ -141,6 +141,12 @@ const newGoalsListInRedesignedLearnerDashboard = '.e2e-test-new-goals-list';
 const goalCheckboxInRedesignedLearnerDashboard =
   '.oppia-learner-dash-goals-checkbox';
 
+// Top navbar "Learn" menu selectors (desktop dropdown / mobile sidebar).
+const navbarLearnMenuButton = '.e2e-test-navbar-learn-menu';
+const mobileNavbarMenuButton = '.e2e-mobile-test-navbar-button';
+const mobileLearnMenuToggle = '.e2e-mobile-test-learn';
+const classroomNavLinkSelector = '.e2e-mobile-test-classroom-link';
+
 // Learner Dashboard > Home Tab Selectors.
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
@@ -978,6 +984,28 @@ export class LoggedInUser extends BaseUser {
     if (!targetHref) {
       throw new Error(`${classroom} is not a valid classroom`);
     }
+  }
+
+  /**
+   * Navigates to a classroom using the "Learn" menu in the top navbar (or
+   * its equivalent submenu in the mobile sidebar). Unlike
+   * navigateToClassroomFromLearnerDashboard, this does not depend on the
+   * learner having no progress in the classroom's topics, since the "Learn"
+   * menu is always available regardless of progress state.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async navigateToClassroomFromNavbar(classroomName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileNavbarMenuButton);
+      await this.clickOnElementWithSelector(mobileLearnMenuToggle);
+    } else {
+      await this.clickOnElementWithSelector(navbarLearnMenuButton);
+    }
+    await this.clickOnElementWithSelectorAndText(
+      classroomNavLinkSelector,
+      classroomName
+    );
+    await this.page.waitForNavigation({waitUntil: 'networkidle'});
   }
 
   /**
