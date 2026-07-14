@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+import re
 
 from core import utils
 from core.constants import constants
@@ -301,6 +302,32 @@ class Classroom:
         )
 
     @classmethod
+    def require_valid_feedback_recipient_email(
+        cls, feedback_recipient_email: str
+    ) -> None:
+        """Checks whether the feedback recipient email is valid.
+
+        Args:
+            feedback_recipient_email: str. The email of the feedback recipient.
+        """
+        if not isinstance(feedback_recipient_email, str):
+            raise utils.ValidationError(
+                'Expected feedback_recipient_email of the classroom to be a '
+                'string, received: %s.' % feedback_recipient_email
+            )
+
+        if feedback_recipient_email == '':
+            raise utils.ValidationError(
+                'feedback_recipient_email field should not be empty'
+            )
+
+        if not re.match(constants.EMAIL_REGEX, feedback_recipient_email):
+            raise utils.ValidationError(
+                'Invalid feedback_recipient_email: %s.'
+                % feedback_recipient_email
+            )
+
+    @classmethod
     def require_valid_bg_color(cls, bg_color: str, is_thumbnail: bool) -> None:
         """Checks whether the image bg_color of the classroom is valid.
 
@@ -372,6 +399,9 @@ class Classroom:
             )
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
+        self.require_valid_feedback_recipient_email(
+            self.feedback_recipient_email
+        )
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids
         )

@@ -170,7 +170,7 @@ describe('Classroom Admin Data Service', () => {
     ).toEqual(10);
     expect(
       classroomAdminDataService.getSaveClassroomValidationErrors().length
-    ).toEqual(2);
+    ).toEqual(3);
   });
 
   it('should be able to reinitialize validation errors', () => {

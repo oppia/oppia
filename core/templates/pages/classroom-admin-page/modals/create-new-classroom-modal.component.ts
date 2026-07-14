@@ -87,6 +87,7 @@ export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
           classroom_id: res.new_classroom_id,
           name: name,
           url_fragment: urlFragment,
+          feedback_recipient_email: feedbackRecipientEmail,
         });
         this.newClassroomCreationInProgress = false;
       });

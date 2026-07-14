@@ -91,14 +91,14 @@ let dummyTopicToClassroomRelations = [
     topic_name: 'topic2',
     classroom_name: null,
     classroom_url_fragment: null,
-    feedback_recipient_email: 'user@email.com',
+    feedback_recipient_email: null,
   },
   {
     topic_id: 'topicid3',
     topic_name: 'topic3',
     classroom_name: null,
     classroom_url_fragment: null,
-    feedback_recipient_email: 'user@email.com',
+    feedback_recipient_email: null,
   },
 ];
 

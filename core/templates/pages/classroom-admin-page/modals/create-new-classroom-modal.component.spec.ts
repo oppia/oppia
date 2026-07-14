@@ -109,6 +109,7 @@ describe('Create new classroom modal', () => {
     componentInstance.ngOnInit();
     componentInstance.tempClassroom.setClassroomName('physics');
     componentInstance.tempClassroom.setUrlFragment('physics');
+    componentInstance.tempClassroom.setFeedbackEmail('user@email.com');
 
     componentInstance.createClassroom();
     tick();
@@ -117,6 +118,7 @@ describe('Create new classroom modal', () => {
       classroom_id: 'newClassroomId',
       name: 'physics',
       url_fragment: 'physics',
+      feedback_recipient_email: 'user@email.com',
     };
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(expectedDefaultClassroom);
@@ -132,6 +134,15 @@ describe('Create new classroom modal', () => {
     classroomAdminDataService.urlValidationError = 'Invalid URL fragment.';
 
     expect(componentInstance.urlValidationError).toBe('Invalid URL fragment.');
+  });
+
+  it('should return feedback recipient email validation error from the data service', () => {
+    classroomAdminDataService.feedbackRecipientEmailValidationError =
+      'Invalid Email.';
+
+    expect(componentInstance.feedbackRecipientEmailValidationError).toBe(
+      'Invalid Email.'
+    );
   });
 
   it('should delegate validateClassroom to the data service', () => {
