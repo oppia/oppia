@@ -35,6 +35,7 @@ import './feedback-table.component.css';
 @Component({
   selector: 'oppia-feedback-table',
   templateUrl: './feedback-table.component.html',
+  styleUrls: ['./feedback-table.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackTableComponent {

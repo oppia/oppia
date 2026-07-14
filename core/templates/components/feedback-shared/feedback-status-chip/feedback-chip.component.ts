@@ -29,6 +29,7 @@ import './feedback-chip.component.css';
 @Component({
   selector: 'oppia-feedback-chip',
   templateUrl: './feedback-chip.component.html',
+  styleUrls: ['./feedback-chip.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackChipComponent {

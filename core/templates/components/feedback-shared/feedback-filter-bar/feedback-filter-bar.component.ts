@@ -31,6 +31,7 @@ import './feedback-filter-bar.component.css';
 @Component({
   selector: 'oppia-feedback-filter-bar',
   templateUrl: './feedback-filter-bar.component.html',
+  styleUrls: ['./feedback-filter-bar.component.css'],
 })
 export class FeedbackFilterBarComponent {
   @Input() config!: FeedbackFilterConfig;

@@ -28,6 +28,7 @@ import './feedback-detail-page.component.css';
 @Component({
   selector: 'oppia-feedback-detail-page',
   templateUrl: './feedback-detail-page.component.html',
+  styleUrls: ['./feedback-detail-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackDetailPageComponent {

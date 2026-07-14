@@ -22,6 +22,7 @@ import './feedback-empty-state.component.css';
 @Component({
   selector: 'oppia-feedback-empty-state',
   templateUrl: './feedback-empty-state.component.html',
+  styleUrls: ['./feedback-empty-state.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackEmptyStateComponent {
