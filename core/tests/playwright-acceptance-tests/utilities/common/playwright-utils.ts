@@ -225,6 +225,26 @@ export class BaseUser {
   }
 
   /**
+   * Gets the trimmed text content of an element.
+   * @param {ElementHandle<Element>} element - The element to get text from.
+   */
+  async getTextContent(element: ElementHandle<Element>): Promise<string> {
+    const text = await element.evaluate(el => el.textContent);
+    return (text ?? '').trim();
+  }
+
+  /**
+   * Clicks an element via JavaScript, bypassing overlay/blocking issues.
+   * @param {string} selector - The CSS selector of the element to click.
+   */
+  async clickWithJavascript(selector: string): Promise<void> {
+    await this.page.evaluate((sel: string) => {
+      const el = document.querySelector(sel) as HTMLElement | null;
+      el?.click();
+    }, selector);
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {
