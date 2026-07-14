@@ -137,7 +137,6 @@ export class TechnicalFeedbackDashboardPageComponent {
   }
 
   onRowClick(feedbackId: string): void {
-    console.log('Open report:', feedbackId);
     const route =
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TECHNICAL_FEEDBACK_DETAIL.ROUTE.replace(
         ':team',

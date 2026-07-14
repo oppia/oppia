@@ -53,10 +53,7 @@ export class FeedbackTableComponent {
     return CATEGORY_LABELS[category];
   }
 
-  getSourceLabel(source: string | null): string {
-    if (!source) {
-      return '';
-    }
-    return SOURCE_LABELS[source] || source;
+  getSourceLabel(source: string): string {
+    return SOURCE_LABELS[source];
   }
 }

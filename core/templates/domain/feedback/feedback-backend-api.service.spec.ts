@@ -25,12 +25,15 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
+  ReportType,
   LessonFeedbackModel,
   PlatformFeedbackModel,
+  ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {throwError} from 'rxjs';
+import {FeedbackStatus, TechnicalTeamType} from './feedback.model';
 
 describe('Feedback backend api service', () => {
   let feedbackBackendApiService: FeedbackBackendApiService;
@@ -50,7 +53,7 @@ describe('Feedback backend api service', () => {
   });
 
   const issueReportPayload = PlatformFeedbackModel.createForSubmission({
-    source: 'lesson',
+    source: ReportType.LESSON,
     reportMessage: 'text',
     pageUrl: 'http://localhost:8181/explore/test',
     explorationContext: {
@@ -60,37 +63,40 @@ describe('Feedback backend api service', () => {
       stateIndex: 1,
       learnerCurrentAnswer: 'test',
     },
-    category: 'broken_layout_or_image',
+    category: ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE,
     includeTechnicalLogs: false,
     sessionInfo: null,
     screenshotFilename: null,
   });
 
   const filterState1 = {
-    status: 'open',
+    status: FeedbackStatus.OPEN,
+    searchText: 'test',
     dateRange: {
       start: new Date('2021-01-01'),
       end: new Date('2021-02-01'),
     },
-    technicalTeam: 'LEAP',
+    technicalTeam: TechnicalTeamType.LEAP,
   };
 
   const filterState2 = {
-    status: 'open',
+    status: FeedbackStatus.OPEN,
+    searchText: 'test',
     dateRange: {
       start: new Date('2021-01-01'),
       end: new Date('2021-02-01'),
     },
-    technicalTeam: 'CORE',
+    technicalTeam: TechnicalTeamType.CORE,
   };
 
   const filterState3 = {
-    status: 'open',
+    status: FeedbackStatus.OPEN,
+    searchText: 'test',
     dateRange: {
       start: new Date('2021-01-01'),
       end: null,
     },
-    technicalTeam: null,
+    technicalTeam: TechnicalTeamType.LEAP,
   };
 
   const detailedReportResponse = {
