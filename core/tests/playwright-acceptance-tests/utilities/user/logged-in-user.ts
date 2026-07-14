@@ -144,7 +144,6 @@ const goalCheckboxInRedesignedLearnerDashboard =
 // Top navbar "Learn" menu selectors (desktop dropdown / mobile sidebar).
 const navbarLearnMenuButton = '.e2e-test-navbar-learn-menu';
 const mobileNavbarMenuButton = '.e2e-mobile-test-navbar-button';
-const mobileLearnMenuToggle = '.e2e-mobile-test-learn';
 const classroomNavLinkSelector = '.e2e-mobile-test-classroom-link';
 
 // Learner Dashboard > Home Tab Selectors.
@@ -996,8 +995,10 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToClassroomFromNavbar(classroomName: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      // The mobile sidebar's "Learn" submenu is expanded by default, so
+      // opening the sidebar is enough — no separate toggle click is needed
+      // (and clicking the toggle would collapse it instead).
       await this.clickOnElementWithSelector(mobileNavbarMenuButton);
-      await this.clickOnElementWithSelector(mobileLearnMenuToggle);
     } else {
       await this.clickOnElementWithSelector(navbarLearnMenuButton);
     }
