@@ -49,8 +49,8 @@
   box-sizing: border-box;
   color: #212121;
   font-size: 13px;
-  padding: 6px 12px;
   outline: none;
+  padding: 6px 12px;
   width: 100%;
 }
 
@@ -94,9 +94,9 @@
 }
 
 .oppia-feedback-filter-bar-clear {
+  background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  background: #fff;
   color: #616161;
   cursor: pointer;
   font-size: 13px;

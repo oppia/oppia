@@ -24,7 +24,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {FeedbackEmptyStateComponent} from './feedback-empty-state/feedback-empty-state.component';
 import {FeedbackFilterBarComponent} from './feedback-filter-bar/feedback-filter-bar.component';
 import {FeedbackTableComponent} from './feedback-table/feedback-table.component';
-import {FeedbackStatusChipComponent} from './feedback-status-chip/feedback-status-chip.component';
+import {FeedbackChipComponent} from './feedback-status-chip/feedback-chip.component';
 import {FeedbackDetailPageComponent} from './feedback-detail-page/feedback-detail-page.component';
 
 @NgModule({
@@ -33,14 +33,14 @@ import {FeedbackDetailPageComponent} from './feedback-detail-page/feedback-detai
     FeedbackEmptyStateComponent,
     FeedbackFilterBarComponent,
     FeedbackTableComponent,
-    FeedbackStatusChipComponent,
+    FeedbackChipComponent,
     FeedbackDetailPageComponent,
   ],
   exports: [
     FeedbackEmptyStateComponent,
     FeedbackFilterBarComponent,
     FeedbackTableComponent,
-    FeedbackStatusChipComponent,
+    FeedbackChipComponent,
     FeedbackDetailPageComponent,
   ],
 })

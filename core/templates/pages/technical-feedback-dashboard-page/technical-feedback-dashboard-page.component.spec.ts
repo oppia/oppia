@@ -26,7 +26,6 @@ import {
   TechnicalTeamType,
   FeedbackFilterState,
   FeedbackStatus,
-  PlatformFeedbackBackendResponse,
 } from 'domain/feedback/feedback.model';
 import {
   ActivatedRoute,
@@ -37,13 +36,12 @@ import {
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {Location} from '@angular/common';
 import {AppConstants} from 'app.constants';
-import {BehaviorSubject, of} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
   let fixture: ComponentFixture<TechnicalFeedbackDashboardPageComponent>;
   let router: Router;
-  let activatedRoute: ActivatedRoute;
   let feedbackBackendApiService: FeedbackBackendApiService;
   let currentFilterState: FeedbackFilterState;
   let navigateSpy: jasmine.Spy;
@@ -95,7 +93,6 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     fixture = TestBed.createComponent(TechnicalFeedbackDashboardPageComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
-    activatedRoute = TestBed.inject(ActivatedRoute);
     feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
 
     currentFilterState = {

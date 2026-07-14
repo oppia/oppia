@@ -1,5 +1,5 @@
 .oppia-technical-feedback-dashboard-page {
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   display: flex;
@@ -20,8 +20,8 @@
 
 .oppia-feedback-table {
   display: flex;
-  max-height: 55vh;
   flex: 1;
+  max-height: 55vh;
 }
 
 .oppia-technical-feedback-dashboard-page .oppia-feedback-detail-card {

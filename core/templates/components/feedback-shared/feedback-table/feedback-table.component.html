@@ -16,24 +16,22 @@
             Source
           </th>
 
-          <th
-            *ngIf="feedbackCardConfig.showCategory"
-            class="oppia-feedback-table-th oppia-feedback-table-col-category">
+          <th *ngIf="feedbackCardConfig.showCategory"
+              class="oppia-feedback-table-th oppia-feedback-table-col-category">
             Category
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr
-          *ngFor="let feedback of feedbackSummaries"
-          class="oppia-feedback-table-row"
-          (click)="rowClick.emit(feedback.id)">
+        <tr *ngFor="let feedback of feedbackSummaries"
+            class="oppia-feedback-table-row"
+            (click)="rowClick.emit(feedback.id)">
 
           <td class="oppia-feedback-table-td oppia-feedback-table-col-status">
-            <oppia-feedback-status-chip
-              [status]="feedback.status">
-            </oppia-feedback-status-chip>
+            <oppia-feedback-chip [value]="feedback.status"
+                                 [type]="'status'">
+            </oppia-feedback-chip>
           </td>
 
           <td class="oppia-feedback-table-td oppia-feedback-table-col-desc">
@@ -46,11 +44,12 @@
             {{ getSourceLabel(feedback.source) }}
           </td>
 
-          <td
-            *ngIf="feedbackCardConfig.showCategory"
-            class="oppia-feedback-table-td oppia-feedback-table-col-category">
+          <td *ngIf="feedbackCardConfig.showCategory"
+              class="oppia-feedback-table-td oppia-feedback-table-col-category">
             <span class="oppia-feedback-table-chip-category">
-              {{ getCategoryLabel(feedback.category) }}
+              <oppia-feedback-chip [value]="feedback.category"
+                                   [type]="'category'">
+              </oppia-feedback-chip>
             </span>
           </td>
         </tr>
@@ -63,18 +62,16 @@
       Page {{ currentPage }}
     </span>
 
-    <button
-      class="oppia-feedback-table-pagination-btn"
-      [disabled]="currentPage <= 1"
-      (click)="previousPage.emit()">
+    <button class="oppia-feedback-table-pagination-btn"
+            [disabled]="currentPage <= 1"
+            (click)="previousPage.emit()">
       <i class="fas fa-angle-left"></i> Prev
     </button>
 
-    <button
-      class="oppia-feedback-table-pagination-btn"
-      [disabled]="!moreFeedbackAvailable"
-      (click)="nextPage.emit()">
-      Next 
+    <button class="oppia-feedback-table-pagination-btn"
+            [disabled]="!moreFeedbackAvailable"
+            (click)="nextPage.emit()">
+      Next
       <i class="fas fa-angle-right"></i>
     </button>
   </div>

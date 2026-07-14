@@ -21,19 +21,33 @@ import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {
   FeedbackStatus,
   FEEDBACK_STATUS_LABELS,
+  ReportAnIssueCategory,
+  CATEGORY_LABELS,
 } from '../../../domain/feedback/feedback.model';
-import './feedback-status-chip.component.css';
+import './feedback-chip.component.css';
 
 @Component({
-  selector: 'oppia-feedback-status-chip',
-  templateUrl: './feedback-status-chip.component.html',
+  selector: 'oppia-feedback-chip',
+  templateUrl: './feedback-chip.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FeedbackStatusChipComponent {
-  @Input() status!: FeedbackStatus;
+export class FeedbackChipComponent {
+  @Input() value!: FeedbackStatus | ReportAnIssueCategory | null;
+  @Input() type!: 'status' | 'category';
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
+  readonly categoryLabels = CATEGORY_LABELS;
+
+  get label(): string {
+    if (this.value === null) {
+      return '—';
+    }
+
+    return this.type === 'status'
+      ? this.statusLabels[this.value as FeedbackStatus]
+      : this.categoryLabels[this.value as ReportAnIssueCategory];
+  }
 
   get cssClass(): string {
-    return `oppia-feedback-status-chip-${this.status}`;
+    return `oppia-feedback-chip-${this.value ?? 'none'}`;
   }
 }
