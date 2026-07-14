@@ -264,8 +264,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             new_classroom_id,
             'chemistry',
             'chemistry',
-            'Curated chemistry foundations course.',
             'user@email.com',
+            'Curated chemistry foundations course.',
             'Teaser test for chemistry classroom',
             'Start from the basics with our first topic.',
             {
