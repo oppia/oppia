@@ -21,6 +21,8 @@ import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -1020,8 +1022,6 @@ export class ExplorationEditor extends BaseUser {
       const download = await downloadPromise;
 
       const suggestedFilename = download.suggestedFilename();
-      const fs = await import('fs');
-      const path = await import('path');
       const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
 
       if (!fs.existsSync(downloadDir)) {
