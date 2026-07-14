@@ -41,15 +41,19 @@ test.describe('Exploration Creator', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
+
     await explorationEditor.createMinimalExploration(
       'Content',
       INTERACTION_TYPES.END_EXPLORATION
     );
     await explorationEditor.saveExplorationDraft();
+
     await explorationEditor.updateCardContent('Modified version 3 ');
     await explorationEditor.saveExplorationDraft();
+
     await explorationEditor.updateCardContent('Modified version 4 ');
     await explorationEditor.saveExplorationDraft();
+
     await explorationEditor.updateCardContent('Modified version 5 ');
     await explorationEditor.saveExplorationDraft();
     await UserFactory.closeSuperAdminBrowser();
