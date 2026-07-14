@@ -25,7 +25,7 @@ import {
   QuestionBackendDict,
 } from '../../../domain/question/question.model';
 import {StateCard} from '../../../domain/state_card/state-card.model';
-import {Interaction} from '../../../domain/exploration/interaction.model';
+
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
@@ -1074,13 +1074,12 @@ describe('Question player engine service', () => {
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
         (html, envs) => html
       );
+      spyOn(Math, 'random').and.returnValue(0.999);
 
-      const originalContentIds = multipleQuestionsBackendDict.map(
-        q => q.question_state_data.content.content_id
-      );
-      for (const q of multipleQuestionsBackendDict) {
-        q.question_state_data.content.content_id = null;
-      }
+      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
+      const originalContentId =
+        nextQuestionBackendDict.question_state_data.content.content_id;
+      nextQuestionBackendDict.question_state_data.content.content_id = null;
 
       multipleQuestionsObjects = multipleQuestionsBackendDict.map(
         function (questionDict) {
@@ -1101,9 +1100,8 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
       } finally {
-        multipleQuestionsBackendDict.forEach((q, idx) => {
-          q.question_state_data.content.content_id = originalContentIds[idx];
-        });
+        nextQuestionBackendDict.question_state_data.content.content_id =
+          originalContentId;
         multipleQuestionsObjects = multipleQuestionsBackendDict.map(
           function (questionDict) {
             return Question.createFromBackendDict(questionDict);
@@ -1140,13 +1138,12 @@ describe('Question player engine service', () => {
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
         (html, envs) => html
       );
+      spyOn(Math, 'random').and.returnValue(0.999);
 
-      const originalInteractionIds = multipleQuestionsBackendDict.map(
-        q => q.question_state_data.interaction.id
-      );
-      for (const q of multipleQuestionsBackendDict) {
-        q.question_state_data.interaction.id = null;
-      }
+      const nextQuestionBackendDict = multipleQuestionsBackendDict[1];
+      const originalInteractionId =
+        nextQuestionBackendDict.question_state_data.interaction.id;
+      nextQuestionBackendDict.question_state_data.interaction.id = null;
 
       multipleQuestionsObjects = multipleQuestionsBackendDict.map(
         function (questionDict) {
@@ -1167,9 +1164,8 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
       } finally {
-        multipleQuestionsBackendDict.forEach((q, idx) => {
-          q.question_state_data.interaction.id = originalInteractionIds[idx];
-        });
+        nextQuestionBackendDict.question_state_data.interaction.id =
+          originalInteractionId;
         multipleQuestionsObjects = multipleQuestionsBackendDict.map(
           function (questionDict) {
             return Question.createFromBackendDict(questionDict);
@@ -1177,13 +1173,9 @@ describe('Question player engine service', () => {
         );
       }
 
-      expect(createNewCardSpy).toHaveBeenCalledWith(
-        'true',
-        jasmine.any(String),
-        '',
-        jasmine.any(Object),
-        jasmine.any(String)
-      );
+      expect(createNewCardSpy).toHaveBeenCalledTimes(2);
+      expect(createNewCardSpy.calls.argsFor(1)[0]).toBe('true');
+      expect(createNewCardSpy.calls.argsFor(1)[2].trim()).toBe('');
     });
   });
 });
