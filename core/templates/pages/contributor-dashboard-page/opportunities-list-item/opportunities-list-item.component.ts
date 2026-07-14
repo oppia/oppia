@@ -59,6 +59,7 @@ export class OpportunitiesListItemComponent {
   @Input() showPinUnpinButton: boolean = false;
 
   labelText!: string;
+  progressBarLabel!: string;
   labelStyle!: {'background-color': string};
   progressPercentage!: string;
   progressBarStyle!: {width: string};

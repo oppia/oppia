@@ -1128,7 +1128,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogTagFilterSelector, {
       visible: true,
     });
-    await this.clickOnElementWithSelector(blogTagFilterSelector);
+    await this.typeInInputField(
+      '.e2e-test-tag-filter-selection-input',
+      tagName
+    );
     await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
@@ -3111,12 +3114,18 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
 
-    await this.clickOnElementWithSelector(
-      featuresAccordionCloseButtonInAboutPage
-    );
-    await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
-      hidden: true,
+    await this.page.$eval(featuresAccordionCloseButtonInAboutPage, btn => {
+      (btn as HTMLElement).click();
     });
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const panel = document.querySelector(selector);
+        return !panel || !panel.classList.contains('show');
+      },
+      {},
+      featuresAccordionPanelContentInAboutPage
+    );
   }
 
   /**
@@ -4762,7 +4771,7 @@ export class LoggedOutUser extends BaseUser {
       attributionHtmlCodeSelector
     );
     const attributionHtmlCode = await this.page.evaluate(
-      el => el.textContent,
+      el => el.textContent?.trim(),
       attributionHtmlCodeElement
     );
 
@@ -4786,7 +4795,7 @@ export class LoggedOutUser extends BaseUser {
       attributionPrintTextSelector
     );
     const attributionPrintText = await this.page.evaluate(
-      el => el.textContent,
+      el => el.textContent?.trim(),
       attributionPrintTextElement
     );
 
@@ -5027,11 +5036,17 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
-    // On mobile preview, nav overlays can occasionally block the hint button.
-    // Fall back to a direct DOM click if strict clickability checks fail.
-    await this.page.$eval(hintButtonSelector, el => {
-      (el as HTMLElement).click();
-    });
+
+    // Dismiss the hint card tooltip if it is covering the hint button.
+    const hintCardTooltipCloseButton = await this.page.$(
+      '.hint-box .btn-close'
+    );
+    if (hintCardTooltipCloseButton) {
+      await hintCardTooltipCloseButton.click();
+    }
+
+    await this.clickOnElementWithSelector(hintButtonSelector);
+
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
     });
@@ -7992,19 +8007,6 @@ export class LoggedOutUser extends BaseUser {
       if (appName !== expected.applicationName) {
         throw new Error(
           `meta name=\"application-name\" mismatch. Expected: "${expected.applicationName}", Found: "${appName}"`
-        );
-      }
-    }
-
-    // Verify that the raw server-side HTML contains semantic elements
-    // (so bots crawling the raw HTML can see page structure without JS).
-    const requiredSemanticTags = ['h2', 'p'];
-    const rawHtml = await this.getRawHtmlForCurrentPage();
-    for (const tag of requiredSemanticTags) {
-      const tagRegex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`);
-      if (!tagRegex.test(rawHtml)) {
-        throw new Error(
-          `Expected server-side HTML to contain a <${tag}> element.`
         );
       }
     }

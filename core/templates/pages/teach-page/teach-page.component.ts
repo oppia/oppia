@@ -23,6 +23,7 @@ import {
   OnInit,
   Renderer2,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -36,8 +37,6 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
 import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import {AccordionPanelData} from 'pages/about-page/data.model';
-
-import './teach-page.component.css';
 
 export interface Testimonial {
   personDetails: string;
@@ -54,6 +53,7 @@ export interface Testimonial {
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
   styleUrls: ['./teach-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
