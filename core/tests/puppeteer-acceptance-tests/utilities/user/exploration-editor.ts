@@ -3952,40 +3952,10 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Returns whether a graph label matches the requested card name.
-   * Long graph labels are truncated with an ellipsis in the UI.
-   */
-  isMatchingGraphCardName(
-    displayedCardName: string,
-    requestedCardName: string
-  ): boolean {
-    return (
-      displayedCardName === requestedCardName ||
-      (displayedCardName.endsWith('...') &&
-        requestedCardName.startsWith(displayedCardName.slice(0, -3)))
-    );
-  }
-
-  /**
-   * Returns the index of a graph label matching the requested card name.
-   */
-  getGraphCardIndex(
-    displayedCardNames: string[],
-    requestedCardName: string
-  ): number {
-    return displayedCardNames.findIndex(displayedCardName =>
-      this.isMatchingGraphCardName(displayedCardName, requestedCardName)
-    );
-  }
-
-  /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
-    // Ensure we're on the editor tab where the graph is visible.
-    await this.navigateToEditorTab();
-
     let elements;
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
@@ -4021,7 +3991,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(scopedStateNodeGroupSelector);
     elements = await this.page.$$(scopedStateNodeGroupSelector);
 
-    const cardNames: string[] = await Promise.all(
+    const cardNames = await Promise.all(
       elements.map(element =>
         element.$eval(
           '.e2e-test-node-label',
@@ -4029,17 +3999,10 @@ export class ExplorationEditor extends BaseUser {
         )
       )
     );
-    const searchableCardCount = this.isViewportAtMobileWidth()
-      ? elements.length / 2
-      : elements.length;
-    const searchableCardNames = cardNames.slice(0, searchableCardCount);
-    const cardIndex = this.getGraphCardIndex(searchableCardNames, cardName);
+    const cardIndex = cardNames.indexOf(cardName);
 
     if (cardIndex === -1) {
-      throw new Error(
-        `Card name ${cardName} not found in the graph. ` +
-          `Visible graph labels: ${searchableCardNames.join(', ')}.`
-      );
+      throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
     const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
@@ -6530,17 +6493,12 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.page.waitForFunction(
-      (selector: string, requestedCardName: string) => {
+      (selector: string, value: string) => {
         const elements = document.querySelectorAll(selector);
         const cardValues = Array.from(elements).map(element =>
           element.textContent?.trim()
         );
-        return cardValues.some(
-          displayedCardName =>
-            displayedCardName === requestedCardName ||
-            (displayedCardName?.endsWith('...') &&
-              requestedCardName.startsWith(displayedCardName.slice(0, -3)))
-        );
+        return cardValues.includes(value);
       },
       {},
       stateNodeSelector,
