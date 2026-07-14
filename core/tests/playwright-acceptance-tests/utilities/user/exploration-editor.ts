@@ -981,12 +981,8 @@ export class ExplorationEditor extends BaseUser {
    * Uses Playwright's download event to reliably capture the file,
    * regardless of the download directory configuration.
    * @param {number} explorationVersion - The version of the exploration to download.
-   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
    */
-  async downloadExploration(
-    explorationVersion: number,
-    isExplorationPublished: boolean
-  ): Promise<void> {
+  async downloadExploration(explorationVersion: number): Promise<void> {
     await this.expectElementToBeVisible(historyListContent);
     const historyItems = await this.page.$$(historyListContent);
 
