@@ -42,6 +42,7 @@ import DEFAULT_OBJECT_VALUES from '../../../../../extensions/objects/object_defa
 import INTERACTION_SPECS from '../../../../../extensions/interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface SelectItem {
   type: string;
@@ -74,7 +75,7 @@ export class RuleEditorComponent
   @Input() modalId!: symbol;
 
   ruleDescriptionFragments!: RuleDescriptionFragment[];
-  currentInteractionId!: string;
+  currentInteractionId!: InteractionSpecsKey;
   ruleDescriptionChoices!: Choice[];
   isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
@@ -324,7 +325,11 @@ export class RuleEditorComponent
         }
       );
     }
-    this.currentInteractionId = this.stateInteractionIdService.savedMemento;
+    const currentInteractionId = this.stateInteractionIdService.savedMemento;
+    if (currentInteractionId === null) {
+      throw new Error('Cannot load rule editor without interaction.');
+    }
+    this.currentInteractionId = currentInteractionId;
     this.editRuleForm = {};
     // Select a default rule type, if one isn't already selected.
     if (this.rule.type === null) {

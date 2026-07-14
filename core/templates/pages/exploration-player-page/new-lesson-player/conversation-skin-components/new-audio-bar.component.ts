@@ -21,8 +21,8 @@ import {
   Component,
   ElementRef,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
-import './new-audio-bar.component.css';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
@@ -42,6 +42,7 @@ import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-m
   selector: 'oppia-new-audio-bar',
   templateUrl: './new-audio-bar.component.html',
   styleUrls: ['./new-audio-bar.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class NewAudioBarComponent {
   @ViewChild('audioControls', {static: false}) audioControlsRef!: ElementRef;

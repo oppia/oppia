@@ -70,6 +70,7 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {AppConstants} from 'app.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -341,7 +342,10 @@ export class ExplorationStatesService {
     stateName: string,
     backendName: 'param_changes'
   ): ParamChange[];
-  getStatePropertyMemento(stateName: string, backendName: 'widget_id'): string;
+  getStatePropertyMemento(
+    stateName: string,
+    backendName: 'widget_id'
+  ): InteractionSpecsKey | null;
   getStatePropertyMemento(
     stateName: string,
     backendName: 'widget_customization_args'
@@ -422,7 +426,7 @@ export class ExplorationStatesService {
   saveStateProperty(
     stateName: string,
     backendName: 'widget_id',
-    newValue: string | null
+    newValue: InteractionSpecsKey | null
   ): void;
   saveStateProperty(
     stateName: string,
@@ -665,11 +669,14 @@ export class ExplorationStatesService {
     this.saveStateProperty(stateName, 'param_changes', newParamChanges);
   }
 
-  getInteractionIdMemento(stateName: string): string {
+  getInteractionIdMemento(stateName: string): InteractionSpecsKey | null {
     return this.getStatePropertyMemento(stateName, 'widget_id');
   }
 
-  saveInteractionId(stateName: string, newInteractionId: string | null): void {
+  saveInteractionId(
+    stateName: string,
+    newInteractionId: InteractionSpecsKey | null
+  ): void {
     this.saveStateProperty(stateName, 'widget_id', newInteractionId);
     this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._getStates().getState(stateName));
