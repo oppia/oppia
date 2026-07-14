@@ -1955,6 +1955,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     def test_pre_accept_validate_metadata_content_id(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict.copy()
+        expected_suggestion_dict['language_code'] = 'ak'
         expected_suggestion_dict['change_cmd'] = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
