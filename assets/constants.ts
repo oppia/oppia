@@ -6605,13 +6605,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned from your classroom."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned from your classroom."
         }
       ]
     },

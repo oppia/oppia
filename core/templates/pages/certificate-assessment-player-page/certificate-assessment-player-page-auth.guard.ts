@@ -39,6 +39,14 @@ export class CertificateAssessmentPlayerPageAuthGuard implements CanActivate {
     private location: Location
   ) {}
 
+  //  Returns true if the EnableCertificateAssessment feature flag is
+  //  enabled, allowing navigation to proceed to the requested route.
+
+  //  Returns false if the feature flag is disabled. In this case the user
+  //  is redirected to the 404 page and the browser URL is replaced with
+  //  the originally requested state.url, so that navigation to the
+  //  disabled route is blocked and does not appear in browser history.
+
   async canActivate(
     _route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot

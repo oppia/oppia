@@ -24,4 +24,8 @@ import {Component, EventEmitter, Output} from '@angular/core';
 })
 export class AssessmentInstructionPanelComponent {
   @Output() startAssessment = new EventEmitter<void>();
+
+  onStartAssessment(): void {
+    this.startAssessment.emit();
+  }
 }

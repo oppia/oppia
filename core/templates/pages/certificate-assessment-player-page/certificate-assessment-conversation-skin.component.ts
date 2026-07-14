@@ -35,4 +35,12 @@ export class CertificateAssessmentConversationSkinComponent {
   @Input() isLastQuestion = false;
   @Output() nextQuestion = new EventEmitter<void>();
   @Output() submitAssessment = new EventEmitter<void>();
+
+  onNextQuestion(): void {
+    this.nextQuestion.emit();
+  }
+
+  onSubmitAssessment(): void {
+    this.submitAssessment.emit();
+  }
 }
