@@ -19,7 +19,8 @@
 import {Page, ElementHandle, expect} from '@playwright/test';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {TopicManager} from './topic-manager';
+import { BaseUser } from '../common/playwright-utils';
+
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -196,7 +197,7 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
-export class CurriculumAdmin extends TopicManager {
+export class CurriculumAdmin extends BaseUser {
   /**
    * Create a basic algebra question in the skill editor page.
    * @param {string} skillName The name of the skill to which the question will be added.
@@ -419,6 +420,8 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.keyboard.press('Tab');
     await this.saveStoryDraft();
 
+    
+
     const url = new URL(this.page.url());
     const pathSegments = url.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
@@ -426,6 +429,8 @@ export class CurriculumAdmin extends TopicManager {
     await this.waitForNetworkIdle();
 
     return storyId;
+
+    
   }
 
   /**
@@ -707,7 +712,9 @@ export class CurriculumAdmin extends TopicManager {
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(subtopicReassignHeader);
+      const reassignHeader = this.page.locator(subtopicReassignHeader).first();
+      await reassignHeader.waitFor({ state: 'attached' });
+      await reassignHeader.evaluate(node => (node as HTMLElement).click());
     }
     await this.expectElementToBeVisible(addSkillButton);
     await this.clickOnElementWithSelector(addSkillButton);
@@ -802,8 +809,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeAttachedInDOM('.e2e-test-topics-table');
     await this.openTopicEditor(name);
     await this.expectElementToBeVisible(topicMetaTagInput);
-    await this.page.focus(topicMetaTagInput);
-    await this.typeInInputField(topicMetaTagInput, 'meta');
+    await this.page.locator(topicMetaTagInput).fill('meta', { force: true });
     await this.page.keyboard.press('Tab');
     await this.saveTopicDraft(name);
     const topicUrl = this.page.url();
@@ -966,7 +972,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(skillsTab);
     await this.expectElementToBeVisible(skillSelector);
-    await this.clickOnElementWithSelectorAndText(skillSelector, skillName);
+    await this.page.locator(skillSelector, { hasText: skillName }).first().click();
     await this.expectElementToBeVisible(skillEditorCollapsibleCard);
 
     expect(this.page.url()).toContain('/skill_editor/');
