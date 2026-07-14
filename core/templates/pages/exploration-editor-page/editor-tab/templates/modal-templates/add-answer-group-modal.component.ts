@@ -44,6 +44,10 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {Outcome} from 'domain/exploration/outcome.model';
+import {
+  SubtitledHtmlBackendDict,
+  SubtitledHtml,
+} from 'domain/exploration/subtitled-html.model';
 import {AppConstants} from 'app.constants';
 import {EditabilityService} from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
@@ -53,6 +57,11 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 interface TaggedMisconception {
   skillId: string | null;
   misconceptionId: number;
+}
+
+interface MisconceptionOutcome {
+  feedback: SubtitledHtmlBackendDict;
+  labelledAsCorrect: boolean;
 }
 
 interface DestValidation {
@@ -92,6 +101,13 @@ export class AddAnswerGroupModalComponent
   isInvalid: boolean = false;
   validation: boolean = false;
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
+
+  get misconceptionOutcome(): MisconceptionOutcome {
+    return {
+      feedback: this.tmpOutcome.feedback.toBackendDict(),
+      labelledAsCorrect: this.tmpOutcome.labelledAsCorrect,
+    };
+  }
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -212,9 +228,11 @@ export class AddAnswerGroupModalComponent
       this.platformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled;
   }
 
-  updateAnswerGroupFeedback(outcome: Outcome): void {
+  updateAnswerGroupFeedback(outcome: MisconceptionOutcome): void {
     this.openFeedbackEditor();
-    this.tmpOutcome.feedback = outcome.feedback;
+    this.tmpOutcome.feedback = SubtitledHtml.createFromBackendDict(
+      outcome.feedback
+    );
   }
 
   ngAfterViewInit(): void {
