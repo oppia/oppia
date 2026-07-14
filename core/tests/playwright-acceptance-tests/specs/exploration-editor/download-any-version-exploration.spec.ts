@@ -31,7 +31,6 @@ test.describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(6000000);
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com',
