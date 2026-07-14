@@ -61,8 +61,8 @@ test.describe('Exploration Creator', function () {
     // Before publishing, the Exploration zip file name would be
     // oppia-unpublished_exploration-v{versionNumber}.zip or
     // oppia-unpublished_exploration-v{versionNumber} (numberOfDownloadsSameFile).zip.
-    await explorationEditor.downloadExploration(5, false);
-    await explorationEditor.downloadExploration(2, false);
+    await explorationEditor.downloadExploration(5);
+    await explorationEditor.downloadExploration(2);
 
     // Navigate back to the editor tab before publishing, otherwise the
     // history tab content blocks the publish button on mobile.
@@ -81,8 +81,8 @@ test.describe('Exploration Creator', function () {
     // After publishing, the Exploration zip file name would be
     // oppia-{explorationTitle}-v{versionNumber}.zip or
     // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip.
-    await explorationEditor.downloadExploration(5, true);
-    await explorationEditor.downloadExploration(2, true);
+    await explorationEditor.downloadExploration(5);
+    await explorationEditor.downloadExploration(2);
   });
 
   test.afterAll(async function () {

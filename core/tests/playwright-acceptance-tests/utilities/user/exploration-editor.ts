@@ -989,23 +989,19 @@ export class ExplorationEditor extends BaseUser {
     const historyItems = await this.page.$$(historyListContent);
 
     for (const historyItem of historyItems) {
-      const versionNumberElement = await historyItem.$(historyTableIndex);
-      if (!versionNumberElement) {
-        continue;
-      }
-      const versionText = await versionNumberElement.evaluate(
-        el => el.textContent
+      const versionNumberElement = await this.getElementInParent(
+        historyTableIndex,
+        historyItem
       );
+      const versionText = await this.getTextContent(versionNumberElement);
       if (parseInt(versionText ?? '', 10) !== explorationVersion) {
         continue;
       }
 
-      const dropdownButton = await historyItem.$(historyListOptions);
-      if (!dropdownButton) {
-        throw new Error(
-          `Dropdown button not found for version ${explorationVersion}`
-        );
-      }
+      const dropdownButton = await this.getElementInParent(
+        historyListOptions,
+        historyItem
+      );
       await dropdownButton.evaluate(el => (el as HTMLElement).click());
       await this.page.waitForTimeout(1000);
 
@@ -1045,10 +1041,7 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       // On mobile, history table items may block the navbar dropdown click.
       // Use a direct JavaScript click to bypass the blocking element.
-      await this.page.evaluate((selector: string) => {
-        const el = document.querySelector(selector) as HTMLElement | null;
-        el?.click();
-      }, mobileNavbarDropdown);
+      await this.clickWithJavascript(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileMainTabButton);
       await this.clickOnElementWithSelector(mobileMainTabButton);
     } else {
