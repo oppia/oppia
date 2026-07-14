@@ -1328,6 +1328,7 @@
   "I18N_SKILL_LEVEL_INTERMIDIATE": "متوسط",
   "I18N_SKILL_LEVEL_NEEDS_WORK": "بحاجة إلى التطوير",
   "I18N_SKILL_LEVEL_PROFICIENT": "متقدم",
+  "I18N_SKILL_PREVIEW_TAB_QUESTIONS_NUMBER_DISPLAY": "عرض <[startingNumber]> - <[endingNumber]> من <[totalNumber]> أسئلة",
   "I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK": "حسنا، دعنا الآن نعود إلى إجابتك.",
   "I18N_SOLICIT_ANSWER_DETAILS_QUESTION": "هل يمكن أن توضح لماذا اخترت هذه الإجابة؟",
   "I18N_SOLUTION_EXPLANATION_TITLE": "الشرح:",

@@ -1389,6 +1389,7 @@
     "I18N_SKILL_LEVEL_INTERMIDIATE": "Intermediate",
     "I18N_SKILL_LEVEL_NEEDS_WORK": "Needs Work",
     "I18N_SKILL_LEVEL_PROFICIENT": "Proficient",
+    "I18N_SKILL_PREVIEW_TAB_QUESTIONS_NUMBER_DISPLAY": "Displaying <[startingNumber]> - <[endingNumber]> of <[totalNumber]> questions",
     "I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK": "Okay, now let's go back to your answer.",
     "I18N_SOLICIT_ANSWER_DETAILS_QUESTION": "Could you explain why you picked this answer?",
     "I18N_SOLUTION_EXPLANATION_TITLE": "Explanation:",

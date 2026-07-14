@@ -40,9 +40,8 @@
           </div>
         </div>
         <div class="question-pagination-box" *ngIf="questionsFetched && totalQuestionCount > 0">
-          <span class="question-pagination-display">
-            Displaying {{ firstQuestionOnPageNum }} - {{ lastQuestionOnPageNum }} of {{ totalQuestionCount }}
-            questions
+          <span class="question-pagination-display"
+            [innerHTML]="'I18N_SKILL_PREVIEW_TAB_QUESTIONS_NUMBER_DISPLAY' | translate: { startingNumber: firstQuestionOnPageNum, endingNumber: lastQuestionOnPageNum, totalNumber: totalQuestionCount }">
           </span>
           <ngb-pagination [collectionSize]="totalQuestionCount" [(page)]="page" [maxSize]="2"
             [pageSize]="QUESTION_COUNT" [rotate]="true" (pageChange)="onPageChange($event)" class="ms-auto me-auto">
