@@ -116,5 +116,24 @@ describe('Subtopic data object factory', () => {
         );
       }).toThrowError('Neither sections nor page_contents provided.');
     });
+
+    it('should NOT throw error if sections is provided but pageContents is null', function () {
+      var sampleSubtopicDataBackendDictWithSectionsOnly = {
+        topic_id: 'topic_id',
+        topic_name: 'topic',
+        next_subtopic_dict: null,
+        prev_subtopic_dict: null,
+        subtopic_title: 'sample_title',
+        current_subtopic_id: 1,
+        sections: [],
+        page_contents: null,
+      };
+
+      var result = ReadOnlySubtopicPageData.createFromBackendDict(
+        sampleSubtopicDataBackendDictWithSectionsOnly
+      );
+      expect(result.getSections()).toEqual([]);
+      expect(result.getPageContents()).toEqual(null);
+    });
   });
 });

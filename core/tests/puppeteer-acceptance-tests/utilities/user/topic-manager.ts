@@ -2996,6 +2996,13 @@ export class TopicManager extends BaseUser {
       await this.page.type(subtopicUrlFragmentField, urlFragment);
     }
 
+    // If the study guide has multiple sections, we need to expand the first section
+    // before we can edit its content.
+    const firstSectionSelector = '.e2e-test-study-guide-section-0';
+    if (await this.page.$(firstSectionSelector)) {
+      await this.clickOnElementWithSelector(firstSectionSelector);
+    }
+
     await this.clickOnElementWithSelector(editSubtopicExplanationSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.clearAllTextFrom(richTextAreaField);

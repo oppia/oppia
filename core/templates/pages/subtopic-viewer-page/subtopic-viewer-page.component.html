@@ -6,8 +6,8 @@
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
     </button>
   </div>
-  <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitle }}</p>
-  <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
+  <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title oppia-subtopic-title">{{ subtopicTitle }}</p>
+  <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title oppia-subtopic-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
     <div class="content">
       <div class="card" *ngFor="let section of sections">
