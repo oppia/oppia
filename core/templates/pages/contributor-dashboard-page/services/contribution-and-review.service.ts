@@ -263,6 +263,16 @@ export class ContributionAndReviewService {
       );
       sortedTranslationCards.push(...cardsForState);
     }
+
+    const genericCards =
+      translationSuggestionsByState.get(
+        AppConstants.DEFAULT_SUGGESTION_STATE_NAME
+      ) || [];
+    genericCards.sort(
+      ContributionAndReviewService.compareTranslationSuggestions
+    );
+    sortedTranslationCards.push(...genericCards);
+
     return sortedTranslationCards;
   }
 

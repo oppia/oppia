@@ -824,11 +824,29 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         self.validate()
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        if self.change_cmd.state_name not in exploration.states:
-            raise utils.ValidationError(
-                'Expected %s to be a valid state name'
-                % self.change_cmd.state_name
+        if (
+            self.change_cmd.state_name
+            == constants.DEFAULT_SUGGESTION_STATE_NAME
+        ):
+            translatable_contents = (
+                exploration.get_translatable_contents_collection(
+                    override_metadata_feature_flag=True
+                )
             )
+            if (
+                self.change_cmd.content_id
+                not in translatable_contents.content_id_to_translatable_content
+            ):
+                raise utils.ValidationError(
+                    'Expected %s to be a valid metadata content ID'
+                    % self.change_cmd.content_id
+                )
+        else:
+            if self.change_cmd.state_name not in exploration.states:
+                raise utils.ValidationError(
+                    'Expected %s to be a valid state name'
+                    % self.change_cmd.state_name
+                )
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""

@@ -2428,19 +2428,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def get_content_html(
         self, state_name: str, content_id: str
     ) -> Union[str, List[str]]:
-        """Return the content for a given content id of a state.
+        """Return the content for a given content id of a state or metadata.
 
         Args:
             state_name: str. The name of the state.
             content_id: str. The id of the content.
 
         Returns:
-            str. The html content corresponding to the given content id of a
-            state.
+            str. The html content corresponding to the given content id.
 
         Raises:
             ValueError. The given state_name does not exist.
         """
+        if content_id.startswith('exploration_'):
+            translatable_contents = self.get_translatable_contents_collection(
+                override_metadata_feature_flag=True
+            )
+            if (
+                content_id
+                in translatable_contents.content_id_to_translatable_content
+            ):
+                return translatable_contents.content_id_to_translatable_content[
+                    content_id
+                ].content_value
+
         if state_name not in self.states:
             raise ValueError('State %s does not exist' % state_name)
 
