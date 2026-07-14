@@ -104,4 +104,28 @@ describe('CertificateAssessmentPlayerPageAuthGuard', () => {
       '/certificate-assessment/cert-1'
     );
   }));
+
+  it('should replace state via the catch block when router.navigate rejects', fakeAsync(() => {
+    platformFeatureService.status.EnableCertificateAssessment.isEnabled = false;
+    router.navigate.and.rejectWith(new Error('Navigation failed'));
+
+    let result = true;
+    guard
+      .canActivate(
+        {} as never,
+        {url: '/certificate-assessment/cert-1'} as never
+      )
+      .then(value => {
+        result = value;
+      });
+    tick();
+
+    expect(result).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
+    expect(location.replaceState).toHaveBeenCalledWith(
+      '/certificate-assessment/cert-1'
+    );
+  }));
 });

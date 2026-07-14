@@ -26,25 +26,30 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let fixture: ComponentFixture<CertificateAssessmentPlayerPageComponent>;
   let router: Router;
 
-  beforeEach(async () => {
+  const activatedRouteStub = (routePath: string | null) => ({
+    snapshot: {
+      paramMap: {
+        get: (name: string) => {
+          if (name === 'certificate_id') {
+            return 'cert-123';
+          }
+          return null;
+        },
+      },
+      url: routePath ? [{path: routePath}] : [],
+    },
+  });
+
+  const configureComponent = async (
+    routePath: string | null
+  ): Promise<void> => {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [CertificateAssessmentPlayerPageComponent],
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: (name: string) => {
-                  if (name === 'certificate_id') {
-                    return 'cert-123';
-                  }
-                  return null;
-                },
-              },
-              url: [],
-            },
-          },
+          useValue: activatedRouteStub(routePath),
         },
         {
           provide: Router,
@@ -59,6 +64,10 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     fixture = TestBed.createComponent(CertificateAssessmentPlayerPageComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
+  };
+
+  beforeEach(async () => {
+    await configureComponent(null);
   });
 
   it('should initialize intro stage for the base route', () => {
@@ -66,6 +75,18 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
     expect(component.certificateId).toBe('cert-123');
     expect(component.currentStage).toBe('intro');
+  });
+
+  it('should set current stage to questions when route is session', async () => {
+    await configureComponent('session');
+    fixture.detectChanges();
+    expect(component.currentStage).toBe('questions');
+  });
+
+  it('should set current stage to result when route is result', async () => {
+    await configureComponent('result');
+    fixture.detectChanges();
+    expect(component.currentStage).toBe('result');
   });
 
   it('should navigate to the session route on startAssessment', () => {
@@ -88,5 +109,52 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
       '/certificate-assessment/cert-123/result',
       'attempt-1234',
     ]);
+  });
+
+  it('should switch to the instructions stage on showInstructions', () => {
+    fixture.detectChanges();
+    expect(component.currentStage).toBe('intro');
+
+    component.showInstructions();
+
+    expect(component.currentStage).toBe('instructions');
+  });
+
+  it('should advance to the next question on nextQuestion when not at the last question', () => {
+    fixture.detectChanges();
+    expect(component.currentQuestionIndex).toBe(0);
+
+    component.nextQuestion();
+
+    expect(component.currentQuestionIndex).toBe(1);
+  });
+
+  it('should not advance past the last question on nextQuestion', () => {
+    fixture.detectChanges();
+    component.currentQuestionIndex = component.mockQuestions.length - 1;
+
+    component.nextQuestion();
+
+    expect(component.currentQuestionIndex).toBe(
+      component.mockQuestions.length - 1
+    );
+  });
+
+  it('should compute the progress percentage based on the current question index', () => {
+    fixture.detectChanges();
+    component.currentQuestionIndex = 0;
+    expect(component.getProgressPercentage()).toBe(
+      Math.round((1 / component.mockQuestions.length) * 100)
+    );
+
+    component.currentQuestionIndex = component.mockQuestions.length - 1;
+    expect(component.getProgressPercentage()).toBe(100);
+  });
+
+  it('should return the question at the current question index', () => {
+    fixture.detectChanges();
+    component.currentQuestionIndex = 1;
+
+    expect(component.getCurrentQuestion()).toEqual(component.mockQuestions[1]);
   });
 });
