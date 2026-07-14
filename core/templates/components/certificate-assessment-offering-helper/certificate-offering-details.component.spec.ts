@@ -74,12 +74,15 @@ describe('Certificate Offering Details Component', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(CertificateOfferingDetailsComponent);
     component = fixture.componentInstance;
     component.certificateAssessmentOffering =
       CertificateAssessmentOfferingData.createEmpty();
     fixture.detectChanges();
+    // Wait for the loadClassrooms() call triggered by ngOnInit to settle so
+    // it cannot race with a second loadClassrooms() call made in a test.
+    await fixture.whenStable();
   });
 
   it('should load classroom options on init', async () => {
