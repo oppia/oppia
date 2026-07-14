@@ -24,6 +24,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {Collection} from 'domain/collection/collection.model';
 import {UrlService} from 'services/contextual/url.service';
 import {PageTitleService} from 'services/page-title.service';
+import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {CollectionEditorPageComponent} from './collection-editor-page.component';
 import {CollectionEditorRoutingService} from './services/collection-editor-routing.service';
 import {CollectionEditorStateService} from './services/collection-editor-state.service';
@@ -44,6 +45,7 @@ describe('Collection editor page component', () => {
   let pageTitleService: PageTitleService;
   let urlService: UrlService;
   let translateService: TranslateService;
+  let bottomNavbarStatusService: BottomNavbarStatusService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -54,6 +56,7 @@ describe('Collection editor page component', () => {
         CollectionEditorStateService,
         PageTitleService,
         UrlService,
+        BottomNavbarStatusService,
         {
           provide: TranslateService,
           useClass: MockTranslateService,
@@ -73,6 +76,7 @@ describe('Collection editor page component', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     urlService = TestBed.inject(UrlService);
     translateService = TestBed.inject(TranslateService);
+    bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
   });
 
   afterEach(() => {
@@ -87,6 +91,7 @@ describe('Collection editor page component', () => {
       collectionEditorStateService,
       'onCollectionInitialized'
     ).and.returnValue(mockOnCollectionInitializedEventEmitter);
+    spyOn(bottomNavbarStatusService, 'markBottomNavbarStatus');
     spyOn(collectionEditorStateService, 'loadCollection');
     spyOn(componentInstance, 'setTitle');
     spyOn(componentInstance, 'subscribeToOnLangChange');
@@ -98,6 +103,7 @@ describe('Collection editor page component', () => {
     mockOnCollectionInitializedEventEmitter.emit();
     fixture.detectChanges();
 
+    expect(bottomNavbarStatusService.markBottomNavbarStatus).toHaveBeenCalledWith(true);
     expect(componentInstance.setTitle).toHaveBeenCalled();
     expect(componentInstance.subscribeToOnLangChange).toHaveBeenCalled();
     expect(collectionEditorStateService.loadCollection).toHaveBeenCalledWith(
