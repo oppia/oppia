@@ -116,12 +116,12 @@ describe('Voiceover player service', () => {
   it('should be able to get active voiceovers', () => {
     voiceoverPlayerService.activeVoiceover = manualVoiceover;
 
-    expect(voiceoverPlayerService.getActiveVoiceover()!.filename).toEqual(
+    expect((voiceoverPlayerService.getActiveVoiceover() as Voiceover).filename).toEqual(
       'a.mp3'
     );
 
     manualVoiceover.filename = 'b.mp3';
-    expect(voiceoverPlayerService.getActiveVoiceover()!.filename).toEqual(
+    expect((voiceoverPlayerService.getActiveVoiceover() as Voiceover).filename).toEqual(
       'b.mp3'
     );
   });
