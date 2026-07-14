@@ -499,9 +499,13 @@ describe('Release coordinator page feature tab', function () {
           last_updated: '08/17/2023, 15:30:45:123456',
         });
 
-        expect(component.getLastUpdatedDate({...featureFlag, searchQuery: '', filteredUserGroups: []})).toEqual(
-          'Aug 17, 2023'
-        );
+        expect(
+          component.getLastUpdatedDate({
+            ...featureFlag,
+            searchQuery: '',
+            filteredUserGroups: [],
+          })
+        ).toEqual('Aug 17, 2023');
       }
     );
   });
@@ -523,9 +527,13 @@ describe('Release coordinator page feature tab', function () {
         user_group_ids: [],
         last_updated: null,
       });
-      expect(component.getFeatureStageString({...featureFlagTestStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)).toBe(
-        'Test (can only be enabled on dev and test server).'
-      );
+      expect(
+        component.getFeatureStageString({
+          ...featureFlagTestStage,
+          searchQuery: '',
+          filteredUserGroups: [],
+        } as FeatureFlagViewModel)
+      ).toBe('Test (can only be enabled on dev and test server).');
     });
 
     it('should return text for prod feature stage', () => {
@@ -538,9 +546,13 @@ describe('Release coordinator page feature tab', function () {
         user_group_ids: [],
         last_updated: null,
       });
-      expect(component.getFeatureStageString({...featureFlagProdStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)).toBe(
-        'Prod (can only be enabled on dev, test and prod server).'
-      );
+      expect(
+        component.getFeatureStageString({
+          ...featureFlagProdStage,
+          searchQuery: '',
+          filteredUserGroups: [],
+        } as FeatureFlagViewModel)
+      ).toBe('Prod (can only be enabled on dev, test and prod server).');
     });
   });
 
@@ -576,7 +588,11 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'dev';
 
         expect(
-          component.getFeatureValidOnCurrentServer({...featureFlagDevStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)
+          component.getFeatureValidOnCurrentServer({
+            ...featureFlagDevStage,
+            searchQuery: '',
+            filteredUserGroups: [],
+          } as FeatureFlagViewModel)
         ).toBe(true);
       }
     );
@@ -588,7 +604,11 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'test';
 
         expect(
-          component.getFeatureValidOnCurrentServer({...featureFlagDevStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)
+          component.getFeatureValidOnCurrentServer({
+            ...featureFlagDevStage,
+            searchQuery: '',
+            filteredUserGroups: [],
+          } as FeatureFlagViewModel)
         ).toBe(false);
       }
     );
@@ -600,7 +620,11 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'test';
 
         expect(
-          component.getFeatureValidOnCurrentServer({...featureFlagProdStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)
+          component.getFeatureValidOnCurrentServer({
+            ...featureFlagProdStage,
+            searchQuery: '',
+            filteredUserGroups: [],
+          } as FeatureFlagViewModel)
         ).toBe(true);
       }
     );
@@ -612,7 +636,11 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'prod';
 
         expect(
-          component.getFeatureValidOnCurrentServer({...featureFlagProdStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)
+          component.getFeatureValidOnCurrentServer({
+            ...featureFlagProdStage,
+            searchQuery: '',
+            filteredUserGroups: [],
+          } as FeatureFlagViewModel)
         ).toBe(true);
       }
     );
@@ -624,7 +652,11 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'prod';
 
         expect(
-          component.getFeatureValidOnCurrentServer({...featureFlagDevStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)
+          component.getFeatureValidOnCurrentServer({
+            ...featureFlagDevStage,
+            searchQuery: '',
+            filteredUserGroups: [],
+          } as FeatureFlagViewModel)
         ).toBe(false);
       }
     );
@@ -633,7 +665,11 @@ describe('Release coordinator page feature tab', function () {
       component.serverStage = 'unknown';
 
       expect(
-        component.getFeatureValidOnCurrentServer({...featureFlagDevStage, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)
+        component.getFeatureValidOnCurrentServer({
+          ...featureFlagDevStage,
+          searchQuery: '',
+          filteredUserGroups: [],
+        } as FeatureFlagViewModel)
       ).toBe(false);
     });
   });
@@ -791,7 +827,13 @@ describe('Release coordinator page feature tab', function () {
     it('should return false if the feature is the same as the backup instance', () => {
       const featureFlag = component.featureFlagViewModels[0];
 
-      expect(component.isFeatureFlagViewModelChanged({...featureFlag, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)).toBe(false);
+      expect(
+        component.isFeatureFlagViewModelChanged({
+          ...featureFlag,
+          searchQuery: '',
+          filteredUserGroups: [],
+        } as FeatureFlagViewModel)
+      ).toBe(false);
     });
 
     it('should return true if the feature is different from the backup instance', () => {
@@ -799,7 +841,13 @@ describe('Release coordinator page feature tab', function () {
 
       featureFlag.userGroupIds = ['user_group_1'];
 
-      expect(component.isFeatureFlagViewModelChanged({...featureFlag, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel)).toBe(true);
+      expect(
+        component.isFeatureFlagViewModelChanged({
+          ...featureFlag,
+          searchQuery: '',
+          filteredUserGroups: [],
+        } as FeatureFlagViewModel)
+      ).toBe(true);
     });
 
     it('should throw error if the feature name is not found', () => {
@@ -814,7 +862,11 @@ describe('Release coordinator page feature tab', function () {
       });
 
       expect(() => {
-        component.isFeatureFlagViewModelChanged({...featureFlag, searchQuery: '', filteredUserGroups: []} as FeatureFlagViewModel);
+        component.isFeatureFlagViewModelChanged({
+          ...featureFlag,
+          searchQuery: '',
+          filteredUserGroups: [],
+        } as FeatureFlagViewModel);
       }).toThrowError();
     });
   });
@@ -833,8 +885,7 @@ describe('Release coordinator page feature tab', function () {
         }),
         searchQuery: '',
         filteredUserGroups: [],
-      } as FeatureFlagViewModel
-      );
+      } as FeatureFlagViewModel);
 
       expect(issues).toEqual([]);
     });
@@ -852,8 +903,7 @@ describe('Release coordinator page feature tab', function () {
         }),
         searchQuery: '',
         filteredUserGroups: [],
-      } as FeatureFlagViewModel
-      );
+      } as FeatureFlagViewModel);
 
       expect(issues).toEqual([
         'Rollout percentage should be between 0 to 100.',

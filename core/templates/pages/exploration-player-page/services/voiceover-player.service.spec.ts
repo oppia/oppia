@@ -19,7 +19,10 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
-import {EntityVoiceovers, EntityVoiceoversBackendDict} from '../../../domain/voiceover/entity-voiceovers.model';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from '../../../domain/voiceover/entity-voiceovers.model';
 import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
 import {
   Voiceover,
