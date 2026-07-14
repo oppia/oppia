@@ -701,11 +701,6 @@
       "framework": "puppeteer"
     },
     {
-      "name": "topic-viewer/topic-viewer-extensions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-viewer/topic-viewer-extensions.spec.ts",
-      "framework": "puppeteer"
-    },
-    {
       "name": "contributor-dashboard-admin/manage-auto-translation-configuration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/contributor-dashboard-admin/manage-auto-translation-configuration.spec.ts",
       "framework": "puppeteer"
