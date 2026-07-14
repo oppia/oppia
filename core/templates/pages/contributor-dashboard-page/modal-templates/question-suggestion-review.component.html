@@ -70,11 +70,11 @@
 
 <div class="modal-footer">
   <div class="oppia-review-buttons">
-    <div ngbTooltip="Enter review message before rejecting" placement="bottom" disableTooltip="!(reviewMessage.length == 0)">
-      <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
+    <div ngbTooltip="Enter review message before rejecting" placement="bottom" [disableTooltip]="!(reviewMessage.length == 0)">
+      <button type="button" class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
               *ngIf="reviewable"
               [disabled]="reviewMessage.length == 0"
-              (click)="reject(reviewMessage)">Reject
+              (click)="reject()">Reject
       </button>
     </div>
     <div tooltip-placement="bottom">

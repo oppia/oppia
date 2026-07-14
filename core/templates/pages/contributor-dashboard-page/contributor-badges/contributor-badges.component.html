@@ -13,21 +13,21 @@
       <div *ngIf="mobileBadgeTypeDropdownShown"
            class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
-             (click)="selectBadgeType('Translation')"
-             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileBadgeTypeSelected === 'Translation'}">
+             (click)="selectBadgeType(MobileBadgeType.Translation)"
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileBadgeTypeSelected === MobileBadgeType.Translation}">
             Translation
         </div>
         <div *ngIf="userHasQuestionRights"
              class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
-             (click)="selectBadgeType('Question')"
-             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileBadgeTypeSelected === 'Question'}">
+             (click)="selectBadgeType(MobileBadgeType.Question)"
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileBadgeTypeSelected === MobileBadgeType.Question}">
             Question
         </div>
       </div>
     </div>
   </div>
   <div class="badges-type-mobile-container"
-       [hidden]="mobileBadgeTypeSelected === 'Question' || languages.length === 0">
+       [hidden]="mobileBadgeTypeSelected === MobileBadgeType.Question || languages.length === 0">
     <div class="dropdown-label">Language</div>
     <div #mobileDropdown
          class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
@@ -91,10 +91,10 @@
             <badge class="badge-item"
                    *ngFor="let badge of translationBadges[selectedLanguage].submission"
                    [isUnlocked]="badge.isUnlocked"
-                   contributionSubType="{{badge.text}}"
-                   language="{{badge.language}}"
+                   [contributionSubType]="badge.text"
+                   [language]="badge.language"
                    contributionType="translation"
-                   contributionCount="{{badge.contributionCount}}">
+                   [contributionCount]="badge.contributionCount">
             </badge>
           </div>
         </div>
@@ -105,10 +105,10 @@
             <badge class="badge-item"
                    *ngFor="let badge of translationBadges[selectedLanguage].review"
                    [isUnlocked]="badge.isUnlocked"
-                   contributionSubType="{{badge.text}}"
-                   language="{{badge.language}}"
+                   [contributionSubType]="badge.text"
+                   [language]="badge.language"
                    contributionType="translation"
-                   contributionCount="{{badge.contributionCount}}">
+                   [contributionCount]="badge.contributionCount">
             </badge>
           </div>
         </div>
@@ -119,10 +119,10 @@
             <badge class="badge-item"
                    *ngFor="let badge of translationBadges[selectedLanguage].correction"
                    [isUnlocked]="badge.isUnlocked"
-                   contributionSubType="{{badge.text}}"
-                   language="{{badge.language}}"
+                   [contributionSubType]="badge.text"
+                   [language]="badge.language"
                    contributionType="translation"
-                   contributionCount="{{badge.contributionCount}}">
+                   [contributionCount]="badge.contributionCount">
             </badge>
           </div>
         </div>
@@ -142,10 +142,10 @@
             <badge class="badge-item"
                    *ngFor="let badge of questionSubmissionBadges"
                    [isUnlocked]="badge.isUnlocked"
-                   contributionSubType="{{badge.text}}"
-                   language="{{badge.language}}"
+                   [contributionSubType]="badge.text"
+                   [language]="badge.language"
                    contributionType="question"
-                   contributionCount="{{badge.contributionCount}}">
+                   [contributionCount]="badge.contributionCount">
             </badge>
           </div>
         </div>
@@ -156,10 +156,10 @@
             <badge class="badge-item"
                    *ngFor="let badge of questionReviewBadges"
                    [isUnlocked]="badge.isUnlocked"
-                   contributionSubType="{{badge.text}}"
-                   language="{{badge.language}}"
+                   [contributionSubType]="badge.text"
+                   [language]="badge.language"
                    contributionType="question"
-                   contributionCount="{{badge.contributionCount}}">
+                   [contributionCount]="badge.contributionCount">
             </badge>
           </div>
         </div>
@@ -170,10 +170,10 @@
             <badge class="badge-item"
                    *ngFor="let badge of questionCorrectionBadges"
                    [isUnlocked]="badge.isUnlocked"
-                   contributionSubType="{{badge.text}}"
-                   language="{{badge.language}}"
+                   [contributionSubType]="badge.text"
+                   [language]="badge.language"
                    contributionType="question"
-                   contributionCount="{{badge.contributionCount}}">
+                   [contributionCount]="badge.contributionCount">
             </badge>
           </div>
         </div>
@@ -181,7 +181,7 @@
     </div>
   </div>
   <div class="mobile-badge-container e2e-test-mobile-badge-container">
-    <div [hidden]="mobileBadgeTypeSelected === 'Question' ">
+    <div [hidden]="mobileBadgeTypeSelected === MobileBadgeType.Question ">
       <div [hidden]="dataLoading || (languages.length === 0)"
            class="badges-header-container">
         <div class="badge-type-text">Translations</div>
@@ -195,10 +195,10 @@
               <badge class="badge-item"
                      *ngFor="let badge of translationBadges[selectedLanguage].submission"
                      [isUnlocked]="badge.isUnlocked"
-                     contributionSubType="{{badge.text}}"
-                     language="{{badge.language}}"
+                     [contributionSubType]="badge.text"
+                     [language]="badge.language"
                      contributionType="translation"
-                     contributionCount="{{badge.contributionCount}}">
+                     [contributionCount]="badge.contributionCount">
               </badge>
             </div>
           </div>
@@ -209,10 +209,10 @@
               <badge class="badge-item"
                      *ngFor="let badge of translationBadges[selectedLanguage].review"
                      [isUnlocked]="badge.isUnlocked"
-                     contributionSubType="{{badge.text}}"
-                     language="{{badge.language}}"
+                     [contributionSubType]="badge.text"
+                     [language]="badge.language"
                      contributionType="translation"
-                     contributionCount="{{badge.contributionCount}}">
+                     [contributionCount]="badge.contributionCount">
               </badge>
             </div>
           </div>
@@ -222,17 +222,17 @@
               <badge class="badge-item"
                      *ngFor="let badge of translationBadges[selectedLanguage].correction"
                      [isUnlocked]="badge.isUnlocked"
-                     contributionSubType="{{badge.text}}"
-                     language="{{badge.language}}"
+                     [contributionSubType]="badge.text"
+                     [language]="badge.language"
                      contributionType="translation"
-                     contributionCount="{{badge.contributionCount}}">
+                     [contributionCount]="badge.contributionCount">
               </badge>
             </div>
           </div>
         </mat-card>
       </div>
     </div>
-    <div [hidden]="mobileBadgeTypeSelected === 'Translation' ">
+    <div [hidden]="mobileBadgeTypeSelected === MobileBadgeType.Translation ">
       <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)"
            class="badge-type-text">
         Questions
@@ -247,10 +247,10 @@
               <badge class="badge-item"
                      *ngFor="let badge of questionSubmissionBadges"
                      [isUnlocked]="badge.isUnlocked"
-                     contributionSubType="{{badge.text}}"
-                     language="{{badge.language}}"
+                     [contributionSubType]="badge.text"
+                     [language]="badge.language"
                      contributionType="question"
-                     contributionCount="{{badge.contributionCount}}">
+                     [contributionCount]="badge.contributionCount">
               </badge>
             </div>
           </div>
@@ -261,10 +261,10 @@
               <badge class="badge-item"
                      *ngFor="let badge of questionReviewBadges"
                      [isUnlocked]="badge.isUnlocked"
-                     contributionSubType="{{badge.text}}"
-                     language="{{badge.language}}"
+                     [contributionSubType]="badge.text"
+                     [language]="badge.language"
                      contributionType="question"
-                     contributionCount="{{badge.contributionCount}}">
+                     [contributionCount]="badge.contributionCount">
               </badge>
             </div>
           </div>
@@ -275,10 +275,10 @@
               <badge class="badge-item"
                      *ngFor="let badge of questionCorrectionBadges"
                      [isUnlocked]="badge.isUnlocked"
-                     contributionSubType="{{badge.text}}"
-                     language="{{badge.language}}"
+                     [contributionSubType]="badge.text"
+                     [language]="badge.language"
                      contributionType="question"
-                     contributionCount="{{badge.contributionCount}}">
+                     [contributionCount]="badge.contributionCount">
               </badge>
             </div>
           </div>
@@ -287,7 +287,7 @@
     </div>
   </div>
   <mat-card [hidden]="dataLoading"
-            *ngIf="(mobileBadgeTypeSelected === 'Translation' && !translationBadges[selectedLanguage])"
+            *ngIf="(mobileBadgeTypeSelected === MobileBadgeType.Translation && !translationBadges[selectedLanguage])"
             layout="row"
             class="contributions-required-container mobile-badge-container list-view-item">
     <div class="oppia-contributions-required-message">
