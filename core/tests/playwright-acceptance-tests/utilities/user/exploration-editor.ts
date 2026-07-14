@@ -1005,12 +1005,10 @@ export class ExplorationEditor extends BaseUser {
       await dropdownButton.evaluate(el => (el as HTMLElement).click());
       await this.page.waitForTimeout(1000);
 
-      const downloadButton = await historyItem.$(downloadExplorationButton);
-      if (!downloadButton) {
-        throw new Error(
-          `Download button not found for version ${explorationVersion}`
-        );
-      }
+      const downloadButton = await this.getElementInParent(
+        downloadExplorationButton,
+        historyItem
+      );
 
       // Use Playwright's download event to reliably capture the file.
       const downloadPromise = this.page.waitForEvent('download');
