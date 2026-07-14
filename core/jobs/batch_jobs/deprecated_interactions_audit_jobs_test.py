@@ -120,8 +120,21 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
         )
         answers_model_1.update_timestamps()
 
+        # State Answers Model for exp 2 to test empty exp_data branch.
+        answers_model_2 = self.create_model(
+            stats_models.StateAnswersModel,
+            id='exp_2_id:1:init_state:0',
+            exploration_id=self.EXP_2_ID,
+            exploration_version=1,
+            state_name='init_state',
+            shard_id=0,
+            interaction_id='TextInput',
+            submitted_answer_list=[],
+        )
+        answers_model_2.update_timestamps()
+
         datastore_services.put_multi(
-            [exp_model_1, exp_model_2, answers_model_1]
+            [exp_model_1, exp_model_2, answers_model_1, answers_model_2]
         )
 
         last_updated_str = exp_model_1.last_updated.strftime(
