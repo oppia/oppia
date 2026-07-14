@@ -48,7 +48,7 @@ class MachineTranslationGenerateHandler(
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
 
@@ -172,12 +172,12 @@ class TranslationProviderMappingHandler(
         # role-based access control to verify the user is a Translation  Admin.
 
         assert self.normalized_payload is not None
-        new_translation_provider_mapping = self.normalized_payload[
+        new_translation_provider_mapping = self.normalized_payload.get(
             'provider_mapping'
-        ]
-        new_is_enabled = self.normalized_payload[
+        )
+        new_is_enabled = self.normalized_payload.get(
             'automatic_translation_is_enabled'
-        ]
+        )
 
         try:
             machine_translation_services.update_machine_translation_policy(

@@ -249,8 +249,8 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
 
         domain_swap = self.swap(
             machine_translation_services,
-            'save_translation_provider_mapping',
-            mock_update_mapping,
+            'update_machine_translation_policy',
+            lambda mapping, is_enabled: mock_update_mapping(mapping),
         )
 
         with self.feature_flag_swap, domain_swap:
@@ -268,13 +268,13 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
     def test_put_fails_with_validation_error(self) -> None:
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        def mock_update_mapping_fails(new_mapping: Dict[str, str]) -> None:
+        def mock_update_policy_fails(mapping, is_enabled):
             raise utils.ValidationError('Invalid provider specified.')
 
         domain_swap = self.swap(
             machine_translation_services,
-            'save_translation_provider_mapping',
-            mock_update_mapping_fails,
+            'update_machine_translation_policy',
+            mock_update_policy_fails,
         )
 
         with self.feature_flag_swap, domain_swap:
@@ -312,20 +312,15 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
     def test_put_updates_toggle_when_provided(self) -> None:
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        toggle_calls = []
+        policy_calls = []
 
-        def mock_update_toggle(is_enabled: bool) -> None:
-            toggle_calls.append(is_enabled)
+        def mock_update_policy(mapping, is_enabled):
+            policy_calls.append((mapping, is_enabled))
 
-        mapping_swap = self.swap(
+        policy_swap = self.swap(
             machine_translation_services,
-            'save_translation_provider_mapping',
-            lambda m: None,
-        )
-        toggle_swap = self.swap(
-            machine_translation_services,
-            'update_translation_automatic_status',
-            mock_update_toggle,
+            'update_machine_translation_policy',
+            mock_update_policy,
         )
 
         payload = {
@@ -333,7 +328,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
             'automatic_translation_is_enabled': True,
         }
 
-        with self.feature_flag_swap, mapping_swap, toggle_swap:
+        with self.feature_flag_swap, policy_swap:
             csrf_token = self.get_new_csrf_token()
             response = self.put_json(
                 '/translation-provider-mapping',
@@ -342,29 +337,24 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
             )
 
         self.assertEqual(response['status'], 'success')
-        self.assertEqual(toggle_calls, [True])
+        self.assertEqual(policy_calls, [({'hi': 'azure'}, True)])
         self.logout()
 
     def test_put_does_not_update_toggle_when_not_provided(self) -> None:
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        toggle_calls = []
+        policy_calls = []
 
-        def mock_update_toggle(is_enabled: bool) -> None:
-            toggle_calls.append(is_enabled)
+        def mock_update_policy(mapping, is_enabled):
+            policy_calls.append((mapping, is_enabled))
 
-        mapping_swap = self.swap(
+        policy_swap = self.swap(
             machine_translation_services,
-            'save_translation_provider_mapping',
-            lambda m: None,
-        )
-        toggle_swap = self.swap(
-            machine_translation_services,
-            'update_translation_automatic_status',
-            mock_update_toggle,
+            'update_machine_translation_policy',
+            mock_update_policy,
         )
 
-        with self.feature_flag_swap, mapping_swap, toggle_swap:
+        with self.feature_flag_swap, policy_swap:
             csrf_token = self.get_new_csrf_token()
             response = self.put_json(
                 '/translation-provider-mapping',
@@ -373,5 +363,7 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
             )
 
         self.assertEqual(response['status'], 'success')
-        self.assertEqual(toggle_calls, [])  # Toggle NOT called
+        self.assertEqual(
+            policy_calls, [({'hi': 'azure', 'es': 'google'}, None)]
+        )
         self.logout()

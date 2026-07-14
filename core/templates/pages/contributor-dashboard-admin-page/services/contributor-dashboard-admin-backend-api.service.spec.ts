@@ -580,4 +580,49 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should fail to fetch the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributorDashboardAdminBackendApiService
+      .fetchTranslationConfigurationAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {error: 'Failed to fetch'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to fetch');
+  }));
+
+  it('should fail to update the translation configuration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const mockMapping = {hi: 'azure'};
+
+    contributorDashboardAdminBackendApiService
+      .updateTranslationConfigurationAsync(mockMapping, true)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translation-provider-mapping'
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {error: 'Failed to update'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to update');
+  }));
 });
