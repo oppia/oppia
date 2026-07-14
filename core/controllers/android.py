@@ -270,9 +270,6 @@ class AndroidActivityHandler(
             constants.ACTIVITY_TYPE_SUBTOPIC,
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
         ):
-            # Subtopic pages are now backed by StudyGuide models. We fetch
-            # from StudyGuide but return data in the SubtopicPage format so
-            # that existing Android clients receive the shape they expect.
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
                 study_guide = study_guide_services.get_study_guide_by_id(
