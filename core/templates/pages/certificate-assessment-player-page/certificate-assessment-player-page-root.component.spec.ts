@@ -17,13 +17,18 @@
  */
 
 import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {TranslateService} from '@ngx-translate/core';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 
 describe('CertificateAssessmentPlayerPageRootComponent', () => {
   let component: CertificateAssessmentPlayerPageRootComponent;
 
   beforeEach(() => {
-    component = new CertificateAssessmentPlayerPageRootComponent();
+    component = new CertificateAssessmentPlayerPageRootComponent(
+      {} as PageHeadService,
+      {} as TranslateService
+    );
   });
 
   it('should set the title from AppConstants', () => {
