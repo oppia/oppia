@@ -19,6 +19,9 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TechnicalFeedbackDashboardPageComponent} from './technical-feedback-dashboard-page.component';
+import {TechnicalFeedbackDashboardPageModule} from './technical-feedback-dashboard-page.module';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
@@ -26,10 +29,12 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        TechnicalFeedbackDashboardPageComponent,
-        MockTranslatePipe,
+      imports: [
+        TechnicalFeedbackDashboardPageModule,
+        HttpClientTestingModule,
+        RouterTestingModule,
       ],
+      declarations: [MockTranslatePipe],
       providers: [],
     }).compileComponents();
   });
