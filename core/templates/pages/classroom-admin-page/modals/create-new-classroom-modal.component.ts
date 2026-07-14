@@ -44,6 +44,10 @@ export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
     return this.classroomAdminDataService.urlValidationError;
   }
 
+  get feedbackRecipientEmailValidationError(): string {
+    return this.classroomAdminDataService.feedbackRecipientEmailValidationError;
+  }
+
   validateClassroom(
     tempClassroom: NewClassroomData,
     classroom: NewClassroomData

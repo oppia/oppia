@@ -93,7 +93,7 @@
                      class="form-control e2e-update-classroom-feedback-recipient"
                      [(ngModel)]="tempClassroomData._feedbackRecipientEmail"
                      (blur)="updateClassroomField()"
-                     (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                     (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
                     >
             </div>
           </div>
