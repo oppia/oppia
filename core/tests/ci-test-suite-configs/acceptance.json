@@ -362,8 +362,8 @@
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
