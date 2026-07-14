@@ -135,8 +135,18 @@ describe('Create new classroom modal', () => {
   });
 
   it('should delegate validateClassroom to the data service', () => {
-    const tempClassroom = new NewClassroomData('name', 'url', 'desc');
-    const classroom = new NewClassroomData('name', 'url', 'desc');
+    const tempClassroom = new NewClassroomData(
+      'name',
+      'url',
+      'desc',
+      'user@email.com'
+    );
+    const classroom = new NewClassroomData(
+      'name',
+      'url',
+      'desc',
+      'user@email.com'
+    );
     spyOn(classroomAdminDataService, 'validateClassroom');
 
     componentInstance.validateClassroom(tempClassroom, classroom);
