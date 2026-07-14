@@ -39,7 +39,6 @@ import {
   RecentCommitResponse,
   RecentFeedbackMessages,
 } from './services/moderator-page-backend-api.service';
-
 import {HttpErrorResponse} from '@angular/common/http';
 
 describe('Moderator Page Component', () => {
@@ -144,7 +143,7 @@ describe('Moderator Page Component', () => {
     componentInstance = fixture.componentInstance;
     moderatorPageBackendApiService = TestBed.inject(
       ModeratorPageBackendApiService
-    );
+    ) as jasmine.SpyObj<ModeratorPageBackendApiService>;
     loaderService = TestBed.inject(
       LoaderService
     ) as jasmine.SpyObj<LoaderService>;
@@ -225,15 +224,15 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [
       {id: '', type: 'emptyID'},
     ];
-    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled()).toBe(
-      true
-    );
+    expect(
+      componentInstance.isSaveFeaturedActivitiesButtonDisabled()
+    ).toBeTrue();
     componentInstance.displayedFeaturedActivityReferences = [
       {id: 'is', type: 'not'},
     ];
-    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled()).toBe(
-      false
-    );
+    expect(
+      componentInstance.isSaveFeaturedActivitiesButtonDisabled()
+    ).toBeFalse();
   });
 
   it('should save featured activity references', () => {
@@ -277,13 +276,13 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = new HttpErrorResponse({
+    const mockError = {
       status: 400,
       error: {
         error:
           'These Exploration IDs do not exist: dne_exploration. Please enter a different ID.',
       },
-    });
+    };
 
     spyOn(
       moderatorPageBackendApiService,
@@ -293,7 +292,7 @@ describe('Moderator Page Component', () => {
         then: () => {
           return {
             catch: (errorCallback: (err: HttpErrorResponse) => void) => {
-              errorCallback(mockError as HttpErrorResponse);
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -320,13 +319,13 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = new HttpErrorResponse({
+    const mockError = {
       status: 400,
       error: {
         error:
           'These Collection IDs do not exist: dne_collection. Please enter a different ID.',
       },
-    });
+    };
 
     spyOn(
       moderatorPageBackendApiService,
@@ -336,7 +335,7 @@ describe('Moderator Page Component', () => {
         then: () => {
           return {
             catch: (errorCallback: (err: HttpErrorResponse) => void) => {
-              errorCallback(mockError as HttpErrorResponse);
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -363,13 +362,13 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = new HttpErrorResponse({
+    const mockError = {
       status: 400,
       error: {
         error:
           'These Exploration IDs are private: priv_exploration. Please enter a different ID.',
       },
-    });
+    };
 
     spyOn(
       moderatorPageBackendApiService,
@@ -379,7 +378,7 @@ describe('Moderator Page Component', () => {
         then: () => {
           return {
             catch: (errorCallback: (err: HttpErrorResponse) => void) => {
-              errorCallback(mockError as HttpErrorResponse);
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -406,13 +405,13 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = new HttpErrorResponse({
+    const mockError = {
       status: 400,
       error: {
         error:
           'These Collection IDs are private: priv_collection. Please enter a different ID.',
       },
-    });
+    };
 
     spyOn(
       moderatorPageBackendApiService,
@@ -422,7 +421,7 @@ describe('Moderator Page Component', () => {
         then: () => {
           return {
             catch: (errorCallback: (err: HttpErrorResponse) => void) => {
-              errorCallback(mockError as HttpErrorResponse);
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },
@@ -439,12 +438,12 @@ describe('Moderator Page Component', () => {
   it('should display message for miscellaneous errors', () => {
     spyOn(alertsService, 'addWarning');
 
-    const mockError = new HttpErrorResponse({
+    const mockError = {
       status: 404,
       error: {
         error: '',
       },
-    });
+    };
 
     spyOn(
       moderatorPageBackendApiService,
@@ -454,7 +453,7 @@ describe('Moderator Page Component', () => {
         then: () => {
           return {
             catch: (errorCallback: (err: HttpErrorResponse) => void) => {
-              errorCallback(mockError as HttpErrorResponse);
+              errorCallback(mockError as unknown as HttpErrorResponse);
             },
           };
         },

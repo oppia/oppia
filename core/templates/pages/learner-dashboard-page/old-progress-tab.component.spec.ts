@@ -178,12 +178,12 @@ describe('Old Progress tab Component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.windowIsNarrow).toBeTrue();
+    expect(component.windowIsNarrow).toBe(true);
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     mockResizeEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
   }));
 
   it('should get static image url', () => {

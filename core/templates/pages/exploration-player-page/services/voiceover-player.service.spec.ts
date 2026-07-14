@@ -19,10 +19,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
-import {
-  EntityVoiceovers,
-  EntityVoiceoversBackendDict,
-} from '../../../domain/voiceover/entity-voiceovers.model';
+import {EntityVoiceovers, EntityVoiceoversBackendDict} from '../../../domain/voiceover/entity-voiceovers.model';
 import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
 import {
   Voiceover,
@@ -116,14 +113,14 @@ describe('Voiceover player service', () => {
   it('should be able to get active voiceovers', () => {
     voiceoverPlayerService.activeVoiceover = manualVoiceover;
 
-    expect(
-      (voiceoverPlayerService.getActiveVoiceover() as Voiceover).filename
-    ).toEqual('a.mp3');
+    expect(voiceoverPlayerService.getActiveVoiceover()!.filename).toEqual(
+      'a.mp3'
+    );
 
     manualVoiceover.filename = 'b.mp3';
-    expect(
-      (voiceoverPlayerService.getActiveVoiceover() as Voiceover).filename
-    ).toEqual('b.mp3');
+    expect(voiceoverPlayerService.getActiveVoiceover()!.filename).toEqual(
+      'b.mp3'
+    );
   });
 
   it('should be able to get active content id', () => {

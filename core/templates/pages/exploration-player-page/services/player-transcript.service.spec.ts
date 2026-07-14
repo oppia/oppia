@@ -421,7 +421,13 @@ describe('Player transcript service', () => {
   });
 
   it('should find index of latest state', () => {
-    let card1 = StateCard.createNewCard('first', '', '', {} as Interaction, '');
+    let card1 = StateCard.createNewCard(
+      'first',
+      '',
+      '',
+      {} as Interaction,
+      ''
+    );
 
     let card2 = StateCard.createNewCard(
       'second',
@@ -431,9 +437,21 @@ describe('Player transcript service', () => {
       ''
     );
 
-    let card3 = StateCard.createNewCard('third', '', '', {} as Interaction, '');
+    let card3 = StateCard.createNewCard(
+      'third',
+      '',
+      '',
+      {} as Interaction,
+      ''
+    );
 
-    let card4 = StateCard.createNewCard('first', '', '', {} as Interaction, '');
+    let card4 = StateCard.createNewCard(
+      'first',
+      '',
+      '',
+      {} as Interaction,
+      ''
+    );
 
     pts.addNewCard(card1);
     pts.addNewCard(card2);
