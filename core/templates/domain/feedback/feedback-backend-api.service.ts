@@ -135,11 +135,18 @@ export class FeedbackBackendApiService {
     dateToMsecs: number | null
   ): Promise<PlatformFeedbackBackendResponse> {
     let params = new HttpParams();
-    if (cursor) params = params.set('cursor', cursor);
-    if (statusFilter) params = params.set('status', statusFilter);
-    if (dateFromMsecs)
+    if (cursor) {
+      params = params.set('cursor', cursor);
+    }
+    if (statusFilter) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs) {
       params = params.set('date_from_msecs', String(dateFromMsecs));
-    if (dateToMsecs) params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+    if (dateToMsecs) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
 
     const url = [
       this.reportUrl,
