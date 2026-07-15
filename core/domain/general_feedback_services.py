@@ -350,7 +350,9 @@ def get_platform_feedback(
     Returns:
         Optional[PlatformFeedback]. The retrieved report, or None if not found.
     """
-    model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
+    model = general_feedback_models.PlatformFeedbackModel.get(
+        report_id, strict=False
+    )
     if model is None:
         return None
     return _platform_feedback_model_to_domain(model)
