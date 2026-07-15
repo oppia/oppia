@@ -68,10 +68,6 @@ test.describe('Exploration Creator', function () {
     await explorationEditor.downloadExploration(5);
     await explorationEditor.downloadExploration(2);
 
-    // Navigate back to the editor tab before publishing, otherwise the
-    // history tab content blocks the publish button on mobile.
-    await explorationEditor.navigateToEditorTab();
-
     // Publish Exploration.
     await explorationEditor.publishExplorationWithMetadata(
       'Publish with an interaction',
