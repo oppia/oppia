@@ -59,6 +59,7 @@ describe('Story playthrough model', () => {
       completed: true,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: 'filename',
+      status: 'Published',
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
@@ -97,6 +98,7 @@ describe('Story playthrough model', () => {
       completed: false,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: 'filename',
+      status: 'Published',
     };
     var storyPlaythroughBackendObject = {
       story_id: 'qwerty',

@@ -19,7 +19,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import (
     question_services,
@@ -160,6 +160,29 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(json_response['can_create_topic'], False)
         self.assertEqual(json_response['can_delete_skill'], False)
         self.assertEqual(json_response['can_create_skill'], False)
+        self.logout()
+
+    def test_get_with_topic_rights_set_to_none(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        def mock_get_all_topic_rights() -> Dict[str, None]:
+            return {self.topic_id: None}
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_rights',
+            mock_get_all_topic_rights,
+        ):
+            json_response = self.get_json(
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL
+            )
+
+        self.assertNotIn(
+            'is_published', json_response['topic_summary_dicts'][0]
+        )
+        self.assertNotIn(
+            'can_edit_topic', json_response['topic_summary_dicts'][0]
+        )
         self.logout()
 
 
@@ -713,7 +736,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'page_title_fragment': 'testing',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -762,7 +785,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'page_title_fragment': 'testing',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb',
             encoding=None,
@@ -787,7 +810,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def setUp(self) -> None:
         super().setUp()
         self.url = feconf.NEW_SKILL_URL
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             self.original_image_content = f.read()
@@ -943,7 +966,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             },
         ]
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()

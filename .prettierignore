@@ -21,7 +21,6 @@ local_compiled_js_for_test/*
 *.json
 # the following files are either parsed or used as-is in tests for comparison. Formatter is not suitable for them yet.
 assets/constants.ts
-core/templates/services/angular-services.index.ts
 assets/rich_text_components_definitions.ts
 core/tests/data/dummy_constants.js
 extensions/rich_text_components/webdriverio.js

@@ -40,11 +40,11 @@ describe('Collection rights backend API service', function () {
       imports: [HttpClientTestingModule],
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    collectionRightsBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    collectionRightsBackendApiService = TestBed.inject(
       CollectionRightsBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
+    csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return new Promise(resolve => {

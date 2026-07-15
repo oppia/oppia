@@ -455,7 +455,15 @@ export class Contributor extends ExplorationEditor {
   async switchToTabInContributionDashboard(
     tabName: 'Translate Text' | 'My Contributions' | 'Submit Question'
   ): Promise<void> {
-    await this.page.waitForSelector(contributionTabSelector);
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        const tabs = Array.from(document.querySelectorAll(selector));
+        return tabs.some(tab => tab.textContent?.trim() === name);
+      },
+      {},
+      contributionTabSelector,
+      tabName
+    );
 
     // Get required tab element.
     const tabElements = await this.page.$$(contributionTabSelector);
@@ -638,7 +646,7 @@ export class Contributor extends ExplorationEditor {
    * Checks if the featured languages are present or not.
    * @param expectedLanguages - The expected languages.
    */
-  async expectFeaturedLangaugesToContain(
+  async expectFeaturedLanguagesToContain(
     expectedLanguages: string[]
   ): Promise<void> {
     await this.expectElementToBeVisible(featuredLanguageContainerSelector);

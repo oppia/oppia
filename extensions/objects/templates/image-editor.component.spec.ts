@@ -1778,6 +1778,31 @@ describe('ImageEditor', () => {
     });
   });
 
+  it('should show inline warning if uploaded image cannot be read', () => {
+    component.data = {mode: component.MODE_EMPTY, metadata: {}, crop: true};
+
+    const mockImageObjectWithError = {
+      onload: null,
+      onerror: null,
+      set src(_url: string) {
+        if (this.onerror) {
+          this.onerror(new Event('error'));
+        }
+      },
+    };
+    (window.Image as jasmine.Spy).and.returnValue(
+      mockImageObjectWithError as unknown as HTMLImageElement
+    );
+
+    const file = new File(['invalid svg'], 'invalid.svg', {
+      type: 'image/svg+xml',
+    });
+    component.onFileChanged(file);
+
+    expect(component.invalidImageWarningIsShown).toBeTrue();
+    expect(component.data.mode).toBe(component.MODE_EMPTY);
+  });
+
   it("should crop svg when user clicks the 'crop' button", () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func({image: obj.images});
@@ -2208,6 +2233,9 @@ describe('ImageEditor', () => {
         'Failed to upload image'
       );
 
+      httpTestingController
+        .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+        .forEach(req => req.flush({feature_flag_results: {}}));
       httpTestingController.verify();
     })
   );
@@ -2245,6 +2273,9 @@ describe('ImageEditor', () => {
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Error communicating with server.'
       );
+      httpTestingController
+        .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+        .forEach(req => req.flush({feature_flag_results: {}}));
       httpTestingController.verify();
     })
   );
@@ -2307,6 +2338,9 @@ describe('ImageEditor', () => {
       req.flush({
         filename: 'img_20210701_185457_qgrrul296o_height_200_width_260.gif',
       });
+      httpTestingController
+        .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+        .forEach(req => req.flush({feature_flag_results: {}}));
       httpTestingController.verify();
 
       tick(100);

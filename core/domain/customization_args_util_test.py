@@ -289,7 +289,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         filepath = os.path.join(
             feconf.INTERACTIONS_DIR, 'customization-args-defs.ts'
         )
-        with utils.open_file(filepath, 'r', newline='') as f:
+        with open(filepath, 'r', newline='', encoding='utf-8') as f:
             lines = f.readlines()
 
         all_interaction_ids = set(
@@ -345,7 +345,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         filepath = os.path.join(
             'core', 'templates', 'domain', 'exploration', 'interaction.model.ts'
         )
-        with utils.open_file(filepath, 'r', newline='') as f:
+        with open(filepath, 'r', newline='', encoding='utf-8') as f:
             lines = f.readlines()
 
         all_interaction_ids = set(
@@ -386,7 +386,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         filepath = os.path.join(
             'typings', 'tests', 'customization-args-defs-test.ts'
         )
-        with utils.open_file(filepath, 'r', newline='') as f:
+        with open(filepath, 'r', newline='', encoding='utf-8') as f:
             lines = f.readlines()
 
         all_interaction_ids = set(

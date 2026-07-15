@@ -24,7 +24,7 @@ describe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService;
 
   beforeEach(() => {
-    mathInteractionsService = TestBed.get(MathInteractionsService);
+    mathInteractionsService = TestBed.inject(MathInteractionsService);
   });
 
   it('should validate expressions correctly', function () {
@@ -1134,5 +1134,14 @@ describe('MathInteractionsService', () => {
     expect(
       mathInteractionsService.checkUnsupportedFunctions('a - tan(b)*cos(c)')
     ).toEqual(['tan', 'cos']);
+  });
+
+  it('should show error for invalid prefix operator', function () {
+    expect(
+      mathInteractionsService.validateAlgebraicExpression('*', [])
+    ).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toContain(
+      'Invalid multiplication expression'
+    );
   });
 });

@@ -66,7 +66,6 @@ var ExplorationEditorPage = function () {
     '.e2e-test-exploration-category-dropdown'
   );
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
-  var toastMessage = $('.e2e-test-toast-message');
 
   /*
    * Non-Interactive elements
@@ -510,31 +509,41 @@ var ExplorationEditorPage = function () {
   // ---- INTERNET CONNECTION ----
 
   this.waitForOnlineAlert = async function () {
+    const TOAST_CONTAINER = $('.toast-success');
+
+    await waitFor.presenceOf(
+      TOAST_CONTAINER,
+      'Online success toast container taking too long to appear.'
+    );
+
+    const TOAST_MESSAGE = TOAST_CONTAINER.$('.e2e-test-toast-message');
+
     await waitFor.visibilityOf(
-      toastMessage,
+      TOAST_MESSAGE,
       'Online info toast message taking too long to appear.'
     );
-    expect(await action.getText('Toast Message', toastMessage)).toMatch(
+    expect(await action.getText('Toast Message', TOAST_MESSAGE)).toMatch(
       'Reconnected. Checking whether your changes are mergeable.'
-    );
-    await waitFor.invisibilityOf(
-      toastMessage,
-      'Online info toast message taking too long to disappear.'
     );
   };
 
   this.waitForOfflineAlert = async function () {
+    const TOAST_CONTAINER = $('.toast-info');
+
+    await waitFor.presenceOf(
+      TOAST_CONTAINER,
+      'Offline info toast container taking too long to appear.'
+    );
+
+    const TOAST_MESSAGE = TOAST_CONTAINER.$('.e2e-test-toast-message');
+
     await waitFor.visibilityOf(
-      toastMessage,
+      TOAST_MESSAGE,
       'Offline warning toast message taking too long to appear.'
     );
-    expect(await action.getText('Toast Message', toastMessage)).toMatch(
+    expect(await action.getText('Toast Message', TOAST_MESSAGE)).toMatch(
       'Looks like you are offline. You can continue working, and can save ' +
         'your changes once reconnected.'
-    );
-    await waitFor.invisibilityOf(
-      toastMessage,
-      'Offline warning toast message taking too long to disappear.'
     );
   };
 };

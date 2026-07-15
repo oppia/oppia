@@ -911,6 +911,14 @@ describe('Story editor navbar component', () => {
       storyUpdateService,
       'setStoryNodeUnpublishingReason'
     );
+    let changeStoryStatusSpy = spyOn(
+      storyEditorStateService,
+      'changeStoryPublicationStatus'
+    ).and.callFake((newStatus, callback) => {
+      if (callback) {
+        callback();
+      }
+    });
     let unpublishStorySpy = spyOn(component, 'unpublishStory');
     let loadStorySpy = spyOn(
       storyEditorStateService,
@@ -981,7 +989,8 @@ describe('Story editor navbar component', () => {
     expect(modalSpy).toHaveBeenCalled();
     expect(storyNodeStatusSpy).toHaveBeenCalledTimes(4);
     expect(storyNodeUnpublishingReasonSpy).toHaveBeenCalledTimes(4);
-    expect(unpublishStorySpy).toHaveBeenCalled();
+    expect(changeStoryStatusSpy).toHaveBeenCalled();
+    expect(unpublishStorySpy).not.toHaveBeenCalled();
     expect(storyNodePlannedPublicationDateSpy).toHaveBeenCalledTimes(2);
     expect(chapterStatusChangingSpy).toHaveBeenCalledTimes(6);
     expect(saveStorySpy).toHaveBeenCalled();

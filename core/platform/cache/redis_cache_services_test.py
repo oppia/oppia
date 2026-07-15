@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 from scripts import common
@@ -134,8 +134,8 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             os.path.exists(os.path.join(common.CURR_DIR, 'redis.conf'))
         )
 
-        with utils.open_file(
-            os.path.join(common.CURR_DIR, 'redis.conf'), 'r'
+        with open(
+            os.path.join(common.CURR_DIR, 'redis.conf'), 'r', encoding='utf-8'
         ) as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()

@@ -41,7 +41,7 @@ describe('MusicNotesInputValidationService', () => {
       providers: [MusicNotesInputValidationService],
     });
 
-    validatorService = TestBed.get(MusicNotesInputValidationService);
+    validatorService = TestBed.inject(MusicNotesInputValidationService);
 
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({

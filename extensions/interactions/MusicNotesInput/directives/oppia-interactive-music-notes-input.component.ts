@@ -28,6 +28,7 @@ import {
   OnDestroy,
   OnInit,
   Renderer2,
+  ViewChild,
 } from '@angular/core';
 import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
@@ -42,6 +43,7 @@ import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {MusicNotesInputRulesService} from './music-notes-input-rules.service';
 import {MusicPhrasePlayerService} from './music-phrase-player.service';
+import {CdkDragDrop, CdkDragEnd} from '@angular/cdk/drag-drop';
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -59,6 +61,19 @@ interface NoteSequence {
 
 interface Sequence {
   value: ReadableMusicNote[];
+}
+
+interface Note {
+  id: string;
+  type: number;
+  position?: {x: number; y: number};
+}
+
+interface DraggedNoteData {
+  id?: string;
+  type?: string;
+  noteType?: number;
+  isPalette: boolean;
 }
 
 @Component({
@@ -102,6 +117,11 @@ export class MusicNotesInputComponent
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
   staffContainerElt: HTMLElement | null;
+
+  placedNotes: Note[] = [];
+
+  @ViewChild('staffArea') staffAreaRef!: ElementRef;
+  @ViewChild('validNoteArea') validNoteAreaRef!: ElementRef;
 
   constructor(
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -182,20 +202,24 @@ export class MusicNotesInputComponent
     });
   }
 
-  // Remove a specific note with given noteId from noteSequence. If given
-  // noteId is not in noteSequence, nothing will be removed.
-  _removeNotesFromNoteSequenceWithId(noteId: string): void {
-    for (let i = 0; i < this.noteSequence.length; i++) {
-      if (this.noteSequence[i].note.noteId === noteId) {
-        this.noteSequence.splice(i, 1);
-      }
-    }
-  }
-
   // Sorts noteSequence elements according to the return value of the
   // compareNoteStarts function.
   _sortNoteSequence(): void {
     this.noteSequence.sort(this.compareNoteStarts);
+  }
+
+  updateNoteSequenceFromPlacedNotes(): void {
+    this.noteSequence = this.placedNotes.map(note => ({
+      note: {
+        baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES.C4,
+        offset: 0,
+        noteId: note.id,
+        noteStart: {
+          num: 1,
+          den: 1,
+        },
+      },
+    }));
   }
 
   /**
@@ -239,12 +263,9 @@ export class MusicNotesInputComponent
       this.CONTAINER_HEIGHT / this.verticalGridKeys.length;
 
     this.clearNotesFromStaff();
-    this.initPalette();
 
     this.clearDroppableStaff();
     this.buildDroppableStaff();
-
-    this.repaintNotes();
   }
 
   // Initial notes are placed on the staff at the
@@ -310,137 +331,82 @@ export class MusicNotesInputComponent
     return staffLinePositions as Object;
   }
 
-  // Creates the notes and helper-clone notes for the noteChoices div.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
-  initPalette(): void {
-    let noteChoicesDiv = $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-note-choices'
-      )
-    );
-    let validNoteArea = $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-valid-note-area'
-      )
-    );
-    for (let i = 0; i < this.NOTE_TYPES.length; i++) {
-      var addedClass = null;
-      if (this.NOTE_TYPES[i] === this.NOTE_TYPE_NATURAL) {
-        addedClass = 'oppia-music-input-natural-note';
+  onNoteDropped(event: CdkDragDrop<DraggedNoteData>): void {
+    if (!this.interactionIsActive) {
+      return;
+    }
+
+    const data = event.item.data;
+
+    const draggedElement = event.item.element.nativeElement;
+    const draggedRect = draggedElement.getBoundingClientRect();
+    const staffRect = this.staffAreaRef.nativeElement.getBoundingClientRect();
+
+    const relativeX = draggedRect.left - staffRect.left;
+    if (data.isPalette) {
+      const newNote: Note = {
+        id: this.generateUniqueNoteId(),
+        type: data.noteType,
+        position: {
+          x: this.snapToGrid(relativeX),
+          y: 0,
+        },
+      };
+      this.placedNotes.push(newNote);
+    } else {
+      const note = this.placedNotes.find(n => n.id === data.id);
+      if (note) {
+        note.position = {
+          x: this.snapToGrid(relativeX),
+          y: 0,
+        };
       }
-      var innerDiv = $(`<div class="${addedClass}"></div>`).data(
-        'noteType',
-        this.NOTE_TYPES[i]
-      );
-      if (this.interactionIsActive) {
-        innerDiv.draggable({
-          // Keeps note from being placed on top of the clef.
-          containment: validNoteArea,
-          cursor: 'pointer',
-          helper: 'clone',
-          stack: '.oppia-music-input-note-choices div',
-          grid: [this.HORIZONTAL_GRID_SPACING, 1],
-          stop: (evt, ui) => {
-            if (!this.isCloneOffStaff($(ui.helper))) {
-              // This makes the helper clone a new draggable note.
-              $(ui.helper)
-                // Retains original note type (e.g. natural, flat, sharp).
-                .data('noteType', $(innerDiv).data('noteType'))
-                .draggable({
-                  // The leftPosBeforeDrag helps with the sorting of user
-                  // sequence.
-                  start: () => {
-                    $(innerDiv).data(
-                      'leftPosBeforeDrag',
-                      $(innerDiv).position().left
-                    );
-                  },
-                  containment: '.oppia-music-input-valid-note-area',
-                  cursor: 'pointer',
-                  grid: [this.HORIZONTAL_GRID_SPACING, 1],
-                  // Stops helper clone from being cloned again.
-                  helper: 'original',
-                  stack: '.oppia-music-input-note-choices div',
-                  tolerance: 'intersect',
-                  revert: () => {
-                    let draggableOptions = $(innerDiv);
-                    // If note is out of droppable or off staff,
-                    // remove it.
-                    if (this.isCloneOffStaff(draggableOptions)) {
-                      this._removeNotesFromNoteSequenceWithId(
-                        draggableOptions.data('noteId')
-                      );
-                      this._sortNoteSequence();
-                      draggableOptions.remove();
-                    }
-                  },
-                });
-            }
-          },
-        });
-      }
-      noteChoicesDiv.append(innerDiv);
+    }
+
+    this._sortNoteSequence();
+    this.updateNoteSequenceFromPlacedNotes();
+  }
+
+  onPlacedNoteDragEnd(event: CdkDragEnd, note: Note): void {
+    const staffRect = this.staffAreaRef.nativeElement.getBoundingClientRect();
+    const draggedRect =
+      event.source.element.nativeElement.getBoundingClientRect();
+
+    const isOutside =
+      draggedRect.left < staffRect.left ||
+      draggedRect.right > staffRect.right ||
+      draggedRect.top < staffRect.top ||
+      draggedRect.bottom > staffRect.bottom;
+
+    if (isOutside) {
+      this._removeNotesFromNoteSequenceWithId(note.id);
+      this._sortNoteSequence();
+      this.updateNoteSequenceFromPlacedNotes();
     }
   }
 
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
-  repaintNotes(): void {
-    let noteChoicesDiv = $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-note-choices'
-      )
+  // Remove a specific note with given noteId from noteSequence. If given
+  // noteId is not in noteSequence, nothing will be removed.
+
+  _removeNotesFromNoteSequenceWithId(noteId: string): void {
+    this.placedNotes = this.placedNotes.filter(note => note.id !== noteId);
+  }
+
+  snapToGrid(x: number): number {
+    return (
+      Math.round(x / this.HORIZONTAL_GRID_SPACING) *
+      this.HORIZONTAL_GRID_SPACING
     );
-    let validNoteArea = $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-valid-note-area'
-      )
-    );
-    for (let i = 0; i < this.noteSequence.length; i++) {
-      var innerDiv = $(
-        '<div class="oppia-music-input-natural-note' +
-          ' oppia-music-input-on-staff"></div>'
-      )
-        .data('noteType', this.NOTE_TYPE_NATURAL)
-        .data('noteId', this.noteSequence[i].note.noteId)
-        // Position notes horizontally by their noteStart positions and
-        // vertically by the midi value they hold.
-        .css({
-          top:
-            this.getVerticalPosition(
-              this.noteSequence[i].note.baseNoteMidiNumber
-            ) -
-            this.VERTICAL_GRID_SPACING / 2.0,
-          left: this.getHorizontalPosition(
-            this.getNoteStartAsFloat(this.noteSequence[i].note)
-          ),
-          position: 'absolute',
-        });
-      if (this.interactionIsActive) {
-        innerDiv.draggable({
-          // Keeps note from being placed on top of the clef.
-          containment: validNoteArea,
-          cursor: 'pointer',
-          stack: '.oppia-music-input-note-choices div',
-          grid: [this.HORIZONTAL_GRID_SPACING, 1],
-          start: () => {
-            $(innerDiv).data('leftPosBeforeDrag', $(innerDiv).position().left);
-          },
-          revert: () => {
-            let draggableOptions = $(innerDiv);
-            // If note is out of droppable or off staff, remove it.
-            if (this.isCloneOffStaff(draggableOptions)) {
-              this._removeNotesFromNoteSequenceWithId(
-                draggableOptions.data('noteId')
-              );
-              this._sortNoteSequence();
-              draggableOptions.remove();
-            }
-          },
-        });
-      }
-      noteChoicesDiv.append(innerDiv);
-    }
-    this.repaintLedgerLines();
+  }
+
+  getNoteClass(type: number): string {
+    return type === this.NOTE_TYPE_NATURAL
+      ? 'oppia-music-input-natural-note'
+      : '';
+  }
+
+  generateUniqueNoteId(): string {
+    return Math.random().toString(36).substring(2, 9);
   }
 
   buildDroppableStaff(): void {
@@ -674,6 +640,7 @@ export class MusicNotesInputComponent
   // Clear noteSequence values and remove all notes
   // and Ledger Lines from the staff.
   clearSequence(): void {
+    this.placedNotes = [];
     this.noteSequence = [];
     const notesOnStaff = this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-on-staff'
@@ -718,11 +685,11 @@ export class MusicNotesInputComponent
     return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
   }
 
-  isCloneOffStaff(helperClone: JQuery<HTMLElement>): boolean {
-    return !(
-      helperClone.position().top > this.staffTop &&
-      helperClone.position().top < this.staffBottom
-    );
+  isCloneOffStaff(helperClone: HTMLElement): boolean {
+    const rect = helperClone.getBoundingClientRect();
+    const top = rect.top;
+
+    return !(top > this.staffTop && top < this.staffBottom);
   }
 
   isLedgerLineNote(lineValue: string): boolean {
@@ -977,4 +944,16 @@ export class MusicNotesInputComponent
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+
+  getDragData(note: Note): DraggedNoteData {
+    return {
+      id: note.id,
+      type: note.type.toString(),
+      noteType: note.type,
+      isPalette: false,
+    };
+  }
 }
+
+// Music interaction is not working well.
+// We will probably deprecate it, since it's rarely used.

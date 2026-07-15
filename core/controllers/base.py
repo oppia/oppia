@@ -103,7 +103,7 @@ def load_template(filename: str, *, template_is_aot_compiled: bool) -> str:
         ),
         filename,
     )
-    with utils.open_file(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         html_text = f.read()
     return html_text
 

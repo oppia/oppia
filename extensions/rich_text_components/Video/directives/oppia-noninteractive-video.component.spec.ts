@@ -64,7 +64,7 @@ describe('NoninteractiveVideo', () => {
   beforeEach(() => {
     autoplayedVideosService = TestBed.inject(AutoplayedVideosService);
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
-    pageContextService = TestBed.get(PageContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
     fixture = TestBed.createComponent(NoninteractiveVideo);
     component = fixture.componentInstance;

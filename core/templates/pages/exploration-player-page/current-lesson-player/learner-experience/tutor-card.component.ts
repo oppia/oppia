@@ -152,6 +152,7 @@ export class TutorCardComponent {
   skipClickListener: Function | null = null;
   username!: string | null;
   _viewHasLoadedOnce: boolean = false;
+  completedChaptersCount: number = 0;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -225,7 +226,11 @@ export class TutorCardComponent {
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
-
+    this.chapterProgressService.completedChaptersCount$.subscribe(
+      (count: number) => {
+        this.completedChaptersCount = count;
+      }
+    );
     this.directiveSubscriptions.add(
       this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(() => {
         this.waitingForOppiaFeedback = false;
@@ -320,21 +325,19 @@ export class TutorCardComponent {
   generateMilestoneMessage(): string {
     const milestoneMessageIsToBeDisplayed =
       this.chapterProgressService.getChapterCompletedForTheFirstTime();
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
     if (
       !this.inStoryMode ||
       !milestoneMessageIsToBeDisplayed ||
-      !completedChaptersCount ||
+      !this.completedChaptersCount ||
       !MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        completedChaptersCount
+        this.completedChaptersCount
       )
     ) {
       return '';
     }
     let chapterCountMessageIndex =
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
-        completedChaptersCount
+        this.completedChaptersCount
       ) + 1;
     let milestoneMessageTranslationKey =
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex;
@@ -353,18 +356,16 @@ export class TutorCardComponent {
 
     let milestoneMessageIsToBeDisplayed =
       this.chapterProgressService.getChapterCompletedForTheFirstTime();
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
 
     if (
       !milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        completedChaptersCount
+        this.completedChaptersCount
       )
     ) {
       let chapterCountIndex =
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
-          completedChaptersCount
+          this.completedChaptersCount
         );
       this.nextMilestoneChapterCount =
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS[chapterCountIndex + 1];
@@ -372,33 +373,28 @@ export class TutorCardComponent {
     }
 
     for (let milestoneCount of MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS) {
-      if (milestoneCount > completedChaptersCount) {
+      if (milestoneCount > this.completedChaptersCount) {
         this.nextMilestoneChapterCount = milestoneCount;
         return true;
       }
     }
-
     return false;
   }
 
   isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
     let milestoneMessageIsToBeDisplayed =
       this.chapterProgressService.getChapterCompletedForTheFirstTime();
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
 
     return (
       milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        completedChaptersCount
+        this.completedChaptersCount
       )
     );
   }
 
   isCompletedChaptersCountGreaterThanLastMilestone(): boolean {
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
-    return completedChaptersCount > 50;
+    return this.completedChaptersCount > 50;
   }
 
   getStaticImageUrl(imagePath: string): string {

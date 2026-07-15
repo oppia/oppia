@@ -36,15 +36,10 @@ describe('Interested Parent', function () {
     );
     // Check for Thanks Message.
     await interestedParent.expectNewsletterSubscriptionThanksMessage();
-    // Finds the Watch a video button then clicks it.
-    await interestedParent.clickWatchAVideoButton();
-    // Navigate to the home page.
-    await interestedParent.navigateToHome();
-    await interestedParent.submitEmailForNewsletter(
-      'example.abc@domain.xyz.mn'
-    );
-    // Finds the Read Blog button then clicks it.
-    await interestedParent.clickReadBlogButton();
+    // Finds the Watch a video button and checks its link.
+    await interestedParent.expectWatchAVideoButtonToHaveCorrectLink();
+    // Finds the Read Blog button and checks its link.
+    await interestedParent.expectReadBlogButtonToHaveCorrectLink();
   });
 
   afterAll(async function () {

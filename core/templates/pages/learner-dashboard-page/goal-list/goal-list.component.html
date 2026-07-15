@@ -41,7 +41,7 @@
             </div>
             <div class="goal-list-center justify-content-between">
               <div class="goal-list-center">
-                <circle-progress [percent]="getChapterProgress(storyNode)"> </circle-progress>
+                <circle-progress class="e2e-test-progress-lesson" [percent]="getChapterProgress(storyNode)"> </circle-progress>
                 <p class="mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE' | translate: {number: (j + 1), title: storyNode.getTitle()} }} </p>
               </div>
               <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"

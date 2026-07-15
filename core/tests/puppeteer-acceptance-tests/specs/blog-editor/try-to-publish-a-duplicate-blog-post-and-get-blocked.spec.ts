@@ -48,6 +48,9 @@ describe('Blog Editor', function () {
     'should check blog editor unable to publish duplicate blog post',
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
+      await blogPostEditor.updateUsernameInRegisterModal('blogPostEditor');
+      await blogPostEditor.updateUserBioInRegisterModal('Dummy-User-Bio');
+      await blogPostEditor.clickOnSaveProfileButton();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
       await blogPostEditor.publishNewBlogPost('Test-Blog');
 

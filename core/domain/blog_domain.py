@@ -749,6 +749,32 @@ class BlogAuthorDetails:
         self.last_updated = last_updated
 
     @classmethod
+    def create_default_author_details_for_user(
+        cls, user_id: str
+    ) -> BlogAuthorDetails:
+        """Creates a BlogAuthorDetails with default values.
+
+        This is used as a fallback when the underlying
+        BlogAuthorDetailsModel is missing (e.g., the author's account
+        was deleted). The returned object is fully usable but contains
+        placeholder values.
+
+        Args:
+            user_id: str. The user id of the missing author.
+
+        Returns:
+            BlogAuthorDetails. A domain object with default placeholder
+            values.
+        """
+        return cls(
+            instance_id='',
+            author_id=user_id,
+            displayed_author_name='Deleted User',
+            author_bio='',
+            last_updated=datetime.datetime.utcnow(),
+        )
+
+    @classmethod
     def require_valid_displayed_author_name(cls, author_name: str) -> None:
         """Checks if the given author name is valid or not.
 

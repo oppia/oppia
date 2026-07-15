@@ -81,6 +81,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'id': 'abcd',
                             'title': 'title',
                             'tags': ['tag1', 'tag2'],
+                            'summary': 'blog_post_summary',
                             'rank': math.floor(
                                 utils.get_time_in_millisecs(
                                     blog_summary.published_on
@@ -127,6 +128,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'id': 'abcd%s' % i,
                             'title': 'title',
                             'tags': ['tag1', 'tag2'],
+                            'summary': 'blog_post_summary',
                             'rank': math.floor(
                                 utils.get_time_in_millisecs(
                                     blog_summary.published_on
@@ -184,6 +186,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                             'id': 'abcd',
                             'title': 'title',
                             'tags': ['tag1', 'tag2'],
+                            'summary': 'blog_post_summary',
                             'rank': math.floor(
                                 utils.get_time_in_millisecs(
                                     blog_summary.published_on

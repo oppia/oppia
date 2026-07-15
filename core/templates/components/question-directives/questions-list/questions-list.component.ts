@@ -487,13 +487,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   ): boolean {
     let skillId = this.selectedSkillId;
     let expectedMisconceptionIds = this.misconceptionIdsForSelectedSkill;
-    let actualMisconceptionIds = skillMisconceptionIds.map(
-      skillMisconceptionId => {
+    let actualMisconceptionIds = skillMisconceptionIds
+      .map(skillMisconceptionId => {
         if (skillMisconceptionId.startsWith(skillId)) {
           return parseInt(skillMisconceptionId.split('-')[1]);
         }
-      }
-    );
+        return null;
+      })
+      .filter(id => id !== null);
     return this.utilsService.isEquivalent(
       actualMisconceptionIds.sort(),
       expectedMisconceptionIds.sort()

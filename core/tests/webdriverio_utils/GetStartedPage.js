@@ -21,10 +21,28 @@ var action = require('./action.js');
 
 var GetStartedPage = function () {
   var GET_STARTED_PAGE_URL = '/get-started';
+  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
 
   this.get = async function () {
     await browser.url(GET_STARTED_PAGE_URL);
     await waitFor.pageToFullyLoad();
+    // Wait for Angular to update the meta tags. The server returns generic
+    // meta tags, and Angular updates them dynamically in ngOnInit. We need
+    // to wait for this update to complete before the test checks the content.
+    await browser.waitUntil(
+      async () => {
+        // We can't use a classname selector here.
+        // eslint-disable-next-line oppia/e2e-practices
+        var metaTag = await $('meta[itemprop="description"]');
+        var content = await metaTag.getAttribute('content');
+        return content === EXPECTED_META_DESCRIPTION;
+      },
+      {
+        timeout: 10000,
+        timeoutMsg:
+          'Meta tags were not updated by Angular within the timeout period',
+      }
+    );
   };
 
   this.getMetaTagContent = async function (name, type) {

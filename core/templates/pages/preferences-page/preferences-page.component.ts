@@ -48,7 +48,7 @@ require('cropperjs/dist/cropper.min.css');
 import './preferences-page.component.css';
 import {FormControl, FormGroup} from '@angular/forms';
 
-interface AudioLangaugeChoice {
+interface AudioLanguageChoice {
   id: string;
   text: string;
 }
@@ -75,7 +75,7 @@ export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
+  AUDIO_LANGUAGE_CHOICES!: AudioLanguageChoice[];
   TAG_REGEX_STRING!: string;
   LANGUAGE_CHOICES!: LanguageIdAndText[];
   // The following two properties are set to null when the

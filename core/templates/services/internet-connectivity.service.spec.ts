@@ -63,8 +63,8 @@ describe('Connection Service', () => {
         },
       ],
     });
-    internetConnectivityService = TestBed.get(InternetConnectivityService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    internetConnectivityService = TestBed.inject(InternetConnectivityService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
   beforeEach(() => {
     connectionStateSpy = jasmine.createSpy('stateChange');

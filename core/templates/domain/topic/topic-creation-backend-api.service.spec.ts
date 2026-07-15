@@ -50,9 +50,9 @@ describe('Topic creation backend api service', () => {
       providers: [TopicCreationBackendApiService],
     });
 
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    topicCreationBackendApiService = TestBed.get(
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    topicCreationBackendApiService = TestBed.inject(
       TopicCreationBackendApiService
     );
     topic = NewlyCreatedTopic.createDefault();

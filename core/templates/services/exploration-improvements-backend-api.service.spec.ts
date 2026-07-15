@@ -44,10 +44,10 @@ describe('Exploration stats back-end API service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    explorationImprovementsBackendApiService = TestBed.get(
+    explorationImprovementsBackendApiService = TestBed.inject(
       ExplorationImprovementsBackendApiService
     );
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

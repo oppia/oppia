@@ -39,8 +39,8 @@ describe('Promo bar backend api service', () => {
       imports: [HttpClientTestingModule],
       providers: [PromoBarBackendApiService],
     });
-    promoBarBackendApiService = TestBed.get(PromoBarBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    promoBarBackendApiService = TestBed.inject(PromoBarBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

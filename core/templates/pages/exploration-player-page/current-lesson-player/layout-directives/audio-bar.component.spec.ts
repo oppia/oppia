@@ -326,6 +326,15 @@ describe('Audio Bar Component', () => {
       }
     );
 
+    it('should not play voiceover if new audio is loading', () => {
+      component.audioLoadingIndicatorIsShown = true;
+      component.isPaused = true;
+
+      component.onPlayButtonClicked();
+      // Voiceover is still paused.
+      expect(component.isPaused).toBeTrue();
+    });
+
     it('should load audio track and play audio when play button is clicked', () => {
       component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
         filename: 'audio-en.mp3',

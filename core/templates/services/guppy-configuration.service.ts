@@ -62,7 +62,7 @@ const FRACTION_SYMBOL_DICT = {
   output: {
     latex: '\\frac{{$1}}{{$2}}',
     small_latex: '\\frac{{$1}}{{$2}}',
-    asciimath: '/',
+    asciimath: '({$1})/({$2})',
     text: '({$1})/({$2})',
   },
   input: 1,
@@ -127,7 +127,7 @@ export class GuppyConfigurationService {
     Guppy.configure('buttons', ['controls']);
     Guppy.configure(
       'empty_content',
-      '\\color{grey}{\\text{\\small{Type a formula here.}}}'
+      '\\color{grey}{\\small \\text{Type a formula here.}}'
     );
     GuppyConfigurationService.serviceIsInitialized = true;
   }

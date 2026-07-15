@@ -37,9 +37,9 @@ describe('Contributor dashboard admin backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    cdabas = TestBed.get(ContributorDashboardAdminBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    csrfService = TestBed.get(CsrfTokenService);
+    cdabas = TestBed.inject(ContributorDashboardAdminBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 

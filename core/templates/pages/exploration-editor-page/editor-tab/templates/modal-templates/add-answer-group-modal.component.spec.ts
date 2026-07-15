@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for AddAnswerGroupModalController.
  */
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
   fakeAsync,
@@ -61,11 +62,11 @@ describe('Add Answer Group Modal Component', () => {
   var generateContentIdService: GenerateContentIdService;
   var testSubscriptions: Subscription;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [AddAnswerGroupModalComponent],
       providers: [
         EditorFirstTimeEventsService,
@@ -132,6 +133,11 @@ describe('Add Answer Group Modal Component', () => {
 
     expect(component.validation).toBe(false);
   }));
+
+  it('should initialize null outcome destination in question mode', () => {
+    expect(component.questionModeEnabled).toBe(true);
+    expect(component.tmpOutcome.dest).toBe(null);
+  });
 
   it('should update answer group feedback', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);

@@ -359,6 +359,7 @@ class BlogPostSummaryDomainSearchDict(TypedDict):
     id: str
     title: str
     tags: List[str]
+    summary: str
     rank: int
 
 
@@ -402,6 +403,7 @@ def _blog_post_summary_to_search_dict(
             'id': blog_post_summary.id,
             'title': blog_post_summary.title,
             'tags': blog_post_summary.tags,
+            'summary': blog_post_summary.summary,
             'rank': math.floor(
                 utils.get_time_in_millisecs(blog_post_summary.published_on)
             ),

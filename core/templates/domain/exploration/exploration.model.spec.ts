@@ -44,7 +44,7 @@ describe('Exploration', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-    ls = TestBed.get(LoggerService);
+    ls = TestBed.inject(LoggerService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     firstState = {

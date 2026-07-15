@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to fetch and store EntityVoiceovers for the given
- * entity in a given langauge accent code.
+ * entity in a given language accent code.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';

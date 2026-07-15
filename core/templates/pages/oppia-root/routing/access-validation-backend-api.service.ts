@@ -62,6 +62,10 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/can_access_topic_viewer_page/' +
     '<classroom_url_fragment>/<topic_url_fragment>';
 
+  STORY_VIEWER_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_story_viewer_page/' +
+    '<classroom_url_fragment>/<topic_url_fragment>/story/<story_url_fragment>';
+
   PRACTICE_SESSION_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
     '<classroom_url_fragment>/<topic_url_fragment>/practice/session';
@@ -185,6 +189,23 @@ export class AccessValidationBackendApiService {
         topic_url_fragment: topicUrlFragment,
       }
     );
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToStoryViewerPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    storyUrlFragment: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.STORY_VIEWER_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        story_url_fragment: storyUrlFragment,
+      }
+    );
+
     return this.http.get<void>(url).toPromise();
   }
 

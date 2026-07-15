@@ -110,7 +110,7 @@ describe('InteractiveNumericInput', () => {
   }));
 
   beforeEach(() => {
-    currentInteractionService = TestBed.get(CurrentInteractionService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveNumericInput);
     component = fixture.componentInstance;
     component.requireNonnegativeInputWithValue = 'false';

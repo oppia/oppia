@@ -20,7 +20,7 @@ import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {NgbCarouselConfig} from '@ng-bootstrap/ng-bootstrap';
-
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {VolunteerPageComponent} from './volunteer-page.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PageTitleService} from 'services/page-title.service';
@@ -48,6 +48,7 @@ describe('Volunteer page', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [VolunteerPageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,

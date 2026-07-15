@@ -39,7 +39,7 @@ describe('UnicodeStringEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UnicodeStringEditorComponent);
     component = fixture.componentInstance;
-    externalSaveService = TestBed.get(ExternalSaveService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
     spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
       externalSaveEventEmitter
     );

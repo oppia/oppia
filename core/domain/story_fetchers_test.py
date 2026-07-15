@@ -43,6 +43,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2: Final = '%s2' % story_domain.NODE_ID_PREFIX
     EXP_ID_1: Final = 'exp_1'
+    EXP_ID_2: Final = 'exp_2'
     USER_ID: Final = 'user'
 
     def setUp(self) -> None:
@@ -163,6 +164,29 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
 
     def test_migrate_story_contents(self) -> None:
+        changelist = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': self.NODE_ID_2,
+                    'title': 'Title 2',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': self.NODE_ID_2,
+                    'old_value': None,
+                    'new_value': self.EXP_ID_2,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.USER_ID, self.story_id, changelist, 'Added node.'
+        )
         story_id = self.story_id
         story_model = story_models.StoryModel.get(story_id)
         versioned_story_contents: story_domain.VersionedStoryContentsDict = {
@@ -179,7 +203,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story_fetchers._migrate_story_contents_to_latest_schema(  # pylint: disable=protected-access
             versioned_story_contents, story_id
         )
-        versioned_story_contents['schema_version'] = 6
+        versioned_story_contents['schema_version'] = 7
         with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '

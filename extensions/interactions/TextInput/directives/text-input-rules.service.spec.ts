@@ -33,7 +33,7 @@ describe('Text Input rules service', () => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe],
     });
-    tirs = TestBed.get(TextInputRulesService);
+    tirs = TestBed.inject(TextInputRulesService);
 
     RULE_INPUT = {
       x: {

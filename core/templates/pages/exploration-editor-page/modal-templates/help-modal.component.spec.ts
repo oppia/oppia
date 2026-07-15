@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for HelpModalComponent.
  */
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HelpModalComponent} from './help-modal.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -33,6 +34,7 @@ describe('Exploration Player Suggestion Modal Controller', function () {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [HelpModalComponent],
       providers: [SiteAnalyticsService, PageContextService, NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA],

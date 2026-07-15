@@ -94,8 +94,8 @@ describe('Question backend Api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    questionBackendApiService = TestBed.get(QuestionBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

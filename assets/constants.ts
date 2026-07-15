@@ -65,12 +65,12 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
-    "RTE_COMPONENT_CONFIGS": {
-      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
-      "BLOG_COMPONENTS": ["image", "link", "video"],
-      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
-      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
-    },
+  "RTE_COMPONENT_CONFIGS": {
+    "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+    "BLOG_COMPONENTS": ["image", "link", "video"],
+    "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+    "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
+  },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
@@ -6262,6 +6262,7 @@ export default {
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
   "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
+  "MAX_CHARS_IN_SET_INPUT_BUTTON_TEXT": 50,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 65,

@@ -92,6 +92,7 @@ export class BaseContentComponent {
       })
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+    this.keyboardShortcutService.bindLibraryPageShortcuts();
 
     // TODO(sll): Use 'touchstart' for mobile.
     this.windowRef.nativeWindow.document.addEventListener('click', () => {

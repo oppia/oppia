@@ -42,7 +42,7 @@ describe('GraphInputValidationService', () => {
     });
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    validatorService = TestBed.get(GraphInputValidationService);
+    validatorService = TestBed.inject(GraphInputValidationService);
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',

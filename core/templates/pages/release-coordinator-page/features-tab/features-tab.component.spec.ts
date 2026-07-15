@@ -94,8 +94,8 @@ describe('Release coordinator page feature tab', function () {
 
     fixture = TestBed.createComponent(FeaturesTabComponent);
     component = fixture.componentInstance;
-    featureApiService = TestBed.get(FeatureFlagBackendApiService);
-    windowRef = TestBed.get(WindowRef);
+    featureApiService = TestBed.inject(FeatureFlagBackendApiService);
+    windowRef = TestBed.inject(WindowRef);
 
     let confirmResult = true;
     let promptResult: string | null = 'mock msg';
@@ -869,7 +869,7 @@ describe('Release coordinator page feature tab', function () {
     let dummyApiSpy: jasmine.Spy;
 
     beforeEach(() => {
-      dummyApiService = TestBed.get(FeatureFlagDummyBackendApiService);
+      dummyApiService = TestBed.inject(FeatureFlagDummyBackendApiService);
 
       dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled').and.resolveTo();
     });

@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 import pkgutil
 
-from core import constants, feconf, utils
+from core import constants, feconf
 from core.tests import test_utils
 
 
@@ -31,7 +31,9 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_file_contains_valid_json(self) -> None:
         """Test if the constants file is valid json file."""
-        with utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
+        with open(
+            os.path.join('assets', 'constants.ts'), 'r', encoding='utf-8'
+        ) as f:
             json = constants.parse_json_from_ts(f.read())
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
@@ -65,7 +67,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_binary_file_returns_the_content(self) -> None:
         """Test get_package_file_contents with binary file."""
-        with utils.open_file(
+        with open(
             os.path.join('assets', 'images', 'avatar', 'user_blue_150px.png'),
             'rb',
             encoding=None,
@@ -141,7 +143,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         dummy_constants_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'dummy_constants.js'
         )
-        with utils.open_file(dummy_constants_filepath, 'r') as f:
+        with open(dummy_constants_filepath, 'r', encoding='utf-8') as f:
             actual_text_without_comments = constants.remove_comments(f.read())
             expected_text_without_comments = (
                 'var dummy_constants = {\n'

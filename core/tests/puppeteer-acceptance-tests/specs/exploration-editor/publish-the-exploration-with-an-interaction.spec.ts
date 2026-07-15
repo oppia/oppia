@@ -57,7 +57,10 @@ describe('Exploration Creator', function () {
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-      await explorationEditor.addImageInteraction();
+      await explorationEditor.addImageInteraction(
+        'Correct!',
+        CARD_NAME.LAST_CARD
+      );
       await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
         'Wrong.'
       );

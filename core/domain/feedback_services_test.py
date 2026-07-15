@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
+    email_manager,
     event_services,
     exp_domain,
     feedback_domain,
@@ -152,11 +153,12 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             },
             'some text',
         )
-        thread_id = feedback_services.get_threads(
+
+        thread_id_with_suggestion = feedback_services.get_threads(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_1_ID
         )[0].id
         feedback_services.create_message(
-            thread_id, self.user_id, None, None, 'some text'
+            thread_id_with_suggestion, self.user_id, None, None, 'some text'
         )
         feedback_models.FeedbackAnalyticsModel(id=self.EXP_1_ID).put()
 
@@ -168,8 +170,35 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, []
         )
 
+        blog_post_id = 'test_blog_post_id'
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_BLOG_POST,
+            blog_post_id,
+            self.user_id,
+            'Blog subject',
+            'Initial message for blog post',
+        )
+        thread_id_blog_post = feedback_services.get_threads(
+            feconf.ENTITY_TYPE_BLOG_POST, blog_post_id
+        )[0].id
+        feedback_services.create_message(
+            thread_id_blog_post, self.user_id, None, None, 'some text'
+        )
+        feedback_models.FeedbackAnalyticsModel(id=blog_post_id).put()
+
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_BLOG_POST, [blog_post_id]
+        )
+
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_blog_post
+            )
+        )
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id_with_suggestion
+            )
         )
         self.assertIsNone(
             feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID)
@@ -2235,3 +2264,68 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com',
+            ),
+        ]
+    )
+    def test_message_not_sent(
+        self,
+    ) -> None:
+        with self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                'exploration',
+                self.exploration.id,
+                self.new_user_id,
+                'a subject',
+                'some text',
+            )
+            self.process_and_flush_pending_tasks()
+
+            threadlist = feedback_services.get_all_threads(
+                'exploration', self.exploration.id, False
+            )
+            thread_id = threadlist[0].id
+
+            user_pref = user_services.get_email_preferences(self.new_user_id)
+            user_services.update_email_preferences(
+                self.new_user_id,
+                can_receive_email_updates=user_pref.can_receive_email_updates,
+                can_receive_editor_role_email=user_pref.can_receive_editor_role_email,
+                can_receive_feedback_email=False,
+                can_receive_subscription_email=user_pref.can_receive_subscription_email,
+                bulk_email_db_already_updated=False,
+            )
+
+            user_services.set_email_preferences_for_exploration(
+                self.new_user_id,
+                self.exploration.id,
+                mute_feedback_notifications=True,
+            )
+
+            can_receive = email_manager.can_users_receive_thread_email(
+                [self.new_user_id], self.exploration.id, has_suggestion=False
+            )
+            feedback_services.create_message(
+                thread_id,
+                self.editor_id,
+                feedback_models.STATUS_CHOICES_FIXED,
+                None,
+                'editor message',
+            )
+            self.assertEqual(can_receive, [False])

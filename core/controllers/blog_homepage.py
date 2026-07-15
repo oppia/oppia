@@ -81,8 +81,9 @@ def _get_blog_card_summary_dicts_for_homepage(
             summary_dict['author_id'], strict=False
         )
         author_details = blog_services.get_blog_author_details(
-            summary_dict['author_id']
+            summary_dict['author_id'], strict=False
         )
+
         if user_settings:
             card_summary_dict: BlogCardSummaryDict = {
                 'id': summary_dict['id'],
@@ -198,32 +199,20 @@ class BlogHomepageDataHandler(
                     published_post_summaries
                 )
             )
-        # Total number of published blog posts is calculated only when we load
-        # the blog home page for the first time (search offset will be 0).
-        # It is not required to load other subsequent pages as the value is
-        # already loaded in the frontend.
-        if offset != 0:
-            self.values.update(
-                {
-                    'blog_post_summary_dicts': published_post_summary_dicts,
-                }
-            )
-            self.render_json(self.values)
-        else:
-            number_of_published_blog_post_summaries = (
-                blog_services.get_total_number_of_published_blog_post_summaries()
-            )
-            list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
-            self.values.update(
-                {
-                    'no_of_blog_post_summaries': (
-                        number_of_published_blog_post_summaries
-                    ),
-                    'blog_post_summary_dicts': published_post_summary_dicts,
-                    'list_of_default_tags': list_of_default_tags,
-                }
-            )
-            self.render_json(self.values)
+        number_of_published_blog_post_summaries = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        self.values.update(
+            {
+                'no_of_blog_post_summaries': (
+                    number_of_published_blog_post_summaries
+                ),
+                'blog_post_summary_dicts': published_post_summary_dicts,
+                'list_of_default_tags': list_of_default_tags,
+            }
+        )
+        self.render_json(self.values)
 
 
 class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -275,8 +264,9 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         else:
             author_username = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
-            blog_post.author_id
+            blog_post.author_id, strict=False
         )
+
         blog_post_dict = blog_post.to_dict()
         authors_blog_post_dict: AuthorsBlogPostDict = {
             'id': blog_post_dict['id'],
@@ -385,7 +375,7 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 % author_username
             )
 
-        author_details = blog_services.get_blog_author_details(
+        author_details_dict = blog_services.get_blog_author_details(
             user_settings.user_id
         ).to_dict()
         num_of_published_blog_post_summaries = blog_services.get_total_number_of_published_blog_post_summaries_by_author(
@@ -406,7 +396,7 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         self.values.update(
             {
-                'author_details': author_details,
+                'author_details': author_details_dict,
                 'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
                 'summary_dicts': blog_post_summary_dicts,
             }
@@ -482,11 +472,18 @@ class BlogPostSearchHandler(
         )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
+        total_matching_blog_posts = (
+            blog_services.get_total_number_of_matching_blog_posts(
+                query_string, tags
+            )
+        )
+
         self.values.update(
             {
                 'blog_post_summaries_list': blog_post_summary_dicts,
                 'search_offset': new_search_offset,
                 'list_of_default_tags': list_of_default_tags,
+                'total_matching_blog_posts': total_matching_blog_posts,
             }
         )
 

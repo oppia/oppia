@@ -452,6 +452,47 @@ describe('Change List Service when changes are mergable', () => {
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should correctly identify if change list affects automatic voiceovers', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.editStateProperty(
+      'state',
+      'solution',
+      'oldValue',
+      'newValue'
+    );
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.doesChangeListAffectAutoVoiceovers()).toBe(true);
+
+    changeListService.explorationChangeList = [];
+
+    let voiceover: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+    let voiceoverTypeToVoiceovers = {
+      manual: voiceover,
+    };
+
+    changeListService.editVoiceovers(
+      'content_id_1',
+      'en-US',
+      voiceoverTypeToVoiceovers
+    );
+
+    flush();
+    expect(changeListService.doesChangeListAffectAutoVoiceovers()).toBe(false);
+  }));
+
   it('should mark voiceovers as needing update', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;

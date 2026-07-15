@@ -66,9 +66,9 @@ describe('Release coordinator backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    rcbas = TestBed.get(ReleaseCoordinatorBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    csrfService = TestBed.get(CsrfTokenService);
+    rcbas = TestBed.inject(ReleaseCoordinatorBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
     userGroupResponse = {

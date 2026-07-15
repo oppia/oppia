@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import feature_flag_list, utils
+from core import feature_flag_list
 from core.domain import (
     feature_flag_domain,
     feature_flag_registry,
@@ -60,7 +60,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
 
     def _parse_feature_names_in_frontend(self) -> List[str]:
         """Reads and parses feature flag definition in frontend."""
-        with utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
+        with open(FRONTEND_FEATURE_NAMES_PATH, 'r', encoding='utf-8') as f:
             content = f.read()
 
         body_content = ENUM_BODY_REGEXP.search(content)

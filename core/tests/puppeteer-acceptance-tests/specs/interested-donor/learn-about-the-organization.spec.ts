@@ -82,6 +82,7 @@ describe('Interested Donor', function () {
 
   it('should be able to read more what organization has done', async function () {
     await interestedDonor.clickAboutButtonInAboutMenuOnNavbar();
+    await interestedDonor.scrollToBottomOfPage();
     await interestedDonor.clickOnBlogLinkInFooter();
     await interestedDonor.expectScreenshotToMatch('blogPage', __dirname);
   });

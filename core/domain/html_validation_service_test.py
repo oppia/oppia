@@ -21,7 +21,7 @@ from __future__ import annotations
 import os
 import re
 
-from core import feconf, utils
+from core import feconf
 from core.domain import fs_services, html_validation_service
 from core.tests import test_utils
 
@@ -1128,7 +1128,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -1162,7 +1162,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';img2.svg&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -1204,7 +1204,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
             ';&amp;quot;}"></oppia-noninteractive-math>'
         )
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,

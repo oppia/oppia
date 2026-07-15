@@ -84,9 +84,11 @@ describe('Admin page platform parameters tab', () => {
 
     fixture = TestBed.createComponent(AdminPlatformParametersTabComponent);
     component = fixture.componentInstance;
-    adminDataService = TestBed.get(AdminDataService);
-    parameterApiService = TestBed.get(PlatformParameterAdminBackendApiService);
-    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
+    adminDataService = TestBed.inject(AdminDataService);
+    parameterApiService = TestBed.inject(
+      PlatformParameterAdminBackendApiService
+    );
+    adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     spyOn(adminDataService, 'getDataAsync').and.resolveTo({
       platformParameters: [

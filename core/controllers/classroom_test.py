@@ -20,7 +20,7 @@ import json
 import os
 
 import main
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import (
     classroom_config_domain,
@@ -533,13 +533,13 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         self.physics_classroom_dict['thumbnail_data']['filename'] = 'update.svg'
         self.physics_classroom_dict['banner_data']['filename'] = 'update.png'
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_banner_image = f.read()
@@ -574,13 +574,13 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.physics_classroom_dict['thumbnail_data']['filename'] = 'update.svg'
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_banner_image = f.read()
@@ -639,13 +639,13 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.physics_classroom_dict['banner_data']['filename'] = 'update.png'
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_banner_image = f.read()
@@ -715,13 +715,13 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_banner_image = f.read()
@@ -816,13 +816,13 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             self.public_topic_id_2: []
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
         ) as f:
             raw_thumbnail_image = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_banner_image = f.read()

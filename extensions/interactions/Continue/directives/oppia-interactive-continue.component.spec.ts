@@ -96,7 +96,7 @@ describe('OppiaInteractiveContinue', () => {
     beforeEach(() => {
       // The component needs to be created twice since each time a different
       // mockCurrentInteractionService is used.
-      pageContextService = TestBed.get(PageContextService);
+      pageContextService = TestBed.inject(PageContextService);
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;
       component.buttonTextWithValue = 'Continue';
@@ -155,7 +155,7 @@ describe('OppiaInteractiveContinue', () => {
     beforeEach(() => {
       // The component needs to be created twice since each time a different
       // mockCurrentInteractionService is used.
-      pageContextService = TestBed.get(PageContextService);
+      pageContextService = TestBed.inject(PageContextService);
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;
       component.buttonTextWithValue = 'Continue button';

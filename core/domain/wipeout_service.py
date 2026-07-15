@@ -477,6 +477,33 @@ def _delete_profile_picture(
         )
 
 
+def remove_user_from_translation_coordinators(user_id: str) -> None:
+    """Removes the user from all translation coordinator models.
+
+    Args:
+        user_id: str. The ID of the user to remove from translation
+            coordinator models.
+    """
+    translation_coordinator_models: Sequence[
+        suggestion_models.TranslationCoordinatorsModel
+    ] = suggestion_models.TranslationCoordinatorsModel.get_by_user(user_id)
+
+    models_to_update: List[suggestion_models.TranslationCoordinatorsModel] = []
+    for coordinator_model in translation_coordinator_models:
+        if user_id in coordinator_model.coordinator_ids:
+            coordinator_model.coordinator_ids.remove(user_id)
+            coordinator_model.coordinators_count = len(
+                coordinator_model.coordinator_ids
+            )
+            models_to_update.append(coordinator_model)
+
+    if models_to_update:
+        suggestion_models.TranslationCoordinatorsModel.update_timestamps_multi(
+            models_to_update
+        )
+        datastore_services.put_multi(models_to_update)
+
+
 def remove_user_from_user_groups(user_id: str) -> None:
     """Removes the user from all user groups they are a member of.
 
@@ -534,6 +561,7 @@ def delete_user(
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
     remove_user_from_user_groups(user_id)
+    remove_user_from_translation_coordinators(user_id)
 
     # Explicitly handle the case where the user settings model is deleted.
     if (
@@ -583,6 +611,13 @@ def delete_user(
             subtopic_models.SubtopicPageSnapshotMetadataModel,
             subtopic_models.SubtopicPageCommitLogEntryModel,
             'subtopic_page_id',
+        )
+        _pseudonymize_activity_models_without_associated_rights_models(
+            pending_deletion_request,
+            models.Names.SUBTOPIC,
+            subtopic_models.StudyGuideSnapshotMetadataModel,
+            subtopic_models.StudyGuideCommitLogEntryModel,
+            'study_guide_id',
         )
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,

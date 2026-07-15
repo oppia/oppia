@@ -32,7 +32,7 @@ describe('Audio translation manager service', () => {
       providers: [AudioTranslationManagerService],
     });
 
-    atms = TestBed.get(AudioTranslationManagerService);
+    atms = TestBed.inject(AudioTranslationManagerService);
   });
 
   var testAudioTranslations: AudioTranslations;

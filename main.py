@@ -208,6 +208,11 @@ URLS = [
         '/<firebase_path:__/auth(?:/.*)?>', firebase.FirebaseProxyPage
     ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
+    get_redirect_route(
+        r'%s/can_access_story_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/story/<story_url_fragment>'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.StoryViewerPageAccessValidationHandler,
+    ),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler
@@ -615,6 +620,14 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL,
         voiceover.RegenerateVoiceoverOnExpUpdateHandler,
+    ),
+    get_redirect_route(
+        r'/exploration_voiceovers_data/<exploration_id>',
+        voiceover.ExplorationDataForVoiceoverRegenerationHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL,
+        voiceover.RegenerateVoiceoversForExplorationHandler,
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -1379,6 +1392,10 @@ URLS = [
         '/automatic_voiceover_regeneration_record',
         voiceover.AutomaticVoiceoverRegenerationRecordHandler,
     ),
+    get_redirect_route(
+        r'/exploration_voiceover_regeneration_status_url/<exploration_id>',
+        voiceover.VoiceoverRegenerationRequestToCloudTaskHandler,
+    ),
 ]
 
 # Adding redirects for topic landing pages.
@@ -1407,18 +1424,9 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
-        if 'LIGHTWEIGHT' in page:
-            URLS.append(
-                get_redirect_route(
-                    r'/%s' % page['ROUTE'], oppia_root.OppiaLightweightRootPage
-                )
-            )
-        else:
-            URLS.append(
-                get_redirect_route(
-                    r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage
-                )
-            )
+        URLS.append(
+            get_redirect_route(r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage)
+        )
 
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend(
@@ -1536,6 +1544,14 @@ URLS.extend(
             r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler
         ),
         get_redirect_route(
+            r'/cron/cloud_task/mark_stale_cloud_task_run_as_failed',
+            cron.CronMarkStaleCloudTaskRunModelsAsFailedHandler,
+        ),
+        get_redirect_route(
+            r'/cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed',
+            cron.CronMarkStaleVoiceoverRegenerationContentAsFailedHandler,
+        ),
+        get_redirect_route(
             r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler
         ),
         get_redirect_route(
@@ -1574,6 +1590,10 @@ URLS.extend(
         get_redirect_route(
             r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
             tasks.FeedbackThreadStatusChangeEmailHandler,
+        ),
+        get_redirect_route(
+            r'%s' % feconf.TASK_URL_RETRY_FAILED_EMAIL,
+            tasks.RetryEmailHandler,
         ),
         get_redirect_route(
             r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler

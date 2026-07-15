@@ -76,6 +76,7 @@ const userGroupCreateErrorSelector = '.e2e-test-user-group-save-error';
 const removeUserGroupButtonSelector = '.e2e-test-remove-user-group-button';
 const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
 const beamJobStatusSelectorPrefix = '.e2e-test-job-status-';
+const beamJobOutputDialogSelector = '.e2e-test-view-beam-job-output-dialog';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
@@ -519,7 +520,8 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} jobName - The name of the job to run.
    */
   async selectAndRunJob(jobName: string): Promise<void> {
-    await this.page.waitForSelector(jobInputField, {visible: true});
+    await this.expectElementToBeVisible(jobInputField);
+    await this.clearAllTextFrom(jobInputField);
     await this.typeInInputField(jobInputField, jobName);
     await this.page.keyboard.press('Enter');
     await this.page.waitForSelector(startNewJobButton, {visible: true});
@@ -560,47 +562,54 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
-   * Views and copies the output of a job.
+   * Clicks on "View Output" of the latest beam job run.
+   */
+  async viewJobOutput(): Promise<void> {
+    await this.clickOnElementWithText('View Output');
+    await this.expectElementToBeVisible(beamJobOutputDialogSelector);
+  }
+
+  /**
+   * View and copy the output of a job.
    */
   async viewAndCopyJobOutput(): Promise<string> {
-    try {
-      // OverridePermissions is used to allow clipboard access.
-      const context = await this.browserObject.defaultBrowserContext();
-      await context.overridePermissions('http://localhost:8181', [
-        'clipboard-read',
-        'clipboard-write',
-      ]);
-      const pages = await this.browserObject.pages();
-      this.page = pages[pages.length - 1];
+    await this.viewJobOutput();
+    await this.page.waitForSelector(beamJobRunOutputSelector, {
+      visible: true,
+    });
 
-      await this.clickOnElementWithText('View Output');
-      await this.page.waitForSelector(beamJobRunOutputSelector, {
-        visible: true,
-      });
+    // OverridePermissions is used to allow clipboard access.
+    const context = await this.browserObject.defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    const pages = await this.browserObject.pages();
+    this.page = pages[pages.length - 1];
 
-      // Getting the output text directly from the element.
-      const output = await this.page.$eval(
-        beamJobRunOutputSelector,
-        el => el.textContent
+    // Get the output text directly from the element.
+    const output = await this.page.$eval(
+      beamJobRunOutputSelector,
+      el => el.textContent
+    );
+
+    await this.clickOnElementWithSelector(copyOutputButton);
+
+    // Read the clipboard data.
+    const clipboardData = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
+
+    if (clipboardData !== output) {
+      throw new Error(
+        'Data was not copied correctly\n' +
+          `Expected: "${output}"\n` +
+          `Actual: "${clipboardData}"`
       );
-
-      await this.clickOnElementWithSelector(copyOutputButton);
-
-      // Reading the clipboard data.
-      const clipboardData = await this.page.evaluate(async () => {
-        return await navigator.clipboard.readText();
-      });
-
-      if (clipboardData !== output) {
-        throw new Error('Data was not copied correctly');
-      }
-      showMessage('Data was copied correctly');
-
-      return output;
-    } catch (error) {
-      console.error('An error occurred:', error);
-      throw error;
     }
+    showMessage('Data was copied correctly');
+
+    return output;
   }
 
   /**
@@ -615,8 +624,7 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
-   * Closes the output modal.
-   * @returns {Promise<void>}
+   * Closes the output modal by clicking on "Close" button.
    */
   async closeOutputModal(): Promise<void> {
     await this.expectElementToBeVisible(beamJobCloseOuputButtonSelector);

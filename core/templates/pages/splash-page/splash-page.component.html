@@ -6,16 +6,19 @@
         <h2 class="oppia-splash-h2 oppia-splash-h2-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></h2>
       </div>
       <div class="oppia-splash-button-container">
-        <button type="submit" (click)="onClickBrowseLessonsButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200 e2e-test-explore-lessons-btn">
-          {{ 'I18N_EXPLORE_OPPIA_CLASSROOM' | translate }}
-        </button>
+        <oppia-primary-button
+          buttonHref="/learn"
+          (onClickPrimaryButton)="onClickBrowseLessonsButton()"
+          [customClasses]="['btn', 'oppia-splash-button', 'oppia-splash-button-browse', 'oppia-splash-browse-button-position', 'oppia-transition-200', 'e2e-test-explore-lessons-btn']"
+          buttonText="{{ 'I18N_EXPLORE_OPPIA_CLASSROOM' | translate }}">
+        </oppia-primary-button>
       </div>
       <div class="oppia-splash-button-container">
-        <button type="submit" (click)="onClickAccessAndroidButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200 e2e-test-splash-android-app-button">
-          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
-        </button>
+        <oppia-primary-button
+          buttonHref="/android"
+          [customClasses]="['btn', 'oppia-splash-button', 'oppia-splash-button-browse', 'oppia-splash-browse-button-position', 'oppia-transition-200', 'e2e-test-splash-android-app-button']"
+          buttonText="{{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
     <div class="oppia-splash-section-one-right">
@@ -134,11 +137,12 @@
       <h3 [innerHTML]="'I18N_SPLASH_STUDENTS_TITLE' | translate"></h3>
       <p [innerHTML]="'I18N_SPLASH_STUDENTS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
-        <button type="submit"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate"
-                (click)="onClickStartLearningButton()">
-        </button>
+        <oppia-primary-button
+          buttonHref="/learn"
+          (onClickPrimaryButton)="onClickStartLearningButton()"
+          [customClasses]="['btn', 'oppia-splash-button', 'oppia-splash-button-browse', 'oppia-splash-browse-button-position', 'oppia-transition-200']"
+          buttonText="{{ 'I18N_SPLASH_START_LEARNING' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
     <div class="oppia-splash-section-four-right" *ngIf="!isWindowNarrow">
@@ -207,11 +211,12 @@
       <h3 [innerHTML]="'I18N_SPLASH_TEACHERS_TITLE' | translate"></h3>
       <p [innerHTML]="'I18N_SPLASH_TEACHERS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
-        <button type="submit"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate"
-                (click)="onClickStartTeachingButton()">
-        </button>
+        <oppia-primary-button
+          buttonHref="/creator-guidelines"
+          (onClickPrimaryButton)="onClickStartTeachingButton()"
+          [customClasses]="['btn', 'oppia-splash-button', 'oppia-splash-button-browse', 'oppia-splash-browse-button-position', 'oppia-transition-200']"
+          buttonText="{{ 'I18N_SPLASH_START_TEACHING' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
   </div>
@@ -233,11 +238,12 @@
       <h3 [innerHTML]="'I18N_SPLASH_VOLUNTEERS_TITLE' | translate"></h3>
       <p [innerHTML]="'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
-        <button type="submit"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate"
-                (click)="onClickStartContributingButton()">
-        </button>
+        <oppia-primary-button
+          buttonHref="/volunteer"
+          (onClickPrimaryButton)="onClickStartContributingButton()"
+          [customClasses]="['btn', 'oppia-splash-button', 'oppia-splash-button-browse', 'oppia-splash-browse-button-position', 'oppia-transition-200']"
+          buttonText="{{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
     <div class="oppia-splash-section-seven-right" *ngIf="!isWindowNarrow">

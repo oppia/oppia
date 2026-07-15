@@ -34,8 +34,8 @@ describe('History Tab Backend Api Service', () => {
       imports: [HttpClientTestingModule],
       providers: [HistoryTabBackendApiService],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    service = TestBed.get(HistoryTabBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    service = TestBed.inject(HistoryTabBackendApiService);
   });
 
   afterEach(() => {

@@ -27,10 +27,12 @@
         <div class="oppia-footer-newsletter-warning" *ngIf="emailDuplicated">
           <p>{{ 'I18N_FOOTER_NEWSLETTER_WARNING' | translate }}</p>
         </div>
-        <div class="oppia-footer-newsletter-warning" *ngIf="newsletterTouched && (!emailAddress || (emailAddress && emailAddress.trim() === ''))">
+        <div class="oppia-footer-newsletter-warning"
+             *ngIf="newsletterTouched && (!emailAddress || (emailAddress && emailAddress.trim() === ''))">
           <p>{{ 'I18N_FOOTER_NEWSLETTER_REQUIRED' | translate }}</p>
         </div>
-        <div class="oppia-footer-newsletter-warning" *ngIf="newsletterTouched && emailAddress && !validateEmailAddress()">
+        <div class="oppia-footer-newsletter-warning"
+             *ngIf="newsletterTouched && emailAddress && !validateEmailAddress()">
           <p>{{ 'I18N_FOOTER_NEWSLETTER_INVALID' | translate }}</p>
         </div>
       </div>
@@ -47,20 +49,17 @@
         <p>{{ 'I18N_FOOTER_ABOUT_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
-            <a (click)="navigateToAboutPage()"
-               class="e2e-test-footer-about-link">
-               {{ 'I18N_FOOTER_ABOUT' | translate }}
+            <a href="/about" (click)="onAboutLinkClick()" class="e2e-test-footer-about-link">
+              {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
           <li>
-            <a [href]="getOppiaBlogUrl()"
-               class="e2e-test-footer-blog-link">
+            <a [href]="getOppiaBlogUrl()" class="e2e-test-footer-blog-link">
               {{ 'I18N_FOOTER_BLOG' | translate }}
             </a>
           </li>
           <li>
-            <a href="https://groups.google.com/g/oppia"
-               class="e2e-test-footer-forum-link">
+            <a href="https://groups.google.com/g/oppia" class="e2e-test-footer-forum-link">
               {{ 'I18N_FOOTER_FORUM' | translate }}
             </a>
           </li>
@@ -70,33 +69,28 @@
         <p>{{ 'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
-            <a href="/get-started"
-               class="e2e-test-get-started-link">
-               {{ 'I18N_FOOTER_GET_STARTED' | translate }}
+            <a href="/get-started" class="e2e-test-get-started-link">
+              {{ 'I18N_FOOTER_GET_STARTED' | translate }}
             </a>
           </li>
           <li>
-            <a href="/creator-guidelines"
-               class="e2e-test-creator-guidelines-link">
-               {{ 'I18N_PLAYBOOK_HEADING' | translate }}
+            <a href="/creator-guidelines" class="e2e-test-creator-guidelines-link">
+              {{ 'I18N_PLAYBOOK_HEADING' | translate }}
             </a>
           </li>
           <li>
-            <a (click)="navigateToTeachPage()"
-               class="e2e-test-teach-link">
-               {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
+            <a href="/teach" (click)="onTeachLinkClick()" class="e2e-test-teach-link">
+              {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
             </a>
           </li>
           <li>
-            <a href="/community-library"
-               class="e2e-test-community-library-link">
-               {{ 'I18N_FOOTER_BROWSE_LIBRARY' | translate }}
+            <a href="/community-library" class="e2e-test-community-library-link">
+              {{ 'I18N_FOOTER_BROWSE_LIBRARY' | translate }}
             </a>
           </li>
           <li>
-            <a href="/contact"
-               class="e2e-test-contact-link">
-               {{ 'I18N_FOOTER_CONTACT_US' | translate }}
+            <a href="/contact" class="e2e-test-contact-link">
+              {{ 'I18N_FOOTER_CONTACT_US' | translate }}
             </a>
           </li>
         </ul>
@@ -106,8 +100,7 @@
         <oppia-social-buttons></oppia-social-buttons>
       </div>
     </div>
-    <div class="oppia-footer-version-info e2e-test-footer-version-info"
-         *ngIf="versionInformationIsShown">
+    <div class="oppia-footer-version-info e2e-test-footer-version-info" *ngIf="versionInformationIsShown">
       Version: {{ BRANCH_NAME + ' (' + SHORT_COMMIT_HASH + ')' }}
     </div>
   </div>
@@ -116,15 +109,13 @@
       {{ 'I18N_FOOTER_COPYRIGHT' | translate:{currentYear: currentYear} }}
     </small>
     <small>
-      <a href="/terms"
-         class="e2e-test-terms-link">
-         {{ 'I18N_FOOTER_TERMS_OF_SERVICE' | translate }}
+      <a href="/terms" class="e2e-test-terms-link">
+        {{ 'I18N_FOOTER_TERMS_OF_SERVICE' | translate }}
       </a>
     </small>
     <small>
-      <a href="/privacy-policy"
-         class="e2e-test-privacy-policy-link">
-          {{ 'I18N_FOOTER_PRIVACY_POLICY' | translate }}
+      <a href="/privacy-policy" class="e2e-test-privacy-policy-link">
+        {{ 'I18N_FOOTER_PRIVACY_POLICY' | translate }}
       </a>
     </small>
   </div>

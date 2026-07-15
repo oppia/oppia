@@ -39,7 +39,7 @@ describe('Image preloader service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -395,10 +395,10 @@ describe('Image preloader service', () => {
   };
 
   beforeEach(() => {
-    imagePreloaderService = TestBed.get(ImagePreloaderService);
-    pageContextService = TestBed.get(PageContextService);
-    assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-    entityTranslationsService = TestBed.get(EntityTranslationsService);
+    imagePreloaderService = TestBed.inject(ImagePreloaderService);
+    pageContextService = TestBed.inject(PageContextService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
     loggerService = TestBed.inject(LoggerService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);

@@ -317,12 +317,12 @@ def main(args: Optional[List[str]] = None) -> None:
             # Skip webpack build if skip_build flag is passed.
             print('Building files in production mode skipping webpack build.')
             build.main(args=[])
-            common.run_ng_compilation()
+            servers.run_ng_compilation()
             run_webpack_compilation()
     else:
         # Accessibility mode skip webpack build.
         build.main(args=[])
-        common.run_ng_compilation()
+        servers.run_ng_compilation()
         run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:

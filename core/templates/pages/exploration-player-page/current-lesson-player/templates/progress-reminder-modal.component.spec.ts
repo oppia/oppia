@@ -39,7 +39,7 @@ describe('Progress reminder modal component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProgressReminderModalComponent);
     component = fixture.componentInstance;
-    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should initialize the component', () => {

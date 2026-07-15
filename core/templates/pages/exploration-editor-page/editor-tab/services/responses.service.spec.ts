@@ -53,15 +53,15 @@ describe('Responses Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    alertsService = TestBed.get(AlertsService);
-    explorationHtmlFormatterService = TestBed.get(
+    alertsService = TestBed.inject(AlertsService);
+    explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
-    loggerService = TestBed.get(LoggerService);
-    responsesService = TestBed.get(ResponsesService);
-    stateEditorService = TestBed.get(StateEditorService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateSolutionService = TestBed.get(StateSolutionService);
+    loggerService = TestBed.inject(LoggerService);
+    responsesService = TestBed.inject(ResponsesService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateSolutionService = TestBed.inject(StateSolutionService);
 
     savedMemento = new Solution(
       true,

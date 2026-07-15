@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+import builtins
 import io
 import multiprocessing
 import os
 
-from core import utils
 from core.tests import test_utils
 
 from typing import Final, List, Tuple
@@ -44,7 +44,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.verbose_mode_enabled = False
-        self.dependencies_file = io.StringIO('{"dependencies":{"frontend":{}}}')
         self.package_file = io.StringIO(
             '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
             '"guppy-dev":"git+https://github.com/oppia/guppy#f509e",'
@@ -58,19 +57,19 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
 
-        def mock_open_file(
-            path: str, unused_permissions: List[str]
+        def mock_open(
+            path: str,
+            _: List[str],
+            encoding: str = 'utf-8',  # pylint: disable=unused-argument
         ) -> io.StringIO:
-            if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
-                file = self.dependencies_file
-            elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
-                file = self.package_file
-            return file
+            if path == other_files_linter.PACKAGE_JSON_FILE_PATH:
+                return self.package_file
+            raise ValueError('Unexpected file path: %s' % path)
 
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
 
-        self.open_file_swap = self.swap(utils, 'open_file', mock_open_file)
+        self.open_swap = self.swap(builtins, 'open', mock_open)
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
     def test_check_valid_pattern_in_app_dev_yaml(self) -> None:
@@ -90,6 +89,94 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_skip_files_in_app_dev_yaml()
+            expected_error_messages = ['SUCCESS  App dev file check passed']
+            self.assertEqual(
+                error_messages.get_report(), expected_error_messages
+            )
+            self.assertEqual('App dev file', error_messages.name)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_skip_files_in_app_dev_yaml_without_section(self) -> None:
+        """Passes when no '# Third party files:' section exists."""
+
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Some unrelated config',
+                '',
+                'random_setting: true',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+            expected = ['SUCCESS  App dev file check passed']
+            self.assertEqual(error_messages.get_report(), expected)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_skip_files_in_app_dev_yaml_ignores_non_entries(self) -> None:
+        """Tests that blank lines, comments and non '- ' lines are ignored."""
+
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Third party files:',
+                '',
+                # Blank line should be ignored.
+                '# Some explanation',
+                # Comment should be ignored.
+                'random_text',
+                # Not a '- ' entry, should be ignored.
+                '- third_party/static/bootstrap-5.3.3/',
+                # Valid entry.
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+            expected_error_messages = ['SUCCESS  App dev file check passed']
+            self.assertEqual(
+                error_messages.get_report(), expected_error_messages
+            )
+            self.assertEqual('App dev file', error_messages.name)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_skip_files_in_app_dev_yaml_with_no_entries(self) -> None:
+        """Tests that file passes when no skip entries are present."""
+
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Third party files:',
+                '# Only comments present',
+                '',
+                'some_random_text',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
             expected_error_messages = ['SUCCESS  App dev file check passed']
             self.assertEqual(
                 error_messages.get_report(), expected_error_messages
@@ -119,6 +206,36 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             in error_messages.get_report()[0]
         )
         self.assertEqual('App dev file', error_messages.name)
+        self.assertTrue(error_messages.failed)
+
+    def test_check_multiple_invalid_patterns_in_app_dev_yaml(self) -> None:
+        def mock_readlines(
+            unused_self: str, unused_filepath: str
+        ) -> Tuple[str, ...]:
+            return (
+                '# Third party files:',
+                '- third_party/static/bootstrap-5.3/',
+                '- third_party/static/jquery-3/',
+            )
+
+        readlines_swap = self.swap(
+            run_lint_checks.FileCache, 'readlines', mock_readlines
+        )
+
+        with readlines_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE
+            ).check_skip_files_in_app_dev_yaml()
+
+        self.assertEqual(len(error_messages.get_report()), 3)
+        self.assertTrue(
+            'Pattern on line 2 doesn\'t match any file or directory'
+            in error_messages.get_report()[0]
+        )
+        self.assertTrue(
+            'Pattern on line 3 doesn\'t match any file or directory'
+            in error_messages.get_report()[1]
+        )
         self.assertTrue(error_messages.failed)
 
     def test_check_valid_pattern(self) -> None:
@@ -208,7 +325,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed'
         ]
-        with self.open_file_swap, self.listdir_swap:
+        with self.open_swap, self.listdir_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -223,7 +340,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed'
         ]
-        with self.open_file_swap, self.listdir_swap:
+        with self.open_swap, self.listdir_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -236,7 +353,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def test_check_third_party_libs_type_defs_multiple(self) -> None:
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_file_swap, self.listdir_swap, self.print_swap:
+        with self.open_swap, self.listdir_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -261,7 +378,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_file_swap, self.listdir_swap:
+        with self.open_swap, self.listdir_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -287,7 +404,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_file_swap, self.listdir_swap, self.print_swap:
+        with self.open_swap, self.listdir_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()

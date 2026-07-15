@@ -21,6 +21,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
+  tick,
 } from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
@@ -363,26 +364,50 @@ describe('Goals tab Component', () => {
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
   });
 
-  it('should add topic to learner goals if not already present', () => {
+  it('should call preventDefault when checkbox is clicked', () => {
+    component.editGoalsTopicClassification = [0];
+    fixture.detectChanges();
+
+    const checkbox = fixture.debugElement.query(
+      By.css('.e2e-test-remove-topic-from-current-goals-button')
+    );
+    if (!checkbox) {
+      throw new Error('Unable to find the checkbox event');
+    }
+
+    const addToLearnerGoalsSpy = spyOn(
+      component,
+      'addToLearnerGoals'
+    ).and.callThrough();
+
+    checkbox.triggerEventHandler('click', {preventDefault: () => {}} as Event);
+    fixture.detectChanges();
+
+    expect(addToLearnerGoalsSpy).toHaveBeenCalled();
+  });
+
+  it('should add topic to learner goals if not already present', fakeAsync(() => {
     component.topicIdsInCurrentGoals.length = 0;
     component.topicIdsInCompletedGoals = ['1', '2'];
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'addToLearnerGoals'
     ).and.returnValue(Promise.resolve(true));
+    tick();
     component.untrackedTopics = {math: [component.editGoals[0]]};
     component.addToLearnerGoals(component.editGoals[0], 'sample_topic_id', 1);
     fixture.detectChanges();
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
-  });
-  it('should remove topic from learner goals if already present', () => {
+  }));
+  it('should remove topic from learner goals if already present', fakeAsync(() => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'addToLearnerGoals'
     ).and.returnValue(Promise.resolve(true));
+    tick();
     const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
 
     component.addToLearnerGoals(component.editGoals[0], '2', 1);
@@ -390,7 +415,7 @@ describe('Goals tab Component', () => {
 
     expect(removeTopicSpy).toHaveBeenCalled();
     expect(learnerGoalsSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should remove topic from the learner goals', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)

@@ -50,7 +50,7 @@ describe('DragAndDropSortInputValidationService', () => {
       providers: [DragAndDropSortInputValidationService],
     });
 
-    validatorService = TestBed.get(DragAndDropSortInputValidationService);
+    validatorService = TestBed.inject(DragAndDropSortInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';

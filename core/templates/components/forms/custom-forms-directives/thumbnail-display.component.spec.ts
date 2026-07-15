@@ -82,7 +82,7 @@ describe('Thumbnail Component', () => {
 
     fixture = TestBed.createComponent(ThumbnailDisplayComponent);
     component = fixture.componentInstance;
-    svgSanitizerService = TestBed.get(SvgSanitizerService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
   }));
 
   it("should not render malicious SVG's on Init", fakeAsync(() => {

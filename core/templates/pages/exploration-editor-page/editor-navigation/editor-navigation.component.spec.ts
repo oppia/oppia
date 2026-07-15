@@ -91,6 +91,10 @@ describe('Editor Navigation Component', () => {
         isLoggedIn: () => true,
       } as UserInfo);
     }
+
+    isLoggedIn(): boolean {
+      return true;
+    }
   }
 
   class MockStateTutorialFirstTimeService {

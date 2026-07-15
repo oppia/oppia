@@ -343,7 +343,15 @@ export class StoryEditorNavbarComponent implements OnInit {
               }
             }
             if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
-              this.unpublishStory();
+              this.storyEditorStateService.changeStoryPublicationStatus(
+                false,
+                () => {
+                  this.storyIsPublished =
+                    this.storyEditorStateService.isStoryPublished();
+                  this.forceValidateExplorations = true;
+                  this._validateStory();
+                }
+              );
             }
             this.storyEditorStateService.saveStory(
               'Unpublished chapters',

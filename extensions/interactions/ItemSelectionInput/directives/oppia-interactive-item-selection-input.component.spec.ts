@@ -25,7 +25,6 @@ import {InteractionAttributesExtractorService} from 'interactions/interaction-at
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {InteractionAnswer, ItemSelectionAnswer} from 'interactions/answer-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
@@ -102,14 +101,12 @@ describe('oppiaInteractiveItemSelectionInput', function () {
 
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
-    let recordedVoiceovers = new RecordedVoiceovers({});
     displayedCard = new StateCard(
       'test_name',
       'content',
       'interaction',
       interaction,
       [],
-      recordedVoiceovers,
       contentId
     );
   });
@@ -147,9 +144,9 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       });
       expect(component.maxAllowableSelectionCount).toBe(1);
       expect(component.minAllowableSelectionCount).toBe(1);
-      expect(component.displayCheckboxes).toBeFalse();
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeTrue();
+      expect(component.displayCheckboxes).toBe(false);
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(true);
     });
 
     it('should throw error if content id is null', () => {
@@ -195,7 +192,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
             // this error because typescript expects more
             // properties than just one add and remove.
             // We need only add and remove for testing purposes.
-            // @ts-expect-error
             classList: {
               add: () => {
                 return;
@@ -237,7 +233,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(1);
         expect(
           currentInteractionService.updateCurrentAnswer
-        ).toHaveBeenCalledOnceWith(['ca_choices_1']);
+        ).toHaveBeenCalledWith(['ca_choices_1']);
       }
     );
 
@@ -276,7 +272,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
             // this error because typescript expects more
             // properties than just one add and remove.
             // We need only add and remove for testing purposes.
-            // @ts-expect-error
             classList: {
               add: () => {
                 return;
@@ -284,7 +279,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
               remove: () => {
                 return;
               },
-              contains: text => {
+              contains: (text: string) => {
                 return true;
               },
             },
@@ -318,7 +313,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(1);
         expect(
           currentInteractionService.updateCurrentAnswer
-        ).toHaveBeenCalledOnceWith(['ca_choices_1']);
+        ).toHaveBeenCalledWith(['ca_choices_1']);
       }
     );
   });
@@ -355,9 +350,9 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       });
       expect(component.maxAllowableSelectionCount).toBe(2);
       expect(component.minAllowableSelectionCount).toBe(1);
-      expect(component.displayCheckboxes).toBeTrue();
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeTrue();
+      expect(component.displayCheckboxes).toBe(true);
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(true);
     });
 
     it('should toggle checkbox when user clicks checkbox', () => {
@@ -370,9 +365,9 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         'choice 3': false,
       };
       expect(component.selectionCount).toBeUndefined();
-      expect(component.newQuestion).toBeFalse();
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeTrue();
+      expect(component.newQuestion).toBe(false);
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(true);
 
       component.onToggleCheckbox();
 
@@ -382,11 +377,11 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       // maxAllowableSelectionCount is reached. Therefore we test to
       // ensure preventAdditionalSelections is false because the count has
       // not been reached.
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeFalse();
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(false);
       expect(
         currentInteractionService.updateCurrentAnswer
-      ).toHaveBeenCalledOnceWith(['ca_choices_1']);
+      ).toHaveBeenCalledWith(['ca_choices_1']);
     });
 
     it(
@@ -404,17 +399,17 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           'choice 3': false,
         };
         expect(component.selectionCount).toBeUndefined();
-        expect(component.preventAdditionalSelections).toBeFalse();
-        expect(component.notEnoughSelections).toBeTrue();
+        expect(component.preventAdditionalSelections).toBe(false);
+        expect(component.notEnoughSelections).toBe(true);
 
         component.onToggleCheckbox();
 
         expect(component.selectionCount).toBe(2);
-        expect(component.preventAdditionalSelections).toBeTrue();
-        expect(component.notEnoughSelections).toBeFalse();
+        expect(component.preventAdditionalSelections).toBe(true);
+        expect(component.notEnoughSelections).toBe(false);
         expect(
           currentInteractionService.updateCurrentAnswer
-        ).toHaveBeenCalledOnceWith(['ca_choices_1', 'ca_choices_2']);
+        ).toHaveBeenCalledWith(['ca_choices_1', 'ca_choices_2']);
       }
     );
   });
@@ -451,10 +446,10 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       });
       expect(component.maxAllowableSelectionCount).toBe(3);
       expect(component.minAllowableSelectionCount).toBe(3);
-      expect(component.displayCheckboxes).toBeTrue();
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeFalse();
-      expect(component.exactSelections).toBeTrue();
+      expect(component.displayCheckboxes).toBe(true);
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(false);
+      expect(component.exactSelections).toBe(true);
     });
 
     it('should toggle checkbox when user clicks checkbox', () => {
@@ -467,10 +462,10 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         'choice 3': false,
       };
       expect(component.selectionCount).toBeUndefined();
-      expect(component.newQuestion).toBeFalse();
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeFalse();
-      expect(component.exactSelections).toBeTrue();
+      expect(component.newQuestion).toBe(false);
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(false);
+      expect(component.exactSelections).toBe(true);
 
       component.onToggleCheckbox();
 
@@ -480,11 +475,11 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       // maxAllowableSelectionCount is reached. Therefore we test to
       // ensure preventAdditionalSelections is false because the count has
       // not been reached.
-      expect(component.preventAdditionalSelections).toBeFalse();
-      expect(component.notEnoughSelections).toBeFalse();
+      expect(component.preventAdditionalSelections).toBe(false);
+      expect(component.notEnoughSelections).toBe(false);
       expect(
         currentInteractionService.updateCurrentAnswer
-      ).toHaveBeenCalledOnceWith(['ca_choices_1']);
+      ).toHaveBeenCalledWith(['ca_choices_1']);
     });
 
     it(
@@ -502,18 +497,18 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           'choice 3': true,
         };
         expect(component.selectionCount).toBeUndefined();
-        expect(component.preventAdditionalSelections).toBeFalse();
-        expect(component.notEnoughSelections).toBeFalse();
-        expect(component.exactSelections).toBeTrue();
+        expect(component.preventAdditionalSelections).toBe(false);
+        expect(component.notEnoughSelections).toBe(false);
+        expect(component.exactSelections).toBe(true);
 
         component.onToggleCheckbox();
 
         expect(component.selectionCount).toBe(3);
-        expect(component.preventAdditionalSelections).toBeTrue();
-        expect(component.notEnoughSelections).toBeFalse();
+        expect(component.preventAdditionalSelections).toBe(true);
+        expect(component.notEnoughSelections).toBe(false);
         expect(
           currentInteractionService.updateCurrentAnswer
-        ).toHaveBeenCalledOnceWith([
+        ).toHaveBeenCalledWith([
           'ca_choices_1',
           'ca_choices_2',
           'ca_choices_3',

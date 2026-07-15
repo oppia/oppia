@@ -38,10 +38,10 @@ describe('Profile test backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [ProfilePageBackendApiService],
     });
-    profilePageBackendApiService = TestBed.get(ProfilePageBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    profilePageBackendApiService = TestBed.inject(ProfilePageBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
-    urlService = TestBed.get(UrlService);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getPathname').and.returnValue('/profile/testUsername');
   });
 

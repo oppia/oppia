@@ -24,7 +24,7 @@ import uuid
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Final, Type
+from typing import Dict, Final, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -291,3 +291,236 @@ class CloudTaskRunModel(base_models.BaseModel):
                 )
             ).fetch()
         )
+
+
+class VoiceoverRegenerationJobModel(base_models.BaseModel):
+    """The model maps an exploration's voiceover regeneration request to its
+    Cloud Task run.
+
+    The model key is formed by combining the exploration ID and cloud task run
+    ID, separated by a colon (:), ensuring a unique entry for each regeneration
+    task request.
+    """
+
+    # The exploration ID for which the voiceover regeneration is requested.
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    # ID of the corresponding CloudTaskRunModel.
+    cloud_task_run_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    # A dictionary mapping language-accent codes to nested dicts, each nested
+    # dict containing content IDs as keys and regeneration status as values.
+    language_accent_to_content_status_map = datastore_services.JsonProperty(
+        required=True, indexed=False
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_accent_to_content_status_map': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+            },
+        )
+
+    @classmethod
+    def get_all_by_exp_id(
+        cls, exploration_id: str
+    ) -> List[VoiceoverRegenerationJobModel]:
+        """The method fetches all voiceover regeneration task requests for the
+        given exploration ID.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Returns:
+            list(VoiceoverRegenerationJobModel). A list of
+            VoiceoverRegenerationJobModel instances matching the given
+            exploration ID.
+        """
+        return list(
+            VoiceoverRegenerationJobModel.query(
+                datastore_services.all_of(
+                    cls.exploration_id == exploration_id,
+                    cls.deleted  # pylint: disable=singleton-comparison
+                    == False,
+                )
+            ).fetch()
+        )
+
+
+class VoiceoverRegenerationBatchExecutionModel(base_models.BaseModel):
+    """Voiceover regeneration for a large number of contents within a single
+    Cloud Task run (deferred request) significantly increases the workload and
+    may lead to timeout failures due to Gunicorn limitations.
+
+    To mitigate this issue, a single deferred regeneration task is split into
+    multiple smaller batches, organized in a parent-child relationship between
+    Cloud Task runs.
+
+    This model stores metadata for each regeneration batch, including:
+        - The mapping between parent and child Cloud Task runs
+        - Exploration details
+        - Content details associated with the regeneration process
+
+    The model key is composed of the parent Cloud Task run ID and the child
+    Cloud Task run ID, ensuring a unique entry for every parent-child mapping.
+    """
+
+    # ID of the parent CloudTaskRunModel.
+    parent_cloud_task_run_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    # ID of the child CloudTaskRunModel corresponding to a specific batch of
+    # the regeneration task.
+    child_cloud_task_run_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    exploration_version = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+
+    language_accent_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    # A dictionary mapping content IDs to their corresponding content string of
+    # the exploration.
+    content_ids_to_contents_map = datastore_services.JsonProperty(
+        required=True, indexed=False
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'parent_cloud_task_run_id': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'child_cloud_task_run_id': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_version': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'language_accent_code': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'content_ids_to_contents_map': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+            },
+        )
+
+    @classmethod
+    def get_models_by_parent_id(
+        cls, parent_cloud_task_run_id: str
+    ) -> List[VoiceoverRegenerationBatchExecutionModel]:
+        """The method fetches all model instances corresponding to the given
+        parent Cloud Task run ID.
+
+        Args:
+            parent_cloud_task_run_id: str. The ID of the parent Cloud Task run.
+
+        Returns:
+            list(VoiceoverRegenerationBatchExecutionModel). A list of
+            VoiceoverRegenerationBatchExecutionModel instances matching the given
+            parent Cloud Task run ID.
+        """
+        return list(
+            VoiceoverRegenerationBatchExecutionModel.query(
+                datastore_services.all_of(
+                    cls.parent_cloud_task_run_id == parent_cloud_task_run_id,
+                    cls.deleted  # pylint: disable=singleton-comparison
+                    == False,
+                )
+            ).fetch()
+        )
+
+    @classmethod
+    def create_and_save_model(
+        cls,
+        parent_cloud_task_run_id: str,
+        child_cloud_task_run_id: str,
+        exploration_id: str,
+        exploration_version: int,
+        language_accent_code: str,
+        content_ids_to_contents_map: Dict[str, str],
+    ) -> VoiceoverRegenerationBatchExecutionModel:
+        """Creates a new instance of VoiceoverRegenerationBatchExecutionModel.
+
+        Args:
+            parent_cloud_task_run_id: str. The ID of the parent Cloud Task run.
+            child_cloud_task_run_id: str. The ID of the child Cloud Task run
+                corresponding to a specific batch of the regeneration task.
+            exploration_id: str. The ID of the exploration for which the
+                regeneration is being done.
+            exploration_version: int. The version of the exploration for which
+                the regeneration is being done.
+            language_accent_code: str. The language accent code for which the
+                regeneration is being done.
+            content_ids_to_contents_map: dict(str, str). A dictionary mapping
+                content IDs to their corresponding content text associated
+                with the regeneration process.
+
+        Returns:
+            VoiceoverRegenerationBatchExecutionModel. The newly created instance of
+            VoiceoverRegenerationBatchExecutionModel.
+        """
+        model_id = '%s:%s' % (parent_cloud_task_run_id, child_cloud_task_run_id)
+        model_instance = cls(
+            id=model_id,
+            parent_cloud_task_run_id=parent_cloud_task_run_id,
+            child_cloud_task_run_id=child_cloud_task_run_id,
+            exploration_id=exploration_id,
+            exploration_version=exploration_version,
+            language_accent_code=language_accent_code,
+            content_ids_to_contents_map=content_ids_to_contents_map,
+        )
+
+        model_instance.update_timestamps()
+        model_instance.put()
+
+        return model_instance

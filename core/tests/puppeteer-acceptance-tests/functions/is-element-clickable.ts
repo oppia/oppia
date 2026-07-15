@@ -99,6 +99,16 @@ export default function isElementClickable(
     if (overlappingRect) {
       overlappingElements.push(overlappingRect);
     }
+    if (showDebugLogs) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[debug]: Element ${element.tagName} overlapping elements found: ${overlappingElements.length}\n` +
+          `Overlapping element: ${overlappingElement?.tagName ?? 'null'} ` +
+          `(class="${overlappingElement?.className ?? 'N/A'}")\n` +
+          `Overlapping rect: ${overlappingRect?.tagName ?? 'null'} ` +
+          `(class="${overlappingRect?.className ?? 'N/A'}")`
+      );
+    }
     return overlappingElements;
   };
 
@@ -118,8 +128,39 @@ export default function isElementClickable(
     element: Element,
     overlappingElements: Element[]
   ): boolean => {
+    if (showDebugLogs) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[debug]: Checking overlap for ${element.tagName} ` +
+          `(class="${element.className}")\n` +
+          `Overlapping elements to check: ${overlappingElements.length}`
+      );
+      for (const el of overlappingElements) {
+        const isSameElement = el === element;
+        const isContained = element.contains(el);
+        const containsTarget = el.contains(element);
+        // eslint-disable-next-line no-console
+        console.log(
+          `[debug]: Overlapping element ${el.tagName} ` +
+            `(class="${el.className}")\n` +
+            `  - Is same element: ${isSameElement}\n` +
+            `  - Is contained by target: ${isContained}\n` +
+            `  - Contains target: ${containsTarget}`
+        );
+      }
+    }
+    // An element is considered not overlapped if any of the overlapping
+    // elements at the center point:
+    // 1. Is the element itself.
+    // 2. Is a child of the element (target contains the overlapping element).
+    // 3. Is a parent/ancestor of the element (overlapping element contains
+    //    target). This handles cases where clicking on a child element (e.g.,
+    //    a span inside a button) reports the parent container as the
+    //    overlapping element.
     if (
-      overlappingElements.some(el => el === element || element.contains(el))
+      overlappingElements.some(
+        el => el === element || element.contains(el) || el.contains(element)
+      )
     ) {
       return true;
     }
@@ -214,6 +255,21 @@ export default function isElementClickable(
    * disabled.
    */
   const isClickable = (element: Element): boolean => {
+    if (showDebugLogs) {
+      // Log document state to help diagnose styling/loading issues.
+      const styleSheets = document.styleSheets.length;
+      const pendingStylesheets = Array.from(
+        document.querySelectorAll('link[rel="stylesheet"]')
+      ).filter(link => !(link as HTMLLinkElement).sheet).length;
+      // eslint-disable-next-line no-console
+      console.log(
+        '[debug]: Document state:\n' +
+          `  - readyState: ${document.readyState}\n` +
+          `  - styleSheets loaded: ${styleSheets}\n` +
+          `  - pending stylesheets: ${pendingStylesheets}\n` +
+          `  - viewport: ${window.innerWidth}x${window.innerHeight}`
+      );
+    }
     return (
       !isElementDisabled(element) &&
       isElementInViewport(element) &&

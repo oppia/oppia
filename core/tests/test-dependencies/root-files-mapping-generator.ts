@@ -79,7 +79,6 @@ const FILE_EXCLUSIONS_FOR_SEARCH = [
   'core/tests/services_sources',
   'core/tests/test-dependencies',
   'core/templates/tests',
-  'core/templates/services/angular-services.index.ts',
   'core/templates/utility/hashes.ts',
   'webpack.*.ts',
   'angular-template-style-url-replacer.webpack-loader.js',
@@ -110,9 +109,6 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
   'core/templates/pages/oppia-root/index.ts': [
     'core/templates/pages/oppia-root/oppia-root.mainpage.html',
-  ],
-  'core/templates/pages/lightweight-oppia-root/index.ts': [
-    'core/templates/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
   ],
 };
 

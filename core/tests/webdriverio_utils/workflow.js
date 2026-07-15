@@ -306,11 +306,12 @@ var createAndPublishExplorationWithAdditionalCheckpoints = async function (
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function (roleName, username) {
   await action.click('Edit roles', $('.e2e-test-edit-roles'));
-  await action.setValue(
-    'Username input',
-    $('.e2e-test-role-username'),
-    username
+  var usernameInput = $('.e2e-test-role-username');
+  await waitFor.visibilityOf(
+    usernameInput,
+    'Username input is not visible after clicking Edit roles'
   );
+  await action.setValue('Username input', usernameInput, username);
   await action.matSelect('Role select', $('.e2e-test-role-select'), roleName);
   await action.click('Save role', $('.e2e-test-save-role'));
 };

@@ -1,7 +1,7 @@
 <ul class="oppia-navbar-desktop nav navbar-nav oppina-navbar-nav float-end"
     *ngIf="topic && topicRights.canEditTopic()">
-  <li class="oppia-navbar-dropdown-menu">
-    <div ngbDropdown>
+  <li class="oppia-navbar-dropdown-menu d-inline-flex align-items-center">
+    <div class="d-inline-block position-relative">
       <span [matTooltip]="getAllTopicWarnings()"
             matTooltipClass="oppia-mat-tooltip-list"
             [matTooltipDisabled]="isWarningTooltipDisabled()"
@@ -29,24 +29,25 @@
           </span>
         </button>
       </span>
-
-      <button type="button"
-              class="btn btn-light dropdown-toggle dropdown-toggle oppia-dropdown-toggle-button"
-              [disabled]="!changeListLength"
-              aria-label="Dropdown toggle"
-              ngbDropdownToggle>
-      </button>
-      <ul ngbDropdownMenu role="menu"
-          class="oppia-dropdown-menu"
-          [ngStyle]="{ width: changeListLength && topicRights.isPublished() ? '150px' : '120px' }">
-        <li title="Discard all pending changes">
-          <a (click)="discardChanges()"
-             [ngClass]="{'oppia-disabled-link': !changeListLength}"
-             class="dropdown-item">
-            Discard Draft
-          </a>
-        </li>
-      </ul>
+      <div ngbDropdown class="d-inline-block">
+        <button type="button"
+                class="btn btn-light dropdown-toggle dropdown-toggle oppia-dropdown-toggle-button"
+                [disabled]="!changeListLength"
+                aria-label="Dropdown toggle"
+                ngbDropdownToggle>
+        </button>
+        <ul ngbDropdownMenu role="menu"
+            class="oppia-dropdown-menu"
+            [ngStyle]="{ width: changeListLength && topicRights.isPublished() ? '150px' : '120px' }">
+          <li title="Discard all pending changes">
+            <a (click)="discardChanges()"
+               [ngClass]="{'oppia-disabled-link': !changeListLength}"
+               class="dropdown-item">
+              Discard Draft
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </li>
   <li class="oppia-editor-publish-button-container">
@@ -189,10 +190,12 @@
   .oppia-dropdown-toggle-button {
     height: 34px;
     margin-left: 5px !important;
+
   }
   .oppia-dropdown-menu {
+    left: auto;
     min-width: 125px;
-    right: inherit;
+    right: 0;
   }
   .oppia-editor-publish-button-container {
     margin-right: 20px;

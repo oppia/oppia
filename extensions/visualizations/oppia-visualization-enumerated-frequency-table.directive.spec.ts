@@ -36,7 +36,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      AutomaticVoiceoverRegenerationFromExp: {
+      HighlightSentencesDuringAutomaticVoiceoverPlayback: {
         isEnabled: false,
       },
     };
