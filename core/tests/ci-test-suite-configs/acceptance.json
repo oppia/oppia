@@ -516,8 +516,18 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/check-their-accomplishment",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -526,8 +536,18 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-reviewer/filter-the-translations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/filter-the-translations.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/filter-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/filter-the-translations.spec.ts",
       "framework": "puppeteer"
     },
     {
