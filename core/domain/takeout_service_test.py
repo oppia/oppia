@@ -628,6 +628,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.PROFILE_ID_1, topic_ids_to_learn=self.TOPIC_IDS_2
         ).put()
 
+        # Setup for LearnerPlaylistModel.
+        user_models.LearnerPlaylistModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS,
+        ).put()
+        user_models.LearnerPlaylistModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2,
+        ).put()
+
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_IDS[0]),
@@ -2035,8 +2047,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'author_bio': '',
         }
         expected_learner_playlist_data: Dict[str, List[str]] = {
-            'exploration_ids': [],
-            'collection_ids': [],
+            'exploration_ids': self.EXPLORATION_IDS,
+            'collection_ids': self.COLLECTION_IDS,
         }
         expected_learner_group_data = {
             'title': 'sample title',

@@ -173,6 +173,27 @@ def exp_user_last_playthrough_model_relationships(
     yield model.exploration_id, [exp_models.ExplorationModel]
 
 
+@validation_decorators.RelationshipsOf(user_models.LearnerPlaylistModel)
+def learner_playlist_model_relationships(
+    model: Type[user_models.LearnerPlaylistModel],
+) -> Iterator[
+    Tuple[
+        datastore_services.Property,
+        List[
+            Type[
+                Union[
+                    exp_models.ExplorationModel,
+                    collection_models.CollectionModel,
+                ]
+            ]
+        ],
+    ]
+]:
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.exploration_ids, [exp_models.ExplorationModel]
+    yield model.collection_ids, [collection_models.CollectionModel]
+
+
 @validation_decorators.RelationshipsOf(user_models.UserContributionsModel)
 def user_contributions_model_relationships(
     model: Type[user_models.UserContributionsModel],

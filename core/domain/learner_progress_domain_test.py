@@ -58,9 +58,6 @@ class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_learner_progress.completed_collection_summaries, []
         )
-        self.assertEqual(
-            user_learner_progress.completed_collection_summaries, []
-        )
 
 
 class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):

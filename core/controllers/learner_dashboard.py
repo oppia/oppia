@@ -369,8 +369,7 @@ class LearnerDashboardIdsHandler(
     """Gets the progress of the learner.
 
     Gets the ids of all explorations, collections, topics and stories
-    completed by the user, the activities currently being pursued,
-    dashboard.
+    completed by the user and the activities currently being pursued.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
