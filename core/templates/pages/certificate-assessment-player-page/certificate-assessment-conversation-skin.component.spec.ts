@@ -13,54 +13,84 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AssessmentIntroductionCardComponent.
+ * @fileoverview Unit tests for CertificateAssessmentConversationSkinComponent.
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
-import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
+import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
 
-describe('AssessmentIntroductionCardComponent', () => {
-  let component: AssessmentIntroductionCardComponent;
-  let fixture: ComponentFixture<AssessmentIntroductionCardComponent>;
+describe('CertificateAssessmentConversationSkinComponent', () => {
+  let component: CertificateAssessmentConversationSkinComponent;
+  let fixture: ComponentFixture<CertificateAssessmentConversationSkinComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AssessmentIntroductionCardComponent],
+      declarations: [CertificateAssessmentConversationSkinComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AssessmentIntroductionCardComponent);
+    fixture = TestBed.createComponent(
+      CertificateAssessmentConversationSkinComponent
+    );
     component = fixture.componentInstance;
+    component.currentQuestion = {
+      prompt: 'What is 2 + 2?',
+      choices: ['3', '4', '5'],
+    };
     fixture.detectChanges();
   });
 
-  it('should default certificateId to an empty string', () => {
-    expect(component.certificateId).toBe('');
+  it('should default currentQuestionIndex to 0', () => {
+    expect(component.currentQuestionIndex).toBe(0);
   });
 
-  it('should display the provided certificateId', () => {
-    component.certificateId = 'cert-123';
+  it('should default totalQuestions to 0', () => {
+    expect(component.totalQuestions).toBe(0);
+  });
+
+  it('should default progressPercentage to 0', () => {
+    expect(component.progressPercentage).toBe(0);
+  });
+
+  it('should default isLastQuestion to false', () => {
+    expect(component.isLastQuestion).toBe(false);
+  });
+
+  it('should accept a provided currentQuestion', () => {
+    expect(component.currentQuestion).toEqual({
+      prompt: 'What is 2 + 2?',
+      choices: ['3', '4', '5'],
+    });
+  });
+
+  it('should accept provided currentQuestionIndex, totalQuestions, progressPercentage and isLastQuestion', () => {
+    component.currentQuestionIndex = 2;
+    component.totalQuestions = 5;
+    component.progressPercentage = 40;
+    component.isLastQuestion = true;
     fixture.detectChanges();
 
-    const paragraph = fixture.debugElement.query(By.css('p')).nativeElement;
-    expect(paragraph.textContent).toContain('cert-123');
+    expect(component.currentQuestionIndex).toBe(2);
+    expect(component.totalQuestions).toBe(5);
+    expect(component.progressPercentage).toBe(40);
+    expect(component.isLastQuestion).toBe(true);
   });
 
-  it('should emit continue when onContinue is called', () => {
-    spyOn(component.continue, 'emit');
+  it('should emit nextQuestion when onNextQuestion is called', () => {
+    spyOn(component.nextQuestion, 'emit');
 
-    component.onContinue();
+    component.onNextQuestion();
 
-    expect(component.continue.emit).toHaveBeenCalled();
+    expect(component.nextQuestion.emit).toHaveBeenCalled();
   });
 
-  it('should emit continue when the button is clicked', () => {
-    spyOn(component.continue, 'emit');
+  it('should emit submitAssessment when onSubmitAssessment is called', () => {
+    spyOn(component.submitAssessment, 'emit');
 
-    const button = fixture.debugElement.query(By.css('button'));
-    button.triggerEventHandler('click', null);
+    component.onSubmitAssessment();
 
-    expect(component.continue.emit).toHaveBeenCalled();
+    expect(component.submitAssessment.emit).toHaveBeenCalled();
   });
 });
