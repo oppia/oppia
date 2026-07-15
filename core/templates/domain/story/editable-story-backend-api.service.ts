@@ -26,7 +26,7 @@ import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface FetchStoryBackendResponse {
-  story_dict: StoryBackendDict;
+  story: StoryBackendDict;
   topic_name: string;
   story_is_published: boolean;
   skill_summaries: SkillSummaryBackendDict[];
@@ -44,7 +44,7 @@ interface FetchStoryResponse {
 }
 
 interface UpdateStoryBackendResponse {
-  story_dict: StoryBackendDict;
+  story: StoryBackendDict;
 }
 
 interface StoryUrlFragmentExistsBackendResponse {
@@ -83,7 +83,7 @@ export class EditableStoryBackendApiService {
         response => {
           if (successCallback) {
             successCallback({
-              story: response.story_dict,
+              story: response.story,
               topicName: response.topic_name,
               storyIsPublished: response.story_is_published,
               skillSummaries: response.skill_summaries,
@@ -125,7 +125,7 @@ export class EditableStoryBackendApiService {
       .put<UpdateStoryBackendResponse>(editableStoryDataUrl, putData)
       .toPromise()
       .then(
-        response => successCallback(response.story_dict),
+        response => successCallback(response.story),
         errorResponse => errorCallback(errorResponse.error.error)
       );
   }

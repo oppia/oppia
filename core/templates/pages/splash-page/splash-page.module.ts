@@ -25,7 +25,6 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
 import {SplashPageComponent} from './splash-page.component';
 import {SplashPageRootComponent} from './splash-page-root.component';
 import {SplashPageRoutingModule} from './splash-page-routing.module';
-import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 @NgModule({
   imports: [
@@ -34,7 +33,6 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     HttpClientModule,
     RichTextComponentsModule,
     SplashPageRoutingModule,
-    CampaignBannerModule,
   ],
   declarations: [SplashPageComponent, SplashPageRootComponent],
   entryComponents: [SplashPageComponent, SplashPageRootComponent],

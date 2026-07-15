@@ -154,7 +154,7 @@ describe('Translation Submitter', function () {
 
     // Should be able to show correct featured languages.
     await translationSubmitter.clickOnLanguageFilterDropdown();
-    await translationSubmitter.expectFeaturedLanguagesToContain(
+    await translationSubmitter.expectFeaturedLangaugesToContain(
       FEATURED_LANGUAGES
     );
 

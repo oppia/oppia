@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationEmbedButtonModalComponent} from 'components/button-directives/exploration-embed-button-modal.component';
@@ -57,7 +56,6 @@ describe('SharingLinksComponent', () => {
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [SharingLinksComponent],
       providers: [{provide: WindowRef, useValue: windowRef}],
     }).compileComponents();

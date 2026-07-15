@@ -41,8 +41,8 @@ describe('Story editor navigation service', () => {
       search: '',
     };
 
-    windowRef = TestBed.inject(WindowRef);
-    sens = TestBed.inject(StoryEditorNavigationService);
+    windowRef = TestBed.get(WindowRef);
+    sens = TestBed.get(StoryEditorNavigationService);
   });
 
   it('should return the active tab', function () {

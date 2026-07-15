@@ -32,9 +32,6 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Interaction} from 'domain/exploration/interaction.model';
-import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 
 class MockActiveModal {
   close(): void {
@@ -51,13 +48,13 @@ class MockStateInteractionIdService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1: string, item2: AnswerGroup[]) {}
+  saveInteractionAnswerGroups(item1, item2) {}
 
-  saveInteractionDefaultOutcome(item1: string, item2: Outcome | null) {}
+  saveInteractionDefaultOutcome(item1, item2) {}
 
   getState() {
     return {
-      interaction: {} as Interaction,
+      interaction: 'TextInput',
     };
   }
 }
@@ -72,7 +69,7 @@ class MockAnswerClassificationService {
   getMatchingClassificationResult() {
     return {
       answerGroupIndex: 2,
-      outcome: Outcome.createNew('', 'feedback', '', []),
+      outcome: null,
     };
   }
 }
@@ -85,9 +82,6 @@ describe('Training Modal Component', () => {
   let trainingDataService: TrainingDataService;
   let graphDataService: GraphDataService;
   let explorationWarningsService: ExplorationWarningsService;
-  let explorationStatesService: ExplorationStatesService;
-  let stateEditorService: StateEditorService;
-  let angularNameService: AngularNameService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -141,9 +135,6 @@ describe('Training Modal Component', () => {
     responsesService = TestBed.inject(ResponsesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
     graphDataService = TestBed.inject(GraphDataService);
-    explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateEditorService = TestBed.inject(StateEditorService);
-    angularNameService = TestBed.inject(AngularNameService);
     spyOn(ngbActiveModal, 'close').and.stub();
     spyOn(explorationWarningsService, 'updateWarnings').and.stub();
     spyOn(graphDataService, 'recompute').and.stub();
@@ -162,15 +153,7 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 2,
-        newOutcome: new Outcome(
-          'dest',
-          null,
-          SubtitledHtml.createDefault('', 'feedback'),
-          true,
-          [],
-          null,
-          null
-        ),
+        newOutcome: new Outcome('dest', null, null, true, [], null, null),
       };
       component.unhandledAnswer = 'string';
 
@@ -181,7 +164,7 @@ describe('Training Modal Component', () => {
       ] as AnswerGroup[]);
       spyOn(responsesService, 'save').and.callFake(
         (answerGroups, getDefaultOutcome, save) => {
-          save(answerGroups, getDefaultOutcome);
+          save(null, null);
         }
       );
 
@@ -199,15 +182,7 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 1,
-        newOutcome: new Outcome(
-          'dest',
-          null,
-          SubtitledHtml.createDefault('', 'feedback'),
-          true,
-          [],
-          null,
-          null
-        ),
+        newOutcome: new Outcome('dest', null, null, true, [], null, null),
       };
       component.unhandledAnswer = 'string';
 
@@ -225,15 +200,7 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 1,
-        newOutcome: new Outcome(
-          'dest',
-          null,
-          SubtitledHtml.createDefault('', 'feedback'),
-          true,
-          [],
-          null,
-          null
-        ),
+        newOutcome: new Outcome('dest', null, null, true, [], null, null),
       };
       component.unhandledAnswer = 'string';
 
@@ -244,59 +211,4 @@ describe('Training Modal Component', () => {
       expect(ngbActiveModal.close).toHaveBeenCalled();
     }
   );
-
-  it('should throw if active state is missing while saving new answer group', () => {
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('');
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
-    spyOn(responsesService, 'save').and.callFake(
-      (answerGroups, defaultOutcome, save) => {
-        save(answerGroups, defaultOutcome);
-      }
-    );
-    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
-    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
-
-    expect(() => {
-      component._saveNewAnswerGroup(
-        AnswerGroup.createNew(
-          [],
-          Outcome.createNew('', 'feedback_1', '', []),
-          [],
-          null
-        )
-      );
-    }).toThrowError('Expected active state name to be non-null.');
-
-    expect(
-      explorationStatesService.saveInteractionAnswerGroups
-    ).not.toHaveBeenCalled();
-    expect(
-      explorationStatesService.saveInteractionDefaultOutcome
-    ).not.toHaveBeenCalled();
-  });
-
-  it('should throw in init if active state is missing', () => {
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('');
-    spyOn(explorationStatesService, 'getState');
-
-    expect(() => {
-      component.init();
-    }).toThrowError('Expected active state name to be non-null.');
-
-    expect(explorationStatesService.getState).not.toHaveBeenCalled();
-  });
-
-  it('should throw in init if interaction rules service is unmapped', () => {
-    const unknownRulesServiceName = 'UnknownRulesService';
-    spyOn(
-      angularNameService,
-      'getNameOfInteractionRulesService'
-    ).and.returnValue(unknownRulesServiceName);
-
-    expect(() => {
-      component.init();
-    }).toThrowError(
-      `Unrecognized interaction rules service: ${unknownRulesServiceName}`
-    );
-  });
 });

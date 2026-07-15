@@ -214,7 +214,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -401,7 +401,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,

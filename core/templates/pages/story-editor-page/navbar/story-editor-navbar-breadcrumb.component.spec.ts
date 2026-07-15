@@ -53,9 +53,9 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StoryEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
-    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    storyEditorStateService = TestBed.get(StoryEditorStateService);
     ngbModal = TestBed.inject(NgbModal);
-    undoRedoService = TestBed.inject(UndoRedoService);
+    undoRedoService = TestBed.get(UndoRedoService);
     windowRef = TestBed.inject(WindowRef) as jasmine.SpyObj<WindowRef>;
 
     story = Story.createFromBackendDict({

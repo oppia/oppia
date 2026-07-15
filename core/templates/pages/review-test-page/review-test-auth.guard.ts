@@ -27,7 +27,6 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
@@ -35,7 +34,6 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 })
 export class ReviewTestAuthGuard implements CanActivate {
   constructor(
-    private platformFeatureService: PlatformFeatureService,
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
     private location: Location
@@ -48,23 +46,16 @@ export class ReviewTestAuthGuard implements CanActivate {
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
     const storyUrlFragment = route.paramMap.get('story_url_fragment') || '';
-    if (this.platformFeatureService.status.EnableReadyForReviewTest.isEnabled) {
-      try {
-        await this.accessValidationBackendApiService.validateAccessToReviewTestPage(
-          classroomUrlFragment,
-          topicUrlFragment,
-          storyUrlFragment
-        );
 
-        return true;
-      } catch (_) {
-        await this.router.navigate([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-        ]);
-        this.location.replaceState(state.url);
-        return false;
-      }
-    } else {
+    try {
+      await this.accessValidationBackendApiService.validateAccessToReviewTestPage(
+        classroomUrlFragment,
+        topicUrlFragment,
+        storyUrlFragment
+      );
+
+      return true;
+    } catch (_) {
       await this.router.navigate([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
       ]);

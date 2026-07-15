@@ -42,9 +42,7 @@ describe('Logged-In Learner', function () {
 
     await explorationEditor.createAndPublishExplorationWithCards(
       'Solving problems without calculator',
-      'Algebra',
-      2,
-      true
+      'Algebra'
     );
   });
 

@@ -39,7 +39,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CdAdminQuestionRoleEditorModal);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
     component.ngOnInit();
   });
 

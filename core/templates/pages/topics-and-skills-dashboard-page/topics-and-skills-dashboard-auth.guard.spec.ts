@@ -26,7 +26,7 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
-import {UserInfo} from '../../domain/user/user-info.model';
+import {UserInfo} from '../../domain/user/user-info.model.ts';
 import {UserService} from 'services/user.service';
 import {TopicsAndSkillsDashboardAuthGuard} from './topics-and-skills-dashboard-auth.guard';
 
@@ -50,10 +50,6 @@ describe('TopicsAndSkillsDashboardAuthGuard', () => {
     guard = TestBed.inject(TopicsAndSkillsDashboardAuthGuard);
     userService = TestBed.inject(UserService);
     router = TestBed.inject(Router);
-  });
-
-  afterEach(() => {
-    window.sessionStorage.clear();
   });
 
   it('should redirect user to 401 page if user is not a curriculum admin', done => {

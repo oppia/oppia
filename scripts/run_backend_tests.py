@@ -59,6 +59,8 @@ import sys
 import threading
 import time
 
+from core import utils
+
 import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
 
@@ -89,6 +91,7 @@ _LOAD_TESTS_DIR: Final = os.path.join(
 TIME_REPORT_PATH: Final = os.path.join(
     os.getcwd(), 'backend_test_time_report.json'
 )
+AVERAGE_TEST_CASE_TIME: Final = 2
 
 # Error code indicating a segmentation fault, which can occur transiently due to
 # instability in gRPC (a dependency of apache-beam[gcp]). This error was first
@@ -291,7 +294,7 @@ def get_all_test_targets_from_shard(shard_name: str) -> List[str]:
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with open(SHARDS_SPEC_PATH, 'r', encoding='utf-8') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         # Here we use cast because we are narrowing down the type
         # since we know the type of shards_spec as it is the content
         # of the file backend_test_shards.json.
@@ -312,7 +315,7 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
     Raises:
         Exception. Failed to find duplicated module in shards.
     """
-    with open(SHARDS_SPEC_PATH, 'r', encoding='utf-8') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     shard_modules = sorted(
         [module for shard in shards_spec.values() for module in shard]
@@ -426,7 +429,9 @@ def check_test_results(
                     )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                test_time_by_average_test_case = test_time / test_count
+                test_time_by_average_test_case = (
+                    test_count * AVERAGE_TEST_CASE_TIME
+                )
                 time_report[spec.test_target] = (
                     test_time,
                     test_time_by_average_test_case,
@@ -761,7 +766,7 @@ def main(args: Optional[List[str]] = None) -> None:
             raise Exception('Backend test coverage is not 100%')
 
     if parsed_args.generate_time_report:
-        with open(TIME_REPORT_PATH, 'w', encoding='utf-8') as time_report_file:
+        with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
             time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')
@@ -794,8 +799,8 @@ def check_coverage(
         combine_process = subprocess.run(
             [sys.executable, '-m', 'coverage', 'combine'],
             capture_output=True,
-            check=False,
             encoding='utf-8',
+            check=False,
         )
         no_combine = combine_process.stdout.strip() == 'No data to combine'
         if combine_process.returncode and not no_combine:
@@ -821,7 +826,7 @@ def check_coverage(
         env['COVERAGE_FILE'] = data_file
 
     process = subprocess.run(
-        cmd, capture_output=True, env=env, check=False, encoding='utf-8'
+        cmd, capture_output=True, encoding='utf-8', env=env, check=False
     )
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the

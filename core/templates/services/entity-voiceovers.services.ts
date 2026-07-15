@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to fetch EntityVoiceovers for the given entity in a
- * given language code.
+ * given langauge code.
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
@@ -205,7 +205,9 @@ export class EntityVoiceoversService {
       this.languageAccentCodeToEntityVoiceovers
     );
     for (let entityVoiceovers of allEntityVoiceovers) {
-      entityVoiceovers.removeVoiceover(contentId);
+      if (entityVoiceovers.getManualVoiceover(contentId)) {
+        entityVoiceovers.removeVoiceover(contentId);
+      }
     }
   }
 

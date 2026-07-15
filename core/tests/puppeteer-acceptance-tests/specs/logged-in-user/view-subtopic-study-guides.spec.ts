@@ -50,6 +50,9 @@ describe('Logged-in User', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_restructured_study_guides'
     );
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_worked_examples_rte_component'
+    );
 
     await curriculumAdmin.createAndPublishTopicWithSubtopicsAndStudyGuides(
       'Addition and Subtraction',
@@ -69,7 +72,7 @@ describe('Logged-in User', function () {
     );
 
     // Setup taking longer than 300000ms.
-  }, 600000);
+  }, 500000);
 
   it(
     'should be able to view the updated study guides',

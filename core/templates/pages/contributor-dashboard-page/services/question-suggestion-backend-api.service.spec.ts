@@ -75,6 +75,7 @@ describe('Question Suggestion Backend Api Service', () => {
         'review material',
         AppConstants.COMPONENT_NAME_EXPLANATION
       ),
+      [],
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           COMPONENT_NAME_EXPLANATION: {},

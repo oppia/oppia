@@ -56,9 +56,9 @@ describe('KeyboardShortcutHelpModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(KeyboardShortcutHelpModalComponent);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    urlService = TestBed.inject(UrlService);
-    pageContextService = TestBed.inject(PageContextService);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
+    urlService = TestBed.get(UrlService);
+    pageContextService = TestBed.get(PageContextService);
   });
 
   it('should load the library page shortcut descriptions', () => {

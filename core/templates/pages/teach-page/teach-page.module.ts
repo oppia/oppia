@@ -23,7 +23,6 @@ import {TeachPageRootComponent} from './teach-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TeachPageRoutingModule} from './teach-page-routing.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 @NgModule({
   imports: [
@@ -31,7 +30,6 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     SharedComponentsModule,
     TeachPageRoutingModule,
     NgbModule,
-    CampaignBannerModule,
   ],
   declarations: [TeachPageComponent, TeachPageRootComponent],
   entryComponents: [TeachPageComponent, TeachPageRootComponent],

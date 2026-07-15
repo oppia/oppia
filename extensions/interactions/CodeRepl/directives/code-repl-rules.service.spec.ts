@@ -28,7 +28,7 @@ describe('Code REPL rules service', () => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe],
     });
-    crrs = TestBed.inject(CodeReplRulesService);
+    crrs = TestBed.get(CodeReplRulesService);
   });
 
   describe("'equals' rule", () => {

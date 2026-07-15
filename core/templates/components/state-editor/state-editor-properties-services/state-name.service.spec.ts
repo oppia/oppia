@@ -28,7 +28,7 @@ describe('State name service', () => {
       providers: [StateNameService],
     });
 
-    sns = TestBed.inject(StateNameService);
+    sns = TestBed.get(StateNameService);
   });
 
   it('should evaluate properties before the initialization', () => {

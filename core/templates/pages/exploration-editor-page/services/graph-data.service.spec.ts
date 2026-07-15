@@ -32,11 +32,11 @@ describe('Graph Data Service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    graphDataService = TestBed.inject(GraphDataService);
-    explorationInitStateNameService = TestBed.inject(
+    graphDataService = TestBed.get(GraphDataService);
+    explorationInitStateNameService = TestBed.get(
       ExplorationInitStateNameService
     );
-    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    explorationStatesService = TestBed.get(ExplorationStatesService);
 
     explorationStatesService.init(
       {
@@ -102,7 +102,6 @@ describe('Graph Data Service', () => {
             id: 'TextInput',
             solution: null,
           },
-          inapplicable_skill_misconception_ids: [],
           linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: '0',

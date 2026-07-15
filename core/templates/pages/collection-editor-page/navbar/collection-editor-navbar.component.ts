@@ -188,20 +188,6 @@ export class CollectionEditorNavbarComponent {
     }
   }
 
-  unpublishCollection(): void {
-    this.collectionRightsBackendApiService
-      .setCollectionPrivateAsync(
-        this.collectionId,
-        this.collection.getVersion() as number
-      )
-      .then(() => {
-        this.collectionRights.setPrivate();
-        this.collectionEditorStateService.setCollectionRights(
-          this.collectionRights
-        );
-      });
-  }
-
   isLoadingCollection(): boolean {
     return this.collectionEditorStateService.isLoadingCollection();
   }

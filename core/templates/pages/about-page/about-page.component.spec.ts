@@ -17,7 +17,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
+
 import {AboutPageComponent} from './about-page.component';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -72,12 +72,7 @@ describe('About Page', () => {
   beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [
-        NgbAccordionModule,
-        NgbModule,
-        MatIconModule,
-        HttpClientTestingModule,
-      ],
+      imports: [NgbAccordionModule, NgbModule, MatIconModule],
       declarations: [
         AboutPageComponent,
         MockTranslatePipe,

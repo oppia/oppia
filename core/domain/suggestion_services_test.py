@@ -23,7 +23,6 @@ import string
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
-    caching_services,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -45,7 +44,6 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
-    translation_services,
     user_services,
 )
 from core.platform import models
@@ -202,7 +200,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
-            self.version = 1
 
     # All mock explorations created for testing.
     explorations = [
@@ -318,257 +315,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 add_translation_change_dict,
                 'test description',
             )
-
-    def test_create_translation_suggestion_fails_if_duplicate_exists(
-        self,
-    ) -> None:
-
-        # Create an exploration with the content.
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.target_id, title='Title', category='Category'
-        )
-        exp.states['Introduction'].update_content(
-            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
-        )
-        exp_services.save_new_exploration(self.author_id, exp)
-        caching_services.flush_memory_caches()
-
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': exp.states['Introduction'].content.html,
-            'translation_html': '<p>Translation for content.</p>',
-            'data_format': 'html',
-        }
-
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            self.target_id,
-            exp.version,
-            self.author_id,
-            change_dict,
-            'test description',
-        )
-
-        # Trying to subscribe a second suggestion for the same content should
-        # fail.
-        with self.assertRaisesRegex(
-            Exception,
-            'A translation suggestion for this content already exists '
-            'and is currently in review.',
-        ):
-            suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.target_id,
-                exp.version,
-                'author_2',
-                change_dict,
-                'test description',
-            )
-
-    def test_accept_suggestion_fails_if_already_translated(self) -> None:
-
-        # Create an exploration with the content.
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.target_id, title='Title', category='Category'
-        )
-        exp.states['Introduction'].update_content(
-            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
-        )
-        exp_services.save_new_exploration(self.author_id, exp)
-        caching_services.flush_memory_caches()
-
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': exp.states['Introduction'].content.html,
-            'translation_html': '<p>Translation for content.</p>',
-            'data_format': 'html',
-        }
-
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            self.target_id,
-            exp.version,
-            self.author_id,
-            change_dict,
-            'test description',
-        )
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', self.target_id)]
-        )[0]
-
-        # Simulate that the content has already been translated (e.g. by another
-        # user).
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.target_id,
-            exp.version,
-            'hi',
-            'content_0',
-            translation_domain.TranslatedContent(
-                '<p>Old translation</p>',
-                translation_domain.TranslatableContentFormat.HTML,
-                False,
-            ),
-        )
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The content with content_id content_0 has already been '
-            'translated to hi.',
-        ):
-            suggestion_services.accept_suggestion(
-                suggestion.suggestion_id,
-                self.reviewer_id,
-                self.COMMIT_MESSAGE,
-                'review message',
-            )
-
-    def test_create_suggestion_fails_if_content_already_translated(
-        self,
-    ) -> None:
-        """Test that creating a translation suggestion fails if the content has
-        already been translated and is up-to-date.
-        """
-        # Create an exploration with the content.
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.target_id, title='Title', category='Category'
-        )
-        exp.states['Introduction'].update_content(
-            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
-        )
-        exp_services.save_new_exploration(self.author_id, exp)
-        caching_services.flush_memory_caches()
-
-        # Add an up-to-date translation for the content.
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.target_id,
-            exp.version,
-            'hi',
-            'content_0',
-            translation_domain.TranslatedContent(
-                '<p>Existing translation</p>',
-                translation_domain.TranslatableContentFormat.HTML,
-                False,
-            ),
-        )
-
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': exp.states['Introduction'].content.html,
-            'translation_html': '<p>New translation.</p>',
-            'data_format': 'html',
-        }
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The content with content_id content_0 has already been '
-            'translated to hi and is up-to-date.',
-        ):
-            suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.target_id,
-                exp.version,
-                self.author_id,
-                change_dict,
-                'test description',
-            )
-
-    def test_accept_suggestion_succeeds_if_translation_needs_update(
-        self,
-    ) -> None:
-        """Test that accepting a translation suggestion succeeds when the
-        existing translation is marked as needs_update=True (stale).
-        """
-        # Create an exploration with the content.
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.target_id, title='Title', category='Category'
-        )
-        exp.states['Introduction'].update_content(
-            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
-        )
-        exp_services.save_new_exploration(self.author_id, exp)
-        caching_services.flush_memory_caches()
-
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': exp.states['Introduction'].content.html,
-            'translation_html': '<p>Updated translation.</p>',
-            'data_format': 'html',
-        }
-
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            self.target_id,
-            exp.version,
-            self.author_id,
-            change_dict,
-            'test description',
-        )
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', self.target_id)]
-        )[0]
-
-        # Simulate a stale translation (needs_update=True) for the same
-        # content.
-        translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            self.target_id,
-            exp.version,
-            'hi',
-            'content_0',
-            translation_domain.TranslatedContent(
-                '<p>Stale translation</p>',
-                translation_domain.TranslatableContentFormat.HTML,
-                True,
-            ),
-        )
-
-        # Accepting should succeed because the existing translation is stale.
-        # We mock pre_accept_validate and accept to avoid needing the
-        # ExplorationOpportunitySummaryModel which requires a story setup.
-        with self.swap(
-            suggestion_registry.SuggestionTranslateContent,
-            'pre_accept_validate',
-            lambda self: None,
-        ):
-            with self.swap(
-                suggestion_registry.SuggestionTranslateContent,
-                'accept',
-                lambda self, unused_commit_message: None,
-            ):
-                suggestion_services.accept_suggestion(
-                    suggestion.suggestion_id,
-                    self.reviewer_id,
-                    self.COMMIT_MESSAGE,
-                    'review message',
-                )
-
-        # Verify the suggestion was accepted.
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id
-        )
-        self.assertEqual(
-            updated_suggestion.status,
-            suggestion_models.STATUS_ACCEPTED,
-        )
 
     def test_get_submitted_submissions(self) -> None:
         suggestion_services.create_suggestion(
@@ -2119,7 +1865,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
-            self.version = 1
 
         def get_content_html(self, state_name: str, content_id: str) -> str:
             """Used to mock the get_content_html method for explorations."""
@@ -2184,15 +1929,15 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def _create_translation_suggestion_with_language_code(
-        self, language_code: str, content_id: str = 'content_0'
+        self, language_code: str
     ) -> suggestion_registry.SuggestionTranslateContent:
         """Creates a translation suggestion with the language code given."""
         return self._create_translation_suggestion(
-            language_code, self.target_id_1, content_id=content_id
+            language_code, self.target_id_1
         )
 
     def _create_translation_suggestion(
-        self, language_code: str, target_id: str, content_id: str = 'content_0'
+        self, language_code: str, target_id: str
     ) -> suggestion_registry.SuggestionTranslateContent:
         """Creates a translation suggestion for the supplied language code and
         target ID.
@@ -2201,10 +1946,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state_1',
-            'content_id': content_id,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': (
-                '<p>State name: state_1, Content id: %s</p>' % content_id
+                '<p>State name: state_1, Content id: content_0</p>'
             ),
             'translation_html': '<p>This is translated html.</p>',
             'data_format': 'html',
@@ -2573,9 +2318,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_translation_suggestions_in_review(self) -> None:
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
 
         suggestions = suggestion_services.get_translation_suggestions_in_review(
             self.target_id_1
@@ -2605,9 +2348,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_translation_suggestions_in_review_by_exploration(self) -> None:
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
 
         suggestions = suggestion_services.get_translation_suggestions_in_review_by_exploration(
             self.target_id_1, 'hi'
@@ -2639,9 +2380,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
 
         suggestions = suggestion_services.get_translation_suggestions_in_review_by_exploration(
@@ -2655,14 +2394,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
         # Add few question suggestions.
         self._create_question_suggestion_with_skill_id('skill1')
         self._create_question_suggestion_with_skill_id('skill2')
@@ -2701,14 +2436,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
         # Provide the user permission to review suggestions in particular
         # languages.
         user_services.allow_user_to_review_translation_in_language(
@@ -2731,14 +2462,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
 
         # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
@@ -2757,14 +2484,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
         # Provide the user permission to review suggestions in particular
         # languages.
         user_services.allow_user_to_review_translation_in_language(
@@ -2793,14 +2516,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
         # Provide the user permission to review suggestions in particular
         # languages.
         user_services.allow_user_to_review_translation_in_language(
@@ -2834,14 +2553,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
 
         # Get all reviewable translation suggestions.
         suggestions, offset = (
@@ -2864,14 +2579,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
         # Provide the user permission to review suggestions in particular
         # languages.
         user_services.allow_user_to_review_translation_in_language(
@@ -2929,9 +2640,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         fetched_target_id_1, fetched_target_id_2 = ('exp1', 'exp2')
         self._create_translation_suggestion(language_code, fetched_target_id_1)
         self._create_translation_suggestion(language_code, fetched_target_id_2)
-        self._create_translation_suggestion(
-            language_code, fetched_target_id_2, content_id='content_1'
-        )
+        self._create_translation_suggestion(language_code, fetched_target_id_2)
         self._create_translation_suggestion('bn', 'exp3')
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id_1, 'hi'
@@ -2986,9 +2695,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('pt')
         self._create_translation_suggestion_with_language_code('bn')
-        self._create_translation_suggestion_with_language_code(
-            'bn', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('bn')
         # Add a few question suggestions.
         self._create_question_suggestion_with_skill_id('skill1')
         self._create_question_suggestion_with_skill_id('skill2')
@@ -3033,10 +2740,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'hi'
         )
         suggestion_2 = self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
+            'hi'
         )
         suggestion_3 = self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_2'
+            'hi'
         )
 
         suggestions = suggestion_services.get_translation_suggestions_waiting_longest_for_review(
@@ -6744,7 +6451,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
     COMMIT_MESSAGE: Final = 'commit message'
 
     def _create_translation_suggestion_with_language_code_and_author(
-        self, language_code: str, author_id: str, content_id: str = 'content_0'
+        self, language_code: str, author_id: str
     ) -> suggestion_registry.SuggestionTranslateContent:
         """Creates a translation suggestion in the given language_code with the
         given author id.
@@ -6752,32 +6459,22 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': content_id,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html',
         }
 
-        def _mock_get_content_html(
-            _self: exp_domain.Exploration, _state_name: str, _content_id: str
-        ) -> str:
-            return feconf.DEFAULT_STATE_CONTENT_STR
-
-        with self.swap(
-            exp_domain.Exploration,
-            'get_content_html',
-            _mock_get_content_html,
-        ):
-            return suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.target_id,
-                feconf.CURRENT_STATE_SCHEMA_VERSION,
-                author_id,
-                add_translation_change_dict,
-                'test description',
-            )
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            author_id,
+            add_translation_change_dict,
+            'test description',
+        )
 
     def _create_question_suggestion_with_skill_id_and_author_id(
         self, skill_id: str, author_id: str
@@ -7028,7 +6725,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         translation_suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id, content_id='content_1'
+                'hi', self.author_id
             )
         )
         expected_reviewable_suggestion_email_infos = (
@@ -7085,7 +6782,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         translation_suggestion_3 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id, content_id='content_1'
+                'hi', self.author_id
             )
         )
         expected_reviewable_suggestion_email_infos = (
@@ -7122,7 +6819,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         # Create another translation suggestion so that we pass the
         # MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER limit.
         self._create_translation_suggestion_with_language_code_and_author(
-            'hi', self.author_id, content_id='content_1'
+            'hi', self.author_id
         )
         expected_reviewable_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
@@ -7170,10 +6867,10 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         # waiting the longest (since the top two suggestions waiting the
         # longest are from different language codes).
         self._create_translation_suggestion_with_language_code_and_author(
-            'en', self.author_id, content_id='content_1'
+            'en', self.author_id
         )
         self._create_translation_suggestion_with_language_code_and_author(
-            'hi', self.author_id, content_id='content_1'
+            'hi', self.author_id
         )
         expected_reviewable_suggestion_email_infos = (
             self._create_reviewable_suggestion_email_infos_from_suggestions(
@@ -7220,7 +6917,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         translation_suggestion_3 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id, content_id='content_1'
+                'hi', self.author_id
             )
         )
         expected_reviewable_suggestion_email_infos_reviewer_1 = (
@@ -7279,7 +6976,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         suggestion_4 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id, content_id='content_1'
+                'hi', self.author_id
             )
         )
         suggestion_5 = (
@@ -7431,7 +7128,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         suggestion_2 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id, content_id='content_1'
+                'hi', self.author_id
             )
         )
         suggestion_3 = (
@@ -7446,7 +7143,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         suggestion_5 = (
             self._create_translation_suggestion_with_language_code_and_author(
-                'hi', self.author_id, content_id='content_2'
+                'hi', self.author_id
             )
         )
         suggestion_6 = (
@@ -7510,7 +7207,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             'skill_1', self.author_id
         )
         self._create_translation_suggestion_with_language_code_and_author(
-            'hi', self.author_id, content_id='content_1'
+            'hi', self.author_id
         )
         self._create_question_suggestion_with_skill_id_and_author_id(
             'skill_1', self.author_id
@@ -7556,38 +7253,28 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     COMMIT_MESSAGE: Final = 'commit message'
 
     def _create_translation_suggestion_with_language_code(
-        self, language_code: str, content_id: str = 'content_0'
+        self, language_code: str
     ) -> suggestion_registry.SuggestionTranslateContent:
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': content_id,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html',
         }
 
-        def _mock_get_content_html(
-            _self: exp_domain.Exploration, _state_name: str, _content_id: str
-        ) -> str:
-            return feconf.DEFAULT_STATE_CONTENT_STR
-
-        with self.swap(
-            exp_domain.Exploration,
-            'get_content_html',
-            _mock_get_content_html,
-        ):
-            return suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.target_id,
-                feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id,
-                add_translation_change_dict,
-                'test description',
-            )
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id,
+            add_translation_change_dict,
+            'test description',
+        )
 
     def _create_question_suggestion(
         self,
@@ -7981,9 +7668,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self._create_translation_suggestion_with_language_code('hi')
-        self._create_translation_suggestion_with_language_code(
-            'hi', content_id='content_1'
-        )
+        self._create_translation_suggestion_with_language_code('hi')
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
@@ -8120,7 +7805,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         translation_suggestion_2 = (
             self._create_translation_suggestion_with_language_code(
-                self.language_code, content_id='content_1'
+                self.language_code
             )
         )
         # Assert that the translation suggestion count increased.
@@ -8216,38 +7901,28 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
     )
 
     def _create_translation_suggestion(
-        self, content_id: str = 'content_0'
+        self,
     ) -> suggestion_registry.SuggestionTranslateContent:
         """Creates a translation suggestion."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': content_id,
+            'content_id': 'content_0',
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html',
         }
 
-        def _mock_get_content_html(
-            _self: exp_domain.Exploration, _state_name: str, _content_id: str
-        ) -> str:
-            return feconf.DEFAULT_STATE_CONTENT_STR
-
-        with self.swap(
-            exp_domain.Exploration,
-            'get_content_html',
-            _mock_get_content_html,
-        ):
-            return suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_EXPLORATION,
-                self.target_id,
-                feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id,
-                add_translation_change_dict,
-                'test description',
-            )
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id,
+            add_translation_change_dict,
+            'test description',
+        )
 
     def _create_question_suggestion(
         self,
@@ -8460,10 +8135,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
                 # Create and save new suggestion models.
                 suggestions = []
-                for i in range(1, max_suggestions + 1):
-                    suggestion = self._create_translation_suggestion(
-                        content_id='content_%d' % i
-                    )
+                for _ in range(1, max_suggestions + 1):
+                    suggestion = self._create_translation_suggestion()
                     suggestions.append(suggestion)
 
                 # Set the review wait time threshold.
@@ -9108,7 +8781,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3),
         )
-        self.assertEqual(certificate_data['contribution_word_count'], 3)
         self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_rule_translation(
@@ -9151,7 +8823,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(4),
         )
-        self.assertEqual(certificate_data['contribution_word_count'], 4)
         self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_english(
@@ -9202,7 +8873,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3),
         )
-        self.assertEqual(certificate_data['contribution_word_count'], 3)
         self.assertEqual(certificate_data['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
@@ -9269,7 +8939,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_question_contribution_hours(False),
         )
-        self.assertEqual(certificate_data['contribution_word_count'], 0)
 
     def test_create_question_contributor_certificate_with_image_content(
         self,
@@ -9339,7 +9008,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             certificate_data['contribution_hours'],
             self._calculate_question_contribution_hours(True),
         )
-        self.assertEqual(certificate_data['contribution_word_count'], 0)
 
     def test_create_certificate_returns_none_for_no_translation_suggestions(
         self,

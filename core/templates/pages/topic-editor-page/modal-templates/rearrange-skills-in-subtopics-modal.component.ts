@@ -42,14 +42,14 @@ export class RearrangeSkillsInSubtopicsModalComponent
   extends ConfirmOrCancelModal
   implements OnInit, OnDestroy
 {
-  topic!: Topic;
-  subtopics!: Subtopic[];
-  uncategorizedSkillSummaries!: ShortSkillSummary[];
-  skillSummaryToMove!: ShortSkillSummary;
+  topic: Topic;
+  subtopics: Subtopic[];
+  uncategorizedSkillSummaries: ShortSkillSummary[];
+  skillSummaryToMove: ShortSkillSummary;
   oldSubtopicId: number | null = null;
-  errorMsg!: string;
-  editableName!: string;
-  selectedSubtopicId!: number | null;
+  errorMsg: string;
+  editableName: string;
+  selectedSubtopicId: number;
   maxCharsInSubtopicTitle: number = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
 
   SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
@@ -118,18 +118,17 @@ export class RearrangeSkillsInSubtopicsModalComponent
         event.previousIndex,
         event.currentIndex
       );
-
       if (newSubtopicId === this.oldSubtopicId) {
         return;
       }
 
-      if (newSubtopicId === null && this.oldSubtopicId !== null) {
+      if (newSubtopicId === null) {
         this.topicUpdateService.removeSkillFromSubtopic(
           this.topic,
           this.oldSubtopicId,
           this.skillSummaryToMove
         );
-      } else if (newSubtopicId !== null) {
+      } else {
         this.topicUpdateService.moveSkillToSubtopic(
           this.topic,
           this.oldSubtopicId,
@@ -138,7 +137,6 @@ export class RearrangeSkillsInSubtopicsModalComponent
         );
       }
     }
-
     this.initEditor();
   }
 
@@ -158,13 +156,11 @@ export class RearrangeSkillsInSubtopicsModalComponent
     this.editNameOfSubtopicWithId(null);
   }
 
-  editNameOfSubtopicWithId(subtopicId: number | null): void {
-    if (subtopicId === null) {
+  editNameOfSubtopicWithId(subtopicId: number): void {
+    if (!subtopicId) {
       this.editableName = '';
-      this.selectedSubtopicId = null;
-    } else {
-      this.selectedSubtopicId = subtopicId;
     }
+    this.selectedSubtopicId = subtopicId;
   }
 
   isSkillDeleted(skillSummary: ShortSkillSummary): boolean {

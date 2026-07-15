@@ -38,7 +38,6 @@ export interface ContributorCertificateInfo {
   from_date: string;
   to_date: string;
   contribution_hours: number;
-  contribution_word_count: number;
   team_lead: string;
   language: string | null;
 }
@@ -198,19 +197,6 @@ export class ContributionAndReviewBackendApiService {
       offset: offset.toString(),
       sort_key: sortKey,
     };
-    // If the limit is 0, we return an empty response immediately. A limit of 0
-    // can occur if the frontend cache is already full due to redundant
-    // concurrent calls. We must handle this case explicitly because '0' is
-    // falsy in JavaScript and would be omitted from the backend request,
-    // which would lead to a 'ValueError' on the backend for certain
-    // suggestion types.
-    if (limit === 0) {
-      return Promise.resolve({
-        suggestions: [],
-        target_id_to_opportunity_dict: {},
-        next_offset: offset,
-      });
-    }
     if (limit) {
       params.limit = limit.toString();
     }

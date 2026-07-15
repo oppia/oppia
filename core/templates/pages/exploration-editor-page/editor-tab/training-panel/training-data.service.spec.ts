@@ -30,7 +30,6 @@ import {State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {InteractionAnswer} from 'interactions/answer-defs';
 
 class MockNgbModal {
   open() {
@@ -43,14 +42,14 @@ class MockNgbModal {
 class MockResponsesService {
   AnswerGroupArray = [
     new AnswerGroup(
-      [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
-      Outcome.createNew('', 'feedback_1', '', []),
+      [new Rule('TextInput', null, null), new Rule('TextInput', null, null)],
+      null,
       ['trainingData 1'],
       null
     ),
     new AnswerGroup(
-      [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
-      Outcome.createNew('', 'feedback_2', '', []),
+      [new Rule('TextInput', null, null), new Rule('TextInput', null, null)],
+      null,
       ['trainingData 1', 'trainingData 2'],
       null
     ),
@@ -65,22 +64,18 @@ class MockResponsesService {
   }
 
   updateAnswerGroup(
-    item1: number,
-    item2: AnswerGroup,
-    item3: (arg0: AnswerGroup[]) => void
+    item1: string,
+    item2: string,
+    item3: (arg0: string) => void
   ) {
-    item3(this.AnswerGroupArray);
+    item3(null);
   }
 
-  save(
-    item1: AnswerGroup[],
-    item2: Outcome | null,
-    item3: (arg0: AnswerGroup[], arg1: Outcome | null) => void
-  ) {
-    item3(this.AnswerGroupArray, item2);
+  save(item1: string, item2: string, item3: (arg0: string) => void) {
+    item3(null);
   }
 
-  updateConfirmedUnclassifiedAnswers(item1: InteractionAnswer[]) {}
+  updateConfirmedUnclassifiedAnswers(item1: string) {}
   getConfirmedUnclassifiedAnswers() {
     return ['answer1', 'answer2'];
   }
@@ -91,11 +86,11 @@ class MockResponsesService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1: string, item2: AnswerGroup[]) {}
+  saveInteractionAnswerGroups(item1: string, item2: string) {}
 
-  saveInteractionDefaultOutcome(item1: string, item2: Outcome) {}
+  saveInteractionDefaultOutcome(item1: string, item2: string) {}
 
-  saveConfirmedUnclassifiedAnswers(item1: string, item2: InteractionAnswer[]) {}
+  saveConfirmedUnclassifiedAnswers(item1: string, item2: string) {}
 }
 
 class MockStateEditorService {
@@ -226,24 +221,30 @@ describe('Training Data Service', () => {
           'State',
           'id',
           'some',
-          SubtitledHtml.createDefault('', 'content'),
+          null,
           new Interaction(
             [
               new AnswerGroup(
-                [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
-                Outcome.createNew('', 'feedback_3', '', []),
+                [
+                  new Rule('TextInput', null, null),
+                  new Rule('TextInput', null, null),
+                ],
+                null,
                 ['trainingData 1'],
                 null
               ),
               new AnswerGroup(
-                [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
-                Outcome.createNew('', 'feedback_4', '', []),
+                [
+                  new Rule('TextInput', null, null),
+                  new Rule('TextInput', null, null),
+                ],
+                null,
                 ['trainingData 1'],
                 null
               ),
             ],
             [],
-            {} as Interaction['customizationArgs'],
+            null,
             new Outcome(
               'Hola',
               null,
@@ -257,15 +258,15 @@ describe('Training Data Service', () => {
             'id',
             null
           ),
-          [],
-          false,
+          null,
+          null,
           true,
           null
         )
       )
     ).toEqual([
-      Outcome.createNew('', 'feedback_3', '', []),
-      Outcome.createNew('', 'feedback_4', '', []),
+      null,
+      null,
       new Outcome(
         'Hola',
         null,

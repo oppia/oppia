@@ -151,7 +151,6 @@ describe('Parameter Metadata Service', () => {
               },
               hints: [],
             },
-            inapplicable_skill_misconception_ids: [],
           },
           State: {
             classifier_model_id: null,
@@ -221,7 +220,6 @@ describe('Parameter Metadata Service', () => {
               },
               hints: [],
             },
-            inapplicable_skill_misconception_ids: [],
           },
           State2: {
             classifier_model_id: null,
@@ -291,7 +289,6 @@ describe('Parameter Metadata Service', () => {
               },
               hints: [],
             },
-            inapplicable_skill_misconception_ids: [],
           },
           State3: {
             classifier_model_id: null,
@@ -361,7 +358,6 @@ describe('Parameter Metadata Service', () => {
               },
               hints: [],
             },
-            inapplicable_skill_misconception_ids: [],
           },
         });
       }

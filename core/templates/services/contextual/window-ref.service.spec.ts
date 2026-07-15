@@ -23,7 +23,7 @@ describe('Window Ref', () => {
   let wrs: WindowRef;
 
   beforeEach(() => {
-    wrs = TestBed.inject(WindowRef);
+    wrs = TestBed.get(WindowRef);
   });
 
   it('should wrap the window object', () => {

@@ -23,8 +23,6 @@ import {
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DeleteAccountBackendApiService} from './delete-account-backend-api.service';
-import {UserService} from 'services/user.service';
-import {UserInfo} from 'domain/user/user-info.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -33,22 +31,6 @@ class MockWindowRef {
     },
     gtag: () => {},
   };
-}
-
-class MockUserService {
-  isLoggedIn(): boolean {
-    return false;
-  }
-
-  getUserInfoAsync(): Promise<UserInfo> {
-    return Promise.resolve({
-      isLoggedIn: () => true,
-    } as UserInfo);
-  }
-
-  getLoginUrlAsync(): Promise<string> {
-    return Promise.resolve('/login');
-  }
 }
 
 describe('Delete Account Service', () => {
@@ -64,10 +46,6 @@ describe('Delete Account Service', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
-        },
-        {
-          provide: UserService,
-          useClass: MockUserService,
         },
       ],
     });

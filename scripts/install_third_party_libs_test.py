@@ -25,15 +25,15 @@ import shutil
 import subprocess
 import sys
 import tarfile
-import types
 
 from core.tests import test_utils
 
-from typing import Final, List, Optional, Tuple, Type
+from typing import Final, List, Tuple
 
 from . import (
     clean,
     common,
+    install_dependencies_json_packages,
     install_python_prod_dependencies,
     install_third_party_libs,
     pre_commit_hook,
@@ -74,37 +74,10 @@ class Ret:
     ) -> None:
         self.returncode = returncode
         self.communicate_val = communicate_val
-        self.stdout = None
-        self.args: List[str] = []
 
-    def communicate(
-        self,
-        _input: Optional[bytes] = None,  # pylint: disable=unused-argument
-        timeout: Optional[float] = None,  # pylint: disable=unused-argument
-    ) -> Tuple[bytes, bytes]:
+    def communicate(self) -> Tuple[bytes, bytes]:
         """Return required method."""
         return self.communicate_val
-
-    def kill(self) -> None:
-        """Mock kill method."""
-        pass
-
-    def poll(self) -> int:
-        """Mock poll method."""
-        return self.returncode
-
-    def __enter__(self) -> 'Ret':
-        """Context manager enter."""
-        return self
-
-    def __exit__(
-        self,
-        _exc_type: Optional[Type[BaseException]],
-        _exc_val: Optional[BaseException],
-        _exc_tb: Optional[types.TracebackType],
-    ) -> None:
-        """Context manager exit."""
-        pass
 
 
 class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
@@ -140,11 +113,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )
-
-        def mock_popen(*_args: str, **_kwargs: str) -> Ret:
-            return Ret()
-
-        self.Popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        self.Popen_swap = self.swap(subprocess, 'Popen', mock_check_call)
         self.check_call_error_swap = self.swap(
             subprocess, 'check_call', mock_check_call_error
         )
@@ -226,8 +195,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'install_elasticsearch_dev_server',
             mock_install_elasticsearch_dev_server,
         )
+        swap_install_python_prod_main = self.swap(
+            install_python_prod_dependencies, 'main', mock_external_script_call
+        )
         swap_install_json_deps_main = self.swap(
-            install_python_prod_dependencies,
+            install_dependencies_json_packages,
             'main',
             mock_external_script_call,
         )
@@ -242,11 +214,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         )
 
         with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
-            with swap_install_gcloud_sdk, swap_install_json_deps_main:
+            with swap_install_gcloud_sdk, swap_install_python_prod_main:
                 with pre_commit_hook_main_swap, pre_push_hook_main_swap:
                     with swap_isdir, swap_mkdir, swap_copytree:
                         with swap_install_elasticsearch_dev_server:
-                            install_third_party_libs.main()
+                            with swap_install_json_deps_main:
+                                install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

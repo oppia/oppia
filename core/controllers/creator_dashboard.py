@@ -250,12 +250,12 @@ class CreatorDashboardHandler(
                 feedback_thread_analytics
             ),
         }
-
-        average_ratings = dashboard_stats_dict.get('average_ratings')
-        if average_ratings:
-            dashboard_stats_dict['average_ratings'] = _round_average_ratings(
-                average_ratings
-            )
+        if dashboard_stats:
+            average_ratings = dashboard_stats_dict.get('average_ratings')
+            if average_ratings:
+                dashboard_stats_dict['average_ratings'] = (
+                    _round_average_ratings(average_ratings)
+                )
 
         last_week_stats = user_services.get_last_week_dashboard_stats(
             self.user_id

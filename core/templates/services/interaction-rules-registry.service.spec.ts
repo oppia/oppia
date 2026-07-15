@@ -98,44 +98,42 @@ describe('Interaction Rules Registry Service', () => {
       ],
     });
 
-    interactionRulesRegistryService = TestBed.inject(
+    interactionRulesRegistryService = TestBed.get(
       InteractionRulesRegistryService
     );
 
-    algebraicExpressionInputRulesService = TestBed.inject(
+    algebraicExpressionInputRulesService = TestBed.get(
       AlgebraicExpressionInputRulesService
     );
-    codeReplRulesService = TestBed.inject(CodeReplRulesService);
-    continueRulesService = TestBed.inject(ContinueRulesService);
-    dragAndDropSortInputRulesService = TestBed.inject(
+    codeReplRulesService = TestBed.get(CodeReplRulesService);
+    continueRulesService = TestBed.get(ContinueRulesService);
+    dragAndDropSortInputRulesService = TestBed.get(
       DragAndDropSortInputRulesService
     );
-    endExplorationRulesService = TestBed.inject(EndExplorationRulesService);
-    fractionInputRulesService = TestBed.inject(FractionInputRulesService);
-    graphInputRulesService = TestBed.inject(GraphInputRulesService);
-    imageClickInputRulesService = TestBed.inject(ImageClickInputRulesService);
-    interactiveMapRulesService = TestBed.inject(InteractiveMapRulesService);
-    itemSelectionInputRulesService = TestBed.inject(
+    endExplorationRulesService = TestBed.get(EndExplorationRulesService);
+    fractionInputRulesService = TestBed.get(FractionInputRulesService);
+    graphInputRulesService = TestBed.get(GraphInputRulesService);
+    imageClickInputRulesService = TestBed.get(ImageClickInputRulesService);
+    interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
+    itemSelectionInputRulesService = TestBed.get(
       ItemSelectionInputRulesService
     );
-    mathEquationInputRulesService = TestBed.inject(
-      MathEquationInputRulesService
-    );
-    multipleChoiceInputRulesService = TestBed.inject(
+    mathEquationInputRulesService = TestBed.get(MathEquationInputRulesService);
+    multipleChoiceInputRulesService = TestBed.get(
       MultipleChoiceInputRulesService
     );
-    musicNotesInputRulesService = TestBed.inject(MusicNotesInputRulesService);
-    numberWithUnitsRulesService = TestBed.inject(NumberWithUnitsRulesService);
-    numericExpressionInputRulesService = TestBed.inject(
+    musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
+    numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
+    numericExpressionInputRulesService = TestBed.get(
       NumericExpressionInputRulesService
     );
-    numericInputRulesService = TestBed.inject(NumericInputRulesService);
-    pencilCodeEditorRulesService = TestBed.inject(PencilCodeEditorRulesService);
-    ratioExpressionInputRulesService = TestBed.inject(
+    numericInputRulesService = TestBed.get(NumericInputRulesService);
+    pencilCodeEditorRulesService = TestBed.get(PencilCodeEditorRulesService);
+    ratioExpressionInputRulesService = TestBed.get(
       RatioExpressionInputRulesService
     );
-    setInputRulesService = TestBed.inject(SetInputRulesService);
-    textInputRulesService = TestBed.inject(TextInputRulesService);
+    setInputRulesService = TestBed.get(SetInputRulesService);
+    textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
   it('should throw an error for falsey interaction ids', () => {

@@ -42,7 +42,7 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   }));
 
   beforeEach(() => {
-    topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
+    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     fixture = TestBed.createComponent(TopicEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;

@@ -28,7 +28,7 @@ describe('State hints service', () => {
       providers: [StateHintsService],
     });
 
-    shs = TestBed.inject(StateHintsService);
+    shs = TestBed.get(StateHintsService);
   });
 
   it('should called the constructor', () => {

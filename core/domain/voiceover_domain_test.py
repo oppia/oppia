@@ -347,11 +347,6 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             'content_id_0' in self.entity_voiceovers_instance.voiceovers_mapping
         )
 
-        # This does not throw an error if the content_id is not present.
-        self.entity_voiceovers_instance.remove_voiceover(
-            'content_1', feconf.VoiceoverType.MANUAL
-        )
-
     def test_create_empty_entity_voiceovers(self) -> None:
         empty_entity_voiceovers = (
             voiceover_domain.EntityVoiceovers.create_empty(
@@ -378,6 +373,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertEqual(entity_voiceovers_object.language_accent_code, 'en-US')
         self.assertEqual(entity_voiceovers_object.voiceovers_mapping, {})
 
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_1'
+        )
         entity_voiceovers_object.add_voiceover(
             'content_1',
             feconf.VoiceoverType.MANUAL,
@@ -487,8 +485,19 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             voiceovers_mapping=new_voiceover_object,
         )
 
-        entity_voiceovers_object.mark_voiceovers_as_needing_update(
-            'content_0', feconf.VoiceoverType.MANUAL
+        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
+            'content'
+        )
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping['content_0'][
+            'manual'
+        ]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertFalse(voiceover.needs_update)
+
+        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
+            'content_0'
         )
 
         voiceover = entity_voiceovers_object.voiceovers_mapping['content_0'][
@@ -497,8 +506,3 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert voiceover is not None
         self.assertTrue(voiceover.needs_update)
-
-        # This does not throw an error if the content_id is not present.
-        entity_voiceovers_object.mark_voiceovers_as_needing_update(
-            'content_1', feconf.VoiceoverType.MANUAL
-        )

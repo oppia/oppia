@@ -42,31 +42,41 @@ export class AlertsService {
    *   - content: a string containing the warning or message.
    */
 
-  private _warnings: Warning[] = [];
-  private _messages: Message[] = [];
-
+  // TODO(#8472): Remove static when migration is complete.
+  // Until then, we need to use static so that the two instances of the service
+  // created by our hybrid app (one for Angular, the other for AngularJS) can
+  // refer to the same objects.
+  private static warnings: Warning[] = [];
   get warnings(): Warning[] {
-    return this._warnings;
+    return AlertsService.warnings;
   }
 
+  private static messages: Message[] = [];
   get messages(): Message[] {
-    return this._messages;
+    return AlertsService.messages;
   }
+
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(private log: LoggerService) {}
+  constructor(private log: LoggerService) {
+    // Since warnings and messages are static, clearing them in the constructor
+    // retain "instance-like" behavior.
+    this.clearWarnings();
+    this.clearMessages();
+  }
+
   /**
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
   addWarning(warning: string): void {
     this.log.error(warning);
-    if (this._warnings.length >= this.MAX_TOTAL_WARNINGS) {
+    if (this.warnings.length >= this.MAX_TOTAL_WARNINGS) {
       return;
     }
-    this._warnings.push({
+    this.warnings.push({
       type: 'warning',
       content: warning,
     });
@@ -87,17 +97,17 @@ export class AlertsService {
    * @param {Object} warningToDelete - The warning message to be deleted.
    */
   deleteWarning(warningToDelete: Warning): void {
-    const filteredWarnings = this._warnings.filter(
+    const filteredWarnings = this.warnings.filter(
       w => w.content !== warningToDelete.content
     );
-    this._warnings.splice(0, this._warnings.length, ...filteredWarnings);
+    this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
   }
 
   /**
    * Clears all warnings.
    */
   clearWarnings(): void {
-    this._warnings.splice(0, this._warnings.length);
+    this.warnings.splice(0, this.warnings.length);
   }
 
   /**
@@ -107,24 +117,25 @@ export class AlertsService {
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
   addMessage(type: string, message: string, timeoutMilliseconds: number): void {
-    if (this._messages.length >= this.MAX_TOTAL_MESSAGES) {
+    if (this.messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }
-    this._messages.push({
+    this.messages.push({
       type: type,
       content: message,
       timeout: timeoutMilliseconds,
     });
   }
+
   /**
    * Deletes the message from the messages list.
    * @param {Object} messageToDelete - Message to be deleted.
    */
   deleteMessage(messageToDelete: Message): void {
-    const isMessageToKeep = (m: Message): boolean =>
+    const isMessageToKeep = (m: Message) =>
       m.type !== messageToDelete.type || m.content !== messageToDelete.content;
-    const filteredMessages = this._messages.filter(isMessageToKeep);
-    this._messages.splice(0, this._messages.length, ...filteredMessages);
+    const filteredMessages = this.messages.filter(isMessageToKeep);
+    this.messages.splice(0, this.messages.length, ...filteredMessages);
   }
 
   /**
@@ -155,6 +166,6 @@ export class AlertsService {
    * Clears all messages.
    */
   clearMessages(): void {
-    this._messages.splice(0, this._messages.length);
+    this.messages.splice(0, this.messages.length);
   }
 }

@@ -94,7 +94,6 @@ describe('Admin roles tab component ', function () {
     topicSummaries: [sampleTopicSummary],
     platformParameters: [],
     skillList: [],
-    storyList: [],
   };
 
   beforeEach(() => {
@@ -162,12 +161,12 @@ describe('Admin roles tab component ', function () {
       spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
         successPromise
       );
-      expect(component.roleIsCurrentlyBeingEdited).toBe(false);
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();
       tick();
 
-      expect(component.roleIsCurrentlyBeingEdited).toBe(true);
+      expect(component.roleIsCurrentlyBeingEdited).toBeTrue();
     }));
 
     it('should fetch user roles and intialize properties', fakeAsync(() => {
@@ -176,18 +175,18 @@ describe('Admin roles tab component ', function () {
       );
 
       // Prechecks.
-      expect(component.rolesFetched).toBe(false);
+      expect(component.rolesFetched).toBeFalse();
       expect(component.userRoles).toEqual([]);
       expect(component.managedTopicIds).toEqual([]);
-      expect(component.userIsBanned).toBe(false);
+      expect(component.userIsBanned).toBeFalse();
 
       component.startEditing();
       tick();
 
-      expect(component.rolesFetched).toBe(true);
+      expect(component.rolesFetched).toBeTrue();
       expect(component.userRoles).toEqual(['TOPIC_MANAGER']);
       expect(component.managedTopicIds).toEqual(['topic_id_1']);
-      expect(component.userIsBanned).toBe(false);
+      expect(component.userIsBanned).toBeFalse();
     }));
 
     it('should set status when viewUsersRoleAsync fails', fakeAsync(() => {
@@ -195,14 +194,14 @@ describe('Admin roles tab component ', function () {
         Promise.reject('Error')
       );
       spyOn(component.setStatusMessage, 'emit');
-      expect(component.roleIsCurrentlyBeingEdited).toBe(false);
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();
       tick();
 
       // As the promise is rejected with error, we do not expect it to be marked
       // as being edited and the status message is shown with the error.
-      expect(component.roleIsCurrentlyBeingEdited).toBe(false);
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
       expect(component.setStatusMessage.emit).toHaveBeenCalledWith('Error');
     }));
   });
@@ -213,14 +212,14 @@ describe('Admin roles tab component ', function () {
         Promise.resolve()
       );
 
-      expect(component.bannedStatusChangeInProgress).toBe(false);
+      expect(component.bannedStatusChangeInProgress).toBeFalse();
 
       component.markUserBanned();
-      expect(component.bannedStatusChangeInProgress).toBe(true);
+      expect(component.bannedStatusChangeInProgress).toBeTrue();
 
       tick();
 
-      expect(component.bannedStatusChangeInProgress).toBe(false);
+      expect(component.bannedStatusChangeInProgress).toBeFalse();
     }));
 
     it('should set userIsBanned to true', fakeAsync(() => {
@@ -228,12 +227,12 @@ describe('Admin roles tab component ', function () {
         Promise.resolve()
       );
 
-      expect(component.userIsBanned).toBe(false);
+      expect(component.userIsBanned).toBeFalse();
 
       component.markUserBanned();
       tick();
 
-      expect(component.userIsBanned).toBe(true);
+      expect(component.userIsBanned).toBeTrue();
     }));
 
     it('should set alert warning on failed request', fakeAsync(() => {
@@ -257,14 +256,14 @@ describe('Admin roles tab component ', function () {
     });
 
     it('should enable bannedStatusChangeInProgress until user is unbanned', fakeAsync(() => {
-      expect(component.bannedStatusChangeInProgress).toBe(false);
+      expect(component.bannedStatusChangeInProgress).toBeFalse();
 
       component.unmarkUserBanned();
-      expect(component.bannedStatusChangeInProgress).toBe(true);
+      expect(component.bannedStatusChangeInProgress).toBeTrue();
 
       tick();
 
-      expect(component.bannedStatusChangeInProgress).toBe(false);
+      expect(component.bannedStatusChangeInProgress).toBeFalse();
     }));
 
     it('should set userIsBanned to false', fakeAsync(() => {
@@ -273,7 +272,7 @@ describe('Admin roles tab component ', function () {
       component.unmarkUserBanned();
       tick();
 
-      expect(component.userIsBanned).toBe(false);
+      expect(component.userIsBanned).toBeFalse();
     }));
   });
 
@@ -489,7 +488,7 @@ describe('Admin roles tab component ', function () {
 
       component.showNewRoleSelector();
 
-      expect(component.roleSelectorIsShown).toBe(true);
+      expect(component.roleSelectorIsShown).toBeTrue();
     });
 
     it('should set correct value for possibleRolesToAdd', () => {

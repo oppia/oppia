@@ -221,6 +221,10 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       );
     }
 
+    // This ensures that any new parameter names that have been added
+    // before the deletion are added to the list of possible names in
+    // the select2 dropdowns. Otherwise, after the deletion, the
+    // dropdowns may turn blank.
     (this.paramChangesService.displayed as ParamChange[]).forEach(
       paramChange => {
         (
@@ -257,6 +261,11 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       })
     );
 
+    // This is a local letiable that is used by the select2 dropdowns
+    // for choosing parameter names. It may not accurately reflect the
+    // content of ExplorationParamSpecsService, since it's possible that
+    // temporary parameter names may be added and then deleted within
+    // the course of a single "parameter changes" edit.
     this.paramNameChoices = [];
     this.HUMAN_READABLE_ARGS_RENDERERS = {
       Copier: customizationArgs => {

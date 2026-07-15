@@ -149,7 +149,6 @@ const dummyClassroomData = new ClassroomData(
   'dummy',
   'dummy',
   true,
-  false,
   {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
   {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
   1
@@ -309,7 +308,7 @@ describe('Diagnostic test player component', () => {
   }));
 
   it('should not get recommended topics if classroomData is not initialized', () => {
-    expect(component.classroomData).toBeUndefined();
+    component.classroomData = undefined;
     component.getRecommendedTopicSummaries(['test']);
     expect(component.recommendedTopicSummaries).toEqual([]);
   });
@@ -400,7 +399,7 @@ describe('Diagnostic test player component', () => {
   }));
 
   it('should not start diagnostic test if there is error while fetching classroom data', fakeAsync(() => {
-    expect(component.isStartTestButtonDisabled).toBe(false);
+    expect(component.isStartTestButtonDisabled).toBeFalse();
     component.classroomData = dummyClassroomData;
 
     spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
@@ -410,7 +409,7 @@ describe('Diagnostic test player component', () => {
     component.startDiagnosticTest();
     tick();
 
-    expect(component.isStartTestButtonDisabled).toBe(true);
+    expect(component.isStartTestButtonDisabled).toBeTrue();
   }));
 
   it('should register recommendation acceptance event', fakeAsync(() => {

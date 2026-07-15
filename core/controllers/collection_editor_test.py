@@ -100,9 +100,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             '%s/%s'
             % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID)
         )
-        self.assertEqual(
-            self.COLLECTION_ID, json_response['collection_dict']['id']
-        )
+        self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.logout()
 
     def test_editable_collection_handler_put_with_invalid_payload_version(
@@ -226,10 +224,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(
-            self.COLLECTION_ID, json_response['collection_dict']['id']
-        )
-        self.assertEqual(2, json_response['collection_dict']['version'])
+        self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
+        self.assertEqual(2, json_response['collection']['version'])
 
         self.logout()
 

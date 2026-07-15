@@ -119,7 +119,7 @@ describe('Skill backend API service', () => {
     };
 
     const backendResponse = {
-      skill_dict: skillBackendDict,
+      skill: skillBackendDict,
       assigned_skill_topic_data_dict: assignedSkillTopicData,
       grouped_skill_summaries: groupedSkillSummaries,
     };
@@ -170,7 +170,7 @@ describe('Skill backend API service', () => {
   it('should make a request to update the skill in the backend.', fakeAsync(() => {
     skill = Skill.createFromBackendDict(skillBackendDict);
     const backendResponse = {
-      skill_dict: skillBackendDict,
+      skill: skillBackendDict,
     };
     const changeList = {
       cmd: 'add_prerequisite_skill',

@@ -148,7 +148,7 @@ export class TopicUpdateService {
       {
         property_name: propertyName,
         new_value: cloneDeep(newValue),
-        old_value: cloneDeep(oldValue),
+        old_value: cloneDeep(oldValue) || null,
       },
       apply as (
         backendChangeObject: TopicChange,
@@ -659,8 +659,7 @@ export class TopicUpdateService {
         // Check presence of member equivalent of hasOwnProperty
         // https://www.typescriptlang.org/docs/handbook/advanced-types.html
         if ('subtopic_id' in backendChangeDict) {
-          const subtopicIdValue = backendChangeDict.subtopic_id;
-          if (subtopicIdValue === subtopicId) {
+          if (backendChangeDict.subtopic_id === subtopicId) {
             // The indices in the change list corresponding to changes to
             // the currently deleted and newly created subtopic are to be
             // removed from the list.
@@ -669,7 +668,7 @@ export class TopicUpdateService {
           }
           // When a newly created subtopic is deleted, the subtopics created
           // after it would have their id reduced by 1.
-          if (subtopicIdValue > subtopicId) {
+          if (backendChangeDict.subtopic_id > subtopicId) {
             backendChangeDict.subtopic_id--;
           }
         }

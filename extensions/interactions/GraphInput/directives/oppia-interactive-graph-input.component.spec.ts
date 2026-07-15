@@ -111,7 +111,7 @@ describe('InteractiveGraphInput', () => {
 
   beforeEach(() => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
-    playerPositionService = TestBed.inject(PlayerPositionService);
+    playerPositionService = TestBed.get(PlayerPositionService);
     fixture = TestBed.createComponent(InteractiveGraphInput);
     component = fixture.componentInstance;
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);

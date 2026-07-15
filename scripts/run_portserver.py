@@ -57,6 +57,8 @@ import socket
 import sys
 import threading
 
+from core import utils
+
 from typing import Callable, Deque, Final, List, Optional, Sequence
 
 _PROTOCOLS: Final = [
@@ -75,7 +77,7 @@ def get_process_command_line(pid: int) -> str:
         str. The command that started the process.
     """
     try:
-        with open('/proc/{}/cmdline'.format(pid), 'r', encoding='utf-8') as f:
+        with utils.open_file('/proc/{}/cmdline'.format(pid), 'r') as f:
             return f.read()
     except IOError:
         return ''
@@ -91,7 +93,7 @@ def get_process_start_time(pid: int) -> int:
         int. The time when the process started.
     """
     try:
-        with open('/proc/{}/stat'.format(pid), 'r', encoding='utf-8') as f:
+        with utils.open_file('/proc/{}/stat'.format(pid), 'r') as f:
             return int(f.readline().split()[21])
     except IOError:
         return 0

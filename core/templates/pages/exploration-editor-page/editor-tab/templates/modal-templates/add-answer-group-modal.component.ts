@@ -51,7 +51,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
-  skillId: string | null;
+  skillId: string;
   misconceptionId: number;
 }
 
@@ -114,13 +114,8 @@ export class AddAnswerGroupModalComponent
     this.addState.emit(event);
   }
 
-  updateTaggedMisconception(
-    taggedMisconception: TaggedMisconception | null
-  ): void {
-    this.tmpTaggedSkillMisconceptionId =
-      taggedMisconception !== null
-        ? `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`
-        : null;
+  updateTaggedMisconception(taggedMisconception: TaggedMisconception): void {
+    this.tmpTaggedSkillMisconceptionId = `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`;
   }
 
   isSelfLoopWithNoFeedback(tmpOutcome: Outcome): boolean {
@@ -198,7 +193,7 @@ export class AddAnswerGroupModalComponent
     this.isEditable = this.editabilityService.isEditable();
     this.questionModeEnabled = this.stateEditorService.isInQuestionMode();
 
-    this.tmpRule = Rule.createNew(null as unknown as string, {}, {});
+    this.tmpRule = Rule.createNew(null, {}, {});
     var feedbackContentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK
     );

@@ -22,7 +22,6 @@ import {Injectable} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
 import {LocalStorageService} from './local-storage.service';
-import {UserService} from './user.service';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
@@ -40,8 +39,7 @@ export class SiteAnalyticsService {
 
   constructor(
     private windowRef: WindowRef,
-    private localStorageService: LocalStorageService,
-    private userService: UserService
+    private localStorageService: LocalStorageService
   ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
@@ -49,46 +47,13 @@ export class SiteAnalyticsService {
       initializeGoogleAnalytics();
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
-
-    this._initializeLoginStatus();
   }
 
-  private async _initializeLoginStatus(): Promise<void> {
-    await this.userService.getUserInfoAsync();
-    this._pushLoginStatusToDataLayer();
-  }
-
-  private _pushLoginStatusToDataLayer(): void {
-    const loginStatus = this._getLoginStatus();
-
-    this.windowRef.nativeWindow.dataLayer =
-      this.windowRef.nativeWindow.dataLayer || [];
-
-    this.windowRef.nativeWindow.dataLayer.push({
-      login_status: loginStatus,
-    });
-  }
-
-  private _getLoginStatus(): string {
-    return this.userService.isLoggedIn() ? 'logged_in' : 'logged_out';
-  }
-
-  private _sendEventToGoogleAnalytics(
+  _sendEventToGoogleAnalytics(
     eventName: string,
-    eventParameters: Record<string, string | number | boolean> = {}
+    eventParameters: Object = {}
   ): void {
-    const loginStatus = this._getLoginStatus();
-
-    const updatedEventParameters = {
-      ...eventParameters,
-      login_status: loginStatus,
-    };
-
-    this.windowRef.nativeWindow.gtag(
-      'event',
-      eventName,
-      updatedEventParameters
-    );
+    this.windowRef.nativeWindow.gtag('event', eventName, eventParameters);
   }
 
   // The srcElement refers to the element on the page that is clicked.
@@ -640,24 +605,6 @@ export class SiteAnalyticsService {
       button_name: buttonName,
       page_path: this.windowRef.nativeWindow.location.pathname,
     });
-  }
-
-  registerCampaignBannerDonateButtonClick(): void {
-    this._sendEventToGoogleAnalytics(
-      'financial_literacy_campaign_banner_donate_button_click',
-      {
-        page_path: this.windowRef.nativeWindow.location.pathname,
-      }
-    );
-  }
-
-  registerCampaignBannerVisibility(): void {
-    this._sendEventToGoogleAnalytics(
-      'financial_literacy_campaign_banner_shown',
-      {
-        page_path: this.windowRef.nativeWindow.location.pathname,
-      }
-    );
   }
 
   registerClickFooterButtonEvent(

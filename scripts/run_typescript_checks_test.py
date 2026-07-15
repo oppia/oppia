@@ -22,6 +22,7 @@ import os
 import subprocess
 import sys
 
+from core import utils
 from core.tests import test_utils
 
 from typing import List
@@ -58,8 +59,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 run_typescript_checks.TSCONFIG_FILEPATH
             )
             out_dir = ''
-            with open(
-                run_typescript_checks.TSCONFIG_FILEPATH, 'r', encoding='utf-8'
+            with utils.open_file(
+                run_typescript_checks.TSCONFIG_FILEPATH, 'r'
             ) as f:
                 config_data = json.load(f)
                 out_dir = os.path.join(
@@ -173,12 +174,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8'
         )
         non_empty_process = subprocess.Popen(
-            [
-                'echo',
-                'core/new_directory/new_file.ts\ncore/new_directory/fake_excluded_file.ts',
-            ],
-            stdout=subprocess.PIPE,
-            encoding='utf-8',
+            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8'
         )
 
         def mock_popen_for_errors(  # pylint: disable=unused-argument
@@ -192,15 +188,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 return non_empty_process
             return empty_process
 
-        swap_exclude_paths = self.swap(
-            run_typescript_checks,
-            'TS_STRICT_EXCLUDE_PATHS',
-            ['core/new_directory/fake_excluded_file.ts'],
-        )
-
-        with self.swap(
-            subprocess, 'Popen', mock_popen_for_errors
-        ), swap_exclude_paths:
+        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.compile_and_check_typescript(
                     run_typescript_checks.STRICT_TSCONFIG_FILEPATH

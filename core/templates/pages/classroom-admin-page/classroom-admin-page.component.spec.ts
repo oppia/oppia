@@ -162,12 +162,12 @@ describe('Classroom Admin Page component ', () => {
       'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
-    expect(component.pageIsInitialized).toBe(false);
+    expect(component.pageIsInitialized).toBeFalse();
 
     component.ngOnInit();
     tick();
 
-    expect(component.pageIsInitialized).toBe(true);
+    expect(component.pageIsInitialized).toBeTrue();
     expect(component.classroomIdToClassroomNameIndex).toEqual(response);
     expect(component.classroomCount).toEqual(2);
   }));
@@ -180,15 +180,15 @@ describe('Classroom Admin Page component ', () => {
       Promise.resolve(response)
     );
 
-    expect(component.classroomViewerMode).toBe(false);
-    expect(component.classroomDetailsIsShown).toBe(false);
+    expect(component.classroomViewerMode).toBeFalse();
+    expect(component.classroomDetailsIsShown).toBeFalse();
     component.ngOnInit();
 
     component.getClassroomData('classroomId');
     tick();
 
-    expect(component.classroomViewerMode).toBe(true);
-    expect(component.classroomDetailsIsShown).toBe(true);
+    expect(component.classroomViewerMode).toBeTrue();
+    expect(component.classroomDetailsIsShown).toBeTrue();
   }));
 
   it('should display alert when unable to fetch classroom data', fakeAsync(() => {
@@ -241,8 +241,8 @@ describe('Classroom Admin Page component ', () => {
     component.getClassroomData('classroomId');
     tick();
 
-    expect(component.classroomDetailsIsShown).toBe(false);
-    expect(component.classroomViewerMode).toBe(false);
+    expect(component.classroomDetailsIsShown).toBeFalse();
+    expect(component.classroomViewerMode).toBeFalse();
   }));
 
   it('should set topicsToClassroomRelation and filteredTopicsToClassroomRelation', fakeAsync(() => {
@@ -303,9 +303,9 @@ describe('Classroom Admin Page component ', () => {
     component.getClassroomData('classroomId');
     tick();
 
-    expect(component.classroomDetailsIsShown).toBe(true);
-    expect(component.classroomEditorMode).toBe(true);
-    expect(component.classroomViewerMode).toBe(false);
+    expect(component.classroomDetailsIsShown).toBeTrue();
+    expect(component.classroomEditorMode).toBeTrue();
+    expect(component.classroomViewerMode).toBeFalse();
   }));
 
   it('should get classroom ID to classroom name and update classroom count', fakeAsync(() => {
@@ -326,12 +326,12 @@ describe('Classroom Admin Page component ', () => {
       'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
-    expect(component.pageIsInitialized).toBe(false);
+    expect(component.pageIsInitialized).toBeFalse();
 
     component.getAllClassroomIdToClassroomNameIndex();
     tick();
 
-    expect(component.pageIsInitialized).toBe(true);
+    expect(component.pageIsInitialized).toBeTrue();
     expect(component.classroomIdToClassroomNameIndex).toEqual(response);
     expect(component.classroomCount).toEqual(2);
   }));
@@ -351,7 +351,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.updateClassroomField();
 
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it('should be able to update the classroom teaser text', () => {
@@ -369,7 +369,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.updateClassroomField();
 
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it('should be able to update the classroom thumbnail and banner data', () => {
@@ -394,7 +394,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.updateClassroomField();
 
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it(
@@ -414,13 +414,13 @@ describe('Classroom Admin Page component ', () => {
 
       component.updateClassroomField();
 
-      expect(component.classroomDataIsChanged).toBe(true);
+      expect(component.classroomDataIsChanged).toBeTrue();
 
       component.tempClassroomData.setClassroomName('math');
 
       component.updateClassroomField();
 
-      expect(component.classroomDataIsChanged).toBe(false);
+      expect(component.classroomDataIsChanged).toBeFalse();
     }
   );
 
@@ -439,7 +439,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.updateClassroomField();
 
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it('should be able to update the classroom course details', () => {
@@ -459,7 +459,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.updateClassroomField();
 
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it('should be able to update the classroom topic list intro', () => {
@@ -479,7 +479,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.updateClassroomField();
 
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it('should be able to convert classroom dict to the backend form', () => {
@@ -520,8 +520,8 @@ describe('Classroom Admin Page component ', () => {
 
     component.openClassroomInEditorMode();
 
-    expect(component.classroomViewerMode).toBe(false);
-    expect(component.classroomEditorMode).toBe(true);
+    expect(component.classroomViewerMode).toBeFalse();
+    expect(component.classroomEditorMode).toBeTrue();
   });
 
   it('should be able to save classroom data', fakeAsync(() => {
@@ -542,9 +542,9 @@ describe('Classroom Admin Page component ', () => {
     component.saveClassroomData('classroomId');
     tick();
 
-    expect(component.classroomViewerMode).toBe(true);
-    expect(component.classroomEditorMode).toBe(false);
-    expect(component.classroomDataIsChanged).toBe(false);
+    expect(component.classroomViewerMode).toBeTrue();
+    expect(component.classroomEditorMode).toBeFalse();
+    expect(component.classroomDataIsChanged).toBeFalse();
   }));
 
   it('should be able handle rejection handler while saving classroom data', fakeAsync(() => {
@@ -595,9 +595,9 @@ describe('Classroom Admin Page component ', () => {
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
-      expect(component.classroomEditorMode).toBe(false);
-      expect(component.classroomViewerMode).toBe(true);
-      expect(component.classroomDataIsChanged).toBe(false);
+      expect(component.classroomEditorMode).toBeFalse();
+      expect(component.classroomViewerMode).toBeTrue();
+      expect(component.classroomDataIsChanged).toBeFalse();
     })
   );
 
@@ -616,9 +616,9 @@ describe('Classroom Admin Page component ', () => {
       component.closeClassroomConfigEditor();
 
       expect(ngbModal.open).toHaveBeenCalled();
-      expect(component.classroomDataIsChanged).toBe(true);
-      expect(component.classroomEditorMode).toBe(true);
-      expect(component.classroomViewerMode).toBe(false);
+      expect(component.classroomDataIsChanged).toBeTrue();
+      expect(component.classroomEditorMode).toBeTrue();
+      expect(component.classroomViewerMode).toBeFalse();
     }
   );
 
@@ -637,8 +637,8 @@ describe('Classroom Admin Page component ', () => {
       component.closeClassroomConfigEditor();
 
       expect(ngbModal.open).not.toHaveBeenCalled();
-      expect(component.classroomEditorMode).toBe(false);
-      expect(component.classroomViewerMode).toBe(true);
+      expect(component.classroomEditorMode).toBeFalse();
+      expect(component.classroomViewerMode).toBeTrue();
     }
   );
 
@@ -925,19 +925,19 @@ describe('Classroom Admin Page component ', () => {
 
     tick();
 
-    expect(component.topicWithGivenIdExists).toBe(false);
+    expect(component.topicWithGivenIdExists).toBeFalse();
   }));
 
   it('should be able to show and remove new topic input field', () => {
-    expect(component.newTopicCanBeAdded).toBe(false);
+    expect(component.newTopicCanBeAdded).toBeFalse();
 
     component.showNewTopicInputField();
 
-    expect(component.newTopicCanBeAdded).toBe(true);
+    expect(component.newTopicCanBeAdded).toBeTrue();
 
     component.removeNewTopicInputField();
 
-    expect(component.newTopicCanBeAdded).toBe(false);
+    expect(component.newTopicCanBeAdded).toBeFalse();
   });
 
   it('should remove existing error for topic ID model change', () => {
@@ -945,7 +945,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.onNewTopicInputModelChange('DUMMY_ID');
 
-    expect(component.topicWithGivenIdExists).toBe(true);
+    expect(component.topicWithGivenIdExists).toBeTrue();
   });
 
   it('should be able to add prerequisite for a topic', () => {
@@ -1138,11 +1138,11 @@ describe('Classroom Admin Page component ', () => {
 
     component.editDependency('topicName');
 
-    expect(component.topicDependencyEditOptionIsShown).toBe(true);
+    expect(component.topicDependencyEditOptionIsShown).toBeTrue();
 
     component.editDependency('topicName');
 
-    expect(component.topicDependencyEditOptionIsShown).toBe(false);
+    expect(component.topicDependencyEditOptionIsShown).toBeFalse();
   });
 
   it('should be able to delete a topic from the classroom on modal confirmation', fakeAsync(() => {
@@ -1230,7 +1230,7 @@ describe('Classroom Admin Page component ', () => {
       tick();
 
       expect(component.topicIdsToTopicName).toEqual({});
-      expect(component.topicDependencyIsLoaded).toBe(false);
+      expect(component.topicDependencyIsLoaded).toBeFalse();
     })
   );
 
@@ -1413,7 +1413,7 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     component.togglePublicationStatus();
-    component.saveClassroomData('classroomId');
+    component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
@@ -1430,14 +1430,14 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    expect(component.tempClassroomData.getDiagnosticTestIsEnabled()).toBe(
-      false
-    );
+    expect(
+      component.tempClassroomData.getDiagnosticTestIsEnabled()
+    ).toBeFalse();
 
     component.toggleDiagnosticTestStatus();
 
-    expect(component.tempClassroomData.getDiagnosticTestIsEnabled()).toBe(true);
-    expect(component.classroomDataIsChanged).toBe(true);
+    expect(component.tempClassroomData.getDiagnosticTestIsEnabled()).toBeTrue();
+    expect(component.classroomDataIsChanged).toBeTrue();
   });
 
   it('should not be able to publish classroom due to validation errors', () => {
@@ -1498,9 +1498,9 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
     component.updateClassroomField();
-    component.saveClassroomData('classroomId');
+    component.saveClassroomData();
 
-    expect(component.canSaveClassroom()).toBe(false);
+    expect(component.canSaveClassroom()).toBeFalse();
     expect(component.updateClassroomData).not.toHaveBeenCalled();
   });
 
@@ -1522,7 +1522,7 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     component.togglePublicationStatus();
-    component.saveClassroomData('classroomId');
+    component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
@@ -1601,9 +1601,10 @@ describe('Classroom Admin Page component ', () => {
       {classroom_id: 'id2', classroom_name: 'Classroom 2', classroom_index: 1},
     ];
 
-    spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
-      Promise.resolve(response)
-    );
+    spyOn(
+      component.classroomBackendApiService,
+      'getClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(response));
 
     component.getClassroomData('id1');
     tick();

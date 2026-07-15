@@ -23,7 +23,7 @@ describe('Construct Translation Ids Service', () => {
   let ctis: ConstructTranslationIdsService;
 
   beforeEach(() => {
-    ctis = TestBed.inject(ConstructTranslationIdsService);
+    ctis = TestBed.get(ConstructTranslationIdsService);
   });
 
   it('should get library id', () => {

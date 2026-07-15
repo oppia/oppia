@@ -32,8 +32,8 @@ import {Rule} from 'domain/exploration/rule.model';
 import {Subscription} from 'rxjs';
 
 export interface MisconceptionUpdatedValues {
-  misconception: Misconception | null;
-  skillId: string | null;
+  misconception: Misconception;
+  skillId: string;
   feedbackIsUsed: boolean;
 }
 
@@ -49,7 +49,7 @@ export interface Outcome {
 export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() saveAnswerGroupFeedback: EventEmitter<Outcome> = new EventEmitter();
 
-  @Output() saveTaggedMisconception: EventEmitter<TaggedMisconception | null> =
+  @Output() saveTaggedMisconception: EventEmitter<TaggedMisconception> =
     new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
@@ -61,8 +61,8 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() taggedSkillMisconceptionId!: string | null;
   misconceptionName!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
-  selectedMisconception!: Misconception | null;
-  selectedMisconceptionSkillId!: string | null;
+  selectedMisconception!: Misconception;
+  selectedMisconceptionSkillId!: string;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
   previousFeedbackIsUsed: boolean | null = null;
@@ -164,7 +164,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
       this.feedbackIsUsed = newValues.feedbackIsUsed;
     }
     this.selectedMisconception = newValues.misconception;
-    this.selectedMisconceptionSkillId = newValues.skillId ?? null;
+    this.selectedMisconceptionSkillId = newValues.skillId;
   }
 
   tagAnswerGroupWithMisconception(): void {
@@ -194,15 +194,6 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   }
 
   updateMisconception(): void {
-    if (this.selectedMisconception === null) {
-      // The user chose to remove the misconception tag.
-      this.saveTaggedMisconception.emit(null);
-      this.misconceptionName = '';
-      this.selectedMisconceptionSkillId = null;
-      this.externalSaveService.onExternalSave.emit();
-      this.misconceptionEditorIsOpen = false;
-      return;
-    }
     let taggedMisconception = {
       skillId: this.selectedMisconceptionSkillId,
       misconceptionId: this.selectedMisconception.getId(),

@@ -673,8 +673,3 @@ indexes:
   - name: committer_id
   - name: commit_message
   - name: commit_type
-
-- kind: CloudTaskRunModel
-  properties:
-  - name: __key__
-    direction: desc

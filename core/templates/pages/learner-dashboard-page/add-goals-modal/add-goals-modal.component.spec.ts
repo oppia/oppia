@@ -194,6 +194,7 @@ describe('AddGoalsModalComponent', () => {
       )
     );
     saveButton.triggerEventHandler('click', null);
+
     const actualSet = matDialogSpy.close.calls.mostRecent()
       .args[0] as Set<string>;
     expect(actualSet).toEqual(new Set(['0', '2']));
@@ -231,7 +232,6 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics.has('t4')).toBeTrue();
     expect(component.checkedTopics.has('t5')).toBeTrue();
   });
-
   describe('setsAreEqual', () => {
     it('should return true for equal sets', () => {
       const a = new Set(['1', '2']);

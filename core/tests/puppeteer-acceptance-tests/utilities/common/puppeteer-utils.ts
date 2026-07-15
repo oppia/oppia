@@ -42,10 +42,7 @@ const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
-const oskContainerSelector = '.e2e-test-osk-container';
-const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
-const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
-const chapterTitleSelector = '.e2e-test-chapter-title';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -132,7 +129,6 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
-        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -262,27 +258,15 @@ export class BaseUser {
 
     // Prepare an array of promises for screenshots.
     const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
-      if (!instance.page) {
-        return;
-      }
-      if (instance.page.isClosed()) {
+      if (instance.page) {
+        await instance.page.screenshot({
+          path: path.join(
+            outputDir,
+            outputFileName + randomString + `-instance-${i}.png`
+          ),
+        });
         showMessage(
-          `Skipped screenshot for ${instance.username ?? 'unknown user'} because the page is already closed.`
-        );
-        return;
-      }
-      try {
-        const screenshotPath = path.join(
-          outputDir,
-          outputFileName + randomString + `-instance-${i}.png`
-        );
-        await instance.page.screenshot({path: screenshotPath});
-        showMessage(
-          `Screenshot captured for test failure and saved as : ${screenshotPath}`
-        );
-      } catch (error) {
-        showMessage(
-          `Error while taking screenshot for ${instance.username ?? 'unknown user'}: ${error}`
+          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
         );
       }
     });
@@ -402,10 +386,7 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.reload({
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
   /**
@@ -420,7 +401,6 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -466,44 +446,13 @@ export class BaseUser {
   }
 
   /**
-   * Gets a human-readable description of an element for logging purposes.
-   * If a string selector is provided, returns it directly.
-   * If an ElementHandle is provided, extracts tag name and key attributes.
-   */
-  private async getElementDescription(
-    selector: string | ElementHandle<Element>
-  ): Promise<string> {
-    if (typeof selector === 'string') {
-      return selector;
-    }
-    try {
-      const description = await selector.evaluate(el => {
-        const tag = el.tagName.toLowerCase();
-        const id = el.id ? `#${el.id}` : '';
-        const classes = el.className
-          ? `.${el.className.toString().trim().split(/\s+/).join('.')}`
-          : '';
-        const text = el.textContent?.trim().slice(0, 30) || '';
-        const textSuffix = text
-          ? ` "${text}${el.textContent && el.textContent.trim().length > 30 ? '...' : ''}"`
-          : '';
-        return `<${tag}${id}${classes}>${textSuffix}`;
-      });
-      return description;
-    } catch {
-      return '<detached element>';
-    }
-  }
-
-  /**
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
-    const elementDesc = await this.getElementDescription(selector);
-    showMessage(`Checking if element ${elementDesc} is clickable...`);
+    showMessage(`Checking if element ${selector} is clickable...`);
     const element =
       typeof selector === 'string'
         ? await this.page.waitForSelector(selector)
@@ -512,118 +461,9 @@ export class BaseUser {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
-        const clickabilityDiagnostics = await this.page.evaluate(
-          (targetElement: Element) => {
-            const describeElement = (el: Element | null): string => {
-              if (!el) {
-                return 'none';
-              }
-
-              const tag = el.tagName.toLowerCase();
-              const id = el.id ? `#${el.id}` : '';
-              const classNames = el.className
-                ? String(el.className).trim().split(/\s+/).filter(Boolean)
-                : [];
-              const classes =
-                classNames.length > 0 ? `.${classNames.join('.')}` : '';
-              return `<${tag}${id}${classes}>`;
-            };
-
-            const rect = targetElement.getBoundingClientRect();
-            const inViewport =
-              rect.top <= window.innerHeight &&
-              rect.bottom > 0 &&
-              rect.left <= window.innerWidth &&
-              rect.right > 0;
-
-            const isNativeDisabled =
-              (targetElement instanceof HTMLButtonElement ||
-                targetElement instanceof HTMLInputElement ||
-                targetElement instanceof HTMLSelectElement ||
-                targetElement instanceof HTMLTextAreaElement ||
-                targetElement instanceof HTMLOptionElement) &&
-              targetElement.disabled;
-            const isAriaDisabled =
-              targetElement.getAttribute('aria-disabled') === 'true' ||
-              targetElement.closest('[aria-disabled="true"]') !== null;
-            const isDisabled = isNativeDisabled || isAriaDisabled;
-
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const centerTopElement = document.elementFromPoint(
-              centerX,
-              centerY
-            );
-            const firstClientRect = targetElement.getClientRects()[0];
-            const firstRectTopElement = firstClientRect
-              ? document.elementFromPoint(
-                  firstClientRect.left + firstClientRect.width / 2,
-                  firstClientRect.top + firstClientRect.height / 2
-                )
-              : null;
-
-            const isCoveredByOtherElement = [
-              centerTopElement,
-              firstRectTopElement,
-            ]
-              .filter(Boolean)
-              .some(topElement => {
-                if (!topElement) {
-                  return false;
-                }
-                return (
-                  topElement !== targetElement &&
-                  !targetElement.contains(topElement) &&
-                  !topElement.contains(targetElement)
-                );
-              });
-
-            const blockingElement =
-              [centerTopElement, firstRectTopElement]
-                .filter(
-                  topElement =>
-                    topElement &&
-                    topElement !== targetElement &&
-                    !targetElement.contains(topElement) &&
-                    !topElement.contains(targetElement)
-                )
-                .map(topElement => describeElement(topElement))[0] ?? 'none';
-
-            const reasons: string[] = [];
-            if (isDisabled) {
-              reasons.push('Element is disabled.');
-            }
-            if (!inViewport) {
-              reasons.push('Element is not in the viewport.');
-            }
-            if (isCoveredByOtherElement) {
-              reasons.push(`Element is blocked by ${blockingElement}.`);
-            }
-
-            return {
-              reasons,
-              isDisabled,
-              inViewport,
-              isCoveredByOtherElement,
-              blockingElement,
-            };
-          },
-          element
-        );
         await this.page.evaluate(isElementClickable, element, true, true);
-
-        const reasonsText =
-          clickabilityDiagnostics.reasons.length > 0
-            ? clickabilityDiagnostics.reasons
-                .map(
-                  (reason: string, index: number) => `${index + 1}. ${reason}`
-                )
-                .join('\n')
-            : 'No specific reason detected from diagnostics.';
-
         error.message =
-          `Element ${elementDesc} took too long to be clickable.\n` +
-          `Detected reasons:\n${reasonsText}\n` +
+          `Element with selector ${selector} took too long to be clickable.\n` +
           'Original Error:\n' +
           error.message;
       }
@@ -659,7 +499,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 30000});
+    let element = await context.waitForSelector(selector, {timeout: 15000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
@@ -756,7 +596,7 @@ export class BaseUser {
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
-        await this.clickOnElement(matOptionElement);
+        await matOptionElement.click();
         break;
       }
     }
@@ -778,7 +618,6 @@ export class BaseUser {
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
@@ -808,10 +647,7 @@ export class BaseUser {
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
+    await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
 
@@ -880,47 +716,6 @@ export class BaseUser {
   }
 
   /**
-   * This function converts a given date string into ISO format (YYYY-MM-DD).
-   */
-  private toISODate(dateString: string): string {
-    const date = new Date(dateString);
-
-    if (isNaN(date.getTime())) {
-      throw new Error(`Invalid date string: ${dateString}`);
-    }
-
-    return date.toISOString().split('T')[0];
-  }
-
-  /**
-   * This function set publication date for chapter.
-   */
-  async setNodePlannedPublicationDate(): Promise<void> {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 3);
-    const dateString = futureDate.toLocaleDateString('en-US');
-    const isoDate = this.toISODate(dateString);
-    await this.page.$eval(
-      plannedPublicationDateInput,
-      (el, value) => {
-        const input = el as HTMLInputElement;
-        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-          window.HTMLInputElement.prototype,
-          'value'
-        )?.set;
-
-        nativeInputValueSetter?.call(input, value);
-
-        input.dispatchEvent(new Event('input', {bubbles: true}));
-        input.dispatchEvent(new Event('change', {bubbles: true}));
-        input.dispatchEvent(new Event('blur', {bubbles: true}));
-      },
-      isoDate
-    );
-    showMessage('Planned publication date is set to: ' + isoDate);
-  }
-
-  /**
    * This selects a value in a dropdown.
    */
   async select(selector: string, option: string): Promise<void> {
@@ -933,10 +728,7 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
-    await this.page.goto(url, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
 
     if (verifyURL) {
       await this.page.waitForFunction(
@@ -995,19 +787,10 @@ export class BaseUser {
     showMessage(
       `Started closing broswer for ${this.username ?? 'unknown user'}.`
     );
-    // Stop the screen recorder with a timeout to prevent hanging.
+    // Stop the screen recorder.
     if (this.screenRecorder) {
       try {
-        const SCREEN_RECORDER_STOP_TIMEOUT_MS = 120000;
-        await Promise.race([
-          this.screenRecorder.stop(),
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error('Screen recorder stop timed out')),
-              SCREEN_RECORDER_STOP_TIMEOUT_MS
-            )
-          ),
-        ]);
+        await this.screenRecorder.stop();
         showMessage(
           `Screen recording stopped for ${this.username ?? 'unknown user'}.`
         );
@@ -1215,7 +998,6 @@ export class BaseUser {
     newPage: Page | undefined = undefined,
     screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
-    const specName = process.env.SPEC_NAME;
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
     // To wait for all images to load and the page to be stable.
@@ -1254,8 +1036,6 @@ export class BaseUser {
       }
     }
 
-    const runningInCI = __dirname.startsWith('/home/runner');
-
     try {
       const screenshot = await currentPage.screenshot(screenshotOptions);
       expect(screenshot).toMatchImageSnapshot({
@@ -1267,40 +1047,22 @@ export class BaseUser {
          * The following checks if the tests are running on CI. If it is, the folder diff-snapshots will be uploaded as
          * artifacts in the github workflow.
          */
-        customDiffDir: runningInCI
+        customDiffDir: __dirname.startsWith('/home/runner')
           ? path.join(
-              testConstants.TEST_SNAPSHOTS_DIR,
-              specName,
-              path.basename(dirName),
-              'diff-snapshots'
+              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
+              path.basename(dirName)
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
-        storeReceivedOnFailure: true, // Store the new screenshots seperately from the composed diff screenshots on failure.
-        customReceivedDir: runningInCI
-          ? path.join(
-              testConstants.TEST_SNAPSHOTS_DIR,
-              specName,
-              path.basename(dirName),
-              'new-snapshots'
-            )
-          : path.join(testPath, dirName, 'new-snapshots'),
       });
     } catch (error) {
-      var errorMessage = error.message;
-      if (runningInCI) {
-        errorMessage +=
-          '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the difference between the old screenshot(s)' +
-          ' and the new one(s). To download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
-          ' folder name should be something like diff-snapshots_(suite-name)_desktop_original. The diff screenshot(s) should end with "-diff".';
+      if (__dirname.startsWith('/home/runner')) {
+        throw new Error(
+          error.message +
+            '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
+        );
+      } else {
+        throw new Error(error.message);
       }
-      errorMessage +=
-        '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference percentage across ' +
-        'multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshots(s), you should ' +
-        'run the tests in CI, download the artifact folder new-snapshots from the github workflow and use the screenshots in that folder to ' +
-        'replace the old one(s).\r\nTo download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
-        ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
-        ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
-      throw new Error(errorMessage);
     }
   }
 
@@ -1421,7 +1183,6 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -1639,7 +1400,6 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
@@ -1726,43 +1486,6 @@ export class BaseUser {
         ? await this.page.waitForSelector(selector)
         : selector;
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
-  }
-
-  /**
-   * Retrieves a chapter element by its name.
-   * @param {string} chapterName - The name of the chapter to search for.
-   */
-  private async getChapterByName(
-    chapterName: string
-  ): Promise<ElementHandle<Element>> {
-    const chapters = await this.page.$$(chapterTitleSelector);
-
-    for (const chapter of chapters) {
-      const text = await this.page.evaluate(
-        el => el.textContent?.trim(),
-        chapter
-      );
-
-      if (text?.includes(chapterName)) {
-        return chapter;
-      }
-    }
-
-    throw new Error(`Chapter with name "${chapterName}" not found`);
-  }
-
-  /**
-   * Verifies whether a chapter is clickable or not.
-   * @param {string} chapterName - The name of the chapter.
-   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
-   */
-  async expectChapterToBeClickable(
-    chapterName: string,
-    shouldBeClickable: boolean = true
-  ): Promise<void> {
-    const chapterElement = await this.getChapterByName(chapterName);
-
-    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
   }
 
   /**
@@ -1892,10 +1615,10 @@ export class BaseUser {
         selector,
         parentElement
       );
-      await this.clickOnElement(selectElement);
+      await selectElement.click();
 
       // Select the option.
-      await this.page.waitForSelector('mat-option', {visible: true});
+      await this.page.waitForSelector('mat-option');
       const options = await this.page.$$('mat-option');
       const optionTexts: string[] = [];
 
@@ -1917,7 +1640,7 @@ export class BaseUser {
       }
 
       // Click on the option.
-      await this.clickOnElement(optionElement);
+      await optionElement.click();
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);
@@ -2004,7 +1727,6 @@ export class BaseUser {
       throw new Error('Element not found');
     }
 
-    const elementDesc = await this.getElementDescription(selector);
     let previousBox = await element.boundingBox();
     const startTime = Date.now();
 
@@ -2015,7 +1737,7 @@ export class BaseUser {
       element =
         typeof selector === 'string' ? await this.page.$(selector) : element;
       if (!element) {
-        showMessage(`Element ${elementDesc} seems to have detached.`);
+        showMessage('It seems element has detached.');
         continue;
       }
       const currentBox = await element.boundingBox();
@@ -2030,16 +1752,14 @@ export class BaseUser {
       }
 
       showMessage(
-        `Waiting for element ${elementDesc} to stabilize... ` +
-          `moved from (${previousBox?.x?.toFixed(0)}, ${previousBox?.y?.toFixed(0)}) ` +
-          `to (${currentBox?.x?.toFixed(0)}, ${currentBox?.y?.toFixed(0)})`
+        `Waiting for element ${selector} to stabilize...\n` +
+          `Previous Position: ${previousBox?.x?.toFixed(4)}, ${previousBox?.y?.toFixed(4)}\n` +
+          `Current Position: ${currentBox?.x?.toFixed(4)}, ${currentBox?.y?.toFixed(4)}`
       );
       previousBox = currentBox;
     }
 
-    showMessage(
-      `Element ${elementDesc} did not stabilize within ${timeout} ms`
-    );
+    showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
   }
 
   /**
@@ -2135,9 +1855,7 @@ export class BaseUser {
       );
       const newTabPage = await newTarget.page();
       expect(newTabPage).toBeDefined();
-      // Use startsWith instead of exact match because external sites may add
-      // query parameters (e.g., UTM params, Cloudflare challenge tokens, etc.).
-      expect(newTabPage?.url().startsWith(targetPageUrl)).toBe(true);
+      expect(newTabPage?.url()).toBe(targetPageUrl);
       await newTabPage?.close();
     } else {
       showMessage('Anchor target is the same as the current page.');
@@ -2152,13 +1870,8 @@ export class BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToastMessage(expectedMessage: string): Promise<void> {
-    // The toast message disappears after a few seconds, so we need to process
-    // the toastMessageElement as soon as we receive it. Otherwise, the text
-    // within it may no longer be showing at the time of evaluation.
-    const toastMessageElement = await this.page.waitForSelector(
-      toastMessageSelector,
-      {visible: true}
-    );
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
     const toastMessage = await this.page.evaluate(
       el => el.textContent.trim(),
       toastMessageElement
@@ -2232,57 +1945,6 @@ export class BaseUser {
     await this.expectElementToBeVisible(warningToastCloseButtonSelector);
     await this.clickOnElementWithSelector(warningToastCloseButtonSelector);
     await this.expectElementToBeVisible(warningToastMessageSelector, false);
-  }
-
-  /**
-   * Function to verify the number of elements matching a selector.
-   * @param {string} selector - The selector to match elements.
-   * @param {number} count - The expected number of elements.
-   */
-  async expectNumberOfElementsToBe(
-    selector: string,
-    count: number
-  ): Promise<void> {
-    const elements = await this.page.$$(selector);
-    expect(elements.length).toBe(count);
-  }
-
-  /**
-   * Finds child element in parent by matching text values.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {Record<string, string>} selectors - Relevant selectors.
-   * @param {string} criteria - Title value to match.
-   */
-  async findChildElementInParent(
-    parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
-    selectors: Record<string, string>,
-    criteria: string
-  ): Promise<puppeteer.ElementHandle | undefined> {
-    let targetElement;
-    let lastHeadingText: string | undefined;
-
-    const allElements = await parentElement?.$$(selectors.content);
-    for (const h of allElements || []) {
-      const targetHeadingElement = await h.$(selectors.heading);
-      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
-        ele.textContent?.trim()
-      );
-      lastHeadingText = targetHeadingText || undefined;
-      showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
-      if (targetHeadingText === criteria) {
-        targetElement = h;
-        break;
-      }
-    }
-
-    if (!targetElement) {
-      throw new Error(
-        `Element with selectors: ${JSON.stringify(
-          selectors
-        )} and criteria: ${criteria} is not found. Last heading seen: ${lastHeadingText}`
-      );
-    }
-    return targetElement;
   }
 
   protected parseLocaleAbbreviatedDatetimeString(dateString: string): number {
@@ -2359,32 +2021,6 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
-  }
-
-  /**
-   * Checks if the on screen keyboard is visible.
-   */
-  async isOnScreenKeyboardVisible(): Promise<boolean> {
-    return await this.isElementVisible(oskContainerSelector);
-  }
-
-  /**
-   * Hides the on screen keyboard.
-   */
-  async hideOSK(): Promise<void> {
-    await this.expectElementToBeVisible(oskContainerSelector);
-    await this.expectElementToBeVisible(hideOSKButtonSelector);
-    await this.clickOnElementWithSelector(hideOSKButtonSelector);
-    await this.expectElementToBeVisible(hideOSKButtonSelector, false);
-  }
-
-  /**
-   * Logs every navigation event on the page.
-   */
-  attachNavigationLogs(page: Page): void {
-    page.on('framenavigated', frame => {
-      showMessage('NAVIGATED: ' + frame.url());
-    });
   }
 }
 

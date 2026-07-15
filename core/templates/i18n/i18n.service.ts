@@ -96,7 +96,7 @@ export class I18nService {
         ? 'rtl'
         : 'ltr';
       let prevLangDirection = this.i18nLanguageCodeService.isLanguageRTL(
-        this.i18nLanguageCodeService.prevLangCode
+        I18nLanguageCodeService.prevLangCode
       )
         ? 'rtl'
         : 'ltr';

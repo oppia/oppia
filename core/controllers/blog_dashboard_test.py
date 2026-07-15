@@ -26,12 +26,9 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import blog_models, user_models
+    from mypy_imports import user_models
 
-(
-    blog_models,
-    user_models,
-) = models.Registry.import_models([models.Names.BLOG, models.Names.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
@@ -53,9 +50,6 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.blog_editor_id = self.get_user_id_from_email(
             self.BLOG_EDITOR_EMAIL
         )
-
-        blog_services.create_blog_author_details_model(self.blog_admin_id)
-        blog_services.create_blog_author_details_model(self.blog_editor_id)
 
     def test_get_dashboard_page_data(self) -> None:
         # Checks blog editor can access blog dashboard.
@@ -118,42 +112,6 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
 
-    def test_get_dashboard_with_missing_author_model(self) -> None:
-        """Tests that dashboard returns default author details when
-        the author model is missing.
-        """
-        self.signup('neweditor@example.com', 'NewEditor')
-        new_editor_id = self.get_user_id_from_email('neweditor@example.com')
-        self.add_user_role('NewEditor', feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login('neweditor@example.com')
-        # Create a blog post to trigger author model creation.
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '%s' % feconf.BLOG_DASHBOARD_DATA_URL,
-            {},
-            csrf_token=csrf_token,
-        )
-        # Now delete the author model to simulate it being missing.
-        author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
-            new_editor_id
-        )
-        if author_model is None:
-            self.fail(
-                'Expected BlogAuthorDetailsModel to exist for user_id=%s'
-                % new_editor_id
-            )
-        author_model.delete()
-        # Verify dashboard returns default author details.
-        json_response = self.get_json(
-            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
-        )
-        self.assertEqual(
-            json_response['author_details']['displayed_author_name'],
-            'Deleted User',
-        )
-        self.assertEqual(json_response['author_details']['author_bio'], '')
-        self.logout()
-
     def test_create_new_blog_post(self) -> None:
         # Checks blog editor can create a new blog post.
         self.login(self.BLOG_EDITOR_EMAIL)
@@ -186,14 +144,12 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
-        )
-        assert pre_update_author_details is not None
-        pre_update_author_details_dict = pre_update_author_details.to_dict()
+        ).to_dict()
         self.assertEqual(
-            pre_update_author_details_dict['displayed_author_name'],
+            pre_update_author_details['displayed_author_name'],
             self.BLOG_EDITOR_USERNAME,
         )
-        self.assertEqual(pre_update_author_details_dict['author_bio'], '')
+        self.assertEqual(pre_update_author_details['author_bio'], '')
 
         json_response = self.put_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
@@ -221,10 +177,9 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         }
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
-        )
-        pre_update_author_details_dict = pre_update_author_details.to_dict()
+        ).to_dict()
         self.assertEqual(
-            pre_update_author_details_dict['displayed_author_name'],
+            pre_update_author_details['displayed_author_name'],
             self.BLOG_EDITOR_USERNAME,
         )
 
@@ -241,9 +196,8 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         payload = {'displayed_author_name': 'new user', 'author_bio': 1234}
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
-        )
-        pre_update_author_details_dict = pre_update_author_details.to_dict()
-        self.assertEqual(pre_update_author_details_dict['author_bio'], '')
+        ).to_dict()
+        self.assertEqual(pre_update_author_details['author_bio'], '')
 
         self.put_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
@@ -373,6 +327,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
     def test_get_blog_post_data_with_author_account_deleted_by_blog_admin(
         self,
     ) -> None:
+        blog_services.create_blog_author_details_model(self.blog_editor_id)
         blog_services.update_blog_author_details(
             self.blog_editor_id, 'new author name', 'general user bio'
         )
@@ -431,9 +386,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(
-            json_response['blog_post_dict']['title'], 'Sample Title'
-        )
+        self.assertEqual(json_response['blog_post']['title'], 'Sample Title')
         blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
         self.assertEqual(blog_post.thumbnail_filename, 'file.svg')
 
@@ -523,7 +476,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {'thumbnail_filename': 'test_svg.svg'}
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -544,7 +497,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         payload = {'thumbnail_filename': 'cafe.flac'}
 
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
             'rb',
             encoding=None,

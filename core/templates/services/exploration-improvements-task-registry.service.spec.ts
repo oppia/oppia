@@ -67,7 +67,7 @@ describe('Exploration improvements task registrar service', () => {
   const expVersion = 1;
 
   beforeEach(() => {
-    taskRegistryService = TestBed.inject(
+    taskRegistryService = TestBed.get(
       ExplorationImprovementsTaskRegistryService
     );
 
@@ -128,7 +128,6 @@ describe('Exploration improvements task registrar service', () => {
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      inapplicable_skill_misconception_ids: [],
     };
 
     stateStatsBackendDict = {
@@ -698,7 +697,7 @@ describe('Exploration improvements task registrar service', () => {
       );
 
       const [hbrTask] = taskRegistryService.getOpenHighBounceRateTasks();
-      expect(hbrTask.isOpen()).toBeTruthy();
+      expect(hbrTask.isOpen()).toBeTrue();
     });
 
     it('should generate a new ineffective feedback loop task', () => {
@@ -714,7 +713,7 @@ describe('Exploration improvements task registrar service', () => {
 
       const [iflTask] =
         taskRegistryService.getOpenIneffectiveFeedbackLoopTasks();
-      expect(iflTask.isOpen()).toBeTruthy();
+      expect(iflTask.isOpen()).toBeTrue();
     });
 
     it('should generate a new needs guiding responses task', () => {
@@ -733,7 +732,7 @@ describe('Exploration improvements task registrar service', () => {
       );
 
       const [ngrTask] = taskRegistryService.getOpenNeedsGuidingResponsesTasks();
-      expect(ngrTask.isOpen()).toBeTruthy();
+      expect(ngrTask.isOpen()).toBeTrue();
     });
 
     it('should generate a new successive incorrect answers task', () => {
@@ -749,7 +748,7 @@ describe('Exploration improvements task registrar service', () => {
 
       const [siaTask] =
         taskRegistryService.getOpenSuccessiveIncorrectAnswersTasks();
-      expect(siaTask.isOpen()).toBeTruthy();
+      expect(siaTask.isOpen()).toBeTrue();
     });
   });
 
@@ -802,14 +801,14 @@ describe('Exploration improvements task registrar service', () => {
       );
 
       const [ngrTask] = taskRegistryService.getOpenNeedsGuidingResponsesTasks();
-      expect(ngrTask.isOpen()).toBeTruthy();
+      expect(ngrTask.isOpen()).toBeTrue();
 
       answerStats.isAddressed = true;
 
       taskRegistryService.onStateInteractionSaved(
         states.getState('Introduction')
       );
-      expect(ngrTask.isOpen()).toBeFalsy();
+      expect(ngrTask.isOpen()).toBeFalse();
     });
   });
 
@@ -905,13 +904,13 @@ describe('Exploration improvements task registrar service', () => {
         );
 
         expect(hbrTask.targetId).toEqual('Introduction');
-        expect(hbrTask.isOpen()).toBeTruthy();
+        expect(hbrTask.isOpen()).toBeTrue();
         expect(iflTask.targetId).toEqual('Introduction');
-        expect(iflTask.isOpen()).toBeTruthy();
+        expect(iflTask.isOpen()).toBeTrue();
         expect(ngrTask.targetId).toEqual('Introduction');
-        expect(ngrTask.isOpen()).toBeTruthy();
+        expect(ngrTask.isOpen()).toBeTrue();
         expect(siaTask.targetId).toEqual('Introduction');
-        expect(siaTask.isOpen()).toBeTruthy();
+        expect(siaTask.isOpen()).toBeTrue();
 
         taskRegistryService.onStateRenamed('Introduction', 'Prologue');
 
@@ -922,22 +921,22 @@ describe('Exploration improvements task registrar service', () => {
           taskRegistryService.getOpenSuccessiveIncorrectAnswersTasks(),
         ];
 
-        expect(hbrTask.isObsolete()).toBeTruthy();
+        expect(hbrTask.isObsolete()).toBeTrue();
         expect(hbrTask.targetId).toEqual('Introduction');
         expect(iflTask.isObsolete()).toBeTrue();
         expect(iflTask.targetId).toEqual('Introduction');
-        expect(ngrTask.isObsolete()).toBeTruthy();
+        expect(ngrTask.isObsolete()).toBeTrue();
         expect(ngrTask.targetId).toEqual('Introduction');
-        expect(siaTask.isObsolete()).toBeTruthy();
+        expect(siaTask.isObsolete()).toBeTrue();
         expect(siaTask.targetId).toEqual('Introduction');
 
-        expect(newHbrTask.isOpen()).toBeTruthy();
+        expect(newHbrTask.isOpen()).toBeTrue();
         expect(newHbrTask.targetId).toEqual('Prologue');
-        expect(newIflTask.isOpen()).toBeTruthy();
+        expect(newIflTask.isOpen()).toBeTrue();
         expect(newIflTask.targetId).toEqual('Prologue');
-        expect(newNgrTask.isOpen()).toBeTruthy();
+        expect(newNgrTask.isOpen()).toBeTrue();
         expect(newNgrTask.targetId).toEqual('Prologue');
-        expect(newSiaTask.isOpen()).toBeTruthy();
+        expect(newSiaTask.isOpen()).toBeTrue();
         expect(newSiaTask.targetId).toEqual('Prologue');
       }
     );
@@ -989,20 +988,20 @@ describe('Exploration improvements task registrar service', () => {
       );
 
       expect(hbrTask.targetId).toEqual('Introduction');
-      expect(hbrTask.isOpen()).toBeTruthy();
+      expect(hbrTask.isOpen()).toBeTrue();
       expect(iflTask.targetId).toEqual('Introduction');
-      expect(iflTask.isOpen()).toBeTruthy();
+      expect(iflTask.isOpen()).toBeTrue();
       expect(ngrTask.targetId).toEqual('Introduction');
-      expect(ngrTask.isOpen()).toBeTruthy();
+      expect(ngrTask.isOpen()).toBeTrue();
       expect(siaTask.targetId).toEqual('Introduction');
-      expect(siaTask.isOpen()).toBeTruthy();
+      expect(siaTask.isOpen()).toBeTrue();
 
       taskRegistryService.onStateDeleted('Introduction');
 
-      expect(hbrTask.isOpen()).toBeFalsy();
-      expect(iflTask.isOpen()).toBeFalsy();
-      expect(ngrTask.isOpen()).toBeFalsy();
-      expect(siaTask.isOpen()).toBeFalsy();
+      expect(hbrTask.isOpen()).toBeFalse();
+      expect(iflTask.isOpen()).toBeFalse();
+      expect(ngrTask.isOpen()).toBeFalse();
+      expect(siaTask.isOpen()).toBeFalse();
     });
 
     it(

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for WelcomeModalComponent.
  */
 
-import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Component, NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -52,7 +51,6 @@ describe('Welcome Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [
         WelcomeModalComponent,
         ChangesInHumanReadableFormComponentStub,

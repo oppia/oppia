@@ -181,7 +181,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBe(true);
+          expect(response.more).toBeTrue();
         });
 
       flushMicrotasks();
@@ -226,7 +226,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion4Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBe(false);
+          expect(response.more).toBeFalse();
         });
     }));
 
@@ -256,7 +256,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBe(true);
+          expect(response.more).toBeTrue();
         });
 
       flushMicrotasks();
@@ -277,7 +277,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBe(true);
+          expect(response.more).toBeTrue();
         });
     }));
   });
@@ -290,7 +290,6 @@ describe('Contribution and review service', () => {
             from_date: '1 Nov 2022',
             to_date: '1 Dec 2022',
             contribution_hours: 1.0,
-            contribution_word_count: 300,
             team_lead: 'Test User',
             language: 'Hindi',
           },
@@ -315,47 +314,6 @@ describe('Contribution and review service', () => {
           expect(definedData.from_date).toEqual('1 Nov 2022');
           expect(definedData.to_date).toEqual('1 Dec 2022');
           expect(definedData.contribution_hours).toEqual(1.0);
-          expect(definedData.contribution_word_count).toEqual(300);
-          expect(definedData.team_lead).toEqual('Test User');
-          expect(definedData.language).toEqual('Hindi');
-        });
-
-      expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
-    });
-
-    it('should download the contributor certificate when contribution time is less than 1 hour', async () => {
-      downloadContributorCertificateAsyncSpy.and.returnValue(
-        Promise.resolve({
-          certificate_data: {
-            from_date: '1 Nov 2022',
-            to_date: '1 Dec 2022',
-            contribution_hours: 0.01,
-            contribution_word_count: 3,
-            team_lead: 'Test User',
-            language: 'Hindi',
-          },
-        })
-      );
-
-      await cars
-        .downloadContributorCertificateAsync(
-          'user',
-          'translate_content',
-          'hi',
-          '2022-01-01',
-          '2022-01-02'
-        )
-        .then(response => {
-          const data = response.certificate_data;
-
-          expect(data).not.toBeNull();
-
-          // Type assertion needed to satisfy type checker.
-          const definedData = data as ContributorCertificateInfo;
-          expect(definedData.from_date).toEqual('1 Nov 2022');
-          expect(definedData.to_date).toEqual('1 Dec 2022');
-          expect(definedData.contribution_hours).toEqual(0.01);
-          expect(definedData.contribution_word_count).toEqual(3);
           expect(definedData.team_lead).toEqual('Test User');
           expect(definedData.language).toEqual('Hindi');
         });
@@ -534,7 +492,6 @@ describe('Contribution and review service', () => {
               id: 'Continue',
             },
             linked_skill_id: null,
-            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: true,
@@ -559,7 +516,6 @@ describe('Contribution and review service', () => {
               id: 'EndExploration',
             },
             linked_skill_id: null,
-            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: false,
@@ -1002,7 +958,6 @@ describe('Contribution and review service', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
-      inapplicable_skill_misconception_ids: null,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -1011,8 +966,6 @@ describe('Contribution and review service', () => {
     const payload = {
       skill_difficulty: 'easy',
       question_state_data: questionStateData,
-      next_content_id_index: 10,
-      inapplicable_skill_misconception_ids: ['skillid-1'],
     };
 
     const imagesData = [
@@ -1051,7 +1004,6 @@ describe('Contribution and review service', () => {
           2,
           questionStateData,
           10,
-          ['skillid-1'],
           imagesData,
           onSuccess,
           onFailure
@@ -1080,7 +1032,6 @@ describe('Contribution and review service', () => {
           2,
           questionStateData,
           10,
-          ['skillid-1'],
           imagesData,
           onSuccess,
           onFailure
@@ -1252,7 +1203,6 @@ describe('Contribution and review service', () => {
           id: 'Continue',
         },
         linked_skill_id: null,
-        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
@@ -1277,7 +1227,6 @@ describe('Contribution and review service', () => {
           id: 'EndExploration',
         },
         linked_skill_id: null,
-        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,

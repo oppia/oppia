@@ -152,7 +152,7 @@ why they need to be overriden.  */
 }
 
 .mat-button-success {
-  color: #00645c;
+  color: #009688;
 }
 
 .mat-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
@@ -653,7 +653,7 @@ p:last-child {
 
 .oppia-navbar-nav .show > a {
   background-color: #fff;
-  color: #00645c;
+  color: #009688;
 }
 .oppia-dashboard-container a:hover {
   text-decoration: underline;
@@ -661,7 +661,7 @@ p:last-child {
 
 .oppia-navbar-tabs > li:hover > a {
   background-color: #fff;
-  color: #00645c;
+  color: #009688;
 }
 .oppia-activity-summary-tile span {
   vertical-align: middle;
@@ -725,7 +725,7 @@ p:last-child {
   background-color: #18447e;
 }
 .label-success, .bg-success {
-  background-color: #00645c;
+  background-color: #009688;
 }
 
 /*
@@ -1035,9 +1035,11 @@ textarea {
   content: ">";
 }
 
-.oppia-navbar-breadcrumb-rtl .oppia-navbar-breadcrumb-separator {
+.oppia-navbar-breadcrumb-rtl-separator {
   margin-left: 8px;
-  margin-right: 8px;
+}
+.oppia-navbar-breadcrumb-rtl-separator:after {
+  content: "<";
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {

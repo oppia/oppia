@@ -31,25 +31,6 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {EventEmitter} from '@angular/core';
-import {SignInEventService} from 'services/sign-in-event.service';
-import {UserInfo} from 'domain/user/user-info.model';
-
-class MockUserService {
-  isLoggedIn(): boolean {
-    return false;
-  }
-
-  getUserInfoAsync(): Promise<UserInfo> {
-    return Promise.resolve({
-      isLoggedIn: () => true,
-    } as UserInfo);
-  }
-
-  getLoginUrlAsync(): Promise<string> {
-    return Promise.resolve('/login');
-  }
-}
 
 describe('Login required message component', () => {
   let component: LoginRequiredMessageComponent;
@@ -62,18 +43,6 @@ describe('Login required message component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [LoginRequiredMessageComponent],
-      providers: [
-        {
-          provide: SignInEventService,
-          useValue: {
-            onUserSignIn: new EventEmitter<void>(),
-          },
-        },
-        {
-          provide: UserService,
-          useClass: MockUserService,
-        },
-      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(LoginRequiredMessageComponent);

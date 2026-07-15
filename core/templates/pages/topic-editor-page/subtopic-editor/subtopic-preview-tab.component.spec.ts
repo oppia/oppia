@@ -96,10 +96,10 @@ describe('SubtopicPreviewTab', () => {
   });
 
   beforeEach(() => {
-    topicEditorStateService = TestBed.inject(TopicEditorStateService);
-    topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    topicEditorStateService = TestBed.get(TopicEditorStateService);
+    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    platformFeatureService = TestBed.get(PlatformFeatureService);
 
     fixture = TestBed.createComponent(SubtopicPreviewTab);
     component = fixture.componentInstance;

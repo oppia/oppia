@@ -34,8 +34,8 @@ describe('Exploration recommendations backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    httpTestingController = TestBed.inject(HttpTestingController);
-    erbas = TestBed.inject(ExplorationRecommendationsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    erbas = TestBed.get(ExplorationRecommendationsBackendApiService);
   });
 
   afterEach(() => {

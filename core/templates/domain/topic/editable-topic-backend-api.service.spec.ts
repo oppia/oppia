@@ -71,7 +71,7 @@ describe('Editable topic backend API service', () => {
     classroom_name: 'math',
     curriculum_admin_usernames: ['admin1'],
     skill_question_count_dict: {},
-    subtopic_page_dict: {
+    subtopic_page: {
       id: 'topicId-1',
       topicId: 'topicId',
       page_contents: {
@@ -87,7 +87,7 @@ describe('Editable topic backend API service', () => {
       },
       language_code: 'en',
     },
-    study_guide_dict: {
+    study_guide: {
       id: 'topicId-1',
       topicId: 'topicId',
       sections: [
@@ -113,11 +113,11 @@ describe('Editable topic backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.inject(HttpTestingController);
-    editableTopicBackendApiService = TestBed.inject(
+    httpTestingController = TestBed.get(HttpTestingController);
+    editableTopicBackendApiService = TestBed.get(
       EditableTopicBackendApiService
     );
-    csrfService = TestBed.inject(CsrfTokenService);
+    csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
@@ -191,7 +191,7 @@ describe('Editable topic backend API service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.subtopic_page_dict
+      sampleDataResults.subtopic_page
     );
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -237,9 +237,7 @@ describe('Editable topic backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.study_guide_dict
-    );
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.study_guide);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

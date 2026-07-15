@@ -100,9 +100,7 @@ export class KeyboardShortcutService {
       var searchBar = document.querySelector(
         '.oppia-search-bar-text-input'
       ) as HTMLElement;
-      if (searchBar !== null) {
-        searchBar.focus();
-      }
+      searchBar.focus();
       return false;
     });
 
@@ -110,9 +108,7 @@ export class KeyboardShortcutService {
       var categoryBar = document.querySelector(
         '.oppia-search-bar-dropdown-toggle'
       ) as HTMLElement;
-      if (categoryBar !== null) {
-        categoryBar.focus();
-      }
+      categoryBar.focus();
     });
 
     Mousetrap.bind('s', () => {

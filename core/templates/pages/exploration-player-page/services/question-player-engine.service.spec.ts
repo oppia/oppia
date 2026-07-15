@@ -398,7 +398,7 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = TestBed.get(TextInputRulesService);
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict

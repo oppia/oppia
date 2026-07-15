@@ -69,10 +69,8 @@ export class InsertScriptService {
           scriptElement.async = true;
           break;
         case KNOWN_SCRIPTS.MATHJAX:
-          // Use the SVG output configuration so MathJax produces <svg>
-          // elements that are later serialized by the math RTE code.
-          scriptElement.src = '/assets/mathjax/MathJax.js?config=TeX-AMS_SVG';
-          scriptElement.async = true;
+          scriptElement.src =
+            '/third_party/static/MathJax-2.7.5/MathJax.js?config=default';
           break;
         case KNOWN_SCRIPTS.PENCILCODE:
           scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';

@@ -35,7 +35,6 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {TrainingDataService} from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -68,17 +67,9 @@ export const RULES_SERVICE_MAPPING = {
   GraphInputRulesService: GraphInputRulesService,
   SetInputRulesService: SetInputRulesService,
   TextInputRulesService: TextInputRulesService,
-} as const;
-
-type InteractionRulesServiceName = keyof typeof RULES_SERVICE_MAPPING;
-
-const isInteractionRulesServiceName = (
-  serviceName: string
-): serviceName is InteractionRulesServiceName => {
-  return serviceName in RULES_SERVICE_MAPPING;
 };
 
-interface Classification {
+interface classification {
   answerGroupIndex: number;
   newOutcome: Outcome;
 }
@@ -91,16 +82,13 @@ export class TrainingModalComponent
   extends ConfirmOrCancelModal
   implements OnInit
 {
-  @Input() unhandledAnswer: InteractionAnswer = '';
+  @Input() unhandledAnswer: InteractionAnswer;
   @Output() finishTrainingCallback: EventEmitter<void> = new EventEmitter();
 
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
-  classification: Classification = {
-    answerGroupIndex: 0,
-    newOutcome: Outcome.createNew('', '', '', []),
-  };
+  classification: classification;
   addingNewResponse: boolean = false;
 
   constructor(
@@ -122,19 +110,11 @@ export class TrainingModalComponent
   ngOnInit(): void {
     this.classification = {
       answerGroupIndex: 0,
-      newOutcome: Outcome.createNew('', '', '', []),
+      newOutcome: null,
     };
     this.addingNewResponse = false;
 
     this.init();
-  }
-
-  private getValidActiveStateName(): string {
-    const activeStateName = this.stateEditorService.getActiveStateName();
-    if (!activeStateName) {
-      throw new Error('Expected active state name to be non-null.');
-    }
-    return activeStateName;
   }
 
   _saveNewAnswerGroup(newAnswerGroup: AnswerGroup): void {
@@ -145,16 +125,14 @@ export class TrainingModalComponent
       answerGroups,
       this.responsesService.getDefaultOutcome(),
       (newAnswerGroups, newDefaultOutcome) => {
-        const activeStateName = this.getValidActiveStateName();
-
         this.explorationStatesService.saveInteractionAnswerGroups(
-          activeStateName,
+          this.stateEditorService.getActiveStateName(),
           cloneDeep(newAnswerGroups)
         );
 
         this.explorationStatesService.saveInteractionDefaultOutcome(
-          activeStateName,
-          cloneDeep(newDefaultOutcome) ?? Outcome.createNew('', '', '', [])
+          this.stateEditorService.getActiveStateName(),
+          cloneDeep(newDefaultOutcome)
         );
 
         this.graphDataService.recompute();
@@ -198,7 +176,7 @@ export class TrainingModalComponent
   }
 
   init(): void {
-    let currentStateName = this.getValidActiveStateName();
+    let currentStateName = this.stateEditorService.getActiveStateName();
     let state = this.explorationStatesService.getState(currentStateName);
 
     // Retrieve the interaction ID.
@@ -206,16 +184,11 @@ export class TrainingModalComponent
 
     let rulesServiceName =
       this.angularNameService.getNameOfInteractionRulesService(interactionId);
-    if (!isInteractionRulesServiceName(rulesServiceName)) {
-      throw new Error(
-        `Unrecognized interaction rules service: ${rulesServiceName}`
-      );
-    }
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
       RULES_SERVICE_MAPPING[rulesServiceName]
-    ) as InteractionRulesService;
+    );
 
     let classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(

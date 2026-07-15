@@ -52,7 +52,7 @@ describe('Editable story backend API service', () => {
     // Sample story object returnable from the backend.
 
     sampleDataResults = {
-      story_dict: {
+      story: {
         id: 'storyId',
         title: 'Story title',
         description: 'Story description',
@@ -125,7 +125,7 @@ describe('Editable story backend API service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
-      story: sampleDataResults.story_dict,
+      story: sampleDataResults.story,
       topicName: sampleDataResults.topic_name,
       storyIsPublished: true,
       skillSummaries: sampleDataResults.skill_summaries,
@@ -230,7 +230,7 @@ describe('Editable story backend API service', () => {
     story.title = 'New Title';
     story.version = 2;
     var storyWrapper = {
-      story_dict: story,
+      story: story,
     };
 
     // Send a request to update story.

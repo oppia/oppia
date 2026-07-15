@@ -77,7 +77,6 @@ export interface TranslationOpportunity {
   inReviewCount: number;
   totalCount: number;
   translationsCount: number;
-  reviewerOnlyContentCount: number;
 }
 export interface ModifyTranslationOpportunity {
   id: string;
@@ -117,7 +116,6 @@ export class TranslationModalComponent {
   heading!: string;
   loadingData: boolean = true;
   moreAvailable: boolean = false;
-  hasDataFormatListContent: boolean = false;
   textToTranslate: string | string[] = '';
   activeStatus!: Status;
   activeLanguageCode!: string;
@@ -220,8 +218,6 @@ export class TranslationModalComponent {
             this.translateTextService.getTextToTranslate();
           this.updateActiveState(translatableItem);
           ({more: this.moreAvailable} = translatableItem);
-          this.hasDataFormatListContent =
-            this.opportunity.reviewerOnlyContentCount > 0;
           this.loadingData = false;
         }
       );
@@ -370,12 +366,12 @@ export class TranslationModalComponent {
 
   updateActiveState(translatableItem: TranslatableItem): void {
     ({
-      text: this.textToTranslate = '',
+      text: this.textToTranslate,
       more: this.moreAvailable,
       status: this.activeStatus,
       translation: this.activeWrittenTranslation,
+      dataFormat: this.activeDataFormat,
     } = translatableItem);
-    this.activeDataFormat = translatableItem.dataFormat || '';
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
@@ -468,12 +464,9 @@ export class TranslationModalComponent {
   }
 
   getFormattedContentType(
-    contentType?: string,
-    interactionId?: string | null
+    contentType: string,
+    interactionId: string | undefined
   ): string {
-    if (!contentType) {
-      return '';
-    }
     switch (contentType) {
       case 'interaction':
         return interactionId + ' interaction';
@@ -487,10 +480,7 @@ export class TranslationModalComponent {
     return contentType;
   }
 
-  getRuleDescription(
-    ruleType?: string | null,
-    interactionId?: string | null
-  ): string {
+  getRuleDescription(ruleType?: string, interactionId?: string): string {
     if (!ruleType || !interactionId) {
       return '';
     }

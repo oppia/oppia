@@ -56,7 +56,7 @@ describe('Diagnostic test engine service', () => {
       DiagnosticTestPlayerEngineService
     );
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = TestBed.get(TextInputRulesService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     expressionInterpolationService = TestBed.inject(

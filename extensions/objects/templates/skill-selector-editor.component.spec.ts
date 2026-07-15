@@ -123,8 +123,8 @@ describe('SkillSelectorEditorComponent', () => {
   }));
 
   beforeEach(() => {
-    pageContextService = TestBed.inject(PageContextService);
-    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    pageContextService = TestBed.get(PageContextService);
+    skillBackendApiService = TestBed.get(SkillBackendApiService);
     fixture = TestBed.createComponent(SkillSelectorEditorComponent);
     component = fixture.componentInstance;
 

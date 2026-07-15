@@ -23,7 +23,7 @@ import {GraphAnswer} from 'interactions/answer-defs';
 describe('Graph Input service', () => {
   let girs: GraphInputRulesService;
   beforeEach(() => {
-    girs = TestBed.inject(GraphInputRulesService);
+    girs = TestBed.get(GraphInputRulesService);
   });
 
   let undirectedEmptyGraph = (): GraphAnswer => {

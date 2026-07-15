@@ -19,25 +19,21 @@
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {SignInEventService} from 'services/sign-in-event.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PreventPageUnloadEventService {
-  private listenerActive = false;
-  private validationCallback: (() => boolean) | null = null;
+  private listenerActive: boolean;
+  validationCallback: undefined | (() => boolean);
   _preventPageUnloadEventHandlerBind?: (
     this: Window,
     ev: BeforeUnloadEvent
   ) => void;
-  constructor(
-    private windowRef: WindowRef,
-    private signInEventService: SignInEventService
-  ) {
-    this.signInEventService.onUserSignIn.subscribe(() => {
-      this.removeListener();
-    });
+
+  constructor(private windowRef: WindowRef) {
+    this.listenerActive = false;
+    this.validationCallback = undefined;
   }
 
   addListener(callback?: () => boolean): void {

@@ -63,7 +63,7 @@ export class CloudTaskRun {
     this.exceptionMessagesForFailedRuns = exceptionMessagesForFailedRuns;
     this.currentRetryAttempt = currentRetryAttempt;
     this.lastUpdated = lastUpdated;
-    this.createdOn = new Date(createdOn);
+    this.createdOn = createdOn;
 
     switch (this.latestJobState) {
       case 'RUNNING':

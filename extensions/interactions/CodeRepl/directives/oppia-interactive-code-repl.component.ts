@@ -47,26 +47,23 @@ import {CodeReplRulesService} from './code-repl-rules.service';
 export class InteractiveCodeReplComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  @Input() lastAnswer!: {
-    code: string;
-    output: string;
-  } | null;
-  @Input() languageWithValue!: string;
-  @Input() placeholderWithValue!: string;
-  @Input() preCodeWithValue!: string;
-  @Input() postCodeWithValue!: string;
-  @ViewChild(CodemirrorComponent) codeMirrorComponent!: CodemirrorComponent;
+  @Input() lastAnswer;
+  @Input() languageWithValue;
+  @Input() placeholderWithValue;
+  @Input() preCodeWithValue;
+  @Input() postCodeWithValue;
+  @ViewChild(CodemirrorComponent) codeMirrorComponent: CodemirrorComponent;
   componentSubscriptions = new Subscription();
   hasLoaded: boolean = true;
-  code!: string;
-  evaluation!: string;
-  fullError!: string;
-  output!: string;
-  interactionIsActive!: boolean;
-  language!: string;
-  placeholder!: string;
-  preCode!: string;
-  postCode!: string;
+  code: string;
+  evaluation: string;
+  fullError: string;
+  output: string;
+  interactionIsActive: boolean;
+  language: string;
+  placeholder: string;
+  preCode: string;
+  postCode: string;
 
   editorOptions = {
     lineNumbers: true,
@@ -75,11 +72,10 @@ export class InteractiveCodeReplComponent
     mode: 'python',
     extraKeys: {
       Tab: (cm: CodeMirror.Editor): void => {
-        const indentUnit = cm.getOption('indentUnit') ?? 4;
-        const spaces = Array(indentUnit + 1).join(' ');
+        var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
         cm.replaceSelection(spaces);
-
-        const endSelectionPos = cm.getDoc().getCursor('head');
+        // Move the cursor to the end of the selection.
+        var endSelectionPos = cm.getDoc().getCursor('head');
         cm.getDoc().setCursor(endSelectionPos);
       },
     },
@@ -139,19 +135,19 @@ export class InteractiveCodeReplComponent
     if (this.interactionIsActive) {
       this.code = this.preCode + this.placeholder + this.postCode;
       this.output = '';
-    } else if (this.lastAnswer !== null) {
+    } else {
       this.code = this.lastAnswer.code;
       this.output = this.lastAnswer.output;
     }
 
     // Configure Skulpt.
     Sk.configure({
-      output: (out: string) => {
+      output: out => {
         // This output function is called continuously throughout the
         // runtime of the script.
         this.output += out;
       },
-      read: (name: string) => {
+      read: name => {
         // This function is called when a builtin module is imported.
         if (Sk.builtinFiles.files[name] === undefined) {
           // If corresponding module is not present then,
@@ -174,12 +170,9 @@ export class InteractiveCodeReplComponent
 
   ngAfterViewInit(): void {
     const runAfterTimeout = () => {
-      const codeMirror = this.codeMirrorComponent.codeMirror;
-      if (codeMirror) {
-        this.initMarkers(codeMirror);
-        this.hasLoaded = true;
-        this.changeDetectionRef.detectChanges();
-      }
+      this.initMarkers(this.codeMirrorComponent.codeMirror);
+      this.hasLoaded = true;
+      this.changeDetectionRef.detectChanges();
     };
     setTimeout(() => {
       runAfterTimeout();
@@ -222,7 +215,7 @@ export class InteractiveCodeReplComponent
             onFinishRunCallback('', '');
           }
         },
-        (err: Error | null) => {
+        err => {
           if (!(err instanceof Sk.builtin.TimeLimitError)) {
             this.evaluation = '';
             this.fullError = String(err);
@@ -235,7 +228,7 @@ export class InteractiveCodeReplComponent
       );
   }
 
-  private initMarkers(editor: CodeMirror.Editor) {
+  private initMarkers(editor) {
     var doc = editor.getDoc();
 
     // The -1 here is because prepended code ends with a newline.

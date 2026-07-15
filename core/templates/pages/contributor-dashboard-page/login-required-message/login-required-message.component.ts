@@ -20,7 +20,6 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {SignInEventService} from 'services/sign-in-event.service';
 import {Component} from '@angular/core';
 
 @Component({
@@ -38,8 +37,7 @@ export class LoginRequiredMessageComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
-    private readonly windowRef: WindowRef,
-    private readonly signInEventService: SignInEventService
+    private readonly windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -52,9 +50,6 @@ export class LoginRequiredMessageComponent {
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
-        this.signInEventService.onUserSignIn.emit();
-        // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
-        // rather than manually being triggered by buttons.
         this.siteAnalyticsService.registerStartLoginEvent('loginButton');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;

@@ -61,9 +61,9 @@ describe('History tab yaml conversion service', () => {
         language_code: 'hi',
         translations: {
           content1: {
-            content_value: '<p>This is content 1.</p>',
-            content_format: 'html',
-            needs_update: true,
+            translation: '<p>This is content 1.</p>',
+            dataFormat: 'html',
+            needsUpdate: true,
           },
         },
       }),

@@ -22,6 +22,7 @@ import inspect
 import os
 import re
 
+from core import utils
 from core.tests import test_utils
 from extensions.rich_text_components import components
 
@@ -449,7 +450,7 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             if name != '__pycache__'
             and os.path.isdir(os.path.join(rich_text_components_dir, name))
         ]
-        with open(test_file, 'r', encoding='utf-8') as f:
+        with utils.open_file(test_file, 'r') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.
             text = re.sub(r' ', r'', text)

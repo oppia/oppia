@@ -192,14 +192,14 @@ describe('Topics and skills dashboard page component', () => {
   it('should check whether next skill page is present', () => {
     for (let i = 0; i < 10; i++) {
       componentInstance.skillSummaries.push(
-        new SkillSummary('', '', '', 1, 2, 3, 4)
+        new SkillSummary('', '', '', 1, 2, 3, 4, 5)
       );
     }
     componentInstance.skillPageNumber = 0;
     componentInstance.itemsPerPage = 4;
-    expect(componentInstance.isNextSkillPagePresent()).toBeTruthy();
+    expect(componentInstance.isNextSkillPagePresent()).toBeTrue();
     componentInstance.itemsPerPage = 11;
-    expect(componentInstance.isNextSkillPagePresent()).toBeFalsy();
+    expect(componentInstance.isNextSkillPagePresent()).toBeFalse();
   });
 
   it('should set topic tab as active tab', () => {
@@ -231,8 +231,8 @@ describe('Topics and skills dashboard page component', () => {
   it('should intialize skill dashboard', () => {
     spyOn(componentInstance, 'applyFilters');
     componentInstance.initSkillDashboard();
-    expect(componentInstance.moreSkillsPresent).toBeTruthy();
-    expect(componentInstance.firstTimeFetchingSkills).toBeTruthy();
+    expect(componentInstance.moreSkillsPresent).toBeTrue();
+    expect(componentInstance.firstTimeFetchingSkills).toBeTrue();
     expect(componentInstance.applyFilters).toHaveBeenCalledWith();
   });
 
@@ -287,7 +287,7 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.activeTab = componentInstance.TAB_NAME_SKILLS;
     for (let i = 0; i < 10; i++) {
       componentInstance.skillSummaries.push(
-        new SkillSummary('', '', '', 1, 2, 3, 4)
+        new SkillSummary('', '', '', 1, 2, 3, 4, 5)
       );
     }
     componentInstance.pageNumber = 1;
@@ -319,7 +319,7 @@ describe('Topics and skills dashboard page component', () => {
       componentInstance.skillSummaries.length
     );
     expect(componentInstance.goToPageNumber).toHaveBeenCalledWith(0);
-    expect(componentInstance.firstTimeFetchingSkills).toBeFalsy();
+    expect(componentInstance.firstTimeFetchingSkills).toBeFalse();
     componentInstance.fetchSkills();
     tick();
     expect(componentInstance.goToPageNumber).toHaveBeenCalledWith(
@@ -330,7 +330,7 @@ describe('Topics and skills dashboard page component', () => {
     componentInstance.moreSkillsPresent = false;
     for (let i = 0; i < 5; i++) {
       componentInstance.skillSummaries.push(
-        new SkillSummary('', '', '', 1, 2, 3, 4)
+        new SkillSummary('', '', '', 1, 2, 3, 4, 5)
       );
     }
     componentInstance.fetchSkills();
@@ -375,9 +375,9 @@ describe('Topics and skills dashboard page component', () => {
   it('should toggle filter box', () => {
     componentInstance.filterBoxIsShown = false;
     componentInstance.toggleFilterBox();
-    expect(componentInstance.filterBoxIsShown).toBeTruthy();
+    expect(componentInstance.filterBoxIsShown).toBeTrue();
     componentInstance.toggleFilterBox();
-    expect(componentInstance.filterBoxIsShown).toBeFalsy();
+    expect(componentInstance.filterBoxIsShown).toBeFalse();
   });
 
   it('should display filter box on maximizing the window', () => {
@@ -388,7 +388,7 @@ describe('Topics and skills dashboard page component', () => {
 
     componentInstance.filterBoxOnResize();
 
-    expect(componentInstance.filterBoxIsShown).toBeTruthy();
+    expect(componentInstance.filterBoxIsShown).toBeTrue();
   });
 
   it('should hide filter box on minimizing the window', () => {
@@ -399,7 +399,7 @@ describe('Topics and skills dashboard page component', () => {
 
     componentInstance.filterBoxOnResize();
 
-    expect(componentInstance.filterBoxIsShown).toBeFalsy();
+    expect(componentInstance.filterBoxIsShown).toBeFalse();
   });
 
   it('should get upper limit value for pagination', () => {
@@ -410,14 +410,13 @@ describe('Topics and skills dashboard page component', () => {
   });
 
   it('should get total count value for skills', () => {
-    componentInstance.totalSkillCount = 32;
     componentInstance.skillSummaries = [
-      new SkillSummary('', '', '', 2, 3, 4, 6),
+      new SkillSummary('', '', '', 2, 3, 4, 6, 7),
     ];
     componentInstance.itemsPerPage = 0;
-    expect(componentInstance.getTotalCountValueForSkills()).toEqual(32);
+    expect(componentInstance.getTotalCountValueForSkills()).toEqual('many');
     componentInstance.itemsPerPage = 2;
-    expect(componentInstance.getTotalCountValueForSkills()).toEqual(32);
+    expect(componentInstance.getTotalCountValueForSkills()).toEqual(1);
   });
 
   it('should refresh pagination', () => {
@@ -475,7 +474,7 @@ describe('Topics and skills dashboard page component', () => {
         canDeleteTopic: true,
         canCreateTopic: true,
         canCreateSkill: true,
-        untriagedSkillSummaries: [new SkillSummary('', '', '', 2, 3, 4, 5)],
+        untriagedSkillSummaries: [new SkillSummary('', '', '', 2, 3, 4, 5, 6)],
         mergeableSkillSummaries: [],
         totalSkillCount: 5,
         topicSummaries: [],

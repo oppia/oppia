@@ -213,10 +213,7 @@ export class TranslationStatusService implements OnInit {
         allContentIds.forEach(contentId => {
           let availabilityStatus =
             this._getContentAvailabilityStatus(contentId);
-          if (
-            !availabilityStatus.available ||
-            availabilityStatus?.needsUpdate
-          ) {
+          if (!availabilityStatus.available) {
             noTranslationCount++;
             if (
               contentId.indexOf(AppConstants.COMPONENT_NAME_RULE_INPUT) !== 0

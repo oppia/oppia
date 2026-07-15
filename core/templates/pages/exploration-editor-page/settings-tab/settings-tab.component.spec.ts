@@ -16,12 +16,7 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
-import {
-  ChangeDetectorRef,
-  EventEmitter,
-  NO_ERRORS_SCHEMA,
-  Type,
-} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -34,11 +29,7 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ChangeListService} from '../services/change-list.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
@@ -75,6 +66,7 @@ import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Interaction} from 'domain/exploration/interaction.model';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Settings Tab Component', () => {
   let component: SettingsTabComponent;
@@ -613,9 +605,9 @@ describe('Settings Tab Component', () => {
         {} as SubtitledHtml,
         {} as Interaction,
         [],
+        {} as RecordedVoiceovers,
         false,
-        false,
-        []
+        false
       )
     );
     spyOn(explorationInitStateNameService, 'saveDisplayedValue');
@@ -645,13 +637,11 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should not delete exploration when dismissing delete exploration modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          result: Promise.reject(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
     spyOn(alertsService, 'clearWarnings');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: '',
@@ -665,14 +655,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should open a modal when removeRole is called', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     spyOn(explorationRightsService, 'removeRoleAsync').and.returnValue(
       Promise.resolve()
     );
@@ -684,14 +672,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should remove role when resolving remove-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     spyOn(explorationRightsService, 'removeRoleAsync').and.returnValue(
       Promise.resolve()
     );
@@ -703,14 +689,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should not remove role when rejecting remove-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
     spyOn(explorationRightsService, 'removeRoleAsync');
 
     component.removeRole('username1', 'editor');
@@ -720,14 +704,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should remove role when user accept remove-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     spyOn(explorationRightsService, 'removeRoleAsync').and.returnValue(
       Promise.resolve()
     );
@@ -739,14 +721,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should open a modal when removeVoiceArtist is called', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     spyOn(
       explorationRightsService,
       'removeVoiceArtistRoleAsync'
@@ -761,14 +741,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should remove voice artist when resolving remove-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     spyOn(
       explorationRightsService,
       'removeVoiceArtistRoleAsync'
@@ -783,14 +761,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should not remove voice artist when rejecting remove-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
     spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
 
     component.removeVoiceArtist('username');
@@ -802,14 +778,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should open a modal when reassignRole is called', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
 
     component.openEditRolesForm();
     explorationRightsService.init(['owner'], [], [], [], '', '', false, true);
@@ -829,14 +803,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should reassign role when resolving reassign-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
 
     component.openEditRolesForm();
     explorationRightsService.init(['owner'], [], [], [], '', '', false, true);
@@ -860,14 +832,12 @@ describe('Settings Tab Component', () => {
   }));
 
   it('should not reassign role when rejecting remove-role-modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
 
     explorationRightsService.init(['owner'], [], [], [], '', '', false, true);
 
@@ -904,14 +874,12 @@ describe('Settings Tab Component', () => {
     'should not transfer exploration ownership when dismissing transfer' +
       ' ownership modal',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake(
-        (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-          return {
-            componentInstance: NgbModalRef,
-            result: Promise.reject(),
-          } as NgbModalRef;
-        }
-      );
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: NgbModalRef,
+          result: Promise.reject(),
+        } as NgbModalRef;
+      });
       spyOn(alertsService, 'clearWarnings');
 
       component.showTransferExplorationOwnershipModal();
@@ -943,14 +911,12 @@ describe('Settings Tab Component', () => {
   });
 
   it('should open preview summary tile modal with ngbModal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     spyOn(settingTabBackendApiService, 'getData').and.returnValue(
       Promise.resolve({
         draft_email_body: 'Draf message',
@@ -967,18 +933,16 @@ describe('Settings Tab Component', () => {
     'should save moderator changes to backend when closing preview summary' +
       ' tile modal',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake(
-        (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-          return {
-            componentInstance: NgbModalRef,
-            result: Promise.resolve(),
-          } as NgbModalRef;
-        }
-      );
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: NgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
       spyOn(
         explorationRightsService,
         'saveModeratorChangeToBackendAsync'
-      ).and.callFake((_emailBody: string) => {
+      ).and.callFake(emailBody => {
         return Promise.resolve();
       });
       spyOn(settingTabBackendApiService, 'getData').and.returnValue(
@@ -1004,14 +968,12 @@ describe('Settings Tab Component', () => {
   );
 
   it('should clear alerts warning when dismissing preview summary tile modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
-        return {
-          componentInstance: NgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      }
-    );
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: NgbModalRef,
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
     spyOn(alertsService, 'clearWarnings');
     spyOn(settingTabBackendApiService, 'getData').and.returnValue(
       Promise.resolve({
@@ -1029,13 +991,13 @@ describe('Settings Tab Component', () => {
     let feedbackNotificationsSpy = spyOn(
       userEmailPreferencesService,
       'setFeedbackNotificationPreferences'
-    ).and.callFake((_mute: boolean, callb: () => void) => {
+    ).and.callFake((mute: boolean, callb: () => void) => {
       callb();
     });
     let suggestionNotificationsSpy = spyOn(
       userEmailPreferencesService,
       'setSuggestionNotificationPreferences'
-    ).and.callFake((_mute: boolean, callb: () => void) => {
+    ).and.callFake((mute: boolean, callb: () => void) => {
       callb();
     });
     component.muteFeedbackNotifications();
@@ -1130,7 +1092,7 @@ describe('Settings Tab Component', () => {
 
   it('should evaluate when edits are allowed', fakeAsync(() => {
     spyOn(eeabas, 'setEditsAllowed').and.callFake(
-      async (_unusedValue: boolean, _unusedId: string, cb: () => void) => cb()
+      async (unusedValue, unusedId, cb) => cb()
     );
     spyOn(editabilityService, 'lockExploration');
     component.enableEdits();
@@ -1142,7 +1104,7 @@ describe('Settings Tab Component', () => {
 
   it('should evaluate when edits are not allowed', fakeAsync(() => {
     spyOn(eeabas, 'setEditsAllowed').and.callFake(
-      async (_unusedValue: boolean, _unusedId: string, cb: () => void) => cb()
+      async (unusedValue, unusedId, cb) => cb()
     );
     spyOn(editabilityService, 'lockExploration');
     component.disableEdits();
@@ -1425,13 +1387,13 @@ describe('Settings Tab Component', () => {
       'fetchMetadataVersionHistoryAsync'
     ).and.resolveTo(null);
 
-    expect(component.validationErrorIsShown).toBe(false);
+    expect(component.validationErrorIsShown).toBeFalse();
 
     component.updateMetadataVersionHistory();
     tick();
     flushMicrotasks();
 
-    expect(component.validationErrorIsShown).toBe(true);
+    expect(component.validationErrorIsShown).toBeTrue();
   }));
 
   it(

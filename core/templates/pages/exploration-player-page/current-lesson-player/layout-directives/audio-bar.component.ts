@@ -273,9 +273,6 @@ export class AudioBarComponent {
   }
 
   onPlayButtonClicked(): void {
-    if (this.audioLoadingIndicatorIsShown) {
-      return;
-    }
     this.isPaused = !this.isPaused;
     this.progressBarIsShown = true;
 

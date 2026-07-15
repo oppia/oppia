@@ -60,7 +60,6 @@ describe('Read only story node model', () => {
       completed: true,
       thumbnail_bg_color: '#a33f40',
       thumbnail_filename: 'image.png',
-      status: 'Published',
     };
     _sampleStoryNode = ReadOnlyStoryNode.createFromBackendDict(
       sampleReadOnlyStoryNodeBackendDict
@@ -104,6 +103,5 @@ describe('Read only story node model', () => {
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
     expect(_sampleStoryNode.getThumbnailFilename()).toEqual('image.png');
     expect(_sampleStoryNode.getThumbnailBgColor()).toEqual('#a33f40');
-    expect(_sampleStoryNode.getStatus()).toEqual('Published');
   });
 });

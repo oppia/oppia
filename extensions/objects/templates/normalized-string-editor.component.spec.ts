@@ -39,7 +39,7 @@ describe('NormalizedStringEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(NormalizedStringEditorComponent);
     component = fixture.componentInstance;
-    externalSaveService = TestBed.inject(ExternalSaveService);
+    externalSaveService = TestBed.get(ExternalSaveService);
     spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
       externalSaveEventEmitter
     );

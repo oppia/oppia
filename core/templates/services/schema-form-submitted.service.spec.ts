@@ -25,7 +25,7 @@ describe('Schema Submitted Service', () => {
   let schemaFormSubmittedService: SchemaFormSubmittedService;
 
   beforeEach(() => {
-    schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
+    schemaFormSubmittedService = TestBed.get(SchemaFormSubmittedService);
   });
 
   it('should fetch submittedSchemaBasedForm event emitter', () => {

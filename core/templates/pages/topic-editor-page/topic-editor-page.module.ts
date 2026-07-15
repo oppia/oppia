@@ -64,6 +64,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
+import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ExtractImageFilenamesFromModelService} from '../exploration-player-page/services/extract-image-filenames-from-model.service';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
@@ -72,6 +73,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
+import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {RteHelperService} from 'services/rte-helper.service';
 import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
@@ -162,6 +164,7 @@ import {StudyGuideSectionEditorComponent} from './subtopic-editor/study-guide-se
     ImageLocalStorageService,
     NgbActiveModal,
     StoryEditorStateService,
+    AlertsService,
     AssetsBackendApiService,
     ExtractImageFilenamesFromModelService,
     SkillBackendApiService,
@@ -170,6 +173,7 @@ import {StudyGuideSectionEditorComponent} from './subtopic-editor/study-guide-se
     QuestionsListService,
     QuestionBackendApiService,
     BottomNavbarStatusService,
+    LoaderService,
     PreventPageUnloadEventService,
   ],
 })

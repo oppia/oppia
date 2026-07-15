@@ -559,7 +559,7 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
         file_names = ['img.png', 'test2_svg.svg']
         files = {}
         for filename in file_names:
-            with open(
+            with utils.open_file(
                 os.path.join(feconf.TESTS_DATA_DIR, filename),
                 'rb',
                 encoding=None,

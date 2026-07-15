@@ -29,8 +29,24 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  additionalEditorFeatures: [
+    './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
+  ],
+
+  additionalEditorFeaturesModals: [
+    './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
+  ],
+
+  blog: [
+    './core/tests/webdriverio_desktop/blog.js'
+  ],
+
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
+  ],
+
+  contributorAdminDashboard: [
+    './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
   ],
 
   creatorDashboard: [
@@ -47,6 +63,14 @@ var suites = {
 
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
+  ],
+
+  explorationStatisticsTab: [
+    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
+  ],
+
+  explorationTranslationTab: [
+    './core/tests/webdriverio_desktop/explorationTranslationTab.js'
   ],
 
   learner: [
@@ -212,23 +236,26 @@ exports.config = {
    * @param {Array.<String>} specs   List of spec file paths that are to be run
    * @param {Object}         browser instance of created browser/device session
    */
-  before: async function() {
+  before: function() {
     // eslint-disable-next-line eqeqeq
     mobileViewportArg = process.env.MOBILE == 'true';
 
     // eslint-disable-next-line eqeqeq
     if (mobileViewportArg) {
-      await browser.setWindowSize(600, 1000);
+      browser.setWindowSize(600, 1000);
     } else {
       // Set a wide enough window size for the navbar in the library pages to
       // display fully.
-      await browser.setWindowSize(1285, 1000);
+      browser.setWindowSize(1285, 1000);
     }
 
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+
+    // Navigate to the splash page so that tests can begin on an Angular page.
+    browser.url('http://localhost:8181');
   },
   /**
     * Function to be executed before a test (in Mocha/Jasmine only)

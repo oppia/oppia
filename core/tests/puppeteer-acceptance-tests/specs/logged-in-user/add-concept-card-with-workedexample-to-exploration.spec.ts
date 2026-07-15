@@ -22,6 +22,7 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -29,12 +30,22 @@ const ROLES = testConstants.Roles;
 describe('Logged-in User', function () {
   let loggedInUser1: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_worked_examples_rte_component'
     );
 
     await curriculumAdmin.createTopicWithSkill(

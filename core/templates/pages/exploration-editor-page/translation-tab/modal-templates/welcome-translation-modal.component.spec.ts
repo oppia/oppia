@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for welcome translation tab.
  */
 
-import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +44,6 @@ describe('Welcome Translation Modal Component', function () {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [WelcomeTranslationModalComponent],
       providers: [
         PageContextService,

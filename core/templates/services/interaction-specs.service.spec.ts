@@ -24,7 +24,7 @@ describe('InteractionSpecsService', () => {
   let interactionSpecsService: InteractionSpecsService;
 
   beforeEach(() => {
-    interactionSpecsService = TestBed.inject(InteractionSpecsService);
+    interactionSpecsService = TestBed.get(InteractionSpecsService);
   });
 
   describe('checking whether an interaction can be trained with ML', () => {

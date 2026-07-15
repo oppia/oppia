@@ -32,7 +32,6 @@ import {TagFilterComponent} from './tag-filter/tag-filter.component';
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
-import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
 
 @NgModule({
   imports: [
@@ -47,7 +46,6 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     ReactiveFormsModule,
     SharedBlogComponentsModule,
     Error404PageModule,
-    CampaignBannerModule,
   ],
   declarations: [
     BlogHomePageComponent,

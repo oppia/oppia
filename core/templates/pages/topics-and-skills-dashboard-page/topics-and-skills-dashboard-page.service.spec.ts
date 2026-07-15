@@ -210,7 +210,7 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([]);
 
-    topic3.classroom = null;
+    topic3.classroom = undefined;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3]);
 

@@ -27,7 +27,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Observable} from 'rxjs';
 
 interface FetchSkillBackendResponse {
-  skill_dict: SkillBackendDict;
+  skill: SkillBackendDict;
   assigned_skill_topic_data_dict: {
     [topicName: string]: string;
   };
@@ -51,7 +51,7 @@ interface FetchMultiSkillsBackendResponse {
 }
 
 interface UpdateSkillBackendResponse {
-  skill_dict: SkillBackendDict;
+  skill: SkillBackendDict;
 }
 
 interface DoesSkillWithDescriptionExistBackendResponse {
@@ -86,7 +86,7 @@ export class SkillBackendApiService {
         .then(
           response => {
             resolve({
-              skill: Skill.createFromBackendDict(response.skill_dict),
+              skill: Skill.createFromBackendDict(response.skill),
               assignedSkillTopicData: response.assigned_skill_topic_data_dict,
               // TODO(nishantwrp): Refactor this property to return SkillSummary
               // domain objects instead of backend dicts.
@@ -181,7 +181,7 @@ export class SkillBackendApiService {
         .toPromise()
         .then(
           response => {
-            resolve(Skill.createFromBackendDict(response.skill_dict));
+            resolve(Skill.createFromBackendDict(response.skill));
           },
           errorResponse => {
             reject(errorResponse.error.error);

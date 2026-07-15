@@ -37,7 +37,7 @@ describe('Read only collection backend API service', () => {
     meta_name: 'meta_name',
     can_edit: false,
     meta_description: 'meta_description',
-    collection_dict: {
+    collection: {
       id: '0',
       title: 'Collection Under Test',
       category: 'Test',
@@ -88,10 +88,10 @@ describe('Read only collection backend API service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    readOnlyCollectionBackendApiService = TestBed.inject(
+    readOnlyCollectionBackendApiService = TestBed.get(
       ReadOnlyCollectionBackendApiService
     );
-    httpTestingController = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.get(HttpTestingController);
     onCollectionLoadSpy = jasmine.createSpy('onCollectionLoadSpy');
     subscriptions = new Subscription();
     subscriptions.add(
@@ -119,7 +119,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    var collectionObject = Collection.create(sampleDataResults.collection_dict);
+    var collectionObject = Collection.create(sampleDataResults.collection);
 
     expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    var collectionObject = Collection.create(sampleDataResults.collection_dict);
+    var collectionObject = Collection.create(sampleDataResults.collection);
 
     expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();

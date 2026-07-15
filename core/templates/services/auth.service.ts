@@ -25,7 +25,6 @@ import {md5} from 'hash-wasm';
 
 import {AppConstants} from 'app.constants';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
-import {SignInEventService} from 'services/sign-in-event.service';
 
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null>;
@@ -100,8 +99,7 @@ export class AuthService {
 
   constructor(
     @Optional() private angularFireAuth: AngularFireAuth | null,
-    private authBackendApiService: AuthBackendApiService,
-    private signInEventService: SignInEventService
+    private authBackendApiService: AuthBackendApiService
   ) {
     if (!this.angularFireAuth) {
       this.authServiceImpl = new NullAuthServiceImpl();
@@ -186,7 +184,6 @@ export class AuthService {
     if (this.creds?.user !== null) {
       const idToken = await this.creds.user.getIdToken();
       await this.authBackendApiService.beginSessionAsync(idToken);
-      this.signInEventService.onUserSignIn.emit();
     }
   }
 

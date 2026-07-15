@@ -45,7 +45,6 @@ export interface SearchResponseBackendDict {
   search_offset: number | null;
   blog_post_summaries_list: BlogPostSummaryBackendDict[];
   list_of_default_tags: string[];
-  total_matching_blog_posts: number;
 }
 
 export interface BlogPostPageBackendResponse {
@@ -58,7 +57,6 @@ export interface SearchResponseData {
   searchOffset: number | null;
   blogPostSummariesList: BlogPostSummary[];
   listOfDefaultTags: string[];
-  totalMatchingBlogPosts: number;
 }
 
 export interface BlogHomePageData {
@@ -172,7 +170,6 @@ export class BlogHomePageBackendApiService {
                   return BlogPostSummary.createFromBackendDict(blogPostSummary);
                 }
               ),
-              totalMatchingBlogPosts: response.total_matching_blog_posts ?? 0,
             });
           },
           errorResponse => {

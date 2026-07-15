@@ -66,9 +66,9 @@ describe('Keyboard Shortcuts', () => {
   }));
 
   beforeEach(async () => {
-    ngbModal = TestBed.inject(NgbModal);
+    ngbModal = TestBed.get(NgbModal);
     windowRef = new WindowRef();
-    appRef = TestBed.inject(ApplicationRef);
+    appRef = TestBed.get(ApplicationRef);
     keyboardShortcutService = new KeyboardShortcutService(
       windowRef,
       ngbModal,
@@ -189,12 +189,4 @@ describe('Keyboard Shortcuts', () => {
       expect(nextButton.isEqualNode(document.activeElement));
     }
   );
-
-  it('should not throw error if search bar or category bar is missing', () => {
-    spyOn(document, 'querySelector').and.returnValue(null);
-    keyboardShortcutService.bindLibraryPageShortcuts();
-
-    expect(() => Mousetrap.trigger('/')).not.toThrowError();
-    expect(() => Mousetrap.trigger('c')).not.toThrowError();
-  });
 });

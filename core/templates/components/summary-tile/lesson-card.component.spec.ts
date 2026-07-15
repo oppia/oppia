@@ -52,8 +52,7 @@ describe('LessonCardComponent', () => {
     status: 'public',
     category: 'Algebra',
     title: 'Test Title',
-    total_node_count: 0,
-    completed_node_count: 0,
+    node_count: 0,
   };
 
   const sampleExploration = {
@@ -79,8 +78,6 @@ describe('LessonCardComponent', () => {
     activity_type: 'exploration',
     category: 'Algebra',
     title: 'Test Title',
-    visited_checkpoints_count: 5,
-    total_checkpoints_count: 10,
   };
 
   const sampleNode = {
@@ -380,56 +377,7 @@ describe('LessonCardComponent', () => {
     expect(component.imgColor).toEqual(sampleExploration.thumbnail_bg_color);
     expect(component.title).toEqual(sampleExploration.title);
 
-    // Progress = floor((5 - 1) / 10 * 100) = 40.
-    expect(component.progress).toEqual(40);
-    expect(component.lessonTopic).toEqual('Community Lesson');
-  }));
-
-  it('should calculate progress as 0 when no checkpoints are visited', fakeAsync(() => {
-    const explorationWithNoCheckpoints = {
-      ...sampleExploration,
-      visited_checkpoints_count: 0,
-      total_checkpoints_count: 5,
-    };
-
-    component.story = LearnerExplorationSummary.createFromBackendDict(
-      explorationWithNoCheckpoints
-    );
-
-    fixture.detectChanges();
-    tick();
-
     expect(component.progress).toEqual(0);
-    expect(component.lessonTopic).toEqual('Community Lesson');
-  }));
-
-  it('should calculate progress as 0 when total checkpoints is 0', fakeAsync(() => {
-    const explorationWithNoCheckpoints = {
-      ...sampleExploration,
-      visited_checkpoints_count: 0,
-      total_checkpoints_count: 0,
-    };
-
-    component.story = LearnerExplorationSummary.createFromBackendDict(
-      explorationWithNoCheckpoints
-    );
-
-    fixture.detectChanges();
-    tick();
-
-    expect(component.progress).toEqual(0);
-    expect(component.lessonTopic).toEqual('Community Lesson');
-  }));
-
-  it('should set progress to 100 when community lesson is complete', fakeAsync(() => {
-    component.isCommunityLessonComplete = true;
-    component.story =
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration);
-
-    fixture.detectChanges();
-    tick();
-
-    expect(component.progress).toEqual(100);
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
 
@@ -710,49 +658,5 @@ describe('LessonCardComponent', () => {
 
     expect(component.title).toBe('Chapter 2: Title 2');
     expect(component.progress).toBe(50);
-  }));
-
-  it('should set collection progress to 100 when community lesson is complete', fakeAsync(() => {
-    component.isCommunityLessonComplete = true;
-    component.story = CollectionSummary.createFromBackendDict({
-      ...sampleCollection,
-      total_node_count: 5,
-      completed_node_count: 2,
-    });
-
-    fixture.detectChanges();
-    tick();
-
-    expect(component.progress).toEqual(100);
-    expect(component.lessonTopic).toEqual('Collections');
-  }));
-
-  it('should calculate collection progress based on completed node count', fakeAsync(() => {
-    component.story = CollectionSummary.createFromBackendDict({
-      ...sampleCollection,
-      total_node_count: 5,
-      completed_node_count: 2,
-    });
-
-    fixture.detectChanges();
-    tick();
-
-    // Progress = floor(2 / 5 * 100) = 40.
-    expect(component.progress).toEqual(40);
-    expect(component.lessonTopic).toEqual('Collections');
-  }));
-
-  it('should set collection progress to 0 when node count is 0', fakeAsync(() => {
-    component.story = CollectionSummary.createFromBackendDict({
-      ...sampleCollection,
-      total_node_count: 0,
-      completed_node_count: 0,
-    });
-
-    fixture.detectChanges();
-    tick();
-
-    expect(component.progress).toEqual(0);
-    expect(component.lessonTopic).toEqual('Collections');
   }));
 });

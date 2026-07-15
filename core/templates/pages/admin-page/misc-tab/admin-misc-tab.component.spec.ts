@@ -110,6 +110,7 @@ describe('Admin misc tab component ', () => {
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
     // We have only defined the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
   });
 
@@ -386,6 +387,7 @@ describe('Admin misc tab component ', () => {
       // actual 'getElementById' returns more properties than just "files".
       // We need to suppress this error because we need only "files"
       // property for testing.
+      // @ts-expect-error
       spyOn(document, 'getElementById').and.callFake(() => {
         return {
           files: null,
@@ -414,12 +416,12 @@ describe('Admin misc tab component ', () => {
     () => {
       let message = 'message';
       // Pre-checks.
-      expect(component.showDataExtractionQueryStatus).toBe(false);
+      expect(component.showDataExtractionQueryStatus).toBeFalse();
       expect(component.dataExtractionQueryStatusMessage).toBeUndefined();
 
       component.setDataExtractionQueryStatusMessage(message);
 
-      expect(component.showDataExtractionQueryStatus).toBe(true);
+      expect(component.showDataExtractionQueryStatus).toBeTrue();
       expect(component.dataExtractionQueryStatusMessage).toBe(message);
     }
   );
@@ -1007,7 +1009,7 @@ describe('Admin misc tab component ', () => {
       tick();
 
       expect(getAzureAdminConfigSpy).toHaveBeenCalled();
-      expect(component.voiceoverAutogenerationIsEnabled).toBe(true);
+      expect(component.voiceoverAutogenerationIsEnabled).toBeTrue();
     }));
 
     it('should be able to update azure admin config data', fakeAsync(() => {

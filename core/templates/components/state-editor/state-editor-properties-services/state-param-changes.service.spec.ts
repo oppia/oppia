@@ -27,7 +27,7 @@ describe('State Param Changes service', () => {
       providers: [StateParamChangesService],
     });
 
-    spcs = TestBed.inject(StateParamChangesService);
+    spcs = TestBed.get(StateParamChangesService);
   });
 
   it('should call service constructor', () => {
