@@ -88,6 +88,8 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
         this.setFormLink();
       })
     );
+    this.setPageTitle();
+    this.setFormLink();
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/partnerships_hero_image.png'
     );

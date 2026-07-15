@@ -83,6 +83,19 @@ describe('Partnerships page', () => {
   });
 
   it(
+    'should set the page title and form link on initialization ' +
+      'even when the language does not change',
+    () => {
+      spyOn(component, 'setPageTitle');
+      spyOn(component, 'setFormLink');
+      component.ngOnInit();
+
+      expect(component.setPageTitle).toHaveBeenCalled();
+      expect(component.setFormLink).toHaveBeenCalled();
+    }
+  );
+
+  it(
     'should obtain translated page title whenever the selected' +
       'language changes',
     () => {
