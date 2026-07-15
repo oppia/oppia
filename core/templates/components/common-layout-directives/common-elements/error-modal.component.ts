@@ -35,6 +35,7 @@ export class ErrorModalComponent extends ConfirmOrCancelModal {
   description: string = '';
   isSubmitting: boolean = false;
   reportSentSuccessfully: boolean = false;
+  submitFailed: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -53,6 +54,7 @@ export class ErrorModalComponent extends ConfirmOrCancelModal {
       return;
     }
     this.isSubmitting = true;
+    this.submitFailed = false;
 
     this.frontendErrorBackendApiService
       .reportErrorAsync(this.errorMessage, this.description)
@@ -63,6 +65,7 @@ export class ErrorModalComponent extends ConfirmOrCancelModal {
         },
         () => {
           this.isSubmitting = false;
+          this.submitFailed = true;
         }
       );
   }

@@ -479,6 +479,7 @@
   "I18N_ERROR_MODAL_SENDING_BUTTON": "Text on the submit button while sending the error report.",
   "I18N_ERROR_MODAL_SEND_REPORT_BUTTON": "Text on the button to send the error report.",
   "I18N_ERROR_MODAL_SHOW_DETAILS": "Text to show error details in the error modal.",
+  "I18N_ERROR_MODAL_SUBMIT_FAILED": "Error message shown in the error modal when the submission fails.",
   "I18N_ERROR_MODAL_SUCCESS_MESSAGE": "Message thanking the user after their error report is successfully sent.",
   "I18N_ERROR_MODAL_TITLE": "Title of the error modal.",
   "I18N_ERROR_NEXT_STEPS": "Text displayed when an error occurred and the page could not be loaded.",

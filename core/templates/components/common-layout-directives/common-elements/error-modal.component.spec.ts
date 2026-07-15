@@ -108,9 +108,11 @@ describe('Error Modal Component', () => {
     );
     component.errorMessage = 'Sample test error message';
     component.description = 'Sample user description';
+    component.submitFailed = true;
 
     component.sendReport();
     expect(component.isSubmitting).toBeTrue();
+    expect(component.submitFailed).toBeFalse();
     tick();
 
     expect(
@@ -121,6 +123,7 @@ describe('Error Modal Component', () => {
     );
     expect(component.isSubmitting).toBeFalse();
     expect(component.reportSentSuccessfully).toBeTrue();
+    expect(component.submitFailed).toBeFalse();
   }));
 
   it('should handle reporting failure gracefully', fakeAsync(() => {
@@ -132,6 +135,7 @@ describe('Error Modal Component', () => {
 
     component.sendReport();
     expect(component.isSubmitting).toBeTrue();
+    expect(component.submitFailed).toBeFalse();
     tick();
 
     expect(
@@ -142,6 +146,24 @@ describe('Error Modal Component', () => {
     );
     expect(component.isSubmitting).toBeFalse();
     expect(component.reportSentSuccessfully).toBeFalse();
+    expect(component.submitFailed).toBeTrue();
+  }));
+
+  it('should show error message when reporting fails', fakeAsync(() => {
+    spyOn(frontendErrorBackendApiService, 'reportErrorAsync').and.returnValue(
+      Promise.reject('error')
+    );
+
+    component.sendReport();
+    tick();
+
+    fixture.detectChanges();
+    const errorMsgElement =
+      fixture.nativeElement.querySelector('.oppia-form-error');
+    expect(errorMsgElement).not.toBeNull();
+    expect(errorMsgElement.textContent).toContain(
+      'I18N_ERROR_MODAL_SUBMIT_FAILED'
+    );
   }));
 
   it('should not submit report if already submitting', () => {

@@ -23,6 +23,9 @@
                 rows="4"
                 [(ngModel)]="description">
       </textarea>
+      <div *ngIf="submitFailed" class="oppia-form-error oppia-form-error-text mt-2">
+        {{ 'I18N_ERROR_MODAL_SUBMIT_FAILED' | translate }}
+      </div>
     </div>
   </div>
 

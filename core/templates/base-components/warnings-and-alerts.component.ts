@@ -54,7 +54,6 @@ export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
       backdropClass: 'oppia-error-modal-backdrop',
       windowClass: 'oppia-error-modal-window',
       backdrop: 'static',
-      keyboard: false,
     });
     modalRef.componentInstance.errorMessage = warningMessage;
 
