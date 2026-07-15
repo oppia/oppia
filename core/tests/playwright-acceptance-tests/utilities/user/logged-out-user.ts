@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import {errors, expect, Page} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
@@ -28,6 +28,7 @@ const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
 
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
 const mobileNavbarButtonSelector = '.text-uppercase';
@@ -44,6 +45,15 @@ const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const previousCardButton = '.e2e-test-back-button';
 const lessonLanguageSelector = '.oppia-content-language-selector';
+const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
+const saveProgressButton = '.save-progress-btn';
+const saveProgressBtnTooltipSelector = '.save-progress-btn-tooltip';
+const signInBoxInSaveProressModalSelector = '.sign-in-box';
+const signInButton = '.conversation-skin-login-button-text';
+const singInButtonInProgressModal = '.sign-in-link';
+const profilePictureSelector = '.e2e-test-profile-dropdown';
+
+const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
 const conceptCardLinkSelector = '.e2e-test-concept-card-link';
 const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
@@ -77,6 +87,9 @@ const formErrorContainer = '.e2e-test-form-error-container';
 const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
 const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
 const progressRemainderModalSelector = '.oppia-progress-reminder-modal';
+const progressReminderModalHeaderSelector =
+  '.e2e-test-progress-reminder-continue-text';
+const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 
 const communityLibraryLinkInNavbarSelector =
   '.e2e-test-topnb-go-to-community-library-link';
@@ -150,6 +163,17 @@ export class LoggedOutUser extends BaseUser {
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Click on create account button in save progress modal
+   */
+  async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector);
+    await this.waitForElementToStabilize(lessonInfoSignUpButtonSelector);
+    await this.clickOnElementWithSelector(lessonInfoSignUpButtonSelector);
+
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector, false);
   }
 
   /**
@@ -446,6 +470,39 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Copies the progress URL to the clipboard and returns the copied text. (To be used when save progress modal is opened.)
+   */
+  async copyProgressUrl(): Promise<string> {
+    try {
+      // OverridePermissions is used to allow clipboard access.
+      await this.page
+        .context()
+        .grantPermissions(['clipboard-read', 'clipboard-write'], {
+          origin: 'http://localhost:8181',
+        });
+
+      // Click on the copy button.
+      await this.waitForPageToFullyLoad();
+      await this.expectElementToBeVisible(copyProgressUrlButton);
+      await this.clickOnElementWithSelector(copyProgressUrlButton);
+
+      // Reading the clipboard data.
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the exploration URL.');
+      }
+
+      return clipboardData;
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Expands the voiceover bar by clicking on the dropdown.
    */
   async expandVoiceoverBar(): Promise<void> {
@@ -608,7 +665,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if button with "left arrow" icon is present to move back to previous lesson card.
-   * @param visibility - Boolean value representing should be visible or not.
+   * @param {boolean} visibility - Boolean value representing should be visible or not.
    */
   async expectGoBackToPreviousCardButton(
     visibility: boolean = true
@@ -617,8 +674,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if the lesson info modal header matches the expected header.
+   * @param {string} header - The expected header.
+   */
+  async expectLessonInfoModalHeaderToBe(header: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalHeaderSelector);
+    await this.expectTextContentToMatch(lessonInfoModalHeaderSelector, header);
+  }
+
+  /**
    * Checks if the lesson info text is present.
-   * @param lessonText - The expected lesson info text.
+   * @param {string} lessonText - The expected lesson info text.
    */
   async expectLessonInfoTextToBe(lessonText: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -629,6 +695,63 @@ export class LoggedOutUser extends BaseUser {
       lessonInfoTextSelector,
       lessonText
     );
+  }
+
+  /**
+   * Checks if the progress reminder modal text matches the expected text.
+   * @param {string} expectedText - The expected text.
+   */
+  async expectProgressReminderModalTextToBe(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(progressReminderModalHeaderSelector);
+    await this.expectTextContentToMatch(
+      progressReminderModalHeaderSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the save progress button is visible.
+   */
+  async expectSaveProgressButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(saveProgressButton);
+  }
+
+  /**
+   * Checks if the sign-in button is present on the page.
+   */
+  async expectSignInButtonToBePresent(present: boolean = true): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    try {
+      await this.expectElementToBeVisible(signInButton, true, this.page, 5000);
+    } catch (error) {
+      try {
+        await this.page.waitForSelector(singInButtonInProgressModal, {
+          timeout: 5000,
+        });
+
+        showMessage('Sign-in button present.');
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('Timeout') &&
+          !present
+        ) {
+          showMessage('Sign-in button not present.');
+          return;
+        }
+
+        throw new Error(
+          'Sign-in button not found.\n' +
+            `Original error: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
+
+    if (!present) {
+      throw new Error('Sign-in button is present, expected to be absent.');
+    }
   }
 
   /**
@@ -745,6 +868,20 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to verify that the user is on the login page.
+   */
+  async expectToBeOnLoginPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        const currentURL = window.location.href;
+        return currentURL.includes(url);
+      },
+      testConstants.URLs.Login,
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Verifies that the current page URL includes the expected page pathname.
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
@@ -759,6 +896,13 @@ export class LoggedOutUser extends BaseUser {
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
     }
+  }
+
+  /**
+   * Expects the profile picture to be present.
+   */
+  async expectProfilePictureToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(profilePictureSelector);
   }
 
   /**
@@ -1019,6 +1163,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Goes through the sign up process.
+   * @param {string} email - The email to sign up with.
+   * @param {string} username - The username to sign up with.
+   */
+  async goThroughSignUpProcess(email: string, username: string): Promise<void> {
+    await this.expectElementToBeVisible(testConstants.SignInDetails.inputField);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
+    await this.clickOnElementWithText('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle'});
+    await this.typeInInputField('input.e2e-test-username-input', username);
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-agree-to-terms-checkbox'
+    );
+    await this.page.waitForSelector(
+      'button.e2e-test-register-user:not([disabled])'
+    );
+    await this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON);
+    await this.page.waitForNavigation({waitUntil: 'networkidle'});
+    await this.expectElementToBeVisible('button.e2e-test-register-user', false);
+  }
+
+  /**
    * Function to navigate to the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
@@ -1276,6 +1442,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Saves the progress.(To be used when save progress modal is opened.)
+   */
+  async saveProgress(): Promise<void> {
+    await this.expectElementToBeVisible(saveProgressButton);
+
+    // TODO(#26357): Remove this wait once the frontend race condition is fixed.
+    // The saveProgressBtnTooltipSelector div is rendered directly below the
+    // button in a flex column when checkpointStatusArray[0] === 'in-progress'.
+    // This happens when the modal opens before Angular's async checkpoint
+    // service has updated completedCheckpointsCount. While the tooltip is
+    // present, elementFromPoint at the button's center returns the tooltip div
+    // instead of the button, causing waitForElementToBeClickable to time out.
+    // We wait here until the tooltip disappears (i.e. completedCheckpointsCount
+    // has been updated to reflect the reached checkpoint).
+    await this.expectElementToBeVisible(saveProgressBtnTooltipSelector, false);
+
+    await this.clickOnElementWithSelector(saveProgressButton);
+
+    await this.expectElementToBeVisible(signInBoxInSaveProressModalSelector);
+  }
+
+  /**
    * Searches for a lesson in the search bar present in the community library.
    * @param {string} lessonName - The name of the lesson to search for.
    */
@@ -1399,6 +1587,18 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.expectElementToBeVisible(loginPromptContainer, false);
+  }
+
+  /**
+   * Starts an exploration with a progress URL.
+   * @param {string} progressUrl - The URL to navigate to.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async startExplorationUsingProgressUrl(
+    progressUrl: string,
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(progressUrl, verifyURL);
   }
 
   /**

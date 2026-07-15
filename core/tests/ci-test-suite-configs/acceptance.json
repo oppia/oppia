@@ -417,8 +417,8 @@
     },
     {
       "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/use-the-feedback-and-help-cards",
