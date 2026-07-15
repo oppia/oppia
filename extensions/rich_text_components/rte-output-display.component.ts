@@ -173,6 +173,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
     }
+    // Default: return textContent or empty string to avoid undefined values.
+    return node.textContent || '';
   }
 
   // The method recursively traverses the node and wraps span tags around
@@ -182,7 +184,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     sentenceRegex: RegExp
   ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
-
+    if (node.nodeName === 'BR') {
+      return [node];
+    }
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
       const sentences = textContent.split(sentenceRegex);
@@ -229,6 +233,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let textContent = '';
 
         for (let tempChildNode of updatedChildNodes) {
+          // Skip <br> when building the combined text for sentence parsing.
+          if (tempChildNode.nodeName === 'BR') {
+            continue;
+          }
           textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
 
@@ -241,6 +249,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let nextSentenceOffset = '';
 
         for (let childNode of updatedChildNodes) {
+          if (childNode.nodeName === 'BR') {
+            spanNodeList.push(childNode);
+            continue;
+          }
+
           let currentText = this.getReadableTextFromNode(childNode);
 
           let sentence = nextSentenceOffset + currentText;
@@ -270,26 +283,45 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        let nodeTemp = node.cloneNode();
+        // Clone only the element, not its children. Cloning children here
+        // would move or duplicate the original child nodes and could
+        // detach them from the source DOM. We clone the element shell and
+        // then clone/append child nodes explicitly into span wrappers to
+        // preserve the original DOM and avoid side-effects during traversal.
+        let nodeTemp = node.cloneNode(false) as Node;
 
         for (let spanNode of spanNodeList) {
-          let textInsideSpanTag = '';
+          // Preserve <br> tags exactly as-is (clone so we don't move original nodes).
+          if (spanNode.nodeName === 'BR') {
+            nodeTemp.appendChild(spanNode.cloneNode(false));
+            continue;
+          }
 
+          // Process highlight spans.
+          let textInsideSpanTag = '';
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
+          // If the span is just a space, reinsert it as-is (no highlight id).
           if (textInsideSpanTag === ' ') {
-            nodeTemp.appendChild(spanNode);
+            nodeTemp.appendChild(spanNode.cloneNode(true));
             continue;
           }
 
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
-          this.index++;
+          const span = document.createElement('span');
+          const elementId = `highlightBlock${this.index}`;
+          span.id = elementId;
 
-          nodeTemp.appendChild(spanNode);
+          // Preserve inline structure (e.g. <em>, <strong>) by cloning child nodes
+          // into the new span instead of setting textContent.
+          for (let tempChildNode of spanNode.childNodes) {
+            span.appendChild(tempChildNode.cloneNode(true));
+          }
+
+          nodeTemp.appendChild(span);
           this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+          this.index++;
         }
 
         return nodeTemp;
@@ -355,12 +387,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // replaced.
     this.rteString = this.rteString.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
     // The following line is required since blank newlines in between
-    // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
-    // have to be restored, as this will get reduced to <p></p> above.
+    // paragraphs are treated as '<p>&nbsp;</p>' by CKEditor. So, these
+    // have to be restored, as this will get reduced to '<p></p>' above.
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
-    this.rteString = this.rteString.replace(/\n/g, '');
+    // Replace newlines with spaces to preserve separation without merging words.
+    this.rteString = this.rteString.replace(/\n/g, ' ');
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
@@ -450,7 +483,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       this.updateAutomatedVoiceoversAudioOffsets();
     });
 
-    // The below lines runs on every 200ms to highlight the sentence being
+    // These lines run every 100ms to highlight the sentence being
     // played in the audio player.
     setInterval(() => {
       this.highlightSentenceDuringVoiceoverPlay();
