@@ -187,6 +187,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     if (node.nodeName === 'BR') {
       return [node];
     }
+
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
       const sentences = textContent.split(sentenceRegex);
