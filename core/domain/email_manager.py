@@ -3153,4 +3153,5 @@ def send_machine_translation_failure_email(
         feconf.TRANSLATION_TECH_SUPPORT_EMAIL,
         email_subject,
         email_body,
+        email_body,
     )

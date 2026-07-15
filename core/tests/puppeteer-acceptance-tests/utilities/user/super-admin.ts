@@ -1381,13 +1381,13 @@ export class SuperAdmin extends BaseUser {
 
   async enableAutoTranslation(): Promise<void> {
     const toggleSelector = '.e2e-test-auto-translation-toggle input';
-    await this.waitForElementToBePresent(toggleSelector);
+    await this.page.waitForSelector(toggleSelector);
     const isChecked = await this.page.$eval(
       toggleSelector,
-      (el: HTMLInputElement) => el.checked
+      el => (el as HTMLInputElement).checked
     );
     if (!isChecked) {
-      await this.clickOn(toggleSelector);
+      await this.clickOnElementWithSelector(toggleSelector);
     }
   }
 
@@ -1399,18 +1399,18 @@ export class SuperAdmin extends BaseUser {
     const providerDropdown = '.e2e-test-provider-dropdown';
     const addButton = '.e2e-test-add-mapping-btn';
 
-    await this.waitForElementToBePresent(langDropdown);
+    await this.page.waitForSelector(langDropdown);
     await this.page.select(langDropdown, languageCode);
 
-    await this.waitForElementToBePresent(providerDropdown);
+    await this.page.waitForSelector(providerDropdown);
     await this.page.select(providerDropdown, providerId);
 
-    await this.clickOn(addButton);
+    await this.clickOnElementWithSelector(addButton);
   }
 
   async removeTranslationProviderMapping(languageCode: string): Promise<void> {
     const removeButton = `.e2e-test-remove-mapping-btn[aria-label="Remove ${languageCode}"]`;
-    await this.clickOn(removeButton);
+    await this.clickOnElementWithSelector(removeButton);
   }
 
   async getProviderMappingRowCount(): Promise<number> {

@@ -98,8 +98,7 @@ class MachineTranslationGenerateHandler(
 
 
 class TranslationProviderMappingHandler(
-    # Here we use type Any because the request and response payloads
-    # handle dynamic translation provider mappings.
+    # Here we use type Any because the request and response payloads handle dynamic translation provider mappings.
     base.BaseHandler[Dict[str, Any], Dict[str, Any]]
 ):
     """Handler for fetching and updating the translation provider mapping."""

@@ -26,7 +26,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
@@ -250,7 +250,9 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
         domain_swap = self.swap(
             machine_translation_services,
             'update_machine_translation_policy',
-            lambda mapping, is_enabled: mock_update_mapping(mapping),
+            lambda language_to_provider_mapping=None, automatic_translation_is_enabled=None: mock_update_mapping(
+                language_to_provider_mapping
+            ),
         )
 
         with self.feature_flag_swap, domain_swap:
@@ -268,7 +270,10 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
     def test_put_fails_with_validation_error(self) -> None:
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        def mock_update_policy_fails(mapping, is_enabled):
+        def mock_update_policy_fails(
+            language_to_provider_mapping: Optional[Dict[str, str]] = None,
+            automatic_translation_is_enabled: Optional[bool] = None,
+        ) -> None:
             raise utils.ValidationError('Invalid provider specified.')
 
         domain_swap = self.swap(
@@ -314,8 +319,13 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
 
         policy_calls = []
 
-        def mock_update_policy(mapping, is_enabled):
-            policy_calls.append((mapping, is_enabled))
+        def mock_update_policy(
+            language_to_provider_mapping: Optional[Dict[str, str]] = None,
+            automatic_translation_is_enabled: Optional[bool] = None,
+        ) -> None:
+            policy_calls.append(
+                (language_to_provider_mapping, automatic_translation_is_enabled)
+            )
 
         policy_swap = self.swap(
             machine_translation_services,
@@ -345,8 +355,13 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
 
         policy_calls = []
 
-        def mock_update_policy(mapping, is_enabled):
-            policy_calls.append((mapping, is_enabled))
+        def mock_update_policy(
+            language_to_provider_mapping: Optional[Dict[str, str]] = None,
+            automatic_translation_is_enabled: Optional[bool] = None,
+        ) -> None:
+            policy_calls.append(
+                (language_to_provider_mapping, automatic_translation_is_enabled)
+            )
 
         policy_swap = self.swap(
             machine_translation_services,
