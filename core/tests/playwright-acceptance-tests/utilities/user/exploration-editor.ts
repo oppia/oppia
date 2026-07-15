@@ -1025,6 +1025,9 @@ export class ExplorationEditor extends BaseUser {
       const savePath = path.join(downloadDir, suggestedFilename);
       await download.saveAs(savePath);
 
+      // Close the dropdown to prevent it from blocking other elements.
+      await this.page.keyboard.press('Escape');
+
       showMessage(`${suggestedFilename} file is successfully downloaded`);
       return;
     }
