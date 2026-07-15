@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "ओपिया ब्लॉग | ओपिया",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "ओपिया ब्लॉग में आपका स्वागत है!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "खोज परिणाम दिखा रहे हैं",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "कुल खोज परिणामों का <[startingNumber]> - <[endingNumber]> प्रदर्शित करना।",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "<[startingNumber]> - <[endingNumber]> में से <[totalNumber]> पोस्ट प्रदर्शित हो रही हैं।",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "थंबनेल छवि जोड़ें",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "मुख्यभाग",

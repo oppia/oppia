@@ -27,7 +27,7 @@
         <div *ngIf="activeRuleIndex === index">
           <div class="oppia-editor-card-section">
             <div class="oppia-rule-body-container">
-              <oppia-rule-editor [(rule)]="rule" [isEditable]="isEditable" [isEditingRuleInline]="true" (onCancelRuleEdit)="cancelActiveRuleEdit()" (onSaveRule)="saveRules()" class="e2e-test-answer-body">
+              <oppia-rule-editor [(rule)]="rules[index]" [isEditable]="isEditable" [isEditingRuleInline]="true" (onCancelRuleEdit)="cancelActiveRuleEdit()" (onSaveRule)="saveRules()" class="e2e-test-answer-body">
               </oppia-rule-editor>
             </div>
           </div>

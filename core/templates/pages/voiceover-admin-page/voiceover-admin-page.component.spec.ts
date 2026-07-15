@@ -37,6 +37,15 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MatTableModule} from '@angular/material/table';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    EnableBackgroundVoiceoverSynthesis: {
+      isEnabled: true,
+    },
+  };
+}
 
 class MockNgbModal {
   open() {
@@ -52,6 +61,7 @@ describe('Voiceover Admin Page component ', () => {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let ngbModal: NgbModal;
   let languageUtilService: LanguageUtilService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -70,6 +80,10 @@ describe('Voiceover Admin Page component ', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -108,7 +122,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
     ).not.toHaveBeenCalled();
-    expect(component.pageIsInitialized).toBeFalse();
+    expect(component.pageIsInitialized).toBeFalsy();
 
     component.ngOnInit();
     tick();
@@ -121,7 +135,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
       'Hindi (India)': 'hi-IN',
     });
-    expect(component.pageIsInitialized).toBeTrue();
+    expect(component.pageIsInitialized).toBeTruthy();
   }));
 
   it('should be able to add language accent pair', fakeAsync(() => {
@@ -239,24 +253,24 @@ describe('Voiceover Admin Page component ', () => {
     component.languageAccentDropdownIsShown = false;
     component.showLanguageAccentDropdown();
 
-    expect(component.languageAccentDropdownIsShown).toBeTrue();
+    expect(component.languageAccentDropdownIsShown).toBeTruthy();
   });
 
   it('should be able to remove language accent dropdown', () => {
     component.languageAccentDropdownIsShown = true;
     component.removeLanguageAccentDropdown();
 
-    expect(component.languageAccentDropdownIsShown).toBeFalse();
+    expect(component.languageAccentDropdownIsShown).toBeFalsy();
   });
 
   it('should check whether given language accent supports cloud auto regeneration', () => {
     component.cloudSupportedLanguageAccentCodes = ['en-US', 'hi-IN'];
     expect(
       component.isAutogenerationSupportedByCloudService('en-US')
-    ).toBeTrue();
+    ).toBeTruthy();
     expect(
       component.isAutogenerationSupportedByCloudService('en-IN')
-    ).toBeFalse();
+    ).toBeFalsy();
   });
 
   it('should be able to update cloud supported language accent codes', fakeAsync(() => {
@@ -308,6 +322,8 @@ describe('Voiceover Admin Page component ', () => {
         'hi-IN': true,
       },
     });
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should not update cloud supported language accent codes when modal is cancelled', () => {
@@ -365,7 +381,7 @@ describe('Voiceover Admin Page component ', () => {
 
     let cloudTaskRun = [
       CloudTaskRun.createFromBackendDict({
-        id: '123',
+        task_run_id: 'task_1',
         cloud_task_name: 'Test Task',
         latest_job_state: 'RUNNING',
         function_id: 'function_456',
@@ -501,9 +517,16 @@ describe('Voiceover Admin Page component ', () => {
 
     const functionId3 =
       'regenerate_voiceovers_of_exploration_for_given_language_accent';
-    const expectedText3 =
-      'Voiceover regeneration for the exploration in the chosen language accent';
+    const expectedText3 = 'Regeneration from voiceover admin page';
     expect(component.getFunctionIdText(functionId3)).toBe(expectedText3);
+
+    const functionId4 = 'regenerate_voiceovers_for_batch_contents';
+    const expectedText4 = 'Batch regeneration details';
+    expect(component.getFunctionIdText(functionId4)).toBe(expectedText4);
+
+    const functionId5 = 'regenerate_voiceovers_after_accepting_suggestion';
+    const expectedText5 = 'Regeneration after accepting translation';
+    expect(component.getFunctionIdText(functionId5)).toBe(expectedText5);
 
     expect(component.getFunctionIdText('unknown_function_id')).toBe('');
   });
