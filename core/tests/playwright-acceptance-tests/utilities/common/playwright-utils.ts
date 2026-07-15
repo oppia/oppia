@@ -812,6 +812,15 @@ export class BaseUser {
       timeout,
     });
 
+    // Block pencilcode.net: ExplorationEditorPageComponent.ngOnInit() eagerly
+    // loads pencilcodeembed.js on every editor page load, regardless of whether
+    // the exploration uses that interaction. This is a live third-party request
+    // that can hang indefinitely under CI network flakiness, which blocks
+    // networkidle from ever resolving. Aborting it here
+    // is safe — the app already handles load failure gracefully with no
+    // callback depending on success.
+    await this.page.route('https://pencilcode.net/**', route => route.abort());
+
     if (useSelector) {
       await this.waitForElementToStabilize(selector);
       await this.clickOnElementWithSelector(selector);
