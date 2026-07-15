@@ -117,7 +117,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertEqual(report.source, feconf.SOURCE_APP)
         self.assertEqual(
             report.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+            feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
         )
         self.assertIsNone(report.category)
         self.assertIsNone(report.lesson_metadata)
@@ -243,7 +243,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             report.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+            feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
         )
 
     def test_update_platform_feedback_status_for_dashboard_rejects_creator_dashboard_for_technical_feedback(
@@ -340,7 +340,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                 report_id=report.id,
                 new_status=feconf.STATUS_CHOICES_FIXED,
                 dashboard=feconf.DESTINATION_TECHNICAL,
-                dashboard_id=feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+                dashboard_id=feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
             )
 
     def test_get_platform_feedback_returns_domain_object(self) -> None:
@@ -441,7 +441,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
                 dashboard=feconf.DESTINATION_TECHNICAL,
-                dashboard_id=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                dashboard_id=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
             )
         )
 
@@ -623,7 +623,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             report_id=report.id,
             new_status=feconf.STATUS_CHOICES_FIXED,
             dashboard=feconf.DESTINATION_TECHNICAL,
-            dashboard_id=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+            dashboard_id=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
         )
 
         self.assertIsNotNone(updated_report)

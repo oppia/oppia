@@ -157,7 +157,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             report_message='The card image is broken.',
             source=source,
             platform='web',
-            destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+            destination_dashboard=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
             status='open',
             category=category,
             lesson_metadata=lesson_metadata,
@@ -522,7 +522,9 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.login_context(self.TECH_LEAD_EMAIL):
-            response = self.get_json('/platform-feedback/technical/LEAP')
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external'
+            )
 
         self.assertEqual(len(response['summaries']), 1)
         self.assertEqual(response['summaries'][0]['id'], report.id)

@@ -319,14 +319,17 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
             )
         )
 
-        # Lesson report → category broken_layout_or_image → technical dashboard(LEAP).
+        # Lesson report → category broken_layout_or_image → technical external
+        # dashboard.
         self.report_id_broken = (
             general_feedback_models.PlatformFeedbackModel.create(
                 feedback_text='Image on step 3 fails to load.',
                 source=feconf.SOURCE_LESSON,
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
-                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                destination_dashboard=(
+                    feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+                ),
                 lesson_metadata_json=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename='step3.png',
@@ -342,7 +345,9 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 source=feconf.SOURCE_APP,
                 platform=feconf.PLATFORM_ANDROID,
                 category=None,
-                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                destination_dashboard=(
+                    feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+                ),
                 lesson_metadata_json=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
@@ -469,7 +474,9 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 source=feconf.SOURCE_APP,
                 platform=feconf.PLATFORM_ANDROID,
                 category=feconf.CATEGORY_TYPO,
-                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                destination_dashboard=(
+                    feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+                ),
                 lesson_metadata_json=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
@@ -488,7 +495,9 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 source=feconf.SOURCE_APP,
                 platform=feconf.PLATFORM_ANDROID,
                 category=None,
-                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                destination_dashboard=(
+                    feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+                ),
                 lesson_metadata_json=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename=None,
@@ -544,7 +553,9 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
         report_models, next_cursor, more = (
             general_feedback_models.PlatformFeedbackModel.fetch_page(
                 page_size=10,
-                destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                destination_dashboard=(
+                    feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+                ),
                 platform=feconf.PLATFORM_ANDROID,
                 source=feconf.SOURCE_APP,
             )
@@ -591,7 +602,9 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                     source=feconf.SOURCE_APP,
                     platform=feconf.PLATFORM_WEB,
                     page_url='http://oppia.org/donate',
-                    destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+                    destination_dashboard=(
+                        feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
+                    ),
                     category=None,
                     lesson_metadata_json=None,
                     include_technical_logs=False,

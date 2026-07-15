@@ -143,7 +143,8 @@ def _determine_destination_dashboard(
         category: Optional[str]. The report category; None for site reports.
 
     Returns:
-        str. The destination dashboard ("creator" | "LEAP" | "CORE").
+        str. The destination dashboard ("creator" | "tech-external" |
+        "tech-internal").
     """
     if category in feconf.CREATOR_DASHBOARD_CATEGORIES:
         return feconf.DESTINATION_CREATOR
@@ -152,10 +153,10 @@ def _determine_destination_dashboard(
         path = parsed_url.path.strip('/')
         first_path_segement = path.split('/', 1)[0]
 
-        if first_path_segement in feconf.LEAP_DASHBOARD_PATHS:
-            return feconf.DESTINATION_TECHNICAL_LEAP_TEAM
+        if first_path_segement in feconf.TECHNICAL_EXTERNAL_DASHBOARD_PATHS:
+            return feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
         else:
-            return feconf.DESTINATION_TECHNICAL_CORE_TEAM
+            return feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM
 
 
 def validate_platform_feedback_belongs_to_dashboard(
@@ -171,7 +172,7 @@ def validate_platform_feedback_belongs_to_dashboard(
             accessed. This is either "creator" or "technical".
         dashboard_id: str. The dashboard-specific identifier. This is the
             exploration ID for the Creator Dashboard and the team identifier
-            ('LEAP' or 'CORE') for the Technical Dashboard.
+            ("tech-external" or "tech-internal") for the Technical Dashboard.
 
     Raises:
         ValueError. The feedback does not belong to the requested dashboard.
@@ -376,7 +377,8 @@ def get_platform_feedback_summaries(
             either "creator" or "technical".
         dashboard_id: str. Identifier associated with the requested dashboard.
             This is an exploration ID for creator dashboards and a technical
-            team ("LEAP" or "CORE") for technical dashboards.
+            team ("tech-external" or "tech-internal") for technical
+            dashboards.
         status_filter: Optional[str]. If provided, only return reports with
             this status. Otherwise, open status reports are shown.
         cursor: Optional[str]. Pagination cursor from a previous response.
