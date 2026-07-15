@@ -31,6 +31,7 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
   availableCertificateOfferings: AvailableCertificateAssessmentOfferingData[] =
     [];
   isLoading = true;
+  hasError = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -51,6 +52,7 @@ export class AvailableCertificateOfferingPageComponent implements OnInit {
         first.title.localeCompare(second.title)
       );
     } catch {
+      this.hasError = true;
       this.alertsService.addWarning(
         'Failed to load certificate assessment offerings.'
       );

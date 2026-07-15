@@ -17,7 +17,10 @@
     <p *ngIf="isLoading" class="oppia-certificate-offering-available-page-empty-state">
       Loading certificates...
     </p>
-    <p *ngIf="!isLoading && availableCertificateOfferings.length === 0"
+    <p *ngIf="!isLoading && hasError" class="oppia-certificate-offering-available-page-empty-state">
+      Failed to load certificate assessment offerings.
+    </p>
+    <p *ngIf="!isLoading && !hasError && availableCertificateOfferings.length === 0"
        class="oppia-certificate-offering-available-page-empty-state">
       No certificates available yet.
     </p>

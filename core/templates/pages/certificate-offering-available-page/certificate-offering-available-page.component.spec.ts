@@ -79,7 +79,7 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const tiles = Array.from(
+    const tiles: HTMLElement[] = Array.from(
       fixture.nativeElement.querySelectorAll(
         '.oppia-certificate-offering-available-page-tile'
       )
@@ -93,6 +93,7 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       'Arithmetic'
     );
     expect(tiles[1].querySelector('h3')?.textContent?.trim()).toBe('Zoology');
+    expect(component.hasError).toBe(false);
     expect(fixture.nativeElement.textContent).not.toContain(
       'No certificates available yet.'
     );
@@ -110,6 +111,7 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     expect(fixture.nativeElement.textContent).toContain(
       'No certificates available yet.'
     );
+    expect(component.hasError).toBe(false);
     expect(alertsService.addWarning).not.toHaveBeenCalled();
   });
 
@@ -125,7 +127,14 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Failed to load certificate assessment offerings.'
     );
-    expect(component.isLoading).toBeFalse();
+    expect(component.isLoading).toBe(false);
+    expect(component.hasError).toBe(true);
     expect(component.availableCertificateOfferings).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain(
+      'Failed to load certificate assessment offerings.'
+    );
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'No certificates available yet.'
+    );
   });
 });
