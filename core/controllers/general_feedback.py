@@ -210,11 +210,6 @@ class PlatformFeedbackSubmitHandler(
             'page_url': {
                 'schema': {
                     'type': 'basestring',
-                    'post_normalizers': [
-                        {
-                            'id': 'sanitize_url',
-                        }
-                    ],
                 }
             },
             'captcha_token': {

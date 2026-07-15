@@ -19,6 +19,7 @@ import {Component} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {AppConstants} from 'app.constants';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {
   FeedbackCardConfig,
   FeedbackFilterConfig,
@@ -40,9 +41,10 @@ import './technical-feedback-dashboard-page.component.css';
 })
 export class TechnicalFeedbackDashboardPageComponent {
   constructor(
-    private feedbackBackendApiService: FeedbackBackendApiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private feedbackBackendApiService: FeedbackBackendApiService
   ) {}
   readonly filterConfig: FeedbackFilterConfig =
     TECHNICAL_DASHBOARD_FILTER_CONFIG;
@@ -57,6 +59,7 @@ export class TechnicalFeedbackDashboardPageComponent {
   cursorHistory: (string | null)[] = [null];
   moreFeedbackAvailable: boolean = false;
   feedbackDetailResponse: PlatformFeedbackDetailResponse | null = null;
+  screenshotDataUrl: string | null = null;
 
   currentFilterState: FeedbackFilterState = {
     searchText: '',
@@ -88,6 +91,19 @@ export class TechnicalFeedbackDashboardPageComponent {
     );
   }
 
+  private loadScreenshot(): void {
+    const response = this.feedbackDetailResponse;
+    if (!response?.screenshot_entity_id || !response?.screenshot_filename) {
+      return;
+    }
+
+    this.screenshotDataUrl = this.assetsBackendApiService.getImageUrlForPreview(
+      AppConstants.ENTITY_TYPE.FEEDBACK,
+      response.screenshot_entity_id,
+      response.screenshot_filename
+    );
+  }
+
   private loadFeedbackDetails(
     team: TechnicalTeamType,
     feedbackId: string
@@ -96,6 +112,7 @@ export class TechnicalFeedbackDashboardPageComponent {
       .fetchPlatformFeedbackDetailAsync('technical', team, feedbackId)
       .then(response => {
         this.feedbackDetailResponse = response;
+        this.loadScreenshot();
       });
   }
 

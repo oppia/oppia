@@ -23,7 +23,17 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import {PlatformFeedbackDetailResponse} from 'domain/feedback/feedback.model';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {
+  CATEGORY_LABELS,
+  FEEDBACK_STATUS_LABELS,
+  FeedbackCardConfig,
+  FeedbackSessionInfo,
+  FeedbackStatus,
+  PlatformFeedbackDetailResponse,
+  SOURCE_LABELS,
+  TECHNICAL_TEAM_LABELS,
+} from 'domain/feedback/feedback.model';
 import './feedback-detail-page.component.css';
 @Component({
   selector: 'oppia-feedback-detail-page',
@@ -32,7 +42,57 @@ import './feedback-detail-page.component.css';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackDetailPageComponent {
-  constructor() {}
+  constructor(private dateTimeFormatService: DateTimeFormatService) {}
   @Input() feedbackDetailResponse!: PlatformFeedbackDetailResponse;
+  @Input() feedbackDetailPageConfig!: FeedbackCardConfig;
+  @Input() screenshotDataUrl: string | null = null;
   @Output() goBack = new EventEmitter<void>();
+  @Output() statusChange = new EventEmitter<FeedbackStatus>();
+
+  readonly categoryLabels = CATEGORY_LABELS;
+  readonly statusLabels = FEEDBACK_STATUS_LABELS;
+  readonly sourceLabels = SOURCE_LABELS;
+  readonly teamLabels = TECHNICAL_TEAM_LABELS;
+  readonly statusOptions = Object.values(FeedbackStatus);
+
+  replyText: string = '';
+  isSendingReply: boolean = false;
+
+  getPlatformLabel(platform: string): string {
+    return platform === 'web' ? 'Web' : 'Android';
+  }
+
+  formatDate(timestamp: number): string {
+    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+      timestamp
+    );
+  }
+
+  getReportedLessonUrl(): string | null {
+    const metadata = this.feedbackDetailResponse?.lesson_metadata;
+    if (!metadata) {
+      return null;
+    }
+    return (
+      `/explore/${encodeURIComponent(metadata.exploration_id)}` +
+      `?v=${metadata.exploration_version}`
+    );
+  }
+
+  getReportedStateEditorUrl(): string | null {
+    const metadata = this.feedbackDetailResponse?.lesson_metadata;
+    if (!metadata) {
+      return null;
+    }
+
+    return (
+      `/create/${encodeURIComponent(metadata.exploration_id)}` +
+      `#/gui/${encodeURIComponent(metadata.state_name)}`
+    );
+  }
+
+  get sessionInfo(): FeedbackSessionInfo | null {
+    console.log(this.feedbackDetailResponse.session_info);
+    return this.feedbackDetailResponse?.session_info ?? null;
+  }
 }
