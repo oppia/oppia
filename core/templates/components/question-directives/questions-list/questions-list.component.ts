@@ -78,6 +78,7 @@ interface GroupedSkillSummaries {
 @Component({
   selector: 'oppia-questions-list',
   templateUrl: './questions-list.component.html',
+  styleUrls: ['./questions-list.component.css'],
 })
 export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() allSkillSummaries!: ShortSkillSummary[];

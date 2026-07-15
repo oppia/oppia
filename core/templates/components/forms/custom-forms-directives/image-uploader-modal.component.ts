@@ -35,6 +35,7 @@ require('cropperjs/dist/cropper.min.css');
 @Component({
   selector: 'oppia-image-uploader-modal',
   templateUrl: './image-uploader-modal.component.html',
+  styleUrls: ['./image-uploader-modal.component.css'],
 })
 export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() imageUploaderParameters!: ImageUploaderParameters;

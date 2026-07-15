@@ -39,6 +39,7 @@ interface ImageTypeMapping {
 @Component({
   selector: 'oppia-image-receiver',
   templateUrl: './image-receiver.component.html',
+  styleUrls: ['./image-receiver.component.css'],
 })
 export class ImageReceiverComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();

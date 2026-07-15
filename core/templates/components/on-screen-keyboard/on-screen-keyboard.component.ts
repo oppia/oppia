@@ -26,6 +26,7 @@ import {GuppyInitializationService} from 'services/guppy-initialization.service'
 @Component({
   selector: 'oppia-on-screen-keyboard',
   templateUrl: './on-screen-keyboard.component.html',
+  styleUrls: ['./on-screen-keyboard.component.css'],
 })
 export class OnScreenKeyboardComponent {
   // These properties are initialized using Angular lifecycle hooks

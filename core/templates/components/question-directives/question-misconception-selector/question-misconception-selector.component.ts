@@ -33,6 +33,7 @@ interface UpdatedValues {
 @Component({
   selector: 'oppia-question-misconception-selector',
   templateUrl: './question-misconception-selector.component.html',
+  styleUrls: ['./question-misconception-selector.component.css'],
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Output() updateMisconceptionValues: EventEmitter<UpdatedValues> =

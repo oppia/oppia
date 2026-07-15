@@ -39,6 +39,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 @Component({
   selector: 'schema-based-list-editor',
   templateUrl: './schema-based-list-editor.component.html',
+  styleUrls: ['./schema-based-list-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

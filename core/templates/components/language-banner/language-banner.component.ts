@@ -25,6 +25,7 @@ import {Router} from '@angular/router';
 @Component({
   selector: 'language-banner',
   templateUrl: './language-banner.component.html',
+  styleUrls: ['./language-banner.component.css'],
 })
 export class LanguageBannerComponent implements OnInit {
   bannerIsVisible: boolean = false;

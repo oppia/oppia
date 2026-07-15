@@ -45,6 +45,7 @@ export interface Outcome {
 @Component({
   selector: 'oppia-question-misconception-editor',
   templateUrl: './question-misconception-editor.component.html',
+  styleUrls: ['./question-misconception-editor.component.css'],
 })
 export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() saveAnswerGroupFeedback: EventEmitter<Outcome> = new EventEmitter();

@@ -28,6 +28,7 @@ type SkillLabelToFloatKey =
 @Component({
   selector: 'oppia-question-difficulty-selector',
   templateUrl: './question-difficulty-selector.component.html',
+  styleUrls: ['./question-difficulty-selector.component.css'],
 })
 export class QuestionDifficultySelectorComponent {
   // These properties are initialized using Angular lifecycle hooks

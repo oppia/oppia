@@ -42,6 +42,7 @@ import {
 @Component({
   selector: 'schema-based-custom-editor',
   templateUrl: './schema-based-custom-editor.component.html',
+  styleUrls: ['./schema-based-custom-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

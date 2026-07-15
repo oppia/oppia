@@ -53,6 +53,7 @@ interface SkillDescriptionStatusValuesInterface {
 @Component({
   selector: 'oppia-rubrics-editor',
   templateUrl: './rubrics-editor.component.html',
+  styleUrls: ['./rubrics-editor.component.css'],
 })
 export class RubricsEditorComponent {
   @Output() saveRubric: EventEmitter<RubricData> = new EventEmitter();

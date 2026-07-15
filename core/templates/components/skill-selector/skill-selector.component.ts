@@ -32,6 +32,7 @@ interface SubTopicFilterDict {
 @Component({
   selector: 'oppia-skill-selector',
   templateUrl: './skill-selector.component.html',
+  styleUrls: ['./skill-selector.component.css'],
 })
 export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
