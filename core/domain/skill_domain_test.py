@@ -391,6 +391,57 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.skill.superseding_skill_id, '1')
         self.assertEqual(self.skill.all_questions_merged, True)
 
+    def test_get_translatable_contents_collection(self) -> None:
+        translatable_contents = (
+            self.skill.get_translatable_contents_collection()
+        )
+        self.assertEqual(
+            len(translatable_contents.content_id_to_translatable_content), 2
+        )
+
+        explanation_content_id = (
+            self.skill.skill_contents.explanation.content_id
+        )
+        explanation_content = (
+            translatable_contents.content_id_to_translatable_content[
+                explanation_content_id
+            ]
+        )
+        self.assertEqual(
+            explanation_content.content_value, '<p>Explanation</p>'
+        )
+        self.assertEqual(
+            explanation_content.content_type,
+            translation_domain.ContentType.CONTENT,
+        )
+        self.assertEqual(
+            explanation_content.content_format,
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+
+        feedback_content = (
+            translatable_contents.content_id_to_translatable_content[
+                'feedback_0'
+            ]
+        )
+        self.assertEqual(
+            feedback_content.content_value, '<p>default_feedback</p>'
+        )
+        self.assertEqual(
+            feedback_content.content_type,
+            translation_domain.ContentType.FEEDBACK,
+        )
+        self.assertEqual(
+            feedback_content.content_format,
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+
+        self.assertEqual(self.skill.get_content_count(), 2)
+        self.assertItemsEqual(
+            self.skill.get_translatable_content_ids(),
+            [explanation_content_id, 'feedback_0'],
+        )
+
     def test_valid_misconception_must_be_addressed(self) -> None:
         self.skill.validate()
         must_be_addressed = 'False'
