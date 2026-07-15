@@ -127,7 +127,7 @@ describe('Misconception Editor Component', () => {
     let updateNameSpy = spyOn(
       skillUpdateService,
       'updateMisconceptionName'
-    ).and.stub();
+    ).and.returnValue();
     component.openNameEditor();
     // Setting new name.
     component.container.misconceptionName = 'newName';
@@ -141,7 +141,7 @@ describe('Misconception Editor Component', () => {
     let updateNotesSpy = spyOn(
       skillUpdateService,
       'updateMisconceptionNotes'
-    ).and.stub();
+    ).and.returnValue();
     component.openNotesEditor();
     // Setting new notes content.
     component.container.misconceptionNotes = 'newNotes';
@@ -155,7 +155,7 @@ describe('Misconception Editor Component', () => {
     let updateFeedbackSpy = spyOn(
       skillUpdateService,
       'updateMisconceptionFeedback'
-    ).and.stub();
+    ).and.returnValue();
     component.openFeedbackEditor();
     // Setting new feedback content.
     component.container.misconceptionFeedback = 'newFeedback';
@@ -210,7 +210,7 @@ describe('Misconception Editor Component', () => {
     let updatesSpy = spyOn(
       skillUpdateService,
       'updateMisconceptionMustBeAddressed'
-    ).and.stub();
+    ).and.returnValue();
     spyOn(component.onMisconceptionChange, 'emit').and.callThrough();
 
     component.updateMustBeAddressed();

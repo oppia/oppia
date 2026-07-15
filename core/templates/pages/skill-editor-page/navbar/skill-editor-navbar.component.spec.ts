@@ -321,8 +321,11 @@ describe('Skill Editor Navbar Component', () => {
   );
 
   it('should discard changes when calling ' + "'discardChanges'", () => {
-    let discardSpy = spyOn(undoRedoService, 'clearChanges').and.stub();
-    let loadSkillSpy = spyOn(skillEditorStateService, 'loadSkill').and.stub();
+    let discardSpy = spyOn(undoRedoService, 'clearChanges').and.returnValue();
+    let loadSkillSpy = spyOn(
+      skillEditorStateService,
+      'loadSkill'
+    ).and.returnValue();
     let urlSpy = spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('');
 
     component.ngOnInit();
@@ -384,7 +387,7 @@ describe('Skill Editor Navbar Component', () => {
     let navigateToMainTabSpy = spyOn(
       skillEditorRoutingService,
       'navigateToMainTab'
-    ).and.stub();
+    ).and.returnValue();
 
     component.selectMainTab();
 
@@ -395,7 +398,7 @@ describe('Skill Editor Navbar Component', () => {
     let navigateToPreviewTabSpy = spyOn(
       skillEditorRoutingService,
       'navigateToPreviewTab'
-    ).and.stub();
+    ).and.returnValue();
 
     component.selectPreviewTab();
 
@@ -475,7 +478,7 @@ describe('Skill Editor Navbar Component', () => {
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'
-        ).and.stub();
+        ).and.returnValue();
 
         component.selectQuestionsTab();
         tick();
@@ -499,7 +502,7 @@ describe('Skill Editor Navbar Component', () => {
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'
-        ).and.stub();
+        ).and.returnValue();
 
         component.selectQuestionsTab();
         tick();
@@ -517,7 +520,7 @@ describe('Skill Editor Navbar Component', () => {
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'
-        ).and.stub();
+        ).and.returnValue();
 
         component.selectQuestionsTab();
 
