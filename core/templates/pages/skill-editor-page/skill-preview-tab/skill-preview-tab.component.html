@@ -7,7 +7,8 @@
           <div><span class="heading-secondary">Questions</span></div>
           <div *ngIf="questionsFetched">
             <div class="question-filters">
-              <input type="text" class="e2e-test-question-text-input" [(ngModel)]="questionTextFilter"
+              <label for="questionTextFilter">Filter by question text</label>
+              <input id="questionTextFilter" type="text" class="e2e-test-question-text-input" [(ngModel)]="questionTextFilter"
                      (change)="applyFilters()">
               <select [(ngModel)]="interactionFilter" class="form-select" (change)="applyFilters()">
                 <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">
@@ -47,12 +48,14 @@
             [pageSize]="QUESTION_COUNT" [rotate]="true" (pageChange)="onPageChange($event)" class="ms-auto me-auto">
             <ng-template ngbPaginationPrevious>
               <i class="fa fa-angle-left text-center w-100" aria-hidden="true"></i>
+              <span class="visually-hidden">Previous</span>
             </ng-template>
             <ng-template ngbPaginationNumber let-p>
-              <button class="pagination-button">{{ p }}</button>
+              <button type="button" class="pagination-button">{{ p }}</button>
             </ng-template>
             <ng-template ngbPaginationNext>
               <i class="fa fa-angle-right text-center w-100" aria-hidden="true"></i>
+              <span class="visually-hidden">Next</span>
             </ng-template>
           </ngb-pagination>
         </div>
@@ -267,10 +270,12 @@
 
   /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
   ::ng-deep .question-pagination-box ngb-pagination .page-item .pagination-button {
+    align-items: center;
     background: none;
     border: none;
     border-radius: 100%;
     color: #333;
+    display: flex;
     font-size: 22px;
     font-weight: bold;
     height: 100%;

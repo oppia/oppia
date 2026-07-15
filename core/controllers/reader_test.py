@@ -486,8 +486,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
     def test_paginated_fetch_returns_all_questions_across_pages(
         self,
     ) -> None:
-        # The setUp method already links 2 questions to self.skill_id. Add a 3rd so
-        # a page size of 2 forces a second page.
+        # The setUp method already links 2 questions to self.skill_id. Add a
+        # 3rd so a page size of 2 forces a second page.
         content_id_generator = translation_domain.ContentIdGenerator()
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(

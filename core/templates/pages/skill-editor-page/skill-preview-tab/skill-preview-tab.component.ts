@@ -135,7 +135,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         this.questionsFetched = true;
         this.questionDicts = response.questionDicts;
         this.applyFilters();
-        if (this.questionDicts.length) {
+        if (this.displayedQuestions.length) {
           this.selectQuestionToPreview(0);
         }
       });

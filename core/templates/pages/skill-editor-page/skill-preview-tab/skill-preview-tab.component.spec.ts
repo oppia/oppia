@@ -22,10 +22,12 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
+  tick,
   waitForAsync,
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {QuestionBackendDict} from 'domain/question/question.model';
 import {InteractionRulesService} from '../../../pages/exploration-player-page/services/answer-classification.service';
@@ -146,6 +148,7 @@ describe('Skill Preview Tab Component', () => {
   let skillEditorStateService: SkillEditorStateService;
   let currentInteractionService: CurrentInteractionService;
   let conversationFlowService: ConversationFlowService;
+  let questionBackendApiService: QuestionBackendApiService;
   let mockOnSkillChangeEmitter = new EventEmitter();
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
@@ -171,7 +174,7 @@ describe('Skill Preview Tab Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [SkillPreviewTabComponent],
+      declarations: [SkillPreviewTabComponent, MockTranslatePipe],
       providers: [
         SkillEditorStateService,
         UrlService,
@@ -239,6 +242,7 @@ describe('Skill Preview Tab Component', () => {
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionPlayerEngineService =
@@ -382,4 +386,145 @@ describe('Skill Preview Tab Component', () => {
 
     expect(component.questionsFetched).toBe(false);
   }));
+
+  describe('when loading paginated questions', () => {
+    it(
+      'should fetch total question count and load page 1 via ' +
+        'loadTotalQuestionCountAndPage',
+      fakeAsync(() => {
+        spyOn(
+          questionBackendApiService,
+          'fetchTotalQuestionCountForSkillIdsAsync'
+        ).and.returnValue(Promise.resolve(21));
+        spyOn(component, 'loadPage').and.callThrough();
+
+        component.loadTotalQuestionCountAndPage();
+        tick();
+
+        expect(
+          questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync
+        ).toHaveBeenCalledWith([component.skillId]);
+        expect(component.totalQuestionCount).toBe(21);
+        expect(component.loadPage).toHaveBeenCalledWith(component.page);
+      })
+    );
+
+    it('should compute the correct offset for a given page in loadPage', fakeAsync(() => {
+      spyOn(
+        questionBackendApiService,
+        'fetchQuestionsForSkillPreviewPageAsync'
+      ).and.returnValue(
+        Promise.resolve({questionDicts: [questionDict1], more: false})
+      );
+      spyOn(component, 'selectQuestionToPreview').and.stub();
+
+      component.QUESTION_COUNT = 20;
+      component.loadPage(3);
+      tick();
+
+      expect(
+        questionBackendApiService.fetchQuestionsForSkillPreviewPageAsync
+      ).toHaveBeenCalledWith(component.skillId, 20, 40);
+    }));
+
+    it(
+      'should toggle questionsFetched, assign questionDicts, apply ' +
+        'filters, and select the first question when loadPage resolves ' +
+        'with results',
+      fakeAsync(() => {
+        spyOn(
+          questionBackendApiService,
+          'fetchQuestionsForSkillPreviewPageAsync'
+        ).and.returnValue(
+          Promise.resolve({
+            questionDicts: [questionDict1, questionDict2],
+            more: true,
+          })
+        );
+        spyOn(component, 'applyFilters').and.callThrough();
+        spyOn(component, 'selectQuestionToPreview').and.stub();
+
+        component.loadPage(1);
+        expect(component.questionsFetched).toBe(false);
+        tick();
+
+        expect(component.questionsFetched).toBe(true);
+        expect(component.questionDicts).toEqual([questionDict1, questionDict2]);
+        expect(component.applyFilters).toHaveBeenCalled();
+        expect(component.selectQuestionToPreview).toHaveBeenCalledWith(0);
+      })
+    );
+
+    it(
+      'should not attempt to select a question when loadPage resolves ' +
+        'with no questions',
+      fakeAsync(() => {
+        spyOn(
+          questionBackendApiService,
+          'fetchQuestionsForSkillPreviewPageAsync'
+        ).and.returnValue(Promise.resolve({questionDicts: [], more: false}));
+        spyOn(component, 'selectQuestionToPreview').and.stub();
+
+        component.loadPage(1);
+        tick();
+
+        expect(component.questionDicts).toEqual([]);
+        expect(component.selectQuestionToPreview).not.toHaveBeenCalled();
+      })
+    );
+
+    it('should update the current page and load it in onPageChange', fakeAsync(() => {
+      spyOn(component, 'loadPage').and.stub();
+
+      component.onPageChange(3);
+
+      expect(component.page).toBe(3);
+      expect(component.loadPage).toHaveBeenCalledWith(3);
+    }));
+  });
+
+  describe('firstQuestionOnPageNum getter', () => {
+    it('should return 0 when there are no questions', () => {
+      component.totalQuestionCount = 0;
+      component.page = 1;
+
+      expect(component.firstQuestionOnPageNum).toBe(0);
+    });
+
+    it('should return the correct first question number for a given page', () => {
+      component.QUESTION_COUNT = 20;
+      component.totalQuestionCount = 45;
+
+      component.page = 1;
+      expect(component.firstQuestionOnPageNum).toBe(1);
+
+      component.page = 2;
+      expect(component.firstQuestionOnPageNum).toBe(21);
+
+      component.page = 3;
+      expect(component.firstQuestionOnPageNum).toBe(41);
+    });
+  });
+
+  describe('lastQuestionOnPageNum getter', () => {
+    it('should return a full page size when the page is not the last one', () => {
+      component.QUESTION_COUNT = 20;
+      component.totalQuestionCount = 45;
+      component.page = 1;
+
+      expect(component.lastQuestionOnPageNum).toBe(20);
+    });
+
+    it(
+      'should be capped at totalQuestionCount on the final, partially ' +
+        'filled page',
+      () => {
+        component.QUESTION_COUNT = 20;
+        component.totalQuestionCount = 45;
+        component.page = 3;
+
+        expect(component.lastQuestionOnPageNum).toBe(45);
+      }
+    );
+  });
 });

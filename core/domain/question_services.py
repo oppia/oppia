@@ -359,7 +359,16 @@ def get_paginated_questions_by_skill_id(
         Tuple(list(Question), bool). The list of questions for this page
         (at most question_count of them), and a boolean indicating whether
         more questions are available beyond this page.
+
+    Raises:
+        Exception. Question count is higher than the maximum limit.
     """
+    if question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
+        raise Exception(
+            'Question count is too high, please limit the question count to '
+            '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME
+        )
+
     question_skill_link_models = question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids(
         # Fetch one extra so we can tell whether there's a next page,
         # without needing a separate count query.
@@ -374,7 +383,7 @@ def get_paginated_questions_by_skill_id(
 
     question_ids = [model.question_id for model in question_skill_link_models]
     questions_with_none = question_fetchers.get_questions_by_ids(question_ids)
-    questions = []
+    questions: List[question_domain.Question] = []
     for question in questions_with_none:
         # Ruling out the possibility of None for mypy type checking.
         assert question is not None
