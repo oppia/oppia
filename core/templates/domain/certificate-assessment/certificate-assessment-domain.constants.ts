@@ -22,6 +22,8 @@ export const CertificateAssessmentDomainConstants = {
     '/certificate_assessment_offering_handler',
   CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL:
     '/certificate_assessment_offering_handler/<certificate_id>',
+  VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
+    '/validate_certificate_assessment_offering_handler',
 } as const;
 
 // Confirmation actions are used by the pre-save modal to represent the user's
@@ -52,3 +54,13 @@ export const CERTIFICATE_OFFERING_SAVE_STATUSES = {
 
 export type CertificateOfferingSaveStatus =
   (typeof CERTIFICATE_OFFERING_SAVE_STATUSES)[keyof typeof CERTIFICATE_OFFERING_SAVE_STATUSES];
+
+// Async statuses are used when persisting the certificate offering payload to
+// match the backend's expected availability state values.
+export const CERTIFICATE_OFFERING_ASYNC_STATUSES = {
+  AVAILABLE: 'Available',
+  NOT_READY: 'Not_Ready',
+} as const;
+
+export type CertificateOfferingAsyncStatus =
+  (typeof CERTIFICATE_OFFERING_ASYNC_STATUSES)[keyof typeof CERTIFICATE_OFFERING_ASYNC_STATUSES];

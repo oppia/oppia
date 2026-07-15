@@ -25,6 +25,11 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
+export interface UiConfig {
+  hide_complex_extensions?: boolean;
+  startupFocusEnabled?: boolean;
+  rte_component_config_id?: string;
+}
 
 @Component({
   selector: 'schema-based-html-editor',
@@ -51,7 +56,7 @@ export class SchemaBasedHtmlEditorComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
-  @Input() uiConfig!: {add_element_text: string};
+  @Input() uiConfig!: UiConfig;
   localValue!: string;
   onChange: (val: string) => void = () => {};
 

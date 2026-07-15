@@ -16,7 +16,7 @@
  * @fileoverview Component for topic-viewer subtopics list.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {
@@ -24,12 +24,11 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 
-import './subtopics-list.component.css';
-
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',
   styleUrls: ['./subtopics-list.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SubtopicsListComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
