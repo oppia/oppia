@@ -163,7 +163,7 @@
               "core/templates/**/*.ts",
               "core/templates/**/*.component.html",
               "extensions/**/*.ts",
-              "extensions/**/*.component.html"
+              "extensions/**/*.html"
             ]
           }
         },

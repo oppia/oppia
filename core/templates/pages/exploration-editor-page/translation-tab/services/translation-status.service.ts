@@ -66,7 +66,6 @@ export class TranslationStatusService implements OnInit {
     private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
-  // eslint-disable-next-line @angular-eslint/contextual-lifecycle
   ngOnInit(): void {
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.stateNeedsUpdateWarnings = {};

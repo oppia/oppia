@@ -188,7 +188,7 @@
       }
     },
     {
-      "files": ["*.component.html"],
+      "files": ["*.component.html", "*.directive.html"],
       "extends": [
         "plugin:@angular-eslint/template/recommended"
       ],
