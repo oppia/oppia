@@ -64,6 +64,7 @@ interface TurnstileWindow extends Window {
 @Component({
   selector: 'oppia-feedback-modal',
   templateUrl: './feedback-modal.component.html',
+  styleUrls: ['feedback-modal.component.css'],
 })
 export class FeedbackModalComponent implements OnInit {
   @Input() feedbackModalType!: FeedbackModalType;
