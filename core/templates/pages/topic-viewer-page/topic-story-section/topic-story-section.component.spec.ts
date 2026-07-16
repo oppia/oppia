@@ -909,15 +909,15 @@ describe('TopicStorySectionComponent', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
 
-    const arcUrl = component.getEndOfArcUrl('arc-1');
-    expect(arcUrl).toContain('fractions/test/arc/arc-1');
+    const arcUrl = component.getEndOfArcUrl('1');
+    expect(arcUrl).toContain('fractions/test/arc/1');
   });
 
   it('should fallback end of arc url when fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = '';
 
-    const arcUrl = component.getEndOfArcUrl('arc-1');
+    const arcUrl = component.getEndOfArcUrl('1');
     expect(arcUrl).toBe('#');
   });
 });

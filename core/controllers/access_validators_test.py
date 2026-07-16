@@ -467,7 +467,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'arc-abc',
+                'abc',
             ),
             expected_status_int=404,
         )
@@ -479,7 +479,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'arc-0',
+                '0',
             ),
             expected_status_int=404,
         )
@@ -491,7 +491,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'arc-999',
+                '999',
             ),
             expected_status_int=404,
         )
@@ -627,7 +627,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'arc-1',
+                '1',
             ),
             expected_status_int=200,
         )
@@ -704,7 +704,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'arc-1',
+                '1',
             ),
             expected_status_int=200,
         )

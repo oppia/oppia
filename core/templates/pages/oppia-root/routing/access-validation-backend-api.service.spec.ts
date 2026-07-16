@@ -683,12 +683,12 @@ describe('Access validation backend api service', () => {
 
   it('should validate access to end of arc page', fakeAsync(() => {
     avbas
-      .validateAccessToEndOfArcPage('classroom', 'topic', 'arc-1')
+      .validateAccessToEndOfArcPage('classroom', 'topic', '1')
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_practice_session_page/' +
-        'classroom/topic/test/arc/arc-1'
+        'classroom/topic/test/arc/1'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});

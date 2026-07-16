@@ -418,8 +418,8 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve arc id from url', () => {
-    mockLocation.pathname = '/learn/math/fractions/test/arc/arc-1';
-    expect(urlService.getArcIdFromUrl()).toBe('arc-1');
+    mockLocation.pathname = '/learn/math/fractions/test/arc/1';
+    expect(urlService.getArcIdFromUrl()).toBe('1');
 
     mockLocation.pathname = '/learn/math/fractions/practice';
     expect(urlService.getArcIdFromUrl()).toBe('');

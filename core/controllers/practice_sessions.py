@@ -218,22 +218,18 @@ class PracticeSessionsPageDataHandler(
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
-        The arc_id parameter is in the format 'arc-N' where N is a 1-based
-        index that maps to the nth arc across all published stories in the
-        topic.
+        The arc_id parameter is a 1-based index that maps to the nth arc
+        across all published stories in the topic.
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID (e.g., 'arc-1').
+            arc_id: str. The arc index (e.g., '1').
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
         """
-        if not arc_id.startswith('arc-'):
-            return []
-
         try:
-            arc_index = int(arc_id[4:])
+            arc_index = int(arc_id)
         except ValueError:
             return []
 

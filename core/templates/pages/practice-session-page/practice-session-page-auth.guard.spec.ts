@@ -211,7 +211,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      arc_id: 'arc-1',
+      arc_id: '1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -223,7 +223,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', 'arc-1');
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1');
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
