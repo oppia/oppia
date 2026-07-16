@@ -1417,6 +1417,93 @@ describe('SvgEditor with image save destination as local storage', () => {
     expect(addedText.fill).toBe('#000');
   });
 
+  it('should preserve newlines between multiple tspan elements', () => {
+    const mockElement = {
+      childNodes: [
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'Goal'}],
+          style: {fill: '', stroke: '', strokeWidth: ''},
+        },
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'How'}],
+          style: {fill: '', stroke: '', strokeWidth: ''},
+        },
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'to cook'}],
+          style: {fill: '', stroke: '', strokeWidth: ''},
+        },
+      ],
+      getAttribute: (attr: string) => null,
+    } as unknown as Element;
+    const mockObj = {
+      toObject: () => ({
+        left: 50,
+        top: 50,
+        width: 100,
+        text: 'GoalHowto cook',
+      }),
+      get: (attr: string) => null,
+    } as unknown as fabric.Object;
+
+    component.diagramWidth = 450;
+    // This throws "Property 'loadTextObject' is private". We need to
+    // suppress this error because we need to test the private method directly.
+    // @ts-ignore
+    component.loadTextObject(mockElement, mockObj);
+
+    const addedText = component.canvas.getObjects()[
+      component.canvas.getObjects().length - 1
+    ] as fabric.Textbox;
+    expect(addedText.text).toBe('Goal\nHow\nto cook');
+  });
+
+  it('should preserve newlines between tspan elements with fill styles', () => {
+    const mockElement = {
+      childNodes: [
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'Goal'}],
+          style: {fill: 'red', stroke: 'black', strokeWidth: '1'},
+        },
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'Total'}],
+          style: {fill: 'blue', stroke: '', strokeWidth: ''},
+        },
+        {
+          nodeName: 'tspan',
+          childNodes: [{nodeValue: 'Text'}],
+          style: {fill: '', stroke: '', strokeWidth: ''},
+        },
+      ],
+      getAttribute: (attr: string) => null,
+    } as unknown as Element;
+    const mockObj = {
+      toObject: () => ({
+        left: 50,
+        top: 50,
+        width: 100,
+        text: 'GoalTotalText',
+      }),
+      get: (attr: string) => null,
+    } as unknown as fabric.Object;
+
+    component.diagramWidth = 450;
+    // This throws "Property 'loadTextObject' is private". We need to
+    // suppress this error because we need to test the private method directly.
+    // @ts-ignore
+    component.loadTextObject(mockElement, mockObj);
+
+    const addedText = component.canvas.getObjects()[
+      component.canvas.getObjects().length - 1
+    ] as fabric.Textbox;
+    // Colored tspans should still get newlines between them.
+    expect(addedText.text).toBe('Goal\nTotal\nText');
+  });
+
   it('should handle null imageUrl from getTrustedResourceUrlForSvgFileName', () => {
     var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -1435,5 +1522,22 @@ describe('SvgEditor with image save destination as local storage', () => {
     );
     component.setSavedSvgFilename('test.svg', true);
     expect(component.uploadedSvgDataUrl).toBeNull();
+  });
+
+  it('should scale down selection in centerContent only when selection dimensions exceed canvas', () => {
+    spyOn(component.canvas, 'getWidth').and.returnValue(490);
+    spyOn(component.canvas, 'getHeight').and.returnValue(490);
+    const mockRect = new fabric.Rect({
+      width: 600,
+      height: 400,
+    });
+    component.canvas.add(mockRect);
+    spyOn(component.canvas, 'setActiveObject').and.callThrough();
+    spyOn(component.canvas, 'discardActiveObject').and.callThrough();
+
+    component.centerContent();
+
+    // 490 / 600 = 0.81666...
+    expect(mockRect.scaleX).toBeCloseTo(490 / 600, 3);
   });
 });
