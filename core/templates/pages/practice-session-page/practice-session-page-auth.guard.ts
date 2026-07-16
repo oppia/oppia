@@ -50,7 +50,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
     return new Promise<boolean>(resolve => {
       let validationPromise: Promise<void>;
 
-      if (nodeId && nodeId.startsWith('node_')) {
+      if (nodeId) {
         validationPromise =
           this.accessValidationBackendApiService.validateAccessToLessonPracticePage(
             classroomUrlFragment,

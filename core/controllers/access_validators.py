@@ -25,13 +25,14 @@ from core.domain import (
     learner_group_services,
     skill_domain,
     skill_fetchers,
+    story_domain,
     story_fetchers,
     topic_domain,
     topic_fetchers,
     user_services,
 )
 
-from typing import Dict, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
@@ -405,57 +406,117 @@ class PracticeSessionAccessValidationPage(
             if subtopic_id not in subtopics_ids:
                 raise self.NotFoundException
 
+    def _get_all_nodes_for_topic(
+        self, topic: topic_domain.Topic
+    ) -> List[story_domain.StoryNode]:
+        """Returns all nodes across all published stories in the topic.
+
+        Args:
+            topic: Topic. The topic object.
+
+        Returns:
+            list(StoryNode). All nodes in order.
+        """
+        story_ids = topic.get_canonical_story_ids(include_only_published=True)
+        story_ids.extend(
+            topic.get_additional_story_ids(include_only_published=True)
+        )
+        stories = story_fetchers.get_stories_by_ids(story_ids)
+        all_nodes: List[story_domain.StoryNode] = []
+        for story in stories:
+            if story is None:
+                continue
+            all_nodes.extend(story.story_contents.nodes)
+        return all_nodes
+
+    def _get_all_arcs_for_topic(
+        self, topic: topic_domain.Topic
+    ) -> List[story_domain.Arc]:
+        """Returns all arcs across all published stories in the topic.
+
+        Args:
+            topic: Topic. The topic object.
+
+        Returns:
+            list(Arc). All arcs in order.
+        """
+        story_ids = topic.get_canonical_story_ids(include_only_published=True)
+        story_ids.extend(
+            topic.get_additional_story_ids(include_only_published=True)
+        )
+        stories = story_fetchers.get_stories_by_ids(story_ids)
+        all_arcs: List[story_domain.Arc] = []
+        for story in stories:
+            if story is None:
+                continue
+            all_arcs.extend(story.story_contents.arcs)
+        return all_arcs
+
     def _validate_node_id(
         self, topic: topic_domain.Topic, node_id: str
     ) -> None:
         """Validates that the given node ID exists in one of the topic's stories.
 
+        The node_id parameter is a 1-based index that maps to the nth node
+        across all published stories in the topic.
+
         Args:
             topic: Topic. The topic object.
-            node_id: str. The node ID to validate.
+            node_id: str. The node ID (1-based index) to validate.
 
         Raises:
-            NotFoundException. The node ID was not found in any story.
+            NotFoundException. The node ID was not found.
         """
-        story_ids = topic.get_canonical_story_ids(include_only_published=True)
-        story_ids.extend(
-            topic.get_additional_story_ids(include_only_published=True)
-        )
-        stories = story_fetchers.get_stories_by_ids(story_ids)
-        for story in stories:
-            if story is None:
-                continue
-            for node in story.story_contents.nodes:
-                if node.id == node_id:
-                    return
-        raise self.NotFoundException(
-            'Node with id %s is not part of this topic.' % node_id
-        )
+        try:
+            node_index = int(node_id)
+        except ValueError:
+            raise self.NotFoundException(
+                'Invalid node identifier: %s' % node_id
+            )
+
+        if node_index < 1:
+            raise self.NotFoundException(
+                'Node identifier must be a positive integer: %s' % node_id
+            )
+
+        all_nodes = self._get_all_nodes_for_topic(topic)
+        if node_index > len(all_nodes):
+            raise self.NotFoundException(
+                'Node with id %s is not part of this topic.' % node_id
+            )
 
     def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
         """Validates that the given arc ID exists in one of the topic's stories.
 
+        The arc_id parameter is in the format 'arc-N' where N is a 1-based
+        index that maps to the nth arc across all published stories in the
+        topic.
+
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID to validate.
+            arc_id: str. The arc ID (e.g., 'arc-1') to validate.
 
         Raises:
-            NotFoundException. The arc ID was not found in any story.
+            NotFoundException. The arc ID was not found.
         """
-        story_ids = topic.get_canonical_story_ids(include_only_published=True)
-        story_ids.extend(
-            topic.get_additional_story_ids(include_only_published=True)
-        )
-        stories = story_fetchers.get_stories_by_ids(story_ids)
-        for story in stories:
-            if story is None:
-                continue
-            for arc in story.story_contents.arcs:
-                if arc.id == arc_id:
-                    return
-        raise self.NotFoundException(
-            'Arc with id %s is not part of this topic.' % arc_id
-        )
+        if not arc_id.startswith('arc-'):
+            raise self.NotFoundException('Invalid arc identifier: %s' % arc_id)
+
+        try:
+            arc_index = int(arc_id[4:])
+        except ValueError:
+            raise self.NotFoundException('Invalid arc identifier: %s' % arc_id)
+
+        if arc_index < 1:
+            raise self.NotFoundException(
+                'Arc identifier must be a positive integer: %s' % arc_id
+            )
+
+        all_arcs = self._get_all_arcs_for_topic(topic)
+        if arc_index > len(all_arcs):
+            raise self.NotFoundException(
+                'Arc with id %s is not part of this topic.' % arc_id
+            )
 
 
 class ProfileExistsValidationHandler(

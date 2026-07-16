@@ -263,7 +263,7 @@ export class UrlService {
    */
   getNodeIdFromPracticeUrl(): string {
     const pathname = this.getPathname();
-    const match = pathname.match(/\/practice\/(node_\d+)/);
+    const match = pathname.match(/\/practice\/(\d+)/);
     if (match) {
       return decodeURIComponent(match[1]);
     }
@@ -276,7 +276,7 @@ export class UrlService {
    */
   getArcIdFromUrl(): string {
     const pathname = this.getPathname();
-    const match = pathname.match(/\/test\/arc\/(\w+)/);
+    const match = pathname.match(/\/test\/arc\/(arc-\d+)/);
     if (match) {
       return decodeURIComponent(match[1]);
     }

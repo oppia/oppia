@@ -352,7 +352,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/node_1'
+            '%s/staging/%s/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -571,7 +571,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/arc_1'
+            '%s/staging/%s/arc/arc-1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')

@@ -893,15 +893,15 @@ describe('TopicStorySectionComponent', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
 
-    const practiceUrl = component.getLessonPracticeUrl('node_1');
-    expect(practiceUrl).toContain('fractions/practice/node_1');
+    const practiceUrl = component.getLessonPracticeUrl('1');
+    expect(practiceUrl).toContain('fractions/practice/1');
   });
 
   it('should fallback lesson practice url when fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = '';
 
-    const practiceUrl = component.getLessonPracticeUrl('node_1');
+    const practiceUrl = component.getLessonPracticeUrl('1');
     expect(practiceUrl).toBe('#');
   });
 
@@ -909,15 +909,15 @@ describe('TopicStorySectionComponent', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
 
-    const arcUrl = component.getEndOfArcUrl('arc_1');
-    expect(arcUrl).toContain('fractions/test/arc/arc_1');
+    const arcUrl = component.getEndOfArcUrl('arc-1');
+    expect(arcUrl).toContain('fractions/test/arc/arc-1');
   });
 
   it('should fallback end of arc url when fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = '';
 
-    const arcUrl = component.getEndOfArcUrl('arc_1');
+    const arcUrl = component.getEndOfArcUrl('arc-1');
     expect(arcUrl).toBe('#');
   });
 });

@@ -431,7 +431,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'node_1',
+                '1',
             ),
             expected_status_int=200,
         )
@@ -508,7 +508,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'arc_1',
+                'arc-1',
             ),
             expected_status_int=200,
         )

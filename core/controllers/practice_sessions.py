@@ -21,6 +21,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     skill_fetchers,
+    story_domain,
     story_fetchers,
     topic_domain,
     topic_fetchers,
@@ -136,43 +137,116 @@ class PracticeSessionsPageDataHandler(
         )
         self.render_json(self.values)
 
-    def _get_skill_ids_for_node(
-        self, topic: topic_domain.Topic, node_id: str
-    ) -> List[str]:
-        """Returns skill IDs associated with a given story node.
+    def _get_all_nodes_for_topic(
+        self, topic: topic_domain.Topic
+    ) -> List[story_domain.StoryNode]:
+        """Returns all nodes across all published stories in the topic.
 
         Args:
             topic: Topic. The topic object.
-            node_id: str. The node ID (e.g. "node_1").
 
         Returns:
-            list(str). The skill IDs for the node.
+            list(StoryNode). All nodes in order.
         """
         story_ids = topic.get_canonical_story_ids(include_only_published=True)
         story_ids.extend(
             topic.get_additional_story_ids(include_only_published=True)
         )
         stories = story_fetchers.get_stories_by_ids(story_ids)
+        all_nodes: List[story_domain.StoryNode] = []
         for story in stories:
             if story is None:
                 continue
-            for node in story.story_contents.nodes:
-                if node.id == node_id:
-                    return node.acquired_skill_ids
-        return []
+            all_nodes.extend(story.story_contents.nodes)
+        return all_nodes
+
+    def _get_all_arcs_for_topic(
+        self, topic: topic_domain.Topic
+    ) -> List[story_domain.Arc]:
+        """Returns all arcs across all published stories in the topic.
+
+        Args:
+            topic: Topic. The topic object.
+
+        Returns:
+            list(Arc). All arcs in order.
+        """
+        story_ids = topic.get_canonical_story_ids(include_only_published=True)
+        story_ids.extend(
+            topic.get_additional_story_ids(include_only_published=True)
+        )
+        stories = story_fetchers.get_stories_by_ids(story_ids)
+        all_arcs: List[story_domain.Arc] = []
+        for story in stories:
+            if story is None:
+                continue
+            all_arcs.extend(story.story_contents.arcs)
+        return all_arcs
+
+    def _get_skill_ids_for_node(
+        self, topic: topic_domain.Topic, node_id: str
+    ) -> List[str]:
+        """Returns skill IDs associated with a given story node.
+
+        The node_id parameter is a 1-based index that maps to the nth node
+        across all published stories in the topic.
+
+        Args:
+            topic: Topic. The topic object.
+            node_id: str. The node ID (1-based index).
+
+        Returns:
+            list(str). The skill IDs for the node.
+        """
+        try:
+            node_index = int(node_id)
+        except ValueError:
+            return []
+
+        if node_index < 1:
+            return []
+
+        all_nodes = self._get_all_nodes_for_topic(topic)
+        if node_index > len(all_nodes):
+            return []
+
+        node = all_nodes[node_index - 1]
+        return node.acquired_skill_ids
 
     def _get_skill_ids_for_arc(
         self, topic: topic_domain.Topic, arc_id: str
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
+        The arc_id parameter is in the format 'arc-N' where N is a 1-based
+        index that maps to the nth arc across all published stories in the
+        topic.
+
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID.
+            arc_id: str. The arc ID (e.g., 'arc-1').
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
         """
+        if not arc_id.startswith('arc-'):
+            return []
+
+        try:
+            arc_index = int(arc_id[4:])
+        except ValueError:
+            return []
+
+        if arc_index < 1:
+            return []
+
+        all_arcs = self._get_all_arcs_for_topic(topic)
+        if arc_index > len(all_arcs):
+            return []
+
+        arc = all_arcs[arc_index - 1]
+
+        # Find the story that contains this arc to get the node IDs.
         story_ids = topic.get_canonical_story_ids(include_only_published=True)
         story_ids.extend(
             topic.get_additional_story_ids(include_only_published=True)
@@ -181,8 +255,8 @@ class PracticeSessionsPageDataHandler(
         for story in stories:
             if story is None:
                 continue
-            for arc in story.story_contents.arcs:
-                if arc.id == arc_id:
+            for story_arc in story.story_contents.arcs:
+                if story_arc.id == arc.id:
                     return story.get_acquired_skill_ids_for_node_ids(
                         arc.node_ids
                     )

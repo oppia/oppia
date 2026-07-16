@@ -230,7 +230,7 @@ describe('Practice session page', () => {
 
   it('should determine lesson session type from pathname', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/practice/node_1'
+      '/learn/math/fractions/practice/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -251,7 +251,7 @@ describe('Practice session page', () => {
 
   it('should determine arc session type from pathname', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/arc_123'
+      '/learn/math/fractions/test/arc/arc-123'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -314,7 +314,7 @@ describe('Practice session page', () => {
 
   it('should build correct data URL for lesson practice', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/practice/node_1'
+      '/learn/math/fractions/practice/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -329,12 +329,12 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component._getDataUrl()).toContain('abbrev-topic/node_1');
+    expect(component._getDataUrl()).toContain('abbrev-topic/1');
   }));
 
   it('should build correct retry URL for arc practice', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/arc_1'
+      '/learn/math/fractions/test/arc/arc-1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -349,7 +349,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component._getRetryUrl()).toContain('abbrev-topic/test/arc/arc_1');
+    expect(component._getRetryUrl()).toContain('abbrev-topic/test/arc/arc-1');
   }));
 
   it('should build correct retry URL for mastery challenge', fakeAsync(() => {

@@ -167,7 +167,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
   }));
 
-  it('should allow access for lesson practice when node_id starts with node_', fakeAsync(() => {
+  it('should allow access for lesson practice when node_id is present', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
       'validateAccessToLessonPracticePage'
@@ -181,7 +181,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      node_id: 'node_1',
+      node_id: '1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -193,7 +193,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', 'node_1');
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1');
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
@@ -211,7 +211,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      arc_id: 'arc_1',
+      arc_id: 'arc-1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -223,7 +223,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', 'arc_1');
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', 'arc-1');
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 

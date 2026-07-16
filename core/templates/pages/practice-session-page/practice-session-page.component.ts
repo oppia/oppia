@@ -241,7 +241,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     const pathname = this.urlService.getPathname();
     if (pathname.match(/\/practice\//g)) {
       const segments = pathname.split('/');
-      if (segments.length >= 6 && segments[5].startsWith('node_')) {
+      if (segments.length >= 6 && /^\d+$/.test(segments[5])) {
         this.sessionType = PracticeSessionType.Lesson;
         this.nodeId = decodeURIComponent(segments[5]);
       } else if (this.stringifiedSubtopicIds) {
@@ -249,7 +249,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       }
     } else if (pathname.match(/\/test\/arc\//g)) {
       this.sessionType = PracticeSessionType.Arc;
-      const match = pathname.match(/\/test\/arc\/(\w+)/);
+      const match = pathname.match(/\/test\/arc\/(arc-\d+)/);
       if (match) {
         this.arcId = decodeURIComponent(match[1]);
       }
