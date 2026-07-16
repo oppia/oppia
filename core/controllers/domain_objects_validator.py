@@ -477,7 +477,7 @@ def validate_feedback_session_info_log_entries(
             )
         if not isinstance(entry.get('timestamp_msecs'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info console_logs.timestamp_msecs ' 'should be an int.'
+                'Session info console_logs.timestamp_msecs should be an int.'
             )
         log_level = entry.get('log_level')
         if log_level is not None and log_level not in (
@@ -528,7 +528,7 @@ def validate_feedback_session_info_log_entries(
             )
         if not isinstance(entry.get('status_code'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info failed_requests.status_code ' 'should be an int.'
+                'Session info failed_requests.status_code should be an int.'
             )
         if not isinstance(entry.get('timestamp_msecs'), int):
             raise base.BaseHandler.InvalidInputException(
