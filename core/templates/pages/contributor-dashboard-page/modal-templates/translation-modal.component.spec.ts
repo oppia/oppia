@@ -1512,4 +1512,39 @@ describe('Translation Modal Component', () => {
       expect(component.hasSubmitValidationErrors()).toBe(false);
     });
   });
+
+  describe('when getting formatted content type', () => {
+    it('should correctly format content type and content ID', () => {
+      expect(component.getFormattedContentType()).toBe('');
+      expect(
+        component.getFormattedContentType('metadata', null, 'exploration_title')
+      ).toBe('title');
+      expect(
+        component.getFormattedContentType(
+          'metadata',
+          null,
+          'exploration_objective'
+        )
+      ).toBe('objective');
+      expect(
+        component.getFormattedContentType(
+          'metadata',
+          null,
+          'exploration_category'
+        )
+      ).toBe('category');
+      expect(
+        component.getFormattedContentType('metadata', null, 'exploration_tag_0')
+      ).toBe('tag');
+      expect(component.getFormattedContentType('metadata', null, 'other')).toBe(
+        'metadata'
+      );
+      expect(
+        component.getFormattedContentType('interaction', 'TextInput')
+      ).toBe('TextInput interaction');
+      expect(component.getFormattedContentType('ca')).toBe('label');
+      expect(component.getFormattedContentType('rule')).toBe('input rule');
+      expect(component.getFormattedContentType('content')).toBe('content');
+    });
+  });
 });

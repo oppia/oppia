@@ -516,7 +516,7 @@ export class TranslationModalComponent {
   getFormattedContentType(
     contentType?: string,
     interactionId?: string | null,
-    contentId?: string
+    contentId?: string | null
   ): string {
     if (!contentType) {
       return '';
