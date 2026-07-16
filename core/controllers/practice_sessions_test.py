@@ -1158,12 +1158,12 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         call_count = [0]
 
         def mock_get_stories(
-            story_ids: List[str], strict: bool = False
+            story_ids: List[str], *, strict: bool = False
         ) -> List[story_domain.Story | None]:
             call_count[0] += 1
             if call_count[0] == 2:
                 return [None]
-            return list(original_get_stories(story_ids, strict=strict))
+            return list(original_get_stories(story_ids))
 
         with unittest.mock.patch.object(
             story_fetchers,
