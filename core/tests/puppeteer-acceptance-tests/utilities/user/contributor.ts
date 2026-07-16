@@ -119,31 +119,7 @@ export class Contributor extends ExplorationEditor {
     // This causes problem that older node gets detached from the DOM.
     // So, we are ensuring that the opportunity list hasn't been changed
     // for 200 ms.
-    let previousElementIds: string[] = [];
-    let opportunityItemListChanged = true;
-
-    // TODO(#23395): Currently, the opportunity list is refreshed after the
-    // page is loaded. This causes the test to fail. We are using a workaround
-    // for now, by waiting for the opportunity list to be loaded.
-    // Once the issue is fixed, remove the following do-while loop.
-    do {
-      await this.page.waitForTimeout(200);
-
-      const currentElementIds = await this.page.evaluate((selector: string) => {
-        const elements = document.querySelectorAll(selector);
-        return Array.from(elements).map((el, index) => {
-          return el.textContent?.trim() || `element-${index}`;
-        });
-      }, opportunityItemSelector);
-
-      opportunityItemListChanged =
-        previousElementIds.length !== currentElementIds.length ||
-        !previousElementIds.every(
-          (id, index) => id === currentElementIds[index]
-        );
-
-      previousElementIds = currentElementIds;
-    } while (opportunityItemListChanged);
+    await this.waitForElementListToStabilize(opportunityItemSelector);
 
     // Handle the case where no translation opportunity is present.
     if (!translationOpportunitiesPreset) {

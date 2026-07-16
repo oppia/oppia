@@ -1141,6 +1141,37 @@ export class BaseUser {
   }
 
   /**
+   * Waits until the list of elements matching the given selector stops
+   * changing (by count or text content) for at least 200 ms. Some lists
+   * (e.g. contributor dashboard opportunities) refresh shortly after their
+   * initial load, which can otherwise cause a stale read.
+   * TODO(#23395): This is a workaround for the list refreshing after it has
+   * already loaded. Once the underlying issue is fixed, remove this method.
+   * @param {string} selector - The selector matching the list of elements.
+   */
+  async waitForElementListToStabilize(selector: string): Promise<void> {
+    let previousItems: string[] = [];
+    let itemsChanged = true;
+
+    do {
+      await this.page.waitForTimeout(200);
+
+      const currentItems = await this.page.evaluate((sel: string) => {
+        const elements = document.querySelectorAll(sel);
+        return Array.from(elements).map((el, index) => {
+          return el.textContent?.trim() || `element-${index}`;
+        });
+      }, selector);
+
+      itemsChanged =
+        previousItems.length !== currentItems.length ||
+        !previousItems.every((item, index) => item === currentItems[index]);
+
+      previousItems = currentItems;
+    } while (itemsChanged);
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {

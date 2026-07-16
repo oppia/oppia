@@ -420,9 +420,17 @@ export class TranslationSubmitter extends BaseUser {
     subheading: string,
     visible: boolean = true
   ): Promise<ElementHandle | null> {
+    await this.page.waitForNetworkIdle();
+
     const translationOpportunitiesPreset = await this.isElementVisible(
       opportunityItemSelector
     );
+
+    // Sometimes, the opportunities refreshes after they have been loaded.
+    // This causes problem that older node gets detached from the DOM.
+    // So, we are ensuring that the opportunity list hasn't been changed
+    // for 200 ms.
+    await this.waitForElementListToStabilize(opportunityItemSelector);
 
     // Handle the case where the translation opportunity is not present.
     if (!translationOpportunitiesPreset) {
