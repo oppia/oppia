@@ -95,7 +95,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertEqual(report.platform, feconf.PLATFORM_WEB)
         self.assertEqual(
             report.destination_dashboard,
-            feconf.DESTINATION_CREATOR,
+            feconf.DESTINATION_CURRICULUM,
         )
         self.assertEqual(report.category, feconf.CATEGORY_TYPO)
         self.assertEqual(report.lesson_metadata, self.get_lesson_metadata())
@@ -279,7 +279,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id=report1.id,
                 new_status=feconf.STATUS_CHOICES_FIXED,
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
 
@@ -289,7 +289,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id=report2.id,
                 new_status=feconf.STATUS_CHOICES_FIXED,
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='invalid_exp_id',
             )
 
@@ -402,7 +402,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         summaries, next_cursor, more = (
             general_feedback_services.get_platform_feedback_summaries(
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
         )
@@ -488,7 +488,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         updated_report = general_feedback_services.update_platform_feedback_status_for_dashboard(
             report_id=report.id,
             new_status=feconf.STATUS_CHOICES_FIXED,
-            dashboard=feconf.DESTINATION_CREATOR,
+            dashboard=feconf.DESTINATION_CURRICULUM,
             dashboard_id='exp_id',
         )
 
@@ -519,7 +519,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id=report.id,
                 new_status=feconf.STATUS_CHOICES_FIXED,
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
 
@@ -532,7 +532,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id='missing_report',
                 new_status=feconf.STATUS_CHOICES_FIXED,
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
         )
@@ -561,7 +561,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id=report.id,
                 new_status=feconf.STATUS_CHOICES_FIXED,
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
         )
@@ -573,7 +573,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id='report_id',
                 new_status='invalid',
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
 
@@ -600,7 +600,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_services.update_platform_feedback_status_for_dashboard(
                 report_id=report.id,
                 new_status=feconf.STATUS_CHOICES_FIXED,
-                dashboard=feconf.DESTINATION_CREATOR,
+                dashboard=feconf.DESTINATION_CURRICULUM,
                 dashboard_id='exp_id',
             )
 

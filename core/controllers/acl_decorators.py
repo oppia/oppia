@@ -5225,7 +5225,7 @@ def can_access_platform_feedback_reports(
             UnauthorizedUserException. The requested dashboard is invalid.
         """
 
-        if dashboard == feconf.DESTINATION_CREATOR:
+        if dashboard == feconf.DESTINATION_CURRICULUM:
 
             # Here we use type Any because the decorated handler may receive
             # handler-specific keyword arguments.

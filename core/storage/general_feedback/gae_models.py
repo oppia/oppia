@@ -249,8 +249,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     destination_dashboard field is set automatically at creation time
     based on the page_url and category:
 
-        typo                        → creator
-        confusing_or_incorrect_answer → creator
+        typo                        → curriculum
+        confusing_or_incorrect_answer → curriculum
         broken_layout_or_image      → tech-external or tech-internal
         other_or_not_sure           → tech-external or tech-internal
         all site (app) reports      → tech-external or tech-internal
@@ -261,7 +261,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     Fields (in addition to BaseFeedbackModel fields):
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Platform of the report ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" |
+        destination_dashboard: str. Routing target ("curriculum" |
             "tech-external" | "tech-internal").
         category: Optional[str]. Report category; required for lesson reports,
             must be None for site reports.

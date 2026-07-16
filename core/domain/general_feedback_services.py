@@ -131,8 +131,8 @@ def _determine_destination_dashboard(
     Routing rules:
         - All site (app) reports → technical (depends on the team that owns
           the page URL.)
-        - typo → creator
-        - confusing_or_incorrect_answer → creator
+        - typo → curriculum
+        - confusing_or_incorrect_answer → curriculum
         - broken_layout_or_image → technical (depends on the team that owns
           the page URL.)
         - other_or_not_sure → technical (depends on the team that owns the
@@ -143,11 +143,11 @@ def _determine_destination_dashboard(
         category: Optional[str]. The report category; None for site reports.
 
     Returns:
-        str. The destination dashboard ("creator" | "tech-external" |
+        str. The destination dashboard ("curriculum" | "tech-external" |
         "tech-internal").
     """
     if category in feconf.CREATOR_DASHBOARD_CATEGORIES:
-        return feconf.DESTINATION_CREATOR
+        return feconf.DESTINATION_CURRICULUM
     else:
         parsed_url = urllib.parse.urlparse(page_url)
         path = parsed_url.path.strip('/')
@@ -177,9 +177,9 @@ def validate_platform_feedback_belongs_to_dashboard(
     Raises:
         ValueError. The feedback does not belong to the requested dashboard.
     """
-    if dashboard == feconf.DESTINATION_CREATOR:
+    if dashboard == feconf.DESTINATION_CURRICULUM:
         if (
-            feedback.destination_dashboard != feconf.DESTINATION_CREATOR
+            feedback.destination_dashboard != feconf.DESTINATION_CURRICULUM
             or feedback.lesson_metadata is None
         ):
             raise ValueError(
@@ -401,9 +401,9 @@ def get_platform_feedback_summaries(
     """
     if dashboard not in feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES:
         raise ValueError('Invalid dashboard: %s' % dashboard)
-    if dashboard == feconf.DESTINATION_CREATOR:
+    if dashboard == feconf.DESTINATION_CURRICULUM:
         exploration_id = dashboard_id
-        dashboard_filter = feconf.DESTINATION_CREATOR
+        dashboard_filter = feconf.DESTINATION_CURRICULUM
     else:
         if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
             raise ValueError(

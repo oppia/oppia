@@ -204,7 +204,7 @@ class PlatformFeedback:
         report_message: str. The text body of the report.
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Submission platform ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" |
+        destination_dashboard: str. Routing target ("curriculum" |
             "tech-external" | "tech-internal").
         status: str. Current moderation status
             (open | fixed | ignored | compliment | not_actionable).
