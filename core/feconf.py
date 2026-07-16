@@ -1920,7 +1920,7 @@ PLATFORM_ANDROID: Final = 'android'
 PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
 
 # Destination choices.
-DESTINATION_CREATOR: Final = 'creator'
+DESTINATION_CREATOR: Final = 'curriculum'
 DESTINATION_TECHNICAL: Final = 'technical'
 DESTINATION_TECHNICAL_EXTERNAL_TEAM: Final = 'tech-external'
 DESTINATION_TECHNICAL_INTERNAL_TEAM: Final = 'tech-internal'
