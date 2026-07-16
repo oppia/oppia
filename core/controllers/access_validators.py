@@ -469,10 +469,10 @@ class PracticeSessionAccessValidationPage(
         """
         try:
             node_index = int(node_id)
-        except ValueError:
+        except ValueError as exc:
             raise self.NotFoundException(
                 'Invalid node identifier: %s' % node_id
-            )
+            ) from exc
 
         if node_index < 1:
             raise self.NotFoundException(
@@ -504,8 +504,10 @@ class PracticeSessionAccessValidationPage(
 
         try:
             arc_index = int(arc_id[4:])
-        except ValueError:
-            raise self.NotFoundException('Invalid arc identifier: %s' % arc_id)
+        except ValueError as exc:
+            raise self.NotFoundException(
+                'Invalid arc identifier: %s' % arc_id
+            ) from exc
 
         if arc_index < 1:
             raise self.NotFoundException(
