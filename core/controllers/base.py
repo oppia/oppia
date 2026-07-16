@@ -946,6 +946,9 @@ class BaseHandler(
             return
 
         if isinstance(exception, TypeError):
+            self._log_exception_message(
+                exception_type, LogType.EXCEPTION, 'Exception raised'
+            )
             self.error(405)
             values = {
                 'error': 'Invalid method %s for %s'

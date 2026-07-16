@@ -2893,6 +2893,29 @@ Handler class name: BaseHandler
             msg='InternalErrorException message not match',
         )
 
+    def test_type_error_logs_exception_and_returns_405(self) -> None:
+        """Ensures TypeError logs an exception and returns a 405 response."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(TypeError('Invalid method'), False)
+
+        expected_log_message = f"""
+
+TypeError: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='TypeError exception message does not match.',
+        )
+        self.assertEqual(self.handler.response.status_int, 405)
+
     def test_invalid_log_type_raises_exception(self) -> None:
         """Tests that _log_exception_message raises an Exception when an
         invalid log type is passed."""
