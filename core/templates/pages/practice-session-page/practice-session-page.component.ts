@@ -249,7 +249,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       }
     } else if (pathname.match(/\/test\/arc\//g)) {
       this.sessionType = PracticeSessionType.Arc;
-      const match = pathname.match(/\/test\/arc\/(arc-\d+)/);
+      const match = pathname.match(/\/test\/arc\/(arc-\d+|\d+)/);
       if (match) {
         this.arcId = decodeURIComponent(match[1]);
       }
