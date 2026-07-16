@@ -357,7 +357,7 @@ export class FeedbackModalComponent implements OnInit {
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
     const feedbackPayload = LessonFeedbackModel.createForSubmission({
       feedbackText: this.feedbackText,
-      lesson_metadata_json: {
+      lesson_metadata: {
         explorationId: lessonFeedbackMetadata.explorationId,
         explorationVersion: lessonFeedbackMetadata.explorationVersion,
         stateName: lessonFeedbackMetadata.stateName,

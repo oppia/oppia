@@ -143,7 +143,7 @@ class MockActiveModal {
 }
 
 const feedbackSessionInfo: FeedbackSessionInfo = {
-  console_logs_json: [
+  console_logs: [
     {
       error_message: 'TypeError: Something went wrong',
       log_level: 'error',
@@ -151,7 +151,7 @@ const feedbackSessionInfo: FeedbackSessionInfo = {
       stack_trace: 'Error stack trace',
     },
   ],
-  failed_requests_json: [
+  failed_requests: [
     {
       url: '/createhandler/web_feedback',
       method: 'POST',
@@ -161,13 +161,13 @@ const feedbackSessionInfo: FeedbackSessionInfo = {
       error_message: 'Request failed',
     },
   ],
-  navigation_history_json: [
+  navigation_history: [
     {
       path: '/learn/math',
       timestamp_msecs: 1234567892,
     },
   ],
-  environment_json: {
+  environment: {
     client_time_msecs: 1234567893,
     timezone_offset_mins: -330,
     user_agent: 'Mozilla/5.0 Chrome/136.0',

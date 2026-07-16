@@ -44,17 +44,13 @@ def _lesson_feedback_model_to_domain(
     Returns:
         LessonFeedback. The corresponding domain object.
     """
-    lesson_metadata_json = model.lesson_metadata_json or {}
+    lesson_metadata = model.lesson_metadata or {}
     lesson_metadata: general_feedback_domain.LessonMetadataDict = {
-        'exploration_id': lesson_metadata_json.get('exploration_id', ''),
-        'exploration_version': lesson_metadata_json.get(
-            'exploration_version', 0
-        ),
-        'state_name': lesson_metadata_json.get('state_name', ''),
-        'state_index': lesson_metadata_json.get('state_index', 0),
-        'learner_current_answer': lesson_metadata_json.get(
-            'learner_current_answer'
-        ),
+        'exploration_id': lesson_metadata.get('exploration_id', ''),
+        'exploration_version': lesson_metadata.get('exploration_version', 0),
+        'state_name': lesson_metadata.get('state_name', ''),
+        'state_index': lesson_metadata.get('state_index', 0),
+        'learner_current_answer': lesson_metadata.get('learner_current_answer'),
     }
 
     # responded_by is stored in the backend for internal tracking of who authored
@@ -96,8 +92,8 @@ def _platform_feedback_model_to_domain(
         PlatformFeedback. The corresponding domain object.
     """
     lesson_metadata: Optional[general_feedback_domain.LessonMetadataDict] = None
-    if model.lesson_metadata_json is not None:
-        raw = model.lesson_metadata_json
+    if model.lesson_metadata is not None:
+        raw = model.lesson_metadata
         lesson_metadata = {
             'exploration_id': raw.get('exploration_id', ''),
             'exploration_version': raw.get('exploration_version', 0),
@@ -158,7 +154,7 @@ def _determine_destination_dashboard(
 def create_lesson_feedback(
     author_id: str,
     feedback_text: str,
-    lesson_metadata_json: general_feedback_domain.LessonMetadataDict,
+    lesson_metadata: general_feedback_domain.LessonMetadataDict,
     parent_feedback_id: Optional[str] = None,
 ) -> general_feedback_domain.LessonFeedback:
     """Creates a new lesson feedback entry and returns its domain object.
@@ -167,7 +163,7 @@ def create_lesson_feedback(
         author_id: str. User ID of the logged-in learner. Lesson feedback
             always requires a logged-in user.
         feedback_text: str. The main text body submitted by the learner.
-        lesson_metadata_json: LessonMetadataDict. Snapshot of lesson context
+        lesson_metadata: LessonMetadataDict. Snapshot of lesson context
             at submission time, including exploration_id, exploration_version,
             state_name, state_index, and learner_current_answer.
         parent_feedback_id: Optional[str]. If provided, links this submission
@@ -179,11 +175,9 @@ def create_lesson_feedback(
     feedback_id = general_feedback_models.LessonFeedbackModel.create(
         author_id=author_id,
         feedback_text=feedback_text,
-        # Here we use cast because lesson_metadata_json is a TypedDict, while
+        # Here we use cast because lesson_metadata is a TypedDict, while
         # the storage model create() method expects a Dict.
-        lesson_metadata_json=cast(
-            Dict[str, Union[str, int, None]], lesson_metadata_json
-        ),
+        lesson_metadata=cast(Dict[str, Union[str, int, None]], lesson_metadata),
         parent_feedback_id=parent_feedback_id,
     )
 
@@ -196,10 +190,10 @@ def create_platform_report(
     source: str,
     page_url: str,
     category: Optional[str],
-    lesson_metadata_json: Optional[general_feedback_domain.LessonMetadataDict],
+    lesson_metadata: Optional[general_feedback_domain.LessonMetadataDict],
     # Here we use object because session-info diagnostics are heterogeneous
     # JSON-like payloads (nested dict/list values) from client logs.
-    session_info_json: Optional[Dict[str, object]],
+    session_info: Optional[Dict[str, object]],
     screenshot_filename: Optional[str],
     screenshot_entity_id: Optional[str],
     include_technical_logs: bool,
@@ -219,9 +213,9 @@ def create_platform_report(
             "site" is mapped to the model constant SOURCE_APP before storage.
         category: Optional[str]. Report category; required for lesson reports,
             must be None for site reports.
-        lesson_metadata_json: Optional[LessonMetadataDict]. Lesson context
+        lesson_metadata: Optional[LessonMetadataDict]. Lesson context
             snapshot; required for lesson reports, None for site reports.
-        session_info_json: Optional[Dict[str, object]]. Session diagnostics
+        session_info: Optional[Dict[str, object]]. Session diagnostics
             attached when include_technical_logs is True; None otherwise.
         screenshot_filename: Optional[str]. GCS filename of the uploaded
             screenshot, or None if no screenshot was provided.
@@ -250,10 +244,10 @@ def create_platform_report(
         platform=feconf.PLATFORM_WEB,
         category=category,
         destination_dashboard=destination_dashboard,
-        # Here we use cast because lesson_metadata_json is a TypedDict, while
+        # Here we use cast because lesson_metadata is a TypedDict, while
         # the storage model create() method expects a Dict.
-        lesson_metadata_json=cast(
-            Optional[Dict[str, Union[str, int, None]]], lesson_metadata_json
+        lesson_metadata=cast(
+            Optional[Dict[str, Union[str, int, None]]], lesson_metadata
         ),
         include_technical_logs=include_technical_logs,
         screenshot_filename=screenshot_filename,
@@ -263,27 +257,25 @@ def create_platform_report(
 
     # Persist session diagnostics in a linked FeedbackSessionLogModel when
     # the user opted in. The log uses the same ID as the report model.
-    if include_technical_logs and session_info_json is not None:
-        console_logs_json = session_info_json.get('console_logs_json')
-        failed_requests_json = session_info_json.get('failed_requests_json')
-        navigation_history_json = session_info_json.get(
-            'navigation_history_json'
-        )
-        environment_json = session_info_json.get('environment_json')
-        if not isinstance(console_logs_json, list):
-            console_logs_json = []
-        if not isinstance(failed_requests_json, list):
-            failed_requests_json = []
-        if not isinstance(navigation_history_json, list):
-            navigation_history_json = []
-        if not isinstance(environment_json, dict):
-            environment_json = {}
+    if include_technical_logs and session_info is not None:
+        console_logs = session_info.get('console_logs')
+        failed_requests = session_info.get('failed_requests')
+        navigation_history = session_info.get('navigation_history')
+        environment = session_info.get('environment')
+        if not isinstance(console_logs, list):
+            console_logs = []
+        if not isinstance(failed_requests, list):
+            failed_requests = []
+        if not isinstance(navigation_history, list):
+            navigation_history = []
+        if not isinstance(environment, dict):
+            environment = {}
         general_feedback_models.FeedbackSessionLogModel.create(
             report_id=report_id,
-            console_logs_json=console_logs_json,
-            failed_requests_json=failed_requests_json,
-            navigation_history_json=navigation_history_json,
-            environment_json=environment_json,
+            console_logs=console_logs,
+            failed_requests=failed_requests,
+            navigation_history=navigation_history,
+            environment=environment,
         )
 
     model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
