@@ -1158,7 +1158,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         call_count = [0]
 
         def mock_get_stories(
-            story_ids: List[str], *, strict: bool = False
+            story_ids: List[str],
         ) -> List[story_domain.Story | None]:
             call_count[0] += 1
             if call_count[0] == 2:
