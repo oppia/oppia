@@ -341,7 +341,7 @@ export class FeedbackModalComponent implements OnInit {
           ? 'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
           : 'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -375,7 +375,7 @@ export class FeedbackModalComponent implements OnInit {
       const successMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -412,7 +412,7 @@ export class FeedbackModalComponent implements OnInit {
       const successMessage = this.translateService.instant(
         'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'

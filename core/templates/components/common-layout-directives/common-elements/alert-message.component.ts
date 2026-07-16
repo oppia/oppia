@@ -25,6 +25,7 @@ export interface MessageObject {
   type: string;
   content: string;
   timeout: number;
+  closeButton?: boolean;
 }
 
 @Component({
@@ -48,6 +49,7 @@ export class AlertMessageComponent {
       this.toastrService
         .info(this.messageObject.content, '', {
           timeOut: this.messageObject.timeout,
+          closeButton: this.messageObject.closeButton,
         })
         .onHidden.toPromise()
         .then(() => {
@@ -57,6 +59,7 @@ export class AlertMessageComponent {
       this.toastrService
         .success(this.messageObject.content, '', {
           timeOut: this.messageObject.timeout,
+          closeButton: this.messageObject.closeButton,
         })
         .onHidden.toPromise()
         .then(() => {
