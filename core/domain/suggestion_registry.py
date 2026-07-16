@@ -778,11 +778,15 @@ class SuggestionTranslateContent(BaseSuggestion):
         if (
             self.change_cmd.content_id == feconf.EXPLORATION_TITLE_CONTENT_ID
             and isinstance(self.change_cmd.translation_html, str)
-            and len(self.change_cmd.translation_html) > 36
+            and (
+                len(self.change_cmd.translation_html)
+                > feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
+            )
         ):
             raise utils.ValidationError(
                 'Translation exceeds the allowed character limit. The translation '
-                'for the above content must be 36 characters or fewer.'
+                'for the above content must be %s characters or fewer.'
+                % feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
             )
 
     def pre_update_validate(

@@ -2440,7 +2440,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Raises:
             ValueError. The given state_name does not exist.
         """
-        if content_id.startswith('exploration_'):
+        # Content IDs for exploration metadata fields (such as title, objective,
+        # category, and tags) start with the prefix 'exploration_'. Since these
+        # metadata fields do not belong to any specific state, we retrieve them
+        # directly from the exploration's translatable contents collection.
+        if content_id.startswith(feconf.EXPLORATION_METADATA_CONTENT_ID_PREFIX):
             translatable_contents = self.get_translatable_contents_collection(
                 override_metadata_feature_flag=True
             )

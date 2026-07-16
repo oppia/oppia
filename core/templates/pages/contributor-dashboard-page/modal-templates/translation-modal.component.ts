@@ -60,6 +60,9 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
+const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
+const EXPLORATION_TITLE_CHAR_LIMIT = 36;
+
 class UiConfig {
   'hide_complex_extensions': boolean;
   'rte_component_config_id': string;
@@ -252,7 +255,8 @@ export class TranslationModalComponent {
         this.modifyTranslationOpportunity.contentId.split('_')[0];
       this.activeContentType = this.getFormattedContentType(
         contentType,
-        this.modifyTranslationOpportunity.interactionId
+        this.modifyTranslationOpportunity.interactionId,
+        this.modifyTranslationOpportunity.contentId
       );
       this.activeWrittenTranslation =
         this.modifyTranslationOpportunity.currentContentTranslation.translation;
@@ -410,7 +414,8 @@ export class TranslationModalComponent {
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
-      interactionId
+      interactionId,
+      this.translateTextService.activeContentId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType,
@@ -510,10 +515,25 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType?: string,
-    interactionId?: string | null
+    interactionId?: string | null,
+    contentId?: string
   ): string {
     if (!contentType) {
       return '';
+    }
+    if (contentType === 'metadata' && contentId) {
+      if (contentId === EXPLORATION_TITLE_CONTENT_ID) {
+        return 'title';
+      }
+      if (contentId === 'exploration_objective') {
+        return 'objective';
+      }
+      if (contentId === 'exploration_category') {
+        return 'category';
+      }
+      if (contentId.startsWith('exploration_tag_')) {
+        return 'tag';
+      }
     }
     switch (contentType) {
       case 'interaction':
@@ -651,11 +671,12 @@ export class TranslationModalComponent {
     this.hasLengthValidationError = false;
     this.lengthValidationErrorMessage = '';
     const activeContentId = this.translateTextService.activeContentId;
-    if (activeContentId === 'exploration_title') {
-      if (this.activeWrittenTranslation.length > 36) {
+    if (activeContentId === EXPLORATION_TITLE_CONTENT_ID) {
+      if (this.activeWrittenTranslation.length > EXPLORATION_TITLE_CHAR_LIMIT) {
         this.hasLengthValidationError = true;
         this.lengthValidationErrorMessage =
-          'Translation exceeds the allowed character limit. The translation for the above content must be 36 characters or fewer.';
+          'Translation exceeds the allowed character limit. The translation ' +
+          `for the above content must be ${EXPLORATION_TITLE_CHAR_LIMIT} characters or fewer.`;
       }
     }
   }
