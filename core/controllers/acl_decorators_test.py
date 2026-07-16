@@ -8660,7 +8660,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=401,
             )
         self.assertEqual(
@@ -8692,7 +8692,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         )
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=401,
             )
 
@@ -8708,7 +8708,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=200,
             )
         self.assertEqual(response['success'], 1)
@@ -8757,7 +8757,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=401,
             )
 
