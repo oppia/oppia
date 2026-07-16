@@ -44,13 +44,17 @@ def _lesson_feedback_model_to_domain(
     Returns:
         LessonFeedback. The corresponding domain object.
     """
-    lesson_metadata = model.lesson_metadata or {}
+    raw_lesson_metadata = model.lesson_metadata or {}
     lesson_metadata: general_feedback_domain.LessonMetadataDict = {
-        'exploration_id': lesson_metadata.get('exploration_id', ''),
-        'exploration_version': lesson_metadata.get('exploration_version', 0),
-        'state_name': lesson_metadata.get('state_name', ''),
-        'state_index': lesson_metadata.get('state_index', 0),
-        'learner_current_answer': lesson_metadata.get('learner_current_answer'),
+        'exploration_id': raw_lesson_metadata.get('exploration_id', ''),
+        'exploration_version': raw_lesson_metadata.get(
+            'exploration_version', 0
+        ),
+        'state_name': raw_lesson_metadata.get('state_name', ''),
+        'state_index': raw_lesson_metadata.get('state_index', 0),
+        'learner_current_answer': raw_lesson_metadata.get(
+            'learner_current_answer'
+        ),
     }
 
     # responded_by is stored in the backend for internal tracking of who authored
