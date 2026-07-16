@@ -30,6 +30,7 @@
                                 [feedbackDetailPageConfig]="cardConfig"
                                 [screenshotDataUrl]="screenshotDataUrl"
                                 (statusChange)="onStatusChange($event)"
+                                (githubTransfer)="onGithubTransfer($event)"
                                 (goBack)="navigateBackToDashboard()">
     </oppia-feedback-detail-page>
   </ng-template>

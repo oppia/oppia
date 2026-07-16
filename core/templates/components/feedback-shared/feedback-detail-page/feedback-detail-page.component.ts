@@ -33,8 +33,10 @@ import {
   PlatformFeedbackDetailResponse,
   SOURCE_LABELS,
   TECHNICAL_TEAM_LABELS,
+  TechnicalTeamType,
 } from 'domain/feedback/feedback.model';
 import './feedback-detail-page.component.css';
+
 @Component({
   selector: 'oppia-feedback-detail-page',
   templateUrl: './feedback-detail-page.component.html',
@@ -48,12 +50,14 @@ export class FeedbackDetailPageComponent {
   @Input() screenshotDataUrl: string | null = null;
   @Output() goBack = new EventEmitter<void>();
   @Output() statusChange = new EventEmitter<FeedbackStatus>();
+  @Output() githubTransfer = new EventEmitter<string>();
 
   readonly categoryLabels = CATEGORY_LABELS;
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
   readonly sourceLabels = SOURCE_LABELS;
   readonly teamLabels = TECHNICAL_TEAM_LABELS;
   readonly statusOptions = Object.values(FeedbackStatus);
+  readonly transferredToGithubStatus = FeedbackStatus.TRANSFERRED_TO_GITHUB;
 
   replyText: string = '';
   isSendingReply: boolean = false;
@@ -92,7 +96,180 @@ export class FeedbackDetailPageComponent {
   }
 
   get sessionInfo(): FeedbackSessionInfo | null {
-    console.log(this.feedbackDetailResponse.session_info);
     return this.feedbackDetailResponse?.session_info ?? null;
+  }
+
+  get hasTechnicalLogs(): boolean {
+    return this.feedbackDetailResponse?.session_info !== null;
+  }
+
+  getCategoryLabel(category: string | null): string {
+    if (!category) {
+      return 'Not provided';
+    }
+    return this.categoryLabels[category] || category;
+  }
+
+  getSourceLabel(source: string): string {
+    return this.sourceLabels[source] || source;
+  }
+
+  getDestinationLabel(
+    destinationDashboard: TechnicalTeamType | 'creator'
+  ): string {
+    return destinationDashboard === 'creator'
+      ? 'Creator'
+      : this.teamLabels[destinationDashboard];
+  }
+
+  getOptionalText(value: string | null): string {
+    return value || 'Not provided';
+  }
+
+  onStatusOptionClick(status: FeedbackStatus): void {
+    if (status === FeedbackStatus.TRANSFERRED_TO_GITHUB) {
+      this.githubTransfer.emit(this.getGithubIssueUrl());
+      return;
+    }
+
+    this.statusChange.emit(status);
+  }
+
+  getGithubIssueUrl(): string {
+    const response = this.feedbackDetailResponse;
+    const title = response
+      ? `[BUG]: User feedback report: ${this.getCategoryLabel(
+          response.category
+        )}`
+      : '[BUG]: User feedback report';
+    const params = new URLSearchParams({
+      template: '1_bug_report_form.yml',
+      title: title,
+      'describe-the-bug': this.getGithubIssueDescription(),
+      'page-url': response?.page_url || 'Not provided',
+      'steps-to-reproduce': this.getGithubIssueSteps(),
+      'expected-behavior': this.getGithubIssueExpectedBehavior(),
+      'screenshots-videos': this.getGithubIssueScreenshotDetails(),
+      device: 'Desktop',
+      'operating-system': 'Other',
+      browsers: 'Other',
+      'browser-version': this.getGithubIssueBrowserVersion(),
+      'additional-context': this.getGithubIssueAdditionalContext(),
+    });
+
+    return `https://github.com/oppia/oppia/issues/new?${params.toString()}`;
+  }
+
+  private getGithubIssueDescription(): string {
+    const response = this.feedbackDetailResponse;
+    if (response === null) {
+      return 'Feedback details were not available when this issue was created.';
+    }
+
+    return [
+      response.report_message,
+      '',
+      'Transferred from the Oppia Technical feedback dashboard.',
+      `Report ID: ${response.id}`,
+      `Submitted: ${this.formatDate(response.created_on_msecs)}`,
+      `Source: ${this.getSourceLabel(response.source)}`,
+      `Category: ${this.getCategoryLabel(response.category)}`,
+      `Platform: ${this.getPlatformLabel(response.platform)}`,
+      `Dashboard: ${this.getDestinationLabel(response.destination_dashboard)}`,
+    ].join('\n');
+  }
+
+  private getGithubIssueSteps(): string {
+    const response = this.feedbackDetailResponse;
+    if (response === null) {
+      return 'Not provided by the feedback report.';
+    }
+
+    const issueLines = [
+      '1. Review the transferred feedback report details.',
+      `2. Open the reported page: ${response.page_url || 'Not provided'}`,
+    ];
+    if (response.lesson_metadata) {
+      issueLines.push(
+        `3. Check exploration ${response.lesson_metadata.exploration_id}, ` +
+          `state "${response.lesson_metadata.state_name}".`,
+        `4. Learner answer at report time: ${this.getOptionalText(
+          response.lesson_metadata.learner_current_answer
+        )}`
+      );
+    } else {
+      issueLines.push('3. Use the report message and session logs to triage.');
+    }
+
+    return issueLines.join('\n');
+  }
+
+  private getGithubIssueExpectedBehavior(): string {
+    return 'The reported user-facing problem should not occur.';
+  }
+
+  private getGithubIssueScreenshotDetails(): string {
+    const response = this.feedbackDetailResponse;
+    if (response === null || !response.screenshot_filename) {
+      return 'No screenshot was attached to this report.';
+    }
+    return [
+      'A screenshot was attached to the original feedback report.',
+      '',
+      'GitHub cannot load Oppia preview URLs directly. Review the screenshot ' +
+        'from the feedback dashboard before submitting this issue.',
+      '',
+      `Screenshot filename: ${response.screenshot_filename}`,
+      `Screenshot entity ID: ${
+        response.screenshot_entity_id || 'Not provided'
+      }`,
+    ].join('\n');
+  }
+
+  private getGithubIssueAdditionalContext(): string {
+    const response = this.feedbackDetailResponse;
+    if (response === null) {
+      return 'Feedback details were not available when this issue was created.';
+    }
+
+    return [
+      '## Feedback metadata',
+      '',
+      `Report ID: ${response.id}`,
+      `Screenshot entity ID: ${response.screenshot_entity_id || 'Not provided'}`,
+      `Session logs included: ${this.hasTechnicalLogs ? 'Yes' : 'No'}`,
+      '',
+      '## Privacy warning',
+      '',
+      'WARNING: The session logs below may expose user data, page URLs, ' +
+        'browser details, learner answers, request details, or other ' +
+        'sensitive information. Review and redact this section before ' +
+        'submitting the GitHub issue.',
+      '',
+      '## Session logs',
+      '',
+      '```json',
+      this.getGithubIssueSessionLogJson(),
+      '```',
+    ].join('\n');
+  }
+
+  private getGithubIssueBrowserVersion(): string {
+    const userAgent =
+      this.feedbackDetailResponse?.session_info?.environment_json.user_agent;
+    return userAgent || 'Not provided';
+  }
+
+  private getGithubIssueSessionLogJson(): string {
+    const sessionInfo = this.feedbackDetailResponse?.session_info;
+    if (!sessionInfo) {
+      return 'No session logs were attached to this report.';
+    }
+
+    return JSON.stringify(sessionInfo, null, 2) ?? 'Unable to serialize logs.';
+  }
+
+  onReplySend(): void {
+    return;
   }
 }

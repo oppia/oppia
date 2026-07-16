@@ -4,7 +4,8 @@
     <header class="oppia-feedback-detail-topbar">
       <div class="oppia-feedback-detail-topbar-start">
         <button type="button"
-                class="btn btn-secondary btn-sm oppia-feedback-detail-back-btn"
+                class="oppia-feedback-detail-icon-button oppia-feedback-detail-back-btn"
+                aria-label="Back to feedback dashboard"
                 (click)="goBack.emit()">
           <i class="fas fa-angle-left" aria-hidden="true"></i>
         </button>
@@ -56,13 +57,16 @@
               <a [href]="feedback.page_url"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="oppia-feedback-detail-field-value btn btn-outline-primary btn-sm">
+                 class="oppia-feedback-detail-field-value oppia-feedback-detail-link">
                 {{ feedback.page_url }}
               </a>
             </div>
             <div class="oppia-feedback-detail-screenshot" *ngIf="screenshotDataUrl">
               <img class="oppia-feedback-detail-screenshot-img" [src]="screenshotDataUrl" alt="Screenshot">
-              <a [href]="screenshotDataUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+              <a [href]="screenshotDataUrl"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="oppia-feedback-detail-button oppia-feedback-detail-button-secondary">
                 Open screenshot in new tab
               </a>
             </div>
@@ -97,13 +101,13 @@
                  [href]="getReportedLessonUrl()"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="btn btn-outline-primary btn-sm">
+                 class="oppia-feedback-detail-button oppia-feedback-detail-button-secondary">
                 Open reported lesson version
               </a>
               <a *ngIf="getReportedStateEditorUrl()"
                  [href]="getReportedStateEditorUrl()"
                  target="_blank" rel="noopener noreferrer"
-                 class="btn btn-outline-secondary btn-sm">
+                 class="oppia-feedback-detail-button oppia-feedback-detail-button-secondary">
                 Open current state in editor
               </a>
             </div>
@@ -166,7 +170,7 @@
                           placeholder="Write a reply the reporter will see..."></textarea>
                 <div class="oppia-feedback-detail-reply-send-row">
                   <button type="button"
-                          class="btn btn-primary btn-sm"
+                          class="oppia-feedback-detail-button oppia-feedback-detail-button-primary"
                           [disabled]="!replyText.trim() || isSendingReply"
                           (click)="onReplySend()">
                     <span *ngIf="!isSendingReply">Send</span>
@@ -184,8 +188,10 @@
                   <button *ngFor="let statusOption of statusOptions"
                           type="button"
                           [disabled]="statusOption === feedback.status"
-                          class="btn btn-outline-primary btn-sm"
-                          (click)="statusChange.emit(statusOption)">
+                          [attr.aria-pressed]="statusOption === feedback.status"
+                          class="oppia-feedback-detail-button oppia-feedback-detail-status-button"
+                          [ngClass]="'oppia-feedback-detail-status-button-' + statusOption"
+                          (click)="onStatusOptionClick(statusOption)">
                     {{ statusLabels[statusOption] }}
                   </button>
                 </div>

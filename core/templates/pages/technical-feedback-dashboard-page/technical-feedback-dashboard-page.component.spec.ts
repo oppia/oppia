@@ -37,16 +37,21 @@ import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.se
 import {Location} from '@angular/common';
 import {AppConstants} from 'app.constants';
 import {BehaviorSubject} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
   let fixture: ComponentFixture<TechnicalFeedbackDashboardPageComponent>;
   let router: Router;
+  let alertsService: AlertsService;
   let feedbackBackendApiService: FeedbackBackendApiService;
+  let windowRef: WindowRef;
   let currentFilterState: FeedbackFilterState;
   let navigateSpy: jasmine.Spy;
   let fetchFeedbackListSpy: jasmine.Spy;
   let fetchFeedbackDetailSpy: jasmine.Spy;
+  let updateFeedbackStatusSpy: jasmine.Spy;
   let paramMapSubject: BehaviorSubject<ParamMap>;
   let mockDetailResponse = {
     id: 'report1',
@@ -93,7 +98,9 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     fixture = TestBed.createComponent(TechnicalFeedbackDashboardPageComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
+    alertsService = TestBed.inject(AlertsService);
     feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
+    windowRef = TestBed.inject(WindowRef);
 
     currentFilterState = {
       searchText: '',
@@ -122,6 +129,11 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
       feedbackBackendApiService,
       'fetchPlatformFeedbackDetailAsync'
     ).and.returnValue(Promise.resolve(mockDetailResponse));
+
+    updateFeedbackStatusSpy = spyOn(
+      feedbackBackendApiService,
+      'updatePlatformFeedbackStatusAsync'
+    ).and.returnValue(Promise.resolve({success: true}));
   });
 
   it('should create the component instance', () => {
@@ -278,5 +290,73 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
       'report1'
     );
     expect(component.feedbackDetailResponse).toEqual(mockDetailResponse);
+  });
+
+  it('should update feedback status locally after saving it', async () => {
+    const addSuccessMessageSpy = spyOn(
+      alertsService,
+      'addSuccessMessage'
+    ).and.stub();
+
+    paramMapSubject.next(
+      convertToParamMap({
+        team: TechnicalTeamType.CORE,
+        reportId: 'report1',
+      })
+    );
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    component.onStatusChange(FeedbackStatus.FIXED);
+    await fixture.whenStable();
+
+    expect(updateFeedbackStatusSpy).toHaveBeenCalledWith(
+      'technical',
+      TechnicalTeamType.CORE,
+      'report1',
+      FeedbackStatus.FIXED
+    );
+    expect(component.feedbackDetailResponse?.status).toBe(FeedbackStatus.FIXED);
+    expect(addSuccessMessageSpy).toHaveBeenCalledWith(
+      `Feedback status updated to ${FeedbackStatus.FIXED}.`
+    );
+  });
+
+  it('should update status before opening transferred GitHub issue', async () => {
+    const githubIssueUrl = 'https://github.com/oppia/oppia/issues/new';
+    const openSpy = spyOn(windowRef.nativeWindow, 'open').and.stub();
+    const addSuccessMessageSpy = spyOn(
+      alertsService,
+      'addSuccessMessage'
+    ).and.stub();
+
+    paramMapSubject.next(
+      convertToParamMap({
+        team: TechnicalTeamType.CORE,
+        reportId: 'report1',
+      })
+    );
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    component.onGithubTransfer(githubIssueUrl);
+    expect(openSpy).not.toHaveBeenCalled();
+    await fixture.whenStable();
+
+    expect(updateFeedbackStatusSpy).toHaveBeenCalledWith(
+      'technical',
+      TechnicalTeamType.CORE,
+      'report1',
+      FeedbackStatus.TRANSFERRED_TO_GITHUB
+    );
+    expect(component.feedbackDetailResponse?.status).toBe(
+      FeedbackStatus.TRANSFERRED_TO_GITHUB
+    );
+    expect(addSuccessMessageSpy).toHaveBeenCalledWith(
+      `Feedback status updated to ${FeedbackStatus.TRANSFERRED_TO_GITHUB}.`
+    );
+    expect(openSpy).toHaveBeenCalledWith(githubIssueUrl, '_blank', 'noopener');
   });
 });
