@@ -1530,6 +1530,7 @@ describe('SvgEditor with image save destination as local storage', () => {
     const mockRect = new fabric.Rect({
       width: 600,
       height: 400,
+      strokeWidth: 0,
     });
     component.canvas.add(mockRect);
     spyOn(component.canvas, 'setActiveObject').and.callThrough();
