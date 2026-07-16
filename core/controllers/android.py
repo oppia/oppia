@@ -510,16 +510,21 @@ class AndroidActivityHandler(
             for activity_data, entity in zip(activities_data, fetched_entities):
                 if (
                     activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION
-                    and entity is not None
+                    and isinstance(entity, story_domain.Story)
                 ):
-                    payload = entity.to_dict_for_android()
+                    response_dict: ActivityDataResponseDict = {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': entity.to_dict_for_android(),
+                    }
                 else:
-                    payload = entity.to_dict() if entity is not None else None
-                response_dict: ActivityDataResponseDict = {
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': payload,
-                }
+                    response_dict = {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            entity.to_dict() if entity is not None else None
+                        ),
+                    }
                 activities.append(response_dict)
 
         self.render_json(activities)
