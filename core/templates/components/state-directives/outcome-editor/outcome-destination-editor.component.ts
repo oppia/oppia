@@ -223,7 +223,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     });
 
     this.explorationAndSkillIdPattern = this.EXPLORATION_AND_SKILL_ID_PATTERN;
-    this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+    this.newStateNamePattern = /^[a-zA-Z0-9.\s\-]+$/;
     this.destinationChoices = [];
   }
 

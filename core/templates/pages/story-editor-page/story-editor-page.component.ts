@@ -225,7 +225,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     this.storyEditorNavigationService.navigateToStoryEditor();
   }
 
-  onClosingStoryEditorBrowserTab(): void {
+  onClosingStoryEditorBrowserTab = (): void => {
     const story = this.storyEditorStateService.getStory();
 
     const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
@@ -249,7 +249,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS
       );
     }
-  }
+  };
 
   createStoryEditorBrowserTabsInfo(): void {
     const story = this.storyEditorStateService.getStory();
@@ -299,7 +299,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  onCreateOrUpdateStoryEditorBrowserTabsInfo(event: {key: string}): void {
+  onCreateOrUpdateStoryEditorBrowserTabsInfo = (event: {key: string}): void => {
     if (
       event.key ===
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS
@@ -307,7 +307,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
       this.storyEditorStalenessDetectionService.staleTabEventEmitter.emit();
       this.storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
     }
-  }
+  };
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading Story');
@@ -363,5 +363,9 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.windowRef.nativeWindow.removeEventListener(
+      'beforeunload',
+      this.onClosingStoryEditorBrowserTab
+    );
   }
 }

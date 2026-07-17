@@ -23,7 +23,7 @@ import {
 } from './feedback.model';
 
 const feedbackSessionInfo: FeedbackSessionInfo = {
-  console_logs_json: [
+  console_logs: [
     {
       error_message: 'TypeError: Something went wrong',
       log_level: 'error',
@@ -31,7 +31,7 @@ const feedbackSessionInfo: FeedbackSessionInfo = {
       stack_trace: 'Error stack trace',
     },
   ],
-  failed_requests_json: [
+  failed_requests: [
     {
       url: '/createhandler/web_feedback',
       method: 'POST',
@@ -41,13 +41,13 @@ const feedbackSessionInfo: FeedbackSessionInfo = {
       error_message: 'Request failed',
     },
   ],
-  navigation_history_json: [
+  navigation_history: [
     {
       path: '/learn/math',
       timestamp_msecs: 1234567892,
     },
   ],
-  environment_json: {
+  environment: {
     client_time_msecs: 1234567893,
     timezone_offset_mins: -330,
     user_agent: 'Mozilla/5.0 Chrome/136.0',
@@ -70,7 +70,7 @@ describe('LessonFeedbackModel', () => {
   it('should create a new LessonFeedbackModel from arguments', () => {
     const feedback = LessonFeedbackModel.createForSubmission({
       feedbackText: 'text',
-      lesson_metadata_json: {
+      lesson_metadata: {
         explorationId: 'test',
         explorationVersion: 1,
         stateName: 'intro',
@@ -92,7 +92,7 @@ describe('LessonFeedbackModel', () => {
   it('should convert to backend dict', () => {
     const feedback = LessonFeedbackModel.createForSubmission({
       feedbackText: 'text',
-      lesson_metadata_json: {
+      lesson_metadata: {
         explorationId: 'test',
         explorationVersion: 1,
         stateName: 'intro',
@@ -103,7 +103,7 @@ describe('LessonFeedbackModel', () => {
 
     expect(feedback.toBackendDict()).toEqual({
       feedback_text: 'text',
-      lesson_metadata_json: {
+      lesson_metadata: {
         exploration_id: 'test',
         exploration_version: 1,
         state_name: 'intro',
@@ -171,7 +171,7 @@ describe('ReportAnIssueModel', () => {
       source: 'lesson',
       report_message: 'text',
       page_url: 'http://localhost:8181/explore/test',
-      lesson_metadata_json: {
+      lesson_metadata: {
         exploration_id: 'test',
         exploration_version: 1,
         state_name: 'intro',

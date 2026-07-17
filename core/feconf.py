@@ -106,15 +106,15 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles')
+    os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('build', 'webpack_bundles')
+    else os.path.join('build')
 )
 # To know more about AOT visit https://angular.io/guide/glossary#aot
 FRONTEND_AOT_DIR = (
     os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('dist', 'oppia-angular-prod')
+    else os.path.join('build')
 )
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
@@ -228,10 +228,10 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_logs_json',
-    'failed_requests_json',
-    'navigation_history_json',
-    'environment_json',
+    'console_logs',
+    'failed_requests',
+    'navigation_history',
+    'environment',
 )
 
 # Allowed formats of how HTML is present in rule specs.

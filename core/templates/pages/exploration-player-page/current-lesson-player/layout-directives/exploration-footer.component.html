@@ -91,8 +91,11 @@
     font-size: 23px;
   }
   .hint-container {
+    inset-inline-end: 0;
     position: absolute;
-    right: 0;
+  }
+  [dir="rtl"] .hint-container {
+    transform: scaleX(-1);
   }
   .hint-box-add-ons {
     left: -5.5px;
