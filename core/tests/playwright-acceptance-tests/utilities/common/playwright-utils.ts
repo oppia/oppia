@@ -803,23 +803,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks an element using JavaScript's native click() method.
-   * This ensures Angular properly handles the event in its change detection
-   * cycle, which is more reliable than Puppeteer's simulated clicks for
-   * Angular components like the sidebar.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  async clickWithJavaScript(selector: string): Promise<void> {
-    await this.waitForElementToStabilize(selector);
-    await this.page.evaluate((sel: string) => {
-      const element = document.querySelector(sel) as HTMLElement;
-      if (element) {
-        element.click();
-      }
-    }, selector);
-  }
-
-  /**
    * Close all browsers for live BaseUser instances. This mirrors Puppeteer's
    * `closeBrowser` behaviour that closes all user contexts and captures
    * failure screenshots when required.

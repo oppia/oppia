@@ -16,7 +16,7 @@
  * @fileoverview Utility class to interact with RTE editor.
  */
 
-import {Page, ElementHandle} from '@playwright/test';
+import {ElementHandle} from '@playwright/test';
 import {BaseUser} from './playwright-utils';
 import {showMessage} from './show-message';
 
@@ -198,7 +198,3 @@ export class RTEEditor extends BaseUser {
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 }
-
-export const RTEEditorFactory = (page: Page): RTEEditor => {
-  return new RTEEditor(page);
-};

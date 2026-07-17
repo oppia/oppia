@@ -17,6 +17,7 @@
  */
 
 import {Page, ElementHandle} from '@playwright/test';
+import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditorModal} from '../common/exploration-editor';
@@ -198,7 +199,7 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 } as const;
 
-export class ExplorationEditor extends RTEEditor {
+export class ExplorationEditor extends BaseUser {
   /**
    * Navigate to creator dashboard page.
    */
@@ -215,20 +216,21 @@ export class ExplorationEditor extends RTEEditor {
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
 
+    const rteEditor = new RTEEditor(this.page);
     // Add Bold text.
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
     await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
 
     // Add Italic text.
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
     await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
 
     // Add Numbered List.
-    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
@@ -236,7 +238,7 @@ export class ExplorationEditor extends RTEEditor {
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
-    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
@@ -244,24 +246,24 @@ export class ExplorationEditor extends RTEEditor {
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
     await this.typeInInputField(stateContentInputField, 'Pre formatted text');
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
     await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
 
     // Add Collapsible Block.
-    await this.addCollapsibleBlockRTE();
+    await rteEditor.addCollapsibleBlockRTE();
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add Image.
-    await this.addImageRTE(
+    await rteEditor.addImageRTE(
       testConstants.data.profilePicture,
       'Test Image',
       'Test Image Caption'
@@ -271,17 +273,17 @@ export class ExplorationEditor extends RTEEditor {
     await this.page.keyboard.press('ArrowRight');
 
     // Video.
-    await this.addVideoRTE(oppiaYouTubeVideoUrl);
+    await rteEditor.addVideoRTE(oppiaYouTubeVideoUrl);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add Link.
-    await this.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
+    await rteEditor.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
     // Math Formula.
-    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
     const textareaElement = await this.page.$(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
@@ -294,7 +296,7 @@ export class ExplorationEditor extends RTEEditor {
     await this.page.keyboard.press('Enter');
 
     // Concept Card.
-    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     if (skillSearchElement) {
@@ -307,7 +309,7 @@ export class ExplorationEditor extends RTEEditor {
     await this.page.keyboard.press('Enter');
 
     // Tab Contents.
-    await this.addTabContentsRTE();
+    await rteEditor.addTabContentsRTE();
     await this.page.keyboard.press('ArrowRight');
 
     await this.clickOnElementWithSelector(saveContentButton);
@@ -962,7 +964,7 @@ export class ExplorationEditor extends RTEEditor {
         force: true,
       });
       await this.expectElementToBeVisible(mobileNavbarPane);
-      await this.clickWithJavaScript(mobileMainTabButton);
+      await this.page.locator(mobileMainTabButton).dispatchEvent('click');
 
       // Close dropdown if it doesn't automatically close.
       const isVisible = await this.isElementVisible(

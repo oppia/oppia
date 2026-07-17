@@ -36,7 +36,6 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
-import {RTEEditorFactory} from '../common/rte-editor';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -202,7 +201,6 @@ export class UserFactory {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
       LoggedOutUserFactory(page),
       LoggedInUserFactory(page),
-      RTEEditorFactory(page),
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
