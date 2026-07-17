@@ -72,7 +72,9 @@
     "core/templates/pages/teach-page/teach-page.component.css",
     "core/templates/pages/topic-viewer-page/topic-viewer-page.component.css",
     "core/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css",
-    "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts"],
+    "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
+  ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
     "core/templates/pages/oppia-root/index.ts",
@@ -92,5 +94,4 @@
     "extensions/interactions/interactionsQuestionsRequires.ts",
     "extensions/value_generators/valueGeneratorsRequires.ts"
   ]
-
 }
