@@ -90,7 +90,7 @@ class LessonFeedbackSubmitHandler(
                     ],
                 }
             },
-            'lesson_metadata_json': {
+            'lesson_metadata': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
@@ -114,7 +114,7 @@ class LessonFeedbackSubmitHandler(
         assert self.normalized_payload is not None
         payload = self.normalized_payload
         feedback_text = payload['feedback_text']
-        lesson_metadata_json = payload['lesson_metadata_json']
+        lesson_metadata = payload['lesson_metadata']
 
         domain_objects_validator.validate_lesson_feedback_submit_payload_coupling(
             payload=payload
@@ -123,7 +123,7 @@ class LessonFeedbackSubmitHandler(
         feedback = general_feedback_services.create_lesson_feedback(
             author_id=self.user_id,
             feedback_text=feedback_text,
-            lesson_metadata_json=lesson_metadata_json,
+            lesson_metadata=lesson_metadata,
         )
 
         self.render_json({'id': feedback.id})
@@ -172,7 +172,7 @@ class PlatformFeedbackSubmitHandler(
                 },
                 'default_value': None,
             },
-            'lesson_metadata_json': {
+            'lesson_metadata': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
@@ -250,7 +250,7 @@ class PlatformFeedbackSubmitHandler(
         page_url = payload['page_url']
         assert page_url is not None
         category = payload.get('category')
-        lesson_metadata_json = payload.get('lesson_metadata_json')
+        lesson_metadata = payload.get('lesson_metadata')
         include_technical_logs = payload.get('include_technical_logs', False)
         session_info = payload.get('session_info')
         screenshot_filename = payload.get('screenshot_filename')
@@ -278,8 +278,8 @@ class PlatformFeedbackSubmitHandler(
             source=source,
             page_url=page_url,
             category=category,
-            lesson_metadata_json=lesson_metadata_json,
-            session_info_json=session_info,
+            lesson_metadata=lesson_metadata,
+            session_info=session_info,
             screenshot_filename=screenshot_filename,
             screenshot_entity_id=screenshot_entity_id,
             include_technical_logs=include_technical_logs,
