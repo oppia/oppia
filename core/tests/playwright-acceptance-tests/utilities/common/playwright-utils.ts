@@ -157,7 +157,6 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: 'networkidle'});
-    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -801,6 +800,23 @@ export class BaseUser {
     }
 
     await navigationPromise;
+  }
+
+  /**
+   * Clicks an element using JavaScript's native click() method.
+   * This ensures Angular properly handles the event in its change detection
+   * cycle, which is more reliable than Puppeteer's simulated clicks for
+   * Angular components like the sidebar.
+   * @param {string} selector - The CSS selector of the element to click.
+   */
+  async clickWithJavaScript(selector: string): Promise<void> {
+    await this.waitForElementToStabilize(selector);
+    await this.page.evaluate((sel: string) => {
+      const element = document.querySelector(sel) as HTMLElement;
+      if (element) {
+        element.click();
+      }
+    }, selector);
   }
 
   /**
