@@ -167,6 +167,41 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
   }));
 
+  it('should use state url query params when route query params are missing', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToPracticeSessionPage'
+    ).and.returnValue(Promise.resolve());
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+
+    Object.defineProperty(routeSnapshot, 'params', {
+      get: () => ({
+        classroom_url_fragment: 'math',
+        topic_url_fragment: 'algebra',
+      }),
+    });
+
+    Object.defineProperty(routeSnapshot, 'queryParams', {
+      get: () => ({}),
+    });
+
+    let canActivateResult: boolean | null = null;
+
+    guard
+      .canActivate(routeSnapshot, {
+        url: '/learn/math/algebra/practice/session?selected_subtopic_ids=%5B1%5D',
+      } as RouterStateSnapshot)
+      .then(result => {
+        canActivateResult = result;
+      });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '[1]');
+  }));
+
   it('should allow access for lesson practice when node_id is present', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
