@@ -153,6 +153,14 @@ const routes: Route[] = [
       ).then(m => m.DiagnosticTestPlayerPageModule),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CERTIFICATE_ASSESSMENT_PLAYER.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/certificate-assessment-player-page/certificate-assessment-player-page.module'
+      ).then(m => m.CertificateAssessmentPlayerPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
