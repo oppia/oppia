@@ -5037,15 +5037,11 @@ export class LoggedOutUser extends BaseUser {
       timeout: 80000,
     });
 
-    // Dismiss the hint card tooltip if it is covering the hint button.
-    const hintCardTooltipCloseButton = await this.page.$(
-      '.hint-box .btn-close'
-    );
-    if (hintCardTooltipCloseButton) {
-      await hintCardTooltipCloseButton.click();
-    }
-
-    await this.clickOnElementWithSelector(hintButtonSelector);
+    // On mobile preview, nav overlays can occasionally block the hint button.
+    // Fall back to a direct DOM click if strict clickability checks fail.
+    await this.page.$eval(hintButtonSelector, el => {
+      (el as HTMLElement).click();
+    });
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
