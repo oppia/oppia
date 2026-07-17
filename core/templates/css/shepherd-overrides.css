@@ -1,0 +1,252 @@
+.shepherd-element,
+.shepherd-content,
+.shepherd-header,
+.shepherd-footer,
+.shepherd-button,
+.shepherd-cancel-icon {
+  transition: none !important;
+}
+
+.shepherd-button {
+  background-color: #000;
+  border: 2px solid #000;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: normal;
+  margin-right: 0;
+  outline: 0;
+  padding: 6px 12px;
+  text-transform: uppercase;
+  transition: none;
+}
+
+.shepherd-cancel-icon {
+  background: transparent;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: normal;
+  height: 24px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transition: none;
+  width: 24px;
+}
+
+.shepherd-content {
+  background-color: #fff;
+  border-radius: 0;
+  box-sizing: border-box;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  position: relative;
+}
+
+.shepherd-arrow {
+  height: 16px;
+  position: absolute;
+  width: 16px;
+  z-index: -1;
+}
+
+.shepherd-element {
+  border-radius: 0;
+  box-shadow: 0 0 30px 1px #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  max-width: 900px;
+  position: absolute;
+  z-index: 1016;
+}
+
+.shepherd-footer {
+  align-items: center;
+  border-radius: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: 0;
+  padding-left: 8px;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.shepherd-header {
+  align-items: center;
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  line-height: normal;
+  padding: 8px;
+}
+
+.shepherd-modal-overlay-container {
+  z-index: 997;
+}
+
+.shepherd-step-counter {
+  background: none !important;
+  border: none !important;
+  color: #000 !important;
+  cursor: default !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+  margin-right: auto;
+  padding: 0 !important;
+  pointer-events: none;
+  text-transform: none;
+}
+
+.shepherd-text {
+  color: #000;
+  font-size: 16px;
+  line-height: normal;
+  padding: 10px 8px;
+  text-align: left;
+}
+
+.shepherd-title {
+  color: #000;
+  display: block;
+  flex: none;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+}
+
+.shepherd-arrow:before {
+  background: #fff;
+  content: "";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: rotate(45deg);
+  width: 100%;
+}
+
+.shepherd-button:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.shepherd-button:not(:disabled):hover {
+  background-color: #fff;
+  border: 2px solid #000;
+  color: #000;
+}
+
+.shepherd-button.shepherd-button-secondary {
+  background: #000;
+  border: 2px solid #000;
+  color: #fff;
+}
+
+.shepherd-cancel-icon:hover {
+  color: #000;
+}
+
+.shepherd-text li {
+  color: #000;
+  font-size: 16px;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.shepherd-text p {
+  margin: 0 0 8px;
+}
+
+.shepherd-text ul {
+  list-style-position: outside;
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+.shepherd-footer .shepherd-button:last-child {
+  margin-left: 2.5px;
+  margin-right: 0;
+}
+
+.shepherd-text p:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-text ul:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-button.shepherd-button-secondary:not(:disabled):hover {
+  background-color: #fff;
+  border: 2px solid #000;
+  color: #000;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+  background: transparent;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: normal;
+  height: 24px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transition: none;
+  width: 24px;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+  align-items: center;
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  line-height: normal;
+  padding: 8px;
+}
+
+.shepherd-element.shepherd-centered > .shepherd-arrow {
+  display: none;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+  color: #000;
+}
+
+.shepherd-element[data-popper-placement^="bottom"] > .shepherd-arrow {
+  top: -8px;
+}
+
+.shepherd-element[data-popper-placement^="left"] > .shepherd-arrow {
+  right: -8px;
+}
+
+.shepherd-element[data-popper-placement^="right"] > .shepherd-arrow {
+  left: -8px;
+}
+
+.shepherd-element[data-popper-placement^="top"] > .shepherd-arrow {
+  bottom: -8px;
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^="bottom"] > .shepherd-arrow:before {
+  background: #fff;
+}
