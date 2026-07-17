@@ -206,6 +206,100 @@ describe('Question backend Api service', () => {
     expect(failHandler).toHaveBeenCalledWith('Error fetching question count.');
   }));
 
+  it('should successfully fetch a paginated page of questions for the skill preview', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let paginatedQuestionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=20' +
+      '&fetch_by_difficulty=false&offset=0';
+
+    questionBackendApiService
+      .fetchQuestionsForSkillPreviewPageAsync('1', 20, 0)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      paginatedQuestionPlayerHandlerUrl
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      question_dicts: sampleDataResults.question_dicts,
+      more: true,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      questionDicts: sampleDataResults.question_dicts,
+      more: true,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should compute the correct offset for a later page when fetching a paginated skill preview page', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let paginatedQuestionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=20' +
+      '&fetch_by_difficulty=false&offset=40';
+
+    questionBackendApiService
+      .fetchQuestionsForSkillPreviewPageAsync('1', 20, 40)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      paginatedQuestionPlayerHandlerUrl
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      question_dicts: [],
+      more: false,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      questionDicts: [],
+      more: false,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use the fail handler if fetching a paginated skill preview page fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let paginatedQuestionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=20' +
+      '&fetch_by_difficulty=false&offset=0';
+
+    questionBackendApiService
+      .fetchQuestionsForSkillPreviewPageAsync('1', 20, 0)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      paginatedQuestionPlayerHandlerUrl
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error fetching paginated questions.',
+      },
+      {
+        status: 400,
+        statusText: 'Invalid request',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error fetching paginated questions.'
+    );
+  }));
+
   it('should use the fail handler if the backend request failed', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');

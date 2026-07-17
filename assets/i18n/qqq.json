@@ -1389,6 +1389,7 @@
   "I18N_SKILL_LEVEL_INTERMIDIATE": "Text denoting intermediate level mastery of user in a particular skill.",
   "I18N_SKILL_LEVEL_NEEDS_WORK": "Text denoting user needs to work upon a particular skill that needs to be improved.",
   "I18N_SKILL_LEVEL_PROFICIENT": "Text denoting proficient level mastery of user in a particular skill.",
+  "I18N_SKILL_PREVIEW_TAB_QUESTIONS_NUMBER_DISPLAY": "Text shown in the Skill Editor's Preview tab indicating which range of questions (out of the total linked to the skill) is currently displayed, e.g. 'Displaying 1 - 20 of 45 questions'.",
   "I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK": "Text to introduce the regular feedback that Oppia shows after the student submits the answer details.",
   "I18N_SOLICIT_ANSWER_DETAILS_QUESTION": "Text for the question which asks the students to explain why they entered a particular answer.",
   "I18N_SOLUTION_EXPLANATION_TITLE": "Title shown in the section that shows the explanation of a solution to the learner.\n{{identical|Explanation}}",
