@@ -1150,6 +1150,17 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
 )
+START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
+
+SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
+    '/submit_certificate_assessment_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
+    '/certificate_assessment_result_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
+    '/certificate_assessment_attempts_handler'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
