@@ -106,7 +106,6 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
                 'lesson_metadata': base_models.EXPORT_POLICY.EXPORTED,
-                'lesson_metadata': base_models.EXPORT_POLICY.EXPORTED,
                 # Fields specific to LessonFeedbackModel.
                 'parent_feedback_id': base_models.EXPORT_POLICY.EXPORTED,
                 'response_list_schema_version': base_models.EXPORT_POLICY.EXPORTED,
@@ -381,7 +380,6 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'lesson_metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 # Fields specific to PlatformFeedbackModel.
                 'source': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -744,10 +742,10 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
 
         self.assertIsNotNone(session_log_model)
         assert session_log_model is not None
-        self.assertIsNone(session_log_model.console_logs_json)
-        self.assertIsNone(session_log_model.failed_requests_json)
-        self.assertIsNone(session_log_model.navigation_history_json)
-        self.assertIsNone(session_log_model.environment_json)
+        self.assertIsNone(session_log_model.console_logs)
+        self.assertIsNone(session_log_model.failed_requests)
+        self.assertIsNone(session_log_model.navigation_history)
+        self.assertIsNone(session_log_model.environment)
 
     def test_create_raises_error_for_duplicate_thread_id(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
