@@ -25,6 +25,7 @@ import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-s
 
 import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
+import './select-skill-modal.component.css';
 export {CategorizedSkills};
 
 @Component({

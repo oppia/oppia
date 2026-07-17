@@ -19,6 +19,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import './question-misconception-selector.component.css';
 import {
   Misconception,
   MisconceptionSkillMap,

@@ -22,6 +22,7 @@ import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import './on-screen-keyboard.component.css';
 
 @Component({
   selector: 'oppia-on-screen-keyboard',

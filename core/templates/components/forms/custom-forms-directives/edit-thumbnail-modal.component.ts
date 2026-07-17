@@ -21,6 +21,7 @@ import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import './edit-thumbnail-modal.component.css';
 
 interface InvalidTagsAndAttributes {
   tags: string[];

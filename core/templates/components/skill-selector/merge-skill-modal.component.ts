@@ -23,6 +23,7 @@ import {AugmentedSkillSummary} from 'domain/skill/augmented-skill-summary.model'
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import './merge-skill-modal.component.css';
 
 @Component({
   selector: 'oppia-merge-skill',

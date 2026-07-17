@@ -29,6 +29,7 @@ import {Rubric} from 'domain/skill/rubric.model';
 import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import {Schema} from 'services/schema-default-value.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import './rubrics-editor.component.css';
 
 interface Explanation {
   [key: string]: string[];

@@ -20,6 +20,7 @@ import {Component, Input, OnInit} from '@angular/core';
 
 import {SkillMasteryListConstants} from 'components/skills-mastery-list/skills-mastery-list.constants';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
+import './skill-mastery.component.css';
 
 @Component({
   selector: 'skill-mastery-viewer',

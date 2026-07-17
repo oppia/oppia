@@ -27,6 +27,7 @@ import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {EditThumbnailModalComponent} from './edit-thumbnail-modal.component';
+import './thumbnail-uploader.component.css';
 
 @Component({
   selector: 'oppia-thumbnail-uploader',

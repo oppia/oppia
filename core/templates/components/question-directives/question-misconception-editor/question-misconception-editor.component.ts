@@ -30,6 +30,7 @@ import {TagMisconceptionModalComponent} from './tag-misconception-modal-componen
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Subscription} from 'rxjs';
+import './question-misconception-editor.component.css';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception | null;

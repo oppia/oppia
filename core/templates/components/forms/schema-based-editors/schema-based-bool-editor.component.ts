@@ -17,6 +17,7 @@
  */
 
 import {Component, forwardRef, Input} from '@angular/core';
+import './schema-based-bool-editor.component.css';
 import {
   NG_VALUE_ACCESSOR,
   NG_VALIDATORS,

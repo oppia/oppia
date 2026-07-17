@@ -24,6 +24,7 @@ import {PageContextService} from 'services/page-context.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
+import './image-uploader.component.css';
 
 export interface ImageUploaderParameters {
   disabled: boolean;

@@ -21,6 +21,7 @@ import {MatRadioChange} from '@angular/material/radio';
 import {AppConstants} from 'app.constants';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
+import './question-difficulty-selector.component.css';
 
 type SkillLabelToFloatKey =
   keyof typeof AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT;

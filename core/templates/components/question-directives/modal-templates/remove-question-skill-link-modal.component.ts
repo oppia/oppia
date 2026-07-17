@@ -24,6 +24,7 @@ import {AssignedSkill} from 'domain/skill/assigned-skill.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import './remove-question-skill-link-modal.component.css';
 
 export interface TopicNameToTopicId {
   [key: string]: string;

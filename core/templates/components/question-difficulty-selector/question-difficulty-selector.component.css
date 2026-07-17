@@ -22,11 +22,11 @@
 .oppia-skill-description-container {
   font-weight: 400;
   margin-left: 30px;
+  overflow-wrap: break-word;
   white-space: normal;
-  word-break: break-word;
 }
 
-/* :ng-deep is used to style the inner elements of the radio button.*/
+/* :ng-deep is used to style the inner elements of the radio button. */
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 ::ng-deep .single-option .mat-radio-container {
   display: none;

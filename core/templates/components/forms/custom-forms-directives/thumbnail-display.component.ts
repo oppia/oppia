@@ -20,6 +20,7 @@ import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
 
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import './thumbnail-display.component.css';
 
 @Component({
   selector: 'oppia-thumbnail-display',

@@ -44,6 +44,7 @@ import {EditabilityService} from 'services/editability.service';
 import type {InteractionData} from 'interactions/customization-args-defs';
 import {LoaderService} from 'services/loader.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import './question-editor.component.css';
 
 @Component({
   selector: 'oppia-question-editor',
