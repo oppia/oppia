@@ -587,7 +587,7 @@ const revisionTabSelector = 'subtopics-list';
 
 const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const startPracticeButtonSelector = '.e2e-test-practice-start-button';
-const practiceSessionContainerSelector = 'practice-session-page';
+const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
 
 const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
@@ -4132,6 +4132,8 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
       timeout: 60000,
     });
+    await this.expectElementToBeVisible(practiceTabButtonSelector);
+    await this.clickOnElementWithSelector(practiceTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(practiceTabContainerSelector);
@@ -7030,26 +7032,13 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.page.waitForSelector(startPracticeButtonSelector);
-    await Promise.all([
-      this.page.waitForNavigation({
-        waitUntil: ['networkidle2', 'load'],
-        timeout: 60000,
-      }),
-      this.clickOnElementWithSelector(startPracticeButtonSelector),
-    ]);
+    await this.clickOnElementWithSelector(startPracticeButtonSelector);
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
     });
-    await this.page.waitForFunction(() => {
-      const currentUrl = window.location.href;
-      return (
-        currentUrl.includes('/practice/session') &&
-        currentUrl.includes('selected_subtopic_ids=')
-      );
-    });
     await this.page.waitForSelector(practiceSessionContainerSelector, {
       visible: true,
-      timeout: 60000,
+      timeout: 30000,
     });
   }
 

@@ -37,27 +37,11 @@ export class PracticeSessionAccessGuard implements CanActivate {
     private location: Location
   ) {}
 
-  private getSelectedSubtopicIds(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): string {
-    const routeParam = route.queryParams.selected_subtopic_ids;
-
-    if (typeof routeParam === 'string' && routeParam.length > 0) {
-      return routeParam;
-    }
-
-    // In some route transitions, query params are not available on snapshot.
-    const stateUrl = state.url || '';
-    const urlSearchParams = new URLSearchParams(stateUrl.split('?')[1] || '');
-    return urlSearchParams.get('selected_subtopic_ids') || '';
-  }
-
   async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    const selectedSubtopicIds = this.getSelectedSubtopicIds(route, state);
+    const selectedSubtopicIds = route.queryParams.selected_subtopic_ids || '';
     const classroomUrlFragment =
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
