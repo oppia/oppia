@@ -89,7 +89,7 @@ class FeedbackSubmitPayloadDict(TypedDict):
     """Normalized payload for FeedbackSubmitHandler POST."""
 
     feedback_text: str
-    lesson_metadata_json: LessonMetadataDict
+    lesson_metadata: LessonMetadataDict
 
 
 class PlatformFeedbackSubmitPayloadDict(TypedDict):
@@ -99,7 +99,7 @@ class PlatformFeedbackSubmitPayloadDict(TypedDict):
     report_message: str
     page_url: str
     category: Optional[str]
-    lesson_metadata_json: Optional[LessonMetadataDict]
+    lesson_metadata: Optional[LessonMetadataDict]
     include_technical_logs: bool
     # Here we use object because session-info diagnostics are heterogeneous
     # JSON-like payloads (nested dict/list values) from client logs.
