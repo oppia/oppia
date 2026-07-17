@@ -228,10 +228,10 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_logs_json',
-    'failed_requests_json',
-    'navigation_history_json',
-    'environment_json',
+    'console_logs',
+    'failed_requests',
+    'navigation_history',
+    'environment',
 )
 
 # Allowed formats of how HTML is present in rule specs.
