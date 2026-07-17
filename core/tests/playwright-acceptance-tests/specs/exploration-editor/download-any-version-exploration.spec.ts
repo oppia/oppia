@@ -56,7 +56,6 @@ test.describe('Exploration Creator', function () {
 
     await explorationEditor.updateCardContent('Modified version 5 ');
     await explorationEditor.saveExplorationDraft();
-    await UserFactory.closeSuperAdminBrowser();
   });
 
   test('should download any version of Exploration', async function () {
