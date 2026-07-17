@@ -74,7 +74,7 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                     feconf.LESSON_FEEDBACK_URL,
                     {
                         'feedback_text': 'Helpful lesson.',
-                        'lesson_metadata_json': self._get_lesson_metadata(),
+                        'lesson_metadata': self._get_lesson_metadata(),
                     },
                     csrf_token=csrf_token,
                     expected_status_int=200,
@@ -84,7 +84,7 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
         create_lesson_feedback_mock.assert_called_once_with(
             author_id=self.viewer_id,
             feedback_text='Helpful lesson.',
-            lesson_metadata_json=self._get_lesson_metadata(),
+            lesson_metadata=self._get_lesson_metadata(),
         )
 
     def test_submit_lesson_feedback_rejects_logged_out_user(self) -> None:
@@ -94,7 +94,7 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             feconf.LESSON_FEEDBACK_URL,
             {
                 'feedback_text': 'Helpful lesson.',
-                'lesson_metadata_json': self._get_lesson_metadata(),
+                'lesson_metadata': self._get_lesson_metadata(),
             },
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -112,14 +112,14 @@ class FeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                 feconf.LESSON_FEEDBACK_URL,
                 {
                     'feedback_text': 'Helpful lesson.',
-                    'lesson_metadata_json': None,
+                    'lesson_metadata': None,
                 },
                 csrf_token=csrf_token,
                 expected_status_int=400,
             )
 
         self.assertIn(
-            'Missing key in handler args: lesson_metadata_json',
+            'Missing key in handler args: lesson_metadata',
             response['error'],
         )
 
@@ -190,7 +190,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                     'report_message': 'The card image is broken.',
                     'page_url': 'https://oppia.org/exp1',
                     'category': 'broken_layout_or_image',
-                    'lesson_metadata_json': self._get_lesson_metadata(),
+                    'lesson_metadata': self._get_lesson_metadata(),
                     'include_technical_logs': False,
                     'session_info': None,
                     'screenshot_filename': None,
@@ -207,8 +207,8 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             source='lesson',
             page_url='https://oppia.org/exp1',
             category='broken_layout_or_image',
-            lesson_metadata_json=self._get_lesson_metadata(),
-            session_info_json=None,
+            lesson_metadata=self._get_lesson_metadata(),
+            session_info=None,
             screenshot_filename=None,
             screenshot_entity_id=None,
             include_technical_logs=False,
@@ -264,7 +264,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                     'report_message': 'The card image is broken.',
                     'page_url': 'https://oppia.org/exp1',
                     'category': 'broken_layout_or_image',
-                    'lesson_metadata_json': self._get_lesson_metadata(),
+                    'lesson_metadata': self._get_lesson_metadata(),
                     'include_technical_logs': False,
                     'session_info': None,
                     'screenshot_filename': None,
@@ -291,7 +291,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                     'report_message': 'The card image is broken.',
                     'page_url': 'https://oppia.org/exp1',
                     'category': 'broken_layout_or_image',
-                    'lesson_metadata_json': self._get_lesson_metadata(),
+                    'lesson_metadata': self._get_lesson_metadata(),
                     'include_technical_logs': False,
                     'session_info': None,
                     'screenshot_filename': None,
@@ -327,7 +327,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                     'report_message': 'Something is wrong.',
                     'page_url': 'https://oppia.org/exp1',
                     'category': None,
-                    'lesson_metadata_json': self._get_lesson_metadata(),
+                    'lesson_metadata': self._get_lesson_metadata(),
                     'include_technical_logs': False,
                     'session_info': None,
                     'screenshot_filename': None,
@@ -350,7 +350,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                 'report_message': 'Something is wrong.',
                 'page_url': 'https://oppia.org/exp1',
                 'category': 'other_or_not_sure',
-                'lesson_metadata_json': None,
+                'lesson_metadata': None,
                 'include_technical_logs': False,
                 'session_info': None,
                 'screenshot_filename': None,
@@ -362,7 +362,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'lesson_metadata_json is required for lesson reports.',
+            'lesson_metadata is required for lesson reports.',
         )
 
     def test_submit_site_issue_report_rejects_metadata(self) -> None:
@@ -375,7 +375,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                 'report_message': 'The page is broken.',
                 'page_url': 'https://oppia.org/exp1',
                 'category': None,
-                'lesson_metadata_json': self._get_lesson_metadata(),
+                'lesson_metadata': self._get_lesson_metadata(),
                 'include_technical_logs': False,
                 'session_info': None,
                 'screenshot_filename': None,
@@ -387,7 +387,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'lesson_metadata_json must be omitted for site reports.',
+            'lesson_metadata must be omitted for site reports.',
         )
 
     def test_submit_issue_report_with_screenshot_successfully(self) -> None:
@@ -426,7 +426,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
                     'report_message': 'The card image is broken.',
                     'page_url': 'https://oppia.org/exp1',
                     'category': 'broken_layout_or_image',
-                    'lesson_metadata_json': self._get_lesson_metadata(),
+                    'lesson_metadata': self._get_lesson_metadata(),
                     'include_technical_logs': False,
                     'session_info': None,
                     'screenshot_filename': 'feedback.png',

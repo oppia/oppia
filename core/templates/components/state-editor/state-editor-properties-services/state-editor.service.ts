@@ -37,6 +37,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {State} from 'domain/state/state.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;
@@ -60,12 +61,14 @@ export class StateEditorService {
   private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
-  private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
+  private _updateAnswerChoicesEventEmitter = new EventEmitter<
+    AnswerChoice[] | null
+  >();
 
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _saveOutcomeDestIfStuckDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter = new EventEmitter<
-    AnswerChoice[]
+    AnswerChoice[] | null
   >();
 
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
@@ -173,7 +176,7 @@ export class StateEditorService {
     this.interaction = newInteraction;
   }
 
-  setInteractionId(newId: string | null): void {
+  setInteractionId(newId: InteractionSpecsKey | null): void {
     this.interaction.setId(newId);
   }
 
@@ -213,7 +216,7 @@ export class StateEditorService {
   // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
   // 'DragAndDropSortInput'.
   getAnswerChoices(
-    interactionId: string,
+    interactionId: InteractionSpecsKey | null,
     customizationArgs: InteractionCustomizationArgs
   ): AnswerChoice[] | null {
     if (!interactionId) {
@@ -340,7 +343,7 @@ export class StateEditorService {
     return this._refreshStateTranslationEventEmitter;
   }
 
-  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[]> {
+  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[] | null> {
     return this._updateAnswerChoicesEventEmitter;
   }
 
@@ -352,7 +355,7 @@ export class StateEditorService {
     return this._saveOutcomeDestIfStuckDetailsEventEmitter;
   }
 
-  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
+  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[] | null> {
     return this._handleCustomArgsUpdateEventEmitter;
   }
 

@@ -255,8 +255,7 @@ export class FeedbackModalComponent implements OnInit {
       this.formError = this.translateService.instant(
         'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG',
         {
-          length: this.feedbackText.length,
-          maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
+          characterCount: `${this.feedbackText.length}/${this.MAX_REPORT_MESSAGE_LENGTH}`,
         }
       );
       return false;
@@ -358,7 +357,7 @@ export class FeedbackModalComponent implements OnInit {
     const lessonFeedbackMetadata = this.getLessonFeedbackMetadata();
     const feedbackPayload = LessonFeedbackModel.createForSubmission({
       feedbackText: this.feedbackText,
-      lesson_metadata_json: {
+      lesson_metadata: {
         explorationId: lessonFeedbackMetadata.explorationId,
         explorationVersion: lessonFeedbackMetadata.explorationVersion,
         stateName: lessonFeedbackMetadata.stateName,

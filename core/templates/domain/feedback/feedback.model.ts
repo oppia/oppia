@@ -40,7 +40,7 @@ export interface LessonFeedbackMetadataBackendDict {
 
 export interface LessonFeedbackBackendDict {
   feedback_text: string;
-  lesson_metadata_json: LessonFeedbackMetadataBackendDict;
+  lesson_metadata: LessonFeedbackMetadataBackendDict;
 }
 
 export class LessonFeedbackModel {
@@ -51,18 +51,15 @@ export class LessonFeedbackModel {
 
   static createForSubmission(params: {
     feedbackText: string;
-    lesson_metadata_json: LessonFeedbackMetadata;
+    lesson_metadata: LessonFeedbackMetadata;
   }): LessonFeedbackModel {
-    return new LessonFeedbackModel(
-      params.feedbackText,
-      params.lesson_metadata_json
-    );
+    return new LessonFeedbackModel(params.feedbackText, params.lesson_metadata);
   }
 
   toBackendDict(): LessonFeedbackBackendDict {
     return {
       feedback_text: this.feedbackText,
-      lesson_metadata_json: {
+      lesson_metadata: {
         exploration_id: this.explorationContext.explorationId,
         exploration_version: this.explorationContext.explorationVersion,
         state_name: this.explorationContext.stateName,
@@ -85,7 +82,7 @@ export interface PlatformFeedbackBackendDict {
   source: ReportType;
   report_message: string;
   page_url: string;
-  lesson_metadata_json: LessonFeedbackMetadataBackendDict | null;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
   category: ReportAnIssueCategory | null;
   include_technical_logs: boolean;
   session_info: FeedbackSessionInfo | null;
@@ -130,7 +127,7 @@ export class PlatformFeedbackModel {
     return {
       source: this.source,
       report_message: this.reportMessage,
-      lesson_metadata_json: this.explorationContext
+      lesson_metadata: this.explorationContext
         ? {
             exploration_id: this.explorationContext.explorationId,
             exploration_version: this.explorationContext.explorationVersion,
@@ -159,13 +156,13 @@ export type FeedbackStatus =
   | 'transferred_to_github';
 
 export interface FeedbackSessionInfo {
-  console_logs_json: {
+  console_logs: {
     error_message: string;
     log_level: 'error' | 'warn' | 'log' | 'info' | 'debug';
     timestamp_msecs: number;
     stack_trace?: string;
   }[];
-  failed_requests_json: {
+  failed_requests: {
     url: string;
     method: string;
     status_code: number;
@@ -173,11 +170,11 @@ export interface FeedbackSessionInfo {
     status_text?: string;
     error_message?: string;
   }[];
-  navigation_history_json: {
+  navigation_history: {
     path: string;
     timestamp_msecs: number;
   }[];
-  environment_json: {
+  environment: {
     client_time_msecs: number;
     timezone_offset_mins: number;
     user_agent: string;

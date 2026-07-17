@@ -36,7 +36,7 @@ enum CARD_NAME {
 }
 
 const EXPLORATION_ATTRIBUTION_HTML = (explorationId: string | null) =>
-  `<a href="http://localhost:8181/explore/${explorationId}#">Oppia</a> // <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY SA 4.0</a>`;
+  `<a href="http://localhost:8181/explore/${explorationId}">Oppia</a> // <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY SA 4.0</a>`;
 const EXPLORATION_ATTRIBUTION_PRINT =
   '"Algebra Basics" by explorationEditor. Oppia. http://localhost:8181/explore/';
 

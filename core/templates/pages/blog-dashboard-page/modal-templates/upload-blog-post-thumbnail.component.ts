@@ -31,7 +31,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Cropper from 'cropperjs';
-require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-upload-blog-post-thumbnail',
