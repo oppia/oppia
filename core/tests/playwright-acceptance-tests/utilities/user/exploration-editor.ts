@@ -129,9 +129,6 @@ const historyListOptions = '.e2e-test-history-table-option';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
 
-const mainTabButton = '.e2e-test-main-tab';
-const mobileMainTabButton = '.e2e-test-mobile-main-tab';
-
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
