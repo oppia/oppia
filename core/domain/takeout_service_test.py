@@ -1681,7 +1681,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             feedback_text=self.LESSON_FEEDBACK_TEXT_1,
             exploration_id='exp_id_1',
             status=feedback_models.STATUS_CHOICES_OPEN,
-            exploration_id='exp_id_1',
             lesson_metadata_schema_version=(
                 feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
             ),
