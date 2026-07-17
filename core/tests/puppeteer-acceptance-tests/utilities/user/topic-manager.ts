@@ -2996,13 +2996,16 @@ export class TopicManager extends BaseUser {
       await this.page.type(subtopicUrlFragmentField, urlFragment);
     }
 
-    // If the study guide has multiple sections, we need to expand the first section
-    // before we can edit its content.
+    // The subtopic now uses the study guide section editor. Expand the first
+    // section tile so that the section-content edit icon becomes visible.
     const firstSectionSelector = '.e2e-test-study-guide-section-0';
-    if (await this.page.$(firstSectionSelector)) {
-      await this.clickOnElementWithSelector(firstSectionSelector);
-    }
+    await this.page.waitForSelector(firstSectionSelector, {visible: true});
+    await this.clickOnElementWithSelector(firstSectionSelector);
 
+    // Click the section-content edit icon to open the content editor.
+    await this.page.waitForSelector(editSubtopicExplanationSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(editSubtopicExplanationSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.clearAllTextFrom(richTextAreaField);
@@ -3172,9 +3175,16 @@ export class TopicManager extends BaseUser {
       );
     }
 
-    await this.page.waitForSelector(htmlContent);
-    const isExplanationPresent = await this.isTextPresentOnPage(explanation);
-    if (!isExplanationPresent) {
+    // The study guide preview now renders sections in .card-content elements
+    // instead of the legacy .html-content element.
+    await this.page.waitForSelector('.card-content', {visible: true});
+    try {
+      await this.page.waitForFunction(
+        (text: string) => document.body.innerText.includes(text),
+        {timeout: 5000},
+        explanation
+      );
+    } catch {
       throw new Error(
         `Expected explanation "${explanation}" to be present on the page, but it was not`
       );
