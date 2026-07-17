@@ -43,7 +43,7 @@ describe('Feedback backend api service', () => {
 
   const sendALessonFeedbackPayload = LessonFeedbackModel.createForSubmission({
     feedbackText: 'Hello',
-    lesson_metadata_json: {
+    lesson_metadata: {
       explorationId: 'test',
       explorationVersion: 1,
       stateName: 'intro',
