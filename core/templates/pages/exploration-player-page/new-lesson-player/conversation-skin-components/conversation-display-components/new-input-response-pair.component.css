@@ -18,9 +18,10 @@
 }
 
 .conversation-skin-oppia-feedback-container {
-  background-color: #fff;
-  border-radius: 0 16px 16px;
+  background-color: rgba(224,242,241,1);
+  border-radius: 0;
   margin-top: 10px;
+  margin-bottom: 20px;
   width: 70%;
 }
 

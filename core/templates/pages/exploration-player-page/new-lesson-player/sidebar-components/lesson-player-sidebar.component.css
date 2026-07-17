@@ -68,7 +68,8 @@
 .player-desktop-sidebar-menu {
   background-color: #f2f4f7;
   bottom: 0;
-  box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
+  right: 0;
+  box-shadow: -1px 0 0 2px rgba(0, 0, 0, 0.30);
   display: flex;
   flex-direction: column;
   height: calc(100vh - 96px);

@@ -12,6 +12,7 @@ oppia-progress-tracker {
   width: 375px;
 }
 
+<<<<<<< HEAD
 .card-navigation-control .oppia-learner-confirm-button {
   border-radius: 2px;
   font-size: 16px;
@@ -67,6 +68,8 @@ oppia-progress-tracker {
   cursor: default;
 }
 
+=======
+>>>>>>> f53d1283c8 (moved sidebar to right side and changed the question card structure back to old lesson player)
 .card-navigation-control {
   background-color: white;
   height: 60px;
@@ -150,7 +153,6 @@ oppia-progress-tracker {
   text-align: left;
 }
 
-
 /*
   The comment in the section below is an rtlcss value directive mentioned here:
   https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
@@ -162,14 +164,6 @@ oppia-progress-tracker {
   -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
-}
-
-.card-navigation-control .oppia-skip-button {
-  border: 1px solid #0d48a1;
-  color: #0d48a1;
-  font-weight: bold;
-  margin-right: 10px;
-  text-transform: uppercase;
 }
 
 @media (max-width: 1024px) {
@@ -186,21 +180,5 @@ oppia-progress-tracker {
 
   .card-navigation-control .control-container {
     max-width: 650px;
-  }
-}
-
-@media (max-width: 480px) {
-  .card-navigation-control .oppia-learner-confirm-button,
-  .card-navigation-control.continue-button {
-    font-size: 13px;
-  }
-
-  .card-navigation-control .right-side-buttons {
-    margin: 0;
-    margin-bottom: 20px;
-  }
-
-  .hide-save-btn {
-    width: 100px;
   }
 }
