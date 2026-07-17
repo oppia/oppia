@@ -1034,22 +1034,6 @@ export class ExplorationEditor extends BaseUser {
 
     throw new Error(`Version ${explorationVersion} not found in history list.`);
   }
-
-  /**
-   * Function to navigate back to the editor (main) tab.
-   */
-  async navigateToEditorTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      // On mobile, history table items may block the navbar dropdown click.
-      // Use a direct JavaScript click to bypass the blocking element.
-      await this.clickWithJavascript(mobileNavbarDropdown);
-      await this.expectElementToBeVisible(mobileMainTabButton);
-      await this.clickOnElementWithSelector(mobileMainTabButton);
-    } else {
-      await this.clickOnElementWithSelector(mainTabButton);
-    }
-    await this.expectElementToBeVisible(stateEditSelector);
-  }
 }
 
 export const ExplorationEditorFactory = (page: Page): ExplorationEditor => {
