@@ -48,16 +48,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {ExplorationEditorTabComponent} from './exploration-editor-tab.component';
-import {
-  DomRefService,
-  JoyrideDirective,
-  JoyrideOptionsService,
-  JoyrideService,
-  JoyrideStepsContainerService,
-  JoyrideStepService,
-  LoggerService,
-  TemplatesService,
-} from 'ngx-joyride';
+import {ShepherdService} from 'angular-shepherd';
 import {Router} from '@angular/router';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {State, StateBackendDict} from 'domain/state/state.model';
@@ -101,27 +92,37 @@ describe('Exploration editor tab component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
 
-  class MockJoyrideService {
-    startTour() {
-      return {
-        subscribe: (
-          value1: (arg: {number: number}) => void,
-          value2: () => void,
-          value3: () => void
-        ) => {
-          value1({number: 1});
-          value1({number: 2});
-          value1({number: 4});
-          value1({number: 5});
-          value1({number: 6});
-          value1({number: 8});
-          value2();
-          value3();
-        },
+  class MockShepherdService {
+    defaultStepOptions = {};
+    modal = false;
+    steps: object[] = [];
+    tourObject: {
+      on: (eventName: string, cb: () => void) => void;
+      start: () => void;
+      complete: () => void;
+      cancel: () => void;
+    } | null = null;
+
+    addSteps(steps: object[]) {
+      this.steps = steps;
+      this.tourObject = {
+        on: (eventName: string, cb: () => void) => {},
+        start: () => {},
+        complete: () => {},
+        cancel: () => {},
       };
     }
 
-    closeTour() {}
+    start() {
+      this.tourObject?.start();
+    }
+    complete() {
+      this.tourObject?.complete();
+    }
+    back() {}
+    cancel() {
+      this.tourObject?.cancel();
+    }
   }
 
   class MockWindowRef {
@@ -171,25 +172,19 @@ describe('Exploration editor tab component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
-      declarations: [JoyrideDirective, ExplorationEditorTabComponent],
+      declarations: [ExplorationEditorTabComponent],
       providers: [
-        JoyrideStepService,
         {
           provide: Router,
           useClass: MockRouter,
         },
-        TemplatesService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
-        JoyrideOptionsService,
-        JoyrideStepsContainerService,
-        LoggerService,
-        DomRefService,
         {
-          provide: JoyrideService,
-          useClass: MockJoyrideService,
+          provide: ShepherdService,
+          useClass: MockShepherdService,
         },
         {
           provide: ExplorationDataService,
@@ -1142,20 +1137,239 @@ describe('Exploration editor tab component', () => {
       userExplorationPermissionsService,
       'getPermissionsAsync'
     ).and.returnValue(
-      Promise.resolve({
-        canEdit: false,
-      } as ExplorationPermissions)
+      Promise.resolve(
+        new ExplorationPermissions(
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        )
+      )
     );
     stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
     component.leaveTutorial();
-    component.removeTutorialSaveButtonIfNoPermissions();
 
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should smoothly scroll to target position', () => {
+    let scrollToSpy = spyOn(window, 'scrollTo');
+    let callbacks: FrameRequestCallback[] = [];
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        callbacks.push(cb);
+        return 1;
+      }
+    );
+    let mockPerformanceNow = spyOn(performance, 'now');
+
+    mockPerformanceNow.and.returnValue(0);
+    // eslint-disable-next-line dot-notation
+    component['smoothScrollTo'](100, 1000);
+
+    expect(callbacks.length).toBe(1);
+
+    mockPerformanceNow.and.returnValue(100);
+    callbacks[0](100);
+    expect(scrollToSpy).toHaveBeenCalledWith(0, jasmine.any(Number));
+    expect(callbacks.length).toBe(2);
+
+    mockPerformanceNow.and.returnValue(600);
+    callbacks[1](600);
+    expect(callbacks.length).toBe(3);
+
+    mockPerformanceNow.and.returnValue(1000);
+    callbacks[2](1000);
+    expect(scrollToSpy).toHaveBeenCalledWith(0, 100);
+    expect(callbacks.length).toBe(3);
+  });
+
+  it('should trigger all tutorial tour step callbacks, done button, and cancel events', fakeAsync(() => {
+    interface TourStep {
+      id: string;
+      buttons: {text: string; action?: () => void}[];
+      when?: {
+        show?: () => void;
+      };
+    }
+
+    interface TestShepherdService {
+      steps: TourStep[];
+      tourObject: {
+        on: (eventName: string, cb: () => void) => void;
+        start: () => void;
+        complete: () => void;
+        cancel: () => void;
+      } | null;
+      addSteps: (steps: object[]) => void;
+    }
+
+    const shepherdService = TestBed.inject(
+      ShepherdService
+    ) as unknown as TestShepherdService;
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        canEdit: true,
+      } as ExplorationPermissions)
+    );
+
+    const smoothScrollToSpy = spyOn(
+      component as unknown as {
+        smoothScrollTo: (targetY: number, duration: number) => void;
+      },
+      'smoothScrollTo'
+    );
+    // eslint-disable-next-line dot-notation
+    const tickSpy = spyOn(component['applicationRef'], 'tick');
+
+    const registeredCallbacks: Record<string, () => void> = {};
+    spyOn(shepherdService, 'addSteps').and.callFake((steps: object[]) => {
+      shepherdService.steps = steps as unknown as TourStep[];
+      shepherdService.tourObject = {
+        on: (eventName: string, cb: () => void) => {
+          registeredCallbacks[eventName] = cb;
+        },
+        start: () => {},
+        complete: () => {},
+        cancel: () => {},
+      };
+    });
+
+    component.startTutorial();
+    tick();
+
+    const steps = shepherdService.steps;
+    expect(steps.length).toBeGreaterThan(0);
+
+    steps.forEach(step => {
+      if (step.when && typeof step.when.show === 'function') {
+        step.when.show();
+      }
+    });
+
+    expect(smoothScrollToSpy).toHaveBeenCalled();
+
+    const lastStep = steps[steps.length - 1];
+    const doneButton = lastStep.buttons.find(btn => btn.text === 'Done');
+    expect(doneButton).toBeDefined();
+    if (doneButton && doneButton.action) {
+      doneButton.action();
+    }
+    expect(component.tutorialInProgress).toBe(false);
+
+    component.tutorialInProgress = true;
+    expect(registeredCallbacks.cancel).toBeDefined();
+    registeredCallbacks.cancel();
+    expect(tickSpy).toHaveBeenCalled();
+    expect(component.tutorialInProgress).toBe(false);
+  }));
+
+  it('should add step counters even if buttons are missing and cover step counter action', () => {
+    interface StepWithButtons {
+      buttons?: {text: string; classes?: string; action?: () => void}[];
+    }
+    const stepsWithoutButtons: StepWithButtons[] = [{}];
+    // eslint-disable-next-line dot-notation
+    component['addStepCounters'](stepsWithoutButtons);
+    const step = stepsWithoutButtons[0];
+    expect(step.buttons).toBeDefined();
+    if (step.buttons) {
+      expect(step.buttons.length).toBe(1);
+      expect(step.buttons[0].text).toBe('1/1');
+      expect(step.buttons[0].classes).toBe('shepherd-step-counter');
+
+      expect(step.buttons[0].action).toBeDefined();
+      if (step.buttons[0].action) {
+        step.buttons[0].action();
+      }
+    }
+  });
+
+  it('should remove the save step from the tour when user lacks edit permissions', fakeAsync(() => {
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new ExplorationPermissions(
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        )
+      )
+    );
+    const mockSteps: {id: string}[] = [
+      {id: 'step1'},
+      {id: 'editorTabTourSaveDraft'},
+      {id: 'step3'},
+    ];
+    // eslint-disable-next-line dot-notation
+    component['removeTutorialSaveButtonIfNoPermissions'](mockSteps);
+    tick();
+    expect(mockSteps.length).toBe(2);
+    expect(mockSteps.findIndex(s => s.id === 'editorTabTourSaveDraft')).toBe(
+      -1
+    );
+  }));
+
+  it('should not call handleTourFinish on cancel when tutorialInProgress is false', fakeAsync(() => {
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new ExplorationPermissions(
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false
+        )
+      )
+    );
+    const registeredCallbacks: Record<string, () => void> = {};
+    const shepherdService = TestBed.inject(ShepherdService);
+    spyOn(shepherdService, 'addSteps').and.callFake((_steps: object[]) => {
+      const tourObj = {
+        on: (eventName: string, cb: () => void) => {
+          registeredCallbacks[eventName] = cb;
+        },
+        start: () => {},
+        complete: () => {},
+        cancel: () => {},
+      };
+      // eslint-disable-next-line dot-notation
+      shepherdService['tourObject'] = tourObj;
+    });
+    // eslint-disable-next-line dot-notation
+    const tickSpy = spyOn(component['applicationRef'], 'tick');
+
+    component.startTutorial();
+    tick();
+
+    component.tutorialInProgress = false;
+    registeredCallbacks.cancel();
+    expect(tickSpy).not.toHaveBeenCalled();
+  }));
 
   it('should get the last edited version number in case of error', () => {
     versionHistoryService.insertStateVersionHistoryData(4, null, '');
