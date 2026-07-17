@@ -89,10 +89,12 @@
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
+              "node_modules/shepherd.js/dist/css/shepherd.css",
+              "core/templates/css/shepherd-overrides.css",
               "node_modules/guppy-dev/build/guppy-default.min.css",
               "node_modules/cropperjs/dist/cropper.min.css",
               "node_modules/codemirror/lib/codemirror.css",
-              "node_modules/codemirror/addon/merge/merge.css"           
+              "node_modules/codemirror/addon/merge/merge.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
@@ -181,7 +183,9 @@
               },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/shepherd.js/dist/css/shepherd.css",
+              "core/templates/css/shepherd-overrides.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.js"

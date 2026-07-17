@@ -75,7 +75,7 @@ var ExplorationEditorMainTab = function () {
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
-  var postTutorialPopover = $('.joyride .popover-content');
+  var postTutorialPopover = $('.shepherd-element');
   var responseBody = function (responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
@@ -90,7 +90,7 @@ var ExplorationEditorMainTab = function () {
   var stateNodeLabel = function (nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
-  var titleElement = $('.e2e-test-joyride-title');
+  var titleElement = $('.shepherd-title');
 
   /*
    * Buttons
@@ -148,7 +148,7 @@ var ExplorationEditorMainTab = function () {
     );
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    var skipButtons = await $$('.joyride-step__close');
+    var skipButtons = await $$('.shepherd-cancel-icon');
     if ((await skipButtons.length) === 1) {
       await action.click('Skip button', skipButtons[0]);
     } else if ((await skipButtons.length) !== 0) {
@@ -158,12 +158,12 @@ var ExplorationEditorMainTab = function () {
 
   this.finishTutorial = async function () {
     // Finish the tutorial.
-    var finishTutorialButtons = await $$('.joyride-button=done');
+    var finishTutorialButtons = await $$('.shepherd-button-primary');
     await waitFor.elementToBeClickable(
       finishTutorialButtons[0],
       'Finish Tutorial Stage button is not clickable'
     );
-    if (finishTutorialButtons.length === 1) {
+    if (finishTutorialButtons.length >= 1) {
       await action.click(
         'Finish Tutorial Stage button',
         finishTutorialButtons[0]
@@ -184,18 +184,18 @@ var ExplorationEditorMainTab = function () {
     ];
     for (const HEADING of tutorialTabHeadings) {
       // Use: await tutorialTabHeadings.forEach(async function(heading) {
-      var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
+      var tutorialTabHeadingElement = $(`.shepherd-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement,
         'Tutorial: ' + HEADING + ' is not visible'
       );
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButtons = await $$('.joyride-step__next-container');
+      var nextTutorialStageButtons = await $$('.shepherd-button-primary');
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons[0],
         'Next Tutorial Stage button is not clickable'
       );
-      if (nextTutorialStageButtons.length === 1) {
+      if (nextTutorialStageButtons.length >= 1) {
         await action.click(
           'Next Tutorial Stage button',
           nextTutorialStageButtons[0]
