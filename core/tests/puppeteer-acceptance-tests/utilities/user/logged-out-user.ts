@@ -7036,6 +7036,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
     });
+    await this.page.waitForSelector(practiceSessionContainerSelector, {
+      visible: true,
+      timeout: 30000,
+    });
   }
 
   /**
