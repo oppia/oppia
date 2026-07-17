@@ -1,4 +1,4 @@
-<oppia-base-content>
+<oppia-base-content *ngIf="isCertificateCreatorEnabled">
   <navbar-breadcrumb>
     <ul class="nav navbar-nav oppia-navbar-breadcrumb">
       <li>
@@ -11,10 +11,8 @@
       </li>
     </ul>
   </navbar-breadcrumb>
-
   <content>
-    <oppia-edit-certificate-offering-page></oppia-edit-certificate-offering-page>
+    <oppia-certificate-creator-dashboard-page></oppia-certificate-creator-dashboard-page>
   </content>
-
   <page-footer></page-footer>
 </oppia-base-content>

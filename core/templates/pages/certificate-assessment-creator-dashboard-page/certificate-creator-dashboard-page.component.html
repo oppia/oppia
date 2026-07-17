@@ -1,7 +1,7 @@
 <background-banner></background-banner>
-<div class="container position-relative oppia-certificate-offering-dashboard">
-  <div class="oppia-certificate-offering-hero">
-    <div class="oppia-certificate-offering-title-block">
+<div class="container position-relative oppia-certificate-creator-dashboard">
+  <div class="oppia-certificate-creator-hero">
+    <div class="oppia-certificate-creator-title-block">
       <h1 tabindex="0">
         Certificate Creator Dashboard
       </h1>
@@ -12,7 +12,7 @@
     </button>
   </div>
 
-  <div class="card shadow-sm border-0 oppia-certificate-offering-card">
+  <div class="card shadow-sm border-0 oppia-certificate-creator-card">
     <div class="card-header bg-white border-0 d-flex justify-content-center align-items-center gap-2 py-3 fs-4 mt-1">
       <h2 class="m-0">Certificates</h2>
       <span *ngIf="!isLoading; else loadingCount" class="badge oppia-total-badge fs-4">
@@ -27,14 +27,14 @@
     <div class="card-body p-0">
       <div *ngIf="isLoading" class="text-center py-5 text-muted">
         <mat-spinner class="mx-auto mb-3" diameter="28"></mat-spinner>
-        Loading certificate creator dashboard...
+        Loading certificates...
       </div>
       <div *ngIf="!isLoading && certificateOfferings.length === 0"
            class="text-center py-5 text-muted">
         No certificate created yet.
       </div>
       <div *ngIf="!isLoading && certificateOfferings.length > 0" class="table-responsive p-2">
-        <table class="table table-hover align-middle mb-0 oppia-certificate-offering-table">
+        <table class="table table-hover align-middle mb-0 oppia-certificate-creator-table">
           <caption class="visually-hidden">
             List of certificates with status and actions
           </caption>

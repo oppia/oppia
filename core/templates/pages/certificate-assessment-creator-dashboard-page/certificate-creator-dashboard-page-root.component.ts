@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate offering dashboard page root component.
+ * @fileoverview Certificate cre dashboard page root component.
  */
 
 import {Component} from '@angular/core';
@@ -24,26 +24,30 @@ import {PageHeadService} from 'services/page-head.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
-  selector: 'oppia-certificate-offering-dashboard-page-root',
-  templateUrl: './certificate-offering-dashboard-page-root.component.html',
+  selector: 'oppia-certificate-creator-dashboard-page-root',
+  templateUrl: './certificate-creator-dashboard-page-root.component.html',
 })
-export class CertificateOfferingDashboardPageRootComponent extends BaseRootComponent {
-  isCertificateOfferingEnabled: boolean;
+export class CertificateCreatorDashboardPageRootComponent extends BaseRootComponent {
+  isCertificateCreatorEnabled: boolean;
+
+  certificateCreatorDashboardRoute =
+    '/' +
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_CREATOR_DASHBOARD
+      .ROUTE;
 
   title: string =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_CREATOR_DASHBOARD
       .TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .CERTIFICATE_OFFERING_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
-
+    .CERTIFICATE_CREATOR_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
   constructor(
     pageHeadService: PageHeadService,
     translateService: TranslateService,
     private platformFeatureService: PlatformFeatureService
   ) {
     super(pageHeadService, translateService);
-    this.isCertificateOfferingEnabled =
+    this.isCertificateCreatorEnabled =
       this.platformFeatureService.status.EnableCertificateAssessment.isEnabled;
   }
 }

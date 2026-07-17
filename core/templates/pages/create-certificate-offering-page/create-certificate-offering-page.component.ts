@@ -179,6 +179,6 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
   }
 
   private navigateToCertificateOfferingDashboard(): void {
-    this.router.navigate(['/certificate-offering-dashboard']);
+    this.router.navigate(['/certificate-creator-dashboard']);
   }
 }

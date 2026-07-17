@@ -6578,9 +6578,9 @@ export default {
 
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
-    "CERTIFICATE_OFFERING_DASHBOARD": {
-      "ROUTE": "certificate-offering-dashboard",
-      "TITLE": "Certificate Offering Dashboard | Oppia",
+    "CERTIFICATE_CREATOR_DASHBOARD": {
+      "ROUTE": "certificate-creator-dashboard",
+      "TITLE": "Certificate Creator Dashboard | Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",

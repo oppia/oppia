@@ -174,7 +174,7 @@ describe('Create Certificate Offering Page Component', () => {
 
     component.navigateBackToDashboard();
 
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   });
 
   it('should save certificate offering successfully and navigate away', fakeAsync(() => {
@@ -206,7 +206,7 @@ describe('Create Certificate Offering Page Component', () => {
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should create certificate offering and show post-result modal', fakeAsync(() => {
@@ -247,7 +247,7 @@ describe('Create Certificate Offering Page Component', () => {
     expect(secondModalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_RESULT_ACTIONS.CREATED
     );
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should not navigate or show alert if certificate creation returns falsy value', fakeAsync(() => {

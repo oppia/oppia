@@ -77,7 +77,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       this.alertsService.addWarning(
         'The certificate offering could not be loaded.'
       );
-      this.router.navigate(['/certificate-offering-dashboard']);
+      this.router.navigate(['/certificate-creator-dashboard']);
     } finally {
       this.isLoadingCertificateOffering = false;
     }
@@ -202,6 +202,6 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   }
 
   private navigateToCertificateOfferingDashboard(): void {
-    this.router.navigate(['/certificate-offering-dashboard']);
+    this.router.navigate(['/certificate-creator-dashboard']);
   }
 }

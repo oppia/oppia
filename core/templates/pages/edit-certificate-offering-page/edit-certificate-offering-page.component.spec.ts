@@ -184,7 +184,7 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(alertsSpy).toHaveBeenCalledWith(
       'The certificate offering could not be loaded.'
     );
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should correctly evaluate active sections', () => {
@@ -248,7 +248,7 @@ describe('Edit Certificate Offering Page Component', () => {
 
     component.navigateBackToDashboard();
 
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   });
 
   it('should update certificate offering successfully and navigate away', fakeAsync(() => {
@@ -281,7 +281,7 @@ describe('Edit Certificate Offering Page Component', () => {
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should open the post-result modal for updated certificates and navigate after dismissal', fakeAsync(() => {
@@ -323,7 +323,7 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(secondModalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should save certificate offering as not ready and navigate away', fakeAsync(() => {
@@ -350,7 +350,7 @@ describe('Edit Certificate Offering Page Component', () => {
       })
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
-    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-creator-dashboard']);
   }));
 
   it('should not navigate or show alert if certificate update returns falsy value', fakeAsync(() => {

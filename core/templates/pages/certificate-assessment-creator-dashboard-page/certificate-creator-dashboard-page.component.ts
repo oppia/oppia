@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for certificate offering dashboard.
+ * @fileoverview Component for certificate creator dashboard.
  */
 import {Component, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -22,8 +22,8 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {AlertsService} from 'services/alerts.service';
 
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
-import './certificate-offering-dashboard-page.component.css';
-interface CertificateOfferingSummary {
+import './certificate-creator-dashboard-page.component.css';
+interface CertificateSummary {
   certificateId: string;
   title: string;
   topicsLabel: string;
@@ -31,12 +31,12 @@ interface CertificateOfferingSummary {
   status: string;
 }
 @Component({
-  selector: 'oppia-certificate-offering-dashboard-page',
-  templateUrl: './certificate-offering-dashboard-page.component.html',
+  selector: 'oppia-certificate-creator-dashboard-page',
+  templateUrl: './certificate-creator-dashboard-page.component.html',
 })
-export class CertificateOfferingDashboardPageComponent implements OnInit {
+export class CertificateCreatorDashboardPageComponent implements OnInit {
   readonly certificatesPerPage = 5;
-  certificateOfferings: CertificateOfferingSummary[] = [];
+  certificateOfferings: CertificateSummary[] = [];
   isLoading = true;
   currentPage = 1;
 
@@ -100,14 +100,13 @@ export class CertificateOfferingDashboardPageComponent implements OnInit {
     );
   }
 
-  get paginatedCertificateOfferings(): CertificateOfferingSummary[] {
+  get paginatedCertificateOfferings(): CertificateSummary[] {
     const startIndex = (this.currentPage - 1) * this.certificatesPerPage;
     return this.certificateOfferings.slice(
       startIndex,
       startIndex + this.certificatesPerPage
     );
   }
-
   get firstCertificateNumber(): number {
     if (this.totalCertificateOfferings === 0) {
       return 0;

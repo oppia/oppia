@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for CertificateOfferingDashboardPageRootComponent.
+ * @fileoverview Unit tests for CertificateCreatorDashboardPageRootComponent.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -22,18 +22,23 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateModule} from '@ngx-translate/core';
 
 import {AppConstants} from 'app.constants';
-import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
+import {CertificateCreatorDashboardPageRootComponent} from './certificate-creator-dashboard-page-root.component';
 import {PageHeadService} from 'services/page-head.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {RouterTestingModule} from '@angular/router/testing';
 
-describe('CertificateOfferingDashboardPageRootComponent', () => {
-  let component: CertificateOfferingDashboardPageRootComponent;
-  let fixture: ComponentFixture<CertificateOfferingDashboardPageRootComponent>;
+describe('CertificateCreatorDashboardPageRootComponent', () => {
+  let component: CertificateCreatorDashboardPageRootComponent;
+  let fixture: ComponentFixture<CertificateCreatorDashboardPageRootComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-      declarations: [CertificateOfferingDashboardPageRootComponent],
+      imports: [
+        TranslateModule.forRoot(),
+        HttpClientTestingModule,
+        RouterTestingModule,
+      ],
+      declarations: [CertificateCreatorDashboardPageRootComponent],
       providers: [
         PageHeadService,
         {
@@ -51,24 +56,24 @@ describe('CertificateOfferingDashboardPageRootComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(
-      CertificateOfferingDashboardPageRootComponent
+      CertificateCreatorDashboardPageRootComponent
     );
     component = fixture.componentInstance;
   });
 
   it('should create the component', () => {
     expect(
-      component instanceof CertificateOfferingDashboardPageRootComponent
+      component instanceof CertificateCreatorDashboardPageRootComponent
     ).toBeTrue();
   });
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_CREATOR_DASHBOARD
         .TITLE
     );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_CREATOR_DASHBOARD
         .META
     );
   });
