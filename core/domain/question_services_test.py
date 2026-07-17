@@ -305,6 +305,43 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 25, ['skill_1', 'skill_2'], False
             )
 
+    def test_get_paginated_questions_by_skill_id_raises_error_with_high_question_count(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Question count is too high, please limit the question '
+            'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+        ):
+            question_services.get_paginated_questions_by_skill_id(
+                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME + 1, 'skill_1', 0
+            )
+
+    def test_get_paginated_questions_by_skill_id(self) -> None:
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_1, 'skill_1', 0.5
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_2, 'skill_1', 0.7
+        )
+
+        # First page: 2 of 3 questions, so there should be more.
+        questions, more = question_services.get_paginated_questions_by_skill_id(
+            2, 'skill_1', 0
+        )
+        self.assertEqual(len(questions), 2)
+        self.assertTrue(more)
+
+        # Second page: the remaining 1 question, so there should be no more.
+        questions, more = question_services.get_paginated_questions_by_skill_id(
+            2, 'skill_1', 2
+        )
+        self.assertEqual(len(questions), 1)
+        self.assertFalse(more)
+
     def test_create_multi_question_skill_links_for_question(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
