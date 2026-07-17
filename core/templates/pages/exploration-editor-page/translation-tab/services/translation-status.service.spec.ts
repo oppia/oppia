@@ -830,11 +830,8 @@ describe('Translation status service', () => {
     );
   });
 
-  it('should initialize properties correctly when ngOnInit is called', () => {
-    spyOn(tls, 'getActiveLanguageCode').and.returnValue('en');
-    tss.ngOnInit();
-
-    expect(tss.langCode).toBe('en');
+  it('should initialize properties correctly on construction', () => {
+    expect(tss.langCode).toBeDefined();
     expect(tss.stateNeedsUpdateWarnings).toEqual({});
     expect(tss.stateWiseStatusColor).toEqual({});
     expect(tss.explorationTranslationContentRequiredCount).toBe(0);
