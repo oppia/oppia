@@ -422,8 +422,8 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
     def test_create_raises_error_when_lesson_report_has_no_exploration_id(
         self,
     ) -> None:
-        lesson_metadata_json = dict(LESSON_METADATA_JSON)
-        lesson_metadata_json['exploration_id'] = None
+        lesson_metadata = dict(LESSON_METADATA_JSON)
+        lesson_metadata['exploration_id'] = None
 
         with self.assertRaisesRegex(
             ValueError, 'Lesson feedback must include an exploration ID.'
@@ -434,7 +434,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CREATOR,
-                lesson_metadata_json=lesson_metadata_json,
+                lesson_metadata=lesson_metadata,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -716,10 +716,10 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
     def test_create_accepts_empty_session_sections(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
             report_id=self.feedback_id1,
-            console_logs_json=None,
-            failed_requests_json=None,
-            navigation_history_json=None,
-            environment_json=None,
+            console_logs=None,
+            failed_requests=None,
+            navigation_history=None,
+            environment=None,
         )
         session_log_model = (
             general_feedback_models.FeedbackSessionLogModel.get_by_id(
@@ -729,10 +729,10 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
 
         self.assertIsNotNone(session_log_model)
         assert session_log_model is not None
-        self.assertIsNone(session_log_model.console_logs_json)
-        self.assertIsNone(session_log_model.failed_requests_json)
-        self.assertIsNone(session_log_model.navigation_history_json)
-        self.assertIsNone(session_log_model.environment_json)
+        self.assertIsNone(session_log_model.console_logs)
+        self.assertIsNone(session_log_model.failed_requests)
+        self.assertIsNone(session_log_model.navigation_history)
+        self.assertIsNone(session_log_model.environment)
 
     def test_create_raises_error_for_duplicate_thread_id(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(

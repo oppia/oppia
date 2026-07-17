@@ -108,7 +108,7 @@ describe('Feedback backend api service', () => {
     destination_dashboard: 'LEAP',
     page_url: 'http://localhost',
     category: null,
-    lesson_metadata_json: null,
+    lesson_metadata: null,
     include_technical_logs: false,
     session_info: null,
     screenshot_filename: null,

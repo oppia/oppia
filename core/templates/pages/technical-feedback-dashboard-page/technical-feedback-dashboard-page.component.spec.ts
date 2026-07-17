@@ -57,7 +57,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     destination_dashboard: 'LEAP',
     page_url: '/learn/math',
     category: null,
-    lesson_metadata_json: null,
+    lesson_metadata: null,
     include_technical_logs: false,
     session_info: null,
     screenshot_filename: null,
