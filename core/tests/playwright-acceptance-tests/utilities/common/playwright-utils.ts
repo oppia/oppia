@@ -234,13 +234,19 @@ export class BaseUser {
   }
 
   /**
-   * Clicks an element via JavaScript, bypassing overlay/blocking issues.
+   * Clicks an element using JavaScript's native click() method.
+   * This ensures Angular properly handles the event in its change detection
+   * cycle, which is more reliable than Puppeteer's simulated clicks for
+   * Angular components like the sidebar.
    * @param {string} selector - The CSS selector of the element to click.
    */
-  async clickWithJavascript(selector: string): Promise<void> {
+  private async clickWithJavaScript(selector: string): Promise<void> {
+    await this.waitForElementToStabilize(selector);
     await this.page.evaluate((sel: string) => {
-      const el = document.querySelector(sel) as HTMLElement | null;
-      el?.click();
+      const element = document.querySelector(sel) as HTMLElement;
+      if (element) {
+        element.click();
+      }
     }, selector);
   }
 
