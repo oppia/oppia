@@ -224,7 +224,7 @@ export interface PlatformFeedbackDetailResponse {
   destination_dashboard: 'tech-external' | 'tech-internal' | 'curriculum';
   page_url: string;
   category: ReportAnIssueCategory | null;
-  lesson_metadata_json: LessonFeedbackMetadataBackendDict | null;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
   include_technical_logs: boolean;
   session_info: FeedbackSessionInfo | null;
   screenshot_filename: string | null;

@@ -474,7 +474,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
                 reports, must be None for site (app) reports.
             destination_dashboard: str. Routing target ("curriculum" |
                 "tech-external" | "tech-internal").
-            lesson_metadata_json: Optional[Dict]. Lesson metadata at
+            lesson_metadata: Optional[Dict]. Lesson metadata at
                 submission time;
                 required for lesson reports, must be None for site reports.
             include_technical_logs: bool. Whether session diagnostics are included.

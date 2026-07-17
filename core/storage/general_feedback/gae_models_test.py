@@ -37,7 +37,7 @@ if MYPY:  # pragma: no cover
 
 NONEXISTENT_USER_ID = 'id_nonexistent'
 
-LESSON_METADATA_JSON: Dict[str, Union[str, int, None]] = {
+LESSON_METADATA: Dict[str, Union[str, int, None]] = {
     'exploration_id': 'exp_001',
     'exploration_version': 3,
     'state_name': 'Introduction',
@@ -64,21 +64,21 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         self.feedback_id1 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.USER_ID,
             feedback_text=FEEDBACK_TEXT,
-            lesson_metadata=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA,
         )
 
         # Follow-up note by USER_ID referencing feedback_id1.
         self.feedback_id2 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.USER_ID,
             feedback_text='Adding more context to my earlier note.',
-            lesson_metadata=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA,
             parent_feedback_id=self.feedback_id1,
         )
 
         self.feedback_id3 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.OTHER_USER_ID,
             feedback_text='Separate feedback from another learner.',
-            lesson_metadata=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA,
         )
 
     def test_get_deletion_policy(self) -> None:
@@ -105,6 +105,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
+                'lesson_metadata': base_models.EXPORT_POLICY.EXPORTED,
                 'lesson_metadata': base_models.EXPORT_POLICY.EXPORTED,
                 # Fields specific to LessonFeedbackModel.
                 'parent_feedback_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -169,8 +170,8 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         expected: Dict[str, Any] = {
             'feedback_text': FEEDBACK_TEXT,
             'status': feconf.STATUS_CHOICES_OPEN,
-            'exploration_id': LESSON_METADATA_JSON['exploration_id'],
-            'lesson_metadata': LESSON_METADATA_JSON,
+            'exploration_id': LESSON_METADATA['exploration_id'],
+            'lesson_metadata': LESSON_METADATA,
             'parent_feedback_id': None,
             'response_list': [],
             'unread_response_count': 0,
@@ -287,7 +288,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 general_feedback_models.LessonFeedbackModel.create(
                     feedback_text='Feedback text',
                     author_id=self.USER_ID,
-                    lesson_metadata=LESSON_METADATA_JSON,
+                    lesson_metadata=LESSON_METADATA,
                 )
 
 
@@ -311,7 +312,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 destination_dashboard=feconf.DESTINATION_CURRICULUM,
                 category=feconf.CATEGORY_TYPO,
-                lesson_metadata=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -330,7 +331,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 destination_dashboard=(
                     feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
                 ),
-                lesson_metadata=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA,
                 include_technical_logs=False,
                 screenshot_filename='step3.png',
                 screenshot_entity_id='entity_step3',
@@ -348,7 +349,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 destination_dashboard=(
                     feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
                 ),
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -380,6 +381,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
+                'lesson_metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 # Fields specific to PlatformFeedbackModel.
                 'source': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -417,7 +419,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CURRICULUM,
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -427,8 +429,8 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
     def test_create_raises_error_when_lesson_report_has_no_exploration_id(
         self,
     ) -> None:
-        lesson_metadata_json = dict(LESSON_METADATA_JSON)
-        lesson_metadata_json['exploration_id'] = None
+        lesson_metadata = dict(LESSON_METADATA)
+        lesson_metadata['exploration_id'] = None
 
         with self.assertRaisesRegex(
             ValueError, 'Lesson feedback must include an exploration ID.'
@@ -439,7 +441,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CURRICULUM,
-                lesson_metadata_json=lesson_metadata_json,
+                lesson_metadata=lesson_metadata,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -477,7 +479,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 destination_dashboard=(
                     feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
                 ),
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -498,7 +500,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 destination_dashboard=(
                     feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
                 ),
-                lesson_metadata=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -519,7 +521,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CURRICULUM,
-                lesson_metadata=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA,
                 include_technical_logs=False,
                 screenshot_filename='only_filename.png',
                 screenshot_entity_id=None,
@@ -540,7 +542,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CURRICULUM,
-                lesson_metadata=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id='only_entity_id',
@@ -589,7 +591,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
     ) -> None:
         lesson_metadata_without_exploration_id: Dict[
             str, Union[str, int, None]
-        ] = dict(LESSON_METADATA_JSON)
+        ] = dict(LESSON_METADATA)
         lesson_metadata_without_exploration_id['exploration_id'] = None
 
         with self.assertRaisesRegex(
@@ -600,7 +602,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 feedback_text=REPORT_TEXT,
                 source=feconf.SOURCE_LESSON,
                 platform=feconf.PLATFORM_WEB,
-                destination_dashboard=feconf.DESTINATION_CREATOR,
+                destination_dashboard=feconf.DESTINATION_CURRICULUM,
                 category=feconf.CATEGORY_TYPO,
                 lesson_metadata=lesson_metadata_without_exploration_id,
                 include_technical_logs=False,
@@ -623,7 +625,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             report.exploration_id,
-            LESSON_METADATA_JSON['exploration_id'],
+            LESSON_METADATA['exploration_id'],
         )
 
     def test_generate_new_id_raises_error_after_many_collisions(
@@ -670,7 +672,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         self.feedback_id1 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.USER_ID,
             feedback_text=FEEDBACK_TEXT,
-            lesson_metadata=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA,
         )
 
     def test_get_deletion_policy(self) -> None:
@@ -729,10 +731,10 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
     def test_create_accepts_empty_session_sections(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
             report_id=self.feedback_id1,
-            console_logs_json=None,
-            failed_requests_json=None,
-            navigation_history_json=None,
-            environment_json=None,
+            console_logs=None,
+            failed_requests=None,
+            navigation_history=None,
+            environment=None,
         )
         session_log_model = (
             general_feedback_models.FeedbackSessionLogModel.get_by_id(
