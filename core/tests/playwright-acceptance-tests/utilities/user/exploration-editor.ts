@@ -1031,6 +1031,19 @@ export class ExplorationEditor extends BaseUser {
 
     throw new Error(`Version ${explorationVersion} not found in history list.`);
   }
+
+  /**
+   * Function to create and save a new untitled exploration containing only the EndExploration interaction.
+   */
+  async createAndSaveAMinimalExploration(): Promise<void> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorFromCreatorDashboard();
+    await this.createMinimalExploration(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+  }
 }
 
 export const ExplorationEditorFactory = (page: Page): ExplorationEditor => {
