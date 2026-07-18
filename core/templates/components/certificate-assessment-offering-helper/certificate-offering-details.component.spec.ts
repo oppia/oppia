@@ -50,10 +50,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'math',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 0,
                 },
                 {
                   classroom_id: 'science',
@@ -61,10 +59,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'science',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 1,
                 },
               ]),
           },
@@ -99,10 +95,8 @@ describe('Certificate Offering Details Component', () => {
         url_fragment: 'math',
         teaser_text: '',
         is_published: true,
-        diagnostic_test_is_enabled: false,
         thumbnail_filename: '',
         thumbnail_bg_color: '',
-        index: 0,
       },
     ];
 
@@ -461,11 +455,11 @@ describe('Certificate Offering Details Component', () => {
     );
 
     void component.loadClassrooms();
-    expect(component.isLoadingClassrooms).toBeTrue();
+    expect(component.isLoadingClassrooms).toBe(true);
     resolveClassrooms([]);
     flushMicrotasks();
 
-    expect(component.isLoadingClassrooms).toBeFalse();
+    expect(component.isLoadingClassrooms).toBe(false);
   }));
 
   it('should return a demonstrates validation error when outcomes exceed the limit', () => {
