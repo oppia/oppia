@@ -2075,8 +2075,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.LESSON_FEEDBACK_ID_1: {
                 'feedback_text': self.LESSON_FEEDBACK_TEXT_1,
                 'status': feedback_models.STATUS_CHOICES_OPEN,
-                'exploration_id': 'exp_id_1',
                 'lesson_metadata': self.lesson_metadata,
+                'exploration_id': 'exp_id_1',
                 'parent_feedback_id': self.PARENT_FEEDBACK_ID_1,
                 'response_list': self.LESSON_FEEDBACK_RESPONSE_LIST,
                 'unread_response_count': self.LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT,

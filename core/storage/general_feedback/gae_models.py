@@ -249,11 +249,11 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     destination_dashboard field is set automatically at creation time
     based on the page_url and category:
 
-        typo                        → creator
-        confusing_or_incorrect_answer → creator
-        broken_layout_or_image      → LEAP or CORE
-        other_or_not_sure           → LEAP or CORE
-        all site (app) reports      → LEAP or CORE
+        typo                        → curriculum
+        confusing_or_incorrect_answer → curriculum
+        broken_layout_or_image      → tech-external or tech-internal
+        other_or_not_sure           → tech-external or tech-internal
+        all site (app) reports      → tech-external or tech-internal
 
     The id of instances of this class has the form
         feedback.platform.<timestamp_base64><random_base64>
@@ -261,8 +261,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     Fields (in addition to BaseFeedbackModel fields):
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Platform of the report ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "LEAP" |
-            "CORE").
+        destination_dashboard: str. Routing target ("curriculum" |
+            "tech-external" | "tech-internal").
         category: Optional[str]. Report category; required for lesson reports,
             must be None for site reports.
         include_technical_logs: bool. Whether session diagnostics are included.
@@ -472,7 +472,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             platform: str. Platform of the report ("web" | "android").
             category: Optional[str]. Report category; can be for lesson
                 reports, must be None for site (app) reports.
-            destination_dashboard: str. Routing target ("creator" | "LEAP" | "CORE).
+            destination_dashboard: str. Routing target ("curriculum" |
+                "tech-external" | "tech-internal").
             lesson_metadata: Optional[Dict]. Lesson metadata at
                 submission time;
                 required for lesson reports, must be None for site reports.

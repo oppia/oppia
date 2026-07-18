@@ -7,22 +7,28 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
- * @fileoverview Certificate offering available page component.
+ * @fileoverview Component for the certificate assessment result card.
  */
 
 import {Component, Input} from '@angular/core';
-import './certificate-offering-available-page.component.css';
+import {ActivatedRoute} from '@angular/router';
+
 @Component({
-  selector: 'oppia-available-certificate-offering-page',
-  templateUrl: './certificate-offering-available-page.component.html',
+  selector: 'oppia-certificate-assessment-result-card',
+  templateUrl: './certificate-assessment-result-card.component.html',
 })
-export class AvailableCertificateOfferingPageComponent {
-  @Input() classroomUrlFragment: string = '';
-  certificateId: string = 'temporary_certificate_id';
+export class CertificateAssessmentResultCardComponent {
+  @Input() certificateId = '';
+  attemptId = '';
+
+  constructor(private activatedRoute: ActivatedRoute) {
+    this.attemptId =
+      this.activatedRoute.snapshot.paramMap.get('attempt_id') || '';
+  }
 }

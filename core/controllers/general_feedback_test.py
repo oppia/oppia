@@ -157,7 +157,7 @@ class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
             report_message='The card image is broken.',
             source=source,
             platform='web',
-            destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+            destination_dashboard=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
             status='open',
             category=category,
             lesson_metadata=lesson_metadata,
@@ -497,7 +497,7 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.login_context(self.OWNER_EMAIL):
-            response = self.get_json('/platform-feedback/creator/exp_id')
+            response = self.get_json('/platform-feedback/curriculum/exp_id')
 
         self.assertEqual(len(response['summaries']), 1)
         self.assertEqual(response['summaries'][0]['id'], report.id)
@@ -522,7 +522,9 @@ class PlatformFeedbackListHandlerTests(test_utils.GenericTestBase):
         )
 
         with self.login_context(self.TECH_LEAD_EMAIL):
-            response = self.get_json('/platform-feedback/technical/LEAP')
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external'
+            )
 
         self.assertEqual(len(response['summaries']), 1)
         self.assertEqual(response['summaries'][0]['id'], report.id)
@@ -582,7 +584,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
 
         with self.login_context(self.OWNER_EMAIL):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id/%s' % report.id
+                '/platform-feedback/curriculum/exp_id/%s' % report.id
             )
 
         self.assertEqual(response['id'], report.id)
@@ -592,14 +594,14 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
     def test_creator_cannot_get_missing_feedback_detail(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id/missing_report',
+                '/platform-feedback/curriculum/exp_id/missing_report',
                 expected_status_int=404,
             )
 
         self.assertEqual(
             response['error'],
             'Could not find the resource '
-            'http://localhost/platform-feedback/creator/exp_id/missing_report.',
+            'http://localhost/platform-feedback/curriculum/exp_id/missing_report.',
         )
 
     def test_creator_can_update_feedback_status_for_owned_exploration(
@@ -620,7 +622,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         with self.login_context(self.OWNER_EMAIL):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
-                '/platform-feedback/creator/exp_id/%s' % report.id,
+                '/platform-feedback/curriculum/exp_id/%s' % report.id,
                 {'status': feconf.STATUS_CHOICES_FIXED},
                 csrf_token=csrf_token,
                 expected_status_int=200,
@@ -652,7 +654,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         with self.login_context(self.OWNER_EMAIL):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
-                '/platform-feedback/creator/exp_id/%s' % report.id,
+                '/platform-feedback/curriculum/exp_id/%s' % report.id,
                 {'status': 'invalid_status'},
                 csrf_token=csrf_token,
                 expected_status_int=400,
@@ -662,7 +664,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         with self.login_context(self.OWNER_EMAIL):
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
-                '/platform-feedback/creator/exp_id/missing_report',
+                '/platform-feedback/curriculum/exp_id/missing_report',
                 {'status': feconf.STATUS_CHOICES_FIXED},
                 csrf_token=csrf_token,
                 expected_status_int=404,
@@ -671,7 +673,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'Could not find the resource '
-            'http://localhost/platform-feedback/creator/exp_id/missing_report.',
+            'http://localhost/platform-feedback/curriculum/exp_id/missing_report.',
         )
 
     def test_creator_cannot_get_feedback_for_different_exploration(
@@ -695,14 +697,15 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
 
         with self.login_context(self.OWNER_EMAIL):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id/%s' % report.id,
+                '/platform-feedback/curriculum/exp_id/%s' % report.id,
                 expected_status_int=404,
             )
 
         self.assertEqual(
             response['error'],
             'Could not find the resource '
-            'http://localhost/platform-feedback/creator/exp_id/%s.' % report.id,
+            'http://localhost/platform-feedback/curriculum/exp_id/%s.'
+            % report.id,
         )
 
     def test_creator_cannot_update_feedback_for_different_exploration(
@@ -729,7 +732,7 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
             csrf_token = self.get_new_csrf_token()
 
             response = self.post_json(
-                '/platform-feedback/creator/exp_id/%s' % report.id,
+                '/platform-feedback/curriculum/exp_id/%s' % report.id,
                 {'status': feconf.STATUS_CHOICES_FIXED},
                 csrf_token=csrf_token,
                 expected_status_int=404,
@@ -738,5 +741,6 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'Could not find the resource '
-            'http://localhost/platform-feedback/creator/exp_id/%s.' % report.id,
+            'http://localhost/platform-feedback/curriculum/exp_id/%s.'
+            % report.id,
         )
