@@ -28,6 +28,7 @@ import './certificate-offering-available-page.component.css';
 })
 export class AvailableCertificateOfferingPageComponent implements OnInit {
   @Input() classroomUrlFragment: string = '';
+  certificateId: string = 'temporary_certificate_id';
   availableCertificateOfferings: AvailableCertificateAssessmentOfferingData[] =
     [];
   isLoading = true;

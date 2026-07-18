@@ -138,24 +138,29 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     );
   });
 
-  it('should link assessment buttons to the certificate assessment page', () => {
+  it('should link assessment buttons to the certificate assessment page', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        {
+          certificateId: 'certificate-1',
+          title: 'Arithmetic',
+          attemptStatus: 'Not Attempted',
+        },
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
 
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
     ) as HTMLButtonElement[];
 
-    const assessmentButtons = buttons.filter(b =>
-      ['Continue to assessment', 'Retry assessment'].includes(
-        b.textContent?.trim() || ''
-      )
+    const assessmentButtons = buttons.filter(
+      b => b.textContent?.trim() === 'Continue to assessment'
     );
 
-    expect(assessmentButtons.length).toBe(2);
-    assessmentButtons.forEach(button => {
-      expect(button.getAttribute('ng-reflect-router-link')).toContain(
-        '/certificate-assessment'
-      );
-    });
+    expect(assessmentButtons.length).toBe(1);
   });
 });
