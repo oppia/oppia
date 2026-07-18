@@ -22,7 +22,7 @@ from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -62,21 +62,21 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         self.feedback_id1 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.USER_ID,
             feedback_text=FEEDBACK_TEXT,
-            lesson_metadata_json=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA_JSON,
         )
 
         # Follow-up note by USER_ID referencing feedback_id1.
         self.feedback_id2 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.USER_ID,
             feedback_text='Adding more context to my earlier note.',
-            lesson_metadata_json=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA_JSON,
             parent_feedback_id=self.feedback_id1,
         )
 
         self.feedback_id3 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.OTHER_USER_ID,
             feedback_text='Separate feedback from another learner.',
-            lesson_metadata_json=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA_JSON,
         )
 
     def test_get_deletion_policy(self) -> None:
@@ -99,10 +99,11 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.EXPORTED,
                 'status': base_models.EXPORT_POLICY.EXPORTED,
+                'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'lesson_metadata_json': base_models.EXPORT_POLICY.EXPORTED,
+                'lesson_metadata': base_models.EXPORT_POLICY.EXPORTED,
                 # Fields specific to LessonFeedbackModel.
                 'parent_feedback_id': base_models.EXPORT_POLICY.EXPORTED,
                 'response_list_schema_version': base_models.EXPORT_POLICY.EXPORTED,
@@ -160,10 +161,14 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
         export_data = general_feedback_models.LessonFeedbackModel.export_data(
             self.USER_ID
         )
-        expected = {
+        # Here we use type Any because the expected dictionary contains
+        # heterogeneous values, including strings, integers, dictionaries,
+        # lists, and None.
+        expected: Dict[str, Any] = {
             'feedback_text': FEEDBACK_TEXT,
             'status': feconf.STATUS_CHOICES_OPEN,
-            'lesson_metadata_json': LESSON_METADATA_JSON,
+            'exploration_id': LESSON_METADATA_JSON['exploration_id'],
+            'lesson_metadata': LESSON_METADATA_JSON,
             'parent_feedback_id': None,
             'response_list': [],
             'unread_response_count': 0,
@@ -228,7 +233,7 @@ class LessonFeedbackModelTests(test_utils.GenericTestBase):
                 general_feedback_models.LessonFeedbackModel.create(
                     feedback_text='Feedback text',
                     author_id=self.USER_ID,
-                    lesson_metadata_json=LESSON_METADATA_JSON,
+                    lesson_metadata=LESSON_METADATA_JSON,
                 )
 
 
@@ -252,7 +257,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 destination_dashboard=feconf.DESTINATION_CREATOR,
                 category=feconf.CATEGORY_TYPO,
-                lesson_metadata_json=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -268,7 +273,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
                 destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-                lesson_metadata_json=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename='step3.png',
                 screenshot_entity_id='entity_step3',
@@ -284,7 +289,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_ANDROID,
                 category=None,
                 destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -312,10 +317,11 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'lesson_metadata_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'lesson_metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 # Fields specific to PlatformFeedbackModel.
                 'source': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'page_url': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -352,7 +358,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CREATOR,
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -370,7 +376,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 destination_dashboard=feconf.DESTINATION_CREATOR,
                 page_url='https://oppia.org/donate',
                 category=None,
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -388,7 +394,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_ANDROID,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-                lesson_metadata_json=None,
+                lesson_metadata=None,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -407,7 +413,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_ANDROID,
                 category=None,
                 destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
-                lesson_metadata_json=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
@@ -428,7 +434,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CREATOR,
-                lesson_metadata_json=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename='only_filename.png',
                 screenshot_entity_id=None,
@@ -449,12 +455,54 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                 platform=feconf.PLATFORM_WEB,
                 category=feconf.CATEGORY_TYPO,
                 destination_dashboard=feconf.DESTINATION_CREATOR,
-                lesson_metadata_json=LESSON_METADATA_JSON,
+                lesson_metadata=LESSON_METADATA_JSON,
                 include_technical_logs=False,
                 screenshot_filename=None,
                 screenshot_entity_id='only_entity_id',
                 page_url='https://oppia.org/donate',
             )
+
+    def test_create_raises_error_when_lesson_metadata_has_no_exploration_id(
+        self,
+    ) -> None:
+        lesson_metadata_without_exploration_id: Dict[
+            str, Union[str, int, None]
+        ] = dict(LESSON_METADATA_JSON)
+        lesson_metadata_without_exploration_id['exploration_id'] = None
+
+        with self.assertRaisesRegex(
+            ValueError,
+            'Lesson feedback must include an exploration ID.',
+        ):
+            general_feedback_models.PlatformFeedbackModel.create(
+                feedback_text=REPORT_TEXT,
+                source=feconf.SOURCE_LESSON,
+                platform=feconf.PLATFORM_WEB,
+                destination_dashboard=feconf.DESTINATION_CREATOR,
+                category=feconf.CATEGORY_TYPO,
+                lesson_metadata=lesson_metadata_without_exploration_id,
+                include_technical_logs=False,
+                screenshot_filename=None,
+                screenshot_entity_id=None,
+                page_url='https://oppia.org/donate',
+            )
+
+    def test_app_report_has_no_top_level_exploration_id(self) -> None:
+        report = general_feedback_models.PlatformFeedbackModel.get_by_id(
+            self.report_id_app
+        )
+
+        self.assertIsNone(report.exploration_id)
+
+    def test_create_stores_top_level_exploration_id(self) -> None:
+        report = general_feedback_models.PlatformFeedbackModel.get_by_id(
+            self.report_id_typo
+        )
+
+        self.assertEqual(
+            report.exploration_id,
+            LESSON_METADATA_JSON['exploration_id'],
+        )
 
     def test_generate_new_id_raises_error_after_many_collisions(
         self,
@@ -476,7 +524,7 @@ class PlatformFeedbackModelTests(test_utils.GenericTestBase):
                     page_url='http://oppia.org/donate',
                     destination_dashboard=feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
                     category=None,
-                    lesson_metadata_json=None,
+                    lesson_metadata=None,
                     include_technical_logs=False,
                     screenshot_filename=None,
                     screenshot_entity_id=None,
@@ -498,7 +546,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         self.feedback_id1 = general_feedback_models.LessonFeedbackModel.create(
             author_id=self.USER_ID,
             feedback_text=FEEDBACK_TEXT,
-            lesson_metadata_json=LESSON_METADATA_JSON,
+            lesson_metadata=LESSON_METADATA_JSON,
         )
 
     def test_get_deletion_policy(self) -> None:
@@ -519,10 +567,10 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
             general_feedback_models.FeedbackSessionLogModel.get_export_policy(),
             {
                 'session_info_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'console_logs_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'failed_requests_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'navigation_history_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'environment_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'console_logs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'failed_requests': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'navigation_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'environment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -532,10 +580,10 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
     def test_create(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
             report_id=self.feedback_id1,
-            console_logs_json=[{'message': 'err'}],
-            failed_requests_json=[{'url': '/test'}],
-            navigation_history_json=[{'url': '/learn/math'}],
-            environment_json={'user_agent': 'test-agent'},
+            console_logs=[{'message': 'err'}],
+            failed_requests=[{'url': '/test'}],
+            navigation_history=[{'url': '/learn/math'}],
+            environment={'user_agent': 'test-agent'},
         )
         session_log_model = (
             general_feedback_models.FeedbackSessionLogModel.get_by_id(
@@ -544,27 +592,23 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(session_log_model)
         self.assertEqual(session_log_model.id, self.feedback_id1)
+        self.assertEqual(session_log_model.console_logs, [{'message': 'err'}])
+        self.assertEqual(session_log_model.failed_requests, [{'url': '/test'}])
         self.assertEqual(
-            session_log_model.console_logs_json, [{'message': 'err'}]
-        )
-        self.assertEqual(
-            session_log_model.failed_requests_json, [{'url': '/test'}]
-        )
-        self.assertEqual(
-            session_log_model.navigation_history_json,
+            session_log_model.navigation_history,
             [{'url': '/learn/math'}],
         )
         self.assertEqual(
-            session_log_model.environment_json, {'user_agent': 'test-agent'}
+            session_log_model.environment, {'user_agent': 'test-agent'}
         )
 
     def test_create_raises_error_for_duplicate_thread_id(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
             report_id=self.feedback_id1,
-            console_logs_json=[{'message': 'err'}],
-            failed_requests_json=[{'url': '/test'}],
-            navigation_history_json=[{'url': '/learn/math'}],
-            environment_json={'user_agent': 'test-agent'},
+            console_logs=[{'message': 'err'}],
+            failed_requests=[{'url': '/test'}],
+            navigation_history=[{'url': '/learn/math'}],
+            environment={'user_agent': 'test-agent'},
         )
         with self.assertRaisesRegex(
             Exception,
@@ -572,8 +616,8 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         ):
             general_feedback_models.FeedbackSessionLogModel.create(
                 report_id=self.feedback_id1,
-                console_logs_json=[{'message': 'err2'}],
-                failed_requests_json=[{'url': '/test2'}],
-                navigation_history_json=[{'url': '/learn/science'}],
-                environment_json={'user_agent': 'test-agent-2'},
+                console_logs=[{'message': 'err2'}],
+                failed_requests=[{'url': '/test2'}],
+                navigation_history=[{'url': '/learn/science'}],
+                environment={'user_agent': 'test-agent-2'},
             )
