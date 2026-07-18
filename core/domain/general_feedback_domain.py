@@ -71,7 +71,7 @@ class PlatformFeedbackDict(TypedDict):
     """Dict representation of a PlatformFeedback domain object."""
 
     id: str
-    feedback_text: str
+    report_message: str
     source: str
     platform: str
     destination_dashboard: str
@@ -106,6 +106,25 @@ class PlatformFeedbackSubmitPayloadDict(TypedDict):
     session_info: Optional[Dict[str, object]]
     screenshot_filename: Optional[str]
     screenshot_file: Optional[str]
+
+
+class PlatformFeedbackSummaryDict(TypedDict):
+    """Lightweight dict representation of a PlatformFeedback."""
+
+    id: str
+    report_message_preview: str
+    status: str
+    source: str
+    category: Optional[str]
+
+
+class PlatformFeedbackListRequestDict(TypedDict):
+    """Normalized payload for PlatformFeedbackListHandler GET."""
+
+    status: str
+    cursor: Optional[str]
+    date_from_msecs: Optional[float]
+    date_to_msecs: Optional[float]
 
 
 class LessonFeedback:
@@ -182,10 +201,11 @@ class PlatformFeedback:
 
     Fields:
         id: str. Unique identifier of the report.
-        feedback_text: str. The text body of the report.
+        report_message: str. The text body of the report.
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Submission platform ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "technical").
+        destination_dashboard: str. Routing target ("curriculum" |
+            "tech-external" | "tech-internal").
         status: str. Current moderation status
             (open | fixed | ignored | compliment | not_actionable).
         category: Optional[str]. Report category; present for lesson reports,
@@ -202,7 +222,7 @@ class PlatformFeedback:
     def __init__(
         self,
         report_id: str,
-        feedback_text: str,
+        report_message: str,
         source: str,
         platform: str,
         destination_dashboard: str,
@@ -216,7 +236,7 @@ class PlatformFeedback:
         screenshot_entity_id: Optional[str] = None,
     ) -> None:
         self.id = report_id
-        self.feedback_text = feedback_text
+        self.report_message = report_message
         self.source = source
         self.platform = platform
         self.destination_dashboard = destination_dashboard
@@ -237,7 +257,7 @@ class PlatformFeedback:
         """
         return {
             'id': self.id,
-            'feedback_text': self.feedback_text,
+            'report_message': self.report_message,
             'source': self.source,
             'platform': self.platform,
             'destination_dashboard': self.destination_dashboard,
@@ -249,4 +269,22 @@ class PlatformFeedback:
             'screenshot_filename': self.screenshot_filename,
             'screenshot_entity_id': self.screenshot_entity_id,
             'created_on_msecs': self.created_on_msecs,
+        }
+
+    def to_summary_dict(self) -> PlatformFeedbackSummaryDict:
+        """Returns a lightweight summary dict for use in list views.
+
+        Returns:
+            PlatformFeedbackSummaryDict. A summary dict representation of the
+            object.
+        """
+        report_message_preview = self.report_message
+        if len(report_message_preview) > 100:
+            report_message_preview = report_message_preview[:97] + '...'
+        return {
+            'id': self.id,
+            'report_message_preview': report_message_preview,
+            'status': self.status,
+            'source': self.source,
+            'category': self.category,
         }
