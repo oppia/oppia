@@ -2689,6 +2689,82 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Creates the curriculum setup needed for certificate assessment tests.
+   * The helper keeps the requested question counts grouped by rubric
+   * difficulty so the acceptance spec can declare the intended coverage.
+   * @param {Array<{
+   *   topicName: string;
+   *   subtopicName: string;
+   *   skillName: string;
+   *   questionCountsByDifficulty: {Easy: number; Medium: number; Hard: number};
+   *   rubricDifficulties: Array<'Easy' | 'Medium' | 'Hard'>;
+   * }>} skillConfigs - The skills to create and publish.
+   * @param {string} classroomName - The classroom name to create.
+   * @param {string} classroomUrlFragment - The classroom URL fragment.
+   */
+  async createCertificateAssessmentTestSetup(
+    skillConfigs: Array<{
+      topicName: string;
+      subtopicName: string;
+      skillName: string;
+      questionCountsByDifficulty: {
+        Easy: number;
+        Medium: number;
+        Hard: number;
+      };
+      rubricDifficulties: Array<'Easy' | 'Medium' | 'Hard'>;
+    }>,
+    classroomName: string,
+    classroomUrlFragment: string
+  ): Promise<void> {
+    const classroomTopicNames = Array.from(
+      new Set(skillConfigs.map(config => config.topicName))
+    );
+
+    for (const config of skillConfigs) {
+      await this.createTopic(
+        config.topicName,
+        config.topicName.toLowerCase().replace(/ /g, '-')
+      );
+      await this.createSubtopicForTopic(
+        config.subtopicName,
+        config.subtopicName.toLowerCase().replace(/ /g, '-'),
+        config.topicName
+      );
+      await this.createSkillForTopic(config.skillName, config.topicName, false);
+      await this.openSkillEditor(config.skillName);
+
+      for (const difficulty of config.rubricDifficulties) {
+        await this.updateRubric(
+          difficulty,
+          `${config.skillName} - ${difficulty} rubric explanation.`
+        );
+      }
+
+      await this.publishUpdatedSkill(`Added rubrics for ${config.skillName}.`);
+      await this.createQuestionsForSkill(
+        config.skillName,
+        config.questionCountsByDifficulty.Easy +
+          config.questionCountsByDifficulty.Medium +
+          config.questionCountsByDifficulty.Hard
+      );
+      await this.assignSkillToSubtopicInTopicEditor(
+        config.skillName,
+        config.subtopicName,
+        config.topicName
+      );
+      await this.addSkillToDiagnosticTest(config.skillName, config.topicName);
+      await this.publishDraftTopic(config.topicName);
+    }
+
+    await this.createNewClassroom(classroomName, classroomUrlFragment);
+    for (const topicName of classroomTopicNames) {
+      await this.addTopicToClassroom(classroomName, topicName);
+    }
+    await this.publishClassroom(classroomName);
+  }
+
+  /**
    * Creates a topic with a skill.
    * @param {string} topicName - The name of the topic.
    * @param {string} skillName - The name of the skill.

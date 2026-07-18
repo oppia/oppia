@@ -719,6 +719,11 @@
       "name": "exploration-editor/delete-lesson-creators-user-profile",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/delete-lesson-creators-user-profile.spec.ts",
       "framework": "puppeteer"
+    },
+    {
+      "name": "certificate-assessment/create-certificate-assessment-offering",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/certificate-assessment/create-certificate-assessment-offering.spec.ts",
+      "framework": "puppeteer"
     }
   ]
 }
