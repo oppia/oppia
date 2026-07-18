@@ -34,14 +34,20 @@ interface RTETabContent {
   content: string;
 }
 
-export class RTEEditor extends BaseUser {
+export class RTEEditor {
+  private user: BaseUser;
+
+  constructor(user: BaseUser) {
+    this.user = user;
+  }
+
   /**
    * Adds a default collapsible block RTE element.
    */
   async addCollapsibleBlockRTE(): Promise<void> {
     await this.clickOnRTEOptionWithTitle('collapsible block');
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.user.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.user.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -50,10 +56,10 @@ export class RTEEditor extends BaseUser {
    */
   async clickOnRTEOptionWithTitle(title: string): Promise<void> {
     const optionSelector = `a.cke_button[title*="${title}"]`;
-    await this.expectElementToBeVisible(optionSelector);
-    const optionElement = await this.page.$(optionSelector);
+    await this.user.expectElementToBeVisible(optionSelector);
+    const optionElement = await this.user.page.$(optionSelector);
     if (optionElement) {
-      await this.clickOnElement(optionElement);
+      await this.user.clickOnElement(optionElement);
     }
   }
 
@@ -70,28 +76,28 @@ export class RTEEditor extends BaseUser {
   ): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert image');
 
-    await this.waitForNetworkIdle();
-    const helperModel = await this.page.$(rteHelperModalSelector);
+    await this.user.waitForNetworkIdle();
+    const helperModel = await this.user.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const imageDescriptionInput = await helperModel?.$(descriptionBoxSelector);
     const imageCaptionInput = await helperModel?.$(textInputSelector);
 
     if (imageDescriptionInput) {
-      await this.typeInInputField(imageDescriptionInput, imageDescription);
+      await this.user.typeInInputField(imageDescriptionInput, imageDescription);
     } else {
       throw new Error('Image description input not found in the helper modal');
     }
     if (imageCaptionInput && imageCaption) {
-      await this.typeInInputField(imageCaptionInput, imageCaption);
+      await this.user.typeInInputField(imageCaptionInput, imageCaption);
     }
 
-    await this.clickOnElementWithSelector(uploadImageButton);
-    await this.uploadFile(imageFilePath);
-    await this.clickOnElementWithSelector(useTheUploadImageButton);
+    await this.user.clickOnElementWithSelector(uploadImageButton);
+    await this.user.uploadFile(imageFilePath);
+    await this.user.clickOnElementWithSelector(useTheUploadImageButton);
 
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.user.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.user.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -101,8 +107,8 @@ export class RTEEditor extends BaseUser {
   async addTabContentsRTE(tabContents: RTETabContent[] = []): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert tabs');
 
-    await this.waitForNetworkIdle();
-    const helperModel = await this.page.$(rteHelperModalSelector);
+    await this.user.waitForNetworkIdle();
+    const helperModel = await this.user.page.$(rteHelperModalSelector);
 
     let tabTitleInputElements: ElementHandle<Element>[] = [];
     let tabContentInputElements: ElementHandle<Element>[] = [];
@@ -117,29 +123,29 @@ export class RTEEditor extends BaseUser {
 
     for (let i = 0; i < tabContents.length; i++) {
       if (i > 1) {
-        await this.clickOnElementWithSelector('.e2e-test-add-list-entry');
+        await this.user.clickOnElementWithSelector('.e2e-test-add-list-entry');
       }
-      await this.clearAllTextFrom(
+      await this.user.clearAllTextFrom(
         `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
       );
-      await this.clearAllTextFrom(
+      await this.user.clearAllTextFrom(
         `oppia-rte-helper-model ${stateContentInputField}:nth-child(${i + 1})`
       );
       if (tabTitleInputElements[i]) {
-        await this.typeInInputField(
+        await this.user.typeInInputField(
           tabTitleInputElements[i],
           tabContents[i].title
         );
       }
       if (tabContentInputElements[i]) {
-        await this.typeInInputField(
+        await this.user.typeInInputField(
           tabContentInputElements[i],
           tabContents[i].content
         );
       }
     }
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.user.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.user.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -149,9 +155,9 @@ export class RTEEditor extends BaseUser {
    */
   async addTextWithLinkRTE(text: string, url: string): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert link');
-    await this.waitForNetworkIdle();
+    await this.user.waitForNetworkIdle();
 
-    const helperModel = await this.page.$(rteHelperModalSelector);
+    const helperModel = await this.user.page.$(rteHelperModalSelector);
 
     let linkInput: ElementHandle<Element> | undefined;
     let linkTextInput: ElementHandle<Element> | undefined;
@@ -164,14 +170,14 @@ export class RTEEditor extends BaseUser {
     }
 
     if (linkInput && linkTextInput) {
-      await this.typeInInputField(linkInput, url);
-      await this.typeInInputField(linkTextInput, text);
+      await this.user.typeInInputField(linkInput, url);
+      await this.user.typeInInputField(linkTextInput, text);
     } else {
       throw new Error('Link input fields not found in the helper modal');
     }
 
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.user.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.user.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -181,8 +187,8 @@ export class RTEEditor extends BaseUser {
   async addVideoRTE(videoUrl: string): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert video');
 
-    await this.expectElementToBeVisible(rteHelperModalSelector);
-    const helperModel = await this.page.$(rteHelperModalSelector);
+    await this.user.expectElementToBeVisible(rteHelperModalSelector);
+    const helperModel = await this.user.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const videoUrlInput = await helperModel?.$(textInputField);
@@ -190,11 +196,11 @@ export class RTEEditor extends BaseUser {
     if (!videoUrlInput) {
       throw new Error('Video URL input not found in the helper modal');
     }
-    await this.waitForElementToStabilize(videoUrlInput);
-    await this.typeInInputField(videoUrlInput, videoUrl);
+    await this.user.waitForElementToStabilize(videoUrlInput);
+    await this.user.typeInInputField(videoUrlInput, videoUrl);
 
-    await this.expectElementToBeVisible(closeButtonForExtraModel);
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
+    await this.user.expectElementToBeVisible(closeButtonForExtraModel);
+    await this.user.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.user.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 }

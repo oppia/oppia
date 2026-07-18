@@ -233,8 +233,9 @@ export class LoggedOutUser extends BaseUser {
       // Wait for Angular to be stable before clicking the expand button.
       await this.waitForAngularStability();
 
-      // Use JavaScript click for sidebar menu items.
-      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+      await this.page
+        .locator(mobileSidebarExpandAboutMenuButton)
+        .dispatchEvent('click');
 
       // Wait for the About submenu to expand and the About button to be visible.
       await this.expectElementToBeVisible(mobileSidebarAboutButton);
@@ -1021,8 +1022,9 @@ export class LoggedOutUser extends BaseUser {
     // Wait for Angular to be stable before clicking.
     await this.waitForAngularStability();
 
-    // Use JavaScript click to ensure Angular handles the event properly.
-    await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
+    await this.page
+      .locator(mobileNavbarOpenSidebarButton)
+      .dispatchEvent('click');
 
     await this.expectElementToBeVisible(mobileSidebarOpenSelector);
 

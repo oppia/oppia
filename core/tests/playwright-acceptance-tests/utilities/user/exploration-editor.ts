@@ -216,7 +216,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
 
-    const rteEditor = new RTEEditor(this.page);
+    const rteEditor = new RTEEditor(this);
     // Add Bold text.
     await rteEditor.clickOnRTEOptionWithTitle('Bold');
     await this.typeInInputField(stateContentInputField, 'Bold text');
