@@ -233,7 +233,7 @@ export interface PlatformFeedbackDetailResponse {
   source: ReportType;
   status: FeedbackStatus;
   platform: 'web' | 'android';
-  destination_dashboard: 'LEAP' | 'CORE' | 'creator';
+  destination_dashboard: 'tech-external' | 'tech-internal' | 'curriculum';
   page_url: string;
   category: ReportAnIssueCategory | null;
   lesson_metadata: LessonFeedbackMetadataBackendDict | null;

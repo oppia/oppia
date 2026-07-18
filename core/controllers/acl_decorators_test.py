@@ -8639,7 +8639,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/technical/LEAP',
+                '/platform-feedback/technical/tech-external',
                 expected_status_int=401,
             )
 
@@ -8649,7 +8649,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         )
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/technical/CORE',
+                '/platform-feedback/technical/tech-internal',
                 expected_status_int=401,
             )
 
@@ -8660,7 +8660,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=401,
             )
         self.assertEqual(
@@ -8674,7 +8674,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
     ) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/technical/LEAP',
+                '/platform-feedback/technical/tech-external',
                 expected_status_int=401,
             )
 
@@ -8683,7 +8683,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         )
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/technical/CORE',
+                '/platform-feedback/technical/tech-internal',
                 expected_status_int=401,
             )
 
@@ -8692,7 +8692,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         )
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=401,
             )
 
@@ -8708,14 +8708,14 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=200,
             )
         self.assertEqual(response['success'], 1)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/technical/LEAP',
+                '/platform-feedback/technical/tech-external',
                 expected_status_int=401,
             )
 
@@ -8726,7 +8726,7 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/technical/CORE',
+                '/platform-feedback/technical/tech-internal',
                 expected_status_int=401,
             )
 
@@ -8742,18 +8742,22 @@ class CanAccessPlatformFeedbackReportsDecoratorTests(
         self.login(self.TECH_LEAD_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/platform-feedback/technical/LEAP')
-
-        self.assertEqual(response['success'], 1)
-
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/platform-feedback/technical/CORE')
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external'
+            )
 
         self.assertEqual(response['success'], 1)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/platform-feedback/creator/exp_id',
+                '/platform-feedback/technical/tech-internal'
+            )
+
+        self.assertEqual(response['success'], 1)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/curriculum/exp_id',
                 expected_status_int=401,
             )
 

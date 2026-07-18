@@ -294,7 +294,7 @@ class PlatformFeedbackListHandler(
         dashboard_id: str. Identifier associated with the requested dashboard.
             For the Creator Dashboard, this is the exploration ID.
             For the Technical Dashboard, this is the team identifier
-            ('LEAP' or 'CORE').
+            ("tech-external" or "tech-internal").
 
     Query params:
         status: Optional[str]. Filters feedback by status.
@@ -400,7 +400,7 @@ class PlatformFeedbackDetailHandler(
         dashboard_id: str. Identifier associated with the requested dashboard.
             For the Creator Dashboard, this is the exploration ID.
             For the Technical Dashboard, this is the team identifier
-            ('LEAP' or 'CORE').
+            ("tech-external" or "tech-internal").
         report_id: str. The feedback identifier.
 
     POST payload:

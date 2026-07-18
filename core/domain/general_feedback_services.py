@@ -150,8 +150,8 @@ def _determine_destination_dashboard(
     Routing rules:
         - All site (app) reports → technical (depends on the team that owns
           the page URL.)
-        - typo → creator
-        - confusing_or_incorrect_answer → creator
+        - typo → curriculum
+        - confusing_or_incorrect_answer → curriculum
         - broken_layout_or_image → technical (depends on the team that owns
           the page URL.)
         - other_or_not_sure → technical (depends on the team that owns the
@@ -162,19 +162,65 @@ def _determine_destination_dashboard(
         category: Optional[str]. The report category; None for site reports.
 
     Returns:
-        str. The destination dashboard ("creator" | "LEAP" | "CORE").
+        str. The destination dashboard ("curriculum" | "tech-external" |
+        "tech-internal").
     """
     if category in feconf.CREATOR_DASHBOARD_CATEGORIES:
-        return feconf.DESTINATION_CREATOR
+        return feconf.DESTINATION_CURRICULUM
     else:
         parsed_url = urllib.parse.urlparse(page_url)
         path = parsed_url.path.strip('/')
         first_path_segement = path.split('/', 1)[0]
 
-        if first_path_segement in feconf.LEAP_DASHBOARD_PATHS:
-            return feconf.DESTINATION_TECHNICAL_LEAP_TEAM
+        if first_path_segement in feconf.TECHNICAL_EXTERNAL_DASHBOARD_PATHS:
+            return feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM
         else:
-            return feconf.DESTINATION_TECHNICAL_CORE_TEAM
+            return feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM
+
+
+def validate_platform_feedback_belongs_to_dashboard(
+    feedback: general_feedback_domain.PlatformFeedback,
+    dashboard: str,
+    dashboard_id: str,
+) -> None:
+    """Validates that the feedback belongs to the requested dashboard.
+
+    Args:
+        feedback: PlatformFeedback. The feedback to validate.
+        dashboard: str. The dashboard from which the feedback is being
+            accessed. This is either "creator" or "technical".
+        dashboard_id: str. The dashboard-specific identifier. This is the
+            exploration ID for the Creator Dashboard and the team identifier
+            ("tech-external" or "tech-internal") for the Technical Dashboard.
+
+    Raises:
+        ValueError. The feedback does not belong to the requested dashboard.
+    """
+    if dashboard == feconf.DESTINATION_CURRICULUM:
+        if (
+            feedback.destination_dashboard != feconf.DESTINATION_CURRICULUM
+            or feedback.lesson_metadata is None
+        ):
+            raise ValueError(
+                'Feedback does not belong to the requested dashboard.'
+            )
+        exploration_id = feedback.lesson_metadata['exploration_id']
+        if exploration_id != dashboard_id:
+            raise ValueError(
+                'Feedback does not belong to the requested exploration.'
+            )
+        return
+
+    if dashboard == feconf.DESTINATION_TECHNICAL:
+        if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
+            raise ValueError('Invalid technical feedback team.')
+        if feedback.destination_dashboard != dashboard_id:
+            raise ValueError(
+                'Feedback does not belong to the requested dashboard.'
+            )
+        return
+
+    raise ValueError('Invalid dashboard.')
 
 
 def validate_platform_feedback_belongs_to_dashboard(
@@ -396,7 +442,8 @@ def get_platform_feedback_summaries(
             either "creator" or "technical".
         dashboard_id: str. Identifier associated with the requested dashboard.
             This is an exploration ID for creator dashboards and a technical
-            team ("LEAP" or "CORE") for technical dashboards.
+            team ("tech-external" or "tech-internal") for technical
+            dashboards.
         status_filter: Optional[str]. If provided, only return reports with
             this status. Otherwise, open status reports are shown.
         cursor: Optional[str]. Pagination cursor from a previous response.
@@ -417,9 +464,9 @@ def get_platform_feedback_summaries(
     """
     if dashboard not in feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES:
         raise ValueError('Invalid dashboard: %s' % dashboard)
-    if dashboard == feconf.DESTINATION_CREATOR:
+    if dashboard == feconf.DESTINATION_CURRICULUM:
         exploration_id = dashboard_id
-        dashboard_filter = feconf.DESTINATION_CREATOR
+        dashboard_filter = feconf.DESTINATION_CURRICULUM
     else:
         if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
             raise ValueError(

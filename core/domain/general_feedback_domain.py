@@ -207,8 +207,8 @@ class PlatformFeedback:
         report_message: str. The text body of the report.
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Submission platform ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "LEAP" |
-            "CORE").
+        destination_dashboard: str. Routing target ("curriculum" |
+            "tech-external" | "tech-internal").
         status: str. Current moderation status
             (open | fixed | ignored | compliment | not_actionable).
         category: Optional[str]. Report category; present for lesson reports,

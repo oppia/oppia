@@ -1177,7 +1177,7 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
             status=feconf.STATUS_CHOICES_OPEN,
             exploration_id='exp_id',
             lesson_metadata_schema_version=1,
-            lesson_metadata_json={},
+            lesson_metadata={},
         )
         model.update_timestamps()
         model.put()
