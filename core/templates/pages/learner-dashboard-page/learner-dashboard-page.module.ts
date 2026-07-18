@@ -48,6 +48,7 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgCircleProgressModule} from 'ng-circle-progress';
+import {MyCertificatesTabComponent} from './my-certificate-tab.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -96,6 +97,7 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
+    MyCertificatesTabComponent,
   ],
   entryComponents: [
     AddGoalsModalComponent,
@@ -117,6 +119,7 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
+    MyCertificatesTabComponent,
   ],
   providers: [LearnerDashboardActivityBackendApiService],
 })

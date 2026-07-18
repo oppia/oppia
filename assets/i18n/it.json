@@ -334,6 +334,7 @@
   "I18N_LEARNER_DASHBOARD_HOME_SECTION_HEADING": "Benvenuto, <[username]>!",
   "I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "In corso",
   "I18N_LEARNER_DASHBOARD_LEARNER_GROUPS_SECTION_GROUPS": "I tuoi gruppi",
+  "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION": "I miei certificati",
   "I18N_LEARNER_DASHBOARD_LEARNER_GROUP_SECTION_DECLINE_INVITATION": "Rifiuta",
   "I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION": "Sembra che tu non abbia ancora iniziato alcuna esplorazione. Torna alla libreria per iniziare una nuova entusiasmante esplorazione!",
   "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION": "Avanzamento",
