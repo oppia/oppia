@@ -352,11 +352,6 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.TopicViewerPageAccessValidationHandler,
-    ),
-    get_redirect_route(
-        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
         r'/<topic_url_fragment>/story'
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler,

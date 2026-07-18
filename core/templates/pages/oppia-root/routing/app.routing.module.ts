@@ -136,7 +136,15 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NODE_PRACTICE_SESSION
+      .ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
     loadChildren: () =>
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
