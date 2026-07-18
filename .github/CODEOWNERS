@@ -352,6 +352,7 @@
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
 /core/templates/css/oppia-material.css @oppia/lace-frontend-reviewers
+/core/templates/css/shepherd-overrides.css @oppia/lace-frontend-reviewers
 
 
 # Interaction project.
@@ -568,7 +569,6 @@
 /extensions/extensions.module.ts @oppia/lace-frontend-reviewers
 /core/schema_utils*.py @oppia/lace-backend-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
-/.rtlcssrc @oppia/lace-frontend-reviewers
 
 
 # Python typing
@@ -705,6 +705,7 @@
 /core/templates/domain/certificate-assessment/ @oppia/contributor-experience-team
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
 /core/templates/pages/certificate-offering-available-page @oppia/lace-frontend-reviewers
+/core/templates/pages/certificate-assessment-player-page @oppia/lace-frontend-reviewers
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
@@ -717,7 +718,6 @@
 /.lighthouserc*.js @oppia/dev-workflow-reviewers
 /puppeteer-login-script.js @oppia/dev-workflow-reviewers
 /scripts/run_lighthouse_tests.py @oppia/dev-workflow-reviewers
-/webpack.*.ts @oppia/dev-workflow-reviewers
 
 
 # User’s profile page.

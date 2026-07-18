@@ -51,7 +51,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         feedback = general_feedback_services.create_lesson_feedback(
             author_id='user_id',
             feedback_text='This lesson helped.',
-            lesson_metadata_json=self.get_lesson_metadata(),
+            lesson_metadata=self.get_lesson_metadata(),
         )
 
         self.assertEqual(feedback.author_id, 'user_id')
@@ -67,7 +67,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         feedback = general_feedback_services.create_lesson_feedback(
             author_id='user_id',
             feedback_text='Follow-up feedback.',
-            lesson_metadata_json=self.get_lesson_metadata(),
+            lesson_metadata=self.get_lesson_metadata(),
             parent_feedback_id='parent_id',
         )
 
@@ -80,8 +80,8 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             feedback_text='There is a typo.',
             source='lesson',
             category=feconf.CATEGORY_TYPO,
-            lesson_metadata_json=self.get_lesson_metadata(),
-            session_info_json=None,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
             screenshot_filename=None,
             screenshot_entity_id=None,
             include_technical_logs=False,
@@ -104,8 +104,8 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             feedback_text='The page is broken.',
             source='site',
             category=None,
-            lesson_metadata_json=None,
-            session_info_json=None,
+            lesson_metadata=None,
+            session_info=None,
             screenshot_filename=None,
             screenshot_entity_id=None,
             include_technical_logs=False,
@@ -124,26 +124,24 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         session_info = {
-            'console_logs_json': [
+            'console_logs': [
                 {
                     'error_message': 'Console error.',
                     'timestamp_msecs': 1,
                     'log_level': 'error',
                 }
             ],
-            'failed_requests_json': [],
-            'navigation_history_json': [
-                {'path': '/learn', 'timestamp_msecs': 2}
-            ],
-            'environment_json': {'user_agent': 'Mozilla/5.0'},
+            'failed_requests': [],
+            'navigation_history': [{'path': '/learn', 'timestamp_msecs': 2}],
+            'environment': {'user_agent': 'Mozilla/5.0'},
         }
 
         report = general_feedback_services.create_platform_report(
             feedback_text='The card image is broken.',
             source='lesson',
             category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
-            lesson_metadata_json=self.get_lesson_metadata(),
-            session_info_json=session_info,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=session_info,
             screenshot_filename='feedback.png',
             screenshot_entity_id='entity_id',
             include_technical_logs=True,
@@ -159,20 +157,20 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertIsNotNone(session_model)
         assert session_model is not None
         self.assertEqual(
-            session_model.console_logs_json,
-            session_info['console_logs_json'],
+            session_model.console_logs,
+            session_info['console_logs'],
         )
         self.assertEqual(
-            session_model.navigation_history_json,
-            session_info['navigation_history_json'],
+            session_model.navigation_history,
+            session_info['navigation_history'],
         )
         self.assertEqual(
-            session_model.failed_requests_json,
-            session_info['failed_requests_json'],
+            session_model.failed_requests,
+            session_info['failed_requests'],
         )
         self.assertEqual(
-            session_model.environment_json,
-            session_info['environment_json'],
+            session_model.environment,
+            session_info['environment'],
         )
 
     def test_create_platform_report_sanitizes_invalid_session_info(
@@ -181,18 +179,18 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         # Here we use object because session-info diagnostics are heterogeneous
         # JSON-like payloads (nested dict/list values) from client logs.
         session_info: Dict[str, object] = {
-            'console_logs_json': 'invalid',
-            'failed_requests_json': 'invalid',
-            'navigation_history_json': 'invalid',
-            'environment_json': 'invalid',
+            'console_logs': 'invalid',
+            'failed_requests': 'invalid',
+            'navigation_history': 'invalid',
+            'environment': 'invalid',
         }
 
         report = general_feedback_services.create_platform_report(
             feedback_text='Broken page',
             source='lesson',
             category=(feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE),
-            lesson_metadata_json=self.get_lesson_metadata(),
-            session_info_json=session_info,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=session_info,
             screenshot_filename=None,
             screenshot_entity_id=None,
             include_technical_logs=True,
@@ -203,10 +201,10 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             general_feedback_models.FeedbackSessionLogModel.get_by_id(report.id)
         )
 
-        self.assertEqual(session_model.console_logs_json, [])
-        self.assertEqual(session_model.failed_requests_json, [])
-        self.assertEqual(session_model.navigation_history_json, [])
-        self.assertEqual(session_model.environment_json, {})
+        self.assertEqual(session_model.console_logs, [])
+        self.assertEqual(session_model.failed_requests, [])
+        self.assertEqual(session_model.navigation_history, [])
+        self.assertEqual(session_model.environment, {})
 
     def test_create_platform_report_raises_for_missing_lesson_metadata(
         self,
@@ -218,8 +216,8 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                 feedback_text='The card image is broken.',
                 source='lesson',
                 category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
-                lesson_metadata_json=None,
-                session_info_json=None,
+                lesson_metadata=None,
+                session_info=None,
                 screenshot_filename=None,
                 screenshot_entity_id=None,
                 include_technical_logs=False,
@@ -232,8 +230,8 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             source='site',
             page_url='https://oppia.org/create/12',
             category=None,
-            lesson_metadata_json=None,
-            session_info_json=None,
+            lesson_metadata=None,
+            session_info=None,
             screenshot_filename=None,
             screenshot_entity_id=None,
             include_technical_logs=False,

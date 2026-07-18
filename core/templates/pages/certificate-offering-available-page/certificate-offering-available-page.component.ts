@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate offering available page component
+ * @fileoverview Certificate offering available page component.
  */
 
 import {Component, Input, OnInit} from '@angular/core';

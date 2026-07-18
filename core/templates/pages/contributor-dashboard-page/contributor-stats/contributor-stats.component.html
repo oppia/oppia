@@ -15,7 +15,7 @@
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
              (click)="selectOption(option.contributionType)"
              *ngFor="let option of options"
-             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option.contributionType === type}">
             {{option.displayName}}
         </div>
       </div>
@@ -42,7 +42,7 @@
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
              *ngFor="let option of options"
              (click)="selectOption(option.contributionType)"
-             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option.contributionType === type}">
           {{option.displayName}}
         </div>
       </div>
@@ -71,19 +71,19 @@
           </td>
           <td *ngIf="type == 'translationReview'"
               class="stats-data">
-            {{translationStat.reviewedCards}}
+            {{translationStat['reviewedCards']}}
           </td>
           <td *ngIf="type == 'translationReview'"
               class="stats-data">
-            {{translationStat.reviewedWordCount}}
+            {{translationStat['reviewedWordCount']}}
           </td>
           <td *ngIf="type == 'translationContribution' || type == 'translationReview'"
               class="stats-data">
-            {{translationStat.acceptedCards}}
+            {{translationStat['acceptedCards']}}
           </td>
           <td *ngIf="type == 'translationContribution' || type == 'translationReview'"
               class="stats-data">
-            {{translationStat.acceptedWordCount}}
+            {{translationStat['acceptedWordCount']}}
           </td>
         </tr>
       </table>
@@ -111,7 +111,7 @@
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedCards}}
+              {{translationStat['acceptedCards']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -119,7 +119,7 @@
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedWordCount}}
+              {{translationStat['acceptedWordCount']}}
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@
               <b>{{COLUMNS[type].reviewedCards}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.reviewedCards}}
+              {{translationStat['reviewedCards']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -157,7 +157,7 @@
               <b>{{COLUMNS[type].reviewedWordCount}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.reviewedWordCount}}
+              {{translationStat['reviewedWordCount']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -165,7 +165,7 @@
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedCards}}
+              {{translationStat['acceptedCards']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -173,7 +173,7 @@
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{translationStat.acceptedWordCount}}
+              {{translationStat['acceptedWordCount']}}
             </div>
           </div>
         </div>
@@ -239,14 +239,14 @@
           </td>
           <td *ngIf="type == 'questionReview'"
               class="stats-data">
-            {{questionStat.reviewedQuestions}}
+            {{questionStat['reviewedQuestions']}}
           </td>
           <td class="stats-data">
-            {{questionStat.acceptedQuestions}}
+            {{questionStat['acceptedQuestions']}}
           </td>
           <td *ngIf="type == 'questionContribution'"
               class="stats-data">
-            {{questionStat.acceptedQuestionsWithoutEdits}}
+            {{questionStat['acceptedQuestionsWithoutEdits']}}
           </td>
         </tr>
       </table>
@@ -275,7 +275,7 @@
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.acceptedQuestions}}
+              {{questionStat['acceptedQuestions']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -283,7 +283,7 @@
               <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.acceptedQuestionsWithoutEdits}}
+              {{questionStat['acceptedQuestionsWithoutEdits']}}
             </div>
           </div>
         </div>
@@ -313,7 +313,7 @@
               <b>{{COLUMNS[type].reviewedQuestions}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.reviewedQuestions}}
+              {{questionStat['reviewedQuestions']}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -321,7 +321,7 @@
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
             <div class="e2e-test-mobile-stats-cell">
-              {{questionStat.acceptedQuestions}}
+              {{questionStat['acceptedQuestions']}}
             </div>
           </div>
         </div>
