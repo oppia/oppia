@@ -490,7 +490,7 @@ class CertificateAssessmentResultHandler(
     # can_access_certificate_assessment_attempt once real result
     # fetching logic exists.
     @acl_decorators.open_access
-    def get(self, attempt_id: str) -> None:
+    def get(self, attempt_id: str) -> None:  # pylint: disable=unused-argument
         """Returns a hardcoded result payload."""
         self.render_json(
             {
