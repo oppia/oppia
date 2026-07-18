@@ -50,14 +50,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
     return new Promise<boolean>(resolve => {
       let validationPromise: Promise<void>;
 
-      if (nodeId) {
-        validationPromise =
-          this.accessValidationBackendApiService.validateAccessToLessonPracticePage(
-            classroomUrlFragment,
-            topicUrlFragment,
-            nodeId
-          );
-      } else if (arcId) {
+      if (arcId) {
         validationPromise =
           this.accessValidationBackendApiService.validateAccessToEndOfArcPage(
             classroomUrlFragment,
@@ -70,6 +63,13 @@ export class PracticeSessionAccessGuard implements CanActivate {
             classroomUrlFragment,
             topicUrlFragment,
             selectedSubtopicIds
+          );
+      } else if (nodeId) {
+        validationPromise =
+          this.accessValidationBackendApiService.validateAccessToLessonPracticePage(
+            classroomUrlFragment,
+            topicUrlFragment,
+            nodeId
           );
       } else {
         validationPromise =

@@ -167,6 +167,41 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
   }));
 
+  it('should prioritize selected_subtopic_ids over node_id session', fakeAsync(() => {
+    const validatePracticeAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToPracticeSessionPage'
+    ).and.returnValue(Promise.resolve());
+    const validateLessonAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToLessonPracticePage'
+    ).and.returnValue(Promise.resolve());
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {selected_subtopic_ids: '[1]'};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      node_id: 'session',
+    };
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validatePracticeAccessSpy).toHaveBeenCalledWith(
+      'math',
+      'algebra',
+      '[1]'
+    );
+    expect(validateLessonAccessSpy).not.toHaveBeenCalled();
+  }));
+
   it('should allow access for lesson practice when node_id is present', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
