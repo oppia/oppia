@@ -354,6 +354,11 @@ URLS = [
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler,
     ),
+    get_redirect_route(
+        r'%s/can_access_technical_feedback_dashboard'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TechnicalFeedbackDashboardAccessValidationHandler,
+    ),
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -1063,6 +1068,15 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.PLATFORM_FEEDBACK_URL,
         general_feedback.PlatformFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>/<report_id>'
+        % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackListHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,

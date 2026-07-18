@@ -38,18 +38,7 @@ import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-ti
 import {TranslationTabComponent} from './translation-tab.component';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
-import {
-  JoyrideDirective,
-  JoyrideOptionsService,
-  JoyrideService,
-  JoyrideStepsContainerService,
-  JoyrideStepService,
-  // This throws "Object is possibly undefined." The type undefined
-  // comes here from ngx joyride dependency. We need to suppress this
-  // error because of strict type checking. This error is thrown because
-  // the type of the variable is undefined.
-  // @ts-ignore
-} from 'ngx-joyride';
+import {ShepherdService} from 'angular-shepherd';
 
 class MockNgbModal {
   open() {
@@ -82,27 +71,37 @@ describe('Translation tab component', () => {
   let refreshTranslationTabEmitter = new EventEmitter<void>();
   let enterTranslationForTheFirstTimeEmitter = new EventEmitter<string>();
 
-  class MockJoyrideService {
-    startTour() {
-      return {
-        subscribe: (
-          value1: (arg0: {number: number}) => void,
-          value2: () => void,
-          value3: () => void
-        ) => {
-          value1({number: 1});
-          value1({number: 2});
-          value1({number: 3});
-          value1({number: 4});
-          value1({number: 6});
-          value1({number: 8});
-          value2();
-          value3();
-        },
+  class MockShepherdService {
+    defaultStepOptions = {};
+    modal = false;
+    steps: object[] = [];
+    tourObject: {
+      on: (eventName: string, cb: () => void) => void;
+      start: () => void;
+      complete: () => void;
+      cancel: () => void;
+    } | null = null;
+
+    addSteps(steps: object[]) {
+      this.steps = steps;
+      this.tourObject = {
+        on: (eventName: string, cb: () => void) => {},
+        start: () => {},
+        complete: () => {},
+        cancel: () => {},
       };
     }
 
-    closeTour() {}
+    start() {
+      this.tourObject?.start();
+    }
+    complete() {
+      this.tourObject?.complete();
+    }
+    back() {}
+    cancel() {
+      this.tourObject?.cancel();
+    }
   }
 
   class MockUserExplorationPermissionsService {
@@ -136,11 +135,8 @@ describe('Translation tab component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [TranslationTabComponent, JoyrideDirective],
+      declarations: [TranslationTabComponent],
       providers: [
-        JoyrideStepService,
-        JoyrideOptionsService,
-        JoyrideStepsContainerService,
         // The UserExplorationPermissionsService has been
         // mocked here because spying the function of
         // UserExplorationPermissionsService is not able to
@@ -151,8 +147,8 @@ describe('Translation tab component', () => {
           useClass: MockUserExplorationPermissionsService,
         },
         {
-          provide: JoyrideService,
-          useClass: MockJoyrideService,
+          provide: ShepherdService,
+          useClass: MockShepherdService,
         },
         {
           provide: NgbModal,
@@ -395,8 +391,11 @@ describe('Translation tab component', () => {
       component.initTranslationTab();
       component.startTutorial();
 
-      expect(editabilityService.inTutorialMode()).toBe(false);
       expect(component.startTutorial).toHaveBeenCalled();
+      expect(component.tutorialInProgress).toBe(true);
+
+      component.leaveTutorial();
+      expect(editabilityService.inTutorialMode()).toBe(false);
       expect(component.tutorialInProgress).toBe(false);
     })
   );
@@ -406,31 +405,14 @@ describe('Translation tab component', () => {
       ' no permissions',
     () => {
       component.permissions = {
-        canVoiceover: true,
+        canVoiceover: false,
       };
-
-      spyOn(
-        userExplorationPermissionsService,
-        'getPermissionsAsync'
-      ).and.returnValue(
-        Promise.resolve({
-          canUnpublish: false,
-          canReleaseOwnership: false,
-          canPublish: false,
-          canVoiceover: false,
-          canDelete: false,
-          canModifyRoles: false,
-          canEdit: false,
-          canManageVoiceArtist: false,
-        } as ExplorationPermissions)
-      );
 
       editabilityService.onStartTutorial();
       component.ngOnInit();
 
       component.initTranslationTab();
 
-      expect(editabilityService.inTutorialMode()).toBe(false);
       expect(component.tutorialInProgress).toBe(false);
     }
   );
@@ -586,6 +568,138 @@ describe('Translation tab component', () => {
     })
   );
 
+  it('should smoothly scroll to target position', () => {
+    let scrollToSpy = spyOn(window, 'scrollTo');
+    let callbacks: FrameRequestCallback[] = [];
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        callbacks.push(cb);
+        return 1;
+      }
+    );
+    let mockPerformanceNow = spyOn(performance, 'now');
+
+    mockPerformanceNow.and.returnValue(0);
+    // eslint-disable-next-line dot-notation
+    component['smoothScrollTo'](100, 1000);
+
+    expect(callbacks.length).toBe(1);
+
+    mockPerformanceNow.and.returnValue(100);
+    callbacks[0](100);
+    expect(scrollToSpy).toHaveBeenCalledWith(0, jasmine.any(Number));
+    expect(callbacks.length).toBe(2);
+
+    mockPerformanceNow.and.returnValue(600);
+    callbacks[1](600);
+    expect(callbacks.length).toBe(3);
+
+    mockPerformanceNow.and.returnValue(1000);
+    callbacks[2](1000);
+    expect(scrollToSpy).toHaveBeenCalledWith(0, 100);
+    expect(callbacks.length).toBe(3);
+  });
+
+  it('should trigger all tutorial tour step callbacks, done button, and cancel events', fakeAsync(() => {
+    interface TourStep {
+      id: string;
+      buttons: {text: string; action?: () => void}[];
+      when?: {
+        show?: () => void;
+      };
+    }
+
+    interface TestShepherdService {
+      steps: TourStep[];
+      tourObject: {
+        on: (eventName: string, cb: () => void) => void;
+        start: () => void;
+        complete: () => void;
+        cancel: () => void;
+      } | null;
+      addSteps: (steps: object[]) => void;
+    }
+
+    const shepherdService = TestBed.inject(
+      ShepherdService
+    ) as unknown as TestShepherdService;
+
+    component.permissions = {
+      canVoiceover: true,
+    };
+
+    const smoothScrollToSpy = spyOn(
+      component as unknown as {
+        smoothScrollTo: (targetY: number, duration: number) => void;
+      },
+      'smoothScrollTo'
+    );
+    // eslint-disable-next-line dot-notation
+    const tickSpy = spyOn(component['applicationRef'], 'tick');
+
+    const registeredCallbacks: Record<string, () => void> = {};
+    spyOn(shepherdService, 'addSteps').and.callFake((steps: object[]) => {
+      shepherdService.steps = steps as unknown as TourStep[];
+      shepherdService.tourObject = {
+        on: (eventName: string, cb: () => void) => {
+          registeredCallbacks[eventName] = cb;
+        },
+        start: () => {},
+        complete: () => {},
+        cancel: () => {},
+      };
+    });
+
+    component.startTutorial();
+    tick();
+
+    const steps = shepherdService.steps;
+    expect(steps.length).toBeGreaterThan(0);
+
+    steps.forEach(step => {
+      if (step.when && typeof step.when.show === 'function') {
+        step.when.show();
+      }
+    });
+
+    expect(smoothScrollToSpy).toHaveBeenCalled();
+
+    const lastStep = steps[steps.length - 1];
+    const doneButton = lastStep.buttons.find(btn => btn.text === 'Done');
+    expect(doneButton).toBeDefined();
+    if (doneButton && doneButton.action) {
+      doneButton.action();
+    }
+    expect(component.tutorialInProgress).toBe(false);
+
+    component.tutorialInProgress = true;
+    expect(registeredCallbacks.cancel).toBeDefined();
+    registeredCallbacks.cancel();
+    expect(tickSpy).toHaveBeenCalled();
+    expect(component.tutorialInProgress).toBe(false);
+  }));
+
+  it('should add step counters even if buttons are missing and cover step counter action', () => {
+    interface StepWithButtons {
+      buttons?: {text: string; classes?: string; action?: () => void}[];
+    }
+    const stepsWithoutButtons: StepWithButtons[] = [{}];
+    // eslint-disable-next-line dot-notation
+    component['addStepCounters'](stepsWithoutButtons);
+    const step = stepsWithoutButtons[0];
+    expect(step.buttons).toBeDefined();
+    if (step.buttons) {
+      expect(step.buttons.length).toBe(1);
+      expect(step.buttons[0].text).toBe('1/1');
+      expect(step.buttons[0].classes).toBe('shepherd-step-counter');
+
+      expect(step.buttons[0].action).toBeDefined();
+      if (step.buttons[0].action) {
+        step.buttons[0].action();
+      }
+    }
+  });
+
   it('should not start tutorial', () => {
     component.tutorialInProgress = false;
     // This throws "Type 'null' is not assignable to parameter of
@@ -602,4 +716,21 @@ describe('Translation tab component', () => {
 
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should return early from startTutorial if another tour started while permissions were loading', fakeAsync(() => {
+    component.tutorialInProgress = false;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type '{ canVoiceover: boolean; }'." We need to suppress this
+    // error because permissions are null before fetching.
+    // @ts-ignore
+    component.permissions = null;
+
+    component.startTutorial();
+
+    component.tutorialInProgress = true;
+
+    tick();
+
+    expect(component.tutorialInProgress).toBe(true);
+  }));
 });
