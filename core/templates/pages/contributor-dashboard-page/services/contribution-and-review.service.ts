@@ -264,11 +264,13 @@ export class ContributionAndReviewService {
       sortedTranslationCards.push(...cardsForState);
     }
 
-    // Generic cards represent exploration-wide metadata translations (like
-    // exploration title and objective) that do not belong to any specific
-    // exploration state. We append them at the end of the list so they are
-    // presented to the translator after all state-specific content has
-    // been translated.
+    // Generic cards represent exploration-wide metadata translations (such as
+    // title and objective) that do not belong to any specific exploration state.
+    // Based on the consensus from the product and UX team (Sean and Aanu),
+    // these generic cards must be sorted independently and appended at the
+    // end of the sorted state-specific cards list. This separate ordering is
+    // intentional to allow translators to complete state content first; do NOT
+    // combine and sort the entire list together.
     const genericCards =
       translationSuggestionsByState.get(
         AppConstants.DEFAULT_SUGGESTION_STATE_NAME
