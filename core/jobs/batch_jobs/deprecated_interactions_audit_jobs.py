@@ -24,7 +24,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Dict, Iterable, Tuple
+from typing import Dict, Iterable, List, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -41,6 +41,20 @@ DEPRECATED_INTERACTION_IDS = [
     'GraphInput',
     'InteractiveMap',
 ]
+
+
+class ExpData(TypedDict):
+    """TypedDict for exploration data."""
+
+    interactions: List[str]
+    last_updated: str
+
+
+class GroupedData(TypedDict):
+    """TypedDict for grouped data from CoGroupByKey."""
+
+    exp_data: Iterable[ExpData]
+    answers_data: Iterable[str]
 
 
 class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
@@ -78,9 +92,13 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
                 lambda model: (
                     model.exploration_id,
                     (
-                        model.created_on.strftime('%Y-%m-%d %H:%M:%S')
-                        if model.created_on
-                        else ''
+                        model.last_updated.strftime('%Y-%m-%d %H:%M:%S')
+                        if model.last_updated
+                        else (
+                            model.created_on.strftime('%Y-%m-%d %H:%M:%S')
+                            if model.created_on
+                            else ''
+                        )
                     ),
                 )
             )
@@ -101,17 +119,16 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
             job_run_result.JobRunResult.as_stdout
         )
 
-    # Here we use type Any because the dict contains both string and list values.
     def extract_deprecated_interactions_info(
         self, model: exp_models.ExplorationModel
-    ) -> Iterable[Tuple[str, Dict[str, Any]]]:
+    ) -> Iterable[Tuple[str, ExpData]]:
         """Extracts deprecated interactions used in an exploration.
 
         Args:
             model: ExplorationModel. The exploration model.
 
         Yields:
-            Tuple[str, Dict[str, Any]]. A tuple of exploration_id and a dict
+            Tuple[str, ExpData]. A tuple of exploration_id and a dict
             containing the deprecated interactions used and the last_updated time.
         """
         used_deprecated_interactions = set()
@@ -128,21 +145,23 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
                     'last_updated': (
                         model.last_updated.strftime('%Y-%m-%d %H:%M:%S')
                         if model.last_updated
-                        else ''
+                        else (
+                            model.created_on.strftime('%Y-%m-%d %H:%M:%S')
+                            if model.created_on
+                            else ''
+                        )
                     ),
                 },
             )
 
-    # Here we use type Any because the return type of beam.CoGroupByKey()
-    # contains values of different types from multiple PCollections.
     def format_output(
         self,
-        grouped_data: Tuple[str, Dict[str, Iterable[Any]]],
+        grouped_data: Tuple[str, GroupedData],
     ) -> Iterable[str]:
         """Formats the grouped data into a human-readable string.
 
         Args:
-            grouped_data: Tuple[str, Dict[str, Iterable[Any]]].
+            grouped_data: Tuple[str, GroupedData].
                 The CoGroupByKey output.
 
         Yields:
@@ -154,18 +173,18 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
             # Exploration does not have deprecated interactions.
             return
 
-        exp_info = exp_data_list[0]
-        interactions = exp_info['interactions']
-        last_updated_str = exp_info['last_updated']
+        for exp_info in exp_data_list:
+            interactions = exp_info['interactions']
+            last_updated_str = exp_info['last_updated']
 
-        answers_timestamps = list(data['answers_data'])
-        last_answer_str = (
-            max(answers_timestamps) if answers_timestamps else 'None'
-        )
+            answers_timestamps = list(data['answers_data'])
+            last_answer_str = (
+                max(answers_timestamps) if answers_timestamps else 'None'
+            )
 
-        output_str = (
-            'Exp ID: %s, Interactions: %s, Last Edited: %s, '
-            'Last Answer: %s'
-            % (exp_id, interactions, last_updated_str, last_answer_str)
-        )
-        yield output_str
+            output_str = (
+                'Exp ID: %s, Interactions: %s, Last Edited: %s, '
+                'Last Answer: %s'
+                % (exp_id, interactions, last_updated_str, last_answer_str)
+            )
+            yield output_str
