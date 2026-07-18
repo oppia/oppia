@@ -63,17 +63,6 @@ describe('Subtopic page Model', () => {
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 
-  it('should be able to set id and page contents', () => {
-    let subtopicPage = SubtopicPage.createDefault('topic_id', 2);
-    expect(subtopicPage.getId()).toBe('topic_id-2');
-    subtopicPage.setId('new_id');
-    expect(subtopicPage.getId()).toBe('new_id');
-
-    let newPageContents = SubtopicPageContents.createDefault();
-    subtopicPage.setPageContents(newPageContents);
-    expect(subtopicPage.getPageContents()).toEqual(newPageContents);
-  });
-
   it('should be able to copy from another subtopic page', () => {
     var firstSubtopicPage = SubtopicPage.createFromBackendDict({
       id: 'topic_id-1',

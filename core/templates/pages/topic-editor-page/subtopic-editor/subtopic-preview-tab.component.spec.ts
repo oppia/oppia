@@ -23,11 +23,21 @@ import {Topic} from 'domain/topic/topic-object.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
-
+import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {PageContextService} from 'services/page-context.service';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EventEmitter} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+
+class MockPlatformFeatureService {
+  status = {
+    ShowRestructuredStudyGuides: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('SubtopicPreviewTab', () => {
   let component: SubtopicPreviewTab;
@@ -35,11 +45,33 @@ describe('SubtopicPreviewTab', () => {
   let topicEditorStateService: TopicEditorStateService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let windowDimensionsService: WindowDimensionsService;
+  let platformFeatureService: PlatformFeatureService;
+  let subtopicPage: SubtopicPage;
   let subtopic: Subtopic;
   let topic: Topic;
   let studyGuide: StudyGuide;
 
+  let subtopicPageContentsDict = SubtopicPageContents.createFromBackendDict({
+    subtitled_html: {
+      html: 'test content',
+      content_id: 'content',
+    },
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false,
+            duration_secs: 10,
+          },
+        },
+      },
+    },
+  });
   let topicInitializedEventEmitter = new EventEmitter();
+  let topicReinitializedEventEmitter = new EventEmitter();
+  let subtopicPageLoadedEventEmitter = new EventEmitter();
   let studyGuideLoadedEventEmitter = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
@@ -50,6 +82,10 @@ describe('SubtopicPreviewTab', () => {
         TopicEditorStateService,
         TopicEditorRoutingService,
         WindowDimensionsService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -63,6 +99,7 @@ describe('SubtopicPreviewTab', () => {
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     fixture = TestBed.createComponent(SubtopicPreviewTab);
     component = fixture.componentInstance;
@@ -103,6 +140,9 @@ describe('SubtopicPreviewTab', () => {
       return id === 99 ? null : subtopic;
     };
 
+    subtopicPage = SubtopicPage.createDefault('topicId', 1);
+    subtopicPage.setPageContents(subtopicPageContentsDict);
+
     studyGuide = StudyGuide.createFromBackendDict({
       id: 'topic_id-1',
       topic_id: 'topic_id',
@@ -123,85 +163,158 @@ describe('SubtopicPreviewTab', () => {
     });
 
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(topicEditorStateService, 'getSubtopicPage').and.returnValue(
+      subtopicPage
+    );
     spyOn(topicEditorStateService, 'getStudyGuide').and.returnValue(studyGuide);
     spyOn(topicEditorRoutingService, 'getSubtopicIdFromUrl').and.returnValue(1);
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    // Default to feature flag disabled.
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
   });
 
-  it('should initialize with study guide when subtopic preview tab is opened', () => {
-    spyOn(topicEditorStateService, 'loadStudyGuide');
-    component.ngOnInit();
+  describe('when ShowRestructuredStudyGuides feature is disabled', () => {
+    beforeEach(() => {
+      platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled =
+        false;
+    });
 
-    expect(component.topic).toEqual(topic);
-    expect(component.subtopicId).toBe(1);
-    expect(component.subtopic).toEqual(subtopic);
-    expect(topicEditorStateService.loadStudyGuide).toHaveBeenCalledWith('1', 1);
-    expect(component.editableTitle).toBe('Subtopic1');
-    expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
-    expect(component.editableThumbnailBgColor).toBe('#FFFFFF');
-    expect(component.studyGuide).toEqual(studyGuide);
-    expect(component.thumbnailIsShown).toBe(true);
+    it('should initialize when subtopic preview tab is opened', () => {
+      spyOn(topicEditorStateService, 'loadSubtopicPage');
+      component.ngOnInit();
+
+      expect(component.topic).toEqual(topic);
+      expect(component.subtopicId).toBe(1);
+      expect(component.subtopic).toEqual(subtopic);
+      expect(topicEditorStateService.loadSubtopicPage).toHaveBeenCalledWith(
+        '1',
+        1
+      );
+      expect(component.editableTitle).toBe('Subtopic1');
+      expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+      expect(component.editableThumbnailBgColor).toBe('#FFFFFF');
+      expect(component.subtopicPage).toEqual(subtopicPage);
+      expect(component.pageContents).toEqual(subtopicPageContentsDict);
+      expect(component.htmlData).toEqual('test content');
+      expect(component.thumbnailIsShown).toBe(true);
+    });
+
+    it('should get subtopic contents when subtopic preview page is loaded', () => {
+      spyOnProperty(
+        topicEditorStateService,
+        'onSubtopicPageLoaded'
+      ).and.returnValue(subtopicPageLoadedEventEmitter);
+
+      component.ngOnInit();
+      component.htmlData = '';
+
+      subtopicPageLoadedEventEmitter.emit();
+
+      expect(component.subtopicPage).toEqual(subtopicPage);
+      expect(component.pageContents).toEqual(subtopicPageContentsDict);
+      expect(component.htmlData).toEqual('test content');
+    });
+
+    it('should call initEditor when topic is initialized', () => {
+      spyOnProperty(
+        topicEditorStateService,
+        'onTopicInitialized'
+      ).and.returnValue(topicInitializedEventEmitter);
+
+      component.ngOnInit();
+      component.subtopicId = 2;
+      component.editableTitle = 'random title';
+      component.editableThumbnailFilename = 'random_file_name.svg';
+
+      topicInitializedEventEmitter.emit();
+
+      expect(component.subtopicId).toBe(1);
+      expect(component.editableTitle).toBe('Subtopic1');
+      expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+    });
+
+    it('should call initEditor when topic is reinitialized', () => {
+      spyOnProperty(
+        topicEditorStateService,
+        'onTopicInitialized'
+      ).and.returnValue(topicInitializedEventEmitter);
+      spyOnProperty(
+        topicEditorStateService,
+        'onTopicReinitialized'
+      ).and.returnValue(topicReinitializedEventEmitter);
+
+      component.ngOnInit();
+
+      topicInitializedEventEmitter.emit();
+      // Change values.
+      component.subtopicId = 2;
+      component.editableTitle = 'random title';
+      component.editableThumbnailFilename = 'random_file_name.svg';
+      topicReinitializedEventEmitter.emit();
+
+      expect(component.subtopicId).toBe(1);
+      expect(component.editableTitle).toBe('Subtopic1');
+      expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+    });
   });
 
-  it('should get study guide contents when study guide is loaded', () => {
-    spyOnProperty(
-      topicEditorStateService,
-      'onStudyGuideLoaded'
-    ).and.returnValue(studyGuideLoadedEventEmitter);
+  describe('when ShowRestructuredStudyGuides feature is enabled', () => {
+    beforeEach(() => {
+      platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled =
+        true;
+    });
 
-    component.ngOnInit();
-    component.sections = [];
+    it('should initialize with study guide when subtopic preview tab is opened', () => {
+      spyOn(topicEditorStateService, 'loadStudyGuide');
+      component.ngOnInit();
 
-    studyGuideLoadedEventEmitter.emit();
+      expect(component.topic).toEqual(topic);
+      expect(component.subtopicId).toBe(1);
+      expect(component.subtopic).toEqual(subtopic);
+      expect(topicEditorStateService.loadStudyGuide).toHaveBeenCalledWith(
+        '1',
+        1
+      );
+      expect(component.editableTitle).toBe('Subtopic1');
+      expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+      expect(component.editableThumbnailBgColor).toBe('#FFFFFF');
+      expect(component.studyGuide).toEqual(studyGuide);
+      expect(component.thumbnailIsShown).toBe(true);
+    });
 
-    expect(component.studyGuide).toEqual(studyGuide);
-  });
+    it('should get study guide contents when study guide is loaded', () => {
+      spyOnProperty(
+        topicEditorStateService,
+        'onStudyGuideLoaded'
+      ).and.returnValue(studyGuideLoadedEventEmitter);
 
-  it('should call initEditor when topic is initialized with study guide', () => {
-    spyOnProperty(
-      topicEditorStateService,
-      'onTopicInitialized'
-    ).and.returnValue(topicInitializedEventEmitter);
+      component.ngOnInit();
+      component.sections = [];
 
-    component.ngOnInit();
-    component.subtopicId = 2;
-    component.editableTitle = 'random title';
-    component.editableThumbnailFilename = 'random_file_name.svg';
+      studyGuideLoadedEventEmitter.emit();
 
-    topicInitializedEventEmitter.emit();
+      expect(component.studyGuide).toEqual(studyGuide);
+    });
 
-    expect(component.subtopicId).toBe(1);
-    expect(component.editableTitle).toBe('Subtopic1');
-    expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
-    expect(component.studyGuide).toEqual(studyGuide);
-  });
+    it('should call initEditor when topic is initialized with study guide', () => {
+      spyOnProperty(
+        topicEditorStateService,
+        'onTopicInitialized'
+      ).and.returnValue(topicInitializedEventEmitter);
 
-  it('should call initEditor when topic is reinitialized', () => {
-    let topicReinitializedEventEmitter = new EventEmitter();
-    spyOnProperty(
-      topicEditorStateService,
-      'onTopicReinitialized'
-    ).and.returnValue(topicReinitializedEventEmitter);
+      component.ngOnInit();
+      component.subtopicId = 2;
+      component.editableTitle = 'random title';
+      component.editableThumbnailFilename = 'random_file_name.svg';
 
-    component.ngOnInit();
-    component.subtopicId = 2;
-    component.editableTitle = 'random title';
+      topicInitializedEventEmitter.emit();
 
-    topicReinitializedEventEmitter.emit();
-
-    expect(component.subtopicId).toBe(1);
-    expect(component.editableTitle).toBe('Subtopic1');
-  });
-
-  it('should call setSubtopicPreviewIsClosed and unsubscribe when destroyed', () => {
-    let pageContextService = TestBed.inject(PageContextService);
-    spyOn(pageContextService, 'setSubtopicPreviewIsClosed');
-    spyOn(component.directiveSubscriptions, 'unsubscribe');
-
-    component.ngOnDestroy();
-
-    expect(pageContextService.setSubtopicPreviewIsClosed).toHaveBeenCalled();
-    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+      expect(component.subtopicId).toBe(1);
+      expect(component.editableTitle).toBe('Subtopic1');
+      expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+      expect(component.studyGuide).toEqual(studyGuide);
+    });
   });
 
   it('should navigate to subtopic editor when subtopic is clicked', () => {
@@ -230,22 +343,34 @@ describe('SubtopicPreviewTab', () => {
     expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
   });
 
+  it('should return correct value for isShowRestructuredStudyGuidesFeatureEnabled', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(true);
+
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
+    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
+  });
+
   it('should handle case when subtopic does not exist', () => {
     topic.getSubtopicById = jasmine.createSpy().and.returnValue(null);
+    spyOn(topicEditorStateService, 'loadSubtopicPage');
     spyOn(topicEditorStateService, 'loadStudyGuide');
 
     component.ngOnInit();
 
     expect(component.subtopic).toBe(null);
+    expect(topicEditorStateService.loadSubtopicPage).not.toHaveBeenCalled();
     expect(topicEditorStateService.loadStudyGuide).not.toHaveBeenCalled();
   });
 
   it('should handle case when topic ID is empty', () => {
     topic.getId = jasmine.createSpy().and.returnValue('');
+    spyOn(topicEditorStateService, 'loadSubtopicPage');
     spyOn(topicEditorStateService, 'loadStudyGuide');
 
     component.ngOnInit();
 
+    expect(topicEditorStateService.loadSubtopicPage).not.toHaveBeenCalled();
     expect(topicEditorStateService.loadStudyGuide).not.toHaveBeenCalled();
   });
 });

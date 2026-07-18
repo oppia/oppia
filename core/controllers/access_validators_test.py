@@ -600,7 +600,6 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
             subtopics=[subtopic, subtopic2],
             next_subtopic_id=3,
         )
-        self.save_new_study_guide(1, self.admin_id, self.topic_id)
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
     def test_get_redirects_to_studyguide_url(self) -> None:
@@ -714,7 +713,6 @@ class SubtopicViewerPageAccessValidationHandlerTests(
             subtopics=[subtopic, subtopic2],
             next_subtopic_id=3,
         )
-        self.save_new_study_guide(1, self.admin_id, self.topic_id)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
             'topic_id_2',
@@ -729,7 +727,6 @@ class SubtopicViewerPageAccessValidationHandlerTests(
             subtopics=[subtopic],
             next_subtopic_id=2,
         )
-        self.save_new_study_guide(1, self.admin_id, 'topic_id_2')
 
     def test_any_user_can_access_subtopic_viewer_page(self) -> None:
         self.get_html_response(

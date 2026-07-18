@@ -96,7 +96,7 @@ export class CreateNewSubtopicModalComponent
       },
     };
     this.htmlData = '';
-    this.sectionHeadingPlaintext = 'Section 1';
+    this.sectionHeadingPlaintext = '';
     this.sectionContentHtml = '';
     this.schemaEditorIsShown = false;
     this.editableThumbnailFilename = '';
@@ -165,14 +165,24 @@ export class CreateNewSubtopicModalComponent
   }
 
   isSubtopicValid(): boolean {
-    return Boolean(
-      this.editableThumbnailFilename &&
-        this.subtopicTitle &&
-        this.sectionHeadingPlaintext &&
-        this.sectionContentHtml &&
-        this.editableUrlFragment &&
-        this.isUrlFragmentValid()
-    );
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      return Boolean(
+        this.editableThumbnailFilename &&
+          this.subtopicTitle &&
+          this.sectionHeadingPlaintext &&
+          this.sectionContentHtml &&
+          this.editableUrlFragment &&
+          this.isUrlFragmentValid()
+      );
+    } else {
+      return Boolean(
+        this.editableThumbnailFilename &&
+          this.subtopicTitle &&
+          this.htmlData &&
+          this.editableUrlFragment &&
+          this.isUrlFragmentValid()
+      );
+    }
   }
 
   cancel(): void {
@@ -188,6 +198,11 @@ export class CreateNewSubtopicModalComponent
     return this.subtopicValidationService.isUrlFragmentValid(
       this.editableUrlFragment.trim()
     );
+  }
+
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
   }
 
   checkSubtopicExistence(): void {
@@ -223,24 +238,43 @@ export class CreateNewSubtopicModalComponent
       this.editableUrlFragment
     );
 
-    this.studyGuide = StudyGuide.createDefault(
-      this.topic.getId(),
-      this.subtopicId
-    );
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      this.studyGuide = StudyGuide.createDefault(
+        this.topic.getId(),
+        this.subtopicId
+      );
 
-    let sections = cloneDeep(this.studyGuide.getSections());
-    let section = sections[0];
-    section.setHeadingPlaintext(this.sectionHeadingPlaintext);
-    section.setContentHtml(this.sectionContentHtml);
-    this.topicUpdateService.updateSection(
-      this.studyGuide,
-      0,
-      this.sectionHeadingPlaintext,
-      this.sectionContentHtml,
-      this.subtopicId
-    );
-    this.studyGuide.setSections([section]);
-    this.topicEditorStateService.setStudyGuide(this.studyGuide);
+      let sections = cloneDeep(this.studyGuide.getSections());
+      let section = sections[0];
+      section.setHeadingPlaintext(this.sectionHeadingPlaintext);
+      section.setContentHtml(this.sectionContentHtml);
+      this.topicUpdateService.updateSection(
+        this.studyGuide,
+        0,
+        this.sectionHeadingPlaintext,
+        this.sectionContentHtml,
+        this.subtopicId
+      );
+      this.studyGuide.setSections([section]);
+      this.topicEditorStateService.setStudyGuide(this.studyGuide);
+    } else {
+      this.subtopicPage = SubtopicPage.createDefault(
+        this.topic.getId(),
+        this.subtopicId
+      );
+
+      let subtitledHtml = cloneDeep(
+        this.subtopicPage.getPageContents().getSubtitledHtml()
+      );
+      subtitledHtml.html = this.htmlData;
+      this.topicUpdateService.setSubtopicPageContentsHtml(
+        this.subtopicPage,
+        this.subtopicId,
+        subtitledHtml
+      );
+      this.subtopicPage.getPageContents().setHtml(this.htmlData);
+      this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
+    }
     this.topicUpdateService.setSubtopicTitle(
       this.topic,
       this.subtopicId,

@@ -611,6 +611,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
     def setUp(self) -> None:
         super().setUp()
         changelist = [

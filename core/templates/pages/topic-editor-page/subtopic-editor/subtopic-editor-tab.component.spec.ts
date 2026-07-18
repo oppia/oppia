@@ -36,6 +36,7 @@ import {SubtopicValidationService} from '../services/subtopic-validation.service
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {Topic} from 'domain/topic/topic-object.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
@@ -73,6 +74,14 @@ class MockWindowRef {
   };
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ShowRestructuredStudyGuides: {
+      isEnabled: false,
+    },
+  };
+}
+
 class MockNgbModalRef {
   componentInstance = {};
 }
@@ -86,6 +95,7 @@ describe('Subtopic editor tab', () => {
   let topicUpdateService: TopicUpdateService;
   let subtopicValidationService: SubtopicValidationService;
   let topicEditorRoutingService: TopicEditorRoutingService;
+  let platformFeatureService: PlatformFeatureService;
   let subtopic: Subtopic;
   let wds: WindowDimensionsService;
   let topicInitializedEventEmitter = new EventEmitter();
@@ -112,6 +122,10 @@ describe('Subtopic editor tab', () => {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -125,6 +139,7 @@ describe('Subtopic editor tab', () => {
     topicUpdateService = TestBed.inject(TopicUpdateService);
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     wds = TestBed.inject(WindowDimensionsService);
 
     let topic = new Topic(
@@ -207,7 +222,13 @@ describe('Subtopic editor tab', () => {
     expect(component.generatedUrlPrefix).toContain('hostname/learn/math');
   });
 
+  it('should initialize with restructured study guides feature disabled', () => {
+    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
+    expect(component.sections).toEqual([]);
+  });
+
   it('should initialize with restructured study guides feature enabled', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
     spyOn(topicEditorStateService, 'loadStudyGuide');
     component.initEditor();
     expect(topicEditorStateService.loadStudyGuide).toHaveBeenCalled();
@@ -318,6 +339,23 @@ describe('Subtopic editor tab', () => {
     );
   });
 
+  it('should show SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS schema', () => {
+    component.ngOnInit();
+    expect(component.SUBTOPIC_PAGE_SCHEMA).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rows: 100,
+      },
+    });
+  });
+
+  it('should show schema editor', () => {
+    expect(component.schemaEditorIsShown).toEqual(false);
+    component.showSchemaEditor();
+    expect(component.schemaEditorIsShown).toEqual(true);
+  });
+
   it('should return if skill is deleted', () => {
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
     expect(component.isSkillDeleted(skillSummary)).toEqual(false);
@@ -366,6 +404,16 @@ describe('Subtopic editor tab', () => {
     );
     component.resetErrorMsg();
     expect(component.errorMsg).toEqual(null);
+  });
+
+  it('should call topicUpdateService to update the SubtopicPageContent', () => {
+    let updateSubtopicSpy = spyOn(
+      topicUpdateService,
+      'setSubtopicPageContentsHtml'
+    );
+    component.htmlData = 'new html data';
+    component.updateHtmlData();
+    expect(updateSubtopicSpy).toHaveBeenCalled();
   });
 
   it('should call the topicUpdateService if skill is removed from subtopic', () => {
@@ -481,18 +529,45 @@ describe('Subtopic editor tab', () => {
     expect(component.initEditor).toHaveBeenCalledTimes(2);
   });
 
-  it('should subscribe to onStudyGuideLoaded', () => {
-    let newStudyGuide = StudyGuide.createDefault('new_study_guide_id', 2);
-    let mockSections: StudyGuideSection[] = [];
-    spyOn(newStudyGuide, 'getSections').and.returnValue(mockSections);
-    (topicEditorStateService.getStudyGuide as jasmine.Spy).and.returnValue(
-      newStudyGuide
-    );
-    component.ngOnInit();
-    studyGuideLoadedEventEmitter.emit();
-    expect(component.studyGuide).toBe(newStudyGuide);
-    expect(component.sections).toBe(mockSections);
-    expect(topicEditorStateService.getStudyGuide).toHaveBeenCalled();
+  it('should handle subtopic page loaded event', () => {
+    (topicEditorStateService.getSubtopicPage as jasmine.Spy).and.returnValue({
+      getPageContents: () => ({getHtml: () => 'test html'}),
+    } as SubtopicPage);
+    subtopicPageLoadedEventEmitter.emit();
+    expect(component.htmlData).toEqual('test html');
+  });
+
+  it(
+    'should subscribe to onStudyGuideLoaded when restructured' +
+      ' study guides feature is enabled',
+    () => {
+      spyOn(
+        component,
+        'isShowRestructuredStudyGuidesFeatureEnabled'
+      ).and.returnValue(true);
+      let newStudyGuide = StudyGuide.createDefault('new_study_guide_id', 2);
+      let mockSections: StudyGuideSection[] = [];
+      spyOn(newStudyGuide, 'getSections').and.returnValue(mockSections);
+      (topicEditorStateService.getStudyGuide as jasmine.Spy).and.returnValue(
+        newStudyGuide
+      );
+      component.ngOnInit();
+      studyGuideLoadedEventEmitter.emit();
+      expect(component.studyGuide).toBe(newStudyGuide);
+      expect(component.sections).toBe(mockSections);
+      expect(topicEditorStateService.getStudyGuide).toHaveBeenCalled();
+    }
+  );
+
+  it('should hide the html data input on canceling', () => {
+    component.schemaEditorIsShown = true;
+    component.htmlDataBeforeUpdate = 'original html';
+    component.htmlData = 'modified html';
+    spyOn(component, 'updateHtmlData');
+    component.cancelHtmlDataChange();
+    expect(component.htmlData).toEqual('original html');
+    expect(component.updateHtmlData).toHaveBeenCalled();
+    expect(component.schemaEditorIsShown).toEqual(false);
   });
 
   it('should redirect to topic editor if subtopic id is invalid', () => {

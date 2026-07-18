@@ -1170,20 +1170,33 @@ export class CurriculumAdmin extends TopicManager {
     expectWorkedExample: boolean
   ): Promise<void> {
     try {
-      await this.page.waitForFunction(
-        (text: string) => document.body.innerText.includes(text),
-        {timeout: 5000},
-        studyGuideTitle
-      );
+      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
 
-      for (let i = 0; i < studyGuideSections.length; i++) {
-        for (let j = 0; j < 2; j++) {
-          const expectedText = studyGuideSections[i][j];
-          await this.page.waitForFunction(
-            (text: string) => document.body.innerText.includes(text),
-            {timeout: 5000},
-            expectedText
+      if (!isTitlePresent) {
+        throw new Error(
+          'Expected study guide title to be present, but it was not found.'
+        );
+      }
+
+      for (var i = 0; i < studyGuideSections.length; i++) {
+        for (var j = 0; j < 2; j++) {
+          const isHeadingPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
           );
+          if (!isHeadingPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+            );
+          }
+          j++;
+          const isContentPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isContentPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+            );
+          }
         }
       }
       if (expectWorkedExample) {

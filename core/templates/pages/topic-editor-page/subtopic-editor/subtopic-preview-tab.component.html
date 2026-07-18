@@ -1,5 +1,16 @@
+<div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="e2e-test-subtopic-preview-container">
+  <div class="content-box">
+    <div class="content">
+      <span class="content-title">{{ editableTitle }}</span>
+      <div class="html-content">
+        <oppia-rte-output-display [rteString]="pageContents?.getHtml()">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div class="oppia-subtopic-viewer-container">
+<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
   <p class="content-title">{{ editableTitle }}</p>
   <div class="content-box">
     <div class="content">

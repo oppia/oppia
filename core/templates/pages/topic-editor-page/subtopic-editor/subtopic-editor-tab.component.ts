@@ -65,10 +65,12 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   studyGuide!: StudyGuide;
   activeSectionIndex: number = -1;
   allowedBgColors!: readonly string[];
-
+  htmlData!: string;
   sections!: StudyGuideSection[];
   isEditable: boolean = false;
   uncategorizedSkillSummaries!: ShortSkillSummary[];
+  schemaEditorIsShown!: boolean;
+  htmlDataBeforeUpdate!: string;
   toIndex!: number;
   fromIndex!: number;
   subtopicPreviewCardIsShown!: boolean;
@@ -78,6 +80,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   selectedSkillEditOptionsIndex!: number;
   maxCharsInSubtopicTitle!: number;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
+  SUBTOPIC_PAGE_SCHEMA!: {
+    type: string;
+    ui_config: {
+      rte_component_config_id: string;
+      rows: number;
+    };
+  };
   generatedUrlPrefix!: string;
 
   constructor(
@@ -114,10 +123,17 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.subtopicUrlFragmentExists = false;
     this.subtopicUrlFragmentIsValid = false;
     if (this.topic.getId() && this.subtopic) {
-      this.topicEditorStateService.loadStudyGuide(
-        this.topic.getId(),
-        this.subtopicId
-      );
+      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+        this.topicEditorStateService.loadStudyGuide(
+          this.topic.getId(),
+          this.subtopicId
+        );
+      } else {
+        this.topicEditorStateService.loadSubtopicPage(
+          this.topic.getId(),
+          this.subtopicId
+        );
+      }
       this.skillIds = this.subtopic.getSkillIds();
       this.questionCount = 0;
       if (this.skillIds.length) {
@@ -140,10 +156,19 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.editableThumbnailBgColor = thumbnailBgColor || '';
       this.editableUrlFragment = urlFragment || '';
       this.initialSubtopicUrlFragment = urlFragment || '';
-      this.studyGuide = this.topicEditorStateService.getStudyGuide();
+      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+        this.studyGuide = this.topicEditorStateService.getStudyGuide();
+      } else {
+        this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
+      }
       this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
-      var sections = this.studyGuide.getSections();
-      this.sections = sections;
+      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+        var sections = this.studyGuide.getSections();
+        this.sections = sections;
+      } else {
+        var pageContents = this.subtopicPage.getPageContents();
+        this.htmlData = pageContents.getHtml();
+      }
       this.uncategorizedSkillSummaries =
         this.topic.getUncategorizedSkillSummaries();
       this.subtopicUrlFragmentIsValid =
@@ -248,6 +273,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     return skillSummary.getDescription() === null;
   }
 
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
+  }
+
   getSkillEditorUrl(skillId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       this.SKILL_EDITOR_URL_TEMPLATE,
@@ -255,6 +285,33 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
         skillId: skillId,
       }
     );
+  }
+
+  updateHtmlData(): void {
+    if (this.htmlData !== this.subtopicPage.getPageContents().getHtml()) {
+      var subtitledHtml = cloneDeep(
+        this.subtopicPage.getPageContents().getSubtitledHtml()
+      );
+      subtitledHtml.html = this.htmlData;
+      this.topicUpdateService.setSubtopicPageContentsHtml(
+        this.subtopicPage,
+        this.subtopic.getId(),
+        subtitledHtml
+      );
+      this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
+      this.schemaEditorIsShown = false;
+    }
+  }
+
+  cancelHtmlDataChange(): void {
+    this.htmlData = this.htmlDataBeforeUpdate;
+    this.updateHtmlData();
+    this.schemaEditorIsShown = false;
+  }
+
+  showSchemaEditor(): void {
+    this.schemaEditorIsShown = true;
+    this.htmlDataBeforeUpdate = cloneDeep(this.htmlData);
   }
 
   toggleSubtopicPreview(): void {
@@ -381,18 +438,34 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const rteComponents = 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS';
+    this.SUBTOPIC_PAGE_SCHEMA = {
+      type: 'html',
+      ui_config: {rte_component_config_id: rteComponents, rows: 100},
+    };
+    this.htmlData = '';
     this.sections = [];
     this.sectionsListIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.skillsListIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.subtopicPreviewCardIsShown = false;
     this.subtopicEditorCardIsShown = true;
-    this.subtopicEditorCardIsShown = true;
-    this.directiveSubscriptions.add(
-      this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
-        this.studyGuide = this.topicEditorStateService.getStudyGuide();
-        this.sections = this.studyGuide.getSections();
-      })
-    );
+    this.schemaEditorIsShown = false;
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      this.directiveSubscriptions.add(
+        this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
+          this.studyGuide = this.topicEditorStateService.getStudyGuide();
+          this.sections = this.studyGuide.getSections();
+        })
+      );
+    } else {
+      this.directiveSubscriptions.add(
+        this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
+          this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
+          var pageContents = this.subtopicPage.getPageContents();
+          this.htmlData = pageContents.getHtml();
+        })
+      );
+    }
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() => {
         this.initEditor();

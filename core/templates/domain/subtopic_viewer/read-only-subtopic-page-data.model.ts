@@ -112,7 +112,8 @@ export class ReadOnlySubtopicPageData {
       ? Subtopic.create(subtopicDataBackendDict.prev_subtopic_dict, {})
       : null;
     let sections: StudyGuideSection[] = [];
-    let pageContents: SubtopicPageContents | null = null;
+    let pageContents: SubtopicPageContents =
+      SubtopicPageContents.createDefault();
     if (subtopicDataBackendDict.sections) {
       sections = subtopicDataBackendDict.sections.map(section =>
         StudyGuideSection.createFromBackendDict(section)
@@ -122,7 +123,7 @@ export class ReadOnlySubtopicPageData {
       pageContents = SubtopicPageContents.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       );
-    } else if (!subtopicDataBackendDict.sections) {
+    } else {
       throw new Error('Neither sections nor page_contents provided.');
     }
     return new ReadOnlySubtopicPageData(
