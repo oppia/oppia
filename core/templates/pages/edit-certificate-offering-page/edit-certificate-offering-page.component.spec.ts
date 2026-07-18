@@ -274,6 +274,9 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(modalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED
     );
+    expect(modalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
       jasmine.objectContaining({
@@ -313,6 +316,9 @@ describe('Edit Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(firstModalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
       jasmine.objectContaining({

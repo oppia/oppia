@@ -40,7 +40,7 @@
 
     <div class="oppia-certificate-offering-topic-list-wrap">
       <p *ngIf="classroomName" class="oppia-certificate-offering-classroom-label">
-        Classroom: {{ classroomName }}
+        Classroom: {{ classroomName | titlecase }}
       </p>
       <p *ngIf="classroomLoadErrorMessage" class="oppia-certificate-offering-no-results">
         {{ classroomLoadErrorMessage }}

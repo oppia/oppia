@@ -200,6 +200,9 @@ describe('Create Certificate Offering Page Component', () => {
     expect(modalRef.componentInstance.action).toBe(
       CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
     );
+    expect(modalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
         asyncStatus: CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY,
@@ -238,6 +241,9 @@ describe('Create Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(firstModalRef.componentInstance.currentAsyncStatus).toBe(
+      component.certificateAssessmentOffering.asyncStatus
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       jasmine.objectContaining({
         asyncStatus: CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE,

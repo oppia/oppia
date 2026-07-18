@@ -258,7 +258,7 @@ describe('Certificate Offering Review And Availability Component', () => {
     expect(component.getSaveButtonText()).toEqual('Save Certificate');
 
     component.isEditMode = true;
-    expect(component.getSaveButtonText()).toEqual('Update Certificate');
+    expect(component.getSaveButtonText()).toEqual('Save Certificate');
   });
 
   it('should emit save event when clicking save button', () => {

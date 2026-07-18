@@ -183,6 +183,22 @@ describe('Certificate Offering Add Topic Items Component', () => {
     );
   }));
 
+  it('should capitalize the classroom label in the topic step', fakeAsync(() => {
+    flushMicrotasks();
+    component.classroomName = 'math classroom';
+
+    fixture.detectChanges();
+
+    const classroomLabel: HTMLElement | null =
+      fixture.nativeElement.querySelector(
+        '.oppia-certificate-offering-classroom-label'
+      );
+
+    expect(classroomLabel?.textContent?.trim()).toEqual(
+      'Classroom: Math Classroom'
+    );
+  }));
+
   it('should emit events correctly when clicking next button', fakeAsync(() => {
     flushMicrotasks();
     const topicDataChangeSpy = spyOn(component.topicDataChange, 'emit');

@@ -243,7 +243,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   }
 
   getSaveButtonText(): string {
-    return this.isEditMode ? 'Update Certificate' : 'Save Certificate';
+    return 'Save Certificate';
   }
 
   onSaveClicked(): void {

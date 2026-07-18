@@ -91,6 +91,30 @@ describe('Certificate Offering Details Component', () => {
     expect(component.classroomLoadErrorMessage).toEqual('');
   });
 
+  it('should capitalize classroom names in the dropdown', async () => {
+    component.classroomOptions = [
+      {
+        classroom_id: 'math',
+        name: 'math classroom',
+        url_fragment: 'math',
+        teaser_text: '',
+        is_published: true,
+        diagnostic_test_is_enabled: false,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        index: 0,
+      },
+    ];
+
+    fixture.detectChanges();
+
+    const optionText = fixture.nativeElement
+      .querySelectorAll('select option')[1]
+      .textContent.trim();
+
+    expect(optionText).toEqual('Math Classroom');
+  });
+
   it('should show an error message when loading classrooms fails', fakeAsync(() => {
     spyOn(console, 'error');
     spyOn(

@@ -109,6 +109,8 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
       );
       modalRef.componentInstance.action =
         CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
+      modalRef.componentInstance.currentAsyncStatus =
+        this.certificateAssessmentOffering.asyncStatus;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);

@@ -131,6 +131,8 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       );
       modalRef.componentInstance.action =
         CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+      modalRef.componentInstance.currentAsyncStatus =
+        this.certificateAssessmentOffering.asyncStatus;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);

@@ -109,7 +109,7 @@
                   aria-label="Select classroom" aria-required="true">
             <option value="" disabled selected>Select a classroom</option>
             <option *ngFor="let classroom of classroomOptions" [value]="classroom.classroom_id">
-              {{ classroom.name }}
+              {{ classroom.name | titlecase }}
             </option>
           </select>
           <small *ngIf="classroomLoadErrorMessage" class="form-text text-danger">
