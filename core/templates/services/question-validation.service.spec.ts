@@ -401,6 +401,21 @@ describe('Question Validation Service', () => {
         );
       }
     );
+
+    it('should treat feedback differing only in case as duplicate', () => {
+      const interaction = mockQuestionDict.question_state_data.interaction;
+      interaction.answer_groups[0].outcome.feedback.html = 'OK';
+      if (interaction.default_outcome === null) {
+        throw new Error('Expected default outcome to be initialized.');
+      }
+      interaction.default_outcome.feedback.html = '<p>ok</p>';
+      const question = Question.createFromBackendDict(mockQuestionDict);
+
+      expect(qvs.getValidationErrorMessage(question)).toEqual(
+        'Feedback for correct and incorrect answers must be different.'
+      );
+    });
+
     it(
       'should return error message if correct feedback matches an ' +
         'incorrect answer group feedback',

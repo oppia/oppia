@@ -186,7 +186,8 @@ export class QuestionValidationService {
         .replace(/<[^>]*>/g, ' ')
         .replace(/&nbsp;/g, ' ')
         .replace(/\s+/g, ' ')
-        .trim();
+        .trim()
+        .toLowerCase();
     };
     const correctFeedbacks = new Set<string>();
     const incorrectFeedbacks = new Set<string>();
