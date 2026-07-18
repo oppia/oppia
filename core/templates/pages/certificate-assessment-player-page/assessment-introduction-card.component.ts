@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Development environment config file for Webpack with
- * proper source maps.
+ * @fileoverview Component for the assessment introduction card.
  */
 
-var {merge} = require('webpack-merge');
-const dev = require('./webpack.dev.config.ts');
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 
-module.exports = merge(dev, {
-  devtool: 'inline-source-map',
-});
+@Component({
+  selector: 'oppia-assessment-introduction-card',
+  templateUrl: './assessment-introduction-card.component.html',
+})
+export class AssessmentIntroductionCardComponent {
+  @Input() certificateId = '';
+  @Output() continue = new EventEmitter<void>();
+
+  onContinue(): void {
+    this.continue.emit();
+  }
+}

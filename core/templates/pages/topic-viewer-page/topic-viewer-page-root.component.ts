@@ -16,13 +16,15 @@
  * @fileoverview Topic Viewer page root component.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'topic-viewer-page-root',
   templateUrl: './topic-viewer-page-root.component.html',
+  styleUrls: ['./topic-viewer-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TopicViewerPageRootComponent extends BaseRootComponent {
   title: string =
