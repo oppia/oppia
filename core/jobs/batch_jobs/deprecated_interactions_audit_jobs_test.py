@@ -140,7 +140,7 @@ class AuditDeprecatedInteractionsJobTests(job_test_utils.JobTestBase):
         last_updated_str = exp_model_1.last_updated.strftime(
             '%Y-%m-%d %H:%M:%S'
         )
-        last_answer_str = answers_model_1.created_on.strftime(
+        last_answer_str = answers_model_1.last_updated.strftime(
             '%Y-%m-%d %H:%M:%S'
         )
 
