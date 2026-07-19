@@ -721,8 +721,8 @@
       "framework": "puppeteer"
     },
     {
-      "name": "certificate-assessment/create-certificate-assessment-offering",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/certificate-assessment/create-certificate-assessment-offering.spec.ts",
+      "name": "certificate-assessment/certificate-assessment-offering",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/certificate-assessment/certificate-assessment-offering.spec.ts",
       "framework": "puppeteer"
     }
   ]
