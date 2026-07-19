@@ -1016,7 +1016,7 @@ describe('Question player engine service', () => {
       }
     );
 
-    it('should show warning message if initial content id is null', () => {
+    it('should call error callback if initial content id is null', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
 
@@ -1026,11 +1026,6 @@ describe('Question player engine service', () => {
       const originalContentId =
         singleQuestionBackendDict.question_state_data.content.content_id;
       singleQuestionBackendDict.question_state_data.content.content_id = null;
-
-      let alertsServiceSpy = spyOn(
-        alertsService,
-        'addWarning'
-      ).and.callThrough();
 
       try {
         questionPlayerEngineService.init(
@@ -1043,13 +1038,10 @@ describe('Question player engine service', () => {
           originalContentId;
       }
 
-      expect(alertsServiceSpy).toHaveBeenCalledWith(
-        'Content id should not be empty.'
-      );
       expect(initErrorCb).toHaveBeenCalled();
     });
 
-    it('should show warning message if next content id is null', () => {
+    it('should call error callback if next content id is null', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
@@ -1066,10 +1058,6 @@ describe('Question player engine service', () => {
         answerClassificationService,
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
-      let alertsServiceSpy = spyOn(
-        alertsService,
-        'addWarning'
-      ).and.callThrough();
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
         (html, envs) => html
       );
@@ -1107,10 +1095,6 @@ describe('Question player engine service', () => {
           }
         );
       }
-
-      expect(alertsServiceSpy).toHaveBeenCalledWith(
-        'Content id should not be empty.'
-      );
     });
 
     it('should return empty string if next interaction id is null', () => {
