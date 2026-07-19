@@ -2609,7 +2609,7 @@ class RenderedEmailFooterTest(test_utils.GenericTestBase):
         """Tests that a custom footer is returned unchanged."""
         footer = (
             email_manager._get_rendered_email_footer()
-        )  # pylint: disable=protected-access,line-too-long
+        )  # pylint: disable=protected-access
 
         self.assertEqual(
             footer,
