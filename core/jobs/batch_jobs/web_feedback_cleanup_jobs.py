@@ -158,8 +158,16 @@ class LessonFeedbackCleanupJob(base_jobs.JobBase):
             >> beam.Filter(self.is_lesson_feedback_expired)
         )
 
-        updated_lesson_feedback_models = (
+        expired_uncleared_lesson_feedback_models = (
             expired_lesson_feedback_models
+            | 'Filter uncleared LessonFeedbackModels'
+            >> beam.Filter(
+                lambda model: model.feedback_text != CLEARED_FEEDBACK_TEXT
+            )
+        )
+
+        updated_lesson_feedback_models = (
+            expired_uncleared_lesson_feedback_models
             | 'Clear expired LessonFeedbackModel feedback text'
             >> beam.Map(self.clear_expired_feedback_text)
         )

@@ -106,11 +106,18 @@ class LessonFeedbackCleanupJobTests(LessonFeedbackCleanupJobTestBase):
             feconf.STATUS_CHOICES_OPEN,
             datetime.datetime.utcnow() - datetime.timedelta(days=366),
         )
+        already_cleared_feedback_model = self.create_lesson_feedback_model(
+            'already_cleared_feedback_id',
+            web_feedback_cleanup_jobs.CLEARED_FEEDBACK_TEXT,
+            feconf.STATUS_CHOICES_FIXED,
+            datetime.datetime.utcnow() - datetime.timedelta(days=179),
+        )
         self.put_multi(
             [
                 old_closed_feedback_model,
                 fresh_closed_feedback_model,
                 old_open_feedback_model,
+                already_cleared_feedback_model,
             ]
         )
 
