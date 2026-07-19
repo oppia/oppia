@@ -1094,7 +1094,7 @@ describe('Conversation flow service', () => {
   it('should handle answer response when next card is null', fakeAsync(() => {
     spyOn(displayedCard, 'updateCurrentAnswer');
     conversationFlowService.displayedCard = displayedCard;
-    conversationFlowService.answerIsBeingProcessed = true;
+    conversationFlowService.answerIsBeingProcessed = false;
 
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(
