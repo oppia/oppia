@@ -334,7 +334,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component['_getDataUrl']()).toContain('abbrev-topic/1');
+    expect(component._getDataUrl()).toContain('abbrev-topic/1');
   }));
 
   it('should build correct retry URL for arc practice', fakeAsync(() => {
@@ -355,7 +355,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/arc/1');
+    expect(component._getRetryUrl()).toContain('abbrev-topic/test/arc/1');
   }));
 
   it('should build correct retry URL for mastery challenge', fakeAsync(() => {
@@ -375,7 +375,7 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component['_getRetryUrl']()).toContain(
+    expect(component._getRetryUrl()).toContain(
       'abbrev-topic/mastery-challenge'
     );
   }));
