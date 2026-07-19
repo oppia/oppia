@@ -918,6 +918,12 @@ describe('State Responses Component', () => {
     expect(component.isCurrentInteractionTrivial()).toBe(false);
   });
 
+  it('should return false when interaction id is null', () => {
+    stateInteractionIdService.savedMemento = null;
+
+    expect(component.isCurrentInteractionTrivial()).toBe(false);
+  });
+
   it('should check if the interaction is linear and has feedback', () => {
     stateInteractionIdService.savedMemento = 'Continue';
     let outcome1 = Outcome.createNew('Hola', '', '', []);

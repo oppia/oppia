@@ -32,7 +32,7 @@
                                [ngModel]="localValue[idx]"
                                [ngModelOptions]="{standalone: true}"
                                (localValueChange)="setValue($event, idx)"
-                               [name]="idx"
+                               [name]="idx.toString()"
                                [labelForFocusTarget]="getFocusLabel(idx)"
                                (inputBlur)="(idx === localValue.length - 1 ? lastElementOnBlur() : showAddItemButton())"
                                (inputFocus)="(idx === localValue.length - 1 ? hideAddItemButton() : showAddItemButton())">
@@ -56,7 +56,7 @@
 
     <!-- The margin-left is added here to left-align the button with the previous list items. -->
     <div class="oppia-new-tab-button-container">
-      <button [style.opacity]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 1 : 0"
+      <button [style.opacity]="(!isOneLineInput || isAddItemButtonPresent || hasLastElementNonZeroLength()) ? 1 : 0"
               *ngIf="!len && (maxListLength === null || localValue && localValue.length < maxListLength)"
               type="button" class="btn btn-secondary btn-sm ms-0 e2e-test-add-list-entry" (click)="addElement()"
               [disabled]="disabled"

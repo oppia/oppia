@@ -31,6 +31,9 @@
   padding: 32px 0 30px 40px;
   width: 736px;
 }
+[dir="rtl"] .home-tab .continue-where-you-left-off {
+  padding: 32px 40px 30px 0;
+}
 .home-tab .suggested-for-you .classroom-name {
   color: #333;
   font-size: 19px;
@@ -43,7 +46,7 @@
 }
 .home-tab .suggested-for-you .topic-summary-tile {
   display: inline-block;
-  padding-right: 20px;
+  padding-inline-end: 20px;
 }
 .home-tab .suggested-for-you .untracked-topics {
   width: fit-content;
