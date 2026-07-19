@@ -28,6 +28,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {AppConstants} from '../../app.constants';
 import {PracticeSessionAccessGuard} from './practice-session-page-auth.guard';
 import {AccessValidationBackendApiService} from '../../pages/oppia-root/routing/access-validation-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockAccessValidationBackendApiService {
   validateAccessToPracticeSessionPage(
@@ -68,11 +69,20 @@ class MockRouter {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    StoryEditorArcs: {
+      isEnabled: true,
+    },
+  };
+}
+
 describe('PracticeSessionAccessGuard', () => {
   let guard: PracticeSessionAccessGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
   let location: Location;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -84,6 +94,7 @@ describe('PracticeSessionAccessGuard', () => {
           useClass: MockAccessValidationBackendApiService,
         },
         {provide: Router, useClass: MockRouter},
+        {provide: PlatformFeatureService, useClass: MockPlatformFeatureService},
         Location,
       ],
     });
@@ -94,6 +105,9 @@ describe('PracticeSessionAccessGuard', () => {
     );
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
+    mockPlatformFeatureService = TestBed.inject(
+      PlatformFeatureService
+    ) as unknown as MockPlatformFeatureService;
 
     spyOn(location, 'replaceState');
   });
@@ -289,5 +303,82 @@ describe('PracticeSessionAccessGuard', () => {
     expect(canActivateResult).toBeTrue();
     expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra');
     expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should redirect to 404 when StoryEditorArcs flag is disabled and node_id is present', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      node_id: '1',
+    };
+
+    guard
+      .canActivate(routeSnapshot, {
+        url: '/learn/math/algebra/practice/1',
+      } as RouterStateSnapshot)
+      .then(canActivate => {
+        expect(canActivate).toBeFalsy();
+        expect(navigateSpy).toHaveBeenCalledWith([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+        ]);
+      });
+
+    tick();
+  }));
+
+  it('should redirect to 404 when StoryEditorArcs flag is disabled and arc_id is present', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+      arc_id: '1',
+    };
+
+    guard
+      .canActivate(routeSnapshot, {
+        url: '/learn/math/algebra/test/arc/1',
+      } as RouterStateSnapshot)
+      .then(canActivate => {
+        expect(canActivate).toBeFalsy();
+        expect(navigateSpy).toHaveBeenCalledWith([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+        ]);
+      });
+
+    tick();
+  }));
+
+  it('should redirect to 404 when StoryEditorArcs flag is disabled and no params present (mastery)', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const routeSnapshot = new ActivatedRouteSnapshot();
+    routeSnapshot.queryParams = {};
+    (routeSnapshot.params as {[key: string]: string}) = {
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'algebra',
+    };
+
+    guard
+      .canActivate(routeSnapshot, {
+        url: '/learn/math/algebra/mastery-challenge',
+      } as RouterStateSnapshot)
+      .then(canActivate => {
+        expect(canActivate).toBeFalsy();
+        expect(navigateSpy).toHaveBeenCalledWith([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+        ]);
+      });
+
+    tick();
   }));
 });

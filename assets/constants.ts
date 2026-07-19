@@ -7318,6 +7318,9 @@ export default {
     "NODE_PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/:node_id",
       "TITLE": "Practice Session Page",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
@@ -7337,6 +7340,9 @@ export default {
     "END_OF_ARC_TEST": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/arc/:arc_id",
       "TITLE": "End-of-Arc Test",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
@@ -7356,6 +7362,9 @@ export default {
     "MASTERY_CHALLENGE": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/mastery-challenge",
       "TITLE": "Mastery Challenge",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {

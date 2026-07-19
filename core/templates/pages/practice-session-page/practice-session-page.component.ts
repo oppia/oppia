@@ -81,7 +81,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  _getDataUrl(): string {
+  private _getDataUrl(): string {
     const classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     const topicUrlFragment =
@@ -126,7 +126,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  _getRetryUrl(): string {
+  private _getRetryUrl(): string {
     const classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     const topicUrlFragment =
@@ -250,7 +250,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     ) {
       this.sessionType = PracticeSessionType.Arc;
       this.arcId = arcId;
-    } else if (this.urlService.getPathname().match(/\/mastery-challenge/g)) {
+    } else if (this.urlService.getPathname().match(/\/mastery-challenge/)) {
       this.sessionType = PracticeSessionType.Mastery;
     } else if (this.stringifiedSubtopicIds) {
       this.sessionType = PracticeSessionType.Legacy;
