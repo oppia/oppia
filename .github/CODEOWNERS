@@ -352,6 +352,7 @@
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
 /core/templates/css/oppia-material.css @oppia/lace-frontend-reviewers
+/core/templates/css/shepherd-overrides.css @oppia/lace-frontend-reviewers
 
 
 # Interaction project.
@@ -371,9 +372,11 @@
 /extensions/domain*.py @oppia/lace-frontend-reviewers
 /extensions/interactions/ @oppia/lace-frontend-reviewers
 /extensions/objects/ @oppia/lace-backend-reviewers
-/extensions/objects/templates/filepath-editor.component*.ts @oppia/lace-frontend-reviewers
-/extensions/objects/templates/filepath-editor.component.html @oppia/lace-frontend-reviewers
+/extensions/objects/templates/*.ts @oppia/lace-frontend-reviewers
+/extensions/objects/templates/*.html @oppia/lace-frontend-reviewers
 /extensions/value_generators/ @oppia/lace-backend-reviewers
+/extensions/value_generators/templates/*.ts @oppia/lace-frontend-reviewers
+/extensions/value_generators/templates/*.html @oppia/lace-frontend-reviewers
 /extensions/__init__.py @oppia/lace-frontend-reviewers
 
 
@@ -409,6 +412,8 @@
 /extensions/answer_summarizers/ @oppia/lace-backend-reviewers
 /extensions/issues/ @oppia/lace-backend-reviewers
 /extensions/visualizations/ @oppia/lace-backend-reviewers
+/extensions/visualizations/*.ts @oppia/lace-frontend-reviewers
+/extensions/visualizations/*.html @oppia/lace-frontend-reviewers
 
 
 # Library page.
@@ -564,7 +569,6 @@
 /extensions/extensions.module.ts @oppia/lace-frontend-reviewers
 /core/schema_utils*.py @oppia/lace-backend-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
-/.rtlcssrc @oppia/lace-frontend-reviewers
 
 
 # Python typing
@@ -630,6 +634,7 @@
 /core/controllers/general_feedback*.py @oppia/lace-backend-reviewers
 /core/templates/services/feedback-session-info.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/session-info-http-interceptor.service.ts  @oppia/lace-frontend-reviewers
+/core/templates/pages/technical-feedback-dashboard-page/ @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
@@ -700,6 +705,8 @@
 /core/templates/components/certificate-assessment-offering-helper/ @oppia/contributor-experience-team
 /core/templates/domain/certificate-assessment/ @oppia/contributor-experience-team
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
+/core/templates/pages/certificate-offering-available-page @oppia/lace-frontend-reviewers
+/core/templates/pages/certificate-assessment-player-page @oppia/lace-frontend-reviewers
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
@@ -712,7 +719,6 @@
 /.lighthouserc*.js @oppia/dev-workflow-reviewers
 /puppeteer-login-script.js @oppia/dev-workflow-reviewers
 /scripts/run_lighthouse_tests.py @oppia/dev-workflow-reviewers
-/webpack.*.ts @oppia/dev-workflow-reviewers
 
 
 # User’s profile page.

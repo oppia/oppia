@@ -26,6 +26,7 @@ export interface CertificateAssessmentOfferingBackendDict {
   title: string;
   description: string;
   classroom_id: string;
+  topic_ids: string[];
   topic_data: CertificateAssessmentOfferingTopicData;
   demonstrates: string[];
   total_questions: number;

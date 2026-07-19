@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Development environment config file for Webpack with
- * proper source maps.
+ * @fileoverview Type definitions for properties attached to the window
+ * object within core/tests, which is excluded from the main tsconfig
+ * and therefore cannot see typings/custom-window-defs.d.ts.
  */
 
-var {merge} = require('webpack-merge');
-const dev = require('./webpack.dev.config.ts');
-
-module.exports = merge(dev, {
-  devtool: 'inline-source-map',
-});
+interface Window {
+  logClick: (clickDetails: {
+    position: {x: number; y: number};
+    timeInMilliseconds: number;
+  }) => void;
+}

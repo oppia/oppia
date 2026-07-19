@@ -372,6 +372,11 @@ URLS = [
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler,
     ),
+    get_redirect_route(
+        r'%s/can_access_technical_feedback_dashboard'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TechnicalFeedbackDashboardAccessValidationHandler,
+    ),
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -1085,21 +1090,25 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_FEEDBACK_SUBMISSION_URL,
-        general_feedback.GeneralFeedbackSubmitHandler,
+        r'%s' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>/<report_id>'
+        % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackListHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
         general_feedback.GeneralFeedbackCaptchaConfigHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackListHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>'
-        % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackDetailHandler,
     ),
     get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler
@@ -1447,6 +1456,10 @@ URLS = [
     get_redirect_route(
         feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER,
         certificate_assessment.CertificateAssessmentOfferingByIdHandler,
+    ),
+    get_redirect_route(
+        feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+        certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
     ),
 ]
 

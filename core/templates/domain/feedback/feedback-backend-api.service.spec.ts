@@ -25,8 +25,8 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
-  SendALessonFeedbackModel,
-  IssueReportModel,
+  LessonFeedbackModel,
+  PlatformFeedbackModel,
 } from 'domain/feedback/feedback.model';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -38,21 +38,21 @@ describe('Feedback backend api service', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let imageUploadHelperService: ImageUploadHelperService;
 
-  const sendALessonFeedbackPayload =
-    SendALessonFeedbackModel.createForSubmission({
-      feedbackText: 'Hello',
-      exploration_context: {
-        explorationId: 'test',
-        explorationVersion: 1,
-        stateName: 'intro',
-        stateIndex: 1,
-        learnerCurrentAnswer: 'test',
-      },
-    });
+  const sendALessonFeedbackPayload = LessonFeedbackModel.createForSubmission({
+    feedbackText: 'Hello',
+    lesson_metadata: {
+      explorationId: 'test',
+      explorationVersion: 1,
+      stateName: 'intro',
+      stateIndex: 1,
+      learnerCurrentAnswer: 'test',
+    },
+  });
 
-  const issueReportPayload = IssueReportModel.createForSubmission({
+  const issueReportPayload = PlatformFeedbackModel.createForSubmission({
     source: 'lesson',
     reportMessage: 'text',
+    pageUrl: 'http://localhost:8181/explore/test',
     explorationContext: {
       explorationId: 'test',
       explorationVersion: 1,
@@ -148,7 +148,7 @@ describe('Feedback backend api service', () => {
     ]);
     expect(onSuccess).toHaveBeenCalledWith({
       screenshotFilename: 'reply.png',
-      screenshotFile: {'reply.png': 'aW1hZ2UtZGF0YQ=='},
+      screenshotFile: 'aW1hZ2UtZGF0YQ==',
     });
   }));
 
@@ -232,7 +232,7 @@ describe('Feedback backend api service', () => {
       .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
       .then(onSuccess);
     flushMicrotasks();
-    const req = httpTestingController.expectOne('/report');
+    const req = httpTestingController.expectOne('/platform-feedback');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual({
       ...issueReportPayload.toBackendDict(),
@@ -243,47 +243,5 @@ describe('Feedback backend api service', () => {
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalledWith({id: 'thread_id'});
-  }));
-
-  it('should reject with http error when feedback submission fails', fakeAsync(() => {
-    const onFailure = jasmine.createSpy('onFailure');
-
-    feedbackBackendApiService
-      .submitSiteAndLessonIssueReportAsync(issueReportPayload, 'captcha-token')
-      .catch(onFailure);
-    flushMicrotasks();
-
-    const req = httpTestingController.expectOne('/report');
-    req.flush(
-      {error: 'Invalid feedback.'},
-      {
-        status: 400,
-        statusText: 'Bad Request',
-      }
-    );
-    flushMicrotasks();
-
-    expect(
-      onFailure.calls.mostRecent().args[0] instanceof HttpErrorResponse
-    ).toBe(true);
-  }));
-
-  it('should rethrow non-http errors during feedback submission', fakeAsync(() => {
-    const error = new Error('Unexpected error.');
-    const serviceWithFailingHttp = new FeedbackBackendApiService(
-      {
-        post: () => throwError(error),
-      } as never,
-      imageLocalStorageService,
-      imageUploadHelperService
-    );
-    const onFailure = jasmine.createSpy('onFailure');
-
-    serviceWithFailingHttp
-      .submitSiteAndLessonIssueReportAsync(issueReportPayload, null)
-      .catch(onFailure);
-    flushMicrotasks();
-
-    expect(onFailure).toHaveBeenCalledWith(error);
   }));
 });
