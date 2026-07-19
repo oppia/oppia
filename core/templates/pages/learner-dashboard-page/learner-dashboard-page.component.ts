@@ -597,6 +597,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .GOALS:
         return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .MY_CERTIFICATES:
+        return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
       default:
         return `No valid I18N key for heading of ${this.activeSection}`;
     }

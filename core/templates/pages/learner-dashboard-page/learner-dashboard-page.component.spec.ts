@@ -1460,6 +1460,16 @@ describe('Learner dashboard page', () => {
       );
     });
 
+    it('should return certificates greeting when current tab is set to my certificates', () => {
+      component.activeSection =
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+      );
+    });
+
     it('should return default greeting when current tab is not valid', () => {
       component.activeSection = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       fixture.detectChanges();
