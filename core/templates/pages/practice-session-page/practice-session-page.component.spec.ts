@@ -299,7 +299,9 @@ describe('Practice session page', () => {
     spyOn(urlService, 'getPathname').and.returnValue(
       '/learn/math/fractions/practice/session'
     );
-    spyOn(urlService, 'getSelectedSubtopicsFromUrl').and.returnValue('[1,2]');
+    (
+      urlService as jasmine.SpyObj<UrlService>
+    ).getSelectedSubtopicsFromUrl.and.returnValue('[1,2]');
     spyOn(
       practiceSessionsBackendApiService,
       'fetchPracticeSessionsData'
@@ -334,7 +336,9 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component._getDataUrl()).toContain('abbrev-topic/1');
+    // eslint-disable-next-line dot-notation
+    // @ts-ignore
+    expect(component['_getDataUrl']()).toContain('abbrev-topic/1');
   }));
 
   it('should build correct retry URL for arc practice', fakeAsync(() => {
@@ -355,7 +359,9 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component._getRetryUrl()).toContain('abbrev-topic/test/arc/1');
+    // eslint-disable-next-line dot-notation
+    // @ts-ignore
+    expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/arc/1');
   }));
 
   it('should build correct retry URL for mastery challenge', fakeAsync(() => {
@@ -375,7 +381,9 @@ describe('Practice session page', () => {
     component.ngOnInit();
     tick();
 
-    expect(component._getRetryUrl()).toContain(
+    // eslint-disable-next-line dot-notation
+    // @ts-ignore
+    expect(component['_getRetryUrl']()).toContain(
       'abbrev-topic/mastery-challenge'
     );
   }));
