@@ -1166,6 +1166,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
                         'old_value': cast(List[str], []),
                         'new_value': [self.skill_id1],
                     }
@@ -1226,6 +1229,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                             story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
                         ),
                         'node_id': 'node_1',
+                        # Here we use cast because the empty list's type
+                        # cannot be inferred, and List[str] is needed to
+                        # match AcceptableChangeDictTypes.
                         'old_value': cast(List[str], []),
                         'new_value': [self.skill_id2],
                     }

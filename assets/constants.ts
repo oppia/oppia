@@ -7318,17 +7318,20 @@ export default {
     "NODE_PRACTICE_SESSION": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/:node_id",
       "TITLE": "Practice Session Page",
-      "MANUALLY_REGISTERED_WITH_BACKEND": true
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
     },
     "END_OF_ARC_TEST": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/arc/:arc_id",
       "TITLE": "End-of-Arc Test",
-      "MANUALLY_REGISTERED_WITH_BACKEND": true
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
     },
     "MASTERY_CHALLENGE": {
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/mastery-challenge",
       "TITLE": "Mastery Challenge",
-      "MANUALLY_REGISTERED_WITH_BACKEND": true
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
     },
     "BLOG_DASHBOARD": {
       "ROUTE": "blog-dashboard",

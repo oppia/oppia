@@ -244,7 +244,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     if (nodeId) {
       this.sessionType = PracticeSessionType.Lesson;
       this.nodeId = nodeId;
-    } else if (arcId) {
+    } else if (
+      arcId &&
+      this.platformFeatureService.status.StoryEditorArcs.isEnabled
+    ) {
       this.sessionType = PracticeSessionType.Arc;
       this.arcId = arcId;
     } else if (this.urlService.getPathname().match(/\/mastery-challenge/g)) {

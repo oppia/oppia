@@ -336,13 +336,6 @@ class PracticeSessionAccessValidationPage(
                 },
                 'default_value': None,
             },
-            'skill_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString',
-                },
-                'default_value': None,
-            },
         }
     }
 
@@ -352,22 +345,8 @@ class PracticeSessionAccessValidationPage(
 
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
-        skill_ids = self.normalized_request.get('skill_ids')
         node_id = self.request.route_kwargs.get('node_id')
         arc_id = self.request.route_kwargs.get('arc_id')
-
-        if skill_ids is not None:
-            if not isinstance(skill_ids, list) or not all(
-                isinstance(s, str) for s in skill_ids
-            ):
-                raise self.InvalidInputException('Invalid skill_ids')
-            if len(skill_ids) == 0:
-                raise self.InvalidInputException('Empty skill_ids provided.')
-            try:
-                skill_fetchers.get_multi_skills(skill_ids)
-            except Exception as e:
-                raise self.NotFoundException(e)
-            return
 
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         assert isinstance(topic_url_fragment, str)

@@ -45,6 +45,9 @@ class MockPlatformFeatureService {
     NewLessonPlayer: {
       isEnabled: false,
     },
+    StoryEditorArcs: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -250,6 +253,7 @@ describe('Practice session page', () => {
   }));
 
   it('should determine arc session type from pathname', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue(
       '/learn/math/fractions/test/arc/123'
     );
@@ -333,6 +337,7 @@ describe('Practice session page', () => {
   }));
 
   it('should build correct retry URL for arc practice', fakeAsync(() => {
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue(
       '/learn/math/fractions/test/arc/1'
     );
