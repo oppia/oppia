@@ -162,6 +162,7 @@
             "lintFilePatterns": [
               "core/templates/**/*.ts",
               "core/templates/**/*.component.html",
+              "core/templates/**/*.directive.html",
               "extensions/**/*.ts",
               "extensions/**/*.html"
             ]
