@@ -2607,9 +2607,9 @@ class RenderedEmailFooterTest(test_utils.GenericTestBase):
     )
     def test_preserves_custom_footer_without_placeholder(self) -> None:
         """Tests that a custom footer is returned unchanged."""
-        # pylint: disable=protected-access
-        footer = email_manager._get_rendered_email_footer()
-        # pylint: enable=protected-access
+        footer = (
+            email_manager._get_rendered_email_footer()
+        )  # pylint: disable=protected-access
         self.assertEqual(
             footer,
             'You can change your email preferences via the '
