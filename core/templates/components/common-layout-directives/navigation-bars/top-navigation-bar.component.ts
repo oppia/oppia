@@ -113,6 +113,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
+  isTechTeamLead: boolean = false;
   userIsLoggedIn: boolean = false;
   /**
    * Flag to track whether the auth status has been resolved from the
@@ -303,6 +304,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.isTopicManager = userInfo.isTopicManager();
         this.isSuperAdmin = userInfo.isSuperAdmin();
         this.isBlogAdmin = userInfo.isBlogAdmin();
+        this.isTechTeamLead = userInfo.isTechTeamLead();
         this.isBlogPostEditor = userInfo.isBlogPostEditor();
         this.userIsLoggedIn = userInfo.isLoggedIn();
         let usernameFromUserInfo = userInfo.getUsername();
@@ -467,6 +469,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       const parsed = parseInt(countAttr ?? '0', 10);
       this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
     }
+  }
+
+  isTechnicalFeedbackDashboardEnabled(): boolean {
+    return this.platformFeatureService.status.TechnicalFeedbackDashboardEnabled
+      .isEnabled;
   }
 
   changeLanguage(languageCode: string): void {
