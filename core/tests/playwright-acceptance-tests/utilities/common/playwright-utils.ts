@@ -157,7 +157,6 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: 'networkidle'});
-    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -811,15 +810,6 @@ export class BaseUser {
       waitUntil: 'networkidle',
       timeout,
     });
-
-    // Block pencilcode.net: ExplorationEditorPageComponent.ngOnInit() eagerly
-    // loads pencilcodeembed.js on every editor page load, regardless of whether
-    // the exploration uses that interaction. This is a live third-party request
-    // that can hang indefinitely under CI network flakiness, which blocks
-    // networkidle from ever resolving. Aborting it here
-    // is safe — the app already handles load failure gracefully with no
-    // callback depending on success.
-    await this.page.route('https://pencilcode.net/**', route => route.abort());
 
     if (useSelector) {
       await this.waitForElementToStabilize(selector);
