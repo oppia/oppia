@@ -25,7 +25,6 @@ import {
   QuestionBackendDict,
 } from '../../../domain/question/question.model';
 import {StateCard} from '../../../domain/state_card/state-card.model';
-
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';

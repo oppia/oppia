@@ -407,7 +407,6 @@ export class QuestionPlayerEngineService {
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
       const nextContentId = this.getNextStateData().content.contentId;
       if (nextContentId === null) {
-        this.alertsService.addWarning('Content id should not be empty.');
         return false;
       }
       nextCard = StateCard.createNewCard(
@@ -621,6 +620,9 @@ export class QuestionPlayerEngineService {
   ): void {
     const firstQuestionId = this.questions[0].getId();
     if (firstQuestionId === null) {
+      if (errorCallback) {
+        errorCallback();
+      }
       throw new Error('First question ID is null.');
     }
     this.pageContextService.setCustomEntityContext(
@@ -658,7 +660,6 @@ export class QuestionPlayerEngineService {
     }
     const initialContentId = initialState.content.contentId;
     if (initialContentId === null) {
-      this.alertsService.addWarning('Content id should not be empty.');
       if (errorCallback) {
         errorCallback();
       }

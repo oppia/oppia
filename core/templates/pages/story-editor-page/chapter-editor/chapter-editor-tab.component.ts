@@ -36,7 +36,7 @@ export class ChapterEditorTabComponent implements OnInit, OnDestroy {
   storyContents!: StoryContents;
   chapterIndex: number | null = null;
   chapterId!: string;
-  node!: StoryNode;
+  node: StoryNode | null = null;
   nodes!: StoryNode[];
 
   constructor(
@@ -62,9 +62,8 @@ export class ChapterEditorTabComponent implements OnInit, OnDestroy {
           }
         });
       }
-      if (this.chapterIndex !== null) {
-        this.node = this.nodes[this.chapterIndex];
-      }
+      this.node =
+        this.chapterIndex !== null ? this.nodes[this.chapterIndex] : null;
     }
   }
 

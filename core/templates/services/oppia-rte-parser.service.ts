@@ -113,10 +113,8 @@ export class OppiaRteParserService {
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {
         if (node.childNodes[child].nodeType === 3) {
-          const text = (node.childNodes[child].nodeValue ?? '').replace(
-            /[\t\n]/g,
-            ''
-          );
+          const text =
+            node.childNodes[child].nodeValue?.replace(/[\t\n]/g, '') ?? '';
           childNode.children.push(new TextNode(text));
           continue;
         }

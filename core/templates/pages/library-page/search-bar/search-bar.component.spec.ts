@@ -518,7 +518,7 @@ describe('Search bar component', () => {
 
   it('should tell searching status', () => {
     spyOn(searchService, 'isSearchInProgress').and.returnValue(false);
-    expect(component.isSearchInProgress()).toBe(false);
+    expect(component.isSearchInProgress()).toBeFalse();
   });
 
   it('should open sub menu', () => {
