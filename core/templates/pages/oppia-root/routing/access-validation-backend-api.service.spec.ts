@@ -228,6 +228,22 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate access to technical feedback dashboard page', fakeAsync(() => {
+    avbas
+      .validateAccessToTechnicalFeedbackDashboardPage()
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_technical_feedback_dashboard'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate whether user can view any skill editor', fakeAsync(() => {
     let skillId = 'skill_id';
 

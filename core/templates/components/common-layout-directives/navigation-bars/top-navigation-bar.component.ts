@@ -26,6 +26,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  ViewEncapsulation,
 } from '@angular/core';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -53,7 +54,6 @@ import {LanguageBannerService} from 'components/language-banner/language-banner.
 import {SignInEventService} from 'services/sign-in-event.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import './top-navigation-bar.component.css';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
@@ -68,6 +68,7 @@ interface LanguageInfo {
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
   styleUrls: ['./top-navigation-bar.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -112,6 +113,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
+  isTechTeamLead: boolean = false;
   userIsLoggedIn: boolean = false;
   /**
    * Flag to track whether the auth status has been resolved from the
@@ -302,6 +304,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.isTopicManager = userInfo.isTopicManager();
         this.isSuperAdmin = userInfo.isSuperAdmin();
         this.isBlogAdmin = userInfo.isBlogAdmin();
+        this.isTechTeamLead = userInfo.isTechTeamLead();
         this.isBlogPostEditor = userInfo.isBlogPostEditor();
         this.userIsLoggedIn = userInfo.isLoggedIn();
         let usernameFromUserInfo = userInfo.getUsername();
@@ -466,6 +469,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       const parsed = parseInt(countAttr ?? '0', 10);
       this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
     }
+  }
+
+  isTechnicalFeedbackDashboardEnabled(): boolean {
+    return this.platformFeatureService.status.TechnicalFeedbackDashboardEnabled
+      .isEnabled;
   }
 
   changeLanguage(languageCode: string): void {

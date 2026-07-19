@@ -24,6 +24,7 @@ import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
+import {TechnicalFeedbackDashboardPageComponentAuthGuard} from 'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.component-auth.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -151,6 +152,14 @@ const routes: Route[] = [
       import(
         'pages/diagnostic-test-player-page/diagnostic-test-player-page.module'
       ).then(m => m.DiagnosticTestPlayerPageModule),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CERTIFICATE_ASSESSMENT_PLAYER.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/certificate-assessment-player-page/certificate-assessment-player-page.module'
+      ).then(m => m.CertificateAssessmentPlayerPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
@@ -568,6 +577,16 @@ const routes: Route[] = [
       import(
         'pages/edit-certificate-offering-page/edit-certificate-offering-page.module'
       ).then(m => m.EditCertificateOfferingPageModule),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .TECHNICAL_FEEDBACK_DASHBOARD.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module'
+      ).then(m => m.TechnicalFeedbackDashboardPageModule),
+    canActivate: [TechnicalFeedbackDashboardPageComponentAuthGuard],
   },
 ];
 

@@ -1,7 +1,6 @@
-<ng-template #EditorTabTourPreviewTab>
-  <h3 class="e2e-test-joyride-title" tabindex="0">Preview</h3>
-  <p tabindex="0">At any time, you can click the <b>preview</b> button to play through your exploration.</p>
-</ng-template>
+<div id="editorTabTourPreviewTabContent" [hidden]="true">
+  <p tabindex="0">At any time, you can click the <strong>preview</strong> button to play through your exploration.</p>
+</div>
 
 <div class="navbar-helper">
   <div class="navbar-tabs">
@@ -21,7 +20,7 @@
     <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <a href="#"
+        <a href="javascript:void(0)"
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
            placement="{{countWarnings() ? 'left' : 'bottom'}}"
@@ -65,7 +64,7 @@
         </a>
       </li>
 
-      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab"
           (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab"
            [ngbTooltip]="'Preview'"
@@ -150,7 +149,7 @@
 
       <li [ngClass]="{'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item" (click)="!connectedToInternet || showUserHelpModal()"
           [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
-        <a href="#"
+        <a href="javascript:void(0)"
            [ngbTooltip]="'Help'"
            tabindex="0"
            (keydown.enter)="!connectedToInternet || showUserHelpModal()"
