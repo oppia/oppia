@@ -61,7 +61,7 @@ export class TechnicalFeedbackDashboardPageComponent {
   currentFilterState: FeedbackFilterState = {
     searchText: '',
     status: FeedbackStatus.OPEN,
-    technicalTeam: TechnicalTeamType.LEAP,
+    technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
     dateRange: {
       start: null,
       end: null,
@@ -85,6 +85,17 @@ export class TechnicalFeedbackDashboardPageComponent {
     }
     this.displayedFeedbackSummaries = this.feedbackSummaries.filter(feedback =>
       feedback.report_message_preview.toLowerCase().includes(search)
+    );
+  }
+
+  private hasSameServerFilters(filterState: FeedbackFilterState): boolean {
+    return (
+      this.currentFilterState.status === filterState.status &&
+      this.currentFilterState.technicalTeam === filterState.technicalTeam &&
+      this.currentFilterState.dateRange.start?.getTime() ===
+        filterState.dateRange.start?.getTime() &&
+      this.currentFilterState.dateRange.end?.getTime() ===
+        filterState.dateRange.end?.getTime()
     );
   }
 
@@ -115,6 +126,16 @@ export class TechnicalFeedbackDashboardPageComponent {
   }
 
   onFilterChange(_filterState: FeedbackFilterState): void {
+    if (
+      this.hasSameServerFilters(_filterState) &&
+      (this.feedbackSummaries.length > 0 ||
+        this.nextCursor !== null ||
+        this.currentPage > 1)
+    ) {
+      this.currentFilterState = _filterState;
+      this.applySearch();
+      return;
+    }
     this.currentFilterState = _filterState;
     this.currentPage = 1;
     this.cursorHistory = [null];

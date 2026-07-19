@@ -54,7 +54,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     source: 'platform',
     status: FeedbackStatus.OPEN,
     platform: 'web',
-    destination_dashboard: 'LEAP',
+    destination_dashboard: TechnicalTeamType.TECH_EXTERNAL,
     page_url: '/learn/math',
     category: null,
     lesson_metadata: null,
@@ -98,7 +98,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     currentFilterState = {
       searchText: '',
       status: FeedbackStatus.OPEN,
-      technicalTeam: TechnicalTeamType.LEAP,
+      technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
       dateRange: {
         start: null,
         end: null,
@@ -152,7 +152,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
       '/' +
         AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TECHNICAL_FEEDBACK_DETAIL.ROUTE.replace(
           ':team',
-          TechnicalTeamType.LEAP
+          TechnicalTeamType.TECH_EXTERNAL
         ).replace(':reportId', encodeURIComponent('report123'))
     );
   });
@@ -264,7 +264,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
   it('should load feedback details when team and reportId are present', async () => {
     paramMapSubject.next(
       convertToParamMap({
-        team: TechnicalTeamType.LEAP,
+        team: TechnicalTeamType.TECH_EXTERNAL,
         reportId: 'report1',
       })
     );
@@ -274,7 +274,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
 
     expect(fetchFeedbackDetailSpy).toHaveBeenCalledWith(
       'technical',
-      TechnicalTeamType.LEAP,
+      TechnicalTeamType.TECH_EXTERNAL,
       'report1'
     );
     expect(component.feedbackDetailResponse).toEqual(mockDetailResponse);

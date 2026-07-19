@@ -50,7 +50,7 @@ describe('FeedbackFilterBarComponent', () => {
 
     component.searchText = 'test';
     component.selectedStatus = FeedbackStatus.OPEN;
-    component.selectedTechnicalTeam = TechnicalTeamType.LEAP;
+    component.selectedTechnicalTeam = TechnicalTeamType.TECH_EXTERNAL;
     component.fromDate = '2021-01-01';
     component.toDate = '2021-01-02';
   });
@@ -64,7 +64,7 @@ describe('FeedbackFilterBarComponent', () => {
     expect(component.filterChange.emit).toHaveBeenCalledWith({
       searchText: 'test',
       status: FeedbackStatus.OPEN,
-      technicalTeam: TechnicalTeamType.LEAP,
+      technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
       dateRange: {
         start: new Date('2021-01-01'),
         end: new Date('2021-01-02'),
@@ -76,13 +76,15 @@ describe('FeedbackFilterBarComponent', () => {
     component.clearAllFilters();
     expect(component.searchText).toEqual('');
     expect(component.selectedStatus).toEqual(FeedbackStatus.OPEN);
-    expect(component.selectedTechnicalTeam).toEqual(TechnicalTeamType.LEAP);
+    expect(component.selectedTechnicalTeam).toEqual(
+      TechnicalTeamType.TECH_EXTERNAL
+    );
     expect(component.fromDate).toEqual('');
     expect(component.toDate).toEqual('');
     expect(component.filterChange.emit).toHaveBeenCalledWith({
       searchText: '',
       status: FeedbackStatus.OPEN,
-      technicalTeam: TechnicalTeamType.LEAP,
+      technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
       dateRange: {
         start: null,
         end: null,

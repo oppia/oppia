@@ -76,7 +76,7 @@ describe('Feedback backend api service', () => {
       start: new Date('2021-01-01'),
       end: new Date('2021-02-01'),
     },
-    technicalTeam: TechnicalTeamType.LEAP,
+    technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
   };
 
   const filterState2 = {
@@ -96,7 +96,7 @@ describe('Feedback backend api service', () => {
       start: new Date('2021-01-01'),
       end: null,
     },
-    technicalTeam: TechnicalTeamType.LEAP,
+    technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
   };
 
   const detailedReportResponse = {
@@ -105,7 +105,7 @@ describe('Feedback backend api service', () => {
     source: 'lesson',
     status: 'open',
     platform: 'web',
-    destination_dashboard: 'LEAP',
+    destination_dashboard: TechnicalTeamType.TECH_EXTERNAL,
     page_url: 'http://localhost',
     category: null,
     lesson_metadata: null,
@@ -407,13 +407,18 @@ describe('Feedback backend api service', () => {
   it('should fetch details of a Platform Feedback', fakeAsync(() => {
     const onSuccess = jasmine.createSpy('onSuccess');
     feedbackBackendApiService
-      .fetchPlatformFeedbackDetailAsync('technical', 'LEAP', 'test_report_id')
+      .fetchPlatformFeedbackDetailAsync(
+        'technical',
+        'tech-external',
+        'test_report_id'
+      )
       .then(onSuccess);
 
     const req = httpTestingController.expectOne(
       request =>
         request.method === 'GET' &&
-        request.url === '/platform-feedback/technical/LEAP/test_report_id'
+        request.url ===
+          '/platform-feedback/technical/tech-external/test_report_id'
     );
 
     req.flush(detailedReportResponse);
@@ -427,7 +432,7 @@ describe('Feedback backend api service', () => {
     feedbackBackendApiService
       .updatePlatformFeedbackStatusAsync(
         'technical',
-        'LEAP',
+        'tech-external',
         'test_report_id',
         'fixed'
       )
@@ -436,7 +441,8 @@ describe('Feedback backend api service', () => {
     const req = httpTestingController.expectOne(
       request =>
         request.method === 'POST' &&
-        request.url === '/platform-feedback/technical/LEAP/test_report_id'
+        request.url ===
+          '/platform-feedback/technical/tech-external/test_report_id'
     );
 
     expect(req.request.body).toEqual({

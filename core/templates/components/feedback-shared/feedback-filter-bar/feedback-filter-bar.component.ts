@@ -47,7 +47,7 @@ export class FeedbackFilterBarComponent {
   searchText: string = '';
   fromDate: string = '';
   toDate: string = '';
-  selectedTechnicalTeam: TechnicalTeamType = TechnicalTeamType.LEAP;
+  selectedTechnicalTeam: TechnicalTeamType = TechnicalTeamType.TECH_EXTERNAL;
 
   applyFilters(): void {
     const dateRange = {
@@ -67,7 +67,7 @@ export class FeedbackFilterBarComponent {
     this.searchText = '';
     this.fromDate = '';
     this.toDate = '';
-    this.selectedTechnicalTeam = TechnicalTeamType.LEAP;
+    this.selectedTechnicalTeam = TechnicalTeamType.TECH_EXTERNAL;
     this.applyFilters();
   }
 }
