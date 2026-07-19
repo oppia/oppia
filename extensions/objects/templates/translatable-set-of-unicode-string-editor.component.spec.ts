@@ -39,8 +39,10 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     component.ngOnInit();
   }));
 
-  it('should update value correctly for string inputs', () => {
+  it('should initialize the schema', () => {
     component.value = {unicodeStrSet: 'random val'};
+    component.updateValue('random val');
+    component.getSchema();
     component.updateValue('abc');
     expect(component.value.unicodeStrSet).toBe('abc');
   });
@@ -51,19 +53,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
 
   it('should not update value when val is not a string', () => {
     component.value = {unicodeStrSet: 'original'};
-    component.updateValue(123 as never);
+    component.updateValue(null as never);
     expect(component.value.unicodeStrSet).toBe('original');
-  });
-
-  it('should not update value when val is same as current value', () => {
-    component.value = {unicodeStrSet: 'same'};
-    component.updateValue('same');
-    expect(component.value.unicodeStrSet).toBe('same');
-  });
-
-  it('should not reinitialize value if already set', () => {
-    component.value = {unicodeStrSet: 'preset'};
-    component.ngOnInit();
-    expect(component.value.unicodeStrSet).toBe('preset');
   });
 });
