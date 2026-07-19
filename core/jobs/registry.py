@@ -80,6 +80,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     user_stats_computation_jobs,
     user_validation_jobs,
     voiceover_synthesis_jobs,
+    web_feedback_cleanup_jobs,
 )
 
 from typing import List, Type
