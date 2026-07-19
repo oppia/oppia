@@ -42,7 +42,6 @@ from core.domain import (
     story_domain,
     story_fetchers,
     study_guide_services,
-    subtopic_page_services,
     suggestion_services,
     topic_domain,
     topic_fetchers,
@@ -4434,37 +4433,18 @@ def can_access_subtopic_viewer_page(
             )
             return None
 
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-            self.user_id,
-        ):
-            study_guide = study_guide_services.get_study_guide_by_id(
-                topic.id, subtopic_id, strict=False
+        study_guide = study_guide_services.get_study_guide_by_id(
+            topic.id, subtopic_id, strict=False
+        )
+        if study_guide is None:
+            _redirect_based_on_return_type(
+                self,
+                '/learn/%s/%s/studyguide'
+                % (classroom_url_fragment, topic_url_fragment),
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
             )
-            if study_guide is None:
-                _redirect_based_on_return_type(
-                    self,
-                    '/learn/%s/%s/studyguide'
-                    % (classroom_url_fragment, topic_url_fragment),
-                    self.GET_HANDLER_ERROR_RETURN_TYPE,
-                )
-                return None
-            else:
-                return handler(self, topic.name, subtopic_id, **kwargs)
-        else:
-            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-                topic.id, subtopic_id, strict=False
-            )
-            if subtopic_page is None:
-                _redirect_based_on_return_type(
-                    self,
-                    '/learn/%s/%s/studyguide'
-                    % (classroom_url_fragment, topic_url_fragment),
-                    self.GET_HANDLER_ERROR_RETURN_TYPE,
-                )
-                return None
-            else:
-                return handler(self, topic.name, subtopic_id, **kwargs)
+            return None
+        return handler(self, topic.name, subtopic_id, **kwargs)
 
     return test_can_access
 
