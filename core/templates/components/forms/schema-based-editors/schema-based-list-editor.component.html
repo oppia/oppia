@@ -1,4 +1,3 @@
-
 <div class="schema-based-list-editor">
   <form #listEditorForm="ngForm">
     <table class="w-100">
@@ -38,8 +37,8 @@
               type="button" class="btn btn-secondary btn-sm ms-0 e2e-test-add-list-entry" (click)="addElement()"
               [disabled]="disabled"
               [attr.aria-label]="addElementText | translate">
-         {{ addElementText | translate }}
-      </button>
+            </button>
+            {{ addElementText | translate }}
     </div>
   </form>
 </div>
