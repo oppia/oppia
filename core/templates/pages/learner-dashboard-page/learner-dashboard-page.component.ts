@@ -586,6 +586,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
   }
 
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platFeatService.status.EnableCertificateAssessment.isEnabled;
+  }
+
   getDashboardTabHeading(): string {
     switch (this.activeSection) {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS

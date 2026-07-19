@@ -37,7 +37,7 @@
             (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover" tabindex="0"
+        <h4 *ngIf="isCertificateAssessmentEnabled()" class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES)"
             (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES)">
@@ -189,7 +189,7 @@
                                        [subtopicMasteries]="subtopicMasteries">
           </oppia-progress-tab>
         </div>
-        <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES">
+        <div class="w-100" *ngIf="isCertificateAssessmentEnabled() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES">
           <oppia-my-certificates-tab>
           </oppia-my-certificates-tab>
         </div>

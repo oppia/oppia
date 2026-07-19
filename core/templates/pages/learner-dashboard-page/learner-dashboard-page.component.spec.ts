@@ -103,6 +103,9 @@ class MockPlatformFeatureService {
       ShowRedesignedLearnerDashboard: {
         isEnabled: false,
       },
+      EnableCertificateAssessment: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -1468,6 +1471,17 @@ describe('Learner dashboard page', () => {
       expect(component.getDashboardTabHeading()).toBe(
         'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
       );
+    });
+
+    it('should hide my certificates tab when certificate assessment is disabled', () => {
+      component.activeSection =
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
+      fixture.detectChanges();
+
+      expect(component.isCertificateAssessmentEnabled()).toBeFalse();
+      expect(
+        fixture.nativeElement.querySelector('oppia-my-certificates-tab')
+      ).toBeNull();
     });
 
     it('should return default greeting when current tab is not valid', () => {
