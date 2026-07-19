@@ -268,8 +268,9 @@ export class LoggedOutUser extends BaseUser {
       // Wait for Angular to be stable before clicking the expand button.
       await this.waitForAngularStability();
 
-      // Use JavaScript click for sidebar menu items.
-      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+      await this.page
+        .locator(mobileSidebarExpandAboutMenuButton)
+        .dispatchEvent('click');
 
       // Wait for the About submenu to expand and the About button to be visible.
       await this.expectElementToBeVisible(mobileSidebarAboutButton);
@@ -370,23 +371,6 @@ export class LoggedOutUser extends BaseUser {
       },
       {timeout: 10000}
     );
-  }
-
-  /**
-   * Clicks an element using JavaScript's native click() method.
-   * This ensures Angular properly handles the event in its change detection
-   * cycle, which is more reliable than Puppeteer's simulated clicks for
-   * Angular components like the sidebar.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  private async clickWithJavaScript(selector: string): Promise<void> {
-    await this.waitForElementToStabilize(selector);
-    await this.page.evaluate((sel: string) => {
-      const element = document.querySelector(sel) as HTMLElement;
-      if (element) {
-        element.click();
-      }
-    }, selector);
   }
 
   /**
@@ -1176,7 +1160,7 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOnElementWithSelector(
       'input.e2e-test-agree-to-terms-checkbox'
     );
-    await this.page.waitForSelector(
+    await this.expectElementToBeVisible(
       'button.e2e-test-register-user:not([disabled])'
     );
     await this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON);
@@ -1186,6 +1170,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to navigate to the classroom page.
+   * @param {string} urlFragment - The URL fragment for the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
     await this.goto(`${classroomsPageUrl}/${urlFragment}`);
@@ -1227,6 +1212,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Navigates to the community library page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
   async navigateToCommunityLibraryPage(
     verifyURL: boolean = true
@@ -1322,8 +1308,9 @@ export class LoggedOutUser extends BaseUser {
     // Wait for Angular to be stable before clicking.
     await this.waitForAngularStability();
 
-    // Use JavaScript click to ensure Angular handles the event properly.
-    await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
+    await this.page
+      .locator(mobileNavbarOpenSidebarButton)
+      .dispatchEvent('click');
 
     await this.expectElementToBeVisible(mobileSidebarOpenSelector);
 

@@ -21,6 +21,7 @@ import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -81,7 +82,6 @@ const mobilePublishButtonSelector = 'button.e2e-test-mobile-publish-button';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
-('h3.e2e-test-controls-bar-settings-container');
 
 const tagsField = '.e2e-test-chip-list-tags';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
@@ -146,12 +146,6 @@ const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const skillNameInput = '.e2e-test-skill-name-input';
 
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
-const uploadImageButton = '.e2e-test-upload-image';
-const useTheUploadImageButton = '.e2e-test-use-image';
-const rteHelperModalSelector = 'oppia-rte-helper-modal';
-const descriptionBoxSelector = 'textarea.e2e-test-description-box';
-const textInputSelector = 'input.e2e-test-text-input';
-const textInputField = '.e2e-test-text-input';
 
 const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
 const oppiaWebURL = 'https://www.oppia.org';
@@ -205,11 +199,6 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 } as const;
 
-interface TabContent {
-  title: string;
-  content: string;
-}
-
 export class ExplorationEditor extends BaseUser {
   /**
    * Navigate to creator dashboard page.
@@ -220,15 +209,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Adds a default collapsible block RTE element.
-   */
-  async addCollapsibleBlockRTE(): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('collapsible block');
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
-  }
-
-  /**
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
@@ -236,20 +216,21 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
 
+    const rteEditor = new RTEEditor(this);
     // Add Bold text.
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
     await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Bold');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
 
     // Add Italic text.
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
     await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Italic');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
 
     // Add Numbered List.
-    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
@@ -257,7 +238,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
-    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
     await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
@@ -265,24 +246,24 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
     await this.typeInInputField(stateContentInputField, 'Pre formatted text');
-    await this.clickOnRTEOptionWithTitle('Pre');
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
     await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
 
     // Add Collapsible Block.
-    await this.addCollapsibleBlockRTE();
+    await rteEditor.addCollapsibleBlockRTE();
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add Image.
-    await this.addImageRTE(
+    await rteEditor.addImageRTE(
       testConstants.data.profilePicture,
       'Test Image',
       'Test Image Caption'
@@ -292,17 +273,17 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Video.
-    await this.addVideoRTE(oppiaYouTubeVideoUrl);
+    await rteEditor.addVideoRTE(oppiaYouTubeVideoUrl);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add Link.
-    await this.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
+    await rteEditor.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
     // Math Formula.
-    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
     const textareaElement = await this.page.$(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
@@ -315,7 +296,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Concept Card.
-    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     if (skillSearchElement) {
@@ -328,7 +309,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // Tab Contents.
-    await this.addTabContentsRTE();
+    await rteEditor.addTabContentsRTE();
     await this.page.keyboard.press('ArrowRight');
 
     await this.clickOnElementWithSelector(saveContentButton);
@@ -345,147 +326,6 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(stateContentInputField, hint);
     await this.clickOnElementWithSelector(saveHintButton);
     await this.expectElementToBeVisible(saveHintButton, false);
-  }
-
-  /**
-   * Adds an Image RTE element.
-   * @param {string} imageFilePath - Path of Image file to add.
-   * @param {string} imageDescription - Image Description to add.
-   * @param {string | null} imageCaption - Caption to add with image.
-   */
-  async addImageRTE(
-    imageFilePath: string,
-    imageDescription: string,
-    imageCaption: string | null
-  ): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert image');
-
-    await this.waitForNetworkIdle();
-    const helperModel = await this.page.$(rteHelperModalSelector);
-
-    // Get Fields.
-    const imageDescriptionInput = await helperModel?.$(descriptionBoxSelector);
-    const imageCaptionInput = await helperModel?.$(textInputSelector);
-
-    if (imageDescriptionInput) {
-      await this.typeInInputField(imageDescriptionInput, imageDescription);
-    } else {
-      throw new Error('Image description input not found in the helper modal');
-    }
-    if (imageCaptionInput && imageCaption) {
-      await this.typeInInputField(imageCaptionInput, imageCaption);
-    }
-
-    await this.clickOnElementWithSelector(uploadImageButton);
-    await this.uploadFile(imageFilePath);
-    await this.clickOnElementWithSelector(useTheUploadImageButton);
-
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
-  }
-
-  /**
-   * Creates a Tab Element In RTE.
-   * @param {TabContent[]} tabContents - A list of tab contents to add.
-   */
-  async addTabContentsRTE(tabContents: TabContent[] = []): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert tabs');
-
-    await this.waitForNetworkIdle();
-    const helperModel = await this.page.$(rteHelperModalSelector);
-
-    let tabTitleInputElements: ElementHandle<Element>[] = [];
-    let tabContentInputElements: ElementHandle<Element>[] = [];
-
-    if (helperModel) {
-      tabTitleInputElements = await helperModel.$$(textInputSelector);
-      tabContentInputElements = await helperModel.$$(stateContentInputField);
-    }
-
-    showMessage(tabContentInputElements?.length + ' tab contents found.');
-    showMessage(tabTitleInputElements?.length + ' tab titles found.');
-
-    for (let i = 0; i < tabContents.length; i++) {
-      if (i > 1) {
-        await this.clickOnElementWithSelector('.e2e-test-add-list-entry');
-      }
-      await this.clearAllTextFrom(
-        `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
-      );
-      await this.clearAllTextFrom(
-        `oppia-rte-helper-model ${stateContentInputField}:nth-child(${i + 1})`
-      );
-      if (tabTitleInputElements[i]) {
-        await this.typeInInputField(
-          tabTitleInputElements[i],
-          tabContents[i].title
-        );
-      }
-      if (tabContentInputElements[i]) {
-        await this.typeInInputField(
-          tabContentInputElements[i],
-          tabContents[i].content
-        );
-      }
-    }
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
-  }
-
-  /**
-   * Adds text with link in RTE editor.
-   * @param {string} text - The text that should be displayed
-   * @param {string} url - The URL to which the text should redirect to.
-   */
-  async addTextWithLinkRTE(text: string, url: string): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert link');
-    await this.waitForNetworkIdle();
-
-    const helperModel = await this.page.$(rteHelperModalSelector);
-
-    let linkInput: ElementHandle<Element> | undefined;
-    let linkTextInput: ElementHandle<Element> | undefined;
-
-    // Get Fields.
-    if (helperModel) {
-      const inputs = await helperModel.$$(textInputSelector);
-      linkInput = inputs[0];
-      linkTextInput = inputs[1];
-    }
-
-    if (linkInput && linkTextInput) {
-      await this.typeInInputField(linkInput, url);
-      await this.typeInInputField(linkTextInput, text);
-    } else {
-      throw new Error('Link input fields not found in the helper modal');
-    }
-
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
-  }
-
-  /**
-   * Adds Video RTE element.
-   * @param {string} videoUrl - Youtube Video URL
-   */
-  async addVideoRTE(videoUrl: string): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Insert video');
-
-    await this.expectElementToBeVisible(rteHelperModalSelector);
-    const helperModel = await this.page.$(rteHelperModalSelector);
-
-    // Get Fields.
-    const videoUrlInput = await helperModel?.$(textInputField);
-
-    if (!videoUrlInput) {
-      throw new Error('Video URL input not found in the helper modal');
-    }
-    await this.waitForElementToStabilize(videoUrlInput);
-    await this.typeInInputField(videoUrlInput, videoUrl);
-
-    await this.expectElementToBeVisible(closeButtonForExtraModel);
-    await this.clickOnElementWithSelector(closeButtonForExtraModel);
-    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -510,7 +350,6 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    await this.waitForNetworkIdle();
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
     // Wait for active tab panel fade transition to complete.
@@ -734,19 +573,6 @@ export class ExplorationEditor extends BaseUser {
         showMessage(`Switched to ${interaction} tab.`);
         break;
       }
-    }
-  }
-
-  /**
-   * Clicks on the RTE option with the given title.
-   * @param {string} title - The title of RTE option.
-   */
-  async clickOnRTEOptionWithTitle(title: string): Promise<void> {
-    const optionSelector = `a.cke_button[title*="${title}"]`;
-    await this.expectElementToBeVisible(optionSelector);
-    const optionElement = await this.page.$(optionSelector);
-    if (optionElement) {
-      await this.clickOnElement(optionElement);
     }
   }
 
@@ -1096,7 +922,6 @@ export class ExplorationEditor extends BaseUser {
       el.scrollIntoView({block: 'center', inline: 'center'})
     );
     await this.clickOnElement(nodeBackground);
-    await this.waitForNetworkIdle();
 
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
@@ -1139,8 +964,7 @@ export class ExplorationEditor extends BaseUser {
         force: true,
       });
       await this.expectElementToBeVisible(mobileNavbarPane);
-      await this.waitForDropdownToOpen(mobileNavbarPane);
-      await this.clickOnElementWithSelector(mobileMainTabButton);
+      await this.page.locator(mobileMainTabButton).dispatchEvent('click');
 
       // Close dropdown if it doesn't automatically close.
       const isVisible = await this.isElementVisible(
@@ -1165,14 +989,10 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.expectElementToBeVisible(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+    await this.clickOnElementWithSelector(createExplorationButtonSelector);
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
     });
-    // Puppeteer used waitForNetworkIdle here via clickAndWaitForNavigation.
-    // Without this, Angular hasn't finished bootstrapping the modal
-    // by the time dismissWelcomeModal fires.
-    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1468,38 +1288,6 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
-  }
-
-  /**
-   * Waits for the dropdown menu to be fully open: 'show' class applied,
-   * positioned by Popper ('x-placement' set), and opacity fade complete.
-   * @param {string} dropdownMenuSelector - The CSS selector for the dropdown menu.
-   * @param {number} timeout - The maximum time to wait for the dropdown to open (in milliseconds).
-   */
-  async waitForDropdownToOpen(
-    dropdownMenuSelector: string,
-    timeout = 5000
-  ): Promise<void> {
-    await this.page.waitForFunction(
-      selector => {
-        const menu = document.querySelector(selector);
-        if (!menu) {
-          return false;
-        }
-        if (!menu.classList.contains('show')) {
-          return false;
-        }
-        if (!menu.hasAttribute('x-placement')) {
-          return false;
-        }
-
-        const style = window.getComputedStyle(menu);
-        // Require the fade transition to have fully completed, not just started.
-        return parseFloat(style.opacity) >= 0.99;
-      },
-      dropdownMenuSelector,
-      {timeout}
-    );
   }
 }
 
