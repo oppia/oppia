@@ -306,7 +306,7 @@ export class QuestionPlayerEngineService {
     answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService,
     successCallback: (
-      nextCard: StateCard,
+      nextCard: StateCard | null,
       refreshInteraction: boolean,
       feedbackHtml: string,
       refresherExplorationId: string | null,
@@ -398,7 +398,7 @@ export class QuestionPlayerEngineService {
     const onSameCard = !answerIsCorrect;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard: StateCard;
+    let nextCard: StateCard | null = null;
     const nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
@@ -415,18 +415,6 @@ export class QuestionPlayerEngineService {
         nextInteractionHtml,
         this.getNextStateData().interaction,
         nextContentId
-      );
-    } else {
-      // On the final question of the question player, there is no next card.
-      // We pass a placeholder StateCard constructed from the current question
-      // state to satisfy the non-null successCallback signature without using
-      // forbidden non-null assertions (!) or unsafe type casts.
-      nextCard = StateCard.createNewCard(
-        'true',
-        questionHtml,
-        '',
-        oldState.interaction,
-        ''
       );
     }
     successCallback(

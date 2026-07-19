@@ -902,15 +902,15 @@ describe('Conversation flow service', () => {
       answer: string,
       interactionRulesService: InteractionRulesService,
       successCallback: (
-        nextCard: StateCard,
+        nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        refresherExplorationId: string,
-        missingPrerequisiteSkillId: string,
+        refresherExplorationId: string | null,
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
-        wasOldStateInitial: boolean,
-        isFirstHit: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
         isFinalQuestion: boolean,
         nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
@@ -1089,6 +1089,90 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.submitAnswer('', mockInteractionRulesService);
     tick(2000);
+  }));
+
+  it('should handle answer response when next card is null', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = true;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: (
+        nextCard: StateCard | null,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        refresherExplorationId: string | null,
+        missingPrerequisiteSkillId: string | null,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
+        isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
+        focusLabel: string
+      ) => void
+    ) => {
+      successCallback(
+        null,
+        true,
+        'feedback',
+        null,
+        null,
+        false,
+        '',
+        false,
+        false,
+        true,
+        null,
+        ''
+      );
+      return false;
+    };
+
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(
+      questionPlayerEngineService.recordAnswerSubmitted
+    ).toHaveBeenCalled();
+    expect(conversationFlowService.questionSessionCompleted).toBeTrue();
   }));
 
   it('should record checkpoint when card is checkpoint and not yet visited', fakeAsync(() => {
