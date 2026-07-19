@@ -1263,7 +1263,7 @@ export class ConversationFlowService {
     timeAtServerCall,
     currentEngineService,
   }: AnswerResponseData): void {
-    // nextCard is null only in question player mode on the final question.
+    // NextCard is null only in question player mode on the final question.
     // In that context isPresentingIsolatedQuestions() returns true, so all
     // blocks below that use nextCard are already guarded. We handle question
     // player specific logic here and return early to satisfy strict typing.
@@ -1298,7 +1298,7 @@ export class ConversationFlowService {
           nextCard.getStateName(),
           lastAnswer,
           this.learnerParamsService.getAllParams(),
-          isFirstHit!,
+          isFirstHit ?? false,
           String(completedChaptersCount && completedChaptersCount + 1),
           String(this.playerTranscriptService.getNumCards()),
           currentEngineService.getLanguageCode()
