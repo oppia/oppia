@@ -204,51 +204,6 @@ def validate_platform_feedback_belongs_to_dashboard(
     raise ValueError('Invalid dashboard.')
 
 
-def validate_platform_feedback_belongs_to_dashboard(
-    feedback: general_feedback_domain.PlatformFeedback,
-    dashboard: str,
-    dashboard_id: str,
-) -> None:
-    """Validates that the feedback belongs to the requested dashboard.
-
-    Args:
-        feedback: PlatformFeedback. The feedback to validate.
-        dashboard: str. The dashboard from which the feedback is being
-            accessed. This is either "creator" or "technical".
-        dashboard_id: str. The dashboard-specific identifier. This is the
-            exploration ID for the Creator Dashboard and the team identifier
-            ('LEAP' or 'CORE') for the Technical Dashboard.
-
-    Raises:
-        ValueError. The feedback does not belong to the requested dashboard.
-    """
-    if dashboard == feconf.DESTINATION_CREATOR:
-        if (
-            feedback.destination_dashboard != feconf.DESTINATION_CREATOR
-            or feedback.lesson_metadata is None
-        ):
-            raise ValueError(
-                'Feedback does not belong to the requested dashboard.'
-            )
-        exploration_id = feedback.lesson_metadata['exploration_id']
-        if exploration_id != dashboard_id:
-            raise ValueError(
-                'Feedback does not belong to the requested exploration.'
-            )
-        return
-
-    if dashboard == feconf.DESTINATION_TECHNICAL:
-        if dashboard_id not in feconf.TECHNICAL_FEEDBACK_TEAM_CHOICES:
-            raise ValueError('Invalid technical feedback team.')
-        if feedback.destination_dashboard != dashboard_id:
-            raise ValueError(
-                'Feedback does not belong to the requested dashboard.'
-            )
-        return
-
-    raise ValueError('Invalid dashboard.')
-
-
 def create_lesson_feedback(
     author_id: str,
     feedback_text: str,
