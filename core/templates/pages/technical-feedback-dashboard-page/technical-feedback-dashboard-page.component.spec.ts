@@ -203,6 +203,47 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     );
   });
 
+  it('should filter feedback by search text', async () => {
+    component.ngOnInit();
+
+    fetchFeedbackListSpy.and.returnValue(
+      Promise.resolve({
+        summaries: [
+          {
+            id: '1',
+            report_message_preview: 'Angular bug',
+            status: FeedbackStatus.OPEN,
+            source: 'app',
+            category: null,
+          },
+          {
+            id: '2',
+            report_message_preview: 'React issue',
+            status: FeedbackStatus.OPEN,
+            source: 'app',
+            category: null,
+          },
+        ],
+        next_cursor: null,
+        more: false,
+      })
+    );
+
+    component.onFilterChange(currentFilterState);
+    await fixture.whenStable();
+
+    fetchFeedbackListSpy.calls.reset();
+
+    currentFilterState.searchText = 'angular';
+    component.onFilterChange(currentFilterState);
+
+    expect(fetchFeedbackListSpy).not.toHaveBeenCalled();
+    expect(component.displayedFeedbackSummaries.length).toBe(1);
+    expect(component.displayedFeedbackSummaries[0].report_message_preview).toBe(
+      'Angular bug'
+    );
+  });
+
   it('should display all feedback when search text is empty', async () => {
     fetchFeedbackListSpy.and.returnValue(
       Promise.resolve({

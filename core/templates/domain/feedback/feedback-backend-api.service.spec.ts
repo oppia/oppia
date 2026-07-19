@@ -86,7 +86,7 @@ describe('Feedback backend api service', () => {
       start: new Date('2021-01-01'),
       end: new Date('2021-02-01'),
     },
-    technicalTeam: TechnicalTeamType.CORE,
+    technicalTeam: TechnicalTeamType.TECH_INTERNAL,
   };
 
   const filterState3 = {
