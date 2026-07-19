@@ -559,9 +559,11 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         return [key.id() for key in attempt_keys]
 
     @classmethod
-    def _get_keys_for_attempt_ids(cls, attempt_ids: Sequence[str]):
+    def _get_keys_for_attempt_ids(
+        cls, attempt_ids: Sequence[str]
+    ) -> List[datastore_services.Key]:
         """Returns response keys for a set of attempt IDs in datastore-sized batches."""
-        keys = []
+        keys: List[datastore_services.Key] = []
         for index in range(
             0, len(attempt_ids), _ATTEMPT_ID_IN_FILTER_BATCH_SIZE
         ):
