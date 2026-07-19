@@ -337,7 +337,6 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    // @ts-ignore
     expect(component['_getDataUrl']()).toContain('abbrev-topic/1');
   }));
 
@@ -360,7 +359,6 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    // @ts-ignore
     expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/arc/1');
   }));
 
@@ -382,7 +380,6 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    // @ts-ignore
     expect(component['_getRetryUrl']()).toContain(
       'abbrev-topic/mastery-challenge'
     );
