@@ -46,6 +46,7 @@ interface CertificateOfferingDetailsFormData {
 @Component({
   selector: 'oppia-certificate-offering-details',
   templateUrl: './certificate-offering-details.component.html',
+  styleUrls: ['./certificate-offering-details.component.css'],
 })
 export class CertificateOfferingDetailsComponent implements OnInit, OnChanges {
   readonly TITLE_MAX_LENGTH = 80;
