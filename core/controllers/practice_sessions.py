@@ -150,24 +150,6 @@ class PracticeSessionsPageDataHandler(
         """
         return story_fetchers.get_all_nodes_for_topic(topic)
 
-    def _get_all_arcs_for_topic(
-        self, topic: topic_domain.Topic
-    ) -> List[story_domain.Arc]:
-        """Returns all arcs across all published stories in the topic.
-
-        Args:
-            topic: Topic. The topic object.
-
-        Returns:
-            list(Arc). All arcs in order.
-        """
-        return [
-            arc
-            for _, arc in story_fetchers.get_all_arcs_with_stories_for_topic(
-                topic
-            )
-        ]
-
     def _get_skill_ids_for_node(
         self, topic: topic_domain.Topic, node_id: str
     ) -> List[str]:
@@ -221,17 +203,11 @@ class PracticeSessionsPageDataHandler(
         if arc_index < 1:
             return []
 
-        all_arcs = self._get_all_arcs_for_topic(topic)
-        if arc_index > len(all_arcs):
-            return []
-
-        arc = all_arcs[arc_index - 1]
-
-        # Find the story that contains this arc to get the node IDs.
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic
         )
-        for story, story_arc in arcs_with_stories:
-            if story_arc.id == arc.id:
-                return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
-        return []
+        if arc_index > len(arcs_with_stories):
+            return []
+
+        story, arc = arcs_with_stories[arc_index - 1]
+        return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
