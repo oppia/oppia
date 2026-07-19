@@ -8427,3 +8427,312 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
             )
 
         self.assertEqual(response['secret'], 'secret')
+
+
+class CanAccessTechnicalFeedbackDashboardPageDecoratorTests(
+    test_utils.GenericTestBase
+):
+    """Tests for can_access_technical_feedback_dashboard decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_technical_feedback_dashboard
+        def get(self) -> None:
+            self.render_json({'success': 1})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
+
+        self.add_user_role(
+            self.TECH_LEAD_USERNAME,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
+        )
+
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/technical-feedback-dashboard', self.MockHandler
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_normal_user_cannot_access_technical_feedback_dashboard_page(
+        self,
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/technical-feedback-dashboard', expected_status_int=401
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access technical feedback dashboard page.',
+        )
+        self.logout()
+
+    def test_guest_user_cannot_access_technical_feedback_dashboard_page(
+        self,
+    ) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/technical-feedback-dashboard', expected_status_int=401
+            )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+        self.logout()
+
+    def test_super_admin_cannot_access_technical_feedback_dashboard_page(
+        self,
+    ) -> None:
+        self.login(self.system_email_address)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/technical-feedback-dashboard', expected_status_int=401
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access technical feedback dashboard page.',
+        )
+        self.logout()
+
+    def test_tech_lead_can_access_technical_feedback_dashboard_page(
+        self,
+    ) -> None:
+        self.login(self.TECH_LEAD_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/technical-feedback-dashboard')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessPlatformFeedbackReportsDecoratorTests(
+    test_utils.GenericTestBase
+):
+    """Tests for can_access_platform_feedback_reports decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'dashboard': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES,
+                },
+            },
+            'dashboard_id': {
+                'schema': {
+                    'type': 'basestring',
+                },
+            },
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_platform_feedback_reports
+        def get(self, dashboard: str, dashboard_id: str) -> None:
+            del dashboard
+            del dashboard_id
+            self.render_json({'success': 1})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.system_email_address = 'system@example.com'
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
+
+        self.add_user_role(
+            self.TECH_LEAD_USERNAME,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
+        )
+
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/platform-feedback/<dashboard>/<dashboard_id>',
+                        self.MockHandler,
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+        self.save_new_valid_exploration('exp_id', self.owner_id)
+
+    def test_normal_user_cannot_access_platform_feedback_reports(
+        self,
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access technical feedback dashboard page.',
+        )
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-internal',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access technical feedback dashboard page.',
+        )
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/curriculum/exp_id',
+                expected_status_int=401,
+            )
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to edit this exploration.',
+        )
+        self.logout()
+
+    def test_guest_user_cannot_access_platform_feedback_reports(
+        self,
+    ) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-internal',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/curriculum/exp_id',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+        self.logout()
+
+    def test_curriculum_admin_can_only_access_creator_feedback_reports(
+        self,
+    ) -> None:
+        self.login(self.system_email_address)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/curriculum/exp_id',
+                expected_status_int=200,
+            )
+        self.assertEqual(response['success'], 1)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access technical feedback dashboard page.',
+        )
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-internal',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access technical feedback dashboard page.',
+        )
+        self.logout()
+
+    def test_tech_lead_can_access_technical_feedback_dashboard_page(
+        self,
+    ) -> None:
+        self.login(self.TECH_LEAD_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-external'
+            )
+
+        self.assertEqual(response['success'], 1)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/tech-internal'
+            )
+
+        self.assertEqual(response['success'], 1)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/curriculum/exp_id',
+                expected_status_int=401,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to edit this exploration.',
+        )
+        self.logout()
+
+    def test_invalid_technical_dashboard_id_raises_invalid_input_error(
+        self,
+    ) -> None:
+        self.login(self.TECH_LEAD_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/platform-feedback/technical/invalid_dashboard_id',
+                expected_status_int=400,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Invalid technical feedback team: invalid_dashboard_id.',
+        )
+        self.logout()

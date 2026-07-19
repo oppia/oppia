@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core import feconf
 from core.domain import general_feedback_domain, general_feedback_services
 from core.platform import models
@@ -88,12 +90,12 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             page_url='https://example.com',
         )
 
-        self.assertEqual(report.feedback_text, 'There is a typo.')
+        self.assertEqual(report.report_message, 'There is a typo.')
         self.assertEqual(report.source, feconf.SOURCE_LESSON)
         self.assertEqual(report.platform, feconf.PLATFORM_WEB)
         self.assertEqual(
             report.destination_dashboard,
-            feconf.DESTINATION_CREATOR,
+            feconf.DESTINATION_CURRICULUM,
         )
         self.assertEqual(report.category, feconf.CATEGORY_TYPO)
         self.assertEqual(report.lesson_metadata, self.get_lesson_metadata())
@@ -102,7 +104,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_platform_report_for_site_maps_source_to_app(self) -> None:
         report = general_feedback_services.create_platform_report(
             feedback_text='The page is broken.',
-            source='site',
+            source='app',
             category=None,
             lesson_metadata=None,
             session_info=None,
@@ -115,7 +117,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertEqual(report.source, feconf.SOURCE_APP)
         self.assertEqual(
             report.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_LEAP_TEAM,
+            feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
         )
         self.assertIsNone(report.category)
         self.assertIsNone(report.lesson_metadata)
@@ -227,7 +229,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     def test_create_platform_report_routes_to_core_dashboard(self) -> None:
         report = general_feedback_services.create_platform_report(
             feedback_text='Technical issue.',
-            source='site',
+            source='app',
             page_url='https://oppia.org/create/12',
             category=None,
             lesson_metadata=None,
@@ -239,5 +241,412 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             report.destination_dashboard,
-            feconf.DESTINATION_TECHNICAL_CORE_TEAM,
+            feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
         )
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_creator_dashboard_for_technical_feedback(
+        self,
+    ) -> None:
+        report1 = general_feedback_services.create_platform_report(
+            feedback_text='App crashed.',
+            source='app',
+            category=None,
+            lesson_metadata=None,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        report2 = general_feedback_services.create_platform_report(
+            feedback_text='App crashed.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Feedback does not belong to the requested dashboard.'
+        ):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report1.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Feedback does not belong to the requested exploration.'
+        ):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report2.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='invalid_exp_id',
+            )
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_invalid_technical_team(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='App crashed.',
+            source='app',
+            category=None,
+            lesson_metadata=None,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Invalid technical feedback team.'
+        ):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_TECHNICAL,
+                dashboard_id='INVALID_TEAM',
+            )
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_mismatched_technical_team(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='App crashed.',
+            source='app',
+            category=None,
+            lesson_metadata=None,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Feedback does not belong to the requested dashboard.'
+        ):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_TECHNICAL,
+                dashboard_id=feconf.DESTINATION_TECHNICAL_INTERNAL_TEAM,
+            )
+
+    def test_get_platform_feedback_returns_domain_object(self) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        retrieved_report = general_feedback_services.get_platform_feedback(
+            report.id
+        )
+
+        self.assertIsNotNone(retrieved_report)
+        assert retrieved_report is not None
+        self.assertEqual(retrieved_report.id, report.id)
+        self.assertEqual(retrieved_report.report_message, 'There is a typo.')
+
+    def test_get_platform_feedback_returns_none_for_missing_report(
+        self,
+    ) -> None:
+        self.assertIsNone(
+            general_feedback_services.get_platform_feedback('missing_report')
+        )
+
+    def test_get_platform_feedback_summaries_filters_creator_by_exploration(
+        self,
+    ) -> None:
+        other_lesson_metadata = self.get_lesson_metadata()
+        other_lesson_metadata['exploration_id'] = 'other_exp_id'
+        expected_report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+        general_feedback_services.create_platform_report(
+            feedback_text='There is another typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=other_lesson_metadata,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        summaries, next_cursor, more = (
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+        )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0]['id'], expected_report.id)
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_get_platform_feedback_summaries_filters_technical_dashboard(
+        self,
+    ) -> None:
+        expected_report = general_feedback_services.create_platform_report(
+            feedback_text='The donate page is broken.',
+            source='app',
+            category=None,
+            lesson_metadata=None,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/donate',
+        )
+        general_feedback_services.create_platform_report(
+            feedback_text='The create page is broken.',
+            source='app',
+            category=None,
+            lesson_metadata=None,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/create',
+        )
+
+        summaries, next_cursor, more = (
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard=feconf.DESTINATION_TECHNICAL,
+                dashboard_id=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+            )
+        )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0]['id'], expected_report.id)
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_get_platform_feedback_summaries_rejects_invalid_dashboard(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, 'Invalid dashboard: invalid'):
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard='invalid',
+                dashboard_id='exp_id',
+            )
+
+    def test_get_platform_feedback_summaries_rejects_invalid_technical_team(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            ValueError, 'Invalid technical feedback team: invalid'
+        ):
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard=feconf.DESTINATION_TECHNICAL,
+                dashboard_id='invalid',
+            )
+
+    def test_update_platform_feedback_status_for_creator_feedback_tab_updates_model(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        updated_report = general_feedback_services.update_platform_feedback_status_for_dashboard(
+            report_id=report.id,
+            new_status=feconf.STATUS_CHOICES_FIXED,
+            dashboard=feconf.DESTINATION_CURRICULUM,
+            dashboard_id='exp_id',
+        )
+
+        self.assertIsNotNone(updated_report)
+        assert updated_report is not None
+        self.assertEqual(updated_report.status, feconf.STATUS_CHOICES_FIXED)
+
+    def test_update_platform_feedback_status_for_dashboard_fetches_once(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        with mock.patch.object(
+            general_feedback_models.PlatformFeedbackModel,
+            'get_by_id',
+            wraps=general_feedback_models.PlatformFeedbackModel.get_by_id,
+        ) as mock_get_by_id:
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+
+        mock_get_by_id.assert_called_once_with(report.id)
+
+    def test_update_platform_feedback_status_for_dashboard_returns_none_for_missing_report(
+        self,
+    ) -> None:
+        self.assertIsNone(
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id='missing_report',
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+        )
+
+    def test_update_platform_feedback_status_for_dashboard_returns_none_for_deleted_report(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+        model = general_feedback_models.PlatformFeedbackModel.get_by_id(
+            report.id
+        )
+        assert model is not None
+        model.delete()
+
+        self.assertIsNone(
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+        )
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_invalid_status(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, 'Invalid status: invalid'):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id='report_id',
+                new_status='invalid',
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_other_dashboard(
+        self,
+    ) -> None:
+        other_lesson_metadata = self.get_lesson_metadata()
+        other_lesson_metadata['exploration_id'] = 'other_exp_id'
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=other_lesson_metadata,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Feedback does not belong to the requested exploration.'
+        ):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard=feconf.DESTINATION_CURRICULUM,
+                dashboard_id='exp_id',
+            )
+
+    def test_update_platform_feedback_status_for_dashboard_succeeds_for_technical_dashboard(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a bug.',
+            source='app',
+            category=None,
+            lesson_metadata=None,
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        updated_report = general_feedback_services.update_platform_feedback_status_for_dashboard(
+            report_id=report.id,
+            new_status=feconf.STATUS_CHOICES_FIXED,
+            dashboard=feconf.DESTINATION_TECHNICAL,
+            dashboard_id=feconf.DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+        )
+
+        self.assertIsNotNone(updated_report)
+        assert updated_report is not None
+        self.assertEqual(updated_report.status, feconf.STATUS_CHOICES_FIXED)
+
+    def test_update_platform_feedback_status_for_dashboard_rejects_invalid_dashboard(
+        self,
+    ) -> None:
+        report = general_feedback_services.create_platform_report(
+            feedback_text='There is a typo.',
+            source='lesson',
+            category=feconf.CATEGORY_TYPO,
+            lesson_metadata=self.get_lesson_metadata(),
+            session_info=None,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            include_technical_logs=False,
+            page_url='https://oppia.org/learn',
+        )
+
+        with self.assertRaisesRegex(ValueError, 'Invalid dashboard.'):
+            general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                dashboard='invalid',
+                dashboard_id='exp_id',
+            )
