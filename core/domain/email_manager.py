@@ -561,7 +561,7 @@ def require_sender_id_is_valid(intent: str, sender_id: str) -> None:
         )
 
 
-def _get_rendered_email_footer() -> str:
+def get_rendered_email_footer() -> str:
     """Returns the email footer with its preferences-page URL resolved.
 
     EMAIL_FOOTER may contain
@@ -867,7 +867,7 @@ def send_post_signup_email(
             return
 
     recipient_username = user_services.get_username(user_id)
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         recipient_username,
         email_body_content,
@@ -977,7 +977,7 @@ def send_moderator_action_email(
     # called.
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
     full_email_content = '%s<br><br>%s<br><br>%s<br><br>%s' % (
         email_salutation_html,
         email_body,
@@ -1081,7 +1081,7 @@ def send_role_notification_email(
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
     email_body = email_body_template % (
         recipient_username,
         inviter_username,
@@ -1170,7 +1170,7 @@ def send_emails_to_subscribers(
     assert isinstance(noreply_email_address, str)
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
-            email_footer = _get_rendered_email_footer()
+            email_footer = get_rendered_email_footer()
             email_body = email_body_template % (
                 username,
                 creator_name,
@@ -1257,7 +1257,7 @@ def send_feedback_message_email(
         (count_messages, 's') if count_messages > 1 else ('a', '')
     )
 
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
 
     email_body = email_body_template % (
         recipient_username,
@@ -1375,7 +1375,7 @@ def send_suggestion_email(
     can_users_receive_email = can_users_receive_thread_email(
         recipient_list, exploration_id, True
     )
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
@@ -1456,7 +1456,7 @@ def send_instant_feedback_message_email(
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if recipient_preferences.can_receive_feedback_message_email:
-        email_footer = _get_rendered_email_footer()
+        email_footer = get_rendered_email_footer()
         email_body = email_body_template % (
             recipient_username,
             thread_title,
@@ -1522,7 +1522,7 @@ def send_flag_exploration_email(
 
     reporter_username = user_services.get_username(reporter_id)
 
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
 
     email_body = email_body_template % (
         reporter_username,
@@ -1602,7 +1602,7 @@ def send_mail_to_onboard_new_reviewers(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = _get_rendered_email_footer()
+        email_footer = get_rendered_email_footer()
         email_body = email_body_template % (
             recipient_username,
             category,
@@ -1668,7 +1668,7 @@ def send_mail_to_notify_users_to_review(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = _get_rendered_email_footer()
+        email_footer = get_rendered_email_footer()
         email_body = email_body_template % (
             recipient_username,
             category,
@@ -2295,7 +2295,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         )
     )
 
-    email_footer = _get_rendered_email_footer()
+    email_footer = get_rendered_email_footer()
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
