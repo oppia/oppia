@@ -98,11 +98,13 @@ class LessonFeedbackCleanupJob(base_jobs.JobBase):
             else CLOSED_LESSON_FEEDBACK_RETENTION_DAYS
         )
 
-        return datetime.datetime.now(datetime.timezone.utc).replace(
+        expired = datetime.datetime.now(datetime.timezone.utc).replace(
             tzinfo=None
         ) >= lesson_feedback_model.created_on + datetime.timedelta(
             days=retention_days
         )
+
+        return bool(expired)
 
     def create_count_job_run_result(
         self,
@@ -207,11 +209,14 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
         platform_feedback_model: general_feedback_models.PlatformFeedbackModel,
     ) -> bool:
         """Returns whether the platform feedback has exceeded its retention period."""
-        return datetime.datetime.now(datetime.timezone.utc).replace(
+
+        expired = datetime.datetime.now(datetime.timezone.utc).replace(
             tzinfo=None
         ) >= platform_feedback_model.created_on + datetime.timedelta(
             days=PLATFORM_FEEDBACK_RETENTION_DAYS
         )
+
+        return bool(expired)
 
     def delete_platform_feedback_screenshot(
         self,

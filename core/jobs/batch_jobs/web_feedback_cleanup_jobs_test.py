@@ -21,12 +21,13 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.domain import fs_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import web_feedback_cleanup_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, List, Type
+from typing import Final, List, Type, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -373,19 +374,18 @@ class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
     def test_screenshot_deletion_does_nothing_when_screenshot_is_missing(
         self,
     ) -> None:
-        no_filename_model = self.create_platform_feedback_model(
-            'no_filename_feedback_id',
+        no_screenshot_model = self.create_platform_feedback_model(
+            'no_screenshot_feedback_id',
             datetime.datetime.utcnow(),
-            screenshot_entity_id='screenshot_entity_id',
         )
-        no_entity_id_model = self.create_platform_feedback_model(
-            'no_entity_id_feedback_id',
-            datetime.datetime.utcnow(),
-            screenshot_filename='screenshot.png',
+        # Here we use cast because self.job is typed as JobBase in JobTestBase,
+        # but this test always runs PlatformFeedbackCleanupJob, which defines
+        # delete_platform_feedback_screenshot().
+        job = cast(
+            web_feedback_cleanup_jobs.PlatformFeedbackCleanupJob,
+            self.job,
         )
-
-        self.job.delete_platform_feedback_screenshot(no_filename_model)
-        self.job.delete_platform_feedback_screenshot(no_entity_id_model)
+        job.delete_platform_feedback_screenshot(no_screenshot_model)
 
         self.assertEqual(
             PlatformFeedbackCleanupJobTestBase.deleted_filepaths, []
@@ -400,13 +400,18 @@ class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
         )
 
         with self.swap(
-            web_feedback_cleanup_jobs.fs_services,
+            fs_services,
             'GcsFileSystem',
             self.FakeGcsFileSystem,
         ):
-            self.job.delete_platform_feedback_screenshot(
-                platform_feedback_model
+            # Here we use cast because self.job is typed as JobBase in JobTestBase,
+            # but this test always runs PlatformFeedbackCleanupJob, which defines
+            # delete_platform_feedback_screenshot().
+            job = cast(
+                web_feedback_cleanup_jobs.PlatformFeedbackCleanupJob,
+                self.job,
             )
+            job.delete_platform_feedback_screenshot(platform_feedback_model)
 
         self.assertEqual(
             PlatformFeedbackCleanupJobTestBase.deleted_filepaths,
@@ -439,7 +444,7 @@ class PlatformFeedbackCleanupAuditJobTests(PlatformFeedbackCleanupJobTestBase):
         self.put_multi([expired_feedback_model, expired_session_log_model])
 
         with self.swap(
-            web_feedback_cleanup_jobs.fs_services,
+            fs_services,
             'GcsFileSystem',
             self.FakeGcsFileSystem,
         ):
