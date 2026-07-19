@@ -459,6 +459,59 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             gae_models.CertificateAssessmentResponseModel.get_by_id(response.id)
         )
 
+    def test_has_reference_and_apply_deletion_policy_handle_large_attempt_sets(
+        self,
+    ) -> None:
+        responses = []
+        for index in range(31):
+            attempt = gae_models.CertificateAssessmentAttemptModel.create(
+                learner_id='learner_id_1',
+                total_score=75.0,
+                attempt_index=index + 1,
+                attempt_data={
+                    'topic_id_101': {
+                        'total_related_questions': 1,
+                        'total_correct_questions': 1,
+                    }
+                },
+                version_data={
+                    'certificate_id': 'cert_abc123',
+                    'certificate_version': 1,
+                    'topic_versions': {'topic_id_101': 2},
+                    'question_versions': {'question_id_1': 1},
+                    'question_topic_links': {'question_id_1': ['topic_id_101']},
+                },
+                started_at=datetime.datetime.utcnow(),
+                finished_at=None,
+                is_submitted=False,
+            )
+            responses.append(
+                gae_models.CertificateAssessmentResponseModel.create(
+                    attempt_id=attempt.id,
+                    question_id='question_id_1',
+                    question_version=1,
+                    selected_answer='Option A',
+                    is_correct=True,
+                )
+            )
+
+        self.assertTrue(
+            gae_models.CertificateAssessmentResponseModel.has_reference_to_user_id(
+                'learner_id_1'
+            )
+        )
+
+        gae_models.CertificateAssessmentResponseModel.apply_deletion_policy(
+            'learner_id_1'
+        )
+
+        for response in responses:
+            self.assertIsNone(
+                gae_models.CertificateAssessmentResponseModel.get_by_id(
+                    response.id
+                )
+            )
+
     def test_create_and_retrieve_lifecycle(self) -> None:
         response = certificate_models.CertificateAssessmentResponseModel.create(
             attempt_id='attempt_id_1',

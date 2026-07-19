@@ -42,6 +42,11 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
+# Fetch query results in batches of this size when filtering by attempt_id. This is
+# necessary because the datastore has a limit of 30 items in an 'IN' filter.
+# Reference: https://docs.cloud.google.com/datastore/docs/concepts/queries#in
+_ATTEMPT_ID_IN_FILTER_BATCH_SIZE = 29
+
 
 class CertificateAssessmentResponseCreateDict(TypedDict):
     """Input needed to create a certificate assessment response."""
@@ -546,33 +551,45 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
+    def _get_attempt_ids_for_user(cls, user_id: str) -> List[str]:
+        """Returns the IDs of all attempts associated with a user."""
+        attempt_keys = CertificateAssessmentAttemptModel.query(
+            CertificateAssessmentAttemptModel.learner_id == user_id
+        ).fetch(keys_only=True)
+        return [key.id() for key in attempt_keys]
+
+    @classmethod
+    def _get_keys_for_attempt_ids(cls, attempt_ids: Sequence[str]):
+        """Returns response keys for a set of attempt IDs in datastore-sized batches."""
+        keys = []
+        for index in range(
+            0, len(attempt_ids), _ATTEMPT_ID_IN_FILTER_BATCH_SIZE
+        ):
+            batch_attempt_ids = attempt_ids[
+                index : index + _ATTEMPT_ID_IN_FILTER_BATCH_SIZE
+            ]
+            keys.extend(
+                cls.query(cls.attempt_id.IN(batch_attempt_ids)).fetch(
+                    keys_only=True
+                )
+            )
+        return keys
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether any responses exist for attempts owned by a learner."""
-        attempt_models: Sequence[CertificateAssessmentAttemptModel] = (
-            CertificateAssessmentAttemptModel.query(
-                CertificateAssessmentAttemptModel.learner_id == user_id
-            ).fetch(keys_only=False)
-        )
-        attempt_ids = [attempt.id for attempt in attempt_models]
+        attempt_ids = cls._get_attempt_ids_for_user(user_id)
         if not attempt_ids:
             return False
-        return (
-            cls.query(cls.attempt_id.IN(attempt_ids)).get(keys_only=True)
-            is not None
-        )
+        return bool(cls._get_keys_for_attempt_ids(attempt_ids))
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
         """Delete all responses attached to the learner's attempts."""
-        attempt_models: Sequence[CertificateAssessmentAttemptModel] = (
-            CertificateAssessmentAttemptModel.query(
-                CertificateAssessmentAttemptModel.learner_id == user_id
-            ).fetch(keys_only=False)
-        )
-        attempt_ids = [attempt.id for attempt in attempt_models]
+        attempt_ids = cls._get_attempt_ids_for_user(user_id)
         if not attempt_ids:
             return
-        keys = cls.query(cls.attempt_id.IN(attempt_ids)).fetch(keys_only=True)
+        keys = cls._get_keys_for_attempt_ids(attempt_ids)
         datastore_services.delete_multi(keys)
 
     @classmethod
