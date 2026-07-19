@@ -238,22 +238,16 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   }
 
   private _determineSessionType(): void {
-    const pathname = this.urlService.getPathname();
-    if (pathname.match(/\/practice\//g)) {
-      const segments = pathname.split('/');
-      if (segments.length >= 6 && /^\d+$/.test(segments[5])) {
-        this.sessionType = PracticeSessionType.Lesson;
-        this.nodeId = decodeURIComponent(segments[5]);
-      } else if (this.stringifiedSubtopicIds) {
-        this.sessionType = PracticeSessionType.Legacy;
-      }
-    } else if (pathname.match(/\/test\/arc\//g)) {
+    const nodeId = this.urlService.getNodeIdFromPracticeUrl();
+    const arcId = this.urlService.getArcIdFromUrl();
+
+    if (nodeId) {
+      this.sessionType = PracticeSessionType.Lesson;
+      this.nodeId = nodeId;
+    } else if (arcId) {
       this.sessionType = PracticeSessionType.Arc;
-      const match = pathname.match(/\/test\/arc\/(arc-\d+|\d+)/);
-      if (match) {
-        this.arcId = decodeURIComponent(match[1]);
-      }
-    } else if (pathname.match(/\/mastery-challenge/g)) {
+      this.arcId = arcId;
+    } else if (this.urlService.getPathname().match(/\/mastery-challenge/g)) {
       this.sessionType = PracticeSessionType.Mastery;
     } else if (this.stringifiedSubtopicIds) {
       this.sessionType = PracticeSessionType.Legacy;

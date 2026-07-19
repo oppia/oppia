@@ -417,17 +417,7 @@ class PracticeSessionAccessValidationPage(
         Returns:
             list(StoryNode). All nodes in order.
         """
-        story_ids = topic.get_canonical_story_ids(include_only_published=True)
-        story_ids.extend(
-            topic.get_additional_story_ids(include_only_published=True)
-        )
-        stories = story_fetchers.get_stories_by_ids(story_ids)
-        all_nodes: List[story_domain.StoryNode] = []
-        for story in stories:
-            if story is None:
-                continue
-            all_nodes.extend(story.story_contents.nodes)
-        return all_nodes
+        return story_fetchers.get_all_nodes_for_topic(topic)
 
     def _get_all_arcs_for_topic(
         self, topic: topic_domain.Topic
@@ -440,17 +430,12 @@ class PracticeSessionAccessValidationPage(
         Returns:
             list(Arc). All arcs in order.
         """
-        story_ids = topic.get_canonical_story_ids(include_only_published=True)
-        story_ids.extend(
-            topic.get_additional_story_ids(include_only_published=True)
-        )
-        stories = story_fetchers.get_stories_by_ids(story_ids)
-        all_arcs: List[story_domain.Arc] = []
-        for story in stories:
-            if story is None:
-                continue
-            all_arcs.extend(story.story_contents.arcs)
-        return all_arcs
+        return [
+            arc
+            for _, arc in story_fetchers.get_all_arcs_with_stories_for_topic(
+                topic
+            )
+        ]
 
     def _validate_node_id(
         self, topic: topic_domain.Topic, node_id: str

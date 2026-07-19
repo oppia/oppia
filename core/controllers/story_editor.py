@@ -254,7 +254,7 @@ class StoryPublishHandler(
             try:
                 topic_services.publish_story(topic_id, story_id, self.user_id)
             except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+                raise self.InvalidInputException(e) from e
         else:
             topic_services.unpublish_story(
                 topic_id,
