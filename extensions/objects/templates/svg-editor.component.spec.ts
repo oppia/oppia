@@ -1437,7 +1437,7 @@ describe('SvgEditor with image save destination as local storage', () => {
         },
       ],
       getAttribute: (attr: string) => null,
-    } as unknown as Element;
+    };
     const mockObj = {
       toObject: () => ({
         left: 50,
@@ -1446,13 +1446,10 @@ describe('SvgEditor with image save destination as local storage', () => {
         text: 'GoalHowto cook',
       }),
       get: (attr: string) => null,
-    } as unknown as fabric.Object;
+    };
 
     component.diagramWidth = 450;
-    // This throws "Property 'loadTextObject' is private". We need to
-    // suppress this error because we need to test the private method directly.
-    // @ts-ignore
-    component.loadTextObject(mockElement, mockObj);
+    (component as any).loadTextObject(mockElement, mockObj);
 
     const addedText = component.canvas.getObjects()[
       component.canvas.getObjects().length - 1
@@ -1480,7 +1477,7 @@ describe('SvgEditor with image save destination as local storage', () => {
         },
       ],
       getAttribute: (attr: string) => null,
-    } as unknown as Element;
+    };
     const mockObj = {
       toObject: () => ({
         left: 50,
@@ -1489,13 +1486,10 @@ describe('SvgEditor with image save destination as local storage', () => {
         text: 'GoalTotalText',
       }),
       get: (attr: string) => null,
-    } as unknown as fabric.Object;
+    };
 
     component.diagramWidth = 450;
-    // This throws "Property 'loadTextObject' is private". We need to
-    // suppress this error because we need to test the private method directly.
-    // @ts-ignore
-    component.loadTextObject(mockElement, mockObj);
+    (component as any).loadTextObject(mockElement, mockObj);
 
     const addedText = component.canvas.getObjects()[
       component.canvas.getObjects().length - 1
@@ -1538,7 +1532,6 @@ describe('SvgEditor with image save destination as local storage', () => {
 
     component.centerContent();
 
-    // 490 / 600 = 0.81666...
     expect(mockRect.scaleX).toBeCloseTo(490 / 600, 3);
   });
 });
