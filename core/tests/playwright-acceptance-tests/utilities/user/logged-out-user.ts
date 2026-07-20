@@ -53,6 +53,12 @@ const signInButton = '.conversation-skin-login-button-text';
 const singInButtonInProgressModal = '.sign-in-link';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const feedbackSelector = '.e2e-test-conversation-feedback-latest';
+const generateAttributionSelector = '.e2e-test-generate-attribution';
+const attributionHtmlSectionSelector = '.attribution-html-section';
+const attributionHtmlCodeSelector = '.attribution-html-code';
+const attributionPrintTextSelector = '.attribution-print-text';
+const closeAttributionModalButton = '.attribution-modal button';
+const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
 
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
@@ -381,6 +387,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to close the attribution modal.
+   */
+  async closeAttributionModal(): Promise<void> {
+    await this.expectElementToBeVisible(closeAttributionModalButton);
+    await this.clickOnElementWithSelector(closeAttributionModalButton);
+    showMessage('Attribution modal closed successfully');
+
+    await this.expectElementToBeVisible(closeAttributionModalButton, false);
+  }
+
+  /**
    * Function to close the hint modal.
    */
   async closeHintModal(): Promise<void> {
@@ -518,6 +535,41 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectAnswerInputValueToBe(value: string): Promise<void> {
     await this.expectElementValueToBe(floatFormInput, value);
+  }
+
+  /**
+   * Checks if the HTML string is present in the HTML section.
+   * @param {string} htmlString - The HTML string to check for.
+   */
+  async expectAttributionInHtmlSectionToBe(htmlString: string): Promise<void> {
+    await this.expectElementToBeVisible(attributionHtmlCodeSelector);
+    const attributionHtmlCode = await this.getTextContent(
+      attributionHtmlCodeSelector
+    );
+
+    if (!attributionHtmlCode.includes(htmlString)) {
+      throw new Error(
+        `Expected HTML string "${htmlString}" not found in the HTML section. Actual HTML: "${attributionHtmlCode}"`
+      );
+    }
+  }
+
+  /**
+   * Checks if the text string is present in the print text.
+   * @param {string} textString - The text string to check for.
+   */
+  async expectAttributionInPrintToBe(textString: string): Promise<void> {
+    await this.expectElementToBeVisible(attributionPrintTextSelector);
+
+    const attributionPrintText = await this.getTextContent(
+      attributionPrintTextSelector
+    );
+
+    if (!attributionPrintText.includes(textString)) {
+      throw new Error(
+        `Expected text string "${textString}" not found in the print text. Actual text: "${attributionPrintText}"`
+      );
+    }
   }
 
   /**
@@ -1253,6 +1305,15 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Generates attribution
+   */
+  async generateAttribution(): Promise<void> {
+    await this.expectElementToBeVisible(generateAttributionSelector);
+    await this.clickOnElementWithSelector(generateAttributionSelector);
+    await this.expectElementToBeVisible(attributionHtmlSectionSelector);
+  }
+
+  /**
    * Goes through the sign up process.
    * @param {string} email - The email to sign up with.
    * @param {string} username - The username to sign up with.
@@ -1680,6 +1741,59 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.expectElementToBeVisible(loginPromptContainer, false);
+  }
+
+  /**
+   * Shares the exploration.
+   * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
+   * @param {string | null} explorationId - The id of the exploration.
+   */
+  async shareExplorationAndVerifyRedirect(
+    platform: string,
+    explorationId: string | null
+  ): Promise<void> {
+    await this.expectElementToBeVisible(shareExplorationButtonSelector);
+    await this.clickOnElementWithSelector(shareExplorationButtonSelector);
+
+    await this.waitForStaticAssetsToLoad();
+    await this.expectElementToBeVisible(
+      `.e2e-test-share-link-${platform.toLowerCase()}`
+    );
+    const aTag = await this.page.$(
+      `.e2e-test-share-link-${platform.toLowerCase()}`
+    );
+    if (!aTag) {
+      throw new Error(`No share link found for ${platform}.`);
+    }
+    const href = await this.page.evaluate(
+      a => (a as HTMLAnchorElement).href,
+      aTag
+    );
+    let expectedUrl: string;
+    switch (platform) {
+      case 'Facebook':
+        expectedUrl =
+          testConstants.SocialsShare.Facebook.Domain +
+          explorationId +
+          testConstants.SocialsShare.Facebook.queryString;
+        break;
+      case 'Twitter':
+        expectedUrl = testConstants.SocialsShare.Twitter.Domain + explorationId;
+        break;
+      case 'Classroom':
+        expectedUrl =
+          testConstants.SocialsShare.Classroom.Domain + explorationId;
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+
+    if (href !== expectedUrl) {
+      throw new Error(
+        `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
+      );
+    }
+    await this.closeAttributionModal();
   }
 
   /**
