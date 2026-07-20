@@ -80,7 +80,6 @@ const FILE_EXCLUSIONS_FOR_SEARCH = [
   'core/tests/test-dependencies',
   'core/templates/tests',
   'core/templates/utility/hashes.ts',
-  'angular-template-style-url-replacer.webpack-loader.js',
   'core/tests/playwright-acceptance-tests',
 ];
 
