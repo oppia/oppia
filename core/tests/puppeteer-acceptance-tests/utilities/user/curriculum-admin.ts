@@ -2724,11 +2724,11 @@ export class CurriculumAdmin extends TopicManager {
     for (const config of skillConfigs) {
       await this.createTopic(
         config.topicName,
-        config.topicName.toLowerCase().replace(/ /g, '-')
+        config.topicName.toLowerCase().replace(/ /g, '/')
       );
       await this.createSubtopicForTopic(
         config.subtopicName,
-        config.subtopicName.toLowerCase().replace(/ /g, '-'),
+        config.subtopicName.toLowerCase().replace(/ /g, '/'),
         config.topicName
       );
       await this.createSkillForTopic(config.skillName, config.topicName, false);
