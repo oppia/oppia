@@ -324,6 +324,7 @@
 	"I18N_LEAVE_LEARNER_GROUP_MODAL_BODY": "Sidd Dir sécher, datt Dir d'Grupp <b><[groupName]></b> verloosse wëllt?",
 	"I18N_LEAVE_LEARNER_GROUP_MODAL_BUTTON": "Verloossen",
 	"I18N_LEAVE_LEARNER_GROUP_MODAL_HEADER": "Léiergrupp verloossen?",
+	"I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG": "Är Beschreiwung ass e bëssen ze laang (<[characterCount]> Zeechen). Haalt se wgl. e bësse méi kuerz, fir datt eis Ekipp se séier iwwerpréiwe kann!",
 	"I18N_LESSON_HEADER": "Lektioun",
 	"I18N_LESSON_PLAYER_CLOSE_SIDEBAR": "Optiounen zoumaachen",
 	"I18N_LESSON_PLAYER_FEEDBACK_BUTTON": "Feedback",
