@@ -1449,7 +1449,9 @@ describe('SvgEditor with image save destination as local storage', () => {
     };
 
     component.diagramWidth = 450;
-    (component as any).loadTextObject(mockElement, mockObj);
+    // This throws "Property 'loadTextObject' is private". We need to suppress this error because we are specifically testing this private method with partial mock objects.
+    // @ts-expect-error
+    component.loadTextObject(mockElement, mockObj);
 
     const addedText = component.canvas.getObjects()[
       component.canvas.getObjects().length - 1
@@ -1489,7 +1491,9 @@ describe('SvgEditor with image save destination as local storage', () => {
     };
 
     component.diagramWidth = 450;
-    (component as any).loadTextObject(mockElement, mockObj);
+    // This throws "Property 'loadTextObject' is private". We need to suppress this error because we are specifically testing this private method with partial mock objects.
+    // @ts-expect-error
+    component.loadTextObject(mockElement, mockObj);
 
     const addedText = component.canvas.getObjects()[
       component.canvas.getObjects().length - 1
