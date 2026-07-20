@@ -474,8 +474,8 @@ const getDependenciesFromTypeScriptOrJavaScriptFile = (
   });
 
   // If the file ends with '.import.ts', we check if there is a mainpage file
-  // that corresponds to it and add it as a dependency since Webpack loads
-  // these.
+  // that corresponds to it and add it as a dependency since these are loaded
+  // as part of the build.
   if (file.endsWith('.import.ts')) {
     const mainPageFilePath = file.replace('.import.ts', '.mainpage.html');
     if (fs.existsSync(path.join(ROOT_DIRECTORY, mainPageFilePath))) {

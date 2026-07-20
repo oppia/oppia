@@ -82,8 +82,8 @@ import {RatingComputationService} from 'components/ratings/rating-computation/ra
 import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {ServicesConstants} from 'services/services.constants';
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
+// Relative path used as a workaround to get the angular compiler to not
+// complain.
 // TODO(#16309): Fix relative imports.
 import '../third-party-imports/ckeditor.import';
 
@@ -149,7 +149,7 @@ export const registerCustomElements = (injector: Injector): void => {
     // Check if the custom elements have been previously defined. We can't
     // redefine custom elements with the same id. Root cause for the element
     // being already defined is not yet known. Can possibly be a side effect of
-    // webpack and AoT bundles co-existing.
+    // AoT bundles co-existing.
     // TODO(#16718): Investigate custom element already defined error.
     if (
       customElements.get(
