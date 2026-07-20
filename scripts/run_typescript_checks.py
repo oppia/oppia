@@ -37,6 +37,7 @@ from typing import List, Optional, Sequence
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
+    'core/templates/components/oppia-angular-root.component.ts',
     'core/tests/build_sources/extensions/plugin.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/domain/question/question-update.service.ts',

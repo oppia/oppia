@@ -28,9 +28,9 @@ class MockTranslateService {
   instant(key: string): string {
     return key;
   }
-  onLangChange = {subscribe: () => {}};
-  get(key: string): any {
-    return {subscribe: () => {}};
+  onLangChange = {subscribe: (): void => {}};
+  get(key: string): {subscribe: () => void} {
+    return {subscribe: (): void => {}};
   }
 }
 
