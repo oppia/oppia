@@ -83,7 +83,7 @@ VALID_LESSON_REPORT_PAYLOAD: (
 VALID_SITE_REPORT_PAYLOAD: (
     general_feedback_domain.PlatformFeedbackSubmitPayloadDict
 ) = {
-    'source': 'site',
+    'source': 'app',
     'report_message': 'The site crashes on the home page.',
     'category': None,
     'lesson_metadata': None,
