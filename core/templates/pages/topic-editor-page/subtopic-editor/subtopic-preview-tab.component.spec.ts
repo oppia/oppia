@@ -39,6 +39,7 @@ describe('SubtopicPreviewTab', () => {
   let studyGuide: StudyGuide;
 
   let topicInitializedEventEmitter = new EventEmitter();
+  let topicReinitializedEventEmitter = new EventEmitter();
 
   let studyGuideLoadedEventEmitter = new EventEmitter();
 
@@ -170,6 +171,25 @@ describe('SubtopicPreviewTab', () => {
     component.editableThumbnailFilename = 'random_file_name.svg';
 
     topicInitializedEventEmitter.emit();
+
+    expect(component.subtopicId).toBe(1);
+    expect(component.editableTitle).toBe('Subtopic1');
+    expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+    expect(component.studyGuide).toEqual(studyGuide);
+  });
+
+  it('should call initEditor when topic is reinitialized with study guide', () => {
+    spyOnProperty(
+      topicEditorStateService,
+      'onTopicReinitialized'
+    ).and.returnValue(topicReinitializedEventEmitter);
+
+    component.ngOnInit();
+    component.subtopicId = 2;
+    component.editableTitle = 'random title';
+    component.editableThumbnailFilename = 'random_file_name.svg';
+
+    topicReinitializedEventEmitter.emit();
 
     expect(component.subtopicId).toBe(1);
     expect(component.editableTitle).toBe('Subtopic1');

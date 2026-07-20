@@ -451,4 +451,20 @@ describe('create new subtopic modal', function () {
       '#FF0000'
     );
   });
+
+  it('should update sectionContentHtml when localContentValueChange is called', () => {
+    component.sectionContentHtml = 'old-content';
+    component.localContentValueChange('new-content');
+    expect(component.sectionContentHtml).toBe('new-content');
+  });
+
+  it('should return schema', () => {
+    expect(component.getSchema()).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rows: 100,
+      },
+    });
+  });
 });

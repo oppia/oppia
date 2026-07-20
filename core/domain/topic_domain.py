@@ -32,7 +32,7 @@ from core.constants import constants
 # once the schema migration functions are moved outside the
 # domain file.
 from core.domain import fs_services  # pylint: disable=invalid-import-from
-from core.domain import change_domain, study_guide_domain, subtopic_page_domain
+from core.domain import change_domain, study_guide_domain
 
 from typing import Dict, Final, List, Literal, Optional, TypedDict
 
@@ -148,12 +148,6 @@ class TopicChange(change_domain.BaseChange):
         SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
         SUBTOPIC_PROPERTY_URL_FRAGMENT,
     ]
-
-    # The allowed list of subtopic page properties which can be used in
-    # update_subtopic_page_property command.
-    SUBTOPIC_PAGE_PROPERTIES: List[str] = (
-        subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES
-    )
 
     # The allowed list of study guide properties which can be used in
     # update_study_guide_property command.
@@ -313,19 +307,6 @@ class TopicChange(change_domain.BaseChange):
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {'property_name': SUBTOPIC_PROPERTIES},
-            'deprecated_values': {},
-        },
-        {
-            'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-            'required_attribute_names': [
-                'property_name',
-                'new_value',
-                'old_value',
-                'subtopic_id',
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
             'deprecated_values': {},
         },
         {
