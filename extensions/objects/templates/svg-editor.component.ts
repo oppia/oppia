@@ -635,7 +635,6 @@ export class SvgEditorComponent implements OnInit {
     delete textOptions.styles;
     const text = new fabric.Textbox(value, {
       ...textOptions,
-      text: value,
       width: textOptions.width || this.diagramWidth,
       type: 'textbox',
       strokeUniform: true,
