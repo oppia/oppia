@@ -18,14 +18,12 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
-    state_domain,
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
     subtopic_page_services,
     topic_domain,
     topic_services,
-    translation_domain,
     user_services,
 )
 from core.tests import test_utils
@@ -139,73 +137,6 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic],
             next_subtopic_id=2,
-        )
-        self.recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False,
-                        'duration_secs': 0.34234,
-                    }
-                }
-            }
-        }
-        self.written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {'translations_mapping': {'content': {}}}
-        self.subtopic_page_1.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {'html': '<p>hello world</p>', 'content_id': 'content'}
-            )
-        )
-        self.subtopic_page_1.update_page_contents_audio(
-            state_domain.RecordedVoiceovers.from_dict(
-                self.recorded_voiceovers_dict
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_1,
-            'Updated page contents',
-            [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'subtopic_id': self.subtopic_id_1,
-                        'property_name': 'page_contents_html',
-                        'new_value': '<p>hello world</p>',
-                        'old_value': '',
-                    }
-                )
-            ],
-        )
-        self.subtopic_page_2.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {'html': '<p>hello world 2</p>', 'content_id': 'content'}
-            )
-        )
-        self.subtopic_page_2.update_page_contents_audio(
-            state_domain.RecordedVoiceovers.from_dict(
-                self.recorded_voiceovers_dict
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_2,
-            'Updated page contents',
-            [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'subtopic_id': self.subtopic_id_2,
-                        'property_name': 'page_contents_html',
-                        'new_value': '<p>hello world 2</p>',
-                        'old_value': '',
-                    }
-                )
-            ],
         )
 
         self.topic_id_2 = 'topic_id_2'

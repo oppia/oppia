@@ -675,12 +675,6 @@ class EditableTopicDataHandler(
         ] = []
         for change in topic_and_subtopic_page_change_dicts:
             if change.cmd == (
-                subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
-            ):
-                topic_and_subtopic_page_change_list.append(
-                    subtopic_page_domain.SubtopicPageChange(change.to_dict())
-                )
-            elif change.cmd == (
                 study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
             ):
                 topic_and_subtopic_page_change_list.append(

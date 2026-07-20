@@ -1681,26 +1681,6 @@ class TopicChangeTests(test_utils.GenericTestBase):
                 }
             )
 
-    def test_topic_change_object_with_invalid_subtopic_page_property(
-        self,
-    ) -> None:
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            (
-                'Value for property_name in cmd update_subtopic_page_property: '
-                'invalid is not allowed'
-            ),
-        ):
-            topic_domain.TopicChange(
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'subtopic_id': 'subtopic_id',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
-            )
-
     def test_topic_change_object_with_add_subtopic(self) -> None:
         topic_change_object = topic_domain.TopicChange(
             {
@@ -1801,29 +1781,6 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.cmd, 'update_subtopic_property')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
         self.assertEqual(topic_change_object.property_name, 'title')
-        self.assertEqual(topic_change_object.new_value, 'new_value')
-        self.assertEqual(topic_change_object.old_value, 'old_value')
-
-    def test_topic_change_object_with_update_subtopic_page_property(
-        self,
-    ) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'update_subtopic_page_property',
-                'subtopic_id': 'subtopic_id',
-                'property_name': 'page_contents_html',
-                'new_value': 'new_value',
-                'old_value': 'old_value',
-            }
-        )
-
-        self.assertEqual(
-            topic_change_object.cmd, 'update_subtopic_page_property'
-        )
-        self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
-        self.assertEqual(
-            topic_change_object.property_name, 'page_contents_html'
-        )
         self.assertEqual(topic_change_object.new_value, 'new_value')
         self.assertEqual(topic_change_object.old_value, 'old_value')
 

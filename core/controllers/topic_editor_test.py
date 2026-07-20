@@ -859,16 +859,6 @@ class TopicEditorTests(
                     'new_value': 'A new name',
                 },
                 {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': 'page_contents_html',
-                    'old_value': {'html': '', 'content_id': 'content'},
-                    'subtopic_id': 1,
-                    'new_value': {
-                        'html': '<p>New Data</p>',
-                        'content_id': 'content',
-                    },
-                },
-                {
                     'cmd': 'update_study_guide_property',
                     'subtopic_id': 1,
                     'property_name': 'sections',
@@ -917,34 +907,6 @@ class TopicEditorTests(
                     'old_value': '',
                     'subtopic_id': 2,
                 },
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': 'page_contents_html',
-                    'old_value': {'html': '', 'content_id': 'content'},
-                    'new_value': {
-                        'html': '<p>New Value</p>',
-                        'content_id': 'content',
-                    },
-                    'subtopic_id': 2,
-                },
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': 'page_contents_audio',
-                    'old_value': {'voiceovers_mapping': {'content': {}}},
-                    'new_value': {
-                        'voiceovers_mapping': {
-                            'content': {
-                                'en': {
-                                    'filename': 'test.mp3',
-                                    'file_size_bytes': 100,
-                                    'needs_update': False,
-                                    'duration_secs': 0.34342,
-                                }
-                            }
-                        }
-                    },
-                    'subtopic_id': 2,
-                },
             ],
         }
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -973,53 +935,6 @@ class TopicEditorTests(
         )
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
-
-        # Test if the corresponding subtopic pages were created.
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
-        )
-        self.assertEqual(
-            {
-                'subtitled_html': {
-                    'html': '<p><strong>new heading</strong></p>\n\n<p>New Data</p>',
-                    'content_id': 'content',
-                },
-                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
-            },
-            json_response['subtopic_page_dict']['page_contents'],
-        )
-        json_response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 2)
-        )
-        self.assertEqual(
-            {
-                'subtitled_html': {
-                    'html': '<p>New Value</p>',
-                    'content_id': 'content',
-                },
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                        'content': {
-                            'en': {
-                                'file_size_bytes': 100,
-                                'filename': 'test.mp3',
-                                'needs_update': False,
-                                'duration_secs': 0.34342,
-                            }
-                        }
-                    }
-                },
-                'written_translations': {
-                    'translations_mapping': {'content': {}}
-                },
-            },
-            json_response['subtopic_page_dict']['page_contents'],
-        )
 
         # Test if the corresponding study guides were created.
         json_response = self.get_json(
@@ -1148,16 +1063,6 @@ class TopicEditorTests(
                     'new_value': 'A new name',
                 },
                 {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': 'page_contents_html',
-                    'old_value': {'html': '', 'content_id': 'content'},
-                    'subtopic_id': 1,
-                    'new_value': {
-                        'html': '<p>New Data</p>',
-                        'content_id': 'content',
-                    },
-                },
-                {
                     'cmd': 'update_study_guide_property',
                     'subtopic_id': 1,
                     'property_name': 'sections',
@@ -1204,34 +1109,6 @@ class TopicEditorTests(
                     'property_name': 'url_fragment',
                     'new_value': 'subtopic-two',
                     'old_value': '',
-                    'subtopic_id': 2,
-                },
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': 'page_contents_html',
-                    'old_value': {'html': '', 'content_id': 'content'},
-                    'new_value': {
-                        'html': '<p>New Value</p>',
-                        'content_id': 'content',
-                    },
-                    'subtopic_id': 2,
-                },
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': 'page_contents_audio',
-                    'old_value': {'voiceovers_mapping': {'content': {}}},
-                    'new_value': {
-                        'voiceovers_mapping': {
-                            'content': {
-                                'en': {
-                                    'filename': 'test.mp3',
-                                    'file_size_bytes': 100,
-                                    'needs_update': False,
-                                    'duration_secs': 0.34342,
-                                }
-                            }
-                        }
-                    },
                     'subtopic_id': 2,
                 },
             ],

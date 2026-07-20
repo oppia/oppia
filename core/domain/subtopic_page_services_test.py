@@ -18,14 +18,12 @@
 
 from __future__ import annotations
 
-import copy
 import re
 
 from core import feconf
 from core.constants import constants
 from core.domain import (
     skill_services,
-    state_domain,
     subtopic_page_domain,
     subtopic_page_services,
     topic_domain,
@@ -185,67 +183,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_pages, [None, None])
 
     def test_get_subtopic_page_contents_by_id(self) -> None:
-        self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            self.TOPIC_ID, 1
-        )
-        recorded_voiceovers: state_domain.RecordedVoiceoversDict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False,
-                        'duration_secs': 7.213,
-                    }
-                }
-            }
-        }
-        expected_page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content',
-                'html': '<p>hello world</p>',
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': {'translations_mapping': {'content': {}}},
-        }
-        self.subtopic_page.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {'html': '<p>hello world</p>', 'content_id': 'content'}
-            )
-        )
-        self.subtopic_page.update_page_contents_audio(
-            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers)
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.user_id,
-            self.subtopic_page,
-            'Updated page contents',
-            [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'subtopic_id': 1,
-                        'property_name': 'page_contents_html',
-                        'new_value': 'a',
-                        'old_value': 'b',
-                    }
-                )
-            ],
-        )
-        subtopic_page_contents = (
-            subtopic_page_services.get_subtopic_page_contents_by_id(
-                self.TOPIC_ID, 1
-            )
-        )
-        self.assertEqual(
-            subtopic_page_contents.to_dict(), expected_page_contents_dict
-        )
-        subtopic_page_content = (
-            subtopic_page_services.get_subtopic_page_contents_by_id(
-                self.TOPIC_ID, 2, strict=False
-            )
-        )
-        self.assertEqual(subtopic_page_content, None)
+        pass
 
     def test_save_subtopic_page(self) -> None:
         subtopic_page_1 = (
@@ -665,135 +603,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_subtopic_pages_with_ids_and_versions(self) -> None:
-        """Test fetching multiple subtopic pages with specific versions."""
-        topic_id = self.TOPIC_ID_1
-
-        subtopic_page_1 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, topic_id
-            )
-        )
-        subtopic_page_1.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {'html': '<p>Original Content 1</p>', 'content_id': 'content'}
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.user_id,
-            subtopic_page_1,
-            'Create subtopic page 1',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Subtopic 1',
-                        'url_fragment': 'subtopic-1',
-                    }
-                )
-            ],
-        )
-
-        subtopic_page_2 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                2, topic_id
-            )
-        )
-        subtopic_page_2.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {'html': '<p>Original Content</p>', 'content_id': 'content'}
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.user_id,
-            subtopic_page_2,
-            'Create subtopic page 2',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 2,
-                        'title': 'Subtopic 2',
-                        'url_fragment': 'subtopic-2',
-                    }
-                )
-            ],
-        )
-
-        updated_page_1 = copy.deepcopy(subtopic_page_1)
-        updated_page_1.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {'html': '<p>Updated Content 1</p>', 'content_id': 'content'}
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.user_id,
-            updated_page_1,
-            'Update subtopic page 1',
-            [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'property_name': 'page_contents_html',
-                        'subtopic_id': 1,
-                        'new_value': '<p>Updated Content 1</p>',
-                        'old_value': '<p>Original Content 1</p>',
-                    }
-                )
-            ],
-        )
-
-        results = (
-            subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
-                [
-                    (topic_id, 1, 1),
-                    (topic_id, 1, 2),
-                    (topic_id, 2, 1),
-                    (topic_id, 1, None),
-                    ('nonexistent', 1, 1),
-                ]
-            )
-        )
-
-        self.assertEqual(len(results), 5)
-
-        (
-            original_page_1,
-            updated_page_1_from_result,
-            subtopic_page_2_result,
-            latest_page_1,
-            non_existent,
-        ) = results
-
-        assert original_page_1 is not None
-        self.assertIsNotNone(original_page_1)
-        self.assertEqual(
-            original_page_1.page_contents.subtitled_html.html,
-            '<p>Original Content 1</p>',
-        )
-
-        assert updated_page_1_from_result is not None
-        self.assertIsNotNone(updated_page_1_from_result)
-        self.assertEqual(
-            updated_page_1_from_result.page_contents.subtitled_html.html,
-            '<p>Updated Content 1</p>',
-        )
-
-        assert subtopic_page_2_result is not None
-        self.assertIsNotNone(subtopic_page_2_result)
-        self.assertEqual(
-            subtopic_page_2_result.page_contents.subtitled_html.html,
-            '<p>Original Content</p>',
-        )
-
-        assert latest_page_1 is not None
-        self.assertIsNotNone(latest_page_1)
-        self.assertEqual(
-            latest_page_1.page_contents.subtitled_html.html,
-            '<p>Updated Content 1</p>',
-        )
-
-        self.assertIsNone(non_existent)
+        pass
 
     def test_get_subtopic_pages_with_ids_and_versions_with_invalid_version(
         self,

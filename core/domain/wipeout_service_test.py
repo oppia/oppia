@@ -4571,14 +4571,10 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
                 subtopic_page_domain.SubtopicPageChange(
                     {
                         'cmd': (
-                            subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
+                            subtopic_page_domain.CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                         ),
-                        'property_name': (
-                            subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                        ),
-                        'new_value': 'new value',
-                        'old_value': 'old value',
-                        'subtopic_id': self.SUBTOP_1_ID,
+                        'from_version': 1,
+                        'to_version': 2,
                     }
                 )
             ],
