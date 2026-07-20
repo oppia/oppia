@@ -1,68 +1,125 @@
-<!-- TODO(#24717-M2.3): Design UI for available certificate assessment offering -->
+<!-- TODO(#24717-M2.3): Wire up real certificate data + navigation once the
+     available certificate assessment backend endpoint exists. -->
 <background-banner></background-banner>
-<div class="container position-relative oppia oppia-certificate-offering-available-page">
-  <div>
-    <div>
-      <h1 tabindex="0">
-        Available certificate offering
+<div class="container position-relative oppia oppia-certificate-offering-available-page px-3 px-md-5">
+  <div class="row align-items-center oppia-certificate-offering-available-page-header">
+    <div class="col-4">
+      <button type="button" class="btn btn-primary oppia-certificate-offering-available-page-exit-button"
+              [routerLink]="['/learn', classroomUrlFragment]">
+        Exit
+      </button>
+    </div>
+    <div class="text-center">
+      <h1 tabindex="0" class="mb-0">
+        Certificate Assessment
       </h1>
     </div>
-    <button type="button" class="btn btn-primary oppia-certificate-offering-available-page-exit-button"
-            [routerLink]="['/learn', classroomUrlFragment]">
-      Exit
-    </button>
+    <!-- Empty column balances the Exit column so the title centers on the
+         page, not just on the remaining space next to the button. -->
+    <div class="col-4"></div>
   </div>
 
   <section class="oppia-certificate-offering-available-page-panel">
+    <p class="oppia-certificate-offering-available-page-intro">
+      Certificate assessments let you demonstrate your understanding and earn certificates
+      you can share with others.
+    </p>
+
+    <h2 class="fs-1">Available Certificates</h2>
+    <p class="oppia-certificate-offering-available-page-intro">
+      Each certificate focuses on a different set of skills. Select a certificate to learn more.
+    </p>
+
     <div class="oppia-certificate-offering-available-page-tiles">
-      <!-- TODO(#24717-M1.19): Wire these CTAs to the learner flow once the
-           available certificate assessment page has real navigation targets. -->
-      <article class="oppia-certificate-offering-available-page-tile">
+      <article class="oppia-certificate-offering-available-page-tile"
+               *ngFor="let certificate of availableCertificates">
         <div class="oppia-certificate-offering-available-page-tile-top">
-          <div>
-            <h3>Everyday Arithmetic</h3>
-            <p class="oppia-certificate-offering-available-page-tile-subtitle">
-              Number Confidence
+          <div class="oppia-certificate-offering-available-page-tile-heading">
+            <span class="oppia-certificate-offering-available-page-badge-icon"
+                  aria-hidden="true">
+              <svg viewBox="0 0 64 64" width="40" height="40">
+                <circle cx="32" cy="24" r="15" fill="#F1C44C" stroke="#B88914" stroke-width="2"></circle>
+                <circle cx="32" cy="24" r="10" fill="#F9E39B"></circle>
+                <path d="M22 36L15 56L32 47L49 56L42 36Z" fill="#0B7A62"></path>
+                <path d="M27.5 23.5L30.5 26.5L37 20" fill="none" stroke="#B88914" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </span>
+            <div>
+              <h3 class="oppia-certificate-offering-available-page-tile-heading-text">{{ certificate.title }}</h3>
+            </div>
+          </div>
+
+          <div class="oppia-certificate-offering-available-page-status-wrapper"
+               [ngSwitch]="certificate.status">
+            <span *ngSwitchCase="'passed'"
+                  class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
+              Passed
+            </span>
+            <span *ngSwitchCase="'failed'"
+                  class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--failed">
+              Not Passed
+            </span>
+            <span *ngSwitchCase="'not_attempted'"
+                  class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--not-attempted">
+              Not Attempted
+            </span>
+
+            <p *ngIf="certificate.status === 'passed'"
+               class="oppia-certificate-offering-available-page-status-date">
+              Passed on {{ certificate.passedOnDate }}
             </p>
           </div>
-          <span class="oppia-certificate-offering-available-page-status">
-            Not attempted
-          </span>
         </div>
 
-        <div class="oppia-certificate-offering-available-page-actions">
-          <button type="button"
-                  class="btn btn-primary"
-                  [routerLink]="['/certificate-assessment', certificateId]">
-            Continue to assessment
-          </button>
-        </div>
-      </article>
+        <div class="oppia-certificate-offering-available-page-tile-bottom"
+             [ngSwitch]="certificate.status">
+          <ng-container *ngSwitchCase="'passed'">
+            <p>You've earned this certificate. You can view it or retry the assessment.</p>
+            <div class="oppia-certificate-offering-available-page-actions">
+              <button type="button" class="btn btn-primary">
+                Check Score
+              </button>
+              <button type="button"
+                      class="btn btn-outline-primary"
+                      [routerLink]="getCertificateAssessmentRoute(certificate.id)">
+                Retry Assessment
+              </button>
+            </div>
+          </ng-container>
 
-      <article class="oppia-certificate-offering-available-page-tile">
-        <div class="oppia-certificate-offering-available-page-tile-top">
-          <div>
-            <h3>Everyday Arithmetic</h3>
-            <p class="oppia-certificate-offering-available-page-tile-subtitle">
-              Number Confidence
-            </p>
-          </div>
-          <span class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
-            Passed
-          </span>
-        </div>
+          <ng-container *ngSwitchCase="'failed'">
+            <p>You didn't pass this time. Review the material and try again when you're ready.</p>
+            <div class="oppia-certificate-offering-available-page-actions">
+              <button type="button" class="btn btn-secondary">
+                Check Score
+              </button>
+              <button type="button"
+                      class="btn btn-primary"
+                      [routerLink]="getCertificateAssessmentRoute(certificate.id)">
+                Retry Assessment
+              </button>
+            </div>
+          </ng-container>
 
-        <div class="oppia-certificate-offering-available-page-actions">
-          <button type="button" class="btn btn-secondary">
-            Check score
-          </button>
-          <button type="button"
-                  class="btn btn-primary"
-                  [routerLink]="['/certificate-assessment', certificateId]">
-            Retry assessment
-          </button>
+          <ng-container *ngSwitchCase="'not_attempted'">
+            <p>Earn this certificate by passing the assessment.</p>
+            <div class="oppia-certificate-offering-available-page-actions">
+              <button type="button"
+                      class="btn btn-primary"
+                      [routerLink]="getCertificateAssessmentRoute(certificate.id)">
+                Continue to Assessment
+              </button>
+            </div>
+          </ng-container>
         </div>
       </article>
     </div>
+
+    <p class="oppia-certificate-offering-available-page-footnote">
+      <em>
+        Note: Oppia certificates reflect demonstrated proficiency within the Oppia learning
+        platform and are not an accredited academic credential.
+      </em>
+    </p>
   </section>
 </div>
