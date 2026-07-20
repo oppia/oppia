@@ -632,7 +632,6 @@ export class SvgEditorComponent implements OnInit {
     // Use a new Textbox for editability, but copy properties from the loaded object.
     const textOptions = (obj as fabric.Object).toObject();
     delete textOptions.text;
-    delete textOptions.styles;
     const text = new fabric.Textbox(value, {
       ...textOptions,
       width: textOptions.width || this.diagramWidth,
