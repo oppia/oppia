@@ -82,7 +82,7 @@ describe('Certificate Assessment', function () {
           rubricDifficulties: ['Easy', 'Medium', 'Hard'],
         },
         {
-          topicName: 'Addition & Subtraction',
+          topicName: 'Addition and Subtraction',
           subtopicName: 'Basic Operations',
           skillName:
             'Add and subtract two-digit numbers with and without regrouping.',
