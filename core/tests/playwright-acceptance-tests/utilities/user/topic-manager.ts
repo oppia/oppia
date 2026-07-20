@@ -72,22 +72,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Helper to select a material option.
-   */
-  private async selectMatOption(
-    selector: string,
-    optionText: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
-    await this.clickOnElementWithSelector(selector);
-
-    const option = this.page.locator('mat-option', {hasText: optionText});
-    await option.waitFor({state: 'visible'});
-    await option.click();
-    await this.expectElementToBeVisible('mat-option', false);
-  }
-
-  /**
    * Navigates to the Topics and Skills Dashboard page.
    */
   async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
@@ -106,7 +90,7 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
     }
     await this.expectElementToBeVisible(topicStatusDropdownSelector);
-    await this.selectMatOption(topicStatusDropdownSelector, status);
+    await this.selectMatOptionUsingSelector(topicStatusDropdownSelector, status);
 
     const dropdownValue = this.page.locator(
       `${topicStatusDropdownSelector} .mat-select-value-text`
@@ -223,7 +207,7 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
     }
     await this.expectElementToBeVisible(sortDropdownSelector);
-    await this.selectMatOption(sortDropdownSelector, sortOption);
+    await this.selectMatOptionUsingSelector(sortDropdownSelector, sortOption, false);
 
     const dropdownValue = this.page.locator(
       `${sortDropdownSelector} .mat-select-value-text`
@@ -347,7 +331,7 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
     }
     await this.expectElementToBeVisible(skillStatusDropdownSelector);
-    await this.selectMatOption(skillStatusDropdownSelector, status);
+    await this.selectMatOptionUsingSelector(skillStatusDropdownSelector, status);
 
     const dropdownValue = this.page.locator(
       `${skillStatusDropdownSelector} .mat-select-value-text`
@@ -447,6 +431,29 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(closeMobileFiltersButton);
     }
     showMessage(`Filtered skills by keyword: ${keyword}`);
+  }
+
+  /**
+   * Sorts skills by a given option.
+   * @param {string} sortOption - The option to sort by.
+   */
+  async sortSkills(sortOption: string): Promise<void> {
+    try {
+      await this.navigateToTopicsAndSkillsDashboardPage();
+      await this.navigateToSkillsTab();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOnElementWithSelector(displayMobileFiltersButton);
+      }
+      await this.page.pause();
+      await this.selectMatOption("Sort Options", sortOption, false);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOnElementWithSelector(closeMobileFiltersButton);
+      }
+      showMessage(`Sorted skills by: ${sortOption}`);
+    } catch (error: any) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**

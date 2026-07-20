@@ -39,7 +39,7 @@ test.describe('Topic Manager', function () {
     LoggedInUser;
 
   test.beforeAll(async function ({browser}) {
-    test.setTimeout(600_000);
+    test.setTimeout(900_000);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_adm@example.com',
@@ -50,7 +50,9 @@ test.describe('Topic Manager', function () {
     const explorationId =
       await curriculumAdmin.createAndPublishExplorationWithCards(
         'Solving problems without a calculator',
-        'Mathematics'
+        'Mathematics',
+        2,
+        true
       );
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
