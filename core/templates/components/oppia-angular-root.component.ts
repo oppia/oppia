@@ -82,18 +82,15 @@ import {RatingComputationService} from 'components/ratings/rating-computation/ra
 import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {ServicesConstants} from 'services/services.constants';
-// Relative path used as a workaround to get the angular compiler to not
-// complain.
-// TODO(#16309): Fix relative imports.
-import '../third-party-imports/ckeditor.import';
+import 'third-party-imports/ckeditor.import';
 
-import {NoninteractiveCollapsible} from '../../../extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-import {NoninteractiveImage} from '../../../extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component';
-import {NoninteractiveLink} from '../../../extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component';
-import {NoninteractiveMath} from '../../../extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component';
-import {NoninteractiveSkillreview} from '../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import {NoninteractiveTabs} from '../../../extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
-import {NoninteractiveVideo} from '../../../extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component';
+import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import {
   CkEditorInitializerService,
   RteHelperService as RteHelperServiceLocal,
@@ -105,7 +102,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
 import {RteHelperService} from 'services/rte-helper.service';
-import {NoninteractiveWorkedexample} from '../../../extensions/rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
+import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const componentMap = {
   Collapsible: {

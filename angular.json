@@ -163,8 +163,16 @@
             "karmaConfig": "core/tests/karma.conf.ts",
             "assets": [
               "src/favicon.ico",
-              "assets",
-              "extensions",
+              {
+                "glob": "**/*",
+                "input": "assets/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "extensions/",
+                "output": "/extensions/"
+              },
               {
                 "glob": "**/*",
                 "input": "node_modules/mathjax",

@@ -16,10 +16,7 @@
  * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
-// Relative path used as a workaround to get the angular compiler to not
-// complain.
-// TODO(#16309): Fix relative imports.
-import '../../../third-party-imports/codemirror.import';
+import 'third-party-imports/codemirror.import';
 import {
   Component,
   EventEmitter,

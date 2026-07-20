@@ -36,10 +36,7 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
-// Relative path used as a workaround to get the angular compiler to not
-// complain.
-// TODO(#16309): Fix relative imports.
-import '../../../core/templates/mathjaxConfig';
+import 'core/templates/mathjaxConfig';
 import {
   InsertScriptService,
   KNOWN_SCRIPTS,
