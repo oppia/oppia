@@ -76,7 +76,7 @@ export type ReportAnIssueCategory =
   | 'confusing_or_incorrect_answer'
   | 'other_or_not_sure';
 
-export type ReportType = 'lesson' | 'site';
+export type ReportType = 'lesson' | 'app';
 
 export interface PlatformFeedbackBackendDict {
   source: ReportType;
@@ -199,4 +199,35 @@ export interface FeedbackCaptchaConfigResponse {
 
 export interface FeedbackSubmitResponse {
   id: string;
+}
+
+export interface PlatformFeedbackSummary {
+  id: string;
+  report_message_preview: string;
+  status: FeedbackStatus;
+  source: string;
+  category: ReportAnIssueCategory | null;
+}
+
+export interface PlatformFeedbackBackendResponse {
+  summaries: PlatformFeedbackSummary[];
+  next_cursor: string | null;
+  more: boolean;
+}
+
+export interface PlatformFeedbackDetailResponse {
+  id: string;
+  report_message: string;
+  source: ReportType;
+  status: FeedbackStatus;
+  platform: 'web' | 'android';
+  destination_dashboard: 'tech-external' | 'tech-internal' | 'curriculum';
+  page_url: string;
+  category: ReportAnIssueCategory | null;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
+  include_technical_logs: boolean;
+  session_info: FeedbackSessionInfo | null;
+  screenshot_filename: string | null;
+  screenshot_entity_id: string | null;
+  created_on_msecs: number;
 }
