@@ -634,6 +634,7 @@
 /core/controllers/general_feedback*.py @oppia/lace-backend-reviewers
 /core/templates/services/feedback-session-info.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/session-info-http-interceptor.service.ts  @oppia/lace-frontend-reviewers
+/core/templates/pages/technical-feedback-dashboard-page/ @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
