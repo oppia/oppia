@@ -1,8 +1,6 @@
-<!-- TODO(#24717-M2.3): Wire up real certificate data + navigation once the
-     available certificate assessment backend endpoint exists. -->
 <background-banner></background-banner>
-<div class="container position-relative oppia oppia-certificate-offering-available-page px-3 px-md-5">
-  <div class="row align-items-center oppia-certificate-offering-available-page-header">
+<div class="position-relative oppia oppia-certificate-offering-available-page px-3 px-md-5">
+  <div class="oppia-certificate-offering-available-page-header">
     <div class="col-4">
       <button type="button" class="btn btn-primary oppia-certificate-offering-available-page-exit-button"
               [routerLink]="['/learn', classroomUrlFragment]">
@@ -19,13 +17,13 @@
     <div class="col-4"></div>
   </div>
 
-  <section class="oppia-certificate-offering-available-page-panel">
-    <p class="oppia-certificate-offering-available-page-intro">
+  <section class="container oppia-certificate-offering-available-page-panel">
+    <p class="oppia-certificate-offering-available-page-intro oppia-certificate-offering-available-page-intro-large">
       Certificate assessments let you demonstrate your understanding and earn certificates
       you can share with others.
     </p>
 
-    <h2 class="fs-1">Available Certificates</h2>
+    <h2>Available Certificates</h2>
     <p class="oppia-certificate-offering-available-page-intro">
       Each certificate focuses on a different set of skills. Select a certificate to learn more.
     </p>
@@ -37,7 +35,7 @@
           <div class="oppia-certificate-offering-available-page-tile-heading">
             <span class="oppia-certificate-offering-available-page-badge-icon"
                   aria-hidden="true">
-              <svg viewBox="0 0 64 64" width="40" height="40">
+              <svg viewBox="0 0 64 64" width="85" height="85">
                 <circle cx="32" cy="24" r="15" fill="#F1C44C" stroke="#B88914" stroke-width="2"></circle>
                 <circle cx="32" cy="24" r="10" fill="#F9E39B"></circle>
                 <path d="M22 36L15 56L32 47L49 56L42 36Z" fill="#0B7A62"></path>
@@ -68,6 +66,10 @@
                class="oppia-certificate-offering-available-page-status-date">
               Passed on {{ certificate.passedOnDate }}
             </p>
+            <p *ngIf="certificate.status === 'failed'"
+               class="oppia-certificate-offering-available-page-status-date">
+              Failed on {{ certificate.failedOnDate }}
+            </p>
           </div>
         </div>
 
@@ -90,11 +92,11 @@
           <ng-container *ngSwitchCase="'failed'">
             <p>You didn't pass this time. Review the material and try again when you're ready.</p>
             <div class="oppia-certificate-offering-available-page-actions">
-              <button type="button" class="btn btn-secondary">
+              <button type="button" class="btn btn-primary">
                 Check Score
               </button>
               <button type="button"
-                      class="btn btn-primary"
+                      class="btn btn-outline-primary"
                       [routerLink]="getCertificateAssessmentRoute(certificate.id)">
                 Retry Assessment
               </button>

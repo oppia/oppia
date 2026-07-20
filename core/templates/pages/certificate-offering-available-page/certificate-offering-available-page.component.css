@@ -5,29 +5,48 @@
   --certificate-status-gray: #4a4a4a;
   --certificate-status-red: #b3382c;
   --certificate-body-text: #3d3d3d;
-  padding-top: 24px;
   padding-bottom: 56px;
+  padding-top: 24px;
 }
 
 .oppia-certificate-offering-available-page-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
   padding: 28px 0 12px;
+}
+
+.oppia-certificate-offering-available-page-header .col-4 {
+  flex: 0 0 200px;
+  max-width: 200px;
+  padding: 0;
+}
+
+.oppia-certificate-offering-available-page-header .col-4:last-child {
+  visibility: hidden;
+}
+
+.oppia-certificate-offering-available-page-header .text-center {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
 }
 
 .oppia-certificate-offering-available-page-header h1 {
   color: var(--certificate-teal-dark);
+  font-size: 6.5rem;
   font-weight: 800;
-  font-size: 4.25rem;
-  /* ~36px, per request title should read around 30-35px. */
   margin: 0;
 }
 
 .oppia-certificate-offering-available-page-exit-button.btn-primary {
   background-color: var(--certificate-teal);
   border-color: var(--certificate-teal);
-  border-radius: 4px;
-  font-weight: 600;
+  border-radius: 5px;
   font-size: 1.85rem;
-  width: 200px;
+  font-weight: 600;
+  width: 250px;
 }
 
 .oppia-certificate-offering-available-page-exit-button.btn-primary:hover {
@@ -36,21 +55,25 @@
 }
 
 .oppia-certificate-offering-available-page-panel {
-  margin-top: 70px;
   color: var(--certificate-body-text);
+  margin-top: 70px;
+  max-width: 800px !important;
 }
 
 .oppia-certificate-offering-available-page-intro {
-  font-size: 28px;
+  font-size: 23px;
   line-height: 1.5;
-  margin-bottom: 12px;
+  margin-bottom: 35px;
 }
-
+.oppia-certificate-offering-available-page-intro-large {
+  margin-top: 90px;
+}
 .oppia-certificate-offering-available-page-panel h2 {
   color: var(--certificate-teal-dark);
+  font-size: 40px;
   font-weight: 800;
-  margin-top: 24px;
   margin-bottom: 8px;
+  margin-top: 24px;
 }
 
 .oppia-certificate-offering-available-page-tiles {
@@ -61,52 +84,55 @@
 }
 
 .oppia-certificate-offering-available-page-tile {
-  background-color: #ffffff;
+  background-color: #ffff;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   overflow: hidden;
 }
 
 .oppia-certificate-offering-available-page-tile-top {
-  display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   background-color: var(--certificate-mint-bg);
-  padding: 20px 24px;
+  display: flex;
   gap: 16px;
+  justify-content: space-between;
+  padding: 20px 24px;
 }
 
 .oppia-certificate-offering-available-page-tile-heading {
-  display: flex;
   align-items: center;
-  gap: 14px;
+  display: flex;
   font-size: 30px;
+  gap: 14px;
 }
 
 .oppia-certificate-offering-available-page-badge-icon {
-  flex: 0 0 auto;
   display: inline-flex;
+  flex: 0 0 auto;
 }
 
 .oppia-certificate-offering-available-page-tile-heading h3 {
   color: var(--certificate-teal-dark);
+  font-size: 28px;
   font-weight: 800;
   margin: 0;
 }
 
 .oppia-certificate-offering-available-page-status-wrapper {
-  text-align: right;
   flex: 0 0 auto;
+  text-align: right;
 }
 
 .oppia-certificate-offering-available-page-status {
+  border-radius: 2px;
+  color: #fff;
   display: inline-block;
-  padding: 6px 16px;
-  border-radius: 4px;
+  font-size: 1.9rem;
   font-weight: 700;
-  font-size: 0.9rem;
-  color: #ffffff;
+  padding: 6px;
+  text-align: center;
   white-space: nowrap;
+  width: 175px;
 }
 
 .oppia-certificate-offering-available-page-status--passed {
@@ -122,29 +148,35 @@
 }
 
 .oppia-certificate-offering-available-page-status-date {
-  margin: 6px 0 0;
-  font-size: 0.8rem;
   color: #5a5a5a;
+  font-size: 1.5rem;
+  margin: 6px 0 0;
 }
 
 .oppia-certificate-offering-available-page-tile-bottom {
-  padding: 18px 24px 24px;
+  padding: 18px 24px 24px 20px;
 }
 
 .oppia-certificate-offering-available-page-tile-bottom p {
-  margin: 0 0 16px;
-  font-size: 1rem;
+  font-size: 16px;
+  margin: 0 0 16px 20px;
 }
 
 .oppia-certificate-offering-available-page-actions {
   display: flex;
-  gap: 12px;
+  gap: 15px;
+  justify-content: left;
+  margin-left: 20px;
+}
+.btn {
+  font-size: 20px;
 }
 
 .oppia-certificate-offering-available-page-actions .btn-primary {
   background-color: var(--certificate-teal);
   border-color: var(--certificate-teal);
   font-weight: 700;
+  min-width: 160px;
 }
 
 .oppia-certificate-offering-available-page-actions .btn-primary:hover {
@@ -153,10 +185,11 @@
 }
 
 .oppia-certificate-offering-available-page-actions .btn-outline-primary {
-  color: var(--certificate-teal);
+  background-color: #fff;
   border-color: var(--certificate-teal);
+  color: var(--certificate-teal);
   font-weight: 700;
-  background-color: #ffffff;
+  min-width: 500px
 }
 
 .oppia-certificate-offering-available-page-actions .btn-outline-primary:hover {
@@ -168,21 +201,29 @@
 }
 
 .oppia-certificate-offering-available-page-footnote {
-  margin-top: 20px;
-  font-size: 0.85rem;
   color: #5a5a5a;
+  font-size: 18px;
+  margin-top: 20px;
 }
 
 @media (max-width: 600px) {
+  .oppia-certificate-offering-available-page-header {
+    flex-wrap: wrap;
+  }
+
   .oppia-certificate-offering-available-page-header .col-4 {
-    flex: 0 0 100%;
-    max-width: 100%;
-    text-align: left !important;
-    margin-bottom: 12px;
+    flex: 0 0 auto;
+    max-width: none;
   }
 
   .oppia-certificate-offering-available-page-header .col-4:last-child {
     display: none;
+  }
+
+  .oppia-certificate-offering-available-page-header .text-center {
+    flex: 1 1 100%;
+    margin-bottom: 12px;
+    order: -1;
   }
 
   .oppia-certificate-offering-available-page-header h1 {

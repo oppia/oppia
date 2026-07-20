@@ -34,6 +34,8 @@ export interface AvailableCertificate {
   status: CertificateAssessmentStatus;
   // Only present when status is 'passed'.
   passedOnDate?: string;
+  // Only present when status is 'failed'.
+  failedOnDate?: string;
 }
 
 @Component({
@@ -44,8 +46,6 @@ export interface AvailableCertificate {
 export class AvailableCertificateOfferingPageComponent {
   @Input() classroomUrlFragment: string = '';
 
-  // TODO(#24717-M2.3): Replace this stub list with certificates fetched
-  // from the backend for the signed-in learner.
   availableCertificates: AvailableCertificate[] = [
     {
       id: 'everyday_arithmetic_number_confidence',
@@ -62,6 +62,7 @@ export class AvailableCertificateOfferingPageComponent {
       id: 'geometry_measurement_basics',
       title: 'Geometry & Measurement Basics',
       status: 'failed',
+      failedOnDate: 'Feb 2, 2026',
     },
   ];
 
