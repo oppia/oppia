@@ -232,7 +232,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     );
 
     this.topicName = this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    this.stringifiedSubtopicIds = this.urlService.getSelectedSubtopicsFromUrl();
+    if (!this.platformFeatureService.status.StoryEditorArcs.isEnabled) {
+      this.stringifiedSubtopicIds =
+        this.urlService.getSelectedSubtopicsFromUrl();
+    }
     this._determineSessionType();
     this._fetchSkillDetails();
   }

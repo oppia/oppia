@@ -251,10 +251,10 @@ export class UrlService {
   getSelectedSubtopicsFromUrl(): string {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
-    if (pathname.match(/\/practice\/session/g) && queryStrings.length === 2) {
+    if (pathname.match(/\/practice/g) && queryStrings.length === 2) {
       return decodeURIComponent(queryStrings[1]);
     }
-    return '';
+    throw new Error('Invalid URL for practice session');
   }
 
   /**

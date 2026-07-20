@@ -273,11 +273,21 @@ describe('Url Service', () => {
     mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(urlService.getSelectedSubtopicsFromUrl()).toBe('abcdefgijklm');
+  });
+
+  it('should throw error for invalid practice session url', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
     mockLocation.pathname = '/topic/abcdefgijklm';
-    expect(urlService.getSelectedSubtopicsFromUrl()).toBe('');
+    expect(() => {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
     mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
-    expect(urlService.getSelectedSubtopicsFromUrl()).toBe('');
+    expect(() => {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
   });
 
   it('should correctly retrieve classroom url fragment from url', () => {

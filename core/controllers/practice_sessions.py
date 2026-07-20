@@ -36,7 +36,6 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
     """
 
     selected_subtopic_ids: Optional[List[int]]
-    skill_ids: Optional[List[str]]
 
 
 class PracticeSessionsPageDataHandler(
@@ -65,13 +64,6 @@ class PracticeSessionsPageDataHandler(
                 'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'},
                 'default_value': None,
             },
-            'skill_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString',
-                },
-                'default_value': None,
-            },
         }
     }
 
@@ -93,22 +85,11 @@ class PracticeSessionsPageDataHandler(
         selected_subtopic_ids = self.normalized_request.get(
             'selected_subtopic_ids'
         )
-        skill_ids = self.normalized_request.get('skill_ids')
         node_id = self.request.route_kwargs.get('node_id')
         arc_id = self.request.route_kwargs.get('arc_id')
 
-        if skill_ids is not None:
-            if not isinstance(skill_ids, list) or not all(
-                isinstance(s, str) for s in skill_ids
-            ):
-                raise self.InvalidInputException('Invalid skill_ids')
-            if len(skill_ids) == 0:
-                raise self.InvalidInputException('Empty skill_ids provided.')
-
         selected_skill_ids: List[str] = []
-        if skill_ids is not None:
-            selected_skill_ids = skill_ids
-        elif selected_subtopic_ids is not None:
+        if selected_subtopic_ids is not None:
             for subtopic in topic.subtopics:
                 if subtopic.id in selected_subtopic_ids:
                     selected_skill_ids.extend(subtopic.skill_ids)

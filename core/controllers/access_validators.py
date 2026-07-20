@@ -369,7 +369,7 @@ class PracticeSessionAccessValidationPage(
             )
             if is_legacy_path:
                 raise self.InvalidInputException(
-                    'Expected skill_ids or selected_subtopic_ids.'
+                    'Expected selected_subtopic_ids.'
                 )
             # Mastery challenge - just validate topic access (done by decorator).
             return
