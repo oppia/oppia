@@ -1164,6 +1164,12 @@ describe('Conversation flow service', () => {
     );
     spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    // Spy on _moveToNewCard dependencies to allow full execution of the
+    // isFinalQuestion=true path without crashing on missing state.
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
     // Spy on showUpcomingCard which _moveToNewCard calls internally,
     // to prevent cascade into card rendering with missing dependencies.
     spyOn(conversationFlowService, 'showUpcomingCard');
