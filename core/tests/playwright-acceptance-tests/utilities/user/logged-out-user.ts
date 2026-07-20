@@ -52,6 +52,7 @@ const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const signInButton = '.conversation-skin-login-button-text';
 const singInButtonInProgressModal = '.sign-in-link';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
+const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
@@ -76,6 +77,9 @@ const stateConversationContent = '.e2e-test-conversation-content';
 
 const searchInputSelector = '.e2e-test-search-input';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const fractionInputSelector = '.e2e-test-fraction-input';
+const floatFormInput = '.e2e-test-float-form-input';
+const wrongInputErrorContainerSelector = '.oppia-form-error-container';
 
 const resumeExplorationButton = '.resume-button';
 const restartExplorationButton = '.restart-button';
@@ -105,6 +109,9 @@ const lessonInfoButton = '.oppia-lesson-info';
 const lessonInfoCardSelector = '.oppia-lesson-info-card';
 const hintButtonSelector = '.e2e-test-view-hint';
 const gotItButtonSelector = '.e2e-test-learner-got-it-button';
+const closeSolutionModalButton = '.e2e-test-learner-got-it-button';
+const continueToSolutionButton = '.e2e-test-continue-to-solution-btn';
+const viewSolutionButton = '.e2e-test-view-solution';
 
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
@@ -383,6 +390,16 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Closes the solution modal by clicking on the close solution modal button.
+   */
+  async closeSolutionModal(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(closeSolutionModalButton);
+    await this.clickOnElementWithSelector(closeSolutionModalButton);
+    await this.expectElementToBeVisible(closeSolutionModalButton, false);
+  }
+
+  /**
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
@@ -493,6 +510,14 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(voiceoverDropdown);
     await this.clickOnElementWithSelector(voiceoverDropdown);
     await this.expectElementToBeVisible(voiceoverDropdown, false);
+  }
+
+  /**
+   * Checks if value of input is equal to the given value.
+   * @param {string} value - The value to check.
+   */
+  async expectAnswerInputValueToBe(value: string): Promise<void> {
+    await this.expectElementValueToBe(floatFormInput, value);
   }
 
   /**
@@ -622,6 +647,19 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if the error message for wrong input is present.
+   * @param {string} errorMessage - The expected error message.
+   */
+  async expectErrorMessageForWrongInputToBe(
+    errorMessage: string
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      wrongInputErrorContainerSelector,
+      errorMessage
+    );
+  }
+
+  /**
    * Function to verify if the exploration is completed via checking the toast message.
    * @param {string} message - The expected toast message.
    */
@@ -648,6 +686,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if fraction input is visible.
+   */
+  async expectFractionInputToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(fractionInputSelector);
+  }
+
+  /**
    * Checks if button with "left arrow" icon is present to move back to previous lesson card.
    * @param {boolean} visibility - Boolean value representing should be visible or not.
    */
@@ -655,6 +700,20 @@ export class LoggedOutUser extends BaseUser {
     visibility: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(previousCardButton, visibility);
+  }
+
+  /**
+   * Function to verify the number of hint models.
+   * @param {number} n - The expected number of hint models.
+   */
+  async expectHintModelsToBe(n: number): Promise<void> {
+    const actualNumberOfHintModels = await this.page.$$(hintButtonSelector);
+
+    if (actualNumberOfHintModels.length !== n) {
+      throw new Error(
+        `Expected ${n} hint models, but found ${actualNumberOfHintModels.length}`
+      );
+    }
   }
 
   /**
@@ -679,6 +738,28 @@ export class LoggedOutUser extends BaseUser {
       lessonInfoTextSelector,
       lessonText
     );
+  }
+
+  /**
+   * Compares the text content of next button in lesson player.
+   * @param {string} buttonText - Expected button text.
+   */
+  async expectNextCardButtonTextToBe(buttonText: string): Promise<void> {
+    await this.expectTextContentToBe(nextCardButton, buttonText);
+  }
+
+  /**
+   * Function to verify if the latest Oppia feedback matches the expected feedback.
+   * @param {string} expectedFeedback - The expected feedback.
+   */
+  async expectOppiaFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackSelector);
+    const feedbackText = await this.getTextContent(`${feedbackSelector} > p`);
+    if (feedbackText !== expectedFeedback) {
+      throw new Error(
+        `Expected feedback to be '${expectedFeedback}', but got '${feedbackText}'.`
+      );
+    }
   }
 
   /**
@@ -735,6 +816,31 @@ export class LoggedOutUser extends BaseUser {
 
     if (!present) {
       throw new Error('Sign-in button is present, expected to be absent.');
+    }
+  }
+
+  /**
+   * Checks if submit button is visible.
+   * @param {'Visible' | 'Hidden' | 'Disabled'} state - The expected state of the submit button.
+   */
+  async expectSubmitButtonToBe(
+    state: 'Visible' | 'Hidden' | 'Disabled'
+  ): Promise<void> {
+    if (state === 'Disabled') {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const submitButton: HTMLButtonElement | null =
+            document.querySelector(selector);
+          return submitButton?.disabled;
+        },
+        submitAnswerButton,
+        {timeout: 60000}
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        submitAnswerButton,
+        state === 'Visible'
+      );
     }
   }
 
@@ -1745,6 +1851,47 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOnElementWithSelector(hintButtonSelector);
 
     await this.expectElementToBeVisible(gotItButtonSelector);
+  }
+
+  /**
+   * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
+   * @param {number} timeout - The maximum time to wait for the view solution button to be visible, in milliseconds. Defaults to 60000 ms (1 minute).
+   */
+  async viewSolution(timeout: number = 60000): Promise<void> {
+    await this.expectElementToBeVisible(
+      viewSolutionButton,
+      true,
+      this.page,
+      timeout
+    );
+    await this.clickOnElementWithSelector(viewSolutionButton);
+    await this.clickOnElementWithSelector(continueToSolutionButton);
+    await this.expectElementToBeVisible(closeSolutionModalButton);
+  }
+
+  /**
+   * Waits until the number of hint models is equal to the expected count.
+   * @param {number} numberOfHintModals - The expected number of hint models.
+   */
+  async waitForHintModelsToBe(numberOfHintModals: number): Promise<void> {
+    // Wait until number of elements equals the expected count.
+    await this.page.waitForFunction(
+      ({
+        selector,
+        expectedLength,
+      }: {
+        selector: string;
+        expectedLength: number;
+      }) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length === expectedLength;
+      },
+      {selector: hintButtonSelector, expectedLength: numberOfHintModals},
+      {
+        // Each hint modal takes about 1 minute to appear.
+        timeout: numberOfHintModals * 65000,
+      }
+    );
   }
 
   /**
