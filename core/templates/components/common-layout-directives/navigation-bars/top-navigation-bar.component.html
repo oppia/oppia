@@ -520,6 +520,15 @@
           </a>
         </li>
         <li class="nav-item"
+            *ngIf="isTechnicalFeedbackDashboardEnabled() && isTechTeamLead">
+          <a class="dropdown-item nav-link"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/technical-feedback-dashboard"
+             rel="noopener">
+            <span [innerHTML]="'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item"
             *ngIf="isSuperAdmin">
           <a class="dropdown-item nav-link e2e-test-admin-link"
              (click)="closeSubmenuIfNotMobile($event)"
