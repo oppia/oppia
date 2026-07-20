@@ -38,11 +38,38 @@ import {
   platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
 
+// Declare webpack's require.context for dynamic module loading.
+declare var require: {
+  context(
+    directory: string,
+    useSubdirectories: boolean,
+    regExp: RegExp
+  ): {
+    keys(): string[];
+    <T>(id: string): T;
+  };
+};
+
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
+
+// Load all spec files from core/templates and extensions.
+const testsContext = require.context(
+  '../../core/templates',
+  true,
+  /\.spec\.ts$/
+);
+testsContext.keys().forEach(testsContext);
+
+const extensionsContext = require.context(
+  '../../extensions',
+  true,
+  /\.spec\.ts$/
+);
+extensionsContext.keys().forEach(extensionsContext);
 
 jasmine.getEnv().addReporter({
   specDone: function (result) {

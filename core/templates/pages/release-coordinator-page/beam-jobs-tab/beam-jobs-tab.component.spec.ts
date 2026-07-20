@@ -62,7 +62,7 @@ describe('Beam Jobs Tab Component', () => {
   let component: BeamJobsTabComponent;
   let loader: HarnessLoader;
 
-  let backendApiService: ReleaseCoordinatorBackendApiService;
+  let backendApiService: jasmine.SpyObj<ReleaseCoordinatorBackendApiService>;
 
   const fooJob = new BeamJob('FooJob');
   const barJob = new BeamJob('BarJob');
@@ -102,19 +102,16 @@ describe('Beam Jobs Tab Component', () => {
       providers: [
         {
           provide: ReleaseCoordinatorBackendApiService,
-          useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
+          useValue: jasmine.createSpyObj(
             'ReleaseCoordinatorBackendApiService',
-            {},
-            {
-              getBeamJobs: () => of(beamJobs),
-              getBeamJobRuns: () => of(beamJobRuns),
-              startNewBeamJob: () =>
-                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false)),
-              cancelBeamJobRun: () =>
-                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false)),
-              getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
-            } as Partial<ReleaseCoordinatorBackendApiService>
-          ),
+            [
+              'getBeamJobs',
+              'getBeamJobRuns',
+              'startNewBeamJob',
+              'cancelBeamJobRun',
+              'getBeamJobRunOutput',
+            ]
+          ) as jasmine.SpyObj<any>,
         },
       ],
     });
@@ -132,7 +129,20 @@ describe('Beam Jobs Tab Component', () => {
 
     await TestBed.compileComponents();
 
-    backendApiService = TestBed.inject(ReleaseCoordinatorBackendApiService);
+    backendApiService = TestBed.inject(
+      ReleaseCoordinatorBackendApiService
+    ) as unknown as jasmine.SpyObj<ReleaseCoordinatorBackendApiService>;
+    backendApiService.getBeamJobs.and.returnValue(of(beamJobs));
+    backendApiService.getBeamJobRuns.and.returnValue(of(beamJobRuns));
+    backendApiService.startNewBeamJob.and.returnValue(
+      of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false))
+    );
+    backendApiService.cancelBeamJobRun.and.returnValue(
+      of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false))
+    );
+    backendApiService.getBeamJobRunOutput.and.returnValue(
+      of(new BeamJobRunResult('abc', '123'))
+    );
 
     fixture = TestBed.createComponent(BeamJobsTabComponent);
     component = fixture.componentInstance;
@@ -148,10 +158,8 @@ describe('Beam Jobs Tab Component', () => {
       const beamJobRunsOutput = m.hot('^---r-|', {r: beamJobRuns});
       const expectedNames = '          e---n--';
       const expectedRuns = '           e---r--';
-      spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobsOutput);
-      spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(
-        beamJobRunsOutput
-      );
+      backendApiService.getBeamJobs.and.returnValue(beamJobsOutput);
+      backendApiService.getBeamJobRuns.and.returnValue(beamJobRunsOutput);
 
       fixture.detectChanges();
 
@@ -173,7 +181,7 @@ describe('Beam Jobs Tab Component', () => {
     marbles(m => {
       const beamJobs = m.hot('^-#', undefined, new Error('err'));
       const expectedNames = ' e-e';
-      spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
+      backendApiService.getBeamJobs.and.returnValue(beamJobs);
 
       fixture.detectChanges();
       m.expect(component.jobNames).toBeObservable(expectedNames, {e: []});
@@ -187,7 +195,7 @@ describe('Beam Jobs Tab Component', () => {
     marbles(m => {
       const beamJobRuns = m.hot('^-#', undefined, new Error('err'));
       const expectedRuns = '     e-e';
-      spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
+      backendApiService.getBeamJobRuns.and.returnValue(beamJobRuns);
 
       fixture.detectChanges();
       m.expect(component.beamJobRuns).toBeObservable(expectedRuns, {e: []});

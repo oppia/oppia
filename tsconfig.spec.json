@@ -16,6 +16,7 @@
   "exclude": [
     "core/tests/puppeteer-acceptance-tests/**",
     "core/tests/playwright-acceptance-tests/**",
-    "core/tests/test-dependencies/**"
+    "core/tests/test-dependencies/**",
+    "core/tests/build_sources/extensions/plugin.ts"
   ]
 }

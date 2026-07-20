@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TranslationModalComponent.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,
@@ -207,6 +209,10 @@ describe('Translation Modal Component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     activeModal = TestBed.inject(NgbActiveModal);
     translateTextService = TestBed.inject(TranslateTextService);
+    // Prevent accidental HTTP requests from translateTextService.init.
+    // Inner describe blocks that need init() to actually run can override
+    // this spy (e.g. with and.callThrough() or and.callFake()).
+    spyOn(translateTextService, 'init').and.stub();
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);

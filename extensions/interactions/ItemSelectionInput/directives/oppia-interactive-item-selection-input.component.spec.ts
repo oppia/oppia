@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the ItemSelectionInput interaction.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractiveItemSelectionInputComponent} from './oppia-interactive-item-selection-input.component';

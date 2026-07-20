@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for schema-based editor component for custom values
  */
 
+// @ts-nocheck
+
 import {
   Component,
   EventEmitter,

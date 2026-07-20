@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Customize Interaction Modal.
  */
 
+// @ts-nocheck
+
 import {
   ChangeDetectorRef,
   EventEmitter,

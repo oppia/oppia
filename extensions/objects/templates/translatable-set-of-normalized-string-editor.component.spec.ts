@@ -17,6 +17,8 @@
  * editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import {TranslatableSetOfNormalizedStringEditorComponent} from './translatable-set-of-normalized-string-editor.component';

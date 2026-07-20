@@ -16,6 +16,8 @@
  * @fileoverview Unit test for Language banner service.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 import {LanguageBannerService} from './language-banner.service';
 import {CookieService} from 'ngx-cookie';

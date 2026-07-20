@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the positive int component.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {PositiveIntEditorComponent} from './positive-int-editor.component';

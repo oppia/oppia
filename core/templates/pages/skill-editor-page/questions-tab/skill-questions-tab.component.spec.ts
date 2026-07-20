@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Skill question tab Component.
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   TestBed,

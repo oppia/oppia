@@ -19,9 +19,20 @@
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
+import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {DonatePageRootComponent} from './donate-page-root.component';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+  onLangChange = {subscribe: () => {}};
+  get(key: string): any {
+    return {subscribe: () => {}};
+  }
+}
 
 describe('Donate Page Root', () => {
   let fixture: ComponentFixture<DonatePageRootComponent>;
@@ -30,7 +41,7 @@ describe('Donate Page Root', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [DonatePageRootComponent, MockTranslatePipe],
-      providers: [],
+      providers: [{provide: TranslateService, useClass: MockTranslateService}],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(DonatePageRootComponent);

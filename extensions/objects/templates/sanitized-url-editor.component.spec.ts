@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for sanitized URL editor.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
 import {

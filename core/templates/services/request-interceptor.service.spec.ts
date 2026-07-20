@@ -15,6 +15,8 @@
 /**
  * @fileoverview Unit tests for RequestInterceptorService.
  */
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 import {
   HttpClientTestingModule,

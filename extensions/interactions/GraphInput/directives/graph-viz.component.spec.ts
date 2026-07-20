@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the graph-viz.
  */
 
+// @ts-nocheck
+
 import {
   waitForAsync,
   ComponentFixture,

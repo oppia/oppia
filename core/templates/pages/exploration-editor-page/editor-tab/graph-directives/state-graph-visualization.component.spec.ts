@@ -473,7 +473,9 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
           },
         }),
       });
+      Object.defineProperty(d3, 'zoom', {configurable: true, writable: true});
       spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
+      Object.defineProperty(d3, 'event', {configurable: true, writable: true});
       spyOnProperty(d3, 'event').and.returnValue({
         transform: {
           x: 10,
@@ -527,7 +529,9 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
           },
         }),
       });
+      Object.defineProperty(d3, 'zoom', {configurable: true, writable: true});
       spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
+      Object.defineProperty(d3, 'event', {configurable: true, writable: true});
       spyOnProperty(d3, 'event').and.returnValue({
         transform: {
           x: 10,

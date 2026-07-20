@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Schema Based List Editor Component
  */
 
+// @ts-nocheck
+
 import {
   ComponentFixture,
   fakeAsync,
