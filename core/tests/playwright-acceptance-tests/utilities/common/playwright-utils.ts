@@ -1037,8 +1037,49 @@ export class BaseUser {
    * Selects the mat-option with the given value.
    * @param value The value of the mat-option to select.
    */
-  async selectMatOption(value: string): Promise<void> {
+  async clickOnMatOptionByValue(value: string): Promise<void> {
     await this.clickOnElementWithSelectorAndText('mat-option', value);
+    await this.expectElementToBeVisible('mat-option', false);
+  }
+
+  /**
+   * Clicks on select element, and then selects mat-option that matches the text.
+   * @param {string} selector Select option selector.
+   * @param {string} optionText Text content of the option to select.
+   * @param {boolean} useExactMatch Use exact match or not. Only use  this when
+   *     label can by dynamic.
+   */
+  async selectMatOptionUsingSelector(
+    selector: string,
+    optionText: string,
+    useExactMatch: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
+
+    const option = this.page.getByRole('option', { name: optionText, exact: useExactMatch });
+    await option.waitFor({state: 'visible'});
+    await option.click();
+    await this.expectElementToBeVisible('mat-option', false);
+  }
+
+  /**
+   * Clicks on mat-select element elements and clicks on the given option.
+   * @param {string} selectElementLabel Label used for select element.
+   * @param {string} optionText Text content of the option to select.
+   * @param {boolean} useExactMatch Use exact match or not. Only use  this when
+   *     label can by dynamic.
+   */
+  async selectMatOption(
+    selectElementLabel: string,
+    optionText: string,
+    useExactMatch: boolean = true
+  ) {
+    const selectElement = this.page.getByRole('combobox', { name: selectElementLabel, exact: true});
+    await selectElement.click();
+
+    const option = this.page.getByRole('option', { name: optionText, exact: useExactMatch });
+    await option.click();
     await this.expectElementToBeVisible('mat-option', false);
   }
 

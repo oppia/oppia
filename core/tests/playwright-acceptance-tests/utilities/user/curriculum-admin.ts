@@ -318,7 +318,7 @@ export class CurriculumAdmin extends TopicManager {
     }
     await this.clickOnElement(prerequisiteInputElement);
 
-    await this.selectMatOption(prerequisiteTopicName);
+    await this.clickOnMatOptionByValue(prerequisiteTopicName);
     await this.expectMatChipToBeVisible(prerequisiteTopicName);
   }
 

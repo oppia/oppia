@@ -139,7 +139,24 @@ export class SuperAdmin extends LoggedInUser {
   private async selectTopicForTopicManagerRole(
     topicName: string
   ): Promise<void> {
+    // Select the given topic in select element.
     await this.selectOption(topicSelectMenuElementLabel, topicName);
+    // Click on "+" icon.
+    await this.clickOnElementWithSelector(addTopicButton);
+    // Verify selected topics contain the given topic.
+    await this.page.waitForFunction(
+      ({selector, topic}: {selector: string; topic: string}) => {
+        const assignedTopicElements = document.querySelectorAll(selector);
+        for (const element of Array.from(assignedTopicElements)) {
+          if (element.textContent === topic) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {selector: assignedTopicSelector, topic: topicName}
+    );
+
     // await this.expectElementToBeVisible(selectTopicForAssignmentSelector);
     // const selectElement = await this.page.$(selectTopicForAssignmentSelector);
     // if (!selectElement) {
