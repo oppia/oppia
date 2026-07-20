@@ -144,7 +144,7 @@ export class CollectionEditorNavbarComponent {
       }
     );
 
-    modalRef.componentInstance.isCollectionPrivate =
+    modalRef.componentInstance.collectionIsPrivate =
       this.collectionRights.isPrivate();
 
     modalRef.result.then(

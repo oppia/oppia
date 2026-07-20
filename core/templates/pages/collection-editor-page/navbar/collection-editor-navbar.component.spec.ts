@@ -300,7 +300,7 @@ describe('Collection editor navbar component', () => {
 
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
-        isCollectionPrivate: false,
+        collectionIsPrivate: false,
       },
       result: {
         then: (
