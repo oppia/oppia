@@ -795,8 +795,7 @@ def get_all_arcs_with_stories_for_topic(
         topic: Topic. The topic object.
 
     Returns:
-        list(tuple(Story, Arc)). (story, arc) pairs from the first
-        published story in order.
+        list(tuple(Story, Arc)). Story-arc pairs from the first published story.
     """
     story_ids = topic.get_canonical_story_ids(include_only_published=True)
     stories = get_stories_by_ids(story_ids)
