@@ -411,6 +411,14 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   setActiveSection(newActiveSectionName: string): void {
+    if (
+      newActiveSectionName ===
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+          .MY_CERTIFICATES &&
+      !this.isCertificateAssessmentEnabled()
+    ) {
+      return;
+    }
     this.activeSection = newActiveSectionName;
     if (
       this.activeSection ===
