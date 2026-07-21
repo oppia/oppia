@@ -74,11 +74,11 @@ export class AccessValidationBackendApiService {
 
   LESSON_PRACTICE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
-    '<classroom_url_fragment>/<topic_url_fragment>/practice/<node_id>';
+    '<classroom_url_fragment>/<topic_url_fragment>/practice/<story_url_fragment>/<node_id>';
 
   END_OF_ARC_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
-    '<classroom_url_fragment>/<topic_url_fragment>/test/arc/<arc_id>';
+    '<classroom_url_fragment>/<topic_url_fragment>/test/arc/<story_url_fragment>/<arc_id>';
 
   MASTERY_CHALLENGE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +
@@ -251,6 +251,7 @@ export class AccessValidationBackendApiService {
   validateAccessToLessonPracticePage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
+    storyUrlFragment: string,
     nodeId: string
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -258,6 +259,7 @@ export class AccessValidationBackendApiService {
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
+        story_url_fragment: storyUrlFragment,
         node_id: nodeId,
       }
     );
@@ -267,6 +269,7 @@ export class AccessValidationBackendApiService {
   validateAccessToEndOfArcPage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
+    storyUrlFragment: string,
     arcId: string
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -274,6 +277,7 @@ export class AccessValidationBackendApiService {
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
+        story_url_fragment: storyUrlFragment,
         arc_id: arcId,
       }
     );

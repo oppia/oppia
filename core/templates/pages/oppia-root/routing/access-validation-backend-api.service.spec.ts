@@ -682,12 +682,17 @@ describe('Access validation backend api service', () => {
 
   it('should validate access to lesson practice page', fakeAsync(() => {
     avbas
-      .validateAccessToLessonPracticePage('classroom', 'topic', '1')
+      .validateAccessToLessonPracticePage(
+        'classroom',
+        'topic',
+        'my-story',
+        'node_1'
+      )
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_practice_session_page/' +
-        'classroom/topic/practice/1'
+        'classroom/topic/practice/my-story/node_1'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});
@@ -699,12 +704,12 @@ describe('Access validation backend api service', () => {
 
   it('should validate access to end of arc page', fakeAsync(() => {
     avbas
-      .validateAccessToEndOfArcPage('classroom', 'topic', '1')
+      .validateAccessToEndOfArcPage('classroom', 'topic', 'my-story', 'arc_1')
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_practice_session_page/' +
-        'classroom/topic/test/arc/1'
+        'classroom/topic/test/arc/my-story/arc_1'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});

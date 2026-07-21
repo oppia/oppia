@@ -47,6 +47,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
     const classroomUrlFragment =
       route.paramMap.get('classroom_url_fragment') || '';
     const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
+    const storyUrlFragment = route.paramMap.get('story_url_fragment') || '';
     const nodeId = route.paramMap.get('node_id') || '';
     const arcId = route.paramMap.get('arc_id') || '';
 
@@ -77,6 +78,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
           this.accessValidationBackendApiService.validateAccessToEndOfArcPage(
             classroomUrlFragment,
             topicUrlFragment,
+            storyUrlFragment,
             arcId
           );
       } else if (selectedSubtopicIds) {
@@ -91,6 +93,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
           this.accessValidationBackendApiService.validateAccessToLessonPracticePage(
             classroomUrlFragment,
             topicUrlFragment,
+            storyUrlFragment,
             nodeId
           );
       } else {

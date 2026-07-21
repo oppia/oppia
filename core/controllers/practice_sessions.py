@@ -21,9 +21,7 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     skill_fetchers,
-    story_domain,
     story_fetchers,
-    topic_domain,
     topic_fetchers,
 )
 
@@ -49,6 +47,7 @@ class PracticeSessionsPageDataHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
         'node_id': {
             'schema': {'type': 'basestring'},
             'default_value': None,
@@ -85,6 +84,7 @@ class PracticeSessionsPageDataHandler(
         selected_subtopic_ids = self.normalized_request.get(
             'selected_subtopic_ids'
         )
+        story_url_fragment = self.request.route_kwargs.get('story_url_fragment')
         node_id = self.request.route_kwargs.get('node_id')
         arc_id = self.request.route_kwargs.get('arc_id')
 
@@ -93,10 +93,14 @@ class PracticeSessionsPageDataHandler(
             for subtopic in topic.subtopics:
                 if subtopic.id in selected_subtopic_ids:
                     selected_skill_ids.extend(subtopic.skill_ids)
-        elif node_id is not None:
-            selected_skill_ids = self._get_skill_ids_for_node(topic, node_id)
-        elif arc_id is not None:
-            selected_skill_ids = self._get_skill_ids_for_arc(topic, arc_id)
+        elif node_id is not None and story_url_fragment is not None:
+            selected_skill_ids = self._get_skill_ids_for_node(
+                story_url_fragment, node_id
+            )
+        elif arc_id is not None and story_url_fragment is not None:
+            selected_skill_ids = self._get_skill_ids_for_arc(
+                story_url_fragment, arc_id
+            )
         else:
             # Mastery challenge: collect all skills from all subtopics.
             for subtopic in topic.subtopics:
@@ -118,77 +122,42 @@ class PracticeSessionsPageDataHandler(
         )
         self.render_json(self.values)
 
-    def _get_all_nodes_for_topic(
-        self, topic: topic_domain.Topic
-    ) -> List[story_domain.StoryNode]:
-        """Returns all nodes across all published stories in the topic.
-
-        Args:
-            topic: Topic. The topic object.
-
-        Returns:
-            list(StoryNode). All nodes in order.
-        """
-        return story_fetchers.get_all_nodes_for_topic(topic)
-
     def _get_skill_ids_for_node(
-        self, topic: topic_domain.Topic, node_id: str
+        self, story_url_fragment: str, node_id: str
     ) -> List[str]:
-        """Returns skill IDs associated with a given story node.
-
-        The node_id parameter is a 1-based index that maps to the nth node
-        across all published stories in the topic.
+        """Returns skill IDs for a node within a specific story.
 
         Args:
-            topic: Topic. The topic object.
-            node_id: str. The node ID (1-based index).
+            story_url_fragment: str. The story URL fragment.
+            node_id: str. The internal node ID (e.g. 'node_1').
 
         Returns:
             list(str). The skill IDs for the node.
         """
-        try:
-            node_index = int(node_id)
-        except ValueError:
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
+        if story is None:
             return []
-
-        if node_index < 1:
+        node = story_fetchers.get_node_from_story(story, node_id)
+        if node is None:
             return []
-
-        all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index > len(all_nodes):
-            return []
-
-        node = all_nodes[node_index - 1]
         return node.acquired_skill_ids
 
     def _get_skill_ids_for_arc(
-        self, topic: topic_domain.Topic, arc_id: str
+        self, story_url_fragment: str, arc_id: str
     ) -> List[str]:
-        """Returns skill IDs associated with all nodes in a given arc.
-
-        The arc_id parameter is a 1-based index that maps to the nth arc
-        across all published stories in the topic.
+        """Returns skill IDs for all nodes in an arc within a specific story.
 
         Args:
-            topic: Topic. The topic object.
-            arc_id: str. The arc index (e.g., '1').
+            story_url_fragment: str. The story URL fragment.
+            arc_id: str. The internal arc ID (e.g. 'arc_1').
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
         """
-        try:
-            arc_index = int(arc_id)
-        except ValueError:
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
+        if story is None:
             return []
-
-        if arc_index < 1:
+        arc = story_fetchers.get_arc_from_story(story, arc_id)
+        if arc is None:
             return []
-
-        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
-            topic
-        )
-        if arc_index > len(arcs_with_stories):
-            return []
-
-        story, arc = arcs_with_stories[arc_index - 1]
         return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)

@@ -26,11 +26,11 @@ export const PracticeSessionPageConstants = {
 
   LESSON_PRACTICE_DATA_URL:
     '/practice_session/data/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/<node_id>',
+    '<topic_url_fragment>/<story_url_fragment>/<node_id>',
 
   ARC_PRACTICE_DATA_URL:
     '/practice_session/data/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/arc/<arc_id>',
+    '<topic_url_fragment>/arc/<story_url_fragment>/<arc_id>',
 
   MASTERY_CHALLENGE_DATA_URL:
     '/practice_session/data/<classroom_url_fragment>/' + '<topic_url_fragment>',
@@ -43,11 +43,11 @@ export const PracticeSessionPageConstants = {
 
   LESSON_PRACTICE_URL:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice/' +
-    '<node_id>',
+    '<story_url_fragment>/<node_id>',
 
   END_OF_ARC_URL:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/test/arc/' +
-    '<arc_id>',
+    '<story_url_fragment>/<arc_id>',
 
   MASTERY_CHALLENGE_URL:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/' +

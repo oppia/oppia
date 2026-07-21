@@ -434,21 +434,43 @@ describe('Url Service', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
     });
-    mockLocation.pathname = '/learn/math/fractions/practice/1';
-    expect(urlService.getNodeIdFromPracticeUrl()).toBe('1');
+    mockLocation.pathname = '/learn/math/fractions/practice/bakery/node_1';
+    expect(urlService.getNodeIdFromPracticeUrl()).toBe('node_1');
+
+    mockLocation.pathname = '/learn/math/fractions/practice/bakery/';
+    expect(urlService.getNodeIdFromPracticeUrl()).toBe('');
+  });
+
+  it('should correctly retrieve story url fragment from practice url', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
+    mockLocation.pathname = '/learn/math/fractions/practice/bakery/node_1';
+    expect(urlService.getStoryUrlFragmentFromPracticeUrl()).toBe('bakery');
 
     mockLocation.pathname = '/learn/math/fractions/practice/';
-    expect(urlService.getNodeIdFromPracticeUrl()).toBe('');
+    expect(urlService.getStoryUrlFragmentFromPracticeUrl()).toBe('');
   });
 
   it('should correctly retrieve arc id from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
     });
-    mockLocation.pathname = '/learn/math/fractions/test/arc/1';
-    expect(urlService.getArcIdFromUrl()).toBe('1');
+    mockLocation.pathname = '/learn/math/fractions/test/arc/bakery/arc_1';
+    expect(urlService.getArcIdFromUrl()).toBe('arc_1');
 
     mockLocation.pathname = '/learn/math/fractions/practice';
     expect(urlService.getArcIdFromUrl()).toBe('');
+  });
+
+  it('should correctly retrieve story url fragment from arc url', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      StoryEditorArcs: {isEnabled: true},
+    });
+    mockLocation.pathname = '/learn/math/fractions/test/arc/bakery/arc_1';
+    expect(urlService.getStoryUrlFragmentFromArcUrl()).toBe('bakery');
+
+    mockLocation.pathname = '/learn/math/fractions/test/arc/';
+    expect(urlService.getStoryUrlFragmentFromArcUrl()).toBe('');
   });
 });

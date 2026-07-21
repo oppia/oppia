@@ -52,6 +52,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   private sessionType: PracticeSessionType = PracticeSessionType.Mastery;
   private nodeId: string = '';
   private arcId: string = '';
+  private storyUrlFragment: string = '';
 
   constructor(
     private urlService: UrlService,
@@ -94,6 +95,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
+            story_url_fragment: this.storyUrlFragment,
             node_id: this.nodeId,
           }
         );
@@ -103,6 +105,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
+            story_url_fragment: this.storyUrlFragment,
             arc_id: this.arcId,
           }
         );
@@ -139,6 +142,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
+            story_url_fragment: this.storyUrlFragment,
             node_id: this.nodeId,
           }
         );
@@ -148,6 +152,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           {
             classroom_url_fragment: classroomUrlFragment,
             topic_url_fragment: topicUrlFragment,
+            story_url_fragment: this.storyUrlFragment,
             arc_id: this.arcId,
           }
         );
@@ -247,12 +252,15 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     if (nodeId) {
       this.sessionType = PracticeSessionType.Lesson;
       this.nodeId = nodeId;
+      this.storyUrlFragment =
+        this.urlService.getStoryUrlFragmentFromPracticeUrl();
     } else if (
       arcId &&
       this.platformFeatureService.status.StoryEditorArcs.isEnabled
     ) {
       this.sessionType = PracticeSessionType.Arc;
       this.arcId = arcId;
+      this.storyUrlFragment = this.urlService.getStoryUrlFragmentFromArcUrl();
     } else if (this.urlService.getPathname().match(/\/mastery-challenge/)) {
       this.sessionType = PracticeSessionType.Mastery;
     } else if (this.stringifiedSubtopicIds) {

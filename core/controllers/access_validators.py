@@ -25,11 +25,8 @@ from core.domain import (
     learner_group_services,
     skill_domain,
     skill_fetchers,
-    story_domain,
     story_fetchers,
-    topic_domain,
     topic_fetchers,
-    user_services,
 )
 
 from typing import Dict, List, Optional, TypedDict
@@ -318,6 +315,7 @@ class PracticeSessionAccessValidationPage(
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
         'node_id': {
             'schema': {'type': 'basestring'},
             'default_value': None,
@@ -345,6 +343,7 @@ class PracticeSessionAccessValidationPage(
 
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
+        story_url_fragment = self.request.route_kwargs.get('story_url_fragment')
         node_id = self.request.route_kwargs.get('node_id')
         arc_id = self.request.route_kwargs.get('arc_id')
 
@@ -353,12 +352,12 @@ class PracticeSessionAccessValidationPage(
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
         assert topic is not None
 
-        if node_id is not None:
-            self._validate_node_id(topic, node_id)
+        if node_id is not None and story_url_fragment is not None:
+            self._validate_node_id(story_url_fragment, node_id)
             return
 
-        if arc_id is not None:
-            self._validate_arc_id(topic, arc_id)
+        if arc_id is not None and story_url_fragment is not None:
+            self._validate_arc_id(story_url_fragment, arc_id)
             return
 
         if subtopics is None:
@@ -385,99 +384,46 @@ class PracticeSessionAccessValidationPage(
             if subtopic_id not in subtopics_ids:
                 raise self.NotFoundException
 
-    def _get_all_nodes_for_topic(
-        self, topic: topic_domain.Topic
-    ) -> List[story_domain.StoryNode]:
-        """Returns all nodes across all published stories in the topic.
+    def _validate_node_id(self, story_url_fragment: str, node_id: str) -> None:
+        """Validates that a node exists within a specific story.
 
         Args:
-            topic: Topic. The topic object.
-
-        Returns:
-            list(StoryNode). All nodes in order.
-        """
-        return story_fetchers.get_all_nodes_for_topic(topic)
-
-    def _get_all_arcs_for_topic(
-        self, topic: topic_domain.Topic
-    ) -> List[story_domain.Arc]:
-        """Returns all arcs across all published stories in the topic.
-
-        Args:
-            topic: Topic. The topic object.
-
-        Returns:
-            list(Arc). All arcs in order.
-        """
-        return [
-            arc
-            for _, arc in story_fetchers.get_all_arcs_with_stories_for_topic(
-                topic
-            )
-        ]
-
-    def _validate_node_id(
-        self, topic: topic_domain.Topic, node_id: str
-    ) -> None:
-        """Validates that the given node ID exists in one of the topic's stories.
-
-        The node_id parameter is a 1-based index that maps to the nth node
-        across all published stories in the topic.
-
-        Args:
-            topic: Topic. The topic object.
-            node_id: str. The node ID (1-based index) to validate.
+            story_url_fragment: str. The story URL fragment.
+            node_id: str. The internal node ID (e.g. 'node_1').
 
         Raises:
-            NotFoundException. The node ID was not found.
+            NotFoundException. The node was not found.
         """
-        try:
-            node_index = int(node_id)
-        except ValueError as exc:
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
+        if story is None:
             raise self.NotFoundException(
-                'Invalid node identifier: %s' % node_id
-            ) from exc
-
-        if node_index < 1:
+                'Story with url fragment %s not found.' % story_url_fragment
+            )
+        node = story_fetchers.get_node_from_story(story, node_id)
+        if node is None:
             raise self.NotFoundException(
-                'Node identifier must be a positive integer: %s' % node_id
+                'Node %s not found in story %s.' % (node_id, story_url_fragment)
             )
 
-        all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index > len(all_nodes):
-            raise self.NotFoundException(
-                'Node with id %s is not part of this topic.' % node_id
-            )
-
-    def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
-        """Validates that the given arc ID exists in one of the topic's stories.
-
-        The arc_id parameter is a 1-based index that maps to the nth arc
-        across all published stories in the topic.
+    def _validate_arc_id(self, story_url_fragment: str, arc_id: str) -> None:
+        """Validates that an arc exists within a specific story.
 
         Args:
-            topic: Topic. The topic object.
-            arc_id: str. The arc index (e.g., '1') to validate.
+            story_url_fragment: str. The story URL fragment.
+            arc_id: str. The internal arc ID (e.g. 'arc_1').
 
         Raises:
-            NotFoundException. The arc ID was not found.
+            NotFoundException. The arc was not found.
         """
-        try:
-            arc_index = int(arc_id)
-        except ValueError as exc:
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
+        if story is None:
             raise self.NotFoundException(
-                'Invalid arc identifier: %s' % arc_id
-            ) from exc
-
-        if arc_index < 1:
-            raise self.NotFoundException(
-                'Arc identifier must be a positive integer: %s' % arc_id
+                'Story with url fragment %s not found.' % story_url_fragment
             )
-
-        all_arcs = self._get_all_arcs_for_topic(topic)
-        if arc_index > len(all_arcs):
+        arc = story_fetchers.get_arc_from_story(story, arc_id)
+        if arc is None:
             raise self.NotFoundException(
-                'Arc with id %s is not part of this topic.' % arc_id
+                'Arc %s not found in story %s.' % (arc_id, story_url_fragment)
             )
 
 
