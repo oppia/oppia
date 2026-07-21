@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * EL.CL. Learner can play a complete community lesson.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -32,18 +33,23 @@ const CARD_NAMES = {
   THIRD_CARD: 'Last Card',
 };
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let explorationEditor: ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin;
   let explorationId: string | null;
 
-  beforeAll(async function () {
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000); // Setup takes longer than default timeout.
+
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -57,7 +63,8 @@ describe('Logged-Out Learner', function () {
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     // Create a new exploration "What are the place values?" using the
@@ -112,9 +119,9 @@ describe('Logged-Out Learner', function () {
       'Dummy Exploration 2',
       'Algorithms'
     );
-  }, 900000); // Setup takes loner than default timeout.
+  });
 
-  it('should use all RTE components in the exploration', async function () {
+  test('should use all RTE components in the exploration', async function () {
     // Navigate to community library page and expect it to contain 3
     // different explorations.
     // LO.4 - First step of the test is to verify that the community library page
@@ -186,7 +193,7 @@ describe('Logged-Out Learner', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
