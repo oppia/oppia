@@ -2540,7 +2540,7 @@
   resolved "https://registry.yarnpkg.com/@panva/asn1.js/-/asn1.js-1.0.0.tgz#dd55ae7b8129e02049f009408b97c61ccf9032f6"
   integrity sha512-UdkG3mLEqXgnlKsWanWcgb6dOjUzJ+XC5f+aWw30qrtjxeNUSfKX1cd5FBzOaXQumoe9nIqeZUvrRJS03HCCtw==
 
-"@popperjs/core@^2.11.8":
+"@popperjs/core@^2.11.8", "@popperjs/core@^2.9.2":
   version "2.11.8"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
@@ -4177,6 +4177,26 @@ ajv@^8.0.1:
     json-schema-traverse "^1.0.0"
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
+
+alphanum-sort@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
+  integrity sha512-0FcBfdcmaumGPQ0qPn7Q5qTgz/ooXgIyp1rf8ik5bGX8mpE2YHjC0P/eyQvxu1GURYQgq9ozf2mteQ5ZD9YiyQ==
+
+angular-shepherd@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/angular-shepherd/-/angular-shepherd-11.0.0.tgz#b0a7028bac8b84ea86256a001bc8a64314fff4ff"
+  integrity sha512-Ig0OU6vE0JAbyWFTH+qgmTgPKUxLmUXMCJde6XFBAg2gc624fvcJ5s6GapM/lUaFaDjtLkGJuAkb9pI0dUo8rQ==
+  dependencies:
+    shepherd.js "^8.0.1"
+    tslib "^2.0.0"
+
+angular2-template-loader@0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/angular2-template-loader/-/angular2-template-loader-0.6.2.tgz#c0d44e90fff0fac95e8b23f043acda7fd1c51d7c"
+  integrity sha512-jBSrm2yDsTA48GG0H57upn8rmTfJS3/R7EhUeAL/3ryWS8deT9You8UQKWpW4eVSEY7uMJ52iFwpOYXc8QEtGg==
+  dependencies:
+    loader-utils "^0.2.15"
 
 ansi-align@^3.0.0:
   version "3.0.1"
@@ -13938,11 +13958,6 @@ ngx-infinite-scroll@^10.0.1:
     "@scarf/scarf" "^1.1.0"
     opencollective-postinstall "^2.0.2"
 
-ngx-joyride@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/ngx-joyride/-/ngx-joyride-2.3.1.tgz#5e1ef45d453bc6e7f98f3066feb80bbac8b37044"
-  integrity sha512-5Dlpa9qqagUSqarsUvZkw2+iyPhD5SWYoH9rVC5WRWIL9intT/3Td4PoTp9sQoGzgMKUbX+XDmExky02XD+t9Q==
-
 ngx-mat-select-search@^3.3.0:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/ngx-mat-select-search/-/ngx-mat-select-search-3.3.3.tgz#b867e2c8add58a3bc99f2b1634bd7fd25af0a834"
@@ -17050,6 +17065,15 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
+shepherd.js@^8.0.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/shepherd.js/-/shepherd.js-8.3.1.tgz#131eeefc5eb2bc44c9e23d0da139db46b2b55339"
+  integrity sha512-IhxZNhnK2m/pNTXudNfYrcwvcZNWkeYngQbQee8nC3xJ2GjeIatGqivhdZAMZ+LeogZvKMakB931d/V534uhrw==
+  dependencies:
+    "@popperjs/core" "^2.9.2"
+    deepmerge "^4.2.2"
+    smoothscroll-polyfill "^0.4.4"
+
 side-channel@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/side-channel/-/side-channel-1.0.4.tgz#efce5c8fdc104ee751b25c58d4290011fa5ea2cf"
@@ -17129,6 +17153,11 @@ smart-buffer@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
+
+smoothscroll-polyfill@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/smoothscroll-polyfill/-/smoothscroll-polyfill-0.4.4.tgz#3a259131dc6930e6ca80003e1cb03b603b69abf8"
+  integrity sha512-TK5ZA9U5RqCwMpfoMq/l1mrH0JAR7y7KRvOBx0n2869aLxch+gT9GhN3yUfjiw+d/DiF1mKo14+hd62JyMmoBg==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
