@@ -1433,7 +1433,7 @@ describe('Contribution and review service', () => {
       expect(sortedTranslationCards).toEqual(translationSuggestions);
     });
 
-    it('should append generic (metadata) translation suggestions at the end', () => {
+    it('should prepend generic (metadata) translation suggestions at the beginning', () => {
       const states = States.createFromBackendDict(statesBackendDict);
       const suggestionsWithGeneric = [
         ...translationSuggestions,
@@ -1465,7 +1465,7 @@ describe('Contribution and review service', () => {
       );
 
       expect(sortedTranslationCards.length).toBe(7);
-      expect(sortedTranslationCards[6].suggestion_id).toBe('id_generic');
+      expect(sortedTranslationCards[0].suggestion_id).toBe('id_generic');
     });
   });
 });
