@@ -193,24 +193,6 @@ describe('StateHintsEditorComponent', () => {
     expect(result).toBeFalse();
   });
 
-  describe('isFormulaAsText', () => {
-    it('should return true when formula is written as plain text', () => {
-      expect(component.isFormulaAsText('3 + 6 = 9')).toBeTrue();
-      expect(
-        component.isFormulaAsText('<p>Addition</p><p>9 = 6 + 3</p>')
-      ).toBeTrue();
-    });
-
-    it('should return false when formula is inside noninteractive math component or normal text', () => {
-      const mathHtml =
-        '<oppia-noninteractive-math></oppia-noninteractive-math>';
-      expect(component.isFormulaAsText(mathHtml)).toBeFalse();
-      expect(
-        component.isFormulaAsText('Just normal sentence without formula.')
-      ).toBeFalse();
-    });
-  });
-
   describe('when saving or submitting formula as text', () => {
     it('should save content directly when onSaveContentButtonClicked is called', () => {
       spyOn(component, 'saveContent');

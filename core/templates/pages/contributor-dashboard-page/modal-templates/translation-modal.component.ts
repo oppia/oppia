@@ -24,7 +24,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-
+import {MathFormulaDetectionService} from 'services/math-formula-detection.service';
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {PageContextService} from 'services/page-context.service';
@@ -180,7 +180,8 @@ export class TranslationModalComponent {
     private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
-    private readonly translationLanguageService: TranslationLanguageService,
+    private translationLanguageService: TranslationLanguageService,
+    private mathFormulaDetectionService: MathFormulaDetectionService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly wds: WindowDimensionsService,
@@ -424,26 +425,11 @@ export class TranslationModalComponent {
 
   isFormulaAsText(htmlString: string | string[]): boolean {
     if (
-      this.translationLanguageService.getActiveLanguageDirection() !== 'rtl' ||
-      !htmlString ||
-      typeof htmlString !== 'string' ||
-      htmlString.includes('oppia-noninteractive-math')
+      this.translationLanguageService.getActiveLanguageDirection() !== 'rtl'
     ) {
       return false;
     }
-
-    const textWithNewlines = htmlString
-      .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
-      .replace(/<br\s*[\/]?>/gi, '\n')
-      .replace(/<[^>]*>/g, '')
-      .trim();
-
-    const lines = textWithNewlines
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-
-    return lines.some(line => /[+\-*/=]/.test(line));
+    return this.mathFormulaDetectionService.isFormulaAsText(htmlString);
   }
 
   isCopyModeActive(): boolean {

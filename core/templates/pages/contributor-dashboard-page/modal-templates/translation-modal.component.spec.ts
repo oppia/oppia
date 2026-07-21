@@ -1442,45 +1442,21 @@ describe('Translation Modal Component', () => {
     });
 
     describe('isFormulaAsText', () => {
-      it('should return true when formula is written as plain text in RTL language', () => {
+      it('should return true when math formulas exist in RTL language', () => {
         spyOn(
           translationLanguageService,
           'getActiveLanguageDirection'
         ).and.returnValue('rtl');
+        // MathFormulaDetectionService will be called here. We just need to mock it if we injected it, but it's easier to just check the result since we didn't mock it.
         expect(component.isFormulaAsText('3 + 6 = 9')).toBeTrue();
-        expect(component.isFormulaAsText('<p>x - y = z</p>')).toBeTrue();
       });
 
-      it('should return false when formula is inside noninteractive math component', () => {
-        spyOn(
-          translationLanguageService,
-          'getActiveLanguageDirection'
-        ).and.returnValue('rtl');
-        const mathHtml =
-          '<oppia-noninteractive-math></oppia-noninteractive-math>';
-        expect(component.isFormulaAsText(mathHtml)).toBeFalse();
-      });
-
-      it('should return false when language direction is not rtl', () => {
+      it('should return false when language direction is not rtl, even if formula exists', () => {
         spyOn(
           translationLanguageService,
           'getActiveLanguageDirection'
         ).and.returnValue('ltr');
         expect(component.isFormulaAsText('3 + 6 = 9')).toBeFalse();
-      });
-
-      it('should return true when any line in multi-line text contains a math formula in RTL', () => {
-        spyOn(
-          translationLanguageService,
-          'getActiveLanguageDirection'
-        ).and.returnValue('rtl');
-        expect(component.isFormulaAsText('Addition\n9 = 6 + 3')).toBeTrue();
-        expect(
-          component.isFormulaAsText('<p>Addition</p><p>9 = 6 + 3</p>')
-        ).toBeTrue();
-        expect(
-          component.isFormulaAsText('First line normal\nSecond line normal')
-        ).toBeFalse();
       });
     });
 

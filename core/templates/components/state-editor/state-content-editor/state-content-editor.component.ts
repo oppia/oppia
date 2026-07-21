@@ -28,6 +28,7 @@ import {
 import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import {MathFormulaDetectionService} from 'services/math-formula-detection.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
@@ -68,6 +69,7 @@ export class StateContentEditorComponent implements OnInit {
     private pageContextService: PageContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
+    private mathFormulaDetectionService: MathFormulaDetectionService,
     private externalRteSaveService: ExternalRteSaveService,
     public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
@@ -140,26 +142,7 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   isFormulaAsText(htmlString: string | string[]): boolean {
-    if (
-      !htmlString ||
-      typeof htmlString !== 'string' ||
-      htmlString.includes('oppia-noninteractive-math')
-    ) {
-      return false;
-    }
-
-    const textWithNewlines = htmlString
-      .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
-      .replace(/<br\s*[\/]?>/gi, '\n')
-      .replace(/<[^>]*>/g, '')
-      .trim();
-
-    const lines = textWithNewlines
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-
-    return lines.some(line => /[+\-*/=]/.test(line));
+    return this.mathFormulaDetectionService.isFormulaAsText(htmlString);
   }
 
   onSaveContentButtonClicked(): void {
