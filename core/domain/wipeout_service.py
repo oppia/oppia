@@ -247,7 +247,12 @@ def pre_delete_user(user_id: str) -> None:
         # Set all the user's email preferences to False in order to disable all
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
-            user_id, False, False, False, False
+            user_id,
+            False,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=False,
         )
         bulk_email_services.permanently_delete_user_from_list(
             user_settings.email

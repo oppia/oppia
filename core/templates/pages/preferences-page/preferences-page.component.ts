@@ -289,6 +289,9 @@ export class PreferencesPageComponent {
             canReceiveSubscriptionEmail: new FormControl(
               preferencesData.can_receive_subscription_email
             ),
+            canReceiveContributorDashboardEmail: new FormControl(
+              preferencesData.can_receive_contributor_dashboard_email
+            ),
           }),
         });
 
@@ -342,6 +345,8 @@ export class PreferencesPageComponent {
             emailFormData.canReceiveFeedbackMessageEmail,
           can_receive_subscription_email:
             emailFormData.canReceiveSubscriptionEmail,
+          can_receive_contributor_dashboard_email:
+            emailFormData.canReceiveContributorDashboardEmail,
         };
         updates.push({
           update_type: BACKEND_UPDATE_TYPE_DICT[key],

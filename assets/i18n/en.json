@@ -1242,6 +1242,7 @@
     "I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Receive emails when someone sends you feedback on an exploration",
     "I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Receive news and updates about the site",
     "I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Receive emails when a creator you've subscribed to publishes a new exploration",
+    "I18N_PREFERENCES_EMAIL_RECEIVE_CONTRIBUTOR_DASHBOARD_REVIEW_NOTIFICATIONS": "Receive daily emails about Contributor Dashboard suggestions awaiting review",
     "I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "We were not able to add you to our mailing list automatically. Please visit the following link to sign up to our mailing list: ",
     "I18N_PREFERENCES_EXPORT_ACCOUNT": "Export account",
     "I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "This will download your Oppia account data as a JSON formatted text file.",

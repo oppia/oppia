@@ -278,7 +278,12 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         self,
     ) -> None:
         user_services.update_email_preferences(
-            self.new_user_id, True, False, False, False
+            self.new_user_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         with self.can_send_editor_role_email_ctx:
@@ -2555,7 +2560,12 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_id, True, False, False, False
+            self.reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
     @test_utils.set_platform_parameters(
@@ -2642,7 +2652,12 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_id, True, False, False, False
+            self.reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
     @test_utils.set_platform_parameters(
@@ -2722,7 +2737,12 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         user_services.update_email_preferences(
-            self.user_id, True, False, False, False
+            self.user_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
     @test_utils.set_platform_parameters(
@@ -2756,7 +2776,12 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
     )
     def test_that_email_not_sent_if_user_can_not_receive_emails(self) -> None:
         user_services.update_email_preferences(
-            self.user_id, False, False, False, False
+            self.user_id,
+            False,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
@@ -3313,12 +3338,22 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
         self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_1_id, True, False, False, False
+            self.reviewer_1_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         self.signup(self.REVIEWER_2_EMAIL, self.REVIEWER_2_USERNAME)
         self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_2_id, True, False, False, False
+            self.reviewer_2_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
@@ -6384,12 +6419,22 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
         self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_1_id, True, False, False, False
+            self.reviewer_1_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         self.signup(self.REVIEWER_2_EMAIL, self.REVIEWER_2_USERNAME)
         self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_2_id, True, False, False, False
+            self.reviewer_2_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
@@ -7767,7 +7812,12 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         # should not receive any emails.
         for user_id in user_ids:
             user_services.update_email_preferences(
-                user_id, True, True, False, True
+                user_id,
+                True,
+                True,
+                False,
+                True,
+                feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
             )
 
         self.assertListEqual(
@@ -7792,7 +7842,14 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         user_services.set_email_preferences_for_exploration(
             user_ids[1], exp_id, mute_suggestion_notifications=False
         )
-        user_services.update_email_preferences(user_id, True, True, False, True)
+        user_services.update_email_preferences(
+            user_id,
+            True,
+            True,
+            False,
+            True,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
+        )
         self.assertListEqual(
             email_manager.can_users_receive_thread_email(
                 user_ids, exp_id, True
@@ -7810,7 +7867,12 @@ class EmailPreferencesTests(test_utils.EmailTestBase):
         # receive all emails.
         for user_id in user_ids:
             user_services.update_email_preferences(
-                user_id, True, True, True, True
+                user_id,
+                True,
+                True,
+                True,
+                True,
+                feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
             )
 
         self.assertListEqual(
@@ -7922,19 +7984,34 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             self.TRANSLATION_REVIEWER_EMAIL
         )
         user_services.update_email_preferences(
-            self.translation_reviewer_id, True, False, False, False
+            self.translation_reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL
         )
         user_services.update_email_preferences(
-            self.question_reviewer_id, True, False, False, False
+            self.question_reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
         self.question_submitter_id = self.get_user_id_from_email(
             self.QUESTION_SUBMITTER_EMAIL
         )
         user_services.update_email_preferences(
-            self.question_submitter_id, True, False, False, False
+            self.question_submitter_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
     @test_utils.set_platform_parameters(
