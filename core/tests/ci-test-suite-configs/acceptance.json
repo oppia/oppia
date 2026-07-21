@@ -397,8 +397,8 @@
     },
     {
       "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/manage-classroom-progress-in-home-learner-dashboard",
@@ -417,8 +417,8 @@
     },
     {
       "name": "logged-out-learner/play-a-complete-community-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
