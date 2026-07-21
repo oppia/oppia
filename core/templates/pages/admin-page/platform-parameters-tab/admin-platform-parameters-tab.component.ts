@@ -35,7 +35,6 @@ import {
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {PlatformParameterRule} from 'domain/platform-parameter/platform-parameter-rule.model';
 import {HttpErrorResponse} from '@angular/common/http';
-import './admin-platform-parameters-tab.component.css';
 
 interface PlatformSchema {
   type: string;
@@ -47,7 +46,6 @@ type FilterType = keyof typeof PlatformParameterFilterType;
 @Component({
   selector: 'oppia-admin-platform-parameters-tab',
   templateUrl: './admin-platform-parameters-tab.component.html',
-  styleUrls: ['./admin-platform-parameters-tab.component.css'],
 })
 export class AdminPlatformParametersTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();

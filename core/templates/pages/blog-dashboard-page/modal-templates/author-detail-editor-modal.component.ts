@@ -20,12 +20,10 @@ import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './author-detail-editor-modal.component.css';
 
 @Component({
   selector: 'oppia-blog-author-details-editor',
   templateUrl: './author-detail-editor-modal.component.html',
-  styleUrls: ['./author-detail-editor-modal.component.css'],
 })
 export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

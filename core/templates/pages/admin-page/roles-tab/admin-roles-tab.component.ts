@@ -29,12 +29,10 @@ import {TranslationCoordinatorRoleEditorModalComponent} from './translation-coor
 import {AlertsService} from 'services/alerts.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import constants from 'assets/constants';
-import './admin-roles-tab.component.css';
 
 @Component({
   selector: 'oppia-admin-roles-tab',
   templateUrl: './admin-roles-tab.component.html',
-  styleUrls: ['./admin-roles-tab.component.css'],
 })
 export class AdminRolesTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();

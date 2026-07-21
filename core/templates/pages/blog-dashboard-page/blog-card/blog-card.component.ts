@@ -26,12 +26,10 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import dayjs from 'dayjs';
 import {UserService} from 'services/user.service';
-import './blog-card.component.css';
 
 @Component({
   selector: 'oppia-blog-card',
   templateUrl: './blog-card.component.html',
-  styleUrls: ['./blog-card.component.css'],
 })
 export class BlogCardComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
