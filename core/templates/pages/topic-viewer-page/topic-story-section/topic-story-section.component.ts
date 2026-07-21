@@ -427,9 +427,9 @@ export class TopicStorySectionComponent
     const nextArcNumber = Math.min(this.arcGroups.length, 2);
 
     return {
-      practiceTitle: 'Arc 1 Review & Test',
+      practiceTitle: 'Adventure 1 Review & Test',
       practiceDescription:
-        'Test what you have learned in Arc 1 to unlock Arc ' +
+        'Test what you have learned in Adventure 1 to unlock Adventure ' +
         nextArcNumber +
         '.',
       relatedLessonNumber:
