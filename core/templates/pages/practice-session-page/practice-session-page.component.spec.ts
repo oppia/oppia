@@ -233,7 +233,7 @@ describe('Practice session page', () => {
 
   it('should determine lesson session type from pathname', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/practice/my-story/node_1'
+      '/learn/math/fractions/practice/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -255,7 +255,7 @@ describe('Practice session page', () => {
   it('should determine arc session type from pathname', fakeAsync(() => {
     mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/my-story/arc_1'
+      '/learn/math/fractions/test/arc/123'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -321,7 +321,7 @@ describe('Practice session page', () => {
 
   it('should build correct data URL for lesson practice', fakeAsync(() => {
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/practice/my-story/node_1'
+      '/learn/math/fractions/practice/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -337,15 +337,13 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    expect(component['_getDataUrl']()).toContain(
-      'abbrev-topic/my-story/node_1'
-    );
+    expect(component['_getDataUrl']()).toContain('abbrev-topic/1');
   }));
 
   it('should build correct retry URL for arc practice', fakeAsync(() => {
     mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue(
-      '/learn/math/fractions/test/arc/my-story/arc_1'
+      '/learn/math/fractions/test/arc/1'
     );
     spyOn(
       practiceSessionsBackendApiService,
@@ -361,9 +359,7 @@ describe('Practice session page', () => {
     tick();
 
     // eslint-disable-next-line dot-notation
-    expect(component['_getRetryUrl']()).toContain(
-      'abbrev-topic/test/arc/my-story/arc_1'
-    );
+    expect(component['_getRetryUrl']()).toContain('abbrev-topic/test/arc/1');
   }));
 
   it('should build correct retry URL for mastery challenge', fakeAsync(() => {

@@ -381,7 +381,6 @@ export class TopicStorySectionComponent
       {
         classroom_url_fragment: this.classroomUrlFragment,
         topic_url_fragment: this.topicUrlFragment,
-        story_url_fragment: this.storySummary.getUrlFragment(),
         node_id: nodeId,
       }
     );
@@ -396,7 +395,6 @@ export class TopicStorySectionComponent
       {
         classroom_url_fragment: this.classroomUrlFragment,
         topic_url_fragment: this.topicUrlFragment,
-        story_url_fragment: this.storySummary.getUrlFragment(),
         arc_id: arcId,
       }
     );

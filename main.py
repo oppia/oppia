@@ -329,13 +329,13 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/can_access_practice_session_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/practice/<story_url_fragment>/<node_id>'
+        r'/<topic_url_fragment>/practice/<node_id>'
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.PracticeSessionAccessValidationPage,
     ),
     get_redirect_route(
         r'%s/can_access_practice_session_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/test/arc/<story_url_fragment>/<arc_id>'
+        r'/<topic_url_fragment>/test/arc/<arc_id>'
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.PracticeSessionAccessValidationPage,
     ),
@@ -556,14 +556,12 @@ URLS = [
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
-        r'/<story_url_fragment>/<node_id>'
-        % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'/<node_id>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler,
     ),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
-        r'/arc/<story_url_fragment>/<arc_id>'
-        % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'/arc/<arc_id>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler,
     ),
     get_redirect_route(
@@ -1526,13 +1524,11 @@ URLS.extend(
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
-            r'%s/practice/<story_url_fragment>/<node_id>'
-            % feconf.TOPIC_VIEWER_URL_PREFIX,
+            r'%s/practice/<node_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
-            r'%s/test/arc/<story_url_fragment>/<arc_id>'
-            % feconf.TOPIC_VIEWER_URL_PREFIX,
+            r'%s/test/arc/<arc_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(

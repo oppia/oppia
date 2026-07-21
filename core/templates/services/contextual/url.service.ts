@@ -263,34 +263,20 @@ export class UrlService {
    */
   getNodeIdFromPracticeUrl(): string {
     const pathname = this.getPathname();
-    const match = pathname.match(/\/practice\/[^/]+\/(node_\d+)/);
+    const match = pathname.match(/\/practice\/(\d+)/);
     if (match) {
       return decodeURIComponent(match[1]);
     }
     return '';
   }
 
-  getStoryUrlFragmentFromPracticeUrl(): string {
-    const pathname = this.getPathname();
-    const match = pathname.match(/\/practice\/([^/]+)\//);
-    if (match) {
-      return decodeURIComponent(match[1]);
-    }
-    return '';
-  }
-
+  /**
+   * This function returns the arc ID from the end-of-arc URL.
+   * @return {string} the arc ID.
+   */
   getArcIdFromUrl(): string {
     const pathname = this.getPathname();
-    const match = pathname.match(/\/test\/arc\/[^/]+\/(arc_\d+)/);
-    if (match) {
-      return decodeURIComponent(match[1]);
-    }
-    return '';
-  }
-
-  getStoryUrlFragmentFromArcUrl(): string {
-    const pathname = this.getPathname();
-    const match = pathname.match(/\/test\/arc\/([^/]+)\//);
+    const match = pathname.match(/\/test\/arc\/(\d+)/);
     if (match) {
       return decodeURIComponent(match[1]);
     }

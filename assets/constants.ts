@@ -7378,7 +7378,7 @@ export default {
       ]
     },
     "NODE_PRACTICE_SESSION": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/:story_url_fragment/:node_id",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/:node_id",
       "TITLE": "Practice Session Page",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
@@ -7400,7 +7400,7 @@ export default {
       ]
     },
     "END_OF_ARC_TEST": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/arc/:story_url_fragment/:arc_id",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/arc/:arc_id",
       "TITLE": "End-of-Arc Test",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered

@@ -767,42 +767,52 @@ def get_node_index_by_story_id_and_node_id(story_id: str, node_id: str) -> int:
     return node_index
 
 
-def get_node_from_story(
-    story: story_domain.Story,
-    node_id: str,
-) -> Optional[story_domain.StoryNode]:
-    """Returns a node from a story by its internal ID.
+def get_all_nodes_for_topic(
+    topic: topic_domain.Topic,
+) -> List[story_domain.StoryNode]:
+    """Returns all nodes across all published stories in the topic.
 
     Args:
-        story: Story. The story object.
-        node_id: str. The internal node ID (e.g. 'node_1').
+        topic: Topic. The topic object.
 
     Returns:
-        StoryNode or None. The node if found, otherwise None.
+        list(StoryNode). All nodes in order.
     """
-    try:
-        index = story.story_contents.get_node_index(node_id, strict=False)
-        if index is not None:
-            return story.story_contents.nodes[index]
-    except Exception:
-        pass
-    return None
+    story_ids = topic.get_canonical_story_ids(include_only_published=True)
+    story_ids.extend(
+        topic.get_additional_story_ids(include_only_published=True)
+    )
+    stories = get_stories_by_ids(story_ids)
+    all_nodes: List[story_domain.StoryNode] = []
+    for story in stories:
+        if story is None:
+            continue
+        all_nodes.extend(story.story_contents.nodes)
+    return all_nodes
 
 
-def get_arc_from_story(
-    story: story_domain.Story,
-    arc_id: str,
-) -> Optional[story_domain.Arc]:
-    """Returns an arc from a story by its internal ID.
+def get_all_arcs_with_stories_for_topic(
+    topic: topic_domain.Topic,
+) -> List[Tuple[story_domain.Story, story_domain.Arc]]:
+    """Returns all arcs paired with their owning story for the topic.
 
     Args:
-        story: Story. The story object.
-        arc_id: str. The internal arc ID (e.g. 'arc_1').
+        topic: Topic. The topic object.
 
     Returns:
-        Arc or None. The arc if found, otherwise None.
+        list(tuple(Story, Arc)). All (story, arc) pairs in order.
     """
-    try:
-        return story.story_contents.get_arc(arc_id)
-    except ValueError:
-        return None
+    story_ids = topic.get_canonical_story_ids(include_only_published=True)
+    story_ids.extend(
+        topic.get_additional_story_ids(include_only_published=True)
+    )
+    stories = get_stories_by_ids(story_ids)
+    all_arcs_with_stories: List[Tuple[story_domain.Story, story_domain.Arc]] = (
+        []
+    )
+    for story in stories:
+        if story is None:
+            continue
+        for arc in story.story_contents.arcs:
+            all_arcs_with_stories.append((story, arc))
+    return all_arcs_with_stories

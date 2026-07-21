@@ -112,7 +112,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_returns_all_subtopic_skills_when_no_params(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_1'
+            '%s/staging/%s'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -272,7 +272,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/title/node_1'
+            '%s/staging/%s/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -338,7 +338,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/title/nonexistent_node'
+            '%s/staging/%s/nonexistent_node'
             % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name',
@@ -415,7 +415,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/nonexistent_arc'
+            '%s/staging/%s/arc/nonexistent_arc'
             % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'public-topic-name',
@@ -491,7 +491,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_1'
+            '%s/staging/%s/arc/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -507,7 +507,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_returns_empty_for_zero_node_id(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/title/node_0'
+            '%s/staging/%s/0'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -515,7 +515,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_returns_empty_for_large_node_id(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/title/node_999'
+            '%s/staging/%s/999'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -523,7 +523,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_returns_empty_for_invalid_arc_number(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_abc'
+            '%s/staging/%s/arc/abc'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -531,7 +531,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_returns_empty_for_zero_arc_index(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_0'
+            '%s/staging/%s/arc/0'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -539,7 +539,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_returns_empty_for_large_arc_index(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_999'
+            '%s/staging/%s/arc/999'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -616,7 +616,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/title/node_1'
+            '%s/staging/%s/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -702,7 +702,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_1'
+            '%s/staging/%s/arc/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -792,7 +792,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_1'
+            '%s/staging/%s/arc/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -878,7 +878,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_1'
+            '%s/staging/%s/arc/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -1016,7 +1016,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_2'
+            '%s/staging/%s/arc/2'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -1158,7 +1158,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/title/arc_1'
+            '%s/staging/%s/arc/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -1230,7 +1230,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             side_effect=mock_get_stories,
         ):
             json_response = self.get_json(
-                '%s/staging/%s/arc/title/arc_1'
+                '%s/staging/%s/arc/1'
                 % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public-topic-name',

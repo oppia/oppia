@@ -386,12 +386,11 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
                 'nonexistent_arc',
             ),
             expected_status_int=404,
@@ -399,65 +398,60 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_lesson_practice_with_zero_node_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'node_0',
+                '0',
             ),
             expected_status_int=404,
         )
 
     def test_lesson_practice_with_large_node_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'node_999',
+                '999',
             ),
             expected_status_int=404,
         )
 
     def test_end_of_arc_page_with_invalid_arc_number(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'arc_abc',
+                'abc',
             ),
             expected_status_int=404,
         )
 
     def test_end_of_arc_page_with_zero_arc_index(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'arc_0',
+                '0',
             ),
             expected_status_int=404,
         )
 
     def test_end_of_arc_page_with_large_arc_index(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'arc_999',
+                '999',
             ),
             expected_status_int=404,
         )
@@ -512,13 +506,12 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'node_1',
+                '1',
             ),
             expected_status_int=200,
         )
@@ -589,13 +582,12 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'arc_1',
+                '1',
             ),
             expected_status_int=200,
         )
@@ -667,25 +659,23 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
-                'arc_1',
+                '1',
             ),
             expected_status_int=200,
         )
 
     def test_lesson_practice_with_invalid_node_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
                 'nonexistent_node',
             ),
             expected_status_int=404,
@@ -693,12 +683,11 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
 
     def test_end_of_arc_page_with_invalid_arc_id(self) -> None:
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
                 'nonexistent_arc',
             ),
             expected_status_int=404,
@@ -753,12 +742,11 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/practice/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/practice/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
                 'nonexistent_node',
             ),
             expected_status_int=404,
@@ -829,12 +817,11 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         story_services.delete_story(self.admin_id, deleted_story_id)
 
         self.get_html_response(
-            '%s/can_access_practice_session_page/%s/%s/test/arc/%s/%s'
+            '%s/can_access_practice_session_page/%s/%s/test/arc/%s'
             % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
                 'math',
                 'public-topic-name',
-                'title',
                 'nonexistent_arc',
             ),
             expected_status_int=404,

@@ -42,7 +42,6 @@ class MockAccessValidationBackendApiService {
   validateAccessToLessonPracticePage(
     _classroomUrlFragment: string,
     _topicUrlFragment: string,
-    _storyUrlFragment: string,
     _nodeId: string
   ) {
     return Promise.resolve();
@@ -51,7 +50,6 @@ class MockAccessValidationBackendApiService {
   validateAccessToEndOfArcPage(
     _classroomUrlFragment: string,
     _topicUrlFragment: string,
-    _storyUrlFragment: string,
     _arcId: string
   ) {
     return Promise.resolve();
@@ -232,8 +230,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      story_url_fragment: 'my-story',
-      node_id: 'node_1',
+      node_id: '1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -245,12 +242,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith(
-      'math',
-      'algebra',
-      'my-story',
-      'node_1'
-    );
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1');
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
@@ -268,8 +260,7 @@ describe('PracticeSessionAccessGuard', () => {
     (routeSnapshot.params as {[key: string]: string}) = {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'algebra',
-      story_url_fragment: 'my-story',
-      arc_id: 'arc_1',
+      arc_id: '1',
     };
 
     let canActivateResult: boolean | null = null;
@@ -281,12 +272,7 @@ describe('PracticeSessionAccessGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith(
-      'math',
-      'algebra',
-      'my-story',
-      'arc_1'
-    );
+    expect(validateAccessSpy).toHaveBeenCalledWith('math', 'algebra', '1');
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
