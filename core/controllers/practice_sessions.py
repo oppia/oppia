@@ -121,13 +121,13 @@ class PracticeSessionsPageDataHandler(
     def _get_all_nodes_for_topic(
         self, topic: topic_domain.Topic
     ) -> List[story_domain.StoryNode]:
-        """Returns all nodes across all published stories in the topic.
+        """Returns nodes from the first published story in the topic.
 
         Args:
             topic: Topic. The topic object.
 
         Returns:
-            list(StoryNode). All nodes in order.
+            list(StoryNode). Nodes in order.
         """
         return story_fetchers.get_all_nodes_for_topic(topic)
 
@@ -137,7 +137,7 @@ class PracticeSessionsPageDataHandler(
         """Returns skill IDs associated with a given story node.
 
         The node_id parameter is a 1-based index that maps to the nth node
-        across all published stories in the topic.
+        in the first published story of the topic.
 
         Args:
             topic: Topic. The topic object.
@@ -151,11 +151,8 @@ class PracticeSessionsPageDataHandler(
         except ValueError:
             return []
 
-        if node_index < 1:
-            return []
-
         all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index > len(all_nodes):
+        if node_index < 1 or node_index > len(all_nodes):
             return []
 
         node = all_nodes[node_index - 1]
@@ -167,7 +164,7 @@ class PracticeSessionsPageDataHandler(
         """Returns skill IDs associated with all nodes in a given arc.
 
         The arc_id parameter is a 1-based index that maps to the nth arc
-        across all published stories in the topic.
+        in the first published story of the topic.
 
         Args:
             topic: Topic. The topic object.
@@ -181,13 +178,10 @@ class PracticeSessionsPageDataHandler(
         except ValueError:
             return []
 
-        if arc_index < 1:
-            return []
-
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic
         )
-        if arc_index > len(arcs_with_stories):
+        if arc_index < 1 or arc_index > len(arcs_with_stories):
             return []
 
         story, arc = arcs_with_stories[arc_index - 1]

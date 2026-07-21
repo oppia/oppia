@@ -1016,14 +1016,14 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         )
 
         json_response = self.get_json(
-            '%s/staging/%s/arc/2'
+            '%s/staging/%s/arc/1'
             % (feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'public-topic-name'),
         )
         self.assertEqual(json_response['topic_name'], 'public_topic_name')
         self.assertEqual(len(json_response['skill_ids_to_descriptions_map']), 1)
         self.assertEqual(
-            json_response['skill_ids_to_descriptions_map'][self.skill_id2],
-            'Skill 2',
+            json_response['skill_ids_to_descriptions_map'][self.skill_id1],
+            'Skill 1',
         )
 
     def test_get_arc_skills_duplicate_arc_ids_across_stories(self) -> None:

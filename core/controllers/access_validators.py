@@ -388,7 +388,7 @@ class PracticeSessionAccessValidationPage(
     def _get_all_nodes_for_topic(
         self, topic: topic_domain.Topic
     ) -> List[story_domain.StoryNode]:
-        """Returns all nodes across all published stories in the topic.
+        """Returns nodes from the first published story in the topic.
 
         Args:
             topic: Topic. The topic object.
@@ -401,7 +401,7 @@ class PracticeSessionAccessValidationPage(
     def _get_all_arcs_for_topic(
         self, topic: topic_domain.Topic
     ) -> List[story_domain.Arc]:
-        """Returns all arcs across all published stories in the topic.
+        """Returns arcs from the first published story in the topic.
 
         Args:
             topic: Topic. The topic object.
@@ -419,10 +419,10 @@ class PracticeSessionAccessValidationPage(
     def _validate_node_id(
         self, topic: topic_domain.Topic, node_id: str
     ) -> None:
-        """Validates that the given node ID exists in one of the topic's stories.
+        """Validates that the given node ID exists in the first story.
 
         The node_id parameter is a 1-based index that maps to the nth node
-        across all published stories in the topic.
+        in the first published story of the topic.
 
         Args:
             topic: Topic. The topic object.
@@ -438,22 +438,17 @@ class PracticeSessionAccessValidationPage(
                 'Invalid node identifier: %s' % node_id
             ) from exc
 
-        if node_index < 1:
-            raise self.NotFoundException(
-                'Node identifier must be a positive integer: %s' % node_id
-            )
-
         all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index > len(all_nodes):
+        if node_index < 1 or node_index > len(all_nodes):
             raise self.NotFoundException(
                 'Node with id %s is not part of this topic.' % node_id
             )
 
     def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
-        """Validates that the given arc ID exists in one of the topic's stories.
+        """Validates that the given arc ID exists in the first story.
 
         The arc_id parameter is a 1-based index that maps to the nth arc
-        across all published stories in the topic.
+        in the first published story of the topic.
 
         Args:
             topic: Topic. The topic object.
@@ -469,13 +464,8 @@ class PracticeSessionAccessValidationPage(
                 'Invalid arc identifier: %s' % arc_id
             ) from exc
 
-        if arc_index < 1:
-            raise self.NotFoundException(
-                'Arc identifier must be a positive integer: %s' % arc_id
-            )
-
         all_arcs = self._get_all_arcs_for_topic(topic)
-        if arc_index > len(all_arcs):
+        if arc_index < 1 or arc_index > len(all_arcs):
             raise self.NotFoundException(
                 'Arc with id %s is not part of this topic.' % arc_id
             )

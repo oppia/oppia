@@ -702,7 +702,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         all_nodes = story_fetchers.get_all_nodes_for_topic(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         )
-        self.assertEqual(len(all_nodes), 2)
+        self.assertEqual(len(all_nodes), 1)
 
     def test_get_all_arcs_with_stories_for_topic(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
@@ -812,13 +812,10 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         )
-        self.assertEqual(len(arcs_with_stories), 2)
+        self.assertEqual(len(arcs_with_stories), 1)
         first_story, first_arc = arcs_with_stories[0]
-        second_story, second_arc = arcs_with_stories[1]
         self.assertEqual(first_story.id, self.story_id)
         self.assertEqual(first_arc.id, 'arc_1')
-        self.assertEqual(second_story.id, story_id_2)
-        self.assertEqual(second_arc.id, 'arc_1')
 
     def test_get_all_arcs_with_stories_excludes_unpublished(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
