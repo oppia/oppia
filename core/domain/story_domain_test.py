@@ -538,6 +538,42 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 
+    def test_to_dict_for_android(self) -> None:
+        """Test that to_dict_for_android returns a dict without arcs."""
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID,
+            'Title',
+            'Description',
+            topic_id,
+            'story-frag-default',
+        )
+        expected_story_dict: story_domain.StoryDictForAndroid = {
+            'id': self.STORY_ID,
+            'title': 'Title',
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'description': 'Description',
+            'notes': feconf.DEFAULT_STORY_NOTES,
+            'story_contents': {
+                'nodes': [],
+                'initial_node_id': None,
+                'next_node_id': self.NODE_ID_1,
+            },
+            'story_contents_schema_version': (
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ),
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'corresponding_topic_id': topic_id,
+            'version': 0,
+            'url_fragment': 'story-frag-default',
+            'meta_tag_content': '',
+        }
+        self.assertEqual(story.to_dict_for_android(), expected_story_dict)
+        # Verify arcs field is not present in the Android dict.
+        self.assertNotIn('arcs', story.to_dict_for_android()['story_contents'])
+
     def test_get_acquired_skill_ids_for_node_ids(self) -> None:
         self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1']
         self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_2']
@@ -2515,6 +2551,23 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict
         )
+
+    def test_story_contents_to_dict_for_android(self) -> None:
+        """Test that StoryContents.to_dict_for_android returns a dict
+        without arcs.
+        """
+        story_node = story_domain.StoryNode.create_default_story_node(
+            self.NODE_ID_1,
+            'Node title',
+        )
+        story_contents = story_domain.StoryContents(
+            [story_node], self.NODE_ID_1, '2'
+        )
+        story_contents_dict = story_contents.to_dict_for_android()
+        self.assertNotIn('arcs', story_contents_dict)
+        self.assertIn('nodes', story_contents_dict)
+        self.assertIn('initial_node_id', story_contents_dict)
+        self.assertIn('next_node_id', story_contents_dict)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
