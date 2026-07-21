@@ -42,7 +42,7 @@
 
       <div class="oppia-certificate-col-right">
         <div class="form-group"
-             [ngClass]="{'has-error': timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > TIME_LIMIT_MAX_VALUE}">
+             [ngClass]="{'has-error': timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > MAX_TIME_LIMIT_IN_MINUTES}">
           <label class="oppia-certificate-label" for="certificate-offering-time-limit">
             Time Limit<span class="oppia-certificate-required">*</span>
           </label>
@@ -59,12 +59,12 @@
             }">
             <em>
               <span *ngIf="!getTimeLimitValidationError()">
-                Time limit should be between {{MIN_TIME_LIMIT_IN_MINUTES}} and {{TIME_LIMIT_MAX_VALUE}} minutes.
+                Time limit should be between {{MIN_TIME_LIMIT_IN_MINUTES}} and {{MAX_TIME_LIMIT_IN_MINUTES}} minutes.
               </span>
               <span *ngIf="getTimeLimitValidationError()">
                 {{ getTimeLimitValidationError() }}
                 <span *ngIf="timeLimitInMinutes !== null && timeLimitInMinutes !== undefined && timeLimitInMinutes > 0">
-                  Minutes entered: {{timeLimitInMinutes}}/{{TIME_LIMIT_MAX_VALUE}}
+                  Minutes entered: {{timeLimitInMinutes}}/{{MAX_TIME_LIMIT_IN_MINUTES}}
                 </span>
               </span>
             </em>
