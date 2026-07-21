@@ -258,6 +258,8 @@ export class BaseUser {
         element.click();
       }
     }, selector);
+  }
+  /**
    * Clicks on an anchor element with the given inner text and verifies that the
    * target page URL contains the given URL.
    * @param {string} anchorInnerText The inner text of the anchor element.
