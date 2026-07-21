@@ -28,6 +28,8 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
+test.describe.configure({mode: 'serial'});
+
 test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
