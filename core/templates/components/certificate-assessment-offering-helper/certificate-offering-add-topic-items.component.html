@@ -63,8 +63,8 @@
               </div>
             </div>
             <button type="button" class="oppia-certificate-offering-topic-toggle"
-                    [class.oppia-certificate-offering-topic-toggle--added]="selectedTopicIds.has(topic.id)"
-                    [disabled]="isLoadingTopics"
+                    [disabled]="selectedTopicIds.has(topic.id)"
+                    [attr.aria-disabled]="selectedTopicIds.has(topic.id)"
                     (click)="toggleTopic(topic)">
               {{ selectedTopicIds.has(topic.id) ? 'Added' : 'Add' }}
             </button>
@@ -82,6 +82,8 @@
               (click)="onBackClicked()">
         &lt; Back
       </button>
+      <!-- The Next button is disabled until at least one topic is added, so
+      aria-disabled is applied to communicate its disabled state. -->
       <button type="button" class="oppia-certificate-offering-primary-button"
               [disabled]="selectedTopics.length === 0 || isLoadingTopics"
               [attr.aria-disabled]="selectedTopics.length === 0 || isLoadingTopics"

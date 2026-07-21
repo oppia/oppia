@@ -253,14 +253,6 @@ describe('Certificate Offering Review And Availability Component', () => {
     ]);
   });
 
-  it('should get correct save button text depending on mode', () => {
-    component.isEditMode = false;
-    expect(component.getSaveButtonText()).toEqual('Save Certificate');
-
-    component.isEditMode = true;
-    expect(component.getSaveButtonText()).toEqual('Save Certificate');
-  });
-
   it('should emit save event when clicking save button', () => {
     const saveSpy = spyOn(component.saveCertificateOffering, 'emit');
 

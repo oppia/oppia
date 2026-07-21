@@ -243,10 +243,6 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     return `${error.topicName}: Only ${error.available} ${error.difficulty.toLowerCase()} questions (minimum ${error.required} required)`;
   }
 
-  getSaveButtonText(): string {
-    return 'Save Certificate';
-  }
-
   onSaveClicked(): void {
     this.saveCertificateOffering.emit();
   }

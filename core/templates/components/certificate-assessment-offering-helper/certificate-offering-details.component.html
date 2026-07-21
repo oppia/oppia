@@ -8,13 +8,13 @@
       </label>
       <input id="certificate-offering-title" name="certificateOfferingTitle"
              class="oppia-certificate-input" type="text" required
-             [attr.maxlength]="TITLE_MAX_LENGTH" [(ngModel)]="title"
+             [attr.maxlength]="MAX_TITLE_LENGTH" [(ngModel)]="title"
              [disabled]="isLoadingClassrooms"
              placeholder="Enter title" aria-required="true">
       <small class="form-text text-muted">
-        <em> Certificate title should be at most {{TITLE_MAX_LENGTH}} characters.</em>
+        <em> Certificate title should be at most {{MAX_TITLE_LENGTH}} characters.</em>
         <span *ngIf="title?.length > 0">
-          <em> Characters used: {{title.length}}/{{TITLE_MAX_LENGTH}}</em>
+          <em> Characters used: {{title.length}}/{{MAX_TITLE_LENGTH}}</em>
         </span>
       </small>
     </div>
@@ -27,14 +27,14 @@
         <div class="oppia-certificate-textarea-wrap">
           <textarea id="certificate-offering-description" name="certificateOfferingDescription"
                     class="oppia-certificate-textarea" required rows="6"
-                    [attr.maxlength]="DESCRIPTION_MAX_LENGTH" [(ngModel)]="description"
+                    [attr.maxlength]="MAX_DESCRIPTION_LENGTH" [(ngModel)]="description"
                     [disabled]="isLoadingClassrooms"
                     placeholder="Enter description" aria-required="true">
           </textarea>
           <small class="form-text text-muted">
-            <em> Certificate description should be at most {{DESCRIPTION_MAX_LENGTH}} characters.</em>
+            <em> Certificate description should be at most {{MAX_DESCRIPTION_LENGTH}} characters.</em>
             <span *ngIf="description?.length > 0">
-              <em> Characters used: {{description.length}}/{{DESCRIPTION_MAX_LENGTH}}</em>
+              <em> Characters used: {{description.length}}/{{MAX_DESCRIPTION_LENGTH}}</em>
             </span>
           </small>
         </div>
@@ -49,7 +49,8 @@
           <input id="certificate-offering-time-limit" name="certificateOfferingTimeLimit"
                  class="oppia-certificate-input" type="number" required
                  [attr.min]="MIN_TIME_LIMIT_IN_MINUTES"
-                 max="60" [(ngModel)]="timeLimitInMinutes"
+                 [attr.max]="MAX_TIME_LIMIT_IN_MINUTES"
+                 [(ngModel)]="timeLimitInMinutes"
                  [disabled]="isLoadingClassrooms"
                  placeholder="Enter time limit in minutes" aria-required="true">
           <small class="form-text" [ngClass]="{
@@ -71,13 +72,14 @@
         </div>
 
         <div class="form-group"
-          [ngClass]="{'has-error': totalQuestions !== null && totalQuestions !== undefined && totalQuestions > TOTAL_QUESTIONS_MAX_VALUE}">
+          [ngClass]="{'has-error': totalQuestions !== null && totalQuestions !== undefined && totalQuestions > MAX_TOTAL_QUESTIONS}">
           <label class="oppia-certificate-label" for="certificate-offering-total-questions">
             Total Number of Questions<span class="oppia-certificate-required">*</span>
           </label>
           <input id="certificate-offering-total-questions" name="certificateOfferingTotalQuestions"
                  class="oppia-certificate-input" type="number" required
-                 [attr.min]="MIN_TOTAL_QUESTIONS" max="50"
+                 [attr.min]="MIN_TOTAL_QUESTIONS"
+                 [attr.max]="MAX_TOTAL_QUESTIONS"
                  [(ngModel)]="totalQuestions"
                  [disabled]="isLoadingClassrooms"
                  placeholder="Enter total questions" aria-required="true">
@@ -87,12 +89,12 @@
             }">
             <em>
               <span *ngIf="!getTotalQuestionsValidationError()">
-                Total number of questions should be between {{MIN_TOTAL_QUESTIONS}} and {{TOTAL_QUESTIONS_MAX_VALUE}}.
+                Total number of questions should be between {{MIN_TOTAL_QUESTIONS}} and {{MAX_TOTAL_QUESTIONS}}.
               </span>
               <span *ngIf="getTotalQuestionsValidationError()">
                 {{ getTotalQuestionsValidationError() }}
                 <span *ngIf="totalQuestions !== null && totalQuestions !== undefined && totalQuestions > 0">
-                  Questions entered: {{totalQuestions}}/{{TOTAL_QUESTIONS_MAX_VALUE}}
+                  Questions entered: {{totalQuestions}}/{{MAX_TOTAL_QUESTIONS}}
                 </span>
               </span>
             </em>
