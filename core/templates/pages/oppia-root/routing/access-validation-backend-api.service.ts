@@ -24,6 +24,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   providedIn: 'root',
 })
 export class AccessValidationBackendApiService {
+  TECHNICAL_FEEDBACK_DASHBOARD_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_technical_feedback_dashboard';
   STORY_EDITOR_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_story_editor_page/<story_id>';
 
@@ -108,6 +110,12 @@ export class AccessValidationBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  validateAccessToTechnicalFeedbackDashboardPage(): Promise<void> {
+    return this.http
+      .get<void>(this.TECHNICAL_FEEDBACK_DASHBOARD_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
 
   validateAccessToExplorationEditorPage(explorationId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
