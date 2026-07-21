@@ -761,19 +761,6 @@ export class BaseUser {
   }
 
   /**
-   * Returns text in nested element
-   * @param {string} selector - The selector of the element to get text from.
-   */
-  async getTextContent(selector: string): Promise<string> {
-    const element = await this.page.$(selector);
-    const text = await this.page.evaluate(
-      (el: Element) => el.textContent,
-      element as ElementHandle<Element>
-    );
-    return text?.trim() ?? '';
-  }
-
-  /**
    * Close a single user's browser context.
    */
   async closeBrowser(): Promise<void> {
