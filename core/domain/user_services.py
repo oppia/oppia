@@ -1982,10 +1982,10 @@ def get_contributor_dashboard_email_preference(
         email_preferences_model.contributor_dashboard_notifications
     )
     if contributor_dashboard_notifications is not None:
-        return contributor_dashboard_notifications
+        return bool(contributor_dashboard_notifications)
 
     if email_preferences_model.site_updates is not None:
-        return email_preferences_model.site_updates
+        return bool(email_preferences_model.site_updates)
 
     return feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE
 
