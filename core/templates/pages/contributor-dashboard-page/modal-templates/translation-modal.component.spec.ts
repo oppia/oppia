@@ -254,6 +254,26 @@ describe('Translation Modal Component', () => {
     );
   });
 
+  it('should wrap text with ellipsis when text is too long', () => {
+    expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
+  });
+
+  it('should return empty string for empty input', () => {
+    expect(component.wrapTextWithEllipsis('', 10)).toBe('');
+  });
+
+  it('should return input unchanged for short strings', () => {
+    expect(component.wrapTextWithEllipsis('Hi', 10)).toBe('Hi');
+  });
+
+  it('should return input unchanged when characterCount is less than 3', () => {
+    expect(component.wrapTextWithEllipsis('Hello', 2)).toBe('Hello');
+  });
+
+  it('should return input unchanged when length equals characterCount', () => {
+    expect(component.wrapTextWithEllipsis('Hello', 5)).toBe('Hello');
+  });
+
   it('should invoke change detection when html is updated', () => {
     component.activeWrittenTranslation = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
@@ -274,6 +294,14 @@ describe('Translation Modal Component', () => {
     component.updateHtml(['new value']);
 
     expect(component.activeWrittenTranslation).toEqual(['new value']);
+  });
+
+  it('should return early when $event is neither string nor array', () => {
+    component.activeWrittenTranslation = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateHtml(null);
+    expect(component.activeWrittenTranslation).toEqual('old');
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
   it('should set validation errors and disable save when translation has missing custom tags', () => {
@@ -597,6 +625,36 @@ describe('Translation Modal Component', () => {
           type: 'unicode',
         },
       });
+    });
+
+    it('should return activeWrittenTranslation as string when it is a string', () => {
+      component.activeWrittenTranslation = 'test string';
+      expect(component.activeWrittenTranslationAsString).toBe('test string');
+    });
+
+    it('should return first element when activeWrittenTranslation is an array', () => {
+      component.activeWrittenTranslation = ['first', 'second'];
+      expect(component.activeWrittenTranslationAsString).toBe('first');
+    });
+
+    it('should return empty string when activeWrittenTranslation is an empty array', () => {
+      component.activeWrittenTranslation = [];
+      expect(component.activeWrittenTranslationAsString).toBe('');
+    });
+
+    it('should return textToTranslate as string when it is a string', () => {
+      component.textToTranslate = 'test text';
+      expect(component.textToTranslateAsString).toBe('test text');
+    });
+
+    it('should return first element when textToTranslate is an array', () => {
+      component.textToTranslate = ['first', 'second'];
+      expect(component.textToTranslateAsString).toBe('first');
+    });
+
+    it('should return empty string when textToTranslate is an empty array', () => {
+      component.textToTranslate = [];
+      expect(component.textToTranslateAsString).toBe('');
     });
 
     it('should utilize the modify translations opportunity when available', () => {

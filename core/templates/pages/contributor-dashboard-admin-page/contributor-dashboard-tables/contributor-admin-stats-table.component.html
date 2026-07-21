@@ -183,7 +183,7 @@
       </div>
       <div>
         <span>Results per page: </span>
-        <select [value]="itemsPerPage" aria-label="Results Per Page" (change)="onItemsPerPageChange($event.target.value); refreshPagination()">
+        <select [value]="itemsPerPage" aria-label="Results Per Page" (change)="onItemsPerPageChange($any($event.target).value); refreshPagination()">
           <option *ngFor="let choice of itemsPerPageChoice" [value]="choice">{{ choice }}</option>
         </select>
       </div>

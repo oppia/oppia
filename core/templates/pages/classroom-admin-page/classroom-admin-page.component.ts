@@ -17,6 +17,7 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Component, OnInit} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {AlertsService} from 'services/alerts.service';
@@ -69,6 +70,22 @@ export class ClassroomAdminPageComponent implements OnInit {
     private pageContextService: PageContextService,
     private editableTopicBackendApiService: EditableTopicBackendApiService
   ) {}
+
+  get topicsGraphValidationError(): string {
+    return this.classroomAdminDataService.topicsGraphValidationError;
+  }
+
+  validateClassroom(
+    tempClassroomData: ExistingClassroomData,
+    classroomData: ExistingClassroomData
+  ): void {
+    this.classroomAdminDataService.validateClassroom(
+      tempClassroomData,
+      classroomData
+    );
+  }
+
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
   classroomData!: ExistingClassroomData;
   tempClassroomData!: ExistingClassroomData;
