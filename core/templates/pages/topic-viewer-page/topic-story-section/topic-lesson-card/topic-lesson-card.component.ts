@@ -30,8 +30,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
 
-import './topic-lesson-card.component.css';
-
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
@@ -43,10 +41,15 @@ const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   styleUrls: ['./topic-lesson-card.component.css'],
 })
 export class TopicLessonCardComponent implements OnInit, OnChanges {
+  @Input() lessonNumber: number = 1;
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
   @Input() startUrl: string = '';
+  @Input() studyUrl: string = '';
+  @Input() practiceUrl: string = '';
+  @Input() arcAccentColor: string = '#00645c';
+  @Input() isActiveLesson: boolean = false;
   @Input() lessonProgressStatus:
     | 'not_started'
     | 'in_progress'
@@ -59,10 +62,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() availableVoiceoverLanguageAccentDescriptions: {
     [accentCode: string]: string;
   } = {};
+  @Input() navigatedLessonNumber: number | null = null;
 
   resolvedThumbnailUrl: string = '';
   selectedTextLanguageCode: string | null = null;
   selectedVoiceoverLanguageCode: string | null = null;
+  isExpanded: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -76,6 +81,8 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
+    // Expand only the first lesson by default.
+    this.isExpanded = this.lessonNumber === 1;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,6 +91,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       changes.availableVoiceoverLanguageCodes
     ) {
       this.initializeLanguageSelection();
+    }
+    if (changes.navigatedLessonNumber) {
+      // Auto-expand this lesson if it's the navigated lesson from the navbar
+      if (this.navigatedLessonNumber === this.lessonNumber) {
+        this.isExpanded = true;
+      }
     }
   }
 
@@ -116,6 +129,18 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
         this.selectedVoiceoverLanguageCode
       )
     );
+  }
+
+  onPracticeButtonClick(): void {
+    this.navigateTo(this.practiceUrl || this.startUrl);
+  }
+
+  onStudyButtonClick(): void {
+    this.navigateTo(this.studyUrl || this.startUrl);
+  }
+
+  toggleExpanded(): void {
+    this.isExpanded = !this.isExpanded;
   }
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {

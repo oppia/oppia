@@ -11,17 +11,28 @@
   width: 100%;
 }
 
+.topic-lesson-card.collapsed {
+  height: auto;
+  min-height: auto;
+  overflow: visible;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .topic-lesson-card-thumbnail {
-  background: #9fbfbb;
-  flex: 0 0 225px;
+  flex: 0 0 auto;
+  width: 212px;
   height: 100%;
+  overflow: hidden;
 }
 
 .topic-lesson-card-image {
   display: block;
   height: 100%;
-  object-fit: cover;
   width: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .topic-lesson-card-content {
@@ -33,39 +44,108 @@
   padding: 24px 22px 18px;
 }
 
+.topic-lesson-card-content.collapsed {
+  flex-direction: row;
+  align-items: center;
+  padding: 14px 18px;
+  gap: 12px;
+  height: auto;
+  border: none;
+  box-shadow: none;
+}
+
 .topic-lesson-card-copy {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.topic-lesson-card-content.collapsed .topic-lesson-card-copy {
+  flex-direction: row;
+  gap: 12px;
+  flex: 1;
+  align-items: center;
+}
+
+.topic-lesson-card-title-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.topic-lesson-card-title-row.collapsed {
+  width: 100%;
+}
+
+.topic-lesson-card-header {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topic-lesson-card-chevron-badge {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  color: #6b7280;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 32px;
+  height: 32px;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s ease;
+  width: 32px;
+}
+
+.topic-lesson-card-chevron-badge:hover {
+  background: #f3f4f6;
+}
+
+.topic-lesson-card-chevron-badge .material-icons {
+  font-size: 20px;
+}
+
+.topic-lesson-card-chevron-badge.expanded {
+  transform: rotate(180deg);
+}
+
+.topic-lesson-card-footer.collapsed {
+  display: none;
 }
 
 .topic-lesson-card-title {
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
   margin: 0;
 }
 
 .topic-lesson-card-description {
-  color: #3d3d3d;
+  color: #888;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 20px;
+  font-size: 13px;
   line-height: 1.2;
   margin: 0;
 }
 
 .topic-lesson-card-progress {
   height: 24px;
-  width: 296px;
 }
 
 .topic-lesson-card-footer {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: auto;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .topic-lesson-card-progress oppia-checkpoint-bar {
@@ -76,7 +156,6 @@
 
 .topic-lesson-card-start-button {
   align-items: center;
-  align-self: flex-start;
   background: #00645c;
   border: none;
   border-radius: 4px;
@@ -86,42 +165,86 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;
+  gap: 6px;
   height: 44px;
   justify-content: center;
-  margin-left: auto;
-  min-width: 106px;
   outline: none;
   text-decoration: none;
+  width: 100%;
+}
+
+.topic-lesson-card-secondary-button {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #0b776d;
+  border-radius: 4px;
+  color: #0b776d;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 6px;
+  height: 36px;
+  justify-content: center;
+  min-width: 88px;
+  padding: 0 12px;
+}
+
+.topic-lesson-card-btn-icon {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .topic-lesson-card-actions {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
-  justify-content: flex-start;
-  width: 100%;
+  justify-content: space-between;
+  flex: 1 1 auto;
+}
+
+.topic-lesson-card-actions-left {
+  align-items: center;
+  align-self: flex-end;
+  display: flex;
+  flex: 1 1 auto;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 12px;
+}
+
+.topic-lesson-card-actions-right {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.topic-lesson-card-secondary-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .topic-lesson-card-fallback-info-icon {
   align-items: center;
-  color: #3d3d3d;
+  color: #0b776d;
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
-  font-size: 22px;
-  height: 22px;
   justify-content: center;
-  width: 22px;
 }
 
 .topic-lesson-card-fallback-info-icon .material-icons {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .topic-lesson-language-selector {
   flex: 0 1 auto;
+  margin-right: auto;
 }
 
 .topic-lesson-card-info-icon {
@@ -163,7 +286,7 @@
   }
 
   .topic-lesson-card-thumbnail {
-    flex: 0 0 180px;
+    flex: 0 0 140px;
     height: 100%;
   }
 
@@ -207,6 +330,11 @@
     gap: 6px;
   }
 
+  .topic-lesson-card-secondary-button {
+    min-width: 78px;
+    padding: 0 10px;
+  }
+
   .topic-lesson-language-selector-wrapper {
     margin-right: 10px;
   }
@@ -223,7 +351,7 @@
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: auto;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -276,6 +404,11 @@
     align-items: stretch;
     flex-direction: column;
     justify-content: stretch;
+  }
+
+  .topic-lesson-card-secondary-button,
+  .topic-lesson-card-start-button {
+    width: 100%;
   }
 
   .topic-lesson-card-fallback-info-icon {

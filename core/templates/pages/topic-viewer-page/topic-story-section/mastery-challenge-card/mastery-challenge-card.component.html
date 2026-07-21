@@ -1,0 +1,16 @@
+<div class="mastery-challenge-card" aria-label="Mastery challenge">
+  <div class="mastery-challenge-icon" aria-hidden="true">
+    <i class="material-icons">emoji_events</i>
+  </div>
+  <div class="mastery-challenge-content">
+    <h3 class="mastery-challenge-title">{{ title }}</h3>
+    <p class="mastery-challenge-description">{{ description }}</p>
+  </div>
+  <button class="mastery-challenge-button"
+          type="button"
+          [disabled]="!actionUrl"
+          (click)="navigateToAction()">
+    <i class="material-icons" aria-hidden="true">stars</i>
+    <span>{{ buttonLabel }}</span>
+  </button>
+</div>

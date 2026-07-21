@@ -436,7 +436,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].visitedCheckpointsCount).toBe(3);
   });
 
-  it('should not create practice card when lesson cards exist', () => {
+  it('should show arc-end-test card when lesson cards exist and practice is enabled', () => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
       'getDescription',
@@ -472,7 +472,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(1);
-    expect(component.isPracticeCardVisible).toBe(false);
+    expect(component.isPracticeCardVisible).toBe(true);
   });
 
   it('should create practice card only when there are zero lessons', () => {

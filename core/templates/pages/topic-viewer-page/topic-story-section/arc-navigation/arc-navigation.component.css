@@ -1,0 +1,102 @@
+.arc-navigation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.arc-navigation-scroll-area {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.arc-navigation-wrapper {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin: 8px 0 4px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  /* Hide native scrollbar — arrows replace it */
+  scrollbar-width: none;
+}
+
+.arc-navigation-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.arc-navigation-arrow {
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 36px;
+  height: 36px;
+  justify-content: center;
+  outline: none;
+  width: 36px;
+  z-index: 2;
+}
+
+.arc-navigation-arrow:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.arc-navigation-arrow--left {
+  order: -1;
+}
+
+.arc-navigation-arrow--right {
+  order: 1;
+}
+
+.arc-navigation-arrow .material-icons {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.arc-navigation-hint {
+  color: #3730a3;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 4px 0 12px;
+  text-align: center;
+}
+
+.arc-navigation-hint-arrow {
+  display: inline-block;
+  margin: 0 4px;
+}
+
+.arc-navigation-group {
+  align-items: center;
+  border: 2.5px solid;
+  border-radius: 36px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  padding: 8px 14px;
+}
+
+.arc-navigation-mastery {
+  flex: 0 0 auto;
+}
+
+.arc-navigation-clickable {
+  cursor: pointer;
+}
+
+.arc-navigation-clickable:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}

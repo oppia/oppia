@@ -1,6 +1,6 @@
 <div class="lesson-card-container e2e-test-redesigned-lesson-card-container"  *ngIf="allNodes?.length !==0 && (!isRecommendation || statusIsPublished ||!isSerialChapterFeatureLearnerFlagEnabled())">
   <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
-    <img alt="" class="h-100" [src]="imgUrl">
+    <img alt="" class="lesson-card-thumbnail-img" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card-tags w-100">
       <!--TODO(#18384): Learner group tags-->
       <!--TODO(#18384): Should goal tags display if completed?-->
@@ -107,7 +107,14 @@
 
   .lesson-card-img {
     height: 136px;
+    overflow: hidden;
     position: relative;
+  }
+
+  .lesson-card-thumbnail-img {
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
   }
 
   .lesson-card-tags {

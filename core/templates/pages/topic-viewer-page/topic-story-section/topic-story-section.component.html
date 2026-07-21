@@ -34,36 +34,74 @@
     </div>
 
     <div class="story-card-body">
+      <topic-arc-navigation
+        [arcGroups]="arcNavigationGroups"
+        [activeLessonNumber]="activeLessonNumber"
+        (lessonSelected)="onNavigationLessonSelected($event)"
+        (practiceSelected)="onNavigationPracticeSelected($event)">
+      </topic-arc-navigation>
+
       <ng-container *ngIf="arcGroups.length > 0; else flatLessonList">
-        <div class="arc-group" *ngFor="let arcGroup of arcGroups; index as arcIdx">
+        <div class="arc-group" *ngFor="let arcGroup of visibleArcGroups; index as arcIdx"
+             [ngStyle]="{'border-color': arcGroup.headerBorderColor}">
           <div class="arc-header" (click)="toggleArc(arcIdx)" role="button" tabindex="0"
                [attr.aria-expanded]="isArcExpanded(arcIdx)"
+               [ngStyle]="{'background-color': arcGroup.headerBackgroundColor}"
                (keydown.enter)="toggleArc(arcIdx)"
                (keydown.space)="toggleArc(arcIdx); $event.preventDefault()">
             <div class="arc-header-left">
-              <span class="arc-chevron" [class.expanded]="isArcExpanded(arcIdx)">&#9654;</span>
-              <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
+              <div class="arc-flag-icon" [ngStyle]="{'background-color': arcGroup.accentColor}">
+                <i class="material-icons">flag</i>
+              </div>
+              <div class="arc-header-text">
+                <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
+                <p class="arc-completion-text">{{ getArcCompletionText(arcIdx) }}</p>
+              </div>
             </div>
-            <span class="arc-lesson-count">{{ arcGroup.lessonCards.length }} lesson{{ arcGroup.lessonCards.length !== 1 ? 's' : '' }}</span>
+            <div class="arc-chevron-badge" [class.expanded]="isArcExpanded(arcIdx)">
+              <i class="material-icons">expand_more</i>
+            </div>
           </div>
           <p *ngIf="arcGroup.arcDescription && isArcExpanded(arcIdx)" class="arc-description">
             {{ arcGroup.arcDescription }}
           </p>
           <div *ngIf="isArcExpanded(arcIdx)" class="arc-lessons">
             <div class="story-lesson-card-wrapper"
+                 [id]="'lesson-' + lessonCard.lessonNumber"
                  *ngFor="let lessonCard of arcGroup.lessonCards">
               <topic-lesson-card
                 [lessonTitle]="lessonCard.lessonTitle"
                 [lessonDescription]="lessonCard.lessonDescription"
                 [thumbnailUrl]="lessonCard.thumbnailUrl"
                 [startUrl]="lessonCard.startUrl"
+                [studyUrl]="studyGuideUrl"
+                [practiceUrl]="practiceCard.practiceUrl"
+                [lessonNumber]="lessonCard.lessonNumber"
+                [arcAccentColor]="arcGroup.accentColor"
+                [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
                 [lessonProgressStatus]="lessonCard.lessonProgressStatus"
                 [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
                 [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
                 [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
                 [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-                [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions">
+                [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+                [navigatedLessonNumber]="navigatedLessonNumber">
               </topic-lesson-card>
+            </div>
+
+            <div class="story-practice-card-wrapper"
+                 [id]="'practice-card-' + arcIdx"
+                 *ngIf="shouldShowArcEndTestCard(arcIdx)">
+              <topic-arc-end-test-card
+                [practiceTitle]="practiceCard.practiceTitle"
+                [practiceDescription]="practiceCard.practiceDescription"
+                [relatedLessonNumber]="practiceCard.relatedLessonNumber"
+                [thumbnailUrl]="practiceCard.thumbnailUrl"
+                [studyUrl]="practiceCard.studyUrl"
+                [cardBackgroundColor]="arcGroup.headerBackgroundColor"
+                [cardAccentColor]="arcGroup.accentColor"
+                [practiceUrl]="practiceCard.practiceUrl">
+              </topic-arc-end-test-card>
             </div>
           </div>
         </div>
@@ -71,33 +109,47 @@
 
       <ng-template #flatLessonList>
         <div class="story-lesson-card-wrapper"
+             [id]="'lesson-' + lessonCard.lessonNumber"
              *ngFor="let lessonCard of lessonCards">
           <topic-lesson-card
             [lessonTitle]="lessonCard.lessonTitle"
             [lessonDescription]="lessonCard.lessonDescription"
             [thumbnailUrl]="lessonCard.thumbnailUrl"
             [startUrl]="lessonCard.startUrl"
+            [studyUrl]="studyGuideUrl"
+            [practiceUrl]="practiceCard.practiceUrl"
+            [lessonNumber]="lessonCard.lessonNumber"
+            [arcAccentColor]="'#00645c'"
+            [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
             [lessonProgressStatus]="lessonCard.lessonProgressStatus"
             [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
             [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
             [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
             [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
-            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions">
+            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+            [navigatedLessonNumber]="navigatedLessonNumber">
           </topic-lesson-card>
+        </div>
+
+        <div class="story-practice-card-wrapper"
+             id="practice-card-flat"
+             *ngIf="isPracticeCardVisible">
+          <topic-arc-end-test-card
+            [practiceTitle]="practiceCard.practiceTitle"
+            [practiceDescription]="practiceCard.practiceDescription"
+            [relatedLessonNumber]="practiceCard.relatedLessonNumber"
+            [thumbnailUrl]="practiceCard.thumbnailUrl"
+            [studyUrl]="practiceCard.studyUrl"
+            [cardBackgroundColor]="'#ecf7f6'"
+            [cardAccentColor]="'#0b776d'"
+            [practiceUrl]="practiceCard.practiceUrl">
+          </topic-arc-end-test-card>
         </div>
       </ng-template>
 
-      <div class="story-practice-card-wrapper"
-        *ngIf="isPracticeCardVisible">
-        <topic-practice-card
-          [practiceTitle]="practiceCard.practiceTitle"
-          [practiceDescription]="practiceCard.practiceDescription"
-          [relatedLessonNumber]="practiceCard.relatedLessonNumber"
-          [thumbnailUrl]="practiceCard.thumbnailUrl"
-          [studyUrl]="practiceCard.studyUrl"
-          [practiceUrl]="practiceCard.practiceUrl">
-        </topic-practice-card>
-      </div>
+      <topic-mastery-challenge-card
+        [actionUrl]="masteryChallengeUrl">
+      </topic-mastery-challenge-card>
     </div>
   </div>
 </section>

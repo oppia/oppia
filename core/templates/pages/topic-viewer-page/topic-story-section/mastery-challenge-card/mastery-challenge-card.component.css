@@ -1,0 +1,87 @@
+.mastery-challenge-card {
+  align-items: center;
+  background: #fdf5ea;
+  border: 1px solid #f1dfc4;
+  border-radius: 8px;
+  display: flex;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 18px 20px;
+}
+
+.mastery-challenge-icon {
+  align-items: center;
+  color: #f5a623;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.mastery-challenge-icon .material-icons {
+  font-size: 56px;
+}
+
+.mastery-challenge-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mastery-challenge-title {
+  color: #1f2937;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.mastery-challenge-description {
+  color: #4b5563;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.mastery-challenge-button {
+  align-items: center;
+  background: #0b776d;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  gap: 6px;
+  height: 40px;
+  justify-content: center;
+  min-width: 140px;
+  padding: 0 16px;
+}
+
+.mastery-challenge-button .material-icons {
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .mastery-challenge-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mastery-challenge-title {
+    font-size: 24px;
+  }
+
+  .mastery-challenge-description {
+    font-size: 20px;
+  }
+
+  .mastery-challenge-button {
+    font-size: 18px;
+    min-width: 220px;
+  }
+}

@@ -1,0 +1,16 @@
+<span
+      [class]="circleClass"
+      [ngStyle]="{
+        'background-color': backgroundColor,
+        'border-color': borderColor,
+        color: textColor
+      }">
+  <i *ngIf="iconName"
+     class="material-icons"
+     aria-hidden="true">
+    {{ iconName }}
+  </i>
+  <span *ngIf="!iconName" class="arc-circle-badge-label">
+    {{ label }}
+  </span>
+</span>

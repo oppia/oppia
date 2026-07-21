@@ -159,6 +159,7 @@
   display: flex;
   justify-content: space-between;
   padding: 14px 18px;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -174,31 +175,74 @@
 .arc-header-left {
   align-items: center;
   display: flex;
-  gap: 10px;
+  flex: 1;
+  gap: 16px;
+  min-width: 0;
 }
 
-.arc-chevron {
-  color: #00645c;
-  font-size: 12px;
-  transition: transform 0.2s ease;
+.arc-flag-icon {
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  flex: 0 0 44px;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
 }
 
-.arc-chevron.expanded {
-  transform: rotate(90deg);
+.arc-flag-icon .material-icons {
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.arc-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .arc-title {
-  color: #00645c;
+  color: #1f2937;
   font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 18px;
   font-weight: 600;
+  line-height: 1.2;
   margin: 0;
+  overflow-wrap: break-word;
 }
 
-.arc-lesson-count {
-  color: #777;
+.arc-completion-text {
+  color: #1f2937;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 14px;
+  font-size: 13px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.arc-chevron-badge {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  color: #6b7280;
+  display: inline-flex;
+  flex: 0 0 32px;
+  height: 32px;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  width: 32px;
+}
+
+.arc-chevron-badge .material-icons {
+  font-size: 20px;
+}
+
+.arc-chevron-badge.expanded {
+  transform: rotate(180deg);
 }
 
 .arc-description {
@@ -219,7 +263,7 @@
 .story-lesson-card-wrapper,
 .story-practice-card-wrapper {
   align-self: center;
-  margin-top: auto;
+  margin-top: 12px;
   max-width: 912px;
   width: 100%;
 }
@@ -230,6 +274,11 @@
 
 .arc-lessons .story-lesson-card-wrapper:first-child {
   margin-top: 0;
+}
+
+topic-coming-soon-chapters,
+topic-mastery-challenge-card {
+  display: block;
 }
 
 @media (max-width: 768px) {

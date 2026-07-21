@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicPracticeCardComponent.
+ * @fileoverview Unit tests for ArcEndTestCardComponent.
  */
 
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {TopicPracticeCardComponent} from './topic-practice-card.component';
+import {ArcEndTestCardComponent} from './arc-end-test-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -31,9 +32,9 @@ class MockWindowRef {
   };
 }
 
-describe('TopicPracticeCardComponent', () => {
-  let component: TopicPracticeCardComponent;
-  let fixture: ComponentFixture<TopicPracticeCardComponent>;
+describe('ArcEndTestCardComponent', () => {
+  let component: ArcEndTestCardComponent;
+  let fixture: ComponentFixture<ArcEndTestCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
 
@@ -44,7 +45,8 @@ describe('TopicPracticeCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      declarations: [TopicPracticeCardComponent, MockTranslatePipe],
+      declarations: [ArcEndTestCardComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: UrlInterpolationService,
@@ -57,7 +59,7 @@ describe('TopicPracticeCardComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TopicPracticeCardComponent);
+    fixture = TestBed.createComponent(ArcEndTestCardComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
@@ -155,7 +157,7 @@ describe('TopicPracticeCardComponent', () => {
     component.relatedLessonNumber = 3;
 
     expect(component.getResolvedDescription()).toBe(
-      "Practice the skills you've learned in lesson 3."
+      'Test what you have learned in lesson 3.'
     );
   });
 
@@ -164,7 +166,7 @@ describe('TopicPracticeCardComponent', () => {
     component.relatedLessonNumber = null;
 
     expect(component.getResolvedDescription()).toBe(
-      "Practice the skills you've learned in lesson."
+      'Test what you have learned in lesson.'
     );
   });
 

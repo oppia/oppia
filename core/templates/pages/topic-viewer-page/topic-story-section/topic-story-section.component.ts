@@ -27,6 +27,7 @@ import {
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
+import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -35,9 +36,8 @@ import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/servi
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
-
-import './topic-story-section.component.css';
 
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
@@ -66,6 +66,9 @@ interface ArcGroupData {
   arcTitle: string;
   arcDescription: string;
   lessonCards: LessonCardData[];
+  accentColor: string;
+  headerBackgroundColor: string;
+  headerBorderColor: string;
 }
 
 interface PracticeCardData {
@@ -75,6 +78,11 @@ interface PracticeCardData {
   thumbnailUrl: string;
   studyUrl: string;
   practiceUrl: string;
+}
+
+interface ArcNavigationGroupData {
+  lessonNumbers: number[];
+  accentColor: string;
 }
 
 @Component({
@@ -99,9 +107,21 @@ export class TopicStorySectionComponent
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
   arcGroups: ArcGroupData[] = [];
-  practiceCard!: PracticeCardData;
+  visibleArcGroups: ArcGroupData[] = [];
+  arcNavigationGroups: ArcNavigationGroupData[] = [];
+  activeLessonNumber: number | null = null;
+  practiceCard: PracticeCardData = {
+    practiceTitle: '',
+    practiceDescription: '',
+    relatedLessonNumber: null,
+    thumbnailUrl: '',
+    studyUrl: '#',
+    practiceUrl: '#',
+  };
+  masteryChallengeUrl: string = '#';
   isPracticeCardVisible: boolean = false;
   _expandedArcIndices: Set<number> = new Set();
+  navigatedLessonNumber: number | null = null;
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -117,13 +137,45 @@ export class TopicStorySectionComponent
     }
   }
 
+  onNavigationLessonSelected(lessonNumber: number): void {
+    this.activeLessonNumber = lessonNumber;
+    this.navigatedLessonNumber = lessonNumber;
+
+    // Expand the arc that contains this lesson.
+    const arcIndex = this.visibleArcGroups.findIndex(group =>
+      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
+    );
+    if (arcIndex !== -1) {
+      this._expandedArcIndices.add(arcIndex);
+    }
+
+    // Scroll to the lesson card after Angular finishes updating the DOM.
+    setTimeout(() => {
+      const el = document.getElementById('lesson-' + lessonNumber);
+      if (el) {
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    }, 300);
+  }
+
+  onNavigationPracticeSelected(arcIndex: number): void {
+    // Scroll to the practice card of the specific arc after Angular finishes updating the DOM.
+    setTimeout(() => {
+      const el = document.getElementById('practice-card-' + arcIndex);
+      if (el) {
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    }, 300);
+  }
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private chapterProgressLoaderService: ChapterProgressLoaderService,
-    private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService
+    private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -176,16 +228,27 @@ export class TopicStorySectionComponent
   }
 
   getStoryMetaText(): string {
-    return this.getLessonCountText() + ', ' + this.getPracticeCountText();
+    return this.getLessonCountText();
   }
 
   getStoryMetaAriaLabel(): string {
-    return (
-      this.getLessonCountText() +
-      ' and ' +
-      this.getPracticeCountText() +
-      ' available'
-    );
+    return this.getLessonCountText() + ' available';
+  }
+
+  shouldShowArcEndTestCard(arcIndex: number): boolean {
+    return this.isPracticeCardVisible;
+  }
+
+  getArcCompletionText(arcIndex: number): string {
+    const arcGroup = this.visibleArcGroups[arcIndex];
+    if (!arcGroup) {
+      return '';
+    }
+    const completedCount = arcGroup.lessonCards.filter(
+      card => card.lessonProgressStatus === 'completed'
+    ).length;
+    const totalCount = arcGroup.lessonCards.length;
+    return `${completedCount} of ${totalCount} completed`;
   }
 
   isLanguageRTL(): boolean {
@@ -195,6 +258,10 @@ export class TopicStorySectionComponent
   private getLessonProgressStatus(
     node: StoryNode
   ): 'not_started' | 'in_progress' | 'completed' | 'coming_soon' {
+    if (!node.getExplorationId()) {
+      return 'coming_soon';
+    }
+
     const nodeTitle = node.getTitle();
     if (this.storySummary.isNodeCompleted(nodeTitle)) {
       return 'completed';
@@ -250,7 +317,7 @@ export class TopicStorySectionComponent
 
         return {
           lessonNumber: index + 1,
-          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+          lessonTitle: node.getTitle(),
           lessonDescription: node.getDescription(),
           thumbnailUrl: this.getLessonThumbnailUrl(node),
           startUrl: this.getLessonStartUrl(node),
@@ -281,8 +348,9 @@ export class TopicStorySectionComponent
       nodeIndexMap.set(node.getId(), index);
     });
 
-    return arcs.map(arc => {
+    return arcs.map((arc, arcIndex) => {
       const arcLessonCards: LessonCardData[] = [];
+      const paletteColor = this.getArcPaletteColor(arcIndex);
       arc.node_ids.forEach(nodeId => {
         const nodeIndex = nodeIndexMap.get(nodeId);
         if (nodeIndex !== undefined && this.lessonCards[nodeIndex]) {
@@ -293,6 +361,9 @@ export class TopicStorySectionComponent
         arcTitle: arc.title,
         arcDescription: arc.description,
         lessonCards: arcLessonCards,
+        accentColor: paletteColor.rowAccent,
+        headerBackgroundColor: paletteColor.headerBg,
+        headerBorderColor: paletteColor.headerBorder,
       };
     });
   }
@@ -317,7 +388,7 @@ export class TopicStorySectionComponent
     this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
       return {
         lessonNumber: index + 1,
-        lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+        lessonTitle: node.getTitle(),
         lessonDescription: node.getDescription(),
         thumbnailUrl: this.getLessonThumbnailUrl(node),
         startUrl: this.getLessonStartUrl(node),
@@ -334,16 +405,33 @@ export class TopicStorySectionComponent
     });
 
     this.arcGroups = this.buildArcGroups(allNodes);
+    this.visibleArcGroups = this.arcGroups;
+    this.arcNavigationGroups = this.visibleArcGroups.map(group => {
+      return {
+        lessonNumbers: group.lessonCards.map(card => card.lessonNumber),
+        accentColor: group.accentColor,
+      };
+    });
+    this.activeLessonNumber = this.getActiveLessonNumber();
 
-    this.isPracticeCardVisible =
-      this.lessonCards.length === 0 && this.practiceCount >= 1;
+    this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
+    this.masteryChallengeUrl = this.getPracticeSessionUrl();
+
+    if (this.visibleArcGroups.length) {
+      this._expandedArcIndices = new Set([0]);
+    }
   }
 
   private getPracticeCardData(): PracticeCardData {
+    const nextArcNumber = Math.min(this.arcGroups.length, 2);
+
     return {
-      practiceTitle: 'Practice 1: ' + this.storyTitle,
-      practiceDescription: '',
+      practiceTitle: 'Arc 1 Review & Test',
+      practiceDescription:
+        'Test what you have learned in Arc 1 to unlock Arc ' +
+        nextArcNumber +
+        '.',
       relatedLessonNumber:
         this.lessonCards.length > 0 ? this.lessonCards[0].lessonNumber : null,
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
@@ -386,6 +474,36 @@ export class TopicStorySectionComponent
       );
     }
     return this.getFallbackLessonThumbnailUrl();
+  }
+
+  private getArcPaletteColor(arcIndex: number): {
+    headerBg: string;
+    headerBorder: string;
+    flagBg: string;
+    rowAccent: string;
+  } {
+    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
+    return palette[arcIndex % palette.length];
+  }
+
+  private getActiveLessonNumber(): number | null {
+    const inProgressLesson = this.lessonCards.find(
+      lesson => lesson.lessonProgressStatus === 'in_progress'
+    );
+    if (inProgressLesson) {
+      return inProgressLesson.lessonNumber;
+    }
+
+    const notStartedLesson = this.lessonCards.find(
+      lesson => lesson.lessonProgressStatus === 'not_started'
+    );
+    if (notStartedLesson) {
+      return notStartedLesson.lessonNumber;
+    }
+
+    return this.lessonCards.length > 0
+      ? this.lessonCards[0].lessonNumber
+      : null;
   }
 
   private getLessonStartUrl(node: StoryNode): string {
