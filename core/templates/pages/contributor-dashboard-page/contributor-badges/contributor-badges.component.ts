@@ -29,9 +29,11 @@ interface ContributionCounts {
   corrections: number;
 }
 
+type ContributionSubType = 'submission' | 'review' | 'correction';
+
 interface Badge {
   contributionCount: number;
-  text: string;
+  text: ContributionSubType;
   language: string | null;
   isUnlocked: boolean;
 }
@@ -68,6 +70,7 @@ export class ContributorBadgesComponent {
     corrections: 0,
   };
 
+  MobileBadgeType = MobileBadgeType;
   dropdownShown = false;
   mobileDropdownShown = false;
   mobileBadgeTypeDropdownShown = false;
@@ -235,7 +238,7 @@ export class ContributorBadgesComponent {
 
   getObtainedBadges(
     contributionCount: number,
-    contributionSubType: string,
+    contributionSubType: ContributionSubType,
     language: string | null
   ): Badge[] {
     const badges: Badge[] = [];

@@ -121,7 +121,7 @@ describe('FeedbackSessionInfoService', () => {
   it('should collect environment information in session info', () => {
     const sessionInfo = feedbackSessionInfoService.getSessionInfo();
 
-    expect(sessionInfo.environment_json).toEqual({
+    expect(sessionInfo.environment).toEqual({
       client_time_msecs: jasmine.any(Number),
       timezone_offset_mins: jasmine.any(Number),
       user_agent: 'Mock user agent',
@@ -146,7 +146,7 @@ describe('FeedbackSessionInfoService', () => {
 
     const sessionInfo = feedbackSessionInfoService.getSessionInfo();
 
-    expect(sessionInfo.environment_json.locale).toEqual({
+    expect(sessionInfo.environment.locale).toEqual({
       language_code: 'en',
       direction: 'rtl',
     });
@@ -156,15 +156,13 @@ describe('FeedbackSessionInfoService', () => {
     feedbackSessionInfoService.recordConsoleError('Initial error');
     const sessionInfo = feedbackSessionInfoService.getSessionInfo();
 
-    sessionInfo.console_logs_json.push({
+    sessionInfo.console_logs.push({
       error_message: 'Mutated error',
       log_level: 'error',
       timestamp_msecs: 1,
     });
 
-    expect(
-      feedbackSessionInfoService.getSessionInfo().console_logs_json
-    ).toEqual([
+    expect(feedbackSessionInfoService.getSessionInfo().console_logs).toEqual([
       {
         error_message: 'Initial error',
         log_level: 'error',
@@ -182,9 +180,7 @@ describe('FeedbackSessionInfoService', () => {
       'warn'
     );
 
-    expect(
-      feedbackSessionInfoService.getSessionInfo().console_logs_json
-    ).toEqual([
+    expect(feedbackSessionInfoService.getSessionInfo().console_logs).toEqual([
       {
         error_message: 'Default error',
         log_level: 'error',
@@ -204,9 +200,7 @@ describe('FeedbackSessionInfoService', () => {
     mockWindowRef.nativeWindow.console.error('Wrapped error');
 
     expect(mockWindowRef.errorSpy).toHaveBeenCalledWith('Wrapped error');
-    expect(
-      feedbackSessionInfoService.getSessionInfo().console_logs_json
-    ).toEqual([
+    expect(feedbackSessionInfoService.getSessionInfo().console_logs).toEqual([
       {
         error_message: 'Wrapped error',
         log_level: 'error',
@@ -258,7 +252,7 @@ describe('FeedbackSessionInfoService', () => {
     ]);
 
     const consoleMessage =
-      feedbackSessionInfoService.getSessionInfo().console_logs_json[0];
+      feedbackSessionInfoService.getSessionInfo().console_logs[0];
     expect(consoleMessage.log_level).toEqual('debug');
     expect(consoleMessage.stack_trace).toEqual(stackError.stack);
     expect(consoleMessage.error_message).toContain(
@@ -282,7 +276,7 @@ describe('FeedbackSessionInfoService', () => {
     }
 
     const consoleErrors =
-      feedbackSessionInfoService.getSessionInfo().console_logs_json;
+      feedbackSessionInfoService.getSessionInfo().console_logs;
 
     expect(consoleErrors.length).toEqual(25);
     expect(consoleErrors[0].error_message).toEqual('Error 1');
@@ -302,7 +296,7 @@ describe('FeedbackSessionInfoService', () => {
     }
 
     const failedRequests =
-      feedbackSessionInfoService.getSessionInfo().failed_requests_json;
+      feedbackSessionInfoService.getSessionInfo().failed_requests;
 
     expect(failedRequests.length).toEqual(25);
     expect(failedRequests[0]).toEqual({
@@ -323,7 +317,7 @@ describe('FeedbackSessionInfoService', () => {
     }
 
     const navigationHistory =
-      feedbackSessionInfoService.getSessionInfo().navigation_history_json;
+      feedbackSessionInfoService.getSessionInfo().navigation_history;
 
     expect(navigationHistory.length).toEqual(5);
     expect(navigationHistory[0]).toEqual({
