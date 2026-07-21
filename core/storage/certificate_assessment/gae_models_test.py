@@ -329,6 +329,28 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(updated_model.finished_at, finished_at)
         self.assertTrue(updated_model.is_submitted)
 
+    def test_apply_deletion_policy_deletes_attempts_for_user(self) -> None:
+        attempt = certificate_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_id_1',
+            total_score=60.0,
+            attempt_index=1,
+            attempt_data=self._get_sample_attempt_data(),
+            version_data=self._get_sample_version_data(),
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+
+        certificate_models.CertificateAssessmentAttemptModel.apply_deletion_policy(
+            'learner_id_1'
+        )
+
+        self.assertIsNone(
+            certificate_models.CertificateAssessmentAttemptModel.get_by_id(
+                attempt.id
+            )
+        )
+
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         """Ensures the ID generator raises after exhausting retries."""
         get_by_id_swap = self.swap(
@@ -457,6 +479,13 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(
             gae_models.CertificateAssessmentResponseModel.get_by_id(response.id)
+        )
+
+    def test_apply_deletion_policy_noops_when_user_has_no_attempts(
+        self,
+    ) -> None:
+        gae_models.CertificateAssessmentResponseModel.apply_deletion_policy(
+            'missing_learner'
         )
 
     def test_has_reference_and_apply_deletion_policy_handle_large_attempt_sets(
