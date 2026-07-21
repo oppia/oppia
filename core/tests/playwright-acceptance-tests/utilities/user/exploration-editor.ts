@@ -1349,7 +1349,7 @@ export class ExplorationEditor extends BaseUser {
 
       // Use Playwright's download event to reliably capture the file.
       const downloadPromise = this.page.waitForEvent('download');
-      await downloadButton.evaluate(el => (el as HTMLElement).click());
+      await this.clickOnElement(downloadButton);
       const download = await downloadPromise;
 
       const suggestedFilename = download.suggestedFilename();
