@@ -51,7 +51,9 @@ test.describe('Community Library Browser', function () {
     const explorationId =
       await curriculumAdmin.createAndPublishExplorationWithCards(
         'Solving problems without calculator',
-        'Algebra'
+        'Algebra',
+        2,
+        true
       );
 
     await curriculumAdmin.createAndPublishTopic(
