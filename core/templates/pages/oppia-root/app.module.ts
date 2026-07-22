@@ -44,8 +44,8 @@ import {
   AngularFireAuth,
   AngularFireAuthModule,
   USE_EMULATOR,
-} from '@angular/fire/auth';
-import {AngularFireModule} from '@angular/fire';
+} from '@angular/fire/compat/auth';
+import {AngularFireModule} from '@angular/fire/compat';
 import {AuthService} from 'services/auth.service';
 // This throws "TS2307". We need to
 // suppress this error because hammer come from hammerjs

@@ -191,7 +191,8 @@ topic-viewer-page-root .oppia-topic-viewer-tabs-container {
   z-index: 1000;
 }
 
-topic-viewer-page-root .oppia-topic-viewer-container /deep/ .oppia-background-banner {
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+topic-viewer-page-root .oppia-topic-viewer-container ::ng-deep .oppia-background-banner {
   margin-top: -50px;
 }
 

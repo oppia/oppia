@@ -44,6 +44,9 @@ export class CodemirrorMergeviewComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() leftValue!: string | undefined;
   @Input() rightValue!: string | undefined;
+  // This throws "TS2339". We need to suppress this error because
+  // MergeViewEditor doesn't exist in @types/codemirror@5.60.17.
+  // @ts-ignore
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
 
   constructor(

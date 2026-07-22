@@ -24,7 +24,7 @@
 import {HttpClient} from '@angular/common/http';
 import {ErrorHandler} from '@angular/core';
 import {LoggerService} from 'services/contextual/logger.service';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 export class AppErrorHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage

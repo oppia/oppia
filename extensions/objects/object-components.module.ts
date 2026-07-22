@@ -20,7 +20,7 @@ import 'zone.js';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
-import {NgxTrimDirectiveModule} from 'ngx-trim-directive';
+
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {AlgebraicExpressionEditorComponent} from './templates/algebraic-expression-editor.component';
 import {BooleanEditorComponent} from './templates/boolean-editor.component';
@@ -91,7 +91,6 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     MatCheckboxModule,
     NgbModalModule,
     NgbTooltipModule,
-    NgxTrimDirectiveModule,
     RichTextComponentsModule,
     TranslateModule,
   ],

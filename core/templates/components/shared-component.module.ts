@@ -20,12 +20,12 @@ import 'zone.js';
 // Modules.
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {AngularFireModule} from '@angular/fire';
+import {AngularFireModule} from '@angular/fire/compat';
 import {
   AngularFireAuth,
   AngularFireAuthModule,
   USE_EMULATOR,
-} from '@angular/fire/auth';
+} from '@angular/fire/compat/auth';
 import {CustomFormsComponentsModule} from './forms/custom-forms-directives/custom-form-components.module';
 import {DynamicContentModule} from './interaction-display/dynamic-content.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';

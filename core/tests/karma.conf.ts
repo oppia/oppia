@@ -188,6 +188,11 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
           'assets/rich_text_components_definitions':
             'rich_text_components_definitions.ts',
         },
+        fallback: {
+          path: require.resolve('path-browserify'),
+          stream: require.resolve('stream-browserify'),
+          zlib: require.resolve('browserify-zlib'),
+        },
       },
       devtool: 'inline-cheap-source-map',
       module: {
@@ -195,7 +200,6 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
           {
             test: /\.ts$/,
             use: [
-              'cache-loader',
               {
                 loader: 'ts-loader',
                 options: {

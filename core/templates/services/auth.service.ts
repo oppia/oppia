@@ -17,10 +17,10 @@
  */
 
 import {Injectable, Optional} from '@angular/core';
-import {FirebaseOptions} from '@angular/fire';
-import {AngularFireAuth} from '@angular/fire/auth';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import {FirebaseOptions} from 'firebase/app';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 import {md5} from 'hash-wasm';
 
 import {AppConstants} from 'app.constants';
@@ -127,9 +127,9 @@ export class AuthService {
     } as const;
   }
 
-  static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
+  static get firebaseEmulatorConfig(): readonly [string] | undefined {
     return AuthService.firebaseEmulatorIsEnabled
-      ? ['localhost', 9099]
+      ? ['http://localhost:9099']
       : undefined;
   }
 

@@ -17,13 +17,13 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {AngularFireAuth} from '@angular/fire/auth';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
 import {md5} from 'hash-wasm';
 
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
 import {SignInEventService} from 'services/sign-in-event.service';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 
 describe('Auth service', function () {
   let authService: AuthService;
@@ -83,7 +83,9 @@ describe('Auth service', function () {
       'get'
     ).and.returnValue(true);
 
-    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
+    expect(AuthService.firebaseEmulatorConfig).toEqual([
+      'http://localhost:9099',
+    ]);
   });
 
   it('should return undefined when emulator is disabled', () => {

@@ -18,7 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';

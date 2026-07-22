@@ -15,18 +15,21 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "customWebpackConfig": {
+              "config": "webpack.config.js"
+            },
             "allowedCommonJsDependencies": ["path", "stream", "zlib"],
             "outputPath": "dist/oppia-angular",
-            "deployUrl": "/dist/oppia-angular/",
+            "baseHref": "/dist/oppia-angular/",
             "index": {
               "input": "src/index.html",
               "output": "oppia-root.mainpage.html"
             },
             "main": "src/main.ts",
             "polyfills": "core/templates/Polyfills.ts",
-            "tsConfig": "tsconfig.json",
+            "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
               {
@@ -46,7 +49,9 @@
                 "ignore": [
                 "**/*.py",
                 "**/*.pyc",
-                "**/__pycache__/**"
+                "**/__pycache__/**",
+                "**/*.scss",
+                "**/*.sass"
                 ]
               },
               {
@@ -112,16 +117,12 @@
                 "input": "src/index.prod.html",
                 "output": "oppia-root.mainpage.html"
               },
-              "deployUrl": "/build/",
+              "baseHref": "/build/",
               "outputPath": "build",
-              "aot": true,
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -138,7 +139,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
             "browserTarget": "oppia-angular:build"
           },
@@ -160,7 +161,7 @@
             "main": "src/test.ts",
             "polyfills": "core/templates/Polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "karmaConfig": "core/tests/karma.conf.ts",
             "assets": [
               "src/favicon.ico",
               "assets",
@@ -202,21 +203,8 @@
               "**/node_modules/**"
             ]
           }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "oppia-angular:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "oppia-angular:serve:production"
-            }
-          }
         }
       }
     }
-  },
-  "defaultProject": "oppia-angular"
+  }
 }

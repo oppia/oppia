@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/compiler';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EventEmitter} from '@angular/core';
 import {
   ComponentFixture,

@@ -9,7 +9,7 @@
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
-    "target": "es6",
+    "target": "es2017",
     "sourceMap": true,
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
@@ -57,8 +57,7 @@
   "files": [
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
-    "src/main.ts",
-    "core/tests/karma.conf.ts"
+    "src/main.ts"
   ],
   "include": ["core", "extensions", "typings"],
   "exclude": [

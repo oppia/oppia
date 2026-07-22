@@ -26,13 +26,13 @@
 // https://github.com/angular/angular/issues/29281
 
 import 'reflect-metadata';
-import 'zone.js/dist/zone';
-import 'zone.js/dist/long-stack-trace-zone';
-import 'zone.js/dist/proxy.js';
-import 'zone.js/dist/sync-test';
-import 'zone.js/dist/jasmine-patch';
-import 'zone.js/dist/async-test';
-import 'zone.js/dist/fake-async-test';
+import 'zone.js';
+import 'zone.js/plugins/zone-stack-trace';
+import 'zone.js/plugins/proxy';
+import 'zone.js/plugins/sync-test';
+import 'zone.js/plugins/jasmine-patch';
+import 'zone.js/plugins/async-test';
+import 'zone.js/plugins/fake-async-test';
 import {getTestBed} from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,

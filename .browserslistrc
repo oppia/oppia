@@ -1,0 +1,8 @@
+# This file is used by the build system to determine the correct
+# polyfills and transforms to apply. See https://browsersl.ist/
+
+last 1 Chrome version
+last 1 Firefox version
+last 1 Edge version
+last 1 Safari version
+last 1 Opera version

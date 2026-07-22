@@ -34,9 +34,9 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
   </mat-slider>`,
   styles: [
     `
-      .mat-accent /deep/ .mat-slider-track-fill,
-      .mat-accent /deep/ .mat-slider-thumb,
-      .mat-accent /deep/ .mat-slider-thumb-label {
+      .mat-accent ::ng-deep .mat-slider-track-fill,
+      .mat-accent ::ng-deep .mat-slider-thumb,
+      .mat-accent ::ng-deep .mat-slider-thumb-label {
         background: #ff4081;
       }
     `,

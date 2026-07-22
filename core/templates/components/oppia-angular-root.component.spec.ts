@@ -19,7 +19,7 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {Direction} from '@angular/cdk/bidi';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {AngularFireAuth} from '@angular/fire/auth';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
 import {CookieModule} from 'ngx-cookie';
 import {
   OppiaAngularRootComponent,

@@ -334,6 +334,7 @@ describe('Story Editor Component having three story nodes', () => {
       previousContainer: null!,
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
     const event2: CdkDragDrop<string[]> = {
       previousIndex: 1,
@@ -346,6 +347,7 @@ describe('Story Editor Component having three story nodes', () => {
       previousContainer: null!,
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
     const event3: CdkDragDrop<string[]> = {
       previousIndex: 0,
@@ -358,6 +360,7 @@ describe('Story Editor Component having three story nodes', () => {
       previousContainer: null!,
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
+      dropPoint: {x: 0, y: 0},
     };
 
     expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
