@@ -396,7 +396,22 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             self.skill.get_translatable_contents_collection()
         )
         self.assertEqual(
-            len(translatable_contents.content_id_to_translatable_content), 2
+            len(translatable_contents.content_id_to_translatable_content), 3
+        )
+
+        skill_description_content = (
+            translatable_contents.content_id_to_translatable_content[
+                'skill_description'
+            ]
+        )
+        self.assertEqual(skill_description_content.content_value, 'Description')
+        self.assertEqual(
+            skill_description_content.content_type,
+            translation_domain.ContentType.SKILL_DESCRIPTION,
+        )
+        self.assertEqual(
+            skill_description_content.content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
         )
 
         explanation_content_id = (
@@ -412,7 +427,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             explanation_content.content_type,
-            translation_domain.ContentType.CONTENT,
+            translation_domain.ContentType.SKILL_EXPLANATION,
         )
         self.assertEqual(
             explanation_content.content_format,
@@ -421,7 +436,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         feedback_content = (
             translatable_contents.content_id_to_translatable_content[
-                'feedback_0'
+                'misconception_0_feedback'
             ]
         )
         self.assertEqual(
@@ -429,17 +444,21 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             feedback_content.content_type,
-            translation_domain.ContentType.FEEDBACK,
+            translation_domain.ContentType.MISCONCEPTION_FEEDBACK,
         )
         self.assertEqual(
             feedback_content.content_format,
             translation_domain.TranslatableContentFormat.HTML,
         )
 
-        self.assertEqual(self.skill.get_content_count(), 2)
+        self.assertEqual(self.skill.get_content_count(), 3)
         self.assertItemsEqual(
             self.skill.get_translatable_content_ids(),
-            [explanation_content_id, 'feedback_0'],
+            [
+                'skill_description',
+                explanation_content_id,
+                'misconception_0_feedback',
+            ],
         )
 
     def test_valid_misconception_must_be_addressed(self) -> None:

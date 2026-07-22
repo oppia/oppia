@@ -904,16 +904,23 @@ class Skill(translation_domain.BaseTranslatableObject):
         )
 
         translatable_contents_collection.add_translatable_field(
+            'skill_description',
+            translation_domain.ContentType.SKILL_DESCRIPTION,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            self.description,
+        )
+
+        translatable_contents_collection.add_translatable_field(
             self.skill_contents.explanation.content_id,
-            translation_domain.ContentType.CONTENT,
+            translation_domain.ContentType.SKILL_EXPLANATION,
             translation_domain.TranslatableContentFormat.HTML,
             self.skill_contents.explanation.html,
         )
 
         for misconception in self.misconceptions:
             translatable_contents_collection.add_translatable_field(
-                f'feedback_{misconception.id}',
-                translation_domain.ContentType.FEEDBACK,
+                f'misconception_{misconception.id}_feedback',
+                translation_domain.ContentType.MISCONCEPTION_FEEDBACK,
                 translation_domain.TranslatableContentFormat.HTML,
                 misconception.feedback,
             )
