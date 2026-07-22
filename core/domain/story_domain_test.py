@@ -2662,10 +2662,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_node_covered_by_multiple_arcs(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_1'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_1'])
         )
         self._assert_validation_error(
             'Node node_1 is covered by multiple arcs.'
@@ -2673,16 +2673,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_duplicate_arc_ids(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1 dup', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1 dup', '', ['node_1'])
         )
         self._assert_validation_error('Expected all arc ids to be distinct.')
 
     def test_arc_refers_to_non_existent_node(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['nonexistent_node'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['nonexistent_node'])
         )
         self._assert_validation_error(
             'Arc refers to non-existent node nonexistent_node.'
@@ -2690,7 +2690,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_nodes_not_covered_by_any_arc(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
         )
         self._assert_validation_error(
             'Nodes \\[\'node_1\'\\] are not covered by any arc.'
@@ -2698,10 +2698,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_arc_index(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
         )
         self.assertEqual(self.story.story_contents.get_arc_index('arc_1'), 0)
         self.assertEqual(self.story.story_contents.get_arc_index('arc_2'), 1)
@@ -2714,22 +2714,22 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.story_contents.get_arc_index('nonexistent_arc')
 
     def test_get_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+        arc = story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         self.story.story_contents.add_arc(arc)
         self.assertEqual(self.story.story_contents.get_arc('arc_1'), arc)
 
     def test_add_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
+        arc = story_domain.Arc('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
         self.story.story_contents.add_arc(arc)
         self.assertIn(arc, self.story.story_contents.arcs)
         self.assertEqual(len(self.story.story_contents.arcs), 1)
 
     def test_delete_arc(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
         )
         self.story.story_contents.delete_arc('arc_1')
         self.assertEqual(len(self.story.story_contents.arcs), 1)
@@ -2737,10 +2737,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_arcs(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
         )
         self.story.story_contents.rearrange_arcs(['arc_2', 'arc_1'])
         self.assertEqual(
@@ -2749,7 +2749,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_arcs_with_invalid_arc_list(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         with self.assertRaisesRegex(
             ValueError,
@@ -2759,10 +2759,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_arcs_with_unknown_arc_id(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
         )
         with self.assertRaisesRegex(
             ValueError,
@@ -2772,10 +2772,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_move_node_to_arc(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
         )
         self.story.story_contents.move_node_to_arc('node_1', 'arc_2')
         self.assertNotIn(
@@ -2787,17 +2787,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_delete_arc(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.delete_arc('arc_1')
         self.assertEqual(len(self.story.story_contents.arcs), 0)
 
     def test_story_rearrange_arcs(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_2', 'Adventure 2', '', ['node_2'])
+            story_domain.Arc('arc_2', 'Arc 2', '', ['node_2'])
         )
         self.story.rearrange_arcs(['arc_2', 'arc_1'])
         self.assertEqual(
@@ -2942,7 +2942,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_move_node_to_arc_when_node_not_in_any_arc(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
         )
         self.story.story_contents.move_node_to_arc('node_1', 'arc_1')
         self.assertIn(
@@ -2963,20 +2963,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_delete_node_removes_from_arc(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_2'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_2'])
         )
         self.story.delete_node(self.NODE_ID_2)
         self.assertEqual(len(self.story.story_contents.nodes), 1)
 
     def test_create_arc(self) -> None:
-        arc = story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1', 'node_2'])
+        arc = story_domain.Arc('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
         self.story.add_arc(arc)
         self.assertIn(arc, self.story.story_contents.arcs)
         self.assertEqual(len(self.story.story_contents.arcs), 1)
 
     def test_update_arc_property(self) -> None:
         self.story.story_contents.add_arc(
-            story_domain.Arc('arc_1', 'Adventure 1', '', ['node_1'])
+            story_domain.Arc('arc_1', 'Arc 1', '', ['node_1'])
         )
         self.story.story_contents.get_arc('arc_1').title = 'Updated Title'
         self.story.story_contents.get_arc('arc_1').description = (
