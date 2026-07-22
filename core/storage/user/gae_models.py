@@ -213,6 +213,7 @@ class UserSettingsModel(base_models.BaseModel):
                 'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
                 'display_alias': base_models.EXPORT_POLICY.EXPORTED,
                 'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_name_for_certificate': base_models.EXPORT_POLICY.EXPORTED,
                 'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_site_language_code': base_models.EXPORT_POLICY.EXPORTED,
