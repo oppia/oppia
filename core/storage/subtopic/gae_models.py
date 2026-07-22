@@ -127,10 +127,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with VersionedModel.compute_models_to_commit(). Because
-    # argument `commit_message` of super class can accept Optional[str] but
-    # this method can only accept str.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with VersionedModel.compute_models_to_commit(). Because argument
+    # `commit_message` of super class can accept Optional[str] but this method
+    # can only accept str.
     def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
@@ -187,10 +187,8 @@ class SubtopicPageModel(base_models.VersionedModel):
         # after 'snapshot_content_model' otherwise it leads to problems with
         # putting the models into the datastore.
         return {
-            'snapshot_metadata_model': (
-                models_to_put['snapshot_metadata_model']
-            ),
-            'snapshot_content_model': (models_to_put['snapshot_content_model']),
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
             'commit_log_model': subtopic_page_commit_log_entry,
             'versioned_model': models_to_put['versioned_model'],
         }

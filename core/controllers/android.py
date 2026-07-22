@@ -36,6 +36,7 @@ from core.domain import (
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
+    subtopic_page_services,
     topic_domain,
     topic_fetchers,
     translation_fetchers,
@@ -107,7 +108,6 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
     payload: Union[
         exp_domain.ExplorationDictForAndroid,
         story_domain.StoryDict,
-        story_domain.StoryDictForAndroid,
         skill_domain.SkillDict,
         subtopic_page_domain.SubtopicPageDict,
         study_guide_domain.StudyGuideAndroidDict,
@@ -162,7 +162,6 @@ class AndroidActivityHandler(
                         constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
                         constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS,
                         constants.ACTIVITY_TYPE_STORY,
-                        constants.ACTIVITY_TYPE_STORY_MIGRATION,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
                         constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
@@ -244,6 +243,47 @@ class AndroidActivityHandler(
                     }
                 )
 
+        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+            # Subtopic pages require special handling because their IDs are
+            # compound keys (topic_id-subtopic_id) that need to be split and
+            # processed separately.
+            split_ids_and_versions = [
+                (activity_data['id'].split('-'), activity_data.get('version'))
+                for activity_data in activities_data
+            ]
+            topic_subtopic_version_tuples = [
+                (
+                    topic_id,
+                    int(stringified_subtopic_index),
+                    subtopic_page_version,
+                )
+                for (
+                    (topic_id, stringified_subtopic_index),
+                    subtopic_page_version,
+                ) in split_ids_and_versions
+            ]
+            subtopic_pages = (
+                subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
+                    topic_subtopic_version_tuples
+                )
+            )
+            activities.extend(
+                [
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            subtopic_page.to_dict()
+                            if subtopic_page is not None
+                            else None
+                        ),
+                    }
+                    for (activity_data, subtopic_page) in zip(
+                        activities_data, subtopic_pages
+                    )
+                ]
+            )
+
         elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
             # Questions require special handling as they are fetched in bulk.
             # With a fixed limit of questions per request,
@@ -268,9 +308,8 @@ class AndroidActivityHandler(
                 ]
             )
 
-        elif activity_type in (
-            constants.ACTIVITY_TYPE_SUBTOPIC,
-            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
+        elif activity_type == (
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
         ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
@@ -447,12 +486,6 @@ class AndroidActivityHandler(
                         ids_and_versions
                     )
                 )
-            elif activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION:
-                fetched_entities = (
-                    story_fetchers.get_multiple_stories_by_ids_and_version(
-                        ids_and_versions
-                    )
-                )
             elif activity_type == constants.ACTIVITY_TYPE_SKILL:
                 fetched_entities = (
                     skill_fetchers.get_multiple_skills_by_ids_and_version(
@@ -467,23 +500,11 @@ class AndroidActivityHandler(
                 )
 
             for activity_data, entity in zip(activities_data, fetched_entities):
-                if (
-                    activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION
-                    and isinstance(entity, story_domain.Story)
-                ):
-                    response_dict: ActivityDataResponseDict = {
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': entity.to_dict_for_android(),
-                    }
-                else:
-                    response_dict = {
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': (
-                            entity.to_dict() if entity is not None else None
-                        ),
-                    }
+                response_dict: ActivityDataResponseDict = {
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': entity.to_dict() if entity is not None else None,
+                }
                 activities.append(response_dict)
 
         self.render_json(activities)

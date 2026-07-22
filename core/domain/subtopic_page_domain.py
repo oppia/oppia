@@ -27,7 +27,7 @@ from core.domain import (  # pylint: disable=invalid-import-from
     translation_domain,
 )
 
-from typing import Callable, Final, List, Optional, TypedDict
+from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -39,6 +39,9 @@ SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS: Final = (
 )
 
 CMD_CREATE_NEW: Final = 'create_new'
+# These take additional 'property_name' and 'new_value' parameters and,
+# optionally, 'old_value'.
+CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: Final = 'update_subtopic_page_property'
 CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION: Final = (
     'migrate_subtopic_page_contents_schema_to_latest_version'
 )
@@ -55,7 +58,11 @@ class SubtopicPageChange(change_domain.BaseChange):
 
     # The allowed list of subtopic page properties which can be used in
     # update_subtopic_page_property command.
-    SUBTOPIC_PAGE_PROPERTIES: List[str] = []
+    SUBTOPIC_PAGE_PROPERTIES: List[str] = [
+        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
+        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
+        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS,
+    ]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
         {
@@ -64,6 +71,19 @@ class SubtopicPageChange(change_domain.BaseChange):
             'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'required_attribute_names': [
+                'property_name',
+                'new_value',
+                'old_value',
+                'subtopic_id',
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
             'deprecated_values': {},
         },
         {
@@ -77,6 +97,13 @@ class SubtopicPageChange(change_domain.BaseChange):
     ]
 
 
+AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
+    state_domain.SubtitledHtmlDict,
+    state_domain.RecordedVoiceoversDict,
+    translation_domain.WrittenTranslationsDict,
+]
+
+
 class CreateNewSubtopicPageCmd(SubtopicPageChange):
     """Class representing the SubtopicPageChange's
     CMD_CREATE_NEW command.
@@ -84,6 +111,56 @@ class CreateNewSubtopicPageCmd(SubtopicPageChange):
 
     topic_id: str
     subtopic_id: int
+
+
+class UpdateSubtopicPagePropertyCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
+    """
+
+    subtopic_id: int
+    property_name: str
+    new_value: AllowedUpdateSubtopicPagePropertyCmdTypes
+    old_value: AllowedUpdateSubtopicPagePropertyCmdTypes
+
+
+class UpdateSubtopicPagePropertyPageContentsHtmlCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command with
+    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML as
+    allowed value.
+    """
+
+    subtopic_id: int
+    property_name: Literal['page_contents_html']
+    new_value: state_domain.SubtitledHtmlDict
+    old_value: state_domain.SubtitledHtmlDict
+
+
+class UpdateSubtopicPagePropertyPageContentsAudioCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command with
+    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO as
+    allowed value.
+    """
+
+    subtopic_id: int
+    property_name: Literal['page_contents_audio']
+    new_value: state_domain.RecordedVoiceoversDict
+    old_value: state_domain.RecordedVoiceoversDict
+
+
+class UpdateSubtopicPagePropertyPageWrittenTranslationsCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command with
+    SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS
+    as allowed value.
+    """
+
+    subtopic_id: int
+    property_name: Literal['page_written_translations']
+    new_value: translation_domain.WrittenTranslationsDict
+    old_value: translation_domain.WrittenTranslationsDict
 
 
 class SubtopicPageContentsDict(TypedDict):
@@ -408,6 +485,46 @@ class SubtopicPage:
             int. The subtopic_id of the object.
         """
         return int(self.id[len(self.topic_id) + 1 :])
+
+    def update_page_contents_html(
+        self, new_page_contents_html: state_domain.SubtitledHtml
+    ) -> None:
+        """The new value for the html data field.
+
+        Args:
+            new_page_contents_html: SubtitledHtml. The new html for the subtopic
+                page.
+        """
+        self.page_contents.subtitled_html = new_page_contents_html
+
+    def update_page_contents_audio(
+        self, new_page_contents_audio: state_domain.RecordedVoiceovers
+    ) -> None:
+        """The new value for the recorded_voiceovers data field.
+
+        Args:
+            new_page_contents_audio: RecordedVoiceovers. The new audio for
+                the subtopic page.
+        """
+        self.page_contents.recorded_voiceovers = new_page_contents_audio
+
+    def update_page_contents_written_translations(
+        self,
+        new_page_written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ),
+    ) -> None:
+        """The new value for the written_translations data field.
+
+        Args:
+            new_page_written_translations_dict: dict. The new translation for
+                the subtopic page.
+        """
+        self.page_contents.written_translations = (
+            translation_domain.WrittenTranslations.from_dict(
+                new_page_written_translations_dict
+            )
+        )
 
     def validate(self) -> None:
         """Validates various properties of the SubtopicPage object.

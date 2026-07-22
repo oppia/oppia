@@ -1296,16 +1296,6 @@ class StoryContentsDict(TypedDict, total=False):
     arcs: List[ArcDict]
 
 
-class StoryContentsDictForAndroid(TypedDict):
-    """Dictionary representing the StoryContents object for Android
-    (without the arcs field for backward compatibility).
-    """
-
-    nodes: List[StoryNodeDict]
-    initial_node_id: Optional[str]
-    next_node_id: str
-
-
 class StoryContents:
     """Domain object representing the story_contents dict."""
 
@@ -1663,20 +1653,6 @@ class StoryContents:
             'arcs': [arc.to_dict() for arc in self.arcs],
         }
 
-    def to_dict_for_android(self) -> StoryContentsDictForAndroid:
-        """Returns a dict representing this StoryContents domain object for
-        Android, without the arcs field for backward compatibility.
-
-        Returns:
-            dict. A dict, mapping all fields of StoryContents instance except
-            arcs.
-        """
-        return {
-            'nodes': [node.to_dict() for node in self.nodes],
-            'initial_node_id': self.initial_node_id,
-            'next_node_id': self.next_node_id,
-        }
-
     @classmethod
     def from_dict(cls, story_contents_dict: StoryContentsDict) -> StoryContents:
         """Return a StoryContents domain object from a dict.
@@ -1715,27 +1691,6 @@ class StoryDict(TypedDict):
     description: str
     notes: str
     story_contents: StoryContentsDict
-    story_contents_schema_version: int
-    language_code: str
-    corresponding_topic_id: str
-    version: int
-    url_fragment: str
-    meta_tag_content: str
-
-
-class StoryDictForAndroid(TypedDict):
-    """Dictionary representing the Story object for Android (without the arcs
-    field for backward compatibility).
-    """
-
-    id: str
-    title: str
-    thumbnail_filename: Optional[str]
-    thumbnail_bg_color: Optional[str]
-    thumbnail_size_in_bytes: Optional[int]
-    description: str
-    notes: str
-    story_contents: StoryContentsDictForAndroid
     story_contents_schema_version: int
     language_code: str
     corresponding_topic_id: str
@@ -2061,30 +2016,6 @@ class Story:
             'corresponding_topic_id': self.corresponding_topic_id,
             'version': self.version,
             'story_contents': self.story_contents.to_dict(),
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
-            'url_fragment': self.url_fragment,
-            'meta_tag_content': self.meta_tag_content,
-        }
-
-    def to_dict_for_android(self) -> StoryDictForAndroid:
-        """Returns a dict representing this Story domain object for Android,
-        without the arcs field for backward compatibility.
-
-        Returns:
-            dict. A dict, mapping all fields of Story instance except arcs.
-        """
-        return {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'notes': self.notes,
-            'language_code': self.language_code,
-            'story_contents_schema_version': self.story_contents_schema_version,
-            'corresponding_topic_id': self.corresponding_topic_id,
-            'version': self.version,
-            'story_contents': self.story_contents.to_dict_for_android(),
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,

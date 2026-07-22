@@ -16,14 +16,16 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.domain import (
+    state_domain,
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
     subtopic_page_services,
     topic_domain,
     topic_services,
+    translation_domain,
     user_services,
 )
 from core.tests import test_utils
@@ -137,6 +139,73 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic],
             next_subtopic_id=2,
+        )
+        self.recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False,
+                        'duration_secs': 0.34234,
+                    }
+                }
+            }
+        }
+        self.written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {'translations_mapping': {'content': {}}}
+        self.subtopic_page_1.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict(
+                {'html': '<p>hello world</p>', 'content_id': 'content'}
+            )
+        )
+        self.subtopic_page_1.update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(
+                self.recorded_voiceovers_dict
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            self.subtopic_page_1,
+            'Updated page contents',
+            [
+                subtopic_page_domain.SubtopicPageChange(
+                    {
+                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                        'subtopic_id': self.subtopic_id_1,
+                        'property_name': 'page_contents_html',
+                        'new_value': '<p>hello world</p>',
+                        'old_value': '',
+                    }
+                )
+            ],
+        )
+        self.subtopic_page_2.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict(
+                {'html': '<p>hello world 2</p>', 'content_id': 'content'}
+            )
+        )
+        self.subtopic_page_2.update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(
+                self.recorded_voiceovers_dict
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            self.subtopic_page_2,
+            'Updated page contents',
+            [
+                subtopic_page_domain.SubtopicPageChange(
+                    {
+                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                        'subtopic_id': self.subtopic_id_2,
+                        'property_name': 'page_contents_html',
+                        'new_value': '<p>hello world 2</p>',
+                        'old_value': '',
+                    }
+                )
+            ],
         )
 
         self.topic_id_2 = 'topic_id_2'
@@ -338,13 +407,15 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_only_subtopic_in_topic(self) -> None:
         topic_id = 'single_subtopic_topic_id'
         subtopic_id = 1
-        study_guide = study_guide_domain.StudyGuide.create_study_guide(
-            subtopic_id, topic_id, 'heading', 'content'
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic_id
+            )
         )
-        study_guide_services.save_study_guide(
+        subtopic_page_services.save_subtopic_page(
             self.admin_id,
-            study_guide,
-            'Added study guide',
+            subtopic_page,
+            'Added subtopic',
             [
                 topic_domain.TopicChange(
                     {
@@ -392,6 +463,42 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one')
+        )
+        expected_page_contents_dict = {
+            'recorded_voiceovers': self.recorded_voiceovers_dict,
+            'subtitled_html': {
+                'content_id': 'content',
+                'html': '<p>hello world</p>',
+            },
+            'written_translations': self.written_translations_dict,
+        }
+        expected_next_subtopic_dict = {
+            'thumbnail_bg_color': None,
+            'skill_ids': ['skill_id_2'],
+            'id': 2,
+            'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
+            'title': 'Subtopic Title 2',
+            'url_fragment': 'sub-url-frag-two',
+        }
+
+        expected_dict = {
+            'topic_id': 'topic_id',
+            'page_contents': expected_page_contents_dict,
+            'subtopic_title': 'Subtopic Title',
+            'current_subtopic_id': 1,
+            'next_subtopic_dict': expected_next_subtopic_dict,
+            'prev_subtopic_dict': None,
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
+    def test_get_for_first_subtopic_with_study_guides_in_topic(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/%s'
             % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee')
         )
         expected_sections_dicts_list = [
@@ -426,7 +533,10 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_get_for_last_subtopic_in_topic(self) -> None:
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
+    def test_get_for_last_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s'
             % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-twoo')
@@ -456,6 +566,39 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                     },
                 }
             ],
+            'subtopic_title': 'Subtopic Title 2',
+            'current_subtopic_id': 2,
+            'next_subtopic_dict': None,
+            'prev_subtopic_dict': expected_prev_subtopic_dict,
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_get_for_last_subtopic_in_topic(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two')
+        )
+        expected_page_contents_dict = {
+            'recorded_voiceovers': self.recorded_voiceovers_dict,
+            'subtitled_html': {
+                'content_id': 'content',
+                'html': '<p>hello world 2</p>',
+            },
+            'written_translations': self.written_translations_dict,
+        }
+        expected_prev_subtopic_dict = {
+            'thumbnail_bg_color': None,
+            'skill_ids': ['skill_id_1'],
+            'id': 1,
+            'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
+            'title': 'Subtopic Title',
+            'url_fragment': 'sub-url-frag-one',
+        }
+
+        expected_dict = {
+            'topic_id': 'topic_id',
+            'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title 2',
             'current_subtopic_id': 2,
             'next_subtopic_dict': None,
@@ -495,13 +638,13 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         )
         self.assertIn('Could not find the resource', response['error'])
 
-    def test_cannot_get_with_deleted_study_guide(self) -> None:
-        study_guide_services.delete_study_guide(
-            self.admin_id, self.topic_id_2, 1
+    def test_cannot_get_with_deleted_subtopic_page(self) -> None:
+        subtopic_page_services.delete_subtopic_page(
+            self.admin_id, self.topic_id, 1
         )
         response = self.get_json(
             '%s/staging/%s/%s'
-            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee'),
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
             expected_status_int=404,
         )
         self.assertIn('Could not find the resource', response['error'])

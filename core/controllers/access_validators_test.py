@@ -33,8 +33,8 @@ from core.domain import (
     skill_services,
     story_domain,
     story_services,
-    study_guide_domain,
-    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
     topic_domain,
     topic_fetchers,
     topic_services,
@@ -535,36 +535,42 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
         self.topic_id = 'topic_id'
         self.subtopic_id_1 = 1
         self.subtopic_id_2 = 2
-        self.study_guide_1 = study_guide_domain.StudyGuide.create_study_guide(
-            self.subtopic_id_1, self.topic_id, 'Heading', '<p>Content</p>'
+        self.subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, self.topic_id
+            )
         )
-        self.study_guide_2 = study_guide_domain.StudyGuide.create_study_guide(
-            self.subtopic_id_2, self.topic_id, 'Heading', '<p>Content</p>'
+        self.subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_2, self.topic_id
+            )
         )
-        study_guide_services.save_study_guide(
+        subtopic_page_services.save_subtopic_page(
             self.admin_id,
-            self.study_guide_1,
-            'Added study guide',
+            self.subtopic_page_1,
+            'Added subtopic',
             [
-                study_guide_domain.StudyGuideChange(
+                topic_domain.TopicChange(
                     {
-                        'cmd': study_guide_domain.CMD_CREATE_NEW,
-                        'topic_id': self.topic_id,
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                         'subtopic_id': self.subtopic_id_1,
+                        'title': 'Sample',
+                        'url_fragment': 'sample-fragment',
                     }
                 )
             ],
         )
-        study_guide_services.save_study_guide(
+        subtopic_page_services.save_subtopic_page(
             self.admin_id,
-            self.study_guide_2,
-            'Added study guide',
+            self.subtopic_page_2,
+            'Added subtopic',
             [
-                study_guide_domain.StudyGuideChange(
+                topic_domain.TopicChange(
                     {
-                        'cmd': study_guide_domain.CMD_CREATE_NEW,
-                        'topic_id': self.topic_id,
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                         'subtopic_id': self.subtopic_id_2,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment',
                     }
                 )
             ],
@@ -623,55 +629,62 @@ class SubtopicViewerPageAccessValidationHandlerTests(
         self.topic_id = 'topic_id'
         self.subtopic_id_1 = 1
         self.subtopic_id_2 = 2
-        self.study_guide_1 = study_guide_domain.StudyGuide.create_study_guide(
-            self.subtopic_id_1, self.topic_id, 'Heading', '<p>Content</p>'
-        )
-        self.study_guide_2 = study_guide_domain.StudyGuide.create_study_guide(
-            self.subtopic_id_2, self.topic_id, 'Heading', '<p>Content</p>'
-        )
-        study_guide_services.save_study_guide(
-            self.admin_id,
-            self.study_guide_1,
-            'Added study guide',
-            [
-                study_guide_domain.StudyGuideChange(
-                    {
-                        'cmd': study_guide_domain.CMD_CREATE_NEW,
-                        'topic_id': self.topic_id,
-                        'subtopic_id': self.subtopic_id_1,
-                    }
-                )
-            ],
-        )
-        study_guide_services.save_study_guide(
-            self.admin_id,
-            self.study_guide_2,
-            'Added study guide',
-            [
-                study_guide_domain.StudyGuideChange(
-                    {
-                        'cmd': study_guide_domain.CMD_CREATE_NEW,
-                        'topic_id': self.topic_id,
-                        'subtopic_id': self.subtopic_id_2,
-                    }
-                )
-            ],
-        )
-        study_guide_private_topic = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                self.subtopic_id_1, 'topic_id_2', 'Heading', '<p>Content</p>'
+        self.subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, self.topic_id
             )
         )
-        study_guide_services.save_study_guide(
+        self.subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_2, self.topic_id
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
             self.admin_id,
-            study_guide_private_topic,
-            'Added study guide',
+            self.subtopic_page_1,
+            'Added subtopic',
             [
-                study_guide_domain.StudyGuideChange(
+                topic_domain.TopicChange(
                     {
-                        'cmd': study_guide_domain.CMD_CREATE_NEW,
-                        'topic_id': 'topic_id_2',
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                         'subtopic_id': self.subtopic_id_1,
+                        'title': 'Sample',
+                        'url_fragment': 'sample-fragment',
+                    }
+                )
+            ],
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            self.subtopic_page_2,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_2,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment',
+                    }
+                )
+            ],
+        )
+        subtopic_page_private_topic = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, 'topic_id_2'
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            subtopic_page_private_topic,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_1,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment-one',
                     }
                 )
             ],

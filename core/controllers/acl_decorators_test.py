@@ -5811,13 +5811,24 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 expected_status_int=404,
             )
 
-    def test_can_access_subtopic_when_topic_is_published(
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
+    def test_can_access_subtopic_when_topic_is_published_with_flag(
         self,
     ) -> None:
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag-two/sub-three-frag',
+                expected_status_int=200,
+            )
+
+    def test_can_access_subtopic_when_topic_is_published(self) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=200,
             )
 
@@ -5833,7 +5844,20 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             )
         self.logout()
 
-    def test_can_access_subtopic_when_all_url_fragments_are_valid(
+    def test_can_access_subtopic_when_all_url_fragments_are_valid(self) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            studyguide_url_fragment = 'studyguide/sub-one-frag'
+            self.get_html_response(
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
+                expected_status_int=200,
+            )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
+    def test_can_access_subtopic_when_all_url_fragments_are_valid_with_flag(
         self,
     ) -> None:
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
@@ -5859,6 +5883,29 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'],
             )
 
+    def test_fall_back_to_studyguide_page_when_subtopic_page_does_not_exist(
+        self,
+    ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        subtopic_swap = self.swap_to_always_return(
+            subtopic_page_services, 'get_subtopic_page_by_id', None
+        )
+        with testapp_swap, subtopic_swap:
+            response = self.get_html_response(
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
+                expected_status_int=302,
+            )
+            self.assertEqual(
+                'http://localhost/learn/staging/topic-frag/studyguide',
+                response.headers['location'],
+            )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
     def test_fall_back_to_studyguide_page_when_study_guide_does_not_exist(
         self,
     ) -> None:

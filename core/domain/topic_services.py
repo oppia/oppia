@@ -35,6 +35,7 @@ from core.domain import (
     role_services,
     skill_domain,
     skill_fetchers,
+    state_domain,
     story_domain,
     story_fetchers,
     story_services,
@@ -457,11 +458,195 @@ def _collect_study_guide_changes(
         )
 
 
+def _collect_subtopic_page_changes(
+    change: change_domain.BaseChange,
+    topic: topic_domain.Topic,
+    topic_id: str,
+    existing_subtopic_page_ids_to_be_modified: List[int],
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ],
+    existing_study_guide_ids_to_be_modified: List[int],
+    modified_study_guide_change_cmds: Dict[
+        str, List[study_guide_domain.StudyGuideChange]
+    ],
+    ensure_study_guide_exists: Callable[[int], Optional[str]],
+) -> None:
+    """Collects subtopic page preprocessing changes from a change command.
+
+    When page contents HTML is updated, this also queues the matching study
+    guide change (if a study guide exists) so both can be loaded together.
+
+    Args:
+        change: BaseChange. Incoming change command with subtopic page updates.
+        topic: Topic. The topic object being updated.
+        topic_id: str. ID of the topic.
+        existing_subtopic_page_ids_to_be_modified: list(int). List tracking
+            subtopic page ids to be fetched and modified.
+        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
+            Subtopic page change commands grouped by subtopic page id.
+        existing_study_guide_ids_to_be_modified: list(int). List tracking
+            study guide ids to be fetched and modified.
+        modified_study_guide_change_cmds: dict(str, list(StudyGuideChange)).
+            Study guide change commands grouped by study guide id.
+        ensure_study_guide_exists: function. Helper that returns a study guide
+            id when it exists or can be fetched.
+    """
+    # Here we use cast because we are narrowing down the type from
+    # TopicChange to a specific change command.
+    update_subtopic_page_property_cmd = cast(
+        subtopic_page_domain.UpdateSubtopicPagePropertyCmd, change
+    )
+
+    if update_subtopic_page_property_cmd.subtopic_id < topic.next_subtopic_id:
+        existing_subtopic_page_ids_to_be_modified.append(
+            update_subtopic_page_property_cmd.subtopic_id
+        )
+        subtopic_page_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id, update_subtopic_page_property_cmd.subtopic_id
+            )
+        )
+        modified_subtopic_change_cmds[subtopic_page_id].append(
+            update_subtopic_page_property_cmd
+        )
+
+        if update_subtopic_page_property_cmd.property_name == (
+            subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+        ):
+            # Only update study guide if it exists.
+            potential_study_guide_id: Optional[str] = ensure_study_guide_exists(
+                update_subtopic_page_property_cmd.subtopic_id
+            )
+            if potential_study_guide_id is not None:
+                # Here we use cast because we are sure that the
+                # new_value is subtitled html as written
+                # translations and recorded voiceovers are
+                # not used.
+                subtitled_html = cast(
+                    state_domain.SubtitledHtmlDict,
+                    update_subtopic_page_property_cmd.new_value,
+                )
+                update_study_guide_property_cmd = (
+                    study_guide_domain.StudyGuideChange
+                )(
+                    {
+                        'cmd': 'update_study_guide_property',
+                        'property_name': 'sections_content',
+                        'new_value': (subtitled_html['html']),
+                        'old_value': 'section_content_1',
+                        'subtopic_id': (
+                            # We use update_subtopic_page_property_cmd
+                            # here to avoid mypy errors. We will replace
+                            # this with a study guide alternative once
+                            # we start using study guides exclusively.
+                            update_subtopic_page_property_cmd.subtopic_id
+                        ),
+                    }
+                )
+                # We use update_subtopic_page_property_cmd
+                # here to avoid mypy errors. We will replace
+                # this with a study guide alternative once
+                # we start using study guides exclusively.
+                existing_study_guide_ids_to_be_modified.append(
+                    update_subtopic_page_property_cmd.subtopic_id
+                )
+                modified_study_guide_change_cmds[
+                    potential_study_guide_id
+                ].append(update_study_guide_property_cmd)
+
+
+def _apply_subtopic_page_change(
+    change: change_domain.BaseChange,
+    topic_id: str,
+    deleted_subtopic_ids: List[int],
+    modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
+    modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
+) -> None:
+    """Applies a subtopic page property update.
+
+    Args:
+        change: BaseChange. Incoming subtopic page update command.
+        topic_id: str. ID of the topic.
+        deleted_subtopic_ids: list(int). IDs of deleted subtopics.
+        modified_subtopic_pages: dict(str, SubtopicPage). Modified pages map.
+        modified_study_guides: dict(str, StudyGuide). Modified guides map.
+
+    Raises:
+        Exception. The subtopic doesn't exist.
+    """
+    assert isinstance(change.subtopic_id, int)
+
+    subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+        topic_id, change.subtopic_id
+    )
+    study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+        topic_id, change.subtopic_id
+    )
+
+    if (
+        subtopic_page_id not in modified_subtopic_pages
+        or modified_subtopic_pages[subtopic_page_id] is None
+        or change.subtopic_id in deleted_subtopic_ids
+    ):
+        raise Exception(
+            'The subtopic with id %s doesn\'t exist' % change.subtopic_id
+        )
+
+    if (
+        change.property_name
+        == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+    ):
+        # Here we use cast because this 'if' condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsHtmlCmd, which is a specific
+        # subtype of BaseChange with the required property_name and new_value.
+        update_cmd = cast(
+            subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,
+            change,
+        )
+
+        page_contents = state_domain.SubtitledHtml.from_dict(
+            update_cmd.new_value
+        )
+        page_contents.validate()
+
+        modified_subtopic_pages[subtopic_page_id].update_page_contents_html(
+            page_contents
+        )
+
+        if study_guide_id in modified_study_guides:
+            html_content = update_cmd.new_value['html']
+            modified_study_guides[study_guide_id].update_section_content(
+                html_content,
+                'section_content_1',
+            )
+
+    elif (
+        change.property_name
+        == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
+    ):
+        # Here we use cast because this 'elif' condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsAudioCmd, which is a specific
+        # subtype of BaseChange with the required property_name and new_value.
+        update_cmd = cast(
+            subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,
+            change,
+        )
+
+        modified_subtopic_pages[subtopic_page_id].update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(update_cmd.new_value)
+        )
+
+
 def _apply_study_guide_change(
     change: change_domain.BaseChange,
     topic_id: str,
     modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
     deleted_subtopic_ids: List[int],
+    modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ],
 ) -> None:
     """Applies a study guide property update for an existing subtopic.
 
@@ -474,6 +659,9 @@ def _apply_study_guide_change(
         topic_id: str. ID of the topic.
         modified_study_guides: dict(str, StudyGuide). Modified guides map.
         deleted_subtopic_ids: list(int). IDs of deleted subtopics.
+        modified_subtopic_pages: dict(str, SubtopicPage). Modified pages map.
+        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
+            Subtopic page commands grouped by id.
 
     Raises:
         Exception. The subtopic doesn't exist.
@@ -482,6 +670,9 @@ def _apply_study_guide_change(
     # type checking.
     assert isinstance(change.subtopic_id, int)
     study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+        topic_id, change.subtopic_id
+    )
+    subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, change.subtopic_id
     )
     if (modified_study_guides[study_guide_id] is None) or (
@@ -503,6 +694,10 @@ def _apply_study_guide_change(
         ] = update_study_guide_sections_cmd.new_value
         new_sections: List[study_guide_domain.StudyGuideSection] = []
 
+        # For updating the page_contents of the subtopic page corresponding
+        # to the study guide.
+        concatenated_html_parts: List[str] = []
+
         for section_dict in new_sections_dict_list:
             # For the study guide.
             section = study_guide_domain.StudyGuideSection.from_dict(
@@ -511,13 +706,61 @@ def _apply_study_guide_change(
             section.validate()
             new_sections.append(section)
 
+            # For the subtopic page. (To be deprecated once study guides
+            # become standard.)
+            heading_html = (
+                '<p><strong>'
+                + f'{section_dict["heading"]["unicode_str"]}'
+                + '</strong></p>'
+            )
+            concatenated_html_parts.append(heading_html)
+            concatenated_html_parts.append(section_dict['content']['html'])
+
         # Updating study guide.
         modified_study_guides[study_guide_id].update_sections(new_sections)
+
+        # For subtopic page. (To be deprecated once study guides become
+        # standard.) Transforming all sections to a single html field.
+        concatenated_html = '\n\n'.join(concatenated_html_parts)
+        page_contents = state_domain.SubtitledHtml('content', concatenated_html)
+        page_contents.validate()
+        temporary_subtopic_page: Union[
+            subtopic_page_domain.SubtopicPage, None
+        ] = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, change.subtopic_id, False
+        )
+        if temporary_subtopic_page is not None:
+            modified_subtopic_pages[subtopic_page_id] = temporary_subtopic_page
+            old_value = (
+                temporary_subtopic_page.page_contents.subtitled_html.html
+            )
+            update_subtopic_page_property_cmd = (
+                subtopic_page_domain.SubtopicPageChange
+            )(
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_html',
+                    'new_value': (concatenated_html),
+                    'old_value': old_value,
+                    'subtopic_id': (
+                        # We use update_subtopic_page_property_cmd
+                        # here to avoid mypy errors. We will replace
+                        # this with a study guide alternative once
+                        # we start using study guides exclusively.
+                        change.subtopic_id
+                    ),
+                }
+            )
+            modified_subtopic_change_cmds[subtopic_page_id].append(
+                update_subtopic_page_property_cmd
+            )
+            temporary_subtopic_page.update_page_contents_html(page_contents)
 
 
 def apply_change_list(
     topic_id: str,
     change_list: Sequence[change_domain.BaseChange],
+    committer_id: str,
 ) -> Tuple[
     topic_domain.Topic,
     Dict[str, subtopic_page_domain.SubtopicPage],
@@ -535,6 +778,7 @@ def apply_change_list(
         topic_id: str. ID of the given topic.
         change_list: list(TopicChange). A change list to be applied to the given
             topic.
+        committer_id: str. ID of the given committer.
 
     Raises:
         Exception. The incoming changelist had simultaneous creation and
@@ -613,6 +857,18 @@ def apply_change_list(
                 existing_study_guide_ids_to_be_modified,
                 modified_study_guide_change_cmds,
             )
+        # Remove this entire if block once study guides become standard.
+        if change.cmd == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
+            _collect_subtopic_page_changes(
+                change,
+                topic,
+                topic_id,
+                existing_subtopic_page_ids_to_be_modified,
+                modified_subtopic_change_cmds,
+                existing_study_guide_ids_to_be_modified,
+                modified_study_guide_change_cmds,
+                _ensure_study_guide_exists,
+            )
 
     modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
@@ -623,13 +879,19 @@ def apply_change_list(
         # Ruling out the possibility of None for mypy type checking.
         assert subtopic_page is not None
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
-    modified_study_guides_list = study_guide_services.get_study_guides_with_ids(
-        topic_id, existing_study_guide_ids_to_be_modified
-    )
-    for study_guide in modified_study_guides_list:
-        # Ruling out the possibility of None for mypy type checking.
-        assert study_guide is not None
-        modified_study_guides[study_guide.id] = study_guide
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+        committer_id,
+    ):
+        modified_study_guides_list = (
+            study_guide_services.get_study_guides_with_ids(
+                topic_id, existing_study_guide_ids_to_be_modified
+            )
+        )
+        for study_guide in modified_study_guides_list:
+            # Ruling out the possibility of None for mypy type checking.
+            assert study_guide is not None
+            modified_study_guides[study_guide.id] = study_guide
 
     def _handle_add_subtopic_cmd(change: change_domain.BaseChange) -> None:
         # Here we use cast because we are narrowing down the type from
@@ -914,7 +1176,53 @@ def apply_change_list(
                 update_subtopic_property_cmd.subtopic_id,
                 update_subtopic_property_cmd.new_value,
             )
+            if not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                committer_id,
+            ):
+                # Here we use cast because we are narrowing down the
+                # type from TopicChange to a specific change command.
+                update_study_guide_sections_heading_cmd = cast(
+                    study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
+                    change,
+                )
+                study_guide_id = (
+                    study_guide_domain.StudyGuide.get_study_guide_id(
+                        topic_id,
+                        update_study_guide_sections_heading_cmd.subtopic_id,
+                    )
+                )
 
+                # Only update study guide if it exists or can be
+                # fetched.
+                existing_study_guide_id = _ensure_study_guide_exists(
+                    update_study_guide_sections_heading_cmd.subtopic_id
+                )
+
+                if existing_study_guide_id is not None:
+                    modified_study_guide_change_cmds[study_guide_id].append(
+                        study_guide_domain.StudyGuideChange(
+                            {
+                                'cmd': 'update_study_guide_property',
+                                'property_name': 'sections_content',
+                                'new_value': (
+                                    update_study_guide_sections_heading_cmd.new_value
+                                ),
+                                'old_value': 'section_heading_0',
+                                'subtopic_id': (
+                                    update_study_guide_sections_heading_cmd.subtopic_id
+                                ),
+                            }
+                        )
+                    )
+                    (
+                        modified_study_guides[
+                            study_guide_id
+                        ].update_section_heading
+                    )(
+                        (update_study_guide_sections_heading_cmd.new_value),
+                        'section_heading_0',
+                    )
         if (
             update_subtopic_property_cmd.property_name
             == topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME
@@ -949,6 +1257,19 @@ def apply_change_list(
             topic_id,
             modified_study_guides,
             deleted_subtopic_ids,
+            modified_subtopic_pages,
+            modified_subtopic_change_cmds,
+        )
+
+    def _handle_update_subtopic_page_property_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        _apply_subtopic_page_change(
+            change,
+            topic_id,
+            deleted_subtopic_ids,
+            modified_subtopic_pages,
+            modified_study_guides,
         )
 
     def _handle_migrate_subtopic_schema_cmd(
@@ -996,6 +1317,9 @@ def apply_change_list(
         ),
         study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY: (
             _handle_update_study_guide_property_cmd
+        ),
+        subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: (
+            _handle_update_subtopic_page_property_cmd
         ),
         topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION: (
             _handle_migrate_subtopic_schema_cmd
@@ -1133,7 +1457,7 @@ def update_topic_and_subtopic_pages(
         newly_created_subtopic_ids,
         updated_subtopic_pages_change_cmds_dict,
         updated_study_guides_change_cmds_dict,
-    ) = apply_change_list(topic_id, change_list)
+    ) = apply_change_list(topic_id, change_list, committer_id)
 
     if (
         old_topic.url_fragment != updated_topic.url_fragment
@@ -1155,6 +1479,13 @@ def update_topic_and_subtopic_pages(
     # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
         if subtopic_id not in newly_created_subtopic_ids:
+            if not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                committer_id,
+            ):
+                subtopic_page_services.delete_subtopic_page(
+                    committer_id, topic_id, subtopic_id
+                )
             study_guide_services.delete_study_guide(
                 committer_id, topic_id, subtopic_id
             )

@@ -525,8 +525,95 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         )
 
 
+class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s/%s'
+            % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id,
+                topic_fetchers.get_new_topic_id(),
+            ),
+            expected_status_int=404,
+        )
+
+        self.logout()
+
+    def test_editable_subtopic_page_get(self) -> None:
+        # Check that non-admins and non-topic managers cannot access the
+        # editable subtopic data.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1),
+            expected_status_int=401,
+        )
+        self.logout()
+
+        # Check that topic managers not assigned to this topic can
+        # access its subtopic pages.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
+        )
+        self.assertEqual(
+            {
+                'subtitled_html': {'html': '', 'content_id': 'content'},
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
+            },
+            json_response['subtopic_page_dict']['page_contents'],
+        )
+        self.logout()
+
+        # Check that topic managers can access the subtopic page.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
+        )
+        self.assertEqual(
+            {
+                'subtitled_html': {'html': '', 'content_id': 'content'},
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
+            },
+            json_response['subtopic_page_dict']['page_contents'],
+        )
+        self.logout()
+
+        # Check that admins can access the editable subtopic data.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
+        )
+        self.assertEqual(
+            {
+                'subtitled_html': {'html': '', 'content_id': 'content'},
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
+            },
+            json_response['subtopic_page_dict']['page_contents'],
+        )
+        self.logout()
+
+
 class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
     def setUp(self) -> None:
         super().setUp()
         changelist = [
@@ -859,6 +946,16 @@ class TopicEditorTests(
                     'new_value': 'A new name',
                 },
                 {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_html',
+                    'old_value': {'html': '', 'content_id': 'content'},
+                    'subtopic_id': 1,
+                    'new_value': {
+                        'html': '<p>New Data</p>',
+                        'content_id': 'content',
+                    },
+                },
+                {
                     'cmd': 'update_study_guide_property',
                     'subtopic_id': 1,
                     'property_name': 'sections',
@@ -907,6 +1004,34 @@ class TopicEditorTests(
                     'old_value': '',
                     'subtopic_id': 2,
                 },
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_html',
+                    'old_value': {'html': '', 'content_id': 'content'},
+                    'new_value': {
+                        'html': '<p>New Value</p>',
+                        'content_id': 'content',
+                    },
+                    'subtopic_id': 2,
+                },
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_audio',
+                    'old_value': {'voiceovers_mapping': {'content': {}}},
+                    'new_value': {
+                        'voiceovers_mapping': {
+                            'content': {
+                                'en': {
+                                    'filename': 'test.mp3',
+                                    'file_size_bytes': 100,
+                                    'needs_update': False,
+                                    'duration_secs': 0.34342,
+                                }
+                            }
+                        }
+                    },
+                    'subtopic_id': 2,
+                },
             ],
         }
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -935,6 +1060,53 @@ class TopicEditorTests(
         )
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
+
+        # Test if the corresponding subtopic pages were created.
+        json_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
+        )
+        self.assertEqual(
+            {
+                'subtitled_html': {
+                    'html': '<p><strong>new heading</strong></p>\n\n<p>New Data</p>',
+                    'content_id': 'content',
+                },
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
+            },
+            json_response['subtopic_page_dict']['page_contents'],
+        )
+        json_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 2)
+        )
+        self.assertEqual(
+            {
+                'subtitled_html': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content',
+                },
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'file_size_bytes': 100,
+                                'filename': 'test.mp3',
+                                'needs_update': False,
+                                'duration_secs': 0.34342,
+                            }
+                        }
+                    }
+                },
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
+            },
+            json_response['subtopic_page_dict']['page_contents'],
+        )
 
         # Test if the corresponding study guides were created.
         json_response = self.get_json(
@@ -1063,6 +1235,16 @@ class TopicEditorTests(
                     'new_value': 'A new name',
                 },
                 {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_html',
+                    'old_value': {'html': '', 'content_id': 'content'},
+                    'subtopic_id': 1,
+                    'new_value': {
+                        'html': '<p>New Data</p>',
+                        'content_id': 'content',
+                    },
+                },
+                {
                     'cmd': 'update_study_guide_property',
                     'subtopic_id': 1,
                     'property_name': 'sections',
@@ -1109,6 +1291,34 @@ class TopicEditorTests(
                     'property_name': 'url_fragment',
                     'new_value': 'subtopic-two',
                     'old_value': '',
+                    'subtopic_id': 2,
+                },
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_html',
+                    'old_value': {'html': '', 'content_id': 'content'},
+                    'new_value': {
+                        'html': '<p>New Value</p>',
+                        'content_id': 'content',
+                    },
+                    'subtopic_id': 2,
+                },
+                {
+                    'cmd': 'update_subtopic_page_property',
+                    'property_name': 'page_contents_audio',
+                    'old_value': {'voiceovers_mapping': {'content': {}}},
+                    'new_value': {
+                        'voiceovers_mapping': {
+                            'content': {
+                                'en': {
+                                    'filename': 'test.mp3',
+                                    'file_size_bytes': 100,
+                                    'needs_update': False,
+                                    'duration_secs': 0.34342,
+                                }
+                            }
+                        }
+                    },
                     'subtopic_id': 2,
                 },
             ],

@@ -375,25 +375,6 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{'id': 'story_id', 'version': 1, 'payload': story.to_dict()}],
             )
 
-    def test_get_story_migration_returns_correct_json(self) -> None:
-        story = self.save_new_story('story_id', 'user_id', 'Title')
-        with self.secrets_swap:
-            self.assertEqual(
-                self.get_json(
-                    '/android_data?activity_type=story_migration&'
-                    'activities_data=[{"id": "story_id", "version": 1}]',
-                    headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200,
-                ),
-                [
-                    {
-                        'id': 'story_id',
-                        'version': 1,
-                        'payload': story.to_dict_for_android(),
-                    }
-                ],
-            )
-
     def test_get_skill_returns_correct_json(self) -> None:
         skill = self.save_new_skill('skill_id', 'user_id', 'Description')
         with self.secrets_swap:
@@ -408,7 +389,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_subtopic_returns_correct_json(self) -> None:
-        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        subtopic = self.save_new_subtopic(1, 'user_id', 'topic_id')
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
@@ -421,7 +402,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     {
                         'id': 'topic_id-1',
                         'version': 1,
-                        'payload': study_guide.to_subtopic_page_dict_for_android(),
+                        'payload': subtopic.to_dict(),
                     }
                 ],
             )
@@ -1000,8 +981,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_multiple_subtopics_at_once(self) -> None:
         """Test multiple subtopics can be requested at once."""
-        study_guide1 = self.save_new_study_guide(1, 'user_id', 'topic_id')
-        study_guide2 = self.save_new_study_guide(2, 'user_id', 'topic_id')
+        subtopic1 = self.save_new_subtopic(1, 'user_id', 'topic_id')
+        subtopic2 = self.save_new_subtopic(2, 'user_id', 'topic_id')
 
         with self.secrets_swap:
             self.assertEqual(
@@ -1017,12 +998,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     {
                         'id': 'topic_id-1',
                         'version': 1,
-                        'payload': study_guide1.to_subtopic_page_dict_for_android(),
+                        'payload': subtopic1.to_dict(),
                     },
                     {
                         'id': 'topic_id-2',
                         'version': 1,
-                        'payload': study_guide2.to_subtopic_page_dict_for_android(),
+                        'payload': subtopic2.to_dict(),
                     },
                 ],
             )
