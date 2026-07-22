@@ -90,7 +90,7 @@ describe('Edit Arc Modal Component', () => {
 
     it('should close modal with trimmed values', () => {
       const closeSpy = spyOn(ngbActiveModal, 'close');
-      component.arcTitle = '  Arc 3  ';
+      component.arcTitle = '  Adventure 3  ';
       component.arcDescription = '  Intro to decimals  ';
 
       component.save();
@@ -142,7 +142,7 @@ describe('Edit Arc Modal Component', () => {
 
     it('should dismiss bottom sheet with trimmed values on save', () => {
       const dismissSpy = spyOn(bottomSheetRef, 'dismiss');
-      component.arcTitle = '  Arc 3  ';
+      component.arcTitle = '  Adventure 3  ';
       component.arcDescription = '  Intro to decimals  ';
 
       component.save();
