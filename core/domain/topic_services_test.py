@@ -1686,7 +1686,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 1
         )
         study_guide_section = study_guide.sections[0]
-        self.assertEqual(study_guide_section.heading.unicode_str, 'New Title')
+        self.assertEqual(study_guide_section.heading.unicode_str, 'Title')
         self.assertEqual(study_guide_section.content.html, '<p>New Value</p>')
 
         # Change the subtopic page contents first and then the subtopic title.
@@ -1737,9 +1737,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 1
         )
         study_guide_section = study_guide.sections[0]
-        self.assertEqual(
-            study_guide_section.heading.unicode_str, 'Another New Title'
-        )
+        self.assertEqual(study_guide_section.heading.unicode_str, 'Title')
         self.assertEqual(
             study_guide_section.content.html, '<p>Another New Value</p>'
         )
@@ -1902,12 +1900,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].title, 'Title2')
         self.assertEqual(topic.subtopics[0].skill_ids, [self.skill_id_1])
 
-        # Test whether the subtopic page corresponding to the deleted subtopic
+        # Test whether the study guide corresponding to the deleted subtopic
         # was also deleted.
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+        study_guide = study_guide_services.get_study_guide_by_id(
             self.TOPIC_ID, 1, strict=False
         )
-        self.assertIsNone(subtopic_page)
+        self.assertIsNone(study_guide)
         # Validate the newly created subtopic page.
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False
@@ -2001,9 +1999,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(subtopic_page)
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_update_topic_and_study_guide(self) -> None:
         changelist: List[
             Union[topic_domain.TopicChange, study_guide_domain.StudyGuideChange]
@@ -2688,12 +2683,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Removed 1 subtopic.'
         )
-        subtopic_page_with_none = (
-            subtopic_page_services.get_subtopic_page_by_id(
-                self.TOPIC_ID, 1, strict=False
-            )
+        study_guide_with_none = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1, strict=False
         )
-        self.assertIsNone(subtopic_page_with_none)
+        self.assertIsNone(study_guide_with_none)
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.uncategorized_skill_ids, [self.skill_id_1, self.skill_id_2]
