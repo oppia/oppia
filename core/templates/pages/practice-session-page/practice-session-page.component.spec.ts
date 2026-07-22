@@ -58,12 +58,14 @@ describe('Practice session page', () => {
   let pageTitleService: PageTitleService;
   let urlService: UrlService;
   let translateService: TranslateService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let loaderService: LoaderService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let practiceSessionsBackendApiService: PracticeSessionsBackendApiService;
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
+
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
