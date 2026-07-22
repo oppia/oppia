@@ -188,8 +188,8 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
-  isStoryEditorAdventuresFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status.StoryEditorAdventures.isEnabled;
+  isStoryEditorArcsFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.StoryEditorArcs.isEnabled;
   }
 
   getArcIdForNode(nodeId: string): string {

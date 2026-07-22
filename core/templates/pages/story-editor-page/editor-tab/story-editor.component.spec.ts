@@ -61,7 +61,7 @@ class MockPlatformFeatureService {
     SerialChapterLaunchCurriculumAdminView: {
       isEnabled: false,
     },
-    StoryEditorAdventures: {
+    StoryEditorArcs: {
       isEnabled: false,
     },
   };
@@ -1011,12 +1011,12 @@ describe('Story Editor Component having three story nodes', () => {
   }));
 
   it('should check if story editor arcs feature flag is enabled', () => {
-    expect(component.isStoryEditorAdventuresFeatureFlagEnabled()).toBe(false);
+    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(false);
 
-    mockPlatformFeatureService.status.StoryEditorAdventures = {
+    mockPlatformFeatureService.status.StoryEditorArcs = {
       isEnabled: true,
     };
-    expect(component.isStoryEditorAdventuresFeatureFlagEnabled()).toBe(true);
+    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(true);
   });
 
   it('should return true when node index is zero for isSameArc', () => {
