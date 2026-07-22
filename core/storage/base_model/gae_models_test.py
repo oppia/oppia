@@ -470,6 +470,12 @@ class TestVersionedModel(base_models.VersionedModel):
     description = datastore_services.StringProperty(indexed=True)
 
 
+class TestBaseFeedbackModel(base_models.BaseFeedbackModel):
+    """Model that inherits BaseFeedbackModel for testing."""
+
+    ID_PREFIX = 'feedback.test'
+
+
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
@@ -1154,3 +1160,116 @@ class BaseModelTests(test_utils.GenericTestBase):
         self.assertEqual(results[0].description, 'Version 1 content')
         self.assertEqual(results[1].description, 'Version 1 content')
         self.assertEqual(results[2].description, 'Version 2 content')
+
+
+class BaseFeedbackModelTests(test_utils.GenericTestBase):
+    """Tests for BaseFeedbackModel."""
+
+    def _create_feedback_model(
+        self,
+        model_id: str,
+    ) -> None:
+        """Creates a TestBaseFeedbackModel with the given creation time."""
+        model = TestBaseFeedbackModel(
+            id=model_id,
+            author_id='user_id',
+            feedback_text='Feedback text',
+            status=feconf.STATUS_CHOICES_OPEN,
+            exploration_id='exp_id',
+            lesson_metadata_schema_version=1,
+            lesson_metadata={},
+        )
+        model.update_timestamps()
+        model.put()
+
+    def test_get_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeedbackModel.get_deletion_policy()
+
+    def test_has_reference_to_user_id(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The has_reference_to_user_id() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeedbackModel.has_reference_to_user_id('user_id')
+
+    def test_get_model_association_to_user_raises_not_implemented_error(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.'
+            ),
+        ):
+            base_models.BaseFeedbackModel.get_model_association_to_user()
+
+    def test_base_model_export_data_raises_not_implemented_error(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The export_data() method is missing from the derived '
+                'class. It should be implemented in the derived class.'
+            ),
+        ):
+            base_models.BaseFeedbackModel.export_data('user_id')
+
+    def test_generate_new_id_raises_error_when_id_prefix_is_empty(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Subclasses of BaseFeedbackModel must define a non-empty '
+            'ID_PREFIX',
+        ):
+            base_models.BaseFeedbackModel._generate_new_id()  # pylint: disable=protected-access
+
+    def test_fetch_page_returns_cursor_for_next_page(self) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_3', 'feedback_2'],
+        )
+        self.assertIsNotNone(next_cursor)
+        self.assertTrue(more)
+
+    def test_fetch_page_accepts_cursor_for_later_page(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
+
+        _, next_cursor, _ = TestBaseFeedbackModel.fetch_page(page_size=2)
+        assert next_cursor is not None
+
+        feedback_models, final_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2, cursor=next_cursor
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_1'],
+        )
+        self.assertIsNone(final_cursor)
+        self.assertFalse(more)

@@ -392,8 +392,8 @@
     },
     {
       "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/manage-classroom-progress-in-home-learner-dashboard",
@@ -412,8 +412,8 @@
     },
     {
       "name": "logged-out-learner/play-a-complete-community-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
@@ -516,8 +516,18 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/translate-exploration-in-target-language.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/check-their-accomplishment",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/feature-translation-opps-with-new-opps-model/check-their-accomplishment.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -526,8 +536,18 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/review-the-translations.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-reviewer/filter-the-translations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/filter-the-translations.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
+      "name": "translation-reviewer/feature-translation-opps-with-new-opps-model/filter-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/feature-translation-opps-with-new-opps-model/filter-the-translations.spec.ts",
       "framework": "puppeteer"
     },
     {

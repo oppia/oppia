@@ -28,17 +28,22 @@ import {AlertsService} from 'services/alerts.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StoryNode} from 'domain/story/story-node.model';
+import {
+  ArcModel,
+  StoryContents,
+} from 'domain/story/story-contents-object.model';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {NewChapterTitleModalComponent} from '../modal-templates/new-chapter-title-modal.component';
 import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-modal.component';
+import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
 import {Story} from 'domain/story/story.model';
-import {StoryContents} from 'domain/story/story-contents-object.model';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import constants from 'assets/constants';
+import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 
 @Component({
   selector: 'oppia-story-editor',
@@ -134,12 +139,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         this.story.getStoryContents().getNodes()[toIndex].getId()
       );
     }
-    if (fromIndex === 0) {
-      this.storyUpdateService.setInitialNodeId(
-        this.story,
-        this.story.getStoryContents().getNodes()[toIndex].getId()
-      );
-    }
     this.storyUpdateService.rearrangeNodeInStory(
       this.story,
       fromIndex,
@@ -187,6 +186,185 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   isSerialChapterFeatureFlagEnabled(): boolean {
     return this.platformFeatureService.status
       .SerialChapterLaunchCurriculumAdminView.isEnabled;
+  }
+
+  isStoryEditorArcsFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.StoryEditorArcs.isEnabled;
+  }
+
+  getArcIdForNode(nodeId: string): string {
+    for (const arc of this.storyContents.getArcs()) {
+      if (arc.getNodeIds().indexOf(nodeId) !== -1) {
+        return arc.getId();
+      }
+    }
+    throw new Error('Node ' + nodeId + ' does not belong to any arc.');
+  }
+
+  getArcForNode(nodeId: string): ArcModel {
+    const arcId = this.getArcIdForNode(nodeId);
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+    }
+    return this.storyContents.getArcs()[arcIndex];
+  }
+
+  getArcSequenceNumber(nodeId: string): number {
+    const arcId = this.getArcIdForNode(nodeId);
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+    }
+    return arcIndex + 1;
+  }
+
+  getArcColorForNode(
+    nodeId: string
+  ): (typeof StoryDomainConstants.ARC_COLOR_PALETTE)[number] {
+    const arcId = this.getArcIdForNode(nodeId);
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      throw new Error('Arc ' + arcId + ' not found for node ' + nodeId + '.');
+    }
+    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
+    return palette[arcIndex % palette.length];
+  }
+
+  isSameArc(nodeIndex: number): boolean {
+    if (nodeIndex <= 0) {
+      return true;
+    }
+    const prevNodeId = this.linearNodesList[nodeIndex - 1].getId();
+    const currNodeId = this.linearNodesList[nodeIndex].getId();
+    return (
+      this.getArcIdForNode(prevNodeId) === this.getArcIdForNode(currNodeId)
+    );
+  }
+
+  splitIntoArc(nodeIndex: number): void {
+    const nodeId = this.linearNodesList[nodeIndex].getId();
+    const sourceArcId = this.getArcIdForNode(nodeId);
+    const sourceArcIndex = this.storyContents.getArcIndex(sourceArcId);
+    const sourceArc = this.storyContents.getArcs()[sourceArcIndex];
+    const sourceArcNodeIds = [...sourceArc.getNodeIds()];
+    const splitIdx = sourceArcNodeIds.indexOf(nodeId);
+    if (splitIdx <= 0) {
+      return;
+    }
+    const nodesToMove = sourceArcNodeIds.slice(splitIdx);
+
+    const previousArcIdsOrder = this.storyContents
+      .getArcs()
+      .map(arc => arc.getId());
+    let arcId = 'arc_' + Date.now().toString();
+    const existingArcIds = new Set(
+      this.storyContents.getArcs().map(arc => arc.getId())
+    );
+    while (existingArcIds.has(arcId)) {
+      arcId = 'arc_' + Date.now().toString();
+    }
+    this.storyUpdateService.createArc(
+      this.story,
+      arcId,
+      'Arc ' + (this.storyContents.getArcs().length + 1),
+      '',
+      [nodesToMove[0]]
+    );
+
+    this.storyUpdateService.moveNodeToArc(this.story, nodesToMove[0], arcId);
+
+    nodesToMove.slice(1).forEach(nodeIdToMove => {
+      this.storyUpdateService.moveNodeToArc(this.story, nodeIdToMove, arcId);
+    });
+
+    const newArcOrder = [...previousArcIdsOrder];
+    newArcOrder.splice(sourceArcIndex + 1, 0, arcId);
+    this.storyUpdateService.rearrangeArcs(this.story, newArcOrder);
+
+    this._initEditor();
+  }
+
+  onEditArcClick(nodeId: string): void {
+    this.editArc(this.getArcIdForNode(nodeId));
+  }
+
+  editArc(arcId: string): void {
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      return;
+    }
+    const arc = this.storyContents.getArcs()[arcIndex];
+    const modalRef = this.ngbModal.open(EditArcModalComponent, {
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.arcTitle = arc.getTitle();
+    modalRef.componentInstance.arcDescription = arc.getDescription();
+    modalRef.result.then(
+      (result: {title: string; description: string}) => {
+        if (result.title !== arc.getTitle()) {
+          this.storyUpdateService.updateArcProperty(
+            this.story,
+            arcId,
+            StoryDomainConstants.ARC_PROPERTY_TITLE,
+            arc.getTitle(),
+            result.title
+          );
+        }
+        if (result.description !== arc.getDescription()) {
+          this.storyUpdateService.updateArcProperty(
+            this.story,
+            arcId,
+            StoryDomainConstants.ARC_PROPERTY_DESCRIPTION,
+            arc.getDescription(),
+            result.description
+          );
+        }
+        this._initEditor();
+      },
+      () => {}
+    );
+  }
+
+  onRemoveArcClick(nodeId: string): void {
+    this.removeArcBoundary(this.getArcIdForNode(nodeId));
+  }
+
+  isFirstArc(nodeId: string): boolean {
+    const arcId = this.getArcIdForNode(nodeId);
+    return this.storyContents.getArcIndex(arcId) === 0;
+  }
+
+  removeArcBoundary(arcId: string): void {
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      return;
+    }
+
+    let sourceArcIndex = arcIndex;
+    let destinationArcId: string;
+    if (arcIndex === 0) {
+      if (this.storyContents.getArcs().length < 2) {
+        return;
+      }
+      sourceArcIndex = 1;
+      destinationArcId = arcId;
+    } else {
+      destinationArcId = this.storyContents.getArcs()[arcIndex - 1].getId();
+    }
+
+    const currentArc = this.storyContents.getArcs()[sourceArcIndex];
+    const nodeIdsToMove = [...currentArc.getNodeIds()];
+
+    nodeIdsToMove.forEach(nodeId => {
+      this.storyUpdateService.moveNodeToArc(
+        this.story,
+        nodeId,
+        destinationArcId
+      );
+    });
+    this.storyUpdateService.deleteArc(this.story, currentArc.getId());
+    this._initEditor();
   }
 
   _initEditor(): void {
