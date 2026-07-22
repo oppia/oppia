@@ -91,15 +91,7 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
             >> beam.Map(
                 lambda model: (
                     model.exploration_id,
-                    (
-                        model.last_updated.strftime('%Y-%m-%d %H:%M:%S')
-                        if model.last_updated
-                        else (
-                            model.created_on.strftime('%Y-%m-%d %H:%M:%S')
-                            if model.created_on
-                            else ''
-                        )
-                    ),
+                    model.last_updated.strftime('%Y-%m-%d %H:%M:%S'),
                 )
             )
         )
@@ -142,14 +134,8 @@ class AuditDeprecatedInteractionsJob(base_jobs.JobBase):
                 model.id,
                 {
                     'interactions': sorted(list(used_deprecated_interactions)),
-                    'last_updated': (
-                        model.last_updated.strftime('%Y-%m-%d %H:%M:%S')
-                        if model.last_updated
-                        else (
-                            model.created_on.strftime('%Y-%m-%d %H:%M:%S')
-                            if model.created_on
-                            else ''
-                        )
+                    'last_updated': model.last_updated.strftime(
+                        '%Y-%m-%d %H:%M:%S'
                     ),
                 },
             )
