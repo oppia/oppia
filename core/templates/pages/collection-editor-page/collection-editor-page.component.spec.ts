@@ -103,7 +103,9 @@ describe('Collection editor page component', () => {
     mockOnCollectionInitializedEventEmitter.emit();
     fixture.detectChanges();
 
-    expect(bottomNavbarStatusService.markBottomNavbarStatus).toHaveBeenCalledWith(true);
+    expect(
+      bottomNavbarStatusService.markBottomNavbarStatus
+    ).toHaveBeenCalledWith(true);
     expect(componentInstance.setTitle).toHaveBeenCalled();
     expect(componentInstance.subscribeToOnLangChange).toHaveBeenCalled();
     expect(collectionEditorStateService.loadCollection).toHaveBeenCalledWith(
