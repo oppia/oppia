@@ -299,9 +299,7 @@ describe('Practice session page', () => {
     spyOn(urlService, 'getPathname').and.returnValue(
       '/learn/math/fractions/practice/session'
     );
-    (
-      urlService as jasmine.SpyObj<UrlService>
-    ).getSelectedSubtopicsFromUrl.and.returnValue('[1,2]');
+    spyOn(urlService, 'getSelectedSubtopicsFromUrl').and.returnValue('[1,2]');
     spyOn(
       practiceSessionsBackendApiService,
       'fetchPracticeSessionsData'
