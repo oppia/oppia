@@ -119,7 +119,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.downloadCertificate();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
@@ -145,7 +145,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.downloadCertificate();
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
@@ -163,7 +163,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.downloadCertificate();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
@@ -202,7 +202,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual(
       "Please select a 'To' date that is not in the future."
     );
@@ -221,7 +221,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual(
       'There are no contributions for the given date range.'
     );
@@ -236,7 +236,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
@@ -252,7 +252,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeFalse();
+    expect(component.errorsFound).toBe(false);
     expect(component.errorMessage).toEqual('');
   });
 
@@ -306,8 +306,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.printCertificate();
 
-    expect(component.isPrinting).toBeTrue();
-    expect(component.isCancelled).toBeFalse();
+    expect(component.isPrinting).toBe(true);
+    expect(component.isCancelled).toBe(false);
 
     flushMicrotasks();
 
@@ -315,7 +315,7 @@ describe('Contributor Certificate Download Modal Component', () => {
       certificateData,
       true
     );
-    expect(component.isPrinting).toBeFalse();
+    expect(component.isPrinting).toBe(false);
   }));
 
   it('should show error when printing with no contributions', fakeAsync(() => {
@@ -330,11 +330,11 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual(
       'There are no contributions for the given date range.'
     );
-    expect(component.isPrinting).toBeFalse();
+    expect(component.isPrinting).toBe(false);
   }));
 
   it('should handle errors in printCertificate', fakeAsync(() => {
@@ -348,8 +348,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.errorsFound).toBeTrue();
-    expect(component.isPrinting).toBeFalse();
+    expect(component.errorsFound).toBe(true);
+    expect(component.isPrinting).toBe(false);
     expect(component.errorMessage).toBe('Print error');
   }));
 
@@ -365,7 +365,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
+    expect(component.isCancelled).toBe(true);
     expect(component.createCertificate).not.toHaveBeenCalled();
   }));
 
@@ -381,7 +381,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
+    expect(component.isCancelled).toBe(true);
     expect(component.createCertificate).not.toHaveBeenCalled();
   }));
 
@@ -397,8 +397,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
-    expect(component.errorsFound).toBeFalse();
+    expect(component.isCancelled).toBe(true);
+    expect(component.errorsFound).toBe(false);
   }));
 
   it('should not show error if print is cancelled during error', fakeAsync(() => {
@@ -413,28 +413,28 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     flushMicrotasks();
 
-    expect(component.isCancelled).toBeTrue();
-    expect(component.errorsFound).toBeFalse();
+    expect(component.isCancelled).toBe(true);
+    expect(component.errorsFound).toBe(false);
   }));
 
   it('should return true for isDownloadDisabled when downloading', () => {
     component.isDownloading = true;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return true for isDownloadDisabled when printing', () => {
     component.isPrinting = true;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return true for isDownloadDisabled when errors found', () => {
     component.errorsFound = true;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return true for isDownloadDisabled when dates are undefined', () => {
     component.fromDate = undefined as unknown as string;
-    expect(component.isDownloadDisabled).toBeTrue();
+    expect(component.isDownloadDisabled).toBe(true);
   });
 
   it('should return false for isDownloadDisabled when everything is valid', () => {
@@ -443,14 +443,14 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.errorsFound = false;
     component.fromDate = '2022/01/01';
     component.toDate = '2022/10/31';
-    expect(component.isDownloadDisabled).toBeFalse();
+    expect(component.isDownloadDisabled).toBe(false);
   });
 
   it('should set isCancelled to true when close is called', () => {
     spyOn(activeModal, 'close');
-    expect(component.isCancelled).toBeFalse();
+    expect(component.isCancelled).toBe(false);
     component.close();
-    expect(component.isCancelled).toBeTrue();
+    expect(component.isCancelled).toBe(true);
     expect(activeModal.close).toHaveBeenCalled();
   });
 
@@ -460,7 +460,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
@@ -470,13 +470,13 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.validateDate();
 
-    expect(component.errorsFound).toBeTrue();
+    expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
   it('should return true for disableDownloadButton when toDate is undefined', () => {
     component.toDate = undefined as unknown as string;
-    expect(component.disableDownloadButton()).toBeTrue();
+    expect(component.disableDownloadButton()).toBe(true);
   });
 
   it('should trigger print flow when createCertificate is called with isPrinting true', () => {
