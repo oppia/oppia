@@ -77,6 +77,10 @@ class UserSettingsModel(base_models.BaseModel):
     # edited and is unique only among the profiles of the corresponding
     # regular user account.
     display_alias = datastore_services.StringProperty(default=None)
+    # Profile name to be shown on certificates.
+    profile_name_for_certificate = datastore_services.StringProperty(
+        default=None
+    )
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
     # Subject interests specified by the user.

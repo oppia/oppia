@@ -40,6 +40,7 @@ interface NonEmailPreferencesBackendDict {
   default_dashboard: string;
   user_bio: string;
   subject_interests: string;
+  profile_name_for_certificate: string;
   subscription_list: SubscriptionSummary[];
 }
 
@@ -66,6 +67,7 @@ export type BackendPreferenceUpdateType =
   | 'profile_picture_data_url'
   | 'user_bio'
   | 'subject_interests'
+  | 'profile_name_for_certificate'
   | 'default_dashboard'
   | 'preferred_language_codes'
   | 'preferred_site_language_code'
