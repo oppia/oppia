@@ -24,7 +24,7 @@ import urllib.request
 
 from core.constants import constants
 
-import sentence_transformers  # pylint: disable=import-error
+import sentence_transformers
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
