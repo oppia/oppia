@@ -155,6 +155,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 'preferred_site_language_code': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_audio_language_code': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_translation_language_code': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_name_for_certificate': base_models.EXPORT_POLICY.EXPORTED,
                 'username': base_models.EXPORT_POLICY.EXPORTED,
                 'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
