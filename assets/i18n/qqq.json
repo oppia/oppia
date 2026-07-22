@@ -1238,6 +1238,7 @@
   "I18N_PREFERENCES_EMAIL": "Text displayed in the preferences page. - Text shown to the left of the user email address.\n{{Identical|E-mail}}",
   "I18N_PREFERENCES_EMAIL_CLARIFICATION": "Text displayed in the preferences page. - Text shown below the email address.",
   "I18N_PREFERENCES_EMAIL_EXPLAIN": "Text displayed in the preferences page. - Text shown below the user email address.",
+  "I18N_PREFERENCES_EMAIL_RECEIVE_CONTRIBUTOR_DASHBOARD_REVIEW_NOTIFICATIONS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive daily emails about Contributor Dashboard suggestions awaiting review",
   "I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive emails related to user when he/she is given edit rights to an exploration",
   "I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive emails when someone sends them feedback on an exploration",
   "I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive periodic emails from the site.",
