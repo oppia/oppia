@@ -51,7 +51,7 @@ export enum FeatureNames {
   EnableCertificateAssessment = 'enable_certificate_assessment',
   WebFeedbackModalEnabled = 'web_feedback_modal_enabled',
   ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
-  StoryEditorArcs = 'story_editor_arcs',
+  StoryEditorAdventures = 'story_editor_adventures',
 }
 
 export interface FeatureStatusSummaryBackendDict {
