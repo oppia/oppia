@@ -58,11 +58,11 @@ export const StoryDomainConstants = {
   NODE: 'node',
 
   /**
-   * Palette used to colour arc header backgrounds and flag badges in both the
+   * Palette used to colour arc header backgrounds and book badges in both the
    * story-editor and topic-viewer pages.  Each entry has:
    *   headerBg  – light tint for the arc header card background
    *   headerBorder – border / rule colour
-   *   flagBg    – solid colour for the circular flag badge
+   *   bookBg    – solid colour for the circular book badge
    *   rowAccent – left-border accent shown on chapter rows inside this arc
    *
    * At least 15 entries are required so arcs cycle through distinct colours.
@@ -71,91 +71,91 @@ export const StoryDomainConstants = {
     {
       headerBg: '#eef7ef',
       headerBorder: '#b8dbbf',
-      flagBg: '#27a844',
+      bookBg: '#27a844',
       rowAccent: '#27a844',
     },
     {
       headerBg: '#eef3fb',
       headerBorder: '#bdd0ed',
-      flagBg: '#2c6ecb',
+      bookBg: '#2c6ecb',
       rowAccent: '#2c6ecb',
     },
     {
       headerBg: '#fdf6e3',
       headerBorder: '#e8d28a',
-      flagBg: '#c9860a',
+      bookBg: '#c9860a',
       rowAccent: '#c9860a',
     },
     {
       headerBg: '#fef0f0',
       headerBorder: '#f0baba',
-      flagBg: '#d63031',
+      bookBg: '#d63031',
       rowAccent: '#d63031',
     },
     {
       headerBg: '#f3eefb',
       headerBorder: '#cbb8e8',
-      flagBg: '#6741c9',
+      bookBg: '#6741c9',
       rowAccent: '#6741c9',
     },
     {
       headerBg: '#e8f7f5',
       headerBorder: '#9fd5cd',
-      flagBg: '#00897b',
+      bookBg: '#00897b',
       rowAccent: '#00897b',
     },
     {
       headerBg: '#fef3ec',
       headerBorder: '#f0c898',
-      flagBg: '#e07b12',
+      bookBg: '#e07b12',
       rowAccent: '#e07b12',
     },
     {
       headerBg: '#edf0fb',
       headerBorder: '#b4beeb',
-      flagBg: '#3949ab',
+      bookBg: '#3949ab',
       rowAccent: '#3949ab',
     },
     {
       headerBg: '#f3f6e8',
       headerBorder: '#c4d180',
-      flagBg: '#7b8c0e',
+      bookBg: '#7b8c0e',
       rowAccent: '#7b8c0e',
     },
     {
       headerBg: '#fdeef3',
       headerBorder: '#e8b2c5',
-      flagBg: '#b5174f',
+      bookBg: '#b5174f',
       rowAccent: '#b5174f',
     },
     {
       headerBg: '#e4f8fc',
       headerBorder: '#8fd7e5',
-      flagBg: '#0097a7',
+      bookBg: '#0097a7',
       rowAccent: '#0097a7',
     },
     {
       headerBg: '#eef0f3',
       headerBorder: '#b6bfcc',
-      flagBg: '#455a64',
+      bookBg: '#455a64',
       rowAccent: '#455a64',
     },
     {
       headerBg: '#fbeef8',
       headerBorder: '#dda8d5',
-      flagBg: '#a0288e',
+      bookBg: '#a0288e',
       rowAccent: '#a0288e',
     },
     {
       headerBg: '#f5ede8',
       headerBorder: '#d6a98a',
-      flagBg: '#7b4719',
+      bookBg: '#7b4719',
       rowAccent: '#7b4719',
     },
     {
       headerBg: '#e9f5ec',
       headerBorder: '#94c9a0',
-      flagBg: '#2e7d32',
+      bookBg: '#2e7d32',
       rowAccent: '#2e7d32',
     },
   ] as const,
