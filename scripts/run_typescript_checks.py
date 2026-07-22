@@ -66,7 +66,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/moderator-page/moderator-page.component.spec.ts',
     'core/templates/pages/release-coordinator-page/features-tab/features-tab.component.spec.ts',
     'core/templates/pages/release-coordinator-page/release-coordinator-page.component.spec.ts',
-    'core/templates/pages/splash-page/splash-page.module.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
     'core/templates/services/rte-helper-modal.component.spec.ts',
     'core/templates/services/rte-helper-modal.component.ts',
