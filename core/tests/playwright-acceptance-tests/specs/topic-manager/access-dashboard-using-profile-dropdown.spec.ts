@@ -153,13 +153,13 @@ test.describe('Topic Manager', function () {
 
     // Sort skills by date created.
     await topicManager.resetTopicFilter();
-    await topicManager.sortSkills('Oldest Created');
+    await topicManager.changeSkillSort('Most Recently Updated', 'Oldest Created');
     await topicManager.expectFilteredSkillsInOrder([
       'Addition',
       'Subtraction',
       'Word Problems',
     ]);
-    await topicManager.sortSkills('Newly Created');
+    await topicManager.changeSkillSort('Oldest Created', 'Newly Created');
     await topicManager.expectFilteredSkillsInOrder([
       'Word Problems',
       'Subtraction',

@@ -434,26 +434,31 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Sorts skills by a given option.
-   * @param {string} sortOption - The option to sort by.
+   * Navigate to the topic and skills dashboard page.
    */
-  async sortSkills(sortOption: string): Promise<void> {
-    try {
-      await this.navigateToTopicsAndSkillsDashboardPage();
+  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Sorts skills by a given option.
+   * @param {string} currentSort Current sort method used to find select element
+   * @param {string} newSort New sort method to choose.
+   */
+  async changeSkillSort(currentSort: string, newSort: string): Promise<void> {
+      await this.navigateToTopicAndSkillsDashboardPage();
       await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(displayMobileFiltersButton);
       }
-      await this.page.pause();
-      await this.selectMatOption("Sort Options", sortOption, false);
-      if (this.isViewportAtMobileWidth()) {
+      
+await this.changeMatSelectOption(currentSort, newSort);     
+ if (this.isViewportAtMobileWidth()) {
         await this.clickOnElementWithSelector(closeMobileFiltersButton);
       }
-      showMessage(`Sorted skills by: ${sortOption}`);
-    } catch (error: any) {
-      console.error(error.stack);
-      throw error;
-    }
+      showMessage(`Sorted skills by "${newSort}"`);
   }
 
   /**

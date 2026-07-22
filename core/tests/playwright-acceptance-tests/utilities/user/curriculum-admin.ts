@@ -26,7 +26,6 @@ const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;
 const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
-const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const richTextAreaField = 'div.e2e-test-rte';
 

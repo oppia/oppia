@@ -1266,6 +1266,22 @@ export class BaseUser {
   }
 
   /**
+   * Firstly, clicks on any element with given text. Afterwards, clicks on mat-option
+   * with new text.
+   * @param currentOption Current selected option
+   * @param newOption New option to select.
+   */
+  async changeMatSelectOption(
+    currentOption: string,
+    newOption: string
+  ) {
+    const selectElement = this.page.getByText(currentOption, {exact: true});
+    await selectElement.click();
+
+    await this.clickOnMatOptionByValue(newOption);
+  }
+
+  /**
    * This function uploads a file using the given file path.
    */
   async uploadFile(filePath: string): Promise<void> {
