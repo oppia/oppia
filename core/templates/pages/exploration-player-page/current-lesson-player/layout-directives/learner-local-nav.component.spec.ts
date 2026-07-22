@@ -41,13 +41,24 @@ import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav
 
 import {LearnerLocalNavComponent} from './learner-local-nav.component';
 import {FlagExplorationModalComponent} from '../modals/flag-exploration-modal.component';
+import {RestartLessonModalComponent} from '../modals/restart-lesson-modal.component';
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {FeedbackModalComponent} from '../../../../base-components/feedback-modal.component';
+import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
 
 class MockPlatformFeatureService {
   status = {
     WebFeedbackModalEnabled: {
       isEnabled: false,
+    },
+  };
+}
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      reload: jasmine.createSpy('reload'),
     },
   };
 }
@@ -68,6 +79,8 @@ describe('Learner Local Nav Component ', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let userService: UserService;
   let platformFeatureService: MockPlatformFeatureService;
+  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
+  let windowRef: MockWindowRef;
 
   const MockNgbPopover = jasmine.createSpyObj('NgbPopover', [
     'close',
@@ -144,6 +157,11 @@ describe('Learner Local Nav Component ', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
+        EditableExplorationBackendApiService,
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -162,6 +180,10 @@ describe('Learner Local Nav Component ', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     attributionService = TestBed.inject(AttributionService);
     pageContextService = TestBed.inject(PageContextService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService
+    );
+    windowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     spyOn(pageContextService, 'getExplorationId').and.returnValue('test_id');
     spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
   });
@@ -266,6 +288,48 @@ describe('Learner Local Nav Component ', () => {
       backdrop: 'static',
     });
   });
+
+  it(
+    'should reset exploration progress and reload the page when the ' +
+      'learner confirms restarting the chapter',
+    fakeAsync(() => {
+      component.explorationId = 'test_id';
+      const resetSpy = spyOn(
+        editableExplorationBackendApiService,
+        'resetExplorationProgressAsync'
+      ).and.resolveTo();
+
+      component.showRestartLessonModal();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledWith(RestartLessonModalComponent, {
+        backdrop: 'static',
+      });
+      expect(resetSpy).toHaveBeenCalledWith('test_id');
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should not reset exploration progress when the learner cancels ' +
+      'restarting the chapter',
+    fakeAsync(() => {
+      (ngbModal.open as jasmine.Spy).and.returnValue({
+        componentInstance: {},
+        result: Promise.reject(),
+      });
+      const resetSpy = spyOn(
+        editableExplorationBackendApiService,
+        'resetExplorationProgressAsync'
+      );
+
+      component.showRestartLessonModal();
+      tick();
+
+      expect(resetSpy).not.toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.reload).not.toHaveBeenCalled();
+    })
+  );
 
   it('should show attribution modal', () => {
     spyOn(attributionService, 'isAttributionModalShown').and.returnValue(false);

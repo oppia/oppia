@@ -17,7 +17,11 @@
  */
 
 import {NgModule} from '@angular/core';
-import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdownModule,
+  NgbModalModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
 import {ExplorationPlayerViewerCommonModule} from './exploration-player-viewer-common.module';
 import {SharedComponentsModule} from 'components/shared-component.module';
@@ -29,6 +33,7 @@ import {ExplorationSuccessfullyFlaggedModalComponent} from './modals/exploration
 import {LearnerViewInfoComponent} from './layout-directives/learner-view-info.component';
 import {MaterialModule} from 'modules/material.module';
 import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
+import {RestartLessonModalComponent} from './modals/restart-lesson-modal.component';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
 import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
@@ -48,6 +53,7 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     CommonModule,
     InteractionExtensionsModule,
     MatButtonModule,
+    NgbDropdownModule,
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
@@ -72,6 +78,7 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
+    RestartLessonModalComponent,
   ],
   entryComponents: [
     ExplorationPlayerPageComponent,
@@ -82,6 +89,7 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
+    RestartLessonModalComponent,
   ],
   providers: [HintAndSolutionModalService, FatigueDetectionService],
   exports: [LearnerLocalNavComponent, LearnerViewInfoComponent],

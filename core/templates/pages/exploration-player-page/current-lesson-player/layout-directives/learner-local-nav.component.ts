@@ -34,6 +34,9 @@ import {PageContextService} from 'services/page-context.service';
 import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
 import {FeedbackModalType} from 'domain/feedback/feedback.model';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {RestartLessonModalComponent} from '../modals/restart-lesson-modal.component';
 
 @Component({
   selector: 'oppia-learner-local-nav',
@@ -57,8 +60,34 @@ export class LearnerLocalNavComponent implements OnInit {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private userService: UserService,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
-    private pageContextService: PageContextService
+    private pageContextService: PageContextService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private windowRef: WindowRef
   ) {}
+
+  showRestartLessonModal(): void {
+    this.ngbModal
+      .open(RestartLessonModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        () => {
+          // This callback is triggered when the learner confirms that they
+          // want to restart the chapter from the beginning. It resets the
+          // saved checkpoint progress on the backend and reloads the player.
+          this.editableExplorationBackendApiService
+            .resetExplorationProgressAsync(this.explorationId)
+            .then(() => {
+              this.windowRef.nativeWindow.location.reload();
+            });
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
+  }
 
   showFlagExplorationModal(): void {
     this.ngbModal

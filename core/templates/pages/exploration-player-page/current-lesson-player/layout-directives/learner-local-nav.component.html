@@ -70,6 +70,24 @@
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</span>
     </div>
   </li>
+  <li class="nav-item" ngbDropdown display="dynamic" placement="bottom-right">
+    <span tabindex="0"
+          class="nav-link e2e-test-player-settings-menu"
+          ngbTooltip="{{ 'I18N_PLAYER_SETTINGS_TOOLTIP' | translate }}"
+          placement="bottom"
+          ngbDropdownToggle>
+      <i class="fas fa-cog exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_SETTINGS_TOOLTIP' | translate }}</span>
+    </span>
+    <div ngbDropdownMenu>
+      <button ngbDropdownItem
+              class="e2e-test-restart-lesson-button"
+              (click)="showRestartLessonModal()">
+        <i class="fas fa-undo me-2"></i>
+        {{ 'I18N_PLAYER_RESTART_CHAPTER' | translate }}
+      </button>
+    </div>
+  </li>
 </ul>
 
 <style>
