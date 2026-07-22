@@ -61,12 +61,12 @@ describe('Edit Arc Modal Component', () => {
       fixture = TestBed.createComponent(EditArcModalComponent);
       component = fixture.componentInstance;
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      component.arcTitle = 'Arc 2';
+      component.arcTitle = 'Adventure 2';
       component.arcDescription = 'Basics of fractions';
     });
 
     it('should initialize fields from inputs', () => {
-      expect(component.arcTitle).toBe('Arc 2');
+      expect(component.arcTitle).toBe('Adventure 2');
       expect(component.arcDescription).toBe('Basics of fractions');
     });
 
@@ -84,7 +84,7 @@ describe('Edit Arc Modal Component', () => {
 
       component.save();
 
-      expect(component.errorMessage).toBe('Arc title cannot be empty.');
+      expect(component.errorMessage).toBe('Adventure title cannot be empty.');
       expect(closeSpy).not.toHaveBeenCalled();
     });
 
@@ -96,7 +96,7 @@ describe('Edit Arc Modal Component', () => {
       component.save();
 
       expect(closeSpy).toHaveBeenCalledWith({
-        title: 'Arc 3',
+        title: 'Adventure 3',
         description: 'Intro to decimals',
       });
     });
@@ -118,7 +118,7 @@ describe('Edit Arc Modal Component', () => {
       fixture = TestBed.createComponent(EditArcModalComponent);
       component = fixture.componentInstance;
       bottomSheetRef = TestBed.inject(MatBottomSheetRef);
-      component.arcTitle = 'Arc 2';
+      component.arcTitle = 'Adventure 2';
       component.arcDescription = 'Basics of fractions';
     });
 
@@ -136,7 +136,7 @@ describe('Edit Arc Modal Component', () => {
 
       component.save();
 
-      expect(component.errorMessage).toBe('Arc title cannot be empty.');
+      expect(component.errorMessage).toBe('Adventure title cannot be empty.');
       expect(dismissSpy).not.toHaveBeenCalled();
     });
 
@@ -148,7 +148,7 @@ describe('Edit Arc Modal Component', () => {
       component.save();
 
       expect(dismissSpy).toHaveBeenCalledWith({
-        title: 'Arc 3',
+        title: 'Adventure 3',
         description: 'Intro to decimals',
       });
     });
