@@ -16,14 +16,45 @@
  * @fileoverview Component for the assessment instruction panel.
  */
 
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import './assessment-instruction-panel.component.css';
 
 @Component({
   selector: 'oppia-assessment-instruction-panel',
   templateUrl: './assessment-instruction-panel.component.html',
+  styleUrls: ['./assessment-instruction-panel.component.css'],
 })
 export class AssessmentInstructionPanelComponent {
+  @Input() certificateId = '';
   @Output() startAssessment = new EventEmitter<void>();
+
+  // STUBBED DATA: certificateTitle will eventually be populated from the
+  // CertificateAssessmentOfferingModel record identified by
+  // this.certificateId (same record used on the intro card), so both
+  // screens stay in sync. The instructions list below is generic and
+  // applies to every certificate assessment, so it is expected to stay
+  // hardcoded here rather than come from the backend.
+  certificateTitle = 'Everyday Arithmetic & Number Confidence';
+
+  instructionsHeading = "Before you begin, here's what to expect:";
+
+  instructions: string[] = [
+    "You'll have 60 minutes to complete the assessment.",
+    'If the timer runs out, your assessment will be auto-submitted.',
+    "You'll see one question at a time.",
+    'Use the Back (<-) and Next (->) arrows to move between questions.',
+    'You can review and change your answers at any time before ' +
+      'submitting.',
+    'Your answers are final only when you click "Submit Assessment" ' +
+      'at the end of the assessment.',
+    'Unanswered questions will be marked as Incorrect answers.',
+    "You may take the assessment multiple times. If you don't pass, " +
+      'we recommend reviewing the lessons before trying again.',
+    'If your internet connection drops or you exit the assessment ' +
+      'before submitting, your progress will not be saved.',
+    'In that case, you can start the assessment again later, which ' +
+      'will begin a new attempt.',
+  ];
 
   onStartAssessment(): void {
     this.startAssessment.emit();
