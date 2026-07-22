@@ -267,7 +267,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.storyUpdateService.createArc(
       this.story,
       arcId,
-      'Adventure ' + (this.storyContents.getArcs().length + 1),
+      'Arc ' + (this.storyContents.getArcs().length + 1),
       '',
       [nodesToMove[0]]
     );
