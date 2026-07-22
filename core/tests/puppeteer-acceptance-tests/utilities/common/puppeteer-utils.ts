@@ -670,17 +670,6 @@ export class BaseUser {
     const context = parentElement ?? this.page;
     let element = await context.waitForSelector(selector, {timeout: 30000});
 
-    // For button and input elements, wait until the element is both visible and not disabled
-    if (element) {
-      const tagName = await element.evaluate(el => el.tagName.toLowerCase());
-      if (tagName === 'button' || tagName === 'input') {
-        element = await context.waitForSelector(`${selector}:not([disabled])`, {
-          timeout: 30000,
-          visible: true,
-        });
-      }
-    }
-
     // Get nth element if elementPlace is given.
     if (elementPlace) {
       const elements = await context.$$(selector);
@@ -883,7 +872,8 @@ export class BaseUser {
    */
   async typeInInputField(
     selector: string | ElementHandle<Element>,
-    text: string
+    text: string,
+    clickBeforeTyping: boolean = false
   ): Promise<void> {
     let element =
       typeof selector === 'string'
@@ -896,7 +886,10 @@ export class BaseUser {
     await this.waitForElementToBeClickable(element);
     await this.waitForElementToStabilize(selector);
 
-    await element.click();
+    if (clickBeforeTyping) {
+      await element.click();
+    }
+
     await element.type(text);
   }
 

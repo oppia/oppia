@@ -843,9 +843,10 @@ export class TopicManager extends BaseUser {
     await this.openSkillEditor(skillName);
     await this.clickOnElementWithSelector(createQuestionButton);
     await this.clickOnElementWithSelector(textStateEditSelector);
-    await this.typeInInputField(richTextAreaField, 'Add 1+2');
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.typeInInputField(richTextAreaField, 'Add 1+2', true);
+    await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOnElementWithSelector(saveContentButton);
-
     await this.clickOnElementWithSelector(addInteractionButton);
     await this.page.waitForSelector(interactionNumberInputButton, {
       visible: true,
@@ -872,19 +873,18 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(floatTextField, '3');
     await this.clickOnElementWithSelector(answersInGroupAreCorrectToggle);
     await this.clickOnElementWithSelector(openAnswerGroupFeedBackEditor);
-    await this.typeInInputField(richTextAreaField, 'Good job!');
+    await this.typeInInputField(richTextAreaField, 'Good job!', true);
     await this.clickOnElementWithSelector(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOnElementWithSelector(defaultFeedbackTab);
     await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
-    await this.clickOnElementWithSelector(richTextAreaField);
-    await this.typeInInputField(richTextAreaField, 'The answer is 3');
+    await this.typeInInputField(richTextAreaField, 'The answer is 3', true);
     await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
 
     await this.clickOnElementWithSelector(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.typeInInputField(richTextAreaField, '3');
+    await this.typeInInputField(richTextAreaField, '3', true);
     await this.clickOnElementWithSelector(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -894,12 +894,14 @@ export class TopicManager extends BaseUser {
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
     await this.typeInInputField(solutionFloatTextField, '3');
-
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitAnswerButton);
-    await this.typeInInputField(richTextAreaField, '1+2 is 3');
+    await this.typeInInputField(richTextAreaField, '1+2 is 3', true);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
+    await this.page.waitForSelector(`${saveQuestionButton}:not([disabled])`);
     await this.clickOnElementWithSelector(saveQuestionButton);
 
     await this.waitForNetworkIdle();
@@ -917,10 +919,10 @@ export class TopicManager extends BaseUser {
    * Clicks on "Save" button in the question editor.
    */
   async saveQuestion(): Promise<void> {
+    await this.page.waitForSelector(`${saveQuestionButton}:not([disabled])`);
     await this.clickOnElementWithSelector(saveQuestionButton);
     await this.expectElementToBeVisible(saveQuestionButton, false);
   }
-
   /**
    * Save a topic draft.
    * @param {string} topicName - name of the topic to be saved.
