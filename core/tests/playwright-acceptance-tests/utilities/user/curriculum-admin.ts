@@ -25,7 +25,6 @@ const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;
 const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
-const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const richTextAreaField = 'div.e2e-test-rte';
 
@@ -948,15 +947,6 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(classroomAdminUrl);
-  }
-
-  /**
-   * Navigate to the topic and skills dashboard page.
-   */
-  async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
-    await this.page.bringToFront();
-    await this.waitForNetworkIdle();
-    await this.goto(topicAndSkillsDashboardUrl);
   }
 
   /**
