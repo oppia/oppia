@@ -611,6 +611,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "topic-manager/manage-story-adventures",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/manage-story-adventures.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "topic-manager/create-and-edit-questions-in-skill-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-edit-questions-in-skill-dashboard.spec.ts",
       "framework": "puppeteer"

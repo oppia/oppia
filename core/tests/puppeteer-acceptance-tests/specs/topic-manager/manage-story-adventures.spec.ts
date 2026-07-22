@@ -14,12 +14,6 @@
 
 /**
  * @fileoverview Acceptance test for story editor adventures (arcs).
- *
- * TM.CUJ-ADVENTURE.1  Create a new adventure from existing chapters.
- * TM.CUJ-ADVENTURE.2  Edit an adventure's metadata.
- * TM.CUJ-ADVENTURE.3  Remove an adventure boundary.
- * TM.CUJ-ADVENTURE.4  Reorder chapters within adventure groupings.
- * TM.CUJ-ADVENTURE.5  Save changes in the story with adventure groupings.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -50,12 +44,10 @@ describe('Topic Manager', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the story editor arcs feature flag.
     await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
-    // Create five explorations for the story chapters.
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 9; i++) {
       const id = await curriculumAdmin.createAndPublishExplorationWithCards(
         `Exploration ${i + 1}`,
         'Mathematics'
@@ -63,7 +55,6 @@ describe('Topic Manager', function () {
       explorationIds.push(id);
     }
 
-    // Create topic and classroom.
     await curriculumAdmin.createAndPublishTopic(
       'Adventure Topic',
       'adventure-topic',
@@ -75,14 +66,13 @@ describe('Topic Manager', function () {
       'Adventure Topic'
     );
 
-    // Create a story with five chapters.
     await curriculumAdmin.addStoryToTopic(
       'The Adventure Story',
       'the-adventure-story',
       'Adventure Topic'
     );
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 9; i++) {
       await curriculumAdmin.addChapter(`Chapter ${i + 1}`, explorationIds[i]);
     }
 
@@ -90,33 +80,60 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it(
-    'should create a new adventure from existing chapters',
+    'should create adventures by splitting after chapters 3, 6, and 8',
     async function () {
-      // Initially all chapters should be in the default "All Chapters"
-      // adventure.
       await curriculumAdmin.expectAllChaptersInSingleAdventure([
         'Chapter 1',
         'Chapter 2',
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
+        'Chapter 6',
+        'Chapter 7',
+        'Chapter 8',
+        'Chapter 9',
       ]);
 
-      // Split after Chapter 2 to create a new adventure starting at
-      // Chapter 3.
-      await curriculumAdmin.splitIntoAdventure('Chapter 2');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAllChaptersInSingleAdventure',
+        __dirname
+      );
 
-      // Verify a new adventure boundary was created.
+      await curriculumAdmin.splitIntoAdventure('Chapter 3');
       await curriculumAdmin.expectAdventureCount(2);
       await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
 
-      // Chapter order must remain unchanged.
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterSplitAtChapter3',
+        __dirname
+      );
+
+      await curriculumAdmin.splitIntoAdventure('Chapter 6');
+      await curriculumAdmin.expectAdventureCount(3);
+
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterSplitAtChapter6',
+        __dirname
+      );
+
+      await curriculumAdmin.splitIntoAdventure('Chapter 8');
+      await curriculumAdmin.expectAdventureCount(4);
+
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterSplitAtChapter8',
+        __dirname
+      );
+
       await curriculumAdmin.expectChaptersOrderToBe([
         'Chapter 1',
         'Chapter 2',
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
+        'Chapter 6',
+        'Chapter 7',
+        'Chapter 8',
+        'Chapter 9',
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -125,28 +142,33 @@ describe('Topic Manager', function () {
   it(
     'should edit an adventure metadata',
     async function () {
-      // Edit the second (non-default) adventure.
       await curriculumAdmin.editAdventure(
         'Part Two',
         'The second part of the story'
       );
 
-      // Verify the updated title and description are displayed.
       await curriculumAdmin.expectAdventureToHave(
         'Part Two',
         'The second part of the story'
       );
 
-      // The default adventure should still be visible.
       await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
 
-      // Chapter order must remain unchanged.
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterEditingAdventureMetadata',
+        __dirname
+      );
+
       await curriculumAdmin.expectChaptersOrderToBe([
         'Chapter 1',
         'Chapter 2',
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
+        'Chapter 6',
+        'Chapter 7',
+        'Chapter 8',
+        'Chapter 9',
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -155,18 +177,13 @@ describe('Topic Manager', function () {
   it(
     'should remove an adventure boundary',
     async function () {
-      // Remove the second adventure boundary.
       await curriculumAdmin.removeAdventureBoundary();
+      await curriculumAdmin.expectAdventureCount(3);
 
-      // All chapters should be merged back into the single default
-      // adventure.
-      await curriculumAdmin.expectAllChaptersInSingleAdventure([
-        'Chapter 1',
-        'Chapter 2',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-      ]);
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterRemovingAdventureBoundary',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -174,11 +191,6 @@ describe('Topic Manager', function () {
   it(
     'should reorder chapters within adventure groupings',
     async function () {
-      // Create two adventures: All Chapters [1,2,3] and Arc 2 [4,5].
-      await curriculumAdmin.splitIntoAdventure('Chapter 3');
-      await curriculumAdmin.expectAdventureCount(2);
-
-      // Reorder chapters within the first adventure (swap Ch 1 and Ch 2).
       await curriculumAdmin.reorderChapters('Chapter 1', 'Chapter 2');
       await curriculumAdmin.expectChaptersOrderToBe([
         'Chapter 2',
@@ -186,22 +198,32 @@ describe('Topic Manager', function () {
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
+        'Chapter 6',
+        'Chapter 7',
+        'Chapter 8',
+        'Chapter 9',
       ]);
 
-      // Save the story.
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterReorderingChapters',
+        __dirname
+      );
+
       await curriculumAdmin.saveStoryDraft();
 
-      // Verify order persists after save.
       await curriculumAdmin.expectChaptersOrderToBe([
         'Chapter 2',
         'Chapter 1',
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
+        'Chapter 6',
+        'Chapter 7',
+        'Chapter 8',
+        'Chapter 9',
       ]);
 
-      // Each chapter should still belong to exactly one adventure.
-      await curriculumAdmin.expectAdventureCount(2);
+      await curriculumAdmin.expectAdventureCount(3);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -209,36 +231,33 @@ describe('Topic Manager', function () {
   it(
     'should persist adventure groupings after save and reload',
     async function () {
-      // Create a third adventure: All Chapters [2,1,3], Arc 2 [4], Arc 3 [5].
-      await curriculumAdmin.splitIntoAdventure('Chapter 4');
-      await curriculumAdmin.expectAdventureCount(3);
-
-      // Verify the adventure titles are present.
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
-
-      // Save the story.
       await curriculumAdmin.saveStoryDraft();
 
-      // Reload the story editor.
       await curriculumAdmin.openStoryEditor(
         'The Adventure Story',
         'Adventure Topic'
       );
 
-      // Verify adventure groupings persist after reload.
       await curriculumAdmin.expectAdventureCount(3);
 
-      // Verify chapter ordering persists.
       await curriculumAdmin.expectChaptersOrderToBe([
         'Chapter 2',
         'Chapter 1',
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
+        'Chapter 6',
+        'Chapter 7',
+        'Chapter 8',
+        'Chapter 9',
       ]);
 
-      // Verify the default adventure title persists.
       await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
+
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorAfterReloadPersistedGroupings',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
