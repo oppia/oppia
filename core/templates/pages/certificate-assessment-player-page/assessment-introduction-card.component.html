@@ -1,5 +1,41 @@
-<oppia-titled-background-banner
-    [title]="'Certificate Assessment'"
-    [buttonText]="'Back'"
-    [buttonRoute]="['/learn', 'math', 'certificate-offering-available']">
+<oppia-titled-background-banner [title]="'Certificate Assessment'"
+                                [buttonText]="'BACK'"
+                                [buttonRoute]="['/learn', 'math', 'certificate-offering-available']">
 </oppia-titled-background-banner>
+<div class="intro-card-container">
+  <div class="intro-card">
+    <h1 class="certificate-title">{{ certificateTitle }}</h1>
+
+    <p class="certificate-description">{{ certificateDescription }}</p>
+
+    <div class="demonstrates-box">
+      <p class="demonstrates-heading">What this certificate demonstrates</p>
+      <ul class="demonstrates-list">
+        <li *ngFor="let item of demonstratesList">{{ item }}</li>
+      </ul>
+    </div>
+
+    <h2 class="topics-heading">Recommended Topics</h2>
+    <p class="topics-subtext">
+      Learners who are comfortable with the topics below are well prepared
+      for this certificate. You do not need to complete every lesson to
+      attempt the assessment.
+    </p>
+
+    <div class="topics-row">
+      <div class="topic-tile" *ngFor="let topic of recommendedTopics"
+           [ngClass]="topic.colorClass">
+        <div class="topic-tile-info">
+          <p class="topic-name">{{ topic.name }}</p>
+          <p class="topic-lessons">{{ topic.lessonCount }} Lessons</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button type="button" class="continue-button" (click)="onContinue()">
+        Continue to Assessment
+      </button>
+    </div>
+  </div>
+</div>

@@ -36,9 +36,9 @@
  */
 .oppia-titled-background-banner-header h1 {
   color: var(--certificate-teal-dark, #034339);
-  font-size: 6.5rem;
+  font-size: 5.5rem;
   font-weight: 800;
-  margin: 0;
+  margin-top: 30px;
 }
 
 .oppia-titled-background-banner-button.btn-primary {
@@ -47,6 +47,7 @@
   border-radius: 5px;
   font-size: 1.85rem;
   font-weight: 600;
+  margin-left: 50px;
   width: 250px;
 }
 
