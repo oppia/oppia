@@ -21,6 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
 
+const baseURL = testConstants.URLs.BaseURL;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const classroomBannerImage = testConstants.data.classroomBannerImage;
@@ -943,6 +944,21 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(classroomAdminUrl);
+  }
+
+  /**
+   * Function to navigate to exploration editor
+   * @param {string | null} explorationId - ID of the exploration
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseURL}/create/${explorationId}`;
+    await this.goto(editorUrl);
+    showMessage('Navigation to exploration editor is successful.');
   }
 
   /**
