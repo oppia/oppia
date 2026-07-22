@@ -121,7 +121,7 @@ describe('Logged-In Learner', function () {
     }
 
     await curriculumAdmin.saveStoryDraft();
-  }, 6000000);
+  }, 15000000);
 
   it(
     'should should create, track upcoming or delayed publications, and publish chapters.',

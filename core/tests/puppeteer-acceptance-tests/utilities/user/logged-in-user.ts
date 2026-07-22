@@ -248,6 +248,7 @@ const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
+const classroomNewChapterSelector = '.classroom-new-chapter';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -4644,7 +4645,7 @@ export class LoggedInUser extends BaseUser {
             el.parentElement
         )) as ElementHandle;
 
-        const newLabelHandle = await container.$('.classroom-new-chapter');
+        const newLabelHandle = await container.$(classroomNewChapterSelector);
 
         if (!newLabelHandle) {
           throw new Error(
@@ -4681,7 +4682,9 @@ export class LoggedInUser extends BaseUser {
       throw new Error(`Lesson "${chapterName}" not found`);
     }
 
-    const newLabelHandle = await lessonCardElement.$('.classroom-new-chapter');
+    const newLabelHandle = await lessonCardElement.$(
+      classroomNewChapterSelector
+    );
 
     if (!newLabelHandle) {
       throw new Error(

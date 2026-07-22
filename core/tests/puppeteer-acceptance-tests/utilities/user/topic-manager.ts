@@ -398,6 +398,8 @@ const mobileAcquiredSkillsSectionBodySelector =
   '.e2e-test-section-body-acquired-skills';
 const warningIndicatorSelector = '.e2e-test-warning-indicator';
 const warningTextSelector = '.e2e-test-warnings-text';
+const dragHandleSelector = 'tr.cdk-drag';
+const dragHandlerSelector = '.drag-handler';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -5580,9 +5582,9 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
 
-    await this.page.waitForSelector('tr.cdk-drag');
+    await this.page.waitForSelector(dragHandleSelector);
 
-    const rows = await this.page.$$('tr.cdk-drag');
+    const rows = await this.page.$$(dragHandleSelector);
 
     let sourceHandle = null;
     let targetHandle = null;
@@ -5596,11 +5598,11 @@ export class TopicManager extends BaseUser {
       const text = await titleEl.evaluate(el => el.textContent?.trim() || '');
 
       if (text.includes(fromChapterName)) {
-        sourceHandle = await row.$('.drag-handler');
+        sourceHandle = await row.$(dragHandlerSelector);
       }
 
       if (text.includes(toChapterName)) {
-        targetHandle = await row.$('.drag-handler');
+        targetHandle = await row.$(dragHandlerSelector);
       }
     }
 
