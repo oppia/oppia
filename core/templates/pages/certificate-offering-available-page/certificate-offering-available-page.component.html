@@ -33,6 +33,8 @@
                *ngFor="let certificate of availableCertificates">
         <div class="oppia-certificate-offering-available-page-tile-top">
           <div class="oppia-certificate-offering-available-page-tile-heading">
+            <!-- TODO(#24717-M2.25): Replace this placeholder badge icon with the final design from the mocks.
+                 Mock reference: https://canva.link/iyyjva1dn36ymuc -->
             <span class="oppia-certificate-offering-available-page-badge-icon"
                   aria-hidden="true">
               <svg viewBox="0 0 64 64" width="85" height="85">
@@ -83,7 +85,7 @@
               </button>
               <button type="button"
                       class="btn btn-outline-primary"
-                      [routerLink]="getCertificateAssessmentRoute(certificate.id)">
+                      [routerLink]="certificate.assessmentRoute">
                 Retry Assessment
               </button>
             </div>
@@ -97,7 +99,7 @@
               </button>
               <button type="button"
                       class="btn btn-outline-primary"
-                      [routerLink]="getCertificateAssessmentRoute(certificate.id)">
+                      [routerLink]="certificate.assessmentRoute">
                 Retry Assessment
               </button>
             </div>
@@ -108,7 +110,7 @@
             <div class="oppia-certificate-offering-available-page-actions">
               <button type="button"
                       class="btn btn-primary"
-                      [routerLink]="getCertificateAssessmentRoute(certificate.id)">
+                      [routerLink]="certificate.assessmentRoute">
                 Continue to Assessment
               </button>
             </div>

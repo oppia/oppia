@@ -19,22 +19,14 @@
 import {Component, Input} from '@angular/core';
 import './certificate-offering-available-page.component.css';
 
-/**
- * TODO(#24717-M2.3): Replace this local type + stub data with the real
- * backend domain object and backend-api-service call once the certificate
- * assessment offering endpoint exists.
- */
 export type CertificateAssessmentStatus = 'passed' | 'failed' | 'not_attempted';
 
 export interface AvailableCertificate {
-  // Unique id used to route into the assessment player.
   id: string;
-  // Certificate name, shown as the tile's primary heading.
   title: string;
   status: CertificateAssessmentStatus;
-  // Only present when status is 'passed'.
+  assessmentRoute: string[];
   passedOnDate?: string;
-  // Only present when status is 'failed'.
   failedOnDate?: string;
 }
 
@@ -50,17 +42,29 @@ export class AvailableCertificateOfferingPageComponent {
     {
       id: 'everyday_arithmetic_number_confidence',
       title: 'Everyday Arithmetic & Number Confidence',
+      assessmentRoute: [
+        '/certificate-assessment',
+        'everyday_arithmetic_number_confidence',
+      ],
       status: 'passed',
       passedOnDate: 'Jan 16, 2026',
     },
     {
       id: 'fractions_decimals_fundamentals',
       title: 'Fractions & Decimals Fundamentals',
+      assessmentRoute: [
+        '/certificate-assessment',
+        'fractions_decimals_fundamentals',
+      ],
       status: 'not_attempted',
     },
     {
       id: 'geometry_measurement_basics',
       title: 'Geometry & Measurement Basics',
+      assessmentRoute: [
+        '/certificate-assessment',
+        'geometry_measurement_basics',
+      ],
       status: 'failed',
       failedOnDate: 'Feb 2, 2026',
     },

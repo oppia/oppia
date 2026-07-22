@@ -48,30 +48,92 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       fixture.nativeElement.querySelectorAll('button')
     ).map(button => (button as HTMLButtonElement).textContent?.trim() || '');
 
-    expect(buttons.includes('Continue to assessment')).toBe(true);
+    expect(buttons.includes('Continue to Assessment')).toBe(true);
     expect(
       fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
-    ).toBe('Available certificate offering');
+    ).toBe('Certificate Assessment');
+  });
+
+  it('should render a tile for each available certificate', () => {
+    fixture.detectChanges();
+    const tiles = fixture.nativeElement.querySelectorAll(
+      '.oppia-certificate-offering-available-page-tile'
+    );
+    expect(tiles.length).toBe(component.availableCertificates.length);
+  });
+
+  it('should show the correct status label and date for each certificate', () => {
+    fixture.detectChanges();
+    const statusEls = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.oppia-certificate-offering-available-page-status'
+      )
+    ).map(el => (el as HTMLElement).textContent?.trim());
+
+    expect(statusEls).toEqual(['Passed', 'Not Attempted', 'Not Passed']);
+
+    const dateEls = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.oppia-certificate-offering-available-page-status-date'
+      )
+    ).map(el => (el as HTMLElement).textContent?.trim());
+
+    expect(dateEls).toEqual([
+      'Passed on Jan 16, 2026',
+      'Failed on Feb 2, 2026',
+    ]);
   });
 
   it('should link assessment buttons to the certificate assessment page', () => {
     fixture.detectChanges();
-
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
     ) as HTMLButtonElement[];
-
     const assessmentButtons = buttons.filter(b =>
-      ['Continue to assessment', 'Retry assessment'].includes(
+      ['Continue to Assessment', 'Retry Assessment'].includes(
         b.textContent?.trim() || ''
       )
     );
 
-    expect(assessmentButtons.length).toBe(2);
+    expect(assessmentButtons.length).toBe(
+      component.availableCertificates.length
+    );
     assessmentButtons.forEach(button => {
       expect(button.getAttribute('ng-reflect-router-link')).toContain(
         '/certificate-assessment'
       );
     });
+  });
+
+  it('should show a Check Score button for passed and failed certificates', () => {
+    fixture.detectChanges();
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('button')
+    ) as HTMLButtonElement[];
+    const checkScoreButtons = buttons.filter(
+      b => b.textContent?.trim() === 'Check Score'
+    );
+    const passedOrFailedCount = component.availableCertificates.filter(
+      c => c.status === 'passed' || c.status === 'failed'
+    ).length;
+
+    expect(checkScoreButtons.length).toBe(passedOrFailedCount);
+  });
+
+  it('should route the Exit button to the classroom page', () => {
+    fixture.detectChanges();
+    const exitButton = fixture.nativeElement.querySelector(
+      '.oppia-certificate-offering-available-page-exit-button'
+    ) as HTMLButtonElement;
+
+    expect(exitButton.textContent?.trim()).toBe('Exit');
+    expect(exitButton.getAttribute('ng-reflect-router-link')).toContain('math');
+  });
+
+  it('should build the certificate assessment route with the certificate id', () => {
+    expect(component.getCertificateAssessmentRoute('some_cert_id')).toEqual([
+      '/certificate-assessment',
+      'some_cert_id',
+    ]);
   });
 });
