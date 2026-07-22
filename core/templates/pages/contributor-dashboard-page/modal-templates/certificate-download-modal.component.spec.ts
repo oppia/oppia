@@ -62,6 +62,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     contribution_hours: 1.0,
     contribution_word_count: 300,
     language: 'Hindi',
+    certificate_profile_name: 'test_name',
   };
   const certificateDataResponse: ContributorCertificateResponse = {
     certificate_data: certificateData,
