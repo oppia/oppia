@@ -28,6 +28,16 @@ core/templates/components/unsaved-changes-status-info/unsaved-changes-status-inf
 core/templates/components/url-fragment-editor/url-fragment-editor.component.html
 core/templates/components/version-diff-visualization/version-diff-visualization.component.html
 core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.html
+core/templates/pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.html
+core/templates/pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.html
+core/templates/pages/classroom-admin-page/classroom-admin-page.component.html
+core/templates/pages/classroom-admin-page/modals/create-new-classroom-modal.component.html
+core/templates/pages/classroom-admin-page/modals/topic-dependency-graph-viz-modal.component.html
+core/templates/pages/classroom-admin-page/modals/update-classrooms-order-modal.component.html
+core/templates/pages/classroom-admin-page/navbar/classroom-admin-navbar.component.html
+core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.html
+core/templates/pages/classrooms-page/classrooms-page.component.html
+core/templates/pages/collection-editor-page/editor-tab/collection-editor-tab.component.html
 core/templates/pages/collection-editor-page/editor-tab/collection-node-creator.component.html
 core/templates/pages/collection-editor-page/editor-tab/collection-node-editor.component.html
 core/templates/pages/collection-editor-page/navbar/collection-editor-navbar-breadcrumb.component.html
@@ -212,8 +222,8 @@ core/templates/pages/story-editor-page/story-editor-page.component.html
 core/templates/pages/story-editor-page/story-preview-tab/story-preview-tab.component.html
 core/templates/pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component.html
 core/templates/pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component.html
-core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.html
 core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.html
+core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.html
 core/templates/pages/terms-page/terms-page.component.html
 core/templates/pages/thanks-page/thanks-page.component.html
 core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.html
