@@ -837,7 +837,7 @@ export class LoggedInUser extends BaseUser {
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
-    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+    if (!url.toLowerCase().includes(expectedPageInUrl.toLowerCase())) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
@@ -1934,7 +1934,7 @@ export class LoggedInUser extends BaseUser {
       throw new Error('Play Later button not found');
     }
 
-    await playLaterButton?.hover({force: true});
+    await playLaterButton.hover({force: true});
 
     await this.expectElementToBeVisible('.tooltip');
 
