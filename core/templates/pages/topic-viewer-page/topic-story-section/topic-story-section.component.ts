@@ -479,7 +479,7 @@ export class TopicStorySectionComponent
   private getArcPaletteColor(arcIndex: number): {
     headerBg: string;
     headerBorder: string;
-    bookBg: string;
+    flagBg: string;
     rowAccent: string;
   } {
     const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
