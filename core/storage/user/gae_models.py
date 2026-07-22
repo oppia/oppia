@@ -328,6 +328,7 @@ class UserSettingsModel(base_models.BaseModel):
             'has_viewed_lesson_info_modal_once': (
                 user.has_viewed_lesson_info_modal_once
             ),
+            'profile_name_for_certificate': user.profile_name_for_certificate,
         }
 
     @classmethod
