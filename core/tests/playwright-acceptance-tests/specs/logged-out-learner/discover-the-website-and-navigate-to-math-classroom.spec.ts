@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * FL.CP. Learner discovers the website and navigates to the Math Classroom page
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -28,7 +29,9 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin &
     TopicManager &
@@ -37,12 +40,14 @@ describe('Logged-Out Learner', function () {
   let explorationId1: string;
   let explorationId2: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(1200000); // 20 minutes for setup hook.
     // Create Users.
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -93,9 +98,9 @@ describe('Logged-Out Learner', function () {
     // Save draft.
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-  }, 1200000); // 15 minutes for setup hook.
+  });
 
-  it('should be able to find list of subjects to learn', async function () {
+  test('should be able to find list of subjects to learn', async function () {
     await loggedOutLearner.navigateToSplashPage();
     await loggedOutLearner.expectHomePageTitleToBe(
       'Free Education for Everyone'
@@ -117,7 +122,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
   });
 
-  it('should be able start learning from the first topic', async function () {
+  test('should be able start learning from the first topic', async function () {
     // Click "Start Here" under "Don't know where to start" section.
     await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
       'Don’t know where to start?',
@@ -142,7 +147,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectToBeInClassroomPage('math');
   });
 
-  it('should be able to figure out which topic would be best for them', async function () {
+  test('should be able to figure out which topic would be best for them', async function () {
     await loggedOutLearner.navigateToClassroomPage('math');
 
     // Click on "Take a Quiz" under "Already know some Math?" section.
@@ -163,7 +168,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
