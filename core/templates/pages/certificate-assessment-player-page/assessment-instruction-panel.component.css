@@ -1,9 +1,7 @@
 .intro-card-container {
   display: flex;
-  justify-content: center;
   padding: 0 24px 48px;
-  /* Pulls the card up so it overlaps the bottom of the titled banner,
-     matching the layout used on the intro card. */
+  justify-content: center;
   margin-top: 20px;
 }
 
