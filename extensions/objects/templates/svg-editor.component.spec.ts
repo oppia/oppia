@@ -1418,88 +1418,84 @@ describe('SvgEditor with image save destination as local storage', () => {
   });
 
   it('should preserve newlines between multiple tspan elements', () => {
-    const mockElement = {
-      childNodes: [
-        {
-          nodeName: 'tspan',
-          childNodes: [{nodeValue: 'Goal'}],
-          style: {fill: '', stroke: '', strokeWidth: ''},
-        },
-        {
-          nodeName: 'tspan',
-          childNodes: [{nodeValue: 'How'}],
-          style: {fill: '', stroke: '', strokeWidth: ''},
-        },
-        {
-          nodeName: 'tspan',
-          childNodes: [{nodeValue: 'to cook'}],
-          style: {fill: '', stroke: '', strokeWidth: ''},
-        },
-      ],
-      getAttribute: (attr: string) => null,
-    };
-    const mockObj = {
-      toObject: () => ({
-        left: 50,
-        top: 50,
-        width: 100,
-        text: 'GoalHowto cook',
-      }),
-      get: (attr: string) => null,
-    };
+    const textElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    const tspan1 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan1.textContent = 'Goal';
+    const tspan2 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan2.textContent = 'How';
+    const tspan3 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan3.textContent = 'to cook';
+    textElement.appendChild(tspan1);
+    textElement.appendChild(tspan2);
+    textElement.appendChild(tspan3);
+
+    const fabricObj = new fabric.Text('GoalHowto cook', {
+      left: 50,
+      top: 50,
+      width: 100,
+    });
 
     component.diagramWidth = 450;
-    // This throws "Property 'loadTextObject' is private". We need to suppress this error because we are specifically testing this private method with partial mock objects.
-    // @ts-expect-error
-    component.loadTextObject(mockElement, mockObj);
+    component.loadTextObject(textElement, fabricObj);
 
-    const addedText = component.canvas.getObjects()[
-      component.canvas.getObjects().length - 1
-    ] as fabric.Textbox;
-    expect(addedText.text).toBe('Goal\nHow\nto cook');
+    const lastObj =
+      component.canvas.getObjects()[component.canvas.getObjects().length - 1];
+    expect(lastObj.get('text')).toBe('Goal\nHow\nto cook');
   });
 
   it('should preserve newlines between tspan elements with fill styles', () => {
-    const mockElement = {
-      childNodes: [
-        {
-          nodeName: 'tspan',
-          childNodes: [{nodeValue: 'Goal'}],
-          style: {fill: 'red', stroke: 'black', strokeWidth: '1'},
-        },
-        {
-          nodeName: 'tspan',
-          childNodes: [{nodeValue: 'Total'}],
-          style: {fill: 'blue', stroke: '', strokeWidth: ''},
-        },
-        {
-          nodeName: 'tspan',
-          childNodes: [{nodeValue: 'Text'}],
-          style: {fill: '', stroke: '', strokeWidth: ''},
-        },
-      ],
-      getAttribute: (attr: string) => null,
-    };
-    const mockObj = {
-      toObject: () => ({
-        left: 50,
-        top: 50,
-        width: 100,
-        text: 'GoalTotalText',
-      }),
-      get: (attr: string) => null,
-    };
+    const textElement = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
+    const tspan1 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan1.textContent = 'Goal';
+    tspan1.style.fill = 'red';
+    tspan1.style.stroke = 'black';
+    tspan1.style.strokeWidth = '1';
+    const tspan2 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan2.textContent = 'Total';
+    tspan2.style.fill = 'blue';
+    const tspan3 = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan'
+    );
+    tspan3.textContent = 'Text';
+    textElement.appendChild(tspan1);
+    textElement.appendChild(tspan2);
+    textElement.appendChild(tspan3);
+
+    const fabricObj = new fabric.Text('GoalTotalText', {
+      left: 50,
+      top: 50,
+      width: 100,
+    });
 
     component.diagramWidth = 450;
-    // This throws "Property 'loadTextObject' is private". We need to suppress this error because we are specifically testing this private method with partial mock objects.
-    // @ts-expect-error
-    component.loadTextObject(mockElement, mockObj);
+    component.loadTextObject(textElement, fabricObj);
 
-    const addedText = component.canvas.getObjects()[
-      component.canvas.getObjects().length - 1
-    ] as fabric.Textbox;
+    const lastObj =
+      component.canvas.getObjects()[component.canvas.getObjects().length - 1];
     // Colored tspans should still get newlines between them.
-    expect(addedText.text).toBe('Goal\nTotal\nText');
+    expect(lastObj.get('text')).toBe('Goal\nTotal\nText');
   });
 
   it('should handle null imageUrl from getTrustedResourceUrlForSvgFileName', () => {
