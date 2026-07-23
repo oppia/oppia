@@ -436,6 +436,54 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].visitedCheckpointsCount).toBe(3);
   });
 
+  it('should preserve checkpoint counts after non-story input changes', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const mockSummary = new ChapterProgressSummary('exp_1', 3, 1, false);
+    chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
+      mockSummary
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceCount = 0;
+
+    component.ngOnInit();
+    expect(component.lessonCards[0].totalCheckpointsCount).toBe(3);
+    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(1);
+
+    component.practiceCount = 1;
+    component.ngOnChanges({
+      practiceCount: new SimpleChange(0, 1, false),
+    });
+
+    expect(component.lessonCards[0].totalCheckpointsCount).toBe(3);
+    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(1);
+  });
+
   it('should show arc-end-test card when lesson cards exist and practice is enabled', () => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',

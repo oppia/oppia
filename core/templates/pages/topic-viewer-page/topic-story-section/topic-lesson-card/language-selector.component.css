@@ -2,12 +2,13 @@
   display: block;
   flex: 0 0 auto;
   min-width: auto;
+  position: relative;
 }
 
 .topic-lesson-language-selector {
   display: flex;
   flex-direction: column;
-  width: 308px;
+  width: 380px;
 }
 
 .topic-lesson-language-selector-row {
@@ -34,8 +35,8 @@
   border-radius: 4px;
   display: flex;
   flex: 1;
-  height: 32px;
-  max-width: 150px;
+  height: 44px;
+  max-width: 186px;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -47,7 +48,7 @@
 
 .topic-lesson-language-selector-leading-icon {
   color: #006f67;
-  font-size: 18px;
+  font-size: 22px;
   left: 12px;
   pointer-events: none;
   position: absolute;
@@ -79,7 +80,7 @@
 .topic-lesson-language-selector-selected-value {
   color: #006f67;
   display: block;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
   overflow: hidden;
@@ -89,7 +90,7 @@
 
 .topic-lesson-language-selector-trailing-icon {
   color: #006f67;
-  font-size: 18px;
+  font-size: 20px;
   pointer-events: none;
   position: absolute;
   right: 14px;
@@ -124,16 +125,22 @@
 .topic-lesson-language-selector-error {
   color: #c62828;
   font-size: 12px;
+  left: 0;
   margin: 0;
+  position: absolute;
+  top: calc(100% + 8px);
   width: 100%;
 }
 
 .topic-lesson-language-selector-note {
   color: #5f6368;
   font-size: 12px;
+  left: 0;
   line-height: 1.35;
-  margin: 10px 0 0;
+  margin: 0;
   padding-left: 2px;
+  position: absolute;
+  top: calc(100% - 10px);
   width: 100%;
 }
 
@@ -149,6 +156,7 @@
   }
 
   .topic-lesson-language-selector-select-container {
+    height: 40px;
     max-width: none;
     width: 100%;
   }
@@ -174,5 +182,12 @@
   .topic-lesson-language-selector-trailing-icon {
     font-size: 16px;
     right: 12px;
+  }
+
+  .topic-lesson-language-selector-note,
+  .topic-lesson-language-selector-error {
+    margin-top: 8px;
+    position: static;
+    top: auto;
   }
 }

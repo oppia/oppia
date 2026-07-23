@@ -66,6 +66,9 @@
   font-weight: 400;
   line-height: 1.4;
   margin: 0;
+  overflow-wrap: break-word;
+  padding-left: 64px;
+  word-wrap: break-word;
 }
 
 .arc-end-test-card-actions {

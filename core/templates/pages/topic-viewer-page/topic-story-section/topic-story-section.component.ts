@@ -335,6 +335,7 @@ export class TopicStorySectionComponent
 
     const allNodes = this.storySummary.getAllNodes();
     this.arcGroups = this.buildArcGroups(allNodes);
+    this.visibleArcGroups = this.arcGroups;
   }
 
   private buildArcGroups(allNodes: StoryNode[]): ArcGroupData[] {
@@ -386,6 +387,13 @@ export class TopicStorySectionComponent
     this.lessonCount = this.storySummary.getNodeTitles().length;
     const allNodes = this.storySummary.getAllNodes();
     this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
+      const explorationId = node.getExplorationId();
+      const progressSummary = explorationId
+        ? this.chapterProgressLoaderService.getChapterProgressSummary(
+            explorationId
+          )
+        : null;
+
       return {
         lessonNumber: index + 1,
         lessonTitle: node.getTitle(),
@@ -394,8 +402,12 @@ export class TopicStorySectionComponent
         startUrl: this.getLessonStartUrl(node),
         nodeId: node.getId(),
         lessonProgressStatus: this.getLessonProgressStatus(node),
-        totalCheckpointsCount: 0,
-        visitedCheckpointsCount: 0,
+        totalCheckpointsCount: progressSummary
+          ? progressSummary.totalCheckpoints
+          : 0,
+        visitedCheckpointsCount: progressSummary
+          ? progressSummary.visitedCheckpoints
+          : 0,
         availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
         availableVoiceoverLanguageCodes:
           node.getAvailableVoiceoverLanguageCodes(),

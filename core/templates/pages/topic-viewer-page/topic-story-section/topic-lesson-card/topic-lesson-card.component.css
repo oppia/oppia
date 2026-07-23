@@ -1,10 +1,11 @@
 .topic-lesson-card {
+  --lesson-card-header-offset: 64px;
   background: #fff;
   border: 1px solid #eee;
   border-radius: 8px;
   box-shadow: none;
   display: flex;
-  height: 212px;
+  height: auto;
   max-width: 912px;
   min-height: 212px;
   overflow: hidden;
@@ -13,7 +14,7 @@
 
 .topic-lesson-card.collapsed {
   height: auto;
-  min-height: auto;
+  min-height: 0;
   overflow: visible;
   border: 1px solid #d1d5db;
   border-radius: 0;
@@ -21,9 +22,10 @@
 }
 
 .topic-lesson-card-thumbnail {
+  align-self: stretch;
   flex: 0 0 auto;
   width: 212px;
-  height: 100%;
+  min-height: 212px;
   overflow: hidden;
 }
 
@@ -134,17 +136,24 @@
   font-size: 13px;
   line-height: 1.2;
   margin: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .topic-lesson-card-progress {
+  flex: 1 1 220px;
   height: 24px;
+  margin-left: var(--lesson-card-header-offset);
+  max-width: 296px;
+  min-width: 160px;
+  width: 100%;
 }
 
 .topic-lesson-card-footer {
   display: flex;
-  flex-direction: row;
-  gap: 16px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -196,22 +205,24 @@
 }
 
 .topic-lesson-card-actions {
-  align-items: flex-start;
+  align-items: flex-end;
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
   justify-content: space-between;
   flex: 1 1 auto;
+  width: 100%;
 }
 
 .topic-lesson-card-actions-left {
   align-items: center;
   align-self: flex-end;
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   gap: 8px;
+  margin-left: 0;
+  margin-bottom: 0;
   min-width: 0;
-  margin-bottom: 12px;
 }
 
 .topic-lesson-card-actions-right {
@@ -281,13 +292,13 @@
 
 @media (max-width: 768px) {
   .topic-lesson-card {
-    height: 160px;
+    height: auto;
     min-height: 160px;
   }
 
   .topic-lesson-card-thumbnail {
     flex: 0 0 140px;
-    height: 100%;
+    min-height: 160px;
   }
 
   .topic-lesson-card-content {
@@ -310,8 +321,9 @@
 
   .topic-lesson-card-progress {
     height: 24px;
-    max-width: 296px;
-    width: 100%;
+    margin-left: var(--lesson-card-header-offset);
+    max-width: 260px;
+    min-width: 140px;
   }
 
   .topic-lesson-card-footer {
@@ -389,6 +401,7 @@
 
   .topic-lesson-card-progress {
     height: 24px;
+    margin-left: 0;
     width: 100%;
   }
 
@@ -404,6 +417,11 @@
     align-items: stretch;
     flex-direction: column;
     justify-content: stretch;
+  }
+
+  .topic-lesson-card-actions-left {
+    align-self: stretch;
+    margin-bottom: 0;
   }
 
   .topic-lesson-card-secondary-button,

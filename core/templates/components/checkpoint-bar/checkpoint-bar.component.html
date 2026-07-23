@@ -1,5 +1,5 @@
 <div class="progress-bar-container"
-    [ngClass]="{'d-none': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1}">
+    [ngClass]="{'multiple-checkpoints-bar': checkpointCount > 1}">
   <div class="lesson-progress-bar">
     <div tabindex="0" class="completed-progress-bar" [style.width.%]="progressBarWidth" [attr.aria-label]="getProgressPercentage() + ' percent completed'">
     </div>
