@@ -5,12 +5,12 @@
             class="btn btn-primary oppia-titled-background-banner-button"
             [attr.aria-label]="resolvedButtonAriaLabel"
             [routerLink]="buttonRoute">
-      {{ buttonText }}
+      {{ buttonText | translate}}
     </button>
   </div>
   <div class="text-center">
     <h1 tabindex="0" class="mb-0">
-      {{ title }}
+      {{ title | translate }}
     </h1>
   </div>
   <!-- Empty column balances the button column so the title centers on the

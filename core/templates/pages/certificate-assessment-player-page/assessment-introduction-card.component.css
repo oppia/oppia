@@ -6,7 +6,7 @@
 }
 
 .intro-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
   max-width: 720px;
@@ -23,7 +23,7 @@
 }
 
 .certificate-description {
-  color: #333333;
+  color: #333;
   font-size: 17px;
   line-height: 1.5;
   margin: 24 0 24px;
@@ -48,20 +48,20 @@
 }
 
 .demonstrates-list li {
-  color: #333333;
+  color: #333;
   font-size: 17px;
   line-height: 1.4;
 }
 
 .topics-heading {
-  color: #333333;
+  color: #333;
   font-size: 22px;
   font-weight: 700;
   margin: 0 0 4px;
 }
 
 .topics-subtext {
-  color: #555555;
+  color: #555;
   font-size: 17px;
   line-height: 1.5;
   margin: 0 0 16px;
@@ -71,8 +71,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 32px;
   justify-content: center;
+  margin-bottom: 32px;
 }
 
 .topic-tile {
@@ -111,7 +111,7 @@
 }
 
 .topic-name {
-  color: #ffffff;
+  color: #fff;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
@@ -133,7 +133,7 @@
   background: #00645c;
   border: none;
   border-radius: 4px;
-  color: #ffffff;
+  color: #fff;
   cursor: pointer;
   font-size: 20px;
   font-weight: 700;

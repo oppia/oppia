@@ -18,13 +18,6 @@
  * single nav button (e.g. "Exit" or "Back"). The empty column on the
  * opposite side of the button keeps the title visually centered on the
  * page rather than centered in the remaining space next to the button.
- *
- * Usage:
- *   <oppia-titled-background-banner
- *       [title]="'Certificate Assessment'"
- *       [buttonText]="'Back'"
- *       [buttonRoute]="['/learn', classroomUrlFragment]">
- *   </oppia-titled-background-banner>
  */
 
 import {Component, Input} from '@angular/core';
@@ -43,7 +36,7 @@ export class CertificateAssessmentTitledBackgroundBannerComponent {
   @Input() title: string = '';
 
   // Label for the nav button (e.g. 'Exit', 'Back'). Defaults to 'Exit'.
-  @Input() buttonText: string = 'Exit';
+  @Input() buttonText: string = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
 
   // Angular routerLink commands array for the nav button,
   // e.g. ['/learn', classroomUrlFragment] or ['/certificate-assessment'].

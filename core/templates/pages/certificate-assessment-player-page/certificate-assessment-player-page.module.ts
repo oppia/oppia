@@ -27,7 +27,7 @@ import {AssessmentInstructionPanelComponent} from './assessment-instruction-pane
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
-import {CertificateAssessmentTitledBackgroundBannerComponent} from 'pages/certificate-offering-available-page/certificate-assessment-titled-shared-background-banner.component';
+import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
 
 @NgModule({
   imports: [

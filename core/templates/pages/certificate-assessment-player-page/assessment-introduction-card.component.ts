@@ -40,8 +40,16 @@ export class AssessmentIntroductionCardComponent {
   @Input() certificateId = '';
   @Output() continue = new EventEmitter<void>();
 
-  // TODO(##24717-M2.15): Everything below will eventually be populated from the
-  // CertificateAssessmentOfferingModel record identified by
+  // Static UI chrome text, translated via i18n keys.
+  readonly demonstratesHeadingI18nKey =
+    'I18N_CERTIFICATE_ASSESSMENT_DEMONSTRATES_HEADING';
+  readonly topicsHeadingI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_TOPICS_HEADING';
+  readonly topicsSubtextI18nKey = 'I18N_CERTIFICATE_ASSESSMENT_TOPICS_SUBTEXT';
+  readonly continueButtonI18nKey =
+    'I18N_CERTIFICATE_ASSESSMENT_CONTINUE_BUTTON';
+
+  // TODO(##24717-M2.15): Everything below will eventually be populated from
+  // the CertificateAssessmentOfferingModel record identified by
   // this.certificateId, once the corresponding backend handler and
   // domain object/frontend service are available. For now this is
   // hardcoded so the UI can be built and reviewed independently.
