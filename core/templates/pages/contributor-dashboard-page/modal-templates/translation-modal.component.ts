@@ -62,6 +62,10 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
 const EXPLORATION_TITLE_CHAR_LIMIT = 36;
+const CONTENT_TYPE_METADATA = 'metadata';
+const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
+const EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category';
+const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -521,17 +525,17 @@ export class TranslationModalComponent {
     if (!contentType) {
       return '';
     }
-    if (contentType === 'metadata' && contentId) {
+    if (contentType === CONTENT_TYPE_METADATA && contentId) {
       if (contentId === EXPLORATION_TITLE_CONTENT_ID) {
         return 'title';
       }
-      if (contentId === 'exploration_objective') {
+      if (contentId === EXPLORATION_OBJECTIVE_CONTENT_ID) {
         return 'objective';
       }
-      if (contentId === 'exploration_category') {
+      if (contentId === EXPLORATION_CATEGORY_CONTENT_ID) {
         return 'category';
       }
-      if (contentId.startsWith('exploration_tag_')) {
+      if (contentId.startsWith(EXPLORATION_TAG_CONTENT_ID_PREFIX)) {
         return 'tag';
       }
     }
