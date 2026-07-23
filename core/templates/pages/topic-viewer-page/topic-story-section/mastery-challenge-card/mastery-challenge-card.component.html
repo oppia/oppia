@@ -1,6 +1,10 @@
 <div class="mastery-challenge-card" aria-label="Mastery challenge">
   <div class="mastery-challenge-icon" aria-hidden="true">
-    <i class="material-icons">emoji_events</i>
+    <img
+      class="mastery-challenge-icon-image"
+      src="/assets/images/icons/mastery-challenge-trophy.svg"
+      alt=""
+      aria-hidden="true">
   </div>
   <div class="mastery-challenge-content">
     <h3 class="mastery-challenge-title">{{ title }}</h3>
@@ -10,7 +14,7 @@
           type="button"
           [disabled]="!actionUrl"
           (click)="navigateToAction()">
-    <i class="material-icons" aria-hidden="true">stars</i>
+    <span class="mastery-challenge-button-icon" aria-hidden="true">★</span>
     <span>{{ buttonLabel }}</span>
   </button>
 </div>

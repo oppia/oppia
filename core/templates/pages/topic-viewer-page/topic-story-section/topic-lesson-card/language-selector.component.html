@@ -5,7 +5,11 @@
     </i>
     <div class="topic-lesson-language-selector-text-block">
       <span class="topic-lesson-language-selector-selected-value">
-        {{ 'I18N_LANGUAGE_SELECTOR_TEXT_LABEL' | translate }}
+        {{
+          selectedTextLanguageCode
+            ? getLanguageDescription(selectedTextLanguageCode)
+            : ('I18N_LANGUAGE_SELECTOR_TEXT_LABEL' | translate)
+        }}
       </span>
     </div>
 
@@ -32,7 +36,11 @@
     </i>
     <div class="topic-lesson-language-selector-text-block">
       <span class="topic-lesson-language-selector-selected-value">
-        {{ 'I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate }}
+        {{
+          getValidSelectedVoiceoverLanguageCode()
+            ? getLanguageDescription(getValidSelectedVoiceoverLanguageCode() || '')
+            : ('I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate)
+        }}
       </span>
     </div>
 

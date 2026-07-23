@@ -288,21 +288,16 @@
 
 @media (max-width: 768px) {
   .topic-lesson-card {
-    height: 240px;
-    min-height: 240px;
+    min-height: 0;
   }
 
   .topic-lesson-card-thumbnail {
     flex: 0 0 140px;
-    height: 100%;
   }
 
   .topic-lesson-card-content {
-    padding: 14px;
-  }
-
-  .topic-lesson-card-copy {
-    gap: 6px;
+    gap: 10px;
+    padding: 14px 16px;
   }
 
   .topic-lesson-card-title {
@@ -311,40 +306,28 @@
   }
 
   .topic-lesson-card-description {
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 15px;
+    line-height: 1.3;
   }
 
   .topic-lesson-card-progress {
-    height: 24px;
-    margin-left: var(--lesson-card-header-offset);
+    margin-left: 48px;
     max-width: 260px;
-    min-width: 140px;
-  }
-
-  .topic-lesson-card-footer {
-    gap: 10px;
-  }
-
-  .topic-lesson-card-start-button {
-    font-size: 12px;
-    height: 40px;
-    min-width: 90px;
-    padding: 0 12px;
+    min-width: 120px;
+    width: calc(100% - 48px);
   }
 
   .topic-lesson-card-actions {
-    flex-wrap: nowrap;
-    gap: 6px;
+    gap: 10px;
   }
 
   .topic-lesson-card-secondary-button {
-    min-width: 78px;
+    min-width: 80px;
     padding: 0 10px;
   }
 
   .topic-lesson-language-selector-wrapper {
-    margin-right: 10px;
+    margin-right: 8px;
   }
 
   .topic-lesson-card-fallback-helper {
@@ -356,85 +339,73 @@
 @media (max-width: 450px) {
   .topic-lesson-card {
     border-radius: 8px;
-    display: flex;
     flex-direction: column;
-    height: auto;
     min-height: 0;
     overflow: hidden;
   }
 
   .topic-lesson-card-thumbnail {
+    align-self: stretch;
     flex: none;
     height: 140px;
-    min-height: 140px;
     width: 100%;
   }
 
   .topic-lesson-card-content {
-    display: flex;
-    flex-direction: column;
     gap: 8px;
     padding: 12px;
   }
 
   .topic-lesson-card-copy {
     gap: 4px;
-    margin-bottom: 0;
   }
 
   .topic-lesson-card-title {
     font-size: 16px;
     font-weight: 500;
     line-height: 20px;
-    margin: 0;
   }
 
   .topic-lesson-card-description {
     font-size: 13px;
     line-height: 18px;
-    margin: 0;
   }
 
   .topic-lesson-card-progress {
-    height: 24px;
     margin-left: 0;
     width: 100%;
   }
 
-  .topic-lesson-card-start-button {
-    align-self: stretch;
-    font-size: 14px;
-    height: 40px;
-    min-width: 120px;
-    width: 100%;
-  }
-
   .topic-lesson-card-actions {
-    align-items: stretch;
     flex-direction: column;
-    justify-content: stretch;
+    gap: 8px;
   }
 
   .topic-lesson-card-actions-left {
-    align-self: stretch;
-    margin-bottom: 0;
-    margin-top: 0;
+    flex: none;
   }
 
   .topic-lesson-card-actions-right {
-    margin-top: 0;
+    align-items: stretch;
   }
 
-  .topic-lesson-card-secondary-button,
+  .topic-lesson-card-secondary-buttons {
+    justify-content: flex-start;
+  }
+
   .topic-lesson-card-start-button {
     width: 100%;
   }
 
-  .topic-lesson-card-fallback-info-icon {
-    align-self: flex-start;
+  .topic-lesson-card-secondary-button {
+    width: 100%;
   }
 
   .topic-lesson-language-selector-wrapper {
     margin-right: 0;
+  }
+
+  .topic-lesson-card-fallback-info-icon {
+    align-self: flex-start;
   }
 }

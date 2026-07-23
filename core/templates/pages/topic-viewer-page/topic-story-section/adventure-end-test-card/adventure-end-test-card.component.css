@@ -102,43 +102,39 @@
 
 @media (max-width: 768px) {
   .adventure-end-test-card {
-    height: 160px;
-    min-height: 160px;
+    height: auto;
+    min-height: 0;
   }
 
   .adventure-end-test-card-thumbnail {
+    align-self: stretch;
     flex: 0 0 140px;
-    height: 100%;
+    height: auto;
   }
 
   .adventure-end-test-card-content {
-    padding: 16px;
-  }
-
-  .adventure-end-test-card-copy {
-    gap: 6px;
+    padding: 14px 16px;
   }
 
   .adventure-end-test-card-title {
-    font-size: 22px;
-    line-height: 24px;
+    font-size: 18px;
+    line-height: 22px;
   }
 
   .adventure-end-test-card-description {
-    font-size: 18px;
-    line-height: 20px;
+    font-size: 14px;
+    line-height: 1.35;
   }
 
   .adventure-end-test-card-actions {
-    gap: 16px;
-    padding-top: 12px;
+    gap: 10px;
+    padding-top: 8px;
   }
 
   .adventure-end-test-card-practice-button {
-    font-size: 16px;
+    font-size: 14px;
     height: 40px;
-    min-width: 140px;
-    width: 140px;
+    min-width: 130px;
   }
 }
 

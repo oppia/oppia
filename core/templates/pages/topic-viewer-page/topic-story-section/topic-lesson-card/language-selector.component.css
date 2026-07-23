@@ -146,17 +146,19 @@
   .topic-lesson-language-selector-row--compact {
     align-items: center;
     flex-direction: row;
+    gap: 6px;
   }
 
   .topic-lesson-language-selector-select-container {
     height: 40px;
     max-width: none;
+    min-width: 0;
     width: 100%;
   }
 
   .topic-lesson-language-selector-leading-icon {
     font-size: 16px;
-    left: 12px;
+    left: 10px;
   }
 
   .topic-lesson-language-selector-chip-label {
@@ -164,8 +166,8 @@
   }
 
   .topic-lesson-language-selector-text-block {
-    left: 36px;
-    right: 34px;
+    left: 34px;
+    right: 32px;
   }
 
   .topic-lesson-language-selector-selected-value {
@@ -174,12 +176,12 @@
 
   .topic-lesson-language-selector-trailing-icon {
     font-size: 16px;
-    right: 12px;
+    right: 10px;
   }
 
   .topic-lesson-language-selector-note,
   .topic-lesson-language-selector-error {
-    margin-top: 8px;
+    margin-top: 6px;
     position: static;
     top: auto;
   }

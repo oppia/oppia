@@ -192,10 +192,9 @@
   min-width: 44px;
 }
 
-.adventure-flag-icon .fa {
+.adventure-flag-icon .material-icons {
   font-size: 20px;
   line-height: 1;
-  font-weight: 500;
 }
 
 .adventure-header-text {
@@ -327,7 +326,7 @@ topic-mastery-challenge-card {
 
   .story-card-header {
     min-height: 0;
-    padding: 24px 20px 20px;
+    padding: 20px 16px 16px;
   }
 
   .story-title {
@@ -341,13 +340,70 @@ topic-mastery-challenge-card {
   }
 
   .study-skills-cta {
-    font-size: 16px;
-    min-height: 40px;
+    font-size: 14px;
+    min-height: 38px;
+    padding: 8px 14px;
   }
 
   .story-card-body {
-    min-height: 300px;
-    padding: 0 12px 12px;
+    min-height: 240px;
+    padding: 0 14px 14px;
+  }
+
+  .adventure-group {
+    margin-top: 12px;
+  }
+
+  .adventure-header {
+    padding: 12px 14px;
+  }
+
+  .adventure-header-left {
+    gap: 12px;
+  }
+
+  .adventure-flag-icon {
+    flex: 0 0 38px;
+    height: 38px;
+    min-width: 38px;
+    width: 38px;
+  }
+
+  .adventure-flag-icon .material-icons {
+    font-size: 18px;
+  }
+
+  .adventure-title {
+    font-size: 16px;
+  }
+
+  .adventure-completion-text {
+    font-size: 12px;
+  }
+
+  .adventure-chevron-badge {
+    flex: 0 0 38px;
+    height: 38px;
+    width: 38px;
+  }
+
+  .adventure-chevron-badge .material-icons {
+    font-size: 24px;
+  }
+
+  .adventure-description {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  .adventure-lessons {
+    padding: 10px 14px;
+  }
+
+  .story-lesson-card-wrapper,
+  .story-practice-card-wrapper {
+    max-width: 100%;
+    width: 100%;
   }
 }
 
