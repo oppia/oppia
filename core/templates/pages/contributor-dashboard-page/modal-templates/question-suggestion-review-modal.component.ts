@@ -214,7 +214,7 @@ export class QuestionSuggestionReviewModalComponent
 
   reject(): void {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
-      this.suggestionId,
+      this.currentSuggestionId,
     ]);
     this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
       'Question'
@@ -222,12 +222,14 @@ export class QuestionSuggestionReviewModalComponent
     this.suggestionModalService.rejectSuggestion(this.ngbActiveModal, {
       action: AppConstants.ACTION_REJECT_SUGGESTION,
       reviewMessage: this.reviewMessage,
+      suggestionId: this.currentSuggestionId,
+      targetId: this.suggestion.target_id,
     } as ParamDict);
   }
 
   accept(): void {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
-      this.suggestionId,
+      this.currentSuggestionId,
     ]);
     this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
       'Question'
@@ -236,6 +238,8 @@ export class QuestionSuggestionReviewModalComponent
       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
       reviewMessage: this.reviewMessage,
       skillDifficulty: this.skillDifficulty,
+      suggestionId: this.currentSuggestionId,
+      targetId: this.suggestion.target_id,
     });
   }
 

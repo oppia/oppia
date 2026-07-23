@@ -2323,6 +2323,8 @@ class GenericTestBase(AppEngineTestBase):
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
     RELEASE_COORDINATOR_USERNAME: Final = 'releasecoordinator'
+    TECH_LEAD_EMAIL: Final = 'techlead@example.com'
+    TECH_LEAD_USERNAME: Final = 'techlead'
     OWNER_EMAIL: Final = 'owner@example.com'
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'

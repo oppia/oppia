@@ -342,7 +342,19 @@ class BaseHandler(
             return
 
         if self.partially_logged_in and request_split.path != '/logout':
-            self.redirect('/logout?redirect_url=%s' % request_split.path)
+            if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+                self.error(401)
+                self.render_json(
+                    {
+                        'error': (
+                            'You must complete signup before accessing this '
+                            'resource.'
+                        ),
+                        'status_code': 401,
+                    }
+                )
+            else:
+                self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
@@ -786,7 +798,7 @@ class BaseHandler(
             values: dict. The key-value pairs to include in the response.
         """
         # The error codes here should be in sync with the error pages
-        # generated via webpack.common.config.ts.
+        # generated via angular cli.
         assert values['status_code'] in [400, 401, 404, 405, 500]
         method = self.request.environ['REQUEST_METHOD']
 

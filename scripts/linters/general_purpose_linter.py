@@ -82,7 +82,6 @@ EXCLUDED_PATHS: Final = (
     '*.ico',
     '*.jpg',
     '*.min.js',
-    'backend_prod_files/*',
     'assets/scripts/*',
     'core/domain/proto/*.py',
     'core/tests/data/*',
@@ -92,7 +91,6 @@ EXCLUDED_PATHS: Final = (
     'node_modules/*',
     'typings/*',
     'local_compiled_js/*',
-    'webpack_bundles/*',
     'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip',
     'scripts/linters/test_files/*',
@@ -117,9 +115,6 @@ CONFIG_FILE_PATHS: Final = (
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
     'assets/rich_text_components_definitions.ts',
-    'webpack.config.ts',
-    'webpack.dev.config.ts',
-    'webpack.prod.config.ts',
 )
 
 ASSETS_CONSTANTS_FILEPATH: Final = os.path.join(

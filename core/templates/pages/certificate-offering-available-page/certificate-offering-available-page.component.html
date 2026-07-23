@@ -31,7 +31,9 @@
         </div>
 
         <div class="oppia-certificate-offering-available-page-actions">
-          <button type="button" class="btn btn-primary">
+          <button type="button"
+                  class="btn btn-primary"
+                  [routerLink]="['/certificate-assessment', certificateId]">
             Continue to assessment
           </button>
         </div>
@@ -54,7 +56,9 @@
           <button type="button" class="btn btn-secondary">
             Check score
           </button>
-          <button type="button" class="btn btn-primary">
+          <button type="button"
+                  class="btn btn-primary"
+                  [routerLink]="['/certificate-assessment', certificateId]">
             Retry assessment
           </button>
         </div>

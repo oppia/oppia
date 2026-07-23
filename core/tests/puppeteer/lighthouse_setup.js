@@ -91,8 +91,7 @@ var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
 var skillDescriptionField = '.e2e-test-new-skill-description-field';
 var skillOpenConceptCard = '.e2e-test-open-concept-card';
 var confirmSkillCreationButton = '.e2e-test-confirm-skill-creation-button';
-var skillReviewMaterialInput = '.oppia-rte';
-var skillCkEditor = '.e2e-test-ck-editor';
+var skillReviewMaterialInput = '.e2e-test-concept-card-text .e2e-test-rte';
 
 var usernameInputFieldForRolesEditing = '.e2e-test-username-for-role-editor';
 var editUserRoleButton = '.e2e-test-role-edit-button';
@@ -108,6 +107,11 @@ var topicCommitMessageInput = '.e2e-test-commit-message-input';
 var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 
+var roleOptionLabels = {
+  ADMIN: 'curriculum admin',
+  COLLECTION_EDITOR: 'collection editor',
+};
+
 const login = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -115,22 +119,41 @@ const login = async function (browser, page) {
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
-    // Checks if the user's account was already made.
-    try {
-      let cookies = await page.cookies();
-      if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
-        await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
-        await page.click(cookieBannerAcceptButton);
-      }
-      await page.waitForSelector(usernameInput, {visible: true});
-      await page.type(usernameInput, 'username1');
-      await page.click(agreeToTermsCheckBox);
-      await page.waitForSelector(registerUser);
-      await page.click(registerUser);
-      await page.waitForSelector(navbarToggle);
-    } catch (error) {
-      // Already Signed in.
+
+    let cookies = await page.cookies();
+    if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
+      await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
+      await page.click(cookieBannerAcceptButton);
     }
+
+    let usernameInputElement = null;
+    try {
+      usernameInputElement = await page.waitForSelector(usernameInput, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Already signed in.
+    }
+
+    if (usernameInputElement === null) {
+      await page.waitForSelector(navbarToggle);
+      return;
+    }
+
+    await usernameInputElement.type('username1');
+    await Promise.all([
+      page.waitForResponse(response =>
+        response.url().includes('/usernamehandler/data')
+      ),
+      page.evaluate(selector => {
+        document.querySelector(selector).blur();
+      }, usernameInput),
+    ]);
+    await page.click(agreeToTermsCheckBox);
+    await page.waitForSelector(registerUser);
+    await page.click(registerUser);
+    await page.waitForSelector(navbarToggle);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Login Failed');
@@ -156,8 +179,65 @@ const setRole = async function (browser, page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    var selector = `mat-option[ng-reflect-value="${role}"]`;
-    await page.click(selector);
+    await page.waitForSelector('mat-option');
+    const roleOptionWasSelected = await page.evaluate(
+      (role, roleOptionLabels) => {
+        const roleOptionLabel = roleOptionLabels[role];
+        if (!roleOptionLabel) {
+          throw new Error(`No role option label configured for ${role}.`);
+        }
+
+        const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
+        const normalizedRole = role.toLowerCase();
+        const options = Array.from(document.querySelectorAll('mat-option'));
+        const match = options.find(option => {
+          const optionValue = (
+            option.getAttribute('ng-reflect-value') ||
+            option.getAttribute('value') ||
+            option.id ||
+            ''
+          ).toLowerCase();
+          const optionLabel = option.textContent.trim().toLowerCase();
+
+          return (
+            optionValue === normalizedRole ||
+            optionLabel === normalizedRoleOptionLabel ||
+            optionLabel === normalizedRole
+          );
+        });
+
+        if (!match) {
+          return false;
+        }
+
+        match.click();
+        return true;
+      },
+      role,
+      roleOptionLabels
+    );
+
+    if (roleOptionWasSelected) {
+      await page.waitForResponse(response =>
+        response.url().includes('/adminrolehandler')
+      );
+    } else {
+      const roleIsAlreadyAssigned = await page.evaluate(
+        (role, roleOptionLabels, roleEditorContainer) => {
+          const roleOptionLabel = roleOptionLabels[role];
+          const roleEditorText = document
+            .querySelector(roleEditorContainer)
+            .textContent.toLowerCase();
+          return roleEditorText.includes(roleOptionLabel.toLowerCase());
+        },
+        role,
+        roleOptionLabels,
+        roleEditorContainer
+      );
+      if (!roleIsAlreadyAssigned) {
+        throw new Error(`Could not find role option for ${role}.`);
+      }
+    }
     await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -189,6 +269,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(endIneractionSelector);
     await page.waitForSelector(saveInteractionButton, {visible: true});
     await page.click(saveInteractionButton);
+    await page.waitForTimeout(2000);
 
     await page.waitForSelector(saveChangesButton, {visible: true});
     await page.click(saveChangesButton);
@@ -224,11 +305,22 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForTimeout(3000);
     await page.waitForSelector(expCategoryDropdownElement, {visible: true});
     await page.click(expCategoryDropdownElement);
+    await page.waitForSelector('mat-option .mat-option-text', {
+      visible: true,
+    });
+    await page.evaluate(() => {
+      const options = Array.from(
+        document.querySelectorAll('mat-option .mat-option-text')
+      );
 
-    await page.waitForTimeout(3000);
-    await page.waitForSelector('mat-option');
-    await page.waitForTimeout(3000);
-    await page.click('mat-option[ng-reflect-value="Algebra"]');
+      const match = options.find(el => el.textContent.trim() === 'Algebra');
+
+      if (match) {
+        match.closest('mat-option').click();
+      } else {
+        throw new Error('Could not find Algebra category option');
+      }
+    });
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
@@ -340,11 +432,10 @@ const getSkillEditorUrl = async function (browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitForSelector(skillCkEditor, {visible: true});
-    await page.click(skillCkEditor);
-    await page.keyboard.type('Skill Overview here');
+    await page.click(skillReviewMaterialInput);
+    await page.type(skillReviewMaterialInput, 'Skill Overview here');
 
-    await page.waitForSelector(confirmSkillCreationButton, {visible: true});
+    await page.waitForSelector(`${confirmSkillCreationButton}:not([disabled])`);
     await page.waitForTimeout(5000);
     await page.click(confirmSkillCreationButton);
     // Doing waitForTimeout(15000) to handle new tab being opened.

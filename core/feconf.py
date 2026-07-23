@@ -106,15 +106,15 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles')
+    os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('build', 'webpack_bundles')
+    else os.path.join('build')
 )
 # To know more about AOT visit https://angular.io/guide/glossary#aot
 FRONTEND_AOT_DIR = (
     os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('dist', 'oppia-angular-prod')
+    else os.path.join('build')
 )
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
@@ -228,10 +228,10 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_logs_json',
-    'failed_requests_json',
-    'navigation_history_json',
-    'environment_json',
+    'console_logs',
+    'failed_requests',
+    'navigation_history',
+    'environment',
 )
 
 # Allowed formats of how HTML is present in rule specs.
@@ -1087,6 +1087,7 @@ USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 STUDY_GUIDE_EDITOR_DATA_URL_PREFIX = '/study_guide_editor_handler/data'
+TECHNICAL_FEEDBACK_DASHBOARD_URL = '/technical-feedback-dashboard'
 TOPIC_VIEWER_URL_PREFIX = '/learn/<classroom_url_fragment>/<topic_url_fragment>'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
@@ -1281,6 +1282,7 @@ ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
 ROLE_ID_TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR'
+ROLE_ID_TECH_TEAM_LEAD = 'TECH_TEAM_LEAD'
 
 ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER,
@@ -1303,6 +1305,7 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_VOICEOVER_ADMIN,
     ROLE_ID_QUESTION_COORDINATOR,
     ROLE_ID_TRANSLATION_COORDINATOR,
+    ROLE_ID_TECH_TEAM_LEAD,
 ]
 
 # Intent of the User making query to role structure via admin interface. Used
@@ -1923,16 +1926,26 @@ PLATFORM_ANDROID: Final = 'android'
 PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
 
 # Destination choices.
-DESTINATION_CREATOR: Final = 'creator'
-DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
-DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
+DESTINATION_CURRICULUM: Final = 'curriculum'
+DESTINATION_TECHNICAL: Final = 'technical'
+DESTINATION_TECHNICAL_EXTERNAL_TEAM: Final = 'tech-external'
+DESTINATION_TECHNICAL_INTERNAL_TEAM: Final = 'tech-internal'
 DESTINATION_CHOICES: Final = [
-    DESTINATION_CREATOR,
-    DESTINATION_TECHNICAL_LEAP_TEAM,
-    DESTINATION_TECHNICAL_CORE_TEAM,
+    DESTINATION_CURRICULUM,
+    DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+    DESTINATION_TECHNICAL_INTERNAL_TEAM,
+]
+PLATFORM_FEEDBACK_DASHBOARD_CHOICES: Final = [
+    DESTINATION_CURRICULUM,
+    DESTINATION_TECHNICAL,
+]
+TECHNICAL_FEEDBACK_TEAM_CHOICES: Final = [
+    DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+    DESTINATION_TECHNICAL_INTERNAL_TEAM,
 ]
 
-LEAP_DASHBOARD_PATHS = frozenset(
+
+TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
     [
         'about',
         'community-library',

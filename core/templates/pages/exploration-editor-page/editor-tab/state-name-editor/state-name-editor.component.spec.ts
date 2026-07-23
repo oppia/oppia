@@ -338,4 +338,14 @@ describe('State Name Editor component', () => {
       tick();
     }).toThrowError();
   }));
+
+  it('should return the active state name from the editor service', () => {
+    stateEditorService.setActiveStateName('Test State');
+
+    expect(component.activeStateName).toBe('Test State');
+  });
+
+  it('should return whether the state name editor is shown', () => {
+    expect(component.isStateNameEditorShown()).toBeTrue();
+  });
 });

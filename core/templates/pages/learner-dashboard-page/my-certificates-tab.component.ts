@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Development environment config file for Webpack with
- * proper source maps.
+ * @fileoverview Component for my certificates tab in the Learner Dashboard page.
  */
 
-var {merge} = require('webpack-merge');
-const dev = require('./webpack.dev.config.ts');
+import {Component} from '@angular/core';
 
-module.exports = merge(dev, {
-  devtool: 'inline-source-map',
-});
+@Component({
+  selector: 'oppia-my-certificates-tab',
+  templateUrl: './my-certificates-tab.component.html',
+})
+
+// TODO(#24717-M2.17): This is a skeleton component created to establish the flow so that other PRs can be developed in parallel.
+// The functionality will be implemented in a future PR.
+export class MyCertificatesTabComponent {}

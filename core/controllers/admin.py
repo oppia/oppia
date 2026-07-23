@@ -1142,6 +1142,16 @@ class AdminHandler(
             for i, story_node_dict in enumerate(story_node_dicts):
                 generate_dummy_story_nodes(i + 1, **story_node_dict)
 
+
+            # Create a default arc covering all nodes.
+            node_ids = [
+                '%s%d' % (story_domain.NODE_ID_PREFIX, i + 1)
+                for i in range(len(story_node_dicts))
+            ]
+            story.story_contents.add_arc(
+                story_domain.Arc('default_arc', 'Adventure 1', '', node_ids)
+            )
+
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
             skill_services.save_new_skill(self.user_id, skill_3)
@@ -1457,6 +1467,35 @@ class AdminHandler(
                 exploration_ids_to_publish
             )
 
+            # Ensure the story has at least one arc before adding nodes.
+            if not initial_dummy_opportunites_generation:
+                story = story_fetchers.get_story_by_id(story_id)
+                if len(story.story_contents.arcs) == 0:
+                    existing_node_ids = [
+                        node.id for node in story.story_contents.nodes
+                    ]
+                    arc_change_list = [
+                        story_domain.StoryChange(
+                            {
+                                'cmd': 'create_arc',
+                                'arc_id': 'default_arc',
+                                'title': 'Adventure 1',
+                                'description': '',
+                                'node_ids': existing_node_ids,
+                            }
+                        )
+                    ]
+                    story_services.update_story(
+                        self.user_id,
+                        story_id,
+                        arc_change_list,
+                        'create default arc',
+                    )
+                    story = story_fetchers.get_story_by_id(story_id)
+                target_arc_id = story.story_contents.arcs[0].id
+            else:
+                target_arc_id = 'default_arc'
+
             def generate_dummy_story_nodes(
                 node_id: int,
                 stop_update: bool,
@@ -1569,6 +1608,15 @@ class AdminHandler(
                 )
 
             if initial_dummy_opportunites_generation:
+                # Create a default arc covering all nodes.
+                story_node_ids = [
+                    node.id for node in story.story_contents.nodes
+                ]
+                story.story_contents.add_arc(
+                    story_domain.Arc(
+                        'default_arc', 'Adventure 1', '', story_node_ids
+                    )
+                )
                 skill_services.save_new_skill(self.user_id, skill)
                 story_services.save_new_story(self.user_id, story)
                 topic_services.save_new_topic(self.user_id, topic)
@@ -2231,6 +2279,34 @@ class AdminHandler(
                 'thumbnail',
                 False,
             )
+            # Ensure the story has at least one arc before adding nodes.
+            updated_story = story_fetchers.get_story_by_id(story_id)
+            if len(updated_story.story_contents.arcs) == 0:
+                existing_node_ids = [
+                    node.id for node in updated_story.story_contents.nodes
+                ]
+                arc_change_list = [
+                    story_domain.StoryChange(
+                        {
+                            'cmd': 'create_arc',
+                            'arc_id': 'default_arc',
+                            'title': 'Adventure 1',
+                            'description': '',
+                            'node_ids': existing_node_ids,
+                        }
+                    )
+                ]
+                topic_services.update_story_and_topic_summary(
+                    self.user_id,
+                    story_id,
+                    arc_change_list,
+                    'create default arc',
+                    story.corresponding_topic_id,
+                )
+                target_arc_id = 'default_arc'
+            else:
+                target_arc_id = updated_story.story_contents.arcs[0].id
+
             new_node_ids = []
             for i, exp_id in enumerate(exp_ids_to_publish):
                 suffix = i + 1

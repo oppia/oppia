@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Production environment config file for Webpack with
- * proper source maps.
+ * @fileoverview Component for Technical feedback dashboard.
  */
+import {Component} from '@angular/core';
+import './technical-feedback-dashboard-page.component.css';
 
-var {merge} = require('webpack-merge');
-const prod = require('./webpack.prod.config.ts');
-
-module.exports = merge(prod, {
-  devtool: 'source-map',
-});
+@Component({
+  selector: 'oppia-technical-feedback-dashboard-page',
+  templateUrl: './technical-feedback-dashboard-page.component.html',
+})
+export class TechnicalFeedbackDashboardPageComponent {
+  constructor() {}
+  // Stub: no data or logic yet.
+}

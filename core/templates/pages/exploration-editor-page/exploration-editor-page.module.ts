@@ -19,7 +19,6 @@
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
-import {JoyrideModule, JoyrideService, LoggerService} from 'ngx-joyride';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
 import {SharedComponentsModule} from 'components/shared-component.module';
@@ -193,7 +192,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     MatMenuModule,
     FormsModule,
     MatPaginatorModule,
-    JoyrideModule.forRoot(),
     SharedComponentsModule,
     ExplorationPlayerViewerCommonModule,
     OppiaCkEditorCopyToolBarModule,
@@ -354,10 +352,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     InteractionDetailsCacheService,
     InteractionRulesRegistryService,
     InternetConnectivityService,
-    JoyrideService,
     LanguageUtilService,
     LocalStorageService,
-    LoggerService,
     ParameterMetadataService,
     PlatformFeatureService,
     PopulateRuleContentIdsService,
