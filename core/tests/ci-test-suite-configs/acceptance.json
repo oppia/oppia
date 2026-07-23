@@ -482,8 +482,8 @@
     },
     {
       "name": "logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/changes-site-language-to-rtl",

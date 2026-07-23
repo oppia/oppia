@@ -118,6 +118,10 @@ const gotItButtonSelector = '.e2e-test-learner-got-it-button';
 const closeSolutionModalButton = '.e2e-test-learner-got-it-button';
 const continueToSolutionButton = '.e2e-test-continue-to-solution-btn';
 const viewSolutionButton = '.e2e-test-view-solution';
+const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const feedbackSubmissionPopupSelector = '.oppia-feedback-popup-container';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
@@ -738,6 +742,21 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that the feedback submission was successful by checking for the presence of the feedback popup.
+   */
+  async expectFeedbackSubmissionPopupToAppear(): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        `document.querySelector('${feedbackSubmissionPopupSelector}') !== null`,
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch (error) {
+      throw new Error('Feedback was not successfully submitted');
+    }
+  }
+
+  /**
    * Checks if fraction input is visible.
    */
   async expectFractionInputToBeVisible(): Promise<void> {
@@ -1119,6 +1138,33 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if "Stay Anonymous" checkbox is checked or not.
+   * @param {boolean} status - Boolean value representing that checkbox should be checked or not.
+   */
+  async expectStayAnonymousCheckboxToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.expectElementToBeVisible(stayAnonymousCheckbox);
+      showMessage('Stay anonymous checkbox is present.');
+      return;
+    } else {
+      try {
+        await this.expectElementToBeVisible(stayAnonymousCheckbox);
+        throw new Error(
+          'Stay anonymous checkbox is present, but it should not be.'
+        );
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Timeout')) {
+          showMessage('Stay anonymous checkbox is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
    * Verifies that the user is on the community library page.
    */
   async expectToBeOnCommunityLibraryPage(): Promise<void> {
@@ -1416,6 +1462,16 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(practiceTabContainerSelector);
 
     showMessage('Navigated to practice tab in topic page.');
+  }
+
+  /**
+   * Opens the feedback popup and checks if the feedback form is present.
+   */
+  async openFeedbackPopup(): Promise<void> {
+    await this.expectElementToBeVisible('nav-options');
+    await this.expectElementToBeVisible(feedbackPopupSelector);
+    await this.clickOnElementWithSelector(feedbackPopupSelector);
+    await this.expectElementToBeVisible(feedbackTextarea);
   }
 
   /**
@@ -2025,6 +2081,32 @@ export class LoggedOutUser extends BaseUser {
 
     // While mouse is over pause button, the pause button doesn't change its state.
     await this.page.mouse.move(10, 10);
+  }
+
+  /**
+   * Write feedback in the feedback popup and submit it.
+   * @param {string} feedback - The feedback to write in the popup.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
+   * @param {boolean} verifyFeedbackPopup - Whether to verify the feedback popup after submission.
+   */
+  async writeAndSubmitFeedback(
+    feedback: string,
+    stayAnonymous: boolean = false,
+    verifyFeedbackPopup: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTextarea);
+    await this.typeInInputField(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOnElementWithSelector(stayAnonymousCheckbox);
+    }
+
+    await this.clickOnElementWithText('Submit');
+
+    if (verifyFeedbackPopup) {
+      await this.expectFeedbackSubmissionPopupToAppear();
+    }
   }
 }
 
