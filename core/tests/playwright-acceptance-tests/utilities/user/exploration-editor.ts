@@ -1320,8 +1320,12 @@ export class ExplorationEditor extends BaseUser {
    * Uses Playwright's download event to reliably capture the file,
    * regardless of the download directory configuration.
    * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the exploration is published.
    */
-  async downloadExploration(explorationVersion: number): Promise<void> {
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<void> {
     await this.expectElementToBeVisible(historyListContent);
     const historyItems = await this.page.$$(historyListContent);
 
@@ -1353,6 +1357,15 @@ export class ExplorationEditor extends BaseUser {
       const download = await downloadPromise;
 
       const suggestedFilename = download.suggestedFilename();
+      const expectedPrefix = isExplorationPublished
+        ? 'oppia-Publishwithaninteraction-v'
+        : 'oppia-unpublished_exploration-v';
+      if (!suggestedFilename.startsWith(expectedPrefix)) {
+        throw new Error(
+          `Expected filename to start with "${expectedPrefix}" ` +
+            `but got "${suggestedFilename}".`
+        );
+      }
       const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
 
       if (!fs.existsSync(downloadDir)) {
