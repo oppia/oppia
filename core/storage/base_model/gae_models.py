@@ -2220,3 +2220,86 @@ class BaseFeedbackModel(BaseModel):
         raise Exception(
             '%s ID generator is producing too many collisions.' % cls.__name__
         )
+
+    @classmethod
+    def _get_filtered_query(
+        cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+    ) -> datastore_services.Query:
+        """Returns a query object filtered by the given parameters.
+
+        Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime.datetime]. If provided, filters for
+                entries created on or after this date.
+            date_to: Optional[datetime.datetime]. If provided, filters for
+                entries created on or before this date.
+
+        Returns:
+            Query. The filtered query object.
+        """
+        query = cls.query()
+        # Ignoring deleted threads as they are not relevant for operations.
+        query = query.filter(cls.deleted.IN([False]))
+
+        if author_id is not None:
+            query = query.filter(cls.author_id == author_id)
+        if status_filter and status_filter in feconf.STATUS_CHOICES:
+            query = query.filter(cls.status == status_filter)
+        if exploration_id is not None:
+            query = query.filter(cls.exploration_id == exploration_id)
+        if date_from is not None:
+            query = query.filter(cls.created_on >= date_from)
+        if date_to is not None:
+            query = query.filter(cls.created_on <= date_to)
+
+        return query
+
+    @classmethod
+    # Here we use type Any because subclasses can extend the filtered query with
+    # model-specific keyword filters.
+    def fetch_page(
+        cls,
+        page_size: int,
+        cursor: Optional[str] = None,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = None,
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+        **kwargs: Any,
+    ) -> tuple[Sequence['BaseFeedbackModel'], Optional[str], bool]:
+        """Fetches a page of feedback entries sorted by created_on_desc."""
+        query = cls._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+            **kwargs,
+        ).order(-cls.created_on)
+
+        start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
+        results: Sequence[BaseFeedbackModel]
+        results, next_cursor, more = query.fetch_page(
+            page_size, start_cursor=start_cursor
+        )
+
+        next_cursor_str: Optional[str] = None
+        if len(results) < page_size:
+            more = False
+        if next_cursor and more:
+            raw_next_cursor = next_cursor.urlsafe()
+            next_cursor_str = (
+                raw_next_cursor.decode('utf-8')
+                if isinstance(raw_next_cursor, bytes)
+                else raw_next_cursor
+            )
+        return results, next_cursor_str, more
