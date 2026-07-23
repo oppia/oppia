@@ -152,7 +152,7 @@ class PracticeSessionsPageDataHandler(
             return []
 
         all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index < 1 or node_index > len(all_nodes):
+        if node_index not in range(1, len(all_nodes) + 1):
             return []
 
         node = all_nodes[node_index - 1]
@@ -181,7 +181,7 @@ class PracticeSessionsPageDataHandler(
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic
         )
-        if arc_index < 1 or arc_index > len(arcs_with_stories):
+        if arc_index not in range(1, len(arcs_with_stories) + 1):
             return []
 
         story, arc = arcs_with_stories[arc_index - 1]

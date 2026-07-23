@@ -439,7 +439,7 @@ class PracticeSessionAccessValidationPage(
             ) from exc
 
         all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index < 1 or node_index > len(all_nodes):
+        if node_index not in range(1, len(all_nodes) + 1):
             raise self.NotFoundException(
                 'Node with id %s is not part of this topic.' % node_id
             )
@@ -465,7 +465,7 @@ class PracticeSessionAccessValidationPage(
             ) from exc
 
         all_arcs = self._get_all_arcs_for_topic(topic)
-        if arc_index < 1 or arc_index > len(all_arcs):
+        if arc_index not in range(1, len(all_arcs) + 1):
             raise self.NotFoundException(
                 'Arc with id %s is not part of this topic.' % arc_id
             )
