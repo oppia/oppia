@@ -1,4 +1,4 @@
-.arc-end-test-card {
+.adventure-end-test-card {
   background: #ecf7f6;
   border: 1px solid #d3ebe8;
   border-radius: 8px;
@@ -9,7 +9,7 @@
   width: 100%;
 }
 
-.arc-end-test-card-thumbnail {
+.adventure-end-test-card-thumbnail {
   background: #e2f2ef;
   display: flex;
   flex: 0 0 auto;
@@ -21,14 +21,14 @@
   padding: 0;
 }
 
-.arc-end-test-card-image {
+.adventure-end-test-card-image {
   height: 100%;
   width: 100%;
   object-fit: cover;
   object-position: center;
 }
 
-.arc-end-test-card-content {
+.adventure-end-test-card-content {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -37,20 +37,20 @@
   gap: 12px;
 }
 
-.arc-end-test-card-title-row {
+.adventure-end-test-card-title-row {
   align-items: center;
   display: flex;
   gap: 12px;
 }
 
-.arc-end-test-card-copy {
+.adventure-end-test-card-copy {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: auto;
 }
 
-.arc-end-test-card-title {
+.adventure-end-test-card-title {
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
   font-size: 18px;
@@ -59,7 +59,7 @@
   margin: 0;
 }
 
-.arc-end-test-card-description {
+.adventure-end-test-card-description {
   color: #595959;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
@@ -71,7 +71,7 @@
   word-wrap: break-word;
 }
 
-.arc-end-test-card-actions {
+.adventure-end-test-card-actions {
   align-items: center;
   display: flex;
   gap: 8px;
@@ -80,7 +80,7 @@
   justify-content: flex-end;
 }
 
-.arc-end-test-card-practice-button {
+.adventure-end-test-card-practice-button {
   align-items: center;
   background: #00645c;
   border: none;
@@ -101,40 +101,40 @@
 }
 
 @media (max-width: 768px) {
-  .arc-end-test-card {
+  .adventure-end-test-card {
     height: 160px;
     min-height: 160px;
   }
 
-  .arc-end-test-card-thumbnail {
+  .adventure-end-test-card-thumbnail {
     flex: 0 0 140px;
     height: 100%;
   }
 
-  .arc-end-test-card-content {
+  .adventure-end-test-card-content {
     padding: 16px;
   }
 
-  .arc-end-test-card-copy {
+  .adventure-end-test-card-copy {
     gap: 6px;
   }
 
-  .arc-end-test-card-title {
+  .adventure-end-test-card-title {
     font-size: 22px;
     line-height: 24px;
   }
 
-  .arc-end-test-card-description {
+  .adventure-end-test-card-description {
     font-size: 18px;
     line-height: 20px;
   }
 
-  .arc-end-test-card-actions {
+  .adventure-end-test-card-actions {
     gap: 16px;
     padding-top: 12px;
   }
 
-  .arc-end-test-card-practice-button {
+  .adventure-end-test-card-practice-button {
     font-size: 16px;
     height: 40px;
     min-width: 140px;
@@ -143,7 +143,7 @@
 }
 
 @media (max-width: 450px) {
-  .arc-end-test-card {
+  .adventure-end-test-card {
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -152,43 +152,43 @@
     overflow: hidden;
   }
 
-  .arc-end-test-card-thumbnail {
+  .adventure-end-test-card-thumbnail {
     flex: none;
     height: 140px;
     min-height: 140px;
     width: 100%;
   }
 
-  .arc-end-test-card-image {
+  .adventure-end-test-card-image {
     height: 100%;
     width: 100%;
   }
 
-  .arc-end-test-card-content {
+  .adventure-end-test-card-content {
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 12px;
   }
 
-  .arc-end-test-card-copy {
+  .adventure-end-test-card-copy {
     gap: 4px;
   }
 
-  .arc-end-test-card-title {
+  .adventure-end-test-card-title {
     font-size: 16px;
     font-weight: 500;
     line-height: 20px;
     margin: 0;
   }
 
-  .arc-end-test-card-description {
+  .adventure-end-test-card-description {
     font-size: 13px;
     line-height: 18px;
     margin: 0;
   }
 
-  .arc-end-test-card-actions {
+  .adventure-end-test-card-actions {
     align-items: stretch;
     display: flex;
     justify-content: flex-start;
@@ -196,7 +196,7 @@
     width: 100%;
   }
 
-  .arc-end-test-card-practice-button {
+  .adventure-end-test-card-practice-button {
     font-size: 14px;
     height: 40px;
     min-width: 100%;

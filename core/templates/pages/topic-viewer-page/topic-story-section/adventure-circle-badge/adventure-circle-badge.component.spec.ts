@@ -13,23 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ArcCircleBadgeComponent.
+ * @fileoverview Unit tests for AdventureCircleBadgeComponent.
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {ArcCircleBadgeComponent} from './arc-circle-badge.component';
+import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
 
-describe('ArcCircleBadgeComponent', () => {
-  let component: ArcCircleBadgeComponent;
-  let fixture: ComponentFixture<ArcCircleBadgeComponent>;
+describe('AdventureCircleBadgeComponent', () => {
+  let component: AdventureCircleBadgeComponent;
+  let fixture: ComponentFixture<AdventureCircleBadgeComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ArcCircleBadgeComponent],
+      declarations: [AdventureCircleBadgeComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ArcCircleBadgeComponent);
+    fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
     component = fixture.componentInstance;
   }));
 
@@ -40,12 +40,14 @@ describe('ArcCircleBadgeComponent', () => {
   it('should return default circle class when size is md', () => {
     component.size = 'md';
 
-    expect(component.circleClass).toBe('arc-circle-badge');
+    expect(component.circleClass).toBe('adventure-circle-badge');
   });
 
   it('should return compact circle class when size is sm', () => {
     component.size = 'sm';
 
-    expect(component.circleClass).toBe('arc-circle-badge arc-circle-badge--sm');
+    expect(component.circleClass).toBe(
+      'adventure-circle-badge adventure-circle-badge--sm'
+    );
   });
 });

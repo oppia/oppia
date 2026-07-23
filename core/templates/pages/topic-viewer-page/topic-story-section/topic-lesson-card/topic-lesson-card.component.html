@@ -1,6 +1,6 @@
 <div class="topic-lesson-card" [attr.aria-label]="lessonTitle || 'Lesson card'" [class.collapsed]="!isExpanded">
   <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded"
-       [ngStyle]="{'background-color': arcAccentColor}">
+       [ngStyle]="{'background-color': adventureAccentColor}">
     <img class="topic-lesson-card-image"
          [src]="resolvedThumbnailUrl"
          alt="{{ getThumbnailAltText() }}"
@@ -9,14 +9,14 @@
   <div class="topic-lesson-card-content" [class.collapsed]="!isExpanded">
     <div class="topic-lesson-card-copy">
       <div class="topic-lesson-card-title-row" [class.collapsed]="!isExpanded">
-        <topic-arc-circle-badge
+        <topic-adventure-circle-badge
           [label]="lessonNumber.toString()"
           [iconName]="''"
           [size]="'sm'"
-          [backgroundColor]="isExpanded ? arcAccentColor : '#fff'"
-          [borderColor]="isExpanded ? arcAccentColor : '#d1d5db'"
+          [backgroundColor]="isExpanded ? adventureAccentColor : '#fff'"
+          [borderColor]="isExpanded ? adventureAccentColor : '#d1d5db'"
           [textColor]="isExpanded ? '#fff' : '#6b7280'">
-        </topic-arc-circle-badge>
+        </topic-adventure-circle-badge>
         <div class="topic-lesson-card-header">
           <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
           <p class="topic-lesson-card-description" *ngIf="isExpanded">{{ lessonDescription }}</p>

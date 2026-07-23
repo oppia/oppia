@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ArcEndTestCardComponent.
+ * @fileoverview Unit tests for AdventureEndTestCardComponent.
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {ArcEndTestCardComponent} from './arc-end-test-card.component';
+import {AdventureEndTestCardComponent} from './adventure-end-test-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -32,9 +32,9 @@ class MockWindowRef {
   };
 }
 
-describe('ArcEndTestCardComponent', () => {
-  let component: ArcEndTestCardComponent;
-  let fixture: ComponentFixture<ArcEndTestCardComponent>;
+describe('AdventureEndTestCardComponent', () => {
+  let component: AdventureEndTestCardComponent;
+  let fixture: ComponentFixture<AdventureEndTestCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
 
@@ -45,7 +45,7 @@ describe('ArcEndTestCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      declarations: [ArcEndTestCardComponent, MockTranslatePipe],
+      declarations: [AdventureEndTestCardComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
@@ -59,7 +59,7 @@ describe('ArcEndTestCardComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ArcEndTestCardComponent);
+    fixture = TestBed.createComponent(AdventureEndTestCardComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService

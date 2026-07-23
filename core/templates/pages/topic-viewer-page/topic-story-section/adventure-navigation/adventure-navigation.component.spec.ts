@@ -13,25 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ArcNavigationComponent.
+ * @fileoverview Unit tests for AdventureNavigationComponent.
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {ArcNavigationComponent} from './arc-navigation.component';
+import {AdventureNavigationComponent} from './adventure-navigation.component';
 
-describe('ArcNavigationComponent', () => {
-  let component: ArcNavigationComponent;
-  let fixture: ComponentFixture<ArcNavigationComponent>;
+describe('AdventureNavigationComponent', () => {
+  let component: AdventureNavigationComponent;
+  let fixture: ComponentFixture<AdventureNavigationComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ArcNavigationComponent],
+      declarations: [AdventureNavigationComponent],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ArcNavigationComponent);
+    fixture = TestBed.createComponent(AdventureNavigationComponent);
     component = fixture.componentInstance;
   }));
 

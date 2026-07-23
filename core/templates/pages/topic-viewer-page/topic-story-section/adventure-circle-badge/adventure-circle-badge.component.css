@@ -1,4 +1,4 @@
-.arc-circle-badge {
+.adventure-circle-badge {
   align-items: center;
   border: 2px solid #7f8c8d;
   border-radius: 50%;
@@ -13,22 +13,22 @@
   width: 36px;
 }
 
-.arc-circle-badge-label {
+.adventure-circle-badge-label {
   display: inline-flex;
   line-height: 1;
 }
 
-.arc-circle-badge .material-icons {
+.adventure-circle-badge .material-icons {
   font-size: 22px;
 }
 
-.arc-circle-badge--sm {
+.adventure-circle-badge--sm {
   flex-basis: 52px;
   font-size: 26px;
   height: 52px;
   width: 52px;
 }
 
-.arc-circle-badge--sm .material-icons {
+.adventure-circle-badge--sm .material-icons {
   font-size: 26px;
 }

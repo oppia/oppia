@@ -1,0 +1,72 @@
+<div class="adventure-navigation-container" *ngIf="adventureGroups.length > 0">
+  <div class="adventure-navigation-scroll-area">
+    <button
+      class="adventure-navigation-arrow adventure-navigation-arrow--left"
+      *ngIf="showLeftArrow"
+      (click)="scrollLeft()"
+      aria-label="Scroll left"
+      type="button">
+      <i class="material-icons">chevron_left</i>
+    </button>
+
+    <div class="adventure-navigation-wrapper" #scrollWrapper (scroll)="onScroll()">
+      <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx"
+           [ngStyle]="{'border-color': adventureGroup.accentColor}">
+        <topic-adventure-circle-badge
+          *ngFor="let lessonNumber of adventureGroup.lessonNumbers"
+          [label]="lessonNumber.toString()"
+          [size]="'sm'"
+          [backgroundColor]="isActiveLesson(lessonNumber) ? adventureGroup.accentColor : '#fff'"
+          [borderColor]="adventureGroup.accentColor"
+          [textColor]="isActiveLesson(lessonNumber) ? '#fff' : adventureGroup.accentColor"
+          class="adventure-navigation-clickable"
+          (click)="onLessonClick(lessonNumber)"
+          [attr.aria-label]="'Go to lesson ' + lessonNumber"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="onLessonClick(lessonNumber)"
+          (keydown.space)="onLessonClick(lessonNumber); $event.preventDefault()">
+        </topic-adventure-circle-badge>
+
+        <topic-adventure-circle-badge
+          [iconName]="'edit'"
+          [size]="'sm'"
+          [backgroundColor]="'#fff'"
+          [borderColor]="adventureGroup.accentColor"
+          [textColor]="adventureGroup.accentColor"
+          class="adventure-navigation-clickable"
+          (click)="onPracticeClick(adventureIdx)"
+          [attr.aria-label]="'Go to practice'"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="onPracticeClick(adventureIdx)"
+          (keydown.space)="onPracticeClick(adventureIdx); $event.preventDefault()">
+        </topic-adventure-circle-badge>
+      </div>
+
+      <topic-adventure-circle-badge
+        class="adventure-navigation-mastery"
+        [iconName]="'emoji_events'"
+        [size]="'sm'"
+        [backgroundColor]="'#fff7e8'"
+        [borderColor]="'#f5a623'"
+        [textColor]="'#f5a623'">
+      </topic-adventure-circle-badge>
+    </div>
+
+    <button
+      class="adventure-navigation-arrow adventure-navigation-arrow--right"
+      *ngIf="showRightArrow"
+      (click)="scrollRight()"
+      aria-label="Scroll right"
+      type="button">
+      <i class="material-icons">chevron_right</i>
+    </button>
+  </div>
+
+  <p class="adventure-navigation-hint">
+    <span class="adventure-navigation-hint-arrow">&#8592;</span>
+    Click to navigate through lessons and tests
+    <span class="adventure-navigation-hint-arrow">&#8594;</span>
+  </p>
+</div>

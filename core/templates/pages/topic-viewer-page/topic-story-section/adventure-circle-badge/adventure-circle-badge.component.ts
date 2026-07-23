@@ -13,19 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Shared circular badge used in arc navigation and lesson rows.
+ * @fileoverview Shared circular badge used in adventure navigation and lesson rows.
  */
 
 import {Component, Input} from '@angular/core';
 
-import './arc-circle-badge.component.css';
+import './adventure-circle-badge.component.css';
 
 @Component({
-  selector: 'topic-arc-circle-badge',
-  templateUrl: './arc-circle-badge.component.html',
-  styleUrls: ['./arc-circle-badge.component.css'],
+  selector: 'topic-adventure-circle-badge',
+  templateUrl: './adventure-circle-badge.component.html',
+  styleUrls: ['./adventure-circle-badge.component.css'],
 })
-export class ArcCircleBadgeComponent {
+export class AdventureCircleBadgeComponent {
   @Input() label: string = '';
   @Input() iconName: string = '';
   @Input() backgroundColor: string = '#fff';
@@ -35,7 +35,7 @@ export class ArcCircleBadgeComponent {
 
   get circleClass(): string {
     return this.size === 'sm'
-      ? 'arc-circle-badge arc-circle-badge--sm'
-      : 'arc-circle-badge';
+      ? 'adventure-circle-badge adventure-circle-badge--sm'
+      : 'adventure-circle-badge';
   }
 }

@@ -1,17 +1,17 @@
-.arc-navigation-container {
+.adventure-navigation-container {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.arc-navigation-scroll-area {
+.adventure-navigation-scroll-area {
   align-items: center;
   display: flex;
   gap: 8px;
   position: relative;
 }
 
-.arc-navigation-wrapper {
+.adventure-navigation-wrapper {
   align-items: center;
   display: flex;
   flex: 1 1 0;
@@ -25,11 +25,11 @@
   scrollbar-width: none;
 }
 
-.arc-navigation-wrapper::-webkit-scrollbar {
+.adventure-navigation-wrapper::-webkit-scrollbar {
   display: none;
 }
 
-.arc-navigation-arrow {
+.adventure-navigation-arrow {
   align-items: center;
   background: #fff;
   border: 1.5px solid #d1d5db;
@@ -46,25 +46,25 @@
   z-index: 2;
 }
 
-.arc-navigation-arrow:hover {
+.adventure-navigation-arrow:hover {
   background: #f3f4f6;
   border-color: #9ca3af;
 }
 
-.arc-navigation-arrow--left {
+.adventure-navigation-arrow--left {
   order: -1;
 }
 
-.arc-navigation-arrow--right {
+.adventure-navigation-arrow--right {
   order: 1;
 }
 
-.arc-navigation-arrow .material-icons {
+.adventure-navigation-arrow .material-icons {
   font-size: 22px;
   line-height: 1;
 }
 
-.arc-navigation-hint {
+.adventure-navigation-hint {
   color: #3730a3;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
@@ -73,12 +73,12 @@
   text-align: center;
 }
 
-.arc-navigation-hint-arrow {
+.adventure-navigation-hint-arrow {
   display: inline-block;
   margin: 0 4px;
 }
 
-.arc-navigation-group {
+.adventure-navigation-group {
   align-items: center;
   border: 2.5px solid;
   border-radius: 36px;
@@ -88,15 +88,15 @@
   padding: 8px 14px;
 }
 
-.arc-navigation-mastery {
+.adventure-navigation-mastery {
   flex: 0 0 auto;
 }
 
-.arc-navigation-clickable {
+.adventure-navigation-clickable {
   cursor: pointer;
 }
 
-.arc-navigation-clickable:focus-visible {
+.adventure-navigation-clickable:focus-visible {
   outline: 2px solid #3730a3;
   outline-offset: 2px;
 }

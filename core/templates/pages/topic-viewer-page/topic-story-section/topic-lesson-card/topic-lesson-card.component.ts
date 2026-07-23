@@ -48,7 +48,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() startUrl: string = '';
   @Input() studyUrl: string = '';
   @Input() practiceUrl: string = '';
-  @Input() arcAccentColor: string = '#00645c';
+  @Input() adventureAccentColor: string = '#00645c';
   @Input() isActiveLesson: boolean = false;
   @Input() lessonProgressStatus:
     | 'not_started'

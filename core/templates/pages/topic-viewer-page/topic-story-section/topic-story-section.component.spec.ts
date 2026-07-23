@@ -197,7 +197,7 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should build arc groups when story has arcs', () => {
+  it('should build adventure groups when story has arcs', () => {
     const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
       'getTitle',
       'getDescription',
@@ -255,15 +255,15 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.arcGroups.length).toBe(2);
-    expect(component.arcGroups[0].arcTitle).toBe('Adventure 1');
-    expect(component.arcGroups[0].lessonCards.length).toBe(1);
-    expect(component.arcGroups[0].lessonCards[0].lessonTitle).toContain(
+    expect(component.adventureGroups.length).toBe(2);
+    expect(component.adventureGroups[0].adventureTitle).toBe('Adventure 1');
+    expect(component.adventureGroups[0].lessonCards.length).toBe(1);
+    expect(component.adventureGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
-    expect(component.arcGroups[1].arcTitle).toBe('Adventure 2');
-    expect(component.arcGroups[1].lessonCards.length).toBe(1);
-    expect(component.arcGroups[1].lessonCards[0].lessonTitle).toContain(
+    expect(component.adventureGroups[1].adventureTitle).toBe('Adventure 2');
+    expect(component.adventureGroups[1].lessonCards.length).toBe(1);
+    expect(component.adventureGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
     );
   });
@@ -484,7 +484,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].visitedCheckpointsCount).toBe(1);
   });
 
-  it('should show arc-end-test card when lesson cards exist and practice is enabled', () => {
+  it('should show adventure-end-test card when lesson cards exist and practice is enabled', () => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
       'getDescription',
@@ -764,7 +764,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.studyGuideUrl).toBe('unchanged-value');
   });
 
-  it('should toggle arc expansion state', () => {
+  it('should toggle adventure expansion state', () => {
     expect(component.isArcExpanded(0)).toBe(false);
 
     component.toggleArc(0);
@@ -810,8 +810,8 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.arcGroups.length).toBe(1);
-    expect(component.arcGroups[0].lessonCards).toEqual([]);
+    expect(component.adventureGroups.length).toBe(1);
+    expect(component.adventureGroups[0].lessonCards).toEqual([]);
   });
 
   it('should return # as startUrl when exploration id is null', () => {

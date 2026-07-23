@@ -8,11 +8,11 @@
 .topic-lesson-language-selector {
   display: flex;
   flex-direction: column;
-  width: 380px;
+  width: 420px;
 }
 
 .topic-lesson-language-selector-row {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   gap: 8px;
   min-width: auto;
@@ -21,7 +21,7 @@
 }
 
 .topic-lesson-language-selector-row--compact {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   gap: 8px;
   min-width: auto;
@@ -36,7 +36,7 @@
   display: flex;
   flex: 1;
   height: 44px;
-  max-width: 186px;
+  max-width: 206px;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -140,7 +140,7 @@
   margin: 0;
   padding-left: 2px;
   position: absolute;
-  top: calc(100% - 10px);
+  top: calc(100% - 4px);
   width: 100%;
 }
 

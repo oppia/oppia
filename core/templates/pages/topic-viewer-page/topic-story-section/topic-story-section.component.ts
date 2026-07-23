@@ -62,11 +62,12 @@ interface LessonCardData {
   availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
 }
 
-interface ArcGroupData {
-  arcTitle: string;
-  arcDescription: string;
+interface AdventureGroupData {
+  adventureTitle: string;
+  adventureDescription: string;
   lessonCards: LessonCardData[];
   accentColor: string;
+  iconBg: string;
   headerBackgroundColor: string;
   headerBorderColor: string;
 }
@@ -80,7 +81,7 @@ interface PracticeCardData {
   practiceUrl: string;
 }
 
-interface ArcNavigationGroupData {
+interface AdventureNavigationGroupData {
   lessonNumbers: number[];
   accentColor: string;
 }
@@ -106,9 +107,9 @@ export class TopicStorySectionComponent
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
-  arcGroups: ArcGroupData[] = [];
-  visibleArcGroups: ArcGroupData[] = [];
-  arcNavigationGroups: ArcNavigationGroupData[] = [];
+  adventureGroups: AdventureGroupData[] = [];
+  visibleAdventureGroups: AdventureGroupData[] = [];
+  adventureNavigationGroups: AdventureNavigationGroupData[] = [];
   activeLessonNumber: number | null = null;
   practiceCard: PracticeCardData = {
     practiceTitle: '',
@@ -120,20 +121,20 @@ export class TopicStorySectionComponent
   };
   masteryChallengeUrl: string = '#';
   isPracticeCardVisible: boolean = false;
-  _expandedArcIndices: Set<number> = new Set();
+  _expandedAdventureIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
 
   private directiveSubscriptions: Subscription = new Subscription();
 
-  isArcExpanded(index: number): boolean {
-    return this._expandedArcIndices.has(index);
+  isAdventureExpanded(index: number): boolean {
+    return this._expandedAdventureIndices.has(index);
   }
 
-  toggleArc(index: number): void {
-    if (this._expandedArcIndices.has(index)) {
-      this._expandedArcIndices.delete(index);
+  toggleAdventure(index: number): void {
+    if (this._expandedAdventureIndices.has(index)) {
+      this._expandedAdventureIndices.delete(index);
     } else {
-      this._expandedArcIndices.add(index);
+      this._expandedAdventureIndices.add(index);
     }
   }
 
@@ -141,12 +142,12 @@ export class TopicStorySectionComponent
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
 
-    // Expand the arc that contains this lesson.
-    const arcIndex = this.visibleArcGroups.findIndex(group =>
+    // Expand the adventure that contains this lesson.
+    const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
       group.lessonCards.some(card => card.lessonNumber === lessonNumber)
     );
-    if (arcIndex !== -1) {
-      this._expandedArcIndices.add(arcIndex);
+    if (adventureIndex !== -1) {
+      this._expandedAdventureIndices.add(adventureIndex);
     }
 
     // Scroll to the lesson card after Angular finishes updating the DOM.
@@ -158,10 +159,10 @@ export class TopicStorySectionComponent
     }, 300);
   }
 
-  onNavigationPracticeSelected(arcIndex: number): void {
-    // Scroll to the practice card of the specific arc after Angular finishes updating the DOM.
+  onNavigationPracticeSelected(adventureIndex: number): void {
+    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el = document.getElementById('practice-card-' + arcIndex);
+      const el = document.getElementById('practice-card-' + adventureIndex);
       if (el) {
         el.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
@@ -235,19 +236,19 @@ export class TopicStorySectionComponent
     return this.getLessonCountText() + ' available';
   }
 
-  shouldShowArcEndTestCard(arcIndex: number): boolean {
+  shouldShowAdventureEndTestCard(adventureIndex: number): boolean {
     return this.isPracticeCardVisible;
   }
 
-  getArcCompletionText(arcIndex: number): string {
-    const arcGroup = this.visibleArcGroups[arcIndex];
-    if (!arcGroup) {
+  getAdventureCompletionText(adventureIndex: number): string {
+    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
+    if (!adventureGroup) {
       return '';
     }
-    const completedCount = arcGroup.lessonCards.filter(
+    const completedCount = adventureGroup.lessonCards.filter(
       card => card.lessonProgressStatus === 'completed'
     ).length;
-    const totalCount = arcGroup.lessonCards.length;
+    const totalCount = adventureGroup.lessonCards.length;
     return `${completedCount} of ${totalCount} completed`;
   }
 
@@ -334,11 +335,11 @@ export class TopicStorySectionComponent
       });
 
     const allNodes = this.storySummary.getAllNodes();
-    this.arcGroups = this.buildArcGroups(allNodes);
-    this.visibleArcGroups = this.arcGroups;
+    this.adventureGroups = this.buildAdventureGroups(allNodes);
+    this.visibleAdventureGroups = this.adventureGroups;
   }
 
-  private buildArcGroups(allNodes: StoryNode[]): ArcGroupData[] {
+  private buildAdventureGroups(allNodes: StoryNode[]): AdventureGroupData[] {
     const arcs = this.storySummary.getArcs();
     if (!arcs || arcs.length === 0) {
       return [];
@@ -349,20 +350,21 @@ export class TopicStorySectionComponent
       nodeIndexMap.set(node.getId(), index);
     });
 
-    return arcs.map((arc, arcIndex) => {
-      const arcLessonCards: LessonCardData[] = [];
-      const paletteColor = this.getArcPaletteColor(arcIndex);
+    return arcs.map((arc, adventureIndex) => {
+      const adventureLessonCards: LessonCardData[] = [];
+      const paletteColor = this.getAdventurePaletteColor(adventureIndex);
       arc.node_ids.forEach(nodeId => {
         const nodeIndex = nodeIndexMap.get(nodeId);
         if (nodeIndex !== undefined && this.lessonCards[nodeIndex]) {
-          arcLessonCards.push(this.lessonCards[nodeIndex]);
+          adventureLessonCards.push(this.lessonCards[nodeIndex]);
         }
       });
       return {
-        arcTitle: arc.title,
-        arcDescription: arc.description,
-        lessonCards: arcLessonCards,
+        adventureTitle: arc.title,
+        adventureDescription: arc.description,
+        lessonCards: adventureLessonCards,
         accentColor: paletteColor.rowAccent,
+        iconBg: paletteColor.iconBg,
         headerBackgroundColor: paletteColor.headerBg,
         headerBorderColor: paletteColor.headerBorder,
       };
@@ -416,9 +418,9 @@ export class TopicStorySectionComponent
       };
     });
 
-    this.arcGroups = this.buildArcGroups(allNodes);
-    this.visibleArcGroups = this.arcGroups;
-    this.arcNavigationGroups = this.visibleArcGroups.map(group => {
+    this.adventureGroups = this.buildAdventureGroups(allNodes);
+    this.visibleAdventureGroups = this.adventureGroups;
+    this.adventureNavigationGroups = this.visibleAdventureGroups.map(group => {
       return {
         lessonNumbers: group.lessonCards.map(card => card.lessonNumber),
         accentColor: group.accentColor,
@@ -430,13 +432,13 @@ export class TopicStorySectionComponent
     this.practiceCard = this.getPracticeCardData();
     this.masteryChallengeUrl = this.getPracticeSessionUrl();
 
-    if (this.visibleArcGroups.length) {
-      this._expandedArcIndices = new Set([0]);
+    if (this.visibleAdventureGroups.length) {
+      this._expandedAdventureIndices = new Set([0]);
     }
   }
 
   private getPracticeCardData(): PracticeCardData {
-    const nextArcNumber = Math.min(this.arcGroups.length, 2);
+    const nextArcNumber = Math.min(this.adventureGroups.length, 2);
 
     return {
       practiceTitle: 'Arc 1 Review & Test',
@@ -488,14 +490,14 @@ export class TopicStorySectionComponent
     return this.getFallbackLessonThumbnailUrl();
   }
 
-  private getArcPaletteColor(arcIndex: number): {
+  private getAdventurePaletteColor(adventureIndex: number): {
     headerBg: string;
     headerBorder: string;
-    flagBg: string;
+    iconBg: string;
     rowAccent: string;
   } {
     const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
-    return palette[arcIndex % palette.length];
+    return palette[adventureIndex % palette.length];
   }
 
   private getActiveLessonNumber(): number | null {

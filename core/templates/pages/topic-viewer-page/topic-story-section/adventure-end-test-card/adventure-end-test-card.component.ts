@@ -13,23 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Arc end test card component used in the redesigned topic viewer story section.
+ * @fileoverview Adventure end test card component used in the redesigned topic viewer story section.
  */
 
 import {Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import './arc-end-test-card.component.css';
+import './adventure-end-test-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 
 @Component({
-  selector: 'topic-arc-end-test-card',
-  templateUrl: './arc-end-test-card.component.html',
-  styleUrls: ['./arc-end-test-card.component.css'],
+  selector: 'topic-adventure-end-test-card',
+  templateUrl: './adventure-end-test-card.component.html',
+  styleUrls: ['./adventure-end-test-card.component.css'],
 })
-export class ArcEndTestCardComponent implements OnInit {
+export class AdventureEndTestCardComponent implements OnInit {
   @Input() practiceTitle: string = '';
   @Input() practiceDescription: string = '';
   @Input() relatedLessonNumber: number | null = null;

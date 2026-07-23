@@ -5,7 +5,7 @@
   border-radius: 8px;
   box-shadow: none;
   display: flex;
-  height: auto;
+  height: 212px;
   max-width: 912px;
   min-height: 212px;
   overflow: hidden;
@@ -22,10 +22,9 @@
 }
 
 .topic-lesson-card-thumbnail {
-  align-self: stretch;
   flex: 0 0 auto;
   width: 212px;
-  min-height: 212px;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -151,9 +150,9 @@
 
 .topic-lesson-card-footer {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: stretch;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
   width: 100%;
 }
 
@@ -215,10 +214,10 @@
 }
 
 .topic-lesson-card-actions-left {
-  align-items: center;
-  align-self: flex-end;
+  align-items: flex-start;
+  align-self: flex-start;
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   gap: 8px;
   margin-left: 0;
   margin-bottom: 0;
@@ -292,13 +291,13 @@
 
 @media (max-width: 768px) {
   .topic-lesson-card {
-    height: auto;
+    height: 160px;
     min-height: 160px;
   }
 
   .topic-lesson-card-thumbnail {
     flex: 0 0 140px;
-    min-height: 160px;
+    height: 100%;
   }
 
   .topic-lesson-card-content {

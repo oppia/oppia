@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Top arc navigation bar shown above story arcs.
+ * @fileoverview Top adventure navigation bar shown above story arcs.
  */
 
 import {
@@ -30,20 +30,20 @@ import {
   ViewChild,
 } from '@angular/core';
 
-interface ArcNavigationGroup {
+interface AdventureNavigationGroup {
   lessonNumbers: number[];
   accentColor: string;
 }
 
 @Component({
-  selector: 'topic-arc-navigation',
-  templateUrl: './arc-navigation.component.html',
-  styleUrls: ['./arc-navigation.component.css'],
+  selector: 'topic-adventure-navigation',
+  templateUrl: './adventure-navigation.component.html',
+  styleUrls: ['./adventure-navigation.component.css'],
 })
-export class ArcNavigationComponent
+export class AdventureNavigationComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
-  @Input() arcGroups: ArcNavigationGroup[] = [];
+  @Input() adventureGroups: AdventureNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
   @Output() lessonSelected = new EventEmitter<number>();
   @Output() practiceSelected = new EventEmitter<number>();
@@ -63,8 +63,8 @@ export class ArcNavigationComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.arcGroups) {
-      // When arcGroups changes, schedule arrow updates
+    if (changes.adventureGroups) {
+      // When adventureGroups changes, schedule arrow updates
       this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 100));
       this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 300));
     }
@@ -136,7 +136,7 @@ export class ArcNavigationComponent
     this.lessonSelected.emit(lessonNumber);
   }
 
-  onPracticeClick(arcIndex: number): void {
-    this.practiceSelected.emit(arcIndex);
+  onPracticeClick(adventureIndex: number): void {
+    this.practiceSelected.emit(adventureIndex);
   }
 }
