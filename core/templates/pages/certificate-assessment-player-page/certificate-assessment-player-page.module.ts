@@ -28,6 +28,7 @@ import {CertificateAssessmentConversationSkinComponent} from './certificate-asse
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
 import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/c
         canActivate: [CertificateAssessmentPlayerPageAuthGuard],
       },
     ]),
+    TranslateModule,
   ],
   declarations: [
     CertificateAssessmentPlayerPageRootComponent,
