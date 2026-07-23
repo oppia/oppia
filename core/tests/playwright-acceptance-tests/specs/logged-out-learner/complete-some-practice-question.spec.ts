@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * FL.PT. Learner does some practice questions.
  */
 
+import {expect, test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -28,63 +29,63 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let explorationId: string;
 
-  beforeAll(
-    async function () {
-      // Create Users.
-      loggedOutLearner = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(800000); // Setup takes longer than default timeout.
+    // Create Users.
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
-      curriculumAdmin = await UserFactory.createNewUser(
-        'curriculumAdm',
-        'curriculum_admin@example.com',
-        [ROLES.CURRICULUM_ADMIN]
-      );
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      browser,
+      [ROLES.CURRICULUM_ADMIN]
+    );
 
-      // Create explorations.
-      explorationId =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Fractions'
-        );
-
-      // Create a topic and add stories.
-      await curriculumAdmin.createAndPublishTopic(
-        'Fractions',
-        'Algebra',
-        'fractions'
-      );
-
-      await curriculumAdmin.addStoryToTopic(
-        'Learning Fractions',
-        'learn-fractions',
+    // Create explorations.
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Fractions'
       );
-      await curriculumAdmin.addChapter('Fractions 1', explorationId);
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
 
-      await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+    // Create a topic and add stories.
+    await curriculumAdmin.createAndPublishTopic(
+      'Fractions',
+      'Algebra',
+      'fractions'
+    );
 
-      // Enable the "Show practice tab to learners" in Topic Editor.
-      await curriculumAdmin.openTopicEditor('Fractions');
-      await curriculumAdmin.togglePracticeTabCheckbox();
-      await curriculumAdmin.saveTopicDraft('Fractions');
+    await curriculumAdmin.addStoryToTopic(
+      'Learning Fractions',
+      'learn-fractions',
+      'Fractions'
+    );
+    await curriculumAdmin.addChapter('Fractions 1', explorationId);
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
 
-      // Create classroom.
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        'Fractions'
-      );
-    },
-    // Test takes too long to run.
-    800000
-  );
+    await curriculumAdmin.createQuestionsForSkill('fractions', 7);
 
-  it('should be able to do some practice questions through topic page', async function () {
+    // Enable the "Show practice tab to learners" in Topic Editor.
+    await curriculumAdmin.openTopicEditor('Fractions');
+    await curriculumAdmin.togglePracticeTabCheckbox();
+    await curriculumAdmin.saveTopicDraft('Fractions');
+
+    // Create classroom.
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Fractions'
+    );
+  });
+
+  test('should be able to do some practice questions through topic page', async function () {
     // Go to topic page.
     await loggedOutLearner.navigateToClassroomPage('math');
     await loggedOutLearner.selectAndOpenTopic('Fractions');
@@ -111,7 +112,7 @@ describe('Logged-Out Learner', function () {
     ).toBe(true);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
