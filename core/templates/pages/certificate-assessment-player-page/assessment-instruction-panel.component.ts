@@ -36,24 +36,27 @@ export class AssessmentInstructionPanelComponent {
   // hardcoded here rather than come from the backend.
   certificateTitle = 'Everyday Arithmetic & Number Confidence';
 
-  instructionsHeading = "Before you begin, here's what to expect:";
+  // The only instruction whose value can vary; kept as a plain number
+  // and interpolated into the translation string rather than hardcoded,
+  // so it stays correct if the time limit changes.
+  assessmentDurationMinutes = 60;
 
-  instructions: string[] = [
-    "You'll have 60 minutes to complete the assessment.",
-    'If the timer runs out, your assessment will be auto-submitted.',
-    "You'll see one question at a time.",
-    'Use the Back (<-) and Next (->) arrows to move between questions.',
-    'You can review and change your answers at any time before ' +
-      'submitting.',
-    'Your answers are final only when you click "Submit Assessment" ' +
-      'at the end of the assessment.',
-    'Unanswered questions will be marked as Incorrect answers.',
-    "You may take the assessment multiple times. If you don't pass, " +
-      'we recommend reviewing the lessons before trying again.',
-    'If your internet connection drops or you exit the assessment ' +
-      'before submitting, your progress will not be saved.',
-    'In that case, you can start the assessment again later, which ' +
-      'will begin a new attempt.',
+  instructionsHeadingI18nKey = 'I18N_ASSESSMENT_INSTRUCTIONS_HEADING';
+  timeLimitInstructionI18nKey = 'I18N_ASSESSMENT_INSTRUCTION_TIME_LIMIT';
+  startAssessmentButtonI18nKey = 'I18N_ASSESSMENT_START_BUTTON';
+
+  // Remaining instructions are static text, so no interpolation params
+  // are needed for them.
+  staticInstructionI18nKeys: string[] = [
+    'I18N_ASSESSMENT_INSTRUCTION_AUTO_SUBMIT',
+    'I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME',
+    'I18N_ASSESSMENT_INSTRUCTION_NAVIGATION',
+    'I18N_ASSESSMENT_INSTRUCTION_REVIEW_ANSWERS',
+    'I18N_ASSESSMENT_INSTRUCTION_FINAL_SUBMISSION',
+    'I18N_ASSESSMENT_INSTRUCTION_UNANSWERED_MARKED_INCORRECT',
+    'I18N_ASSESSMENT_INSTRUCTION_MULTIPLE_ATTEMPTS',
+    'I18N_ASSESSMENT_INSTRUCTION_PROGRESS_NOT_SAVED',
+    'I18N_ASSESSMENT_INSTRUCTION_NEW_ATTEMPT',
   ];
 
   onStartAssessment(): void {

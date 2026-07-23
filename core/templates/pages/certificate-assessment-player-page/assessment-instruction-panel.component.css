@@ -8,7 +8,7 @@
 }
 
 .intro-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
   max-width: 720px;
@@ -24,7 +24,7 @@
 }
 
 .instructions-heading {
-  color: #333333;
+  color: #333;
   font-size: 20px;
   font-weight: 700;
   margin: 0 0 25px;
@@ -36,7 +36,7 @@
 }
 
 .instructions-list li {
-  color: #333333;
+  color: #333;
   font-size: 17px;
   line-height: 1.1;
   margin-bottom: 8px;
@@ -51,7 +51,7 @@
   background: #00645c;
   border: none;
   border-radius: 4px;
-  color: #ffffff;
+  color: #fff;
   cursor: pointer;
   font-size: 20px;
   font-weight: 700;
