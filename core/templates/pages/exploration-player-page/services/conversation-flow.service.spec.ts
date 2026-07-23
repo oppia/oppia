@@ -1183,6 +1183,99 @@ describe('Conversation flow service', () => {
     ).toHaveBeenCalled();
   }));
 
+  it('should handle answer response when next card is null and answer is incorrect', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    conversationFlowService.displayedCard = displayedCard;
+    conversationFlowService.answerIsBeingProcessed = false;
+
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(
+      playerPositionService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(
+      explorationModeService,
+      'isPresentingIsolatedQuestions'
+    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
+    spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValue(
+      false
+    );
+
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(playerPositionService, 'recordAnswerSubmission');
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
+
+    let callback = (
+      answer: string,
+      interactionRulesService: InteractionRulesService,
+      successCallback: (
+        nextCard: StateCard | null,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        refresherExplorationId: string | null,
+        missingPrerequisiteSkillId: string | null,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
+        isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
+        focusLabel: string
+      ) => void
+    ) => {
+      successCallback(
+        null,
+        true,
+        'feedback',
+        null,
+        null,
+        true,
+        '',
+        false,
+        false,
+        true,
+        null,
+        ''
+      );
+      return false;
+    };
+
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'oldState'
+    );
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(displayedCard, 'markAsCompleted');
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(conversationFlowService, 'showUpcomingCard');
+    spyOn(playerTranscriptService, 'addNewInput');
+
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    tick(200);
+
+    expect(
+      questionPlayerEngineService.recordAnswerSubmitted
+    ).toHaveBeenCalledWith(undefined, false, '');
+    expect(playerTranscriptService.addNewResponse).toHaveBeenCalledWith(
+      'feedback'
+    );
+    expect(conversationFlowService.showUpcomingCard).not.toHaveBeenCalled();
+  }));
+
   it('should record checkpoint when card is checkpoint and not yet visited', fakeAsync(() => {
     const currentStateName = 'State1';
     const version = 1;

@@ -63,9 +63,10 @@ export class AppErrorHandler extends ErrorHandler {
 
   handleError(error: Error): void {
     if (
-      error &&
+      typeof error === 'object' &&
+      error !== null &&
       'code' in error &&
-      typeof (error as {code: unknown}).code === 'string' &&
+      typeof (error as {code: string}).code === 'string' &&
       AppErrorHandler.EXPECTED_ERROR_CODES.includes(
         // The firebase.auth.Error is not compatible with javascript's Error type.
         // That's why explicit type conversion is used here.

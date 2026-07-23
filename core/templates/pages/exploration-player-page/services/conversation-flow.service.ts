@@ -1275,7 +1275,16 @@ export class ConversationFlowService {
           !remainOnCurrentCard,
           taggedSkillMisconceptionId
         );
-        this._moveToNewCard(feedbackHtml, isFinalQuestion);
+        if (!remainOnCurrentCard) {
+          this._moveToNewCard(feedbackHtml, isFinalQuestion);
+        } else {
+          this._giveFeedbackAndStayOnCurrentCard(
+            feedbackHtml,
+            missingPrerequisiteSkillId,
+            refreshInteraction,
+            refresherExplorationId
+          );
+        }
       }
       return;
     }
