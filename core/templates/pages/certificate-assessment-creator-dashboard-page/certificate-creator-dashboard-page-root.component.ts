@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate cre dashboard page root component.
+ * @fileoverview Certificate creator dashboard page root component.
  */
 
 import {Component} from '@angular/core';
