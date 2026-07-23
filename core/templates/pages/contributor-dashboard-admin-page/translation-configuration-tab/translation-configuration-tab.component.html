@@ -1,5 +1,5 @@
-<div class="e2e-test-translation-config-container">
-  <mat-card class="oppia-admin-card oppia-page-card">
+<div class="e2e-test-translation-config-container oppia-contributor-dashboard-admin-page-tabs-container">
+  <mat-card class="oppia-page-card oppia-long-text">
     <h3>Manage supported languages for auto-translation</h3>
 
     <table class="table e2e-test-provider-mapping-table">
@@ -17,7 +17,6 @@
           <td>{{ getProviderDisplayName(entry.value) }}</td>
           <td>
             <button mat-icon-button
-                    color="warn"
                     class="e2e-test-remove-mapping-btn"
                     [attr.aria-label]="'Remove ' + getLanguageName(entry.key)"
                     (click)="removeMapping(entry.key)">
@@ -62,7 +61,7 @@
     </table>
   </mat-card>
 
-  <mat-card class="oppia-admin-card oppia-page-card mt-4">
+  <mat-card class="oppia-page-card oppia-long-text mt-4">
     <h3>Automatic Translation</h3>
     <div class="d-flex justify-content-between align-items-center">
       <span>Enable Automatic Translation Suggestions</span>
@@ -74,3 +73,11 @@
     </div>
   </mat-card>
 </div>
+
+<style>
+  .oppia-contributor-dashboard-admin-page-tabs-container {
+    margin: auto;
+    max-width: 800px;
+    padding-top: 16px;
+  }
+</style>

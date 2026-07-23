@@ -823,6 +823,7 @@
 /core/controllers/base*.py @oppia/core-reviewers
 /core/controllers/firebase*.py @oppia/core-reviewers
 /core/domain/html*.py @oppia/core-reviewers
+/core/domain/html_translation_services*.py @oppia/contributor-experience-team
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
 /core/storage/ @oppia/core-reviewers

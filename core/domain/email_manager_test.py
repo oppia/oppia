@@ -8998,12 +8998,12 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         """Tests the send_machine_translation_failure_email function."""
         email_messages: List[Tuple[str, str]] = []
 
-        def mock_send_mail_to_admin(subject: str, body: str) -> None:
+        def mock_send_mail(
+            sender: str, recipient: str, subject: str, body: str, html_body: str
+        ) -> None:
             email_messages.append((subject, body))
 
-        swap_send_mail = self.swap(
-            email_manager, 'send_mail_to_admin', mock_send_mail_to_admin
-        )
+        swap_send_mail = self.swap(email_services, 'send_mail', mock_send_mail)
 
         with swap_send_mail:
             email_manager.send_machine_translation_failure_email(
