@@ -3,7 +3,7 @@
   <div class="col-4">
     <button type="button"
             class="btn btn-primary oppia-titled-background-banner-button"
-            [attr.aria-label]="resolvedButtonAriaLabel"
+            [attr.aria-label]="buttonText | translate"
             [routerLink]="buttonRoute">
       {{ buttonText | translate}}
     </button>

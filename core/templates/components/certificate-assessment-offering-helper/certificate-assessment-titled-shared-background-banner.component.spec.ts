@@ -27,7 +27,7 @@ import {CertificateAssessmentTitledBackgroundBannerComponent} from './certificat
 @Pipe({name: 'translate'})
 class MockTranslatePipe implements PipeTransform {
   transform(value: string): string {
-    return value;
+    return `translated:${value}`;
   }
 }
 
@@ -94,46 +94,15 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
     expect(component.buttonRoute).toEqual(['/learn', 'math']);
   });
 
-  it('should default buttonAriaLabel to an empty string', () => {
-    expect(component.buttonAriaLabel).toBe('');
-  });
+  it('should render translated button text and aria-label', () => {
+    component.buttonText = BACK_BUTTON_KEY;
+    fixture.detectChanges();
 
-  it('should allow buttonAriaLabel to be set via input binding', () => {
-    component.buttonAriaLabel = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_ARIA_LABEL';
+    const button = fixture.nativeElement.querySelector('button');
 
-    expect(component.buttonAriaLabel).toBe(
-      'I18N_CERTIFICATE_ASSESSMENT_EXIT_ARIA_LABEL'
+    expect(button.textContent.trim()).toBe(`translated:${BACK_BUTTON_KEY}`);
+    expect(button.getAttribute('aria-label')).toBe(
+      `translated:${BACK_BUTTON_KEY}`
     );
-  });
-
-  describe('resolvedButtonAriaLabel', () => {
-    it('should fall back to buttonText when buttonAriaLabel is not provided', () => {
-      component.buttonText = BACK_BUTTON_KEY;
-      component.buttonAriaLabel = '';
-
-      expect(component.resolvedButtonAriaLabel).toBe(BACK_BUTTON_KEY);
-    });
-
-    it('should fall back to the default buttonText (exit key) when neither input is set', () => {
-      expect(component.resolvedButtonAriaLabel).toBe(EXIT_BUTTON_KEY);
-    });
-
-    it('should use buttonAriaLabel when it is explicitly provided', () => {
-      component.buttonText = BACK_BUTTON_KEY;
-      component.buttonAriaLabel = 'I18N_CERTIFICATE_ASSESSMENT_BACK_ARIA_LABEL';
-
-      expect(component.resolvedButtonAriaLabel).toBe(
-        'I18N_CERTIFICATE_ASSESSMENT_BACK_ARIA_LABEL'
-      );
-    });
-
-    it('should recompute when buttonAriaLabel changes from set to empty', () => {
-      component.buttonText = BACK_BUTTON_KEY;
-      component.buttonAriaLabel = 'I18N_CUSTOM_ARIA_LABEL';
-      expect(component.resolvedButtonAriaLabel).toBe('I18N_CUSTOM_ARIA_LABEL');
-
-      component.buttonAriaLabel = '';
-      expect(component.resolvedButtonAriaLabel).toBe(BACK_BUTTON_KEY);
-    });
   });
 });

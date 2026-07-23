@@ -32,21 +32,7 @@ import './certificate-assessment-titled-shared-background-banner.component.css';
   ],
 })
 export class CertificateAssessmentTitledBackgroundBannerComponent {
-  // Title shown centered in the banner (e.g. 'Certificate Assessment').
   @Input() title: string = '';
-
-  // Label for the nav button (e.g. 'Exit', 'Back'). Defaults to 'Exit'.
   @Input() buttonText: string = 'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON';
-
-  // Angular routerLink commands array for the nav button,
-  // e.g. ['/learn', classroomUrlFragment] or ['/certificate-assessment'].
   @Input() buttonRoute: string[] = [];
-
-  // Optional aria-label override for the nav button. Falls back to
-  // buttonText when not provided.
-  @Input() buttonAriaLabel: string = '';
-
-  get resolvedButtonAriaLabel(): string {
-    return this.buttonAriaLabel || this.buttonText;
-  }
 }
