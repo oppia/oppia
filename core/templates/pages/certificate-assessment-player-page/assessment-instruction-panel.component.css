@@ -1,8 +1,8 @@
 .intro-card-container {
   display: flex;
-  padding: 0 24px 48px;
   justify-content: center;
   margin-top: 20px;
+  padding: 0 24px 48px;
 }
 
 .intro-card {
