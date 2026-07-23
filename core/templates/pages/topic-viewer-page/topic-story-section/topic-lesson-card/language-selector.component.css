@@ -2,13 +2,12 @@
   display: block;
   flex: 0 0 auto;
   min-width: auto;
-  position: relative;
 }
 
 .topic-lesson-language-selector {
   display: flex;
   flex-direction: column;
-  width: 420px;
+  width: 468px;
 }
 
 .topic-lesson-language-selector-row {
@@ -36,7 +35,7 @@
   display: flex;
   flex: 1;
   height: 44px;
-  max-width: 206px;
+  max-width: 230px;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -125,22 +124,16 @@
 .topic-lesson-language-selector-error {
   color: #c62828;
   font-size: 12px;
-  left: 0;
-  margin: 0;
-  position: absolute;
-  top: calc(100% + 8px);
+  margin: 6px 0 0;
   width: 100%;
 }
 
 .topic-lesson-language-selector-note {
   color: #5f6368;
   font-size: 12px;
-  left: 0;
   line-height: 1.35;
-  margin: 0;
+  margin: 6px 0 0;
   padding-left: 2px;
-  position: absolute;
-  top: calc(100% - 4px);
   width: 100%;
 }
 
