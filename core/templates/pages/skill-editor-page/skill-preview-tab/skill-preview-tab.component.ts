@@ -30,6 +30,7 @@ import {ConversationFlowService} from 'pages/exploration-player-page/services/co
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-skill-preview-tab',
@@ -44,7 +45,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private conversationFlowService: ConversationFlowService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private alertsService: AlertsService
   ) {}
 
   // These properties below are initialized using Angular lifecycle hooks
@@ -112,10 +114,17 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   loadTotalQuestionCountAndPage(): void {
     this.questionBackendApiService
       .fetchTotalQuestionCountForSkillIdsAsync([this.skillId])
-      .then(totalCount => {
-        this.totalQuestionCount = totalCount;
-        this.loadPage(this.page);
-      });
+      .then(
+        totalCount => {
+          this.totalQuestionCount = totalCount;
+          this.loadPage(this.page);
+        },
+        errorResponse => {
+          this.alertsService.addWarning(
+            'Failed to fetch the total question count for this skill.'
+          );
+        }
+      );
   }
 
   /**
@@ -131,14 +140,22 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         this.QUESTION_COUNT,
         offset
       )
-      .then(response => {
-        this.questionsFetched = true;
-        this.questionDicts = response.questionDicts;
-        this.applyFilters();
-        if (this.displayedQuestions.length) {
-          this.selectQuestionToPreview(0);
+      .then(
+        response => {
+          this.questionsFetched = true;
+          this.questionDicts = response.questionDicts;
+          this.applyFilters();
+          if (this.displayedQuestions.length) {
+            this.selectQuestionToPreview(0);
+          }
+        },
+        errorResponse => {
+          this.questionsFetched = true;
+          this.alertsService.addWarning(
+            'Failed to fetch questions for this page. Please try again.'
+          );
         }
-      });
+      );
   }
 
   onPageChange(page: number): void {

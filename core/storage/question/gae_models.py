@@ -468,7 +468,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         return (
             cls.query(cls.skill_id.IN(skill_ids))
-            .order(-cls.last_updated)
+            .order(-cls.last_updated, cls.key)
             .fetch(question_skill_count, offset=offset)
         )
 
