@@ -405,13 +405,8 @@ const warningIndicatorSelector = '.e2e-test-warning-indicator';
 const warningTextSelector = '.e2e-test-warnings-text';
 
 // Adventure (Arc) selectors.
-const arcBoundaryHeaderSelector = '.arc-boundary-header';
-const arcBoundaryTitleSelector = '.arc-boundary-title';
-const arcBoundaryDescriptionSelector = '.arc-boundary-description';
-const arcBoundaryChapterCountSelector = '.arc-boundary-chapter-count';
 const arcEditButtonSelector = '.arc-edit-button';
 const arcRemoveButtonSelector = '.arc-remove-button';
-const splitIntoArcButtonSelector = '.split-into-arc-button';
 const editArcTitleFieldSelector = '.e2e-test-edit-arc-title-field';
 const editArcDescriptionFieldSelector = '.e2e-test-edit-arc-description-field';
 const saveEditArcButtonSelector = '.e2e-test-save-edit-arc-button';
@@ -5779,7 +5774,7 @@ export class TopicManager extends BaseUser {
 
         throw new Error(
           `Split button not found between "${afterChapterName}" and "${title}". ` +
-            `They may already be in different adventures.`
+            'They may already be in different adventures.'
         );
       }
 
@@ -5870,7 +5865,7 @@ export class TopicManager extends BaseUser {
     );
     showMessage(
       `Adventure header "${title}" is ${visible ? 'visible' : 'not visible'} ` +
-        `as expected.`
+        'as expected.'
     );
   }
 
