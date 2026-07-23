@@ -479,10 +479,19 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(component.disableDownloadButton()).toBe(true);
   });
 
-  it('should trigger print flow when createCertificate is called with isPrinting true', () => {
+  it('should trigger print flow when createCertificate is called with isPrinting true', fakeAsync(() => {
     const mockBlob = new Blob(['image'], {type: 'image/png'});
     const mockUrl = 'blob:mock-url';
-    const mockIframe = document.createElement('iframe');
+    let capturedIframeOnload: (() => void) | null = null;
+    const mockPrint = jasmine.createSpy('print');
+    const mockIframe = {
+      style: {display: ''},
+      src: '',
+      contentWindow: {print: mockPrint},
+      set onload(fn: () => void) {
+        capturedIframeOnload = fn;
+      },
+    };
 
     const mockCanvas = {
       width: 0,
@@ -504,15 +513,29 @@ describe('Contributor Certificate Download Modal Component', () => {
       toDataURL: () => '',
     };
 
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
     spyOn(document, 'createElement').and.callFake((tag: string) => {
       if (tag === 'canvas') {
         return mockCanvas as unknown as HTMLCanvasElement;
       }
       if (tag === 'iframe') {
-        return mockIframe;
+        return mockIframe as unknown as HTMLIFrameElement;
       }
       return document.createElement(tag);
     });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
 
     spyOn(URL, 'createObjectURL').and.returnValue(mockUrl);
     spyOn(URL, 'revokeObjectURL');
@@ -521,8 +544,73 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     component.createCertificate(certificateData, true);
 
-    const image = new Image();
-    image.dispatchEvent(new Event('load'));
+    window.Image = originalImage;
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(mockBlob);
+    expect(document.body.appendChild).toHaveBeenCalled();
+
+    // Trigger iframe.onload to cover the print and cleanup logic.
+    expect(capturedIframeOnload).not.toBeNull();
+    capturedIframeOnload!();
+
+    expect(mockPrint).toHaveBeenCalled();
+
+    // Advance past the 1000ms setTimeout inside iframe.onload.
+    tick(1000);
+
+    expect(document.body.removeChild).toHaveBeenCalled();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(mockUrl);
+  }));
+
+  it('should not throw error when toBlob returns null during print', () => {
+    const mockCanvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({
+        fillStyle: '',
+        fillRect: () => {},
+        drawImage: () => {},
+        font: '',
+        textAlign: '',
+        fillText: () => {},
+        moveTo: () => {},
+        lineTo: () => {},
+        stroke: () => {},
+        save: () => {},
+        restore: () => {},
+      }),
+      toBlob: (cb: (blob: Blob | null) => void) => cb(null),
+      toDataURL: () => '',
+    };
+
+    const mockImage = {
+      set onload(fn: () => void) {
+        fn();
+      },
+      src: '',
+      width: 0,
+      height: 0,
+    };
+
+    spyOn(document, 'createElement').and.callFake((tag: string) => {
+      if (tag === 'canvas') {
+        return mockCanvas as unknown as HTMLCanvasElement;
+      }
+      return document.createElement(tag);
+    });
+
+    const originalImage = window.Image;
+    (window as unknown as {Image: () => void}).Image = function () {
+      return mockImage;
+    };
+
+    spyOn(URL, 'createObjectURL');
+
+    component.createCertificate(certificateData, true);
+
+    window.Image = originalImage;
+
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
   });
 
   it('should draw updated three-line text for translation certificates', () => {
