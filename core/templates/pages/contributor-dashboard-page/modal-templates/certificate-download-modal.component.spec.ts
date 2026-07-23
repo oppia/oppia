@@ -551,7 +551,9 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     // Trigger iframe.onload to cover the print and cleanup logic.
     expect(capturedIframeOnload).not.toBeNull();
-    capturedIframeOnload!();
+    if (capturedIframeOnload) {
+      capturedIframeOnload();
+    }
 
     expect(mockPrint).toHaveBeenCalled();
 

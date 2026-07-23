@@ -339,6 +339,17 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_non_str_profile_name_for_certificate_raises_error(
+        self,
+    ) -> None:
+        self.user_settings.profile_name_for_certificate = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected profile_name_for_certificate to be a string,'
+            ' received %s' % self.user_settings.profile_name_for_certificate,
+        ):
+            self.user_settings.validate()
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
