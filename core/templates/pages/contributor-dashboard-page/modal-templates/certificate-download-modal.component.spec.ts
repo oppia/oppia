@@ -482,7 +482,7 @@ describe('Contributor Certificate Download Modal Component', () => {
   it('should trigger print flow when createCertificate is called with isPrinting true', fakeAsync(() => {
     const mockBlob = new Blob(['image'], {type: 'image/png'});
     const mockUrl = 'blob:mock-url';
-    let capturedIframeOnload: any = null;
+    let capturedIframeOnload: () => void = () => {};
     const mockPrint = jasmine.createSpy('print');
     const mockIframe = {
       style: {display: ''},
