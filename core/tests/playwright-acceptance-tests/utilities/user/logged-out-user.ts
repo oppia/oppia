@@ -135,6 +135,11 @@ const startPracticeButtonSelector = '.e2e-test-practice-start-button';
 const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 
+const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
+const libraryExplorationsGroupSelector = '.oppia-library-group';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
@@ -1221,6 +1226,75 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Fetches the titles of all activities in the "Featured Activities" group
+   * on the community library page.
+   */
+  private async viewAllFeaturedActivities(): Promise<{title: string}[]> {
+    await this.page.waitForSelector(libraryExplorationsGroupSelector);
+
+    const featuredActivities = await this.page.$$eval(
+      libraryExplorationsGroupSelector,
+      groups => {
+        const featuredGroup = groups.find(group =>
+          group
+            .querySelector('h2')
+            ?.textContent?.includes('Featured Activities')
+        );
+
+        const activities = Array.from(
+          featuredGroup?.querySelectorAll(
+            'oppia-collection-summary-tile, oppia-exploration-summary-tile'
+          ) ?? []
+        );
+
+        return activities.map(activity => ({
+          title:
+            activity
+              .querySelector('.e2e-test-exp-summary-tile-title')
+              ?.textContent?.trim() ?? '',
+        }));
+      }
+    );
+
+    return featuredActivities;
+  }
+
+  /**
+   * Expects to view the specified featured activities on the community library page.
+   * @param {Array<string>} expectedActivityTitles - The titles of the expected featured activities.
+   */
+  async expectToViewFeaturedActivities(
+    expectedActivityTitles: string[] = []
+  ): Promise<void> {
+    // Reloading to ensure the page is updated with the newly added/removed featured activities.
+    await this.page.reload({waitUntil: 'networkidle'});
+    const featuredActivities = await this.viewAllFeaturedActivities();
+
+    // If no expected activities were provided, check if the featured activities list is empty.
+    if (expectedActivityTitles.length === 0) {
+      if (featuredActivities.length === 0) {
+        showMessage('No featured activities found as expected.');
+        return;
+      }
+      throw new Error('Expected no featured activities, but found some');
+    }
+
+    // Check if each expected activity is in the list of featured activities.
+    for (const expectedActivity of expectedActivityTitles) {
+      const activity = featuredActivities.find(
+        activity => activity.title === expectedActivity
+      );
+
+      if (!activity) {
+        throw new Error(
+          `Expected to find activity with title ${expectedActivity}, but didn't`
+        );
+      }
+      showMessage(`Activity with title ${expectedActivity} found as expected.`);
+    }
+  }
+
+  /**
    * Function to navigate to the home page.
    * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
@@ -1349,6 +1423,41 @@ export class LoggedOutUser extends BaseUser {
    */
   async playExploration(explorationId: string | null): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  }
+
+  /**
+   * Gives feedback on the exploration.
+   * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
+   */
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
+    await this.clickOnElementWithSelector(feedbackPopupSelector);
+    await this.typeInInputField(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOnElementWithSelector(stayAnonymousCheckbox);
+    }
+
+    await this.clickOnElementWithText('Submit');
+
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".oppia-feedback-popup-container") !== null',
+        undefined,
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch {
+      throw new Error('Feedback was not successfully submitted');
+    }
   }
 
   /**

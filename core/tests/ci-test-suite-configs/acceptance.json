@@ -692,18 +692,18 @@
     },
     {
       "name": "site-moderator/check-recent-commits",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-commits.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/site-moderator/check-recent-commits.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "site-moderator/check-recent-feedback-messages",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-feedback-messages.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/site-moderator/check-recent-feedback-messages.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "site-moderator/featured-activities-section",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-partnerships-page",

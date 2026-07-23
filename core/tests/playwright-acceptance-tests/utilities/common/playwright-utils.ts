@@ -27,6 +27,8 @@ const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
+const warningToastMessageSelector = '.e2e-test-toast-warning-message';
+const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -600,6 +602,29 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the toast warning message matches the expected warning message.
+   * @param {string} expectedWarningMessage - The expected warning message.
+   */
+  async expectToastWarningMessageToBe(
+    expectedWarningMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(warningToastMessageSelector);
+    await this.expectTextContentToContain(
+      warningToastMessageSelector,
+      expectedWarningMessage
+    );
+  }
+
+  /**
+   * Clicks on the close button in the toast warning message.
+   */
+  async closeToastWarningMessage(): Promise<void> {
+    await this.expectElementToBeVisible(warningToastCloseButtonSelector);
+    await this.clickOnElementWithSelector(warningToastCloseButtonSelector);
+    await this.expectElementToBeVisible(warningToastMessageSelector, false);
+  }
+
+  /**
    * Function to expect the page to have no translation ids.
    */
   async expectPageHasNoTranslationIds(): Promise<void> {
@@ -758,6 +783,128 @@ export class BaseUser {
       throw new Error(`Element with selector ${selector} not found.`);
     }
     return element;
+  }
+
+  /**
+   * Verifies that the element value matches the expected value.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
+   * @param {string} value - The expected value.
+   */
+  async expectElementValueToBe(
+    selector: string | ElementHandle<Element>,
+    value: string
+  ): Promise<void> {
+    let element: ElementHandle<Element>;
+    if (typeof selector === 'string') {
+      await this.expectElementToBeVisible(selector);
+      element = await this.getElementInParent(selector);
+    } else {
+      element = selector;
+    }
+
+    try {
+      await this.page.waitForFunction(
+        ({element, value}: {element: Element; value: string}) => {
+          return (
+            (element as HTMLInputElement | HTMLTextAreaElement).value.trim() ===
+            value
+          );
+        },
+        {element, value}
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const actualValue = await element.evaluate(
+        el => (el as HTMLInputElement).value
+      );
+      throw new Error(
+        `Element does not have the expected value "${value}". ` +
+          `Found "${actualValue}".\n` +
+          `Original Error: ${errorMessage}`
+      );
+    }
+  }
+
+  /**
+   * Parses a locale-abbreviated datetime string (as displayed by Oppia's
+   * date filters) into a timestamp for comparison.
+   * @param {string} dateString - The datetime string to parse.
+   */
+  protected parseLocaleAbbreviatedDatetimeString(dateString: string): number {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Check if it's a time string (today) - format: "2:30 PM".
+    const timeRegex = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+    const timeMatch = dateString.match(timeRegex);
+
+    if (timeMatch) {
+      let hours = parseInt(timeMatch[1]);
+      const minutes = parseInt(timeMatch[2]);
+      const ampm = timeMatch[3].toUpperCase();
+
+      if (ampm === 'PM' && hours !== 12) {
+        hours += 12;
+      }
+      if (ampm === 'AM' && hours === 12) {
+        hours = 0;
+      }
+
+      const date = new Date(today);
+      date.setHours(hours, minutes, 0, 0);
+      return date.getTime();
+    }
+
+    // Check if it's current year format - "MMM D" (e.g., "Oct 10").
+    const currentYearRegex = /^([A-Za-z]{3})\s+(\d{1,2})$/;
+    const currentYearMatch = dateString.match(currentYearRegex);
+
+    if (currentYearMatch) {
+      const monthStr = currentYearMatch[1];
+      const day = parseInt(currentYearMatch[2]);
+
+      // Parse month abbreviation.
+      const monthMap: {[key: string]: number} = {
+        Jan: 0,
+        Feb: 1,
+        Mar: 2,
+        Apr: 3,
+        May: 4,
+        Jun: 5,
+        Jul: 6,
+        Aug: 7,
+        Sep: 8,
+        Oct: 9,
+        Nov: 10,
+        Dec: 11,
+      };
+
+      const month = monthMap[monthStr];
+      if (month !== undefined) {
+        const date = new Date(now.getFullYear(), month, day, 0, 0, 0, 0);
+        return date.getTime();
+      }
+    }
+
+    // Check if it's short date format - "MM/DD/YY" (e.g., "10/22/35").
+    const shortDateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/;
+    const shortDateMatch = dateString.match(shortDateRegex);
+
+    if (shortDateMatch) {
+      const month = parseInt(shortDateMatch[1]) - 1;
+      const day = parseInt(shortDateMatch[2]);
+      let year = parseInt(shortDateMatch[3]);
+
+      // Convert 2-digit year to 4-digit year.
+      year += 2000;
+
+      const date = new Date(year, month, day, 0, 0, 0, 0);
+      return date.getTime();
+    }
+
+    // If no pattern matches, throw an error.
+    throw new Error(`Unable to parse date string: "${dateString}"`);
   }
 
   /**
