@@ -19,12 +19,28 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import {SuperAdmin} from '../../utilities/user/super-admin';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import testConstants from '../../utilities/common/test-constants';
+
+const autoTranslationFeatureFlagName =
+  'enable_automatic_translation_suggestions';
 
 describe('Contributor Dashboard Admin - Translation Configuration', function () {
   let superAdmin: SuperAdmin;
+  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
-    superAdmin = await UserFactory.createNewSuperAdmin('superAdmin');
+    // Enable the automatic translation suggestions feature flag, which
+    // gates visibility of the auto-translation toggle and provider
+    // mapping UI on the Contributor Dashboard Admin page.
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoord',
+      'releaseCoord@example.com',
+      [testConstants.Roles.RELEASE_COORDINATOR]
+    );
+    await releaseCoordinator.enableFeatureFlag(autoTranslationFeatureFlagName);
+
+    superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
   });
 
   it('should allow the admin to enable auto-translation and map providers', async function () {
