@@ -9,7 +9,7 @@
   </div>
 
   <div class="adventure-end-test-card-content">
-    <div class="adventure-end-test-card-copy">
+    <div class="adventure-end-test-card-header-row">
       <div class="adventure-end-test-card-title-row">
         <topic-adventure-circle-badge
           [iconName]="'edit'"
@@ -20,17 +20,18 @@
         </topic-adventure-circle-badge>
         <h3 class="adventure-end-test-card-title">{{ practiceTitle }}</h3>
       </div>
-      <p class="adventure-end-test-card-description">{{ getResolvedDescription() }}</p>
+
+      <div class="adventure-end-test-card-actions">
+        <button class="adventure-end-test-card-practice-button"
+                type="button"
+                [disabled]="!practiceUrl"
+                (click)="navigateTo(practiceUrl)">
+          <i class="material-icons">description</i>
+          Practice Test
+        </button>
+      </div>
     </div>
 
-    <div class="adventure-end-test-card-actions">
-      <button class="adventure-end-test-card-practice-button"
-              type="button"
-              [disabled]="!practiceUrl"
-              (click)="navigateTo(practiceUrl)">
-        <i class="material-icons">description</i>
-        Practice Test
-      </button>
-    </div>
+    <p class="adventure-end-test-card-description">{{ getResolvedDescription() }}</p>
   </div>
 </div>

@@ -33,8 +33,15 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
-  padding: 24px 22px 18px;
+  padding: 24px 24px 18px;
   gap: 12px;
+}
+
+.adventure-end-test-card-header-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
 }
 
 .adventure-end-test-card-title-row {
@@ -43,40 +50,32 @@
   gap: 12px;
 }
 
-.adventure-end-test-card-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: auto;
-}
-
 .adventure-end-test-card-title {
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
   margin: 0;
 }
 
 .adventure-end-test-card-description {
   color: #595959;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.35;
   margin: 0;
   overflow-wrap: break-word;
-  padding-left: 64px;
+  padding-left: 60px;
   word-wrap: break-word;
 }
 
 .adventure-end-test-card-actions {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
+  flex: 0 0 auto;
   gap: 8px;
-  margin-top: auto;
-  width: 100%;
   justify-content: flex-end;
 }
 
@@ -89,15 +88,48 @@
   color: #fff;
   display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   gap: 6px;
-  height: 40px;
+  height: 48px;
   justify-content: center;
-  min-width: 130px;
+  min-width: 220px;
   outline: none;
-  padding: 0 14px;
+  padding: 0 20px;
   text-decoration: none;
+}
+
+@media (min-width: 769px) {
+  .adventure-end-test-card-content {
+    justify-content: center;
+  }
+
+  .adventure-end-test-card-title {
+    color: #3b3b3b;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 24px;
+  }
+
+  .adventure-end-test-card-title-row {
+    margin-top: -2px;
+  }
+
+  .adventure-end-test-card-description {
+    color: #3b3b3b;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 30px;
+    letter-spacing: 0;
+    margin-top: 10px;
+    max-width: 520px;
+  }
+
+  .adventure-end-test-card-actions {
+    margin-top: 6px;
+    margin-right: 14px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -116,6 +148,12 @@
     padding: 14px 16px;
   }
 
+  .adventure-end-test-card-header-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .adventure-end-test-card-title {
     font-size: 18px;
     line-height: 22px;
@@ -124,11 +162,12 @@
   .adventure-end-test-card-description {
     font-size: 14px;
     line-height: 1.35;
+    padding-left: 52px;
   }
 
   .adventure-end-test-card-actions {
     gap: 10px;
-    padding-top: 8px;
+    justify-content: flex-start;
   }
 
   .adventure-end-test-card-practice-button {
@@ -167,10 +206,6 @@
     padding: 12px;
   }
 
-  .adventure-end-test-card-copy {
-    gap: 4px;
-  }
-
   .adventure-end-test-card-title {
     font-size: 16px;
     font-weight: 500;
@@ -182,6 +217,7 @@
     font-size: 13px;
     line-height: 18px;
     margin: 0;
+    padding-left: 44px;
   }
 
   .adventure-end-test-card-actions {
