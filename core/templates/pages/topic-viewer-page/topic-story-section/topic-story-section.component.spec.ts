@@ -233,14 +233,14 @@ describe('TopicStorySectionComponent', () => {
     const arcs = [
       {
         id: 'arc_1',
-        title: 'Arc 1',
-        description: 'First arc',
+        title: 'Adventure 1',
+        description: 'First adventure',
         node_ids: ['node_1'],
       },
       {
         id: 'arc_2',
-        title: 'Arc 2',
-        description: 'Second arc',
+        title: 'Adventure 2',
+        description: 'Second adventure',
         node_ids: ['node_2'],
       },
     ];
@@ -256,12 +256,12 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.arcGroups.length).toBe(2);
-    expect(component.arcGroups[0].arcTitle).toBe('Arc 1');
+    expect(component.arcGroups[0].arcTitle).toBe('Adventure 1');
     expect(component.arcGroups[0].lessonCards.length).toBe(1);
     expect(component.arcGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
-    expect(component.arcGroups[1].arcTitle).toBe('Arc 2');
+    expect(component.arcGroups[1].arcTitle).toBe('Adventure 2');
     expect(component.arcGroups[1].lessonCards.length).toBe(1);
     expect(component.arcGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
@@ -794,8 +794,8 @@ describe('TopicStorySectionComponent', () => {
     const arcs = [
       {
         id: 'arc_1',
-        title: 'Arc 1',
-        description: 'First arc',
+        title: 'Adventure 1',
+        description: 'First adventure',
         node_ids: ['missing_node_id'],
       },
     ];

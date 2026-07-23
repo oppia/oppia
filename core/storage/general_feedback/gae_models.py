@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -247,11 +249,11 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     destination_dashboard field is set automatically at creation time
     based on the page_url and category:
 
-        typo                        → creator
-        confusing_or_incorrect_answer → creator
-        broken_layout_or_image      → technical
-        other_or_not_sure           → technical
-        all site (app) reports      → technical
+        typo                        → curriculum
+        confusing_or_incorrect_answer → curriculum
+        broken_layout_or_image      → tech-external or tech-internal
+        other_or_not_sure           → tech-external or tech-internal
+        all site (app) reports      → tech-external or tech-internal
 
     The id of instances of this class has the form
         feedback.platform.<timestamp_base64><random_base64>
@@ -259,7 +261,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     Fields (in addition to BaseFeedbackModel fields):
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Platform of the report ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "technical").
+        destination_dashboard: str. Routing target ("curriculum" |
+            "tech-external" | "tech-internal").
         category: Optional[str]. Report category; required for lesson reports,
             must be None for site reports.
         include_technical_logs: bool. Whether session diagnostics are included.
@@ -393,6 +396,60 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
                 'provided or both be None.'
             )
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @classmethod
+    def _get_filtered_query(
+        cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+        destination_dashboard: Optional[str] = None,
+        platform: Optional[str] = None,
+        source: Optional[str] = None,
+        **kwargs: Any,
+    ) -> datastore_services.Query:
+        """Returns a filtered query based on the given parameters.
+
+        Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime]. If provided, filters reports created
+                on or after this date.
+            date_to: Optional[datetime]. If provided, filters reports created
+                on or before this date.
+            destination_dashboard: Optional[str]. If provided, filters reports
+                routed to this dashboard.
+            platform: Optional[str]. If provided, filters by platform.
+            source: Optional[str]. If provided, filters by source.
+            **kwargs: *. Filters handled by BaseFeedbackModel.
+
+        Returns:
+            Query. The filtered query object.
+        """
+        query = super()._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+            **kwargs,
+        )
+
+        if destination_dashboard is not None:
+            query = query.filter(
+                cls.destination_dashboard == destination_dashboard
+            )
+        if platform is not None:
+            query = query.filter(cls.platform == platform)
+        if source is not None:
+            query = query.filter(cls.source == source)
+        return query
+
     @classmethod
     def create(
         cls,
@@ -415,7 +472,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             platform: str. Platform of the report ("web" | "android").
             category: Optional[str]. Report category; can be for lesson
                 reports, must be None for site (app) reports.
-            destination_dashboard: str. Routing target ("creator" | "LEAP" | "CORE).
+            destination_dashboard: str. Routing target ("curriculum" |
+                "tech-external" | "tech-internal").
             lesson_metadata: Optional[Dict]. Lesson metadata at
                 submission time;
                 required for lesson reports, must be None for site reports.
