@@ -136,53 +136,43 @@ class PracticeSessionsPageDataHandler(
     ) -> List[str]:
         """Returns skill IDs associated with a given story node.
 
-        The node_id parameter is a 1-based index that maps to the nth node
-        in the first published story of the topic.
-
         Args:
             topic: Topic. The topic object.
-            node_id: str. The node ID (1-based index).
+            node_id: str. The node ID.
 
         Returns:
             list(str). The skill IDs for the node.
         """
-        try:
-            node_index = int(node_id)
-        except ValueError:
-            return []
-
         all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index not in range(1, len(all_nodes) + 1):
+        valid_node_ids = [node.id for node in all_nodes]
+        if node_id not in valid_node_ids:
             return []
 
-        node = all_nodes[node_index - 1]
-        return node.acquired_skill_ids
+        for node in all_nodes:
+            if node.id == node_id:
+                return node.acquired_skill_ids
+        return []
 
     def _get_skill_ids_for_arc(
         self, topic: topic_domain.Topic, arc_id: str
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
-        The arc_id parameter is a 1-based index that maps to the nth arc
-        in the first published story of the topic.
-
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc index (e.g., '1').
+            arc_id: str. The arc ID.
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
         """
-        try:
-            arc_index = int(arc_id)
-        except ValueError:
-            return []
-
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic
         )
-        if arc_index not in range(1, len(arcs_with_stories) + 1):
+        valid_arc_ids = [arc.id for _, arc in arcs_with_stories]
+        if arc_id not in valid_arc_ids:
             return []
 
-        story, arc = arcs_with_stories[arc_index - 1]
-        return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
+        for story, arc in arcs_with_stories:
+            if arc.id == arc_id:
+                return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
+        return []

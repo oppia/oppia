@@ -421,25 +421,16 @@ class PracticeSessionAccessValidationPage(
     ) -> None:
         """Validates that the given node ID exists in the first story.
 
-        The node_id parameter is a 1-based index that maps to the nth node
-        in the first published story of the topic.
-
         Args:
             topic: Topic. The topic object.
-            node_id: str. The node ID (1-based index) to validate.
+            node_id: str. The node ID to validate.
 
         Raises:
             NotFoundException. The node ID was not found.
         """
-        try:
-            node_index = int(node_id)
-        except ValueError as exc:
-            raise self.NotFoundException(
-                'Invalid node identifier: %s' % node_id
-            ) from exc
-
         all_nodes = self._get_all_nodes_for_topic(topic)
-        if node_index not in range(1, len(all_nodes) + 1):
+        valid_node_ids = [node.id for node in all_nodes]
+        if node_id not in valid_node_ids:
             raise self.NotFoundException(
                 'Node with id %s is not part of this topic.' % node_id
             )
@@ -447,25 +438,16 @@ class PracticeSessionAccessValidationPage(
     def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
         """Validates that the given arc ID exists in the first story.
 
-        The arc_id parameter is a 1-based index that maps to the nth arc
-        in the first published story of the topic.
-
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc index (e.g., '1') to validate.
+            arc_id: str. The arc ID to validate.
 
         Raises:
             NotFoundException. The arc ID was not found.
         """
-        try:
-            arc_index = int(arc_id)
-        except ValueError as exc:
-            raise self.NotFoundException(
-                'Invalid arc identifier: %s' % arc_id
-            ) from exc
-
         all_arcs = self._get_all_arcs_for_topic(topic)
-        if arc_index not in range(1, len(all_arcs) + 1):
+        valid_arc_ids = [arc.id for arc in all_arcs]
+        if arc_id not in valid_arc_ids:
             raise self.NotFoundException(
                 'Arc with id %s is not part of this topic.' % arc_id
             )
