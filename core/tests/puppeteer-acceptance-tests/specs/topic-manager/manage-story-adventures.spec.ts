@@ -47,7 +47,7 @@ describe('Topic Manager', function () {
     await releaseCoordinator.enableFeatureFlag('story_editor_arcs');
     await UserFactory.closeBrowserForUser(releaseCoordinator);
 
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 11; i++) {
       const id = await curriculumAdmin.createAndPublishExplorationWithCards(
         `Exploration ${i + 1}`,
         'Mathematics'
@@ -72,15 +72,15 @@ describe('Topic Manager', function () {
       'Adventure Topic'
     );
 
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 11; i++) {
       await curriculumAdmin.addChapter(`Chapter ${i + 1}`, explorationIds[i]);
     }
 
     await curriculumAdmin.saveStoryDraft();
-  }, 600000);
+  }, 2100000);
 
   it(
-    'should create adventures by splitting after chapters 3, 6, and 8',
+    'should create adventures by splitting after chapters 3, 7, and 10',
     async function () {
       await curriculumAdmin.expectAllChaptersInSingleAdventure([
         'Chapter 1',
@@ -92,6 +92,8 @@ describe('Topic Manager', function () {
         'Chapter 7',
         'Chapter 8',
         'Chapter 9',
+        'Chapter 10',
+        'Chapter 11',
       ]);
 
       await curriculumAdmin.expectScreenshotToMatch(
@@ -108,19 +110,19 @@ describe('Topic Manager', function () {
         __dirname
       );
 
-      await curriculumAdmin.splitIntoAdventure('Chapter 6');
+      await curriculumAdmin.splitIntoAdventure('Chapter 7');
       await curriculumAdmin.expectAdventureCount(3);
 
       await curriculumAdmin.expectScreenshotToMatch(
-        'storyEditorAfterSplitAtChapter6',
+        'storyEditorAfterSplitAtChapter7',
         __dirname
       );
 
-      await curriculumAdmin.splitIntoAdventure('Chapter 8');
+      await curriculumAdmin.splitIntoAdventure('Chapter 10');
       await curriculumAdmin.expectAdventureCount(4);
 
       await curriculumAdmin.expectScreenshotToMatch(
-        'storyEditorAfterSplitAtChapter8',
+        'storyEditorAfterSplitAtChapter10',
         __dirname
       );
 
@@ -134,6 +136,8 @@ describe('Topic Manager', function () {
         'Chapter 7',
         'Chapter 8',
         'Chapter 9',
+        'Chapter 10',
+        'Chapter 11',
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -169,6 +173,8 @@ describe('Topic Manager', function () {
         'Chapter 7',
         'Chapter 8',
         'Chapter 9',
+        'Chapter 10',
+        'Chapter 11',
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -202,6 +208,8 @@ describe('Topic Manager', function () {
         'Chapter 7',
         'Chapter 8',
         'Chapter 9',
+        'Chapter 10',
+        'Chapter 11',
       ]);
 
       await curriculumAdmin.expectScreenshotToMatch(
@@ -221,6 +229,8 @@ describe('Topic Manager', function () {
         'Chapter 7',
         'Chapter 8',
         'Chapter 9',
+        'Chapter 10',
+        'Chapter 11',
       ]);
 
       await curriculumAdmin.expectAdventureCount(3);
@@ -250,6 +260,8 @@ describe('Topic Manager', function () {
         'Chapter 7',
         'Chapter 8',
         'Chapter 9',
+        'Chapter 10',
+        'Chapter 11',
       ]);
 
       await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
