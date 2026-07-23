@@ -13,28 +13,28 @@
 }
 
 .topic-lesson-card.collapsed {
-  height: auto;
-  min-height: 0;
-  overflow: visible;
   border: 1px solid #d1d5db;
   border-radius: 0;
   box-shadow: none;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
 }
 
 .topic-lesson-card-thumbnail {
   align-self: stretch;
   flex: 0 0 auto;
-  width: 212px;
   height: auto;
   overflow: hidden;
+  width: 212px;
 }
 
 .topic-lesson-card-image {
   display: block;
   height: 100%;
-  width: 100%;
   object-fit: cover;
   object-position: center;
+  width: 100%;
 }
 
 .topic-lesson-card-content {
@@ -47,28 +47,28 @@
 }
 
 .topic-lesson-card-content.collapsed {
-  flex-direction: row;
   align-items: center;
-  padding: 14px 18px;
-  gap: 12px;
-  height: auto;
   border: none;
   box-shadow: none;
+  flex-direction: row;
+  gap: 12px;
+  height: auto;
+  padding: 14px 18px;
 }
 
 .topic-lesson-card-copy {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 8px;
-  flex: 1;
   min-width: 0;
 }
 
 .topic-lesson-card-content.collapsed .topic-lesson-card-copy {
+  align-items: center;
+  flex: 1;
   flex-direction: row;
   gap: 12px;
-  flex: 1;
-  align-items: center;
 }
 
 .topic-lesson-card-title-row {
@@ -82,11 +82,11 @@
 }
 
 .topic-lesson-card-header {
-  flex: 1;
-  min-width: 0;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .topic-lesson-card-chevron-badge {
@@ -222,17 +222,17 @@
 }
 
 .topic-lesson-card-actions-right {
+  align-items: flex-end;
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
   gap: 12px;
-  align-items: flex-end;
 }
 
 .topic-lesson-card-secondary-buttons {
+  align-items: center;
   display: flex;
   gap: 12px;
-  align-items: center;
 }
 
 .topic-lesson-card-fallback-info-icon {

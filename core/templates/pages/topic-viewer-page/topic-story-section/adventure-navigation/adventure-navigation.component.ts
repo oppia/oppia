@@ -56,7 +56,7 @@ export class AdventureNavigationComponent
   private scrollCheckTimeouts: ReturnType<typeof setTimeout>[] = [];
 
   ngAfterViewInit(): void {
-    // Defer checks to allow DOM to fully render
+    // Defer checks to allow DOM to fully render.
     this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 50));
     this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 200));
     this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 500));
@@ -64,7 +64,7 @@ export class AdventureNavigationComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.adventureGroups) {
-      // When adventureGroups changes, schedule arrow updates
+      // When adventureGroups changes, schedule arrow updates.
       this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 100));
       this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 300));
     }
@@ -93,7 +93,7 @@ export class AdventureNavigationComponent
     const hasOverflow = el.scrollWidth > el.clientWidth;
 
     if (!hasOverflow) {
-      // No overflow, hide both arrows
+      // No overflow, hide both arrows.
       this.showLeftArrow = false;
       this.showRightArrow = false;
       return;
@@ -110,7 +110,7 @@ export class AdventureNavigationComponent
     const el = this.scrollWrapper?.nativeElement;
     if (el) {
       el.scrollBy({left: -200, behavior: 'smooth'});
-      // Update arrows after scroll completes
+      // Update arrows after scroll completes.
       setTimeout(() => this.updateArrows(), 500);
     }
   }
@@ -119,13 +119,13 @@ export class AdventureNavigationComponent
     const el = this.scrollWrapper?.nativeElement;
     if (el) {
       el.scrollBy({left: 200, behavior: 'smooth'});
-      // Update arrows after scroll completes
+      // Update arrows after scroll completes.
       setTimeout(() => this.updateArrows(), 500);
     }
   }
 
   isActiveLesson(lessonNumber: number): boolean {
-    // Badge is colored when it's the currently selected lesson in navbar
+    // Badge is colored when it's the currently selected lesson in navbar.
     if (this.activeLessonNumber === null) {
       return lessonNumber === 1;
     }

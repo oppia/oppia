@@ -93,7 +93,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       this.initializeLanguageSelection();
     }
     if (changes.navigatedLessonNumber) {
-      // Auto-expand this lesson if it's the navigated lesson from the navbar
+      // Auto-expand this lesson if it's the navigated lesson from the navbar.
       if (this.navigatedLessonNumber === this.lessonNumber) {
         this.isExpanded = true;
       }

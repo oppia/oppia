@@ -9,13 +9,12 @@
   <div class="topic-lesson-card-content" [class.collapsed]="!isExpanded">
     <div class="topic-lesson-card-copy">
       <div class="topic-lesson-card-title-row" [class.collapsed]="!isExpanded">
-        <topic-adventure-circle-badge
-          [label]="lessonNumber.toString()"
-          [iconName]="''"
-          [size]="'sm'"
-          [backgroundColor]="isExpanded ? adventureAccentColor : '#fff'"
-          [borderColor]="isExpanded ? adventureAccentColor : '#d1d5db'"
-          [textColor]="isExpanded ? '#fff' : '#6b7280'">
+        <topic-adventure-circle-badge [label]="lessonNumber.toString()"
+                                      [iconName]="''"
+                                      [size]="'sm'"
+                                      [backgroundColor]="isExpanded ? adventureAccentColor : '#fff'"
+                                      [borderColor]="isExpanded ? adventureAccentColor : '#d1d5db'"
+                                      [textColor]="isExpanded ? '#fff' : '#6b7280'">
         </topic-adventure-circle-badge>
         <div class="topic-lesson-card-header">
           <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>

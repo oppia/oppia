@@ -188,8 +188,8 @@
   flex: 0 0 44px;
   height: 44px;
   justify-content: center;
-  width: 44px;
   min-width: 44px;
+  width: 44px;
 }
 
 .adventure-flag-icon .material-icons {

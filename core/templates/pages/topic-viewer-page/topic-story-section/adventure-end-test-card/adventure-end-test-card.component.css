@@ -10,31 +10,31 @@
 }
 
 .adventure-end-test-card-thumbnail {
+  align-items: center;
   background: #e2f2ef;
   display: flex;
   flex: 0 0 auto;
-  width: 212px;
   height: 100%;
-  overflow: hidden;
-  align-items: center;
   justify-content: center;
+  overflow: hidden;
   padding: 0;
+  width: 212px;
 }
 
 .adventure-end-test-card-image {
   height: 100%;
-  width: 100%;
   object-fit: cover;
   object-position: center;
+  width: 100%;
 }
 
 .adventure-end-test-card-content {
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: 12px;
   min-width: 0;
   padding: 24px 24px 18px;
-  gap: 12px;
 }
 
 .adventure-end-test-card-header-row {
@@ -135,15 +135,15 @@
     color: #3b3b3b;
     font-size: 20px;
     font-weight: 400;
-    line-height: 30px;
     letter-spacing: 0;
+    line-height: 30px;
     margin-top: -8px;
     max-width: 500px;
   }
 
   .adventure-end-test-card-actions {
-    margin-top: 50px;
     margin-right: 14px;
+    margin-top: 50px;
   }
 }
 
