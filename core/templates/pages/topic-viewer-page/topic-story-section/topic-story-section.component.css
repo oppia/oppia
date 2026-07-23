@@ -226,19 +226,20 @@
 .adventure-chevron-badge {
   align-items: center;
   background: #fff;
-  border: 1px solid #d1d5db;
+  border: 1.5px solid #e8ebef;
   border-radius: 50%;
-  color: #6b7280;
+  color: #111;
   display: inline-flex;
-  flex: 0 0 32px;
-  height: 32px;
+  flex: 0 0 46px;
+  height: 46px;
   justify-content: center;
   transition: transform 0.2s ease;
-  width: 32px;
+  width: 46px;
 }
 
 .adventure-chevron-badge .material-icons {
-  font-size: 20px;
+  font-size: 30px;
+  line-height: 1;
 }
 
 .adventure-chevron-badge.expanded {

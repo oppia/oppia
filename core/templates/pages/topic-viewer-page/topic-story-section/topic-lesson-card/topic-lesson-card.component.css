@@ -5,10 +5,10 @@
   border-radius: 8px;
   box-shadow: none;
   display: flex;
-  height: 248px;
+  height: auto;
   max-width: 912px;
   min-height: 248px;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
 }
 
@@ -22,9 +22,10 @@
 }
 
 .topic-lesson-card-thumbnail {
+  align-self: stretch;
   flex: 0 0 auto;
   width: 212px;
-  height: 100%;
+  height: auto;
   overflow: hidden;
 }
 
@@ -40,9 +41,9 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
-  padding: 24px 22px 18px;
+  padding: 20px 22px 14px;
 }
 
 .topic-lesson-card-content.collapsed {
@@ -91,25 +92,26 @@
 .topic-lesson-card-chevron-badge {
   align-items: center;
   background: #fff;
-  border: 1px solid #d1d5db;
+  border: 1.5px solid #e8ebef;
   border-radius: 50%;
-  color: #6b7280;
+  color: #111;
   cursor: pointer;
   display: inline-flex;
-  flex: 0 0 32px;
-  height: 32px;
+  flex: 0 0 46px;
+  height: 46px;
   justify-content: center;
   padding: 0;
   transition: transform 0.2s ease;
-  width: 32px;
+  width: 46px;
 }
 
 .topic-lesson-card-chevron-badge:hover {
-  background: #f3f4f6;
+  background: #fff;
 }
 
 .topic-lesson-card-chevron-badge .material-icons {
-  font-size: 20px;
+  font-size: 30px;
+  line-height: 1;
 }
 
 .topic-lesson-card-chevron-badge.expanded {
@@ -123,17 +125,17 @@
 .topic-lesson-card-title {
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 24px;
   margin: 0;
 }
 
 .topic-lesson-card-description {
-  color: #888;
+  color: #3d3d3d;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.2;
+  font-size: 17px;
+  line-height: 1.25;
   margin: 0;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -150,7 +152,7 @@
 .topic-lesson-card-footer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -181,7 +183,7 @@
 
 .topic-lesson-card-secondary-button {
   align-items: center;
-  background: #fff;
+  background: #edf7f5;
   border: 2px solid #0b776d;
   border-radius: 4px;
   color: #0b776d;
@@ -296,7 +298,7 @@
   }
 
   .topic-lesson-card-content {
-    padding: 16px;
+    padding: 14px;
   }
 
   .topic-lesson-card-copy {
@@ -416,9 +418,11 @@
   .topic-lesson-card-actions-left {
     align-self: stretch;
     margin-bottom: 0;
+    margin-top: 0;
   }
 
   .topic-lesson-card-actions-right {
+    margin-top: 0;
   }
 
   .topic-lesson-card-secondary-button,
