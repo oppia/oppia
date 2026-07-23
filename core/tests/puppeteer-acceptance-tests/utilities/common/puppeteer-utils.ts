@@ -872,12 +872,11 @@ export class BaseUser {
    */
   async typeInInputField(
     selector: string | ElementHandle<Element>,
-    text: string,
-    clickBeforeTyping: boolean = false
+    text: string
   ): Promise<void> {
     let element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector, {visible: true})
+        ? await this.page.waitForSelector(selector)
         : selector;
     if (!element) {
       throw new Error(`Element not found for selector: ${selector}`);
@@ -885,10 +884,6 @@ export class BaseUser {
     await this.waitForElementToStabilize(element);
     await this.waitForElementToBeClickable(element);
     await this.waitForElementToStabilize(selector);
-
-    if (clickBeforeTyping) {
-      await element.click();
-    }
 
     await element.type(text);
   }
