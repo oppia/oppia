@@ -347,7 +347,7 @@
   .topic-lesson-card-thumbnail {
     align-self: stretch;
     flex: none;
-    height: 140px;
+    height: 120px;
     width: 100%;
   }
 
@@ -394,11 +394,23 @@
   }
 
   .topic-lesson-card-start-button {
+    height: 44px;
     width: 100%;
   }
 
   .topic-lesson-card-secondary-button {
+    height: 40px;
     width: 100%;
+  }
+
+  .topic-lesson-card-chevron-badge {
+    flex: 0 0 38px;
+    height: 38px;
+    width: 38px;
+  }
+
+  .topic-lesson-card-chevron-badge .material-icons {
+    font-size: 24px;
   }
 
   .topic-lesson-language-selector-wrapper {

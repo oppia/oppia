@@ -44,10 +44,21 @@
   justify-content: space-between;
 }
 
+.adventure-end-test-card-badge {
+  flex: 0 0 auto;
+}
+
+.adventure-end-test-card-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
 .adventure-end-test-card-title-row {
   align-items: center;
   display: flex;
-  gap: 12px;
 }
 
 .adventure-end-test-card-title {
@@ -66,8 +77,8 @@
   font-weight: 400;
   line-height: 1.35;
   margin: 0;
+  max-width: 520px;
   overflow-wrap: break-word;
-  padding-left: 60px;
   word-wrap: break-word;
 }
 
@@ -104,6 +115,10 @@
     justify-content: center;
   }
 
+  .adventure-end-test-card-header-row {
+    align-items: flex-start;
+  }
+
   .adventure-end-test-card-title {
     color: #3b3b3b;
     font-size: 24px;
@@ -113,7 +128,7 @@
   }
 
   .adventure-end-test-card-title-row {
-    margin-top: -2px;
+    margin-top: 10px;
   }
 
   .adventure-end-test-card-description {
@@ -122,12 +137,12 @@
     font-weight: 400;
     line-height: 30px;
     letter-spacing: 0;
-    margin-top: 10px;
-    max-width: 520px;
+    margin-top: -8px;
+    max-width: 500px;
   }
 
   .adventure-end-test-card-actions {
-    margin-top: 6px;
+    margin-top: 50px;
     margin-right: 14px;
   }
 }
@@ -154,20 +169,33 @@
     gap: 8px;
   }
 
+  .adventure-end-test-card-badge {
+    margin-bottom: -4px;
+  }
+
+  .adventure-end-test-card-copy {
+    gap: 8px;
+  }
+
   .adventure-end-test-card-title {
     font-size: 18px;
     line-height: 22px;
   }
 
+  .adventure-end-test-card-title-row {
+    gap: 0;
+  }
+
   .adventure-end-test-card-description {
     font-size: 14px;
     line-height: 1.35;
-    padding-left: 52px;
+    max-width: none;
   }
 
   .adventure-end-test-card-actions {
     gap: 10px;
     justify-content: flex-start;
+    margin-top: 8px;
   }
 
   .adventure-end-test-card-practice-button {
@@ -189,8 +217,8 @@
 
   .adventure-end-test-card-thumbnail {
     flex: none;
-    height: 140px;
-    min-height: 140px;
+    height: 120px;
+    min-height: 120px;
     width: 100%;
   }
 
@@ -217,7 +245,7 @@
     font-size: 13px;
     line-height: 18px;
     margin: 0;
-    padding-left: 44px;
+    padding-left: 0;
   }
 
   .adventure-end-test-card-actions {
@@ -230,7 +258,7 @@
 
   .adventure-end-test-card-practice-button {
     font-size: 14px;
-    height: 40px;
+    height: 44px;
     min-width: 100%;
     width: 100%;
   }

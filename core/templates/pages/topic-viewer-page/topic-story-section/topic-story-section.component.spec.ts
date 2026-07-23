@@ -765,13 +765,13 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should toggle adventure expansion state', () => {
-    expect(component.isArcExpanded(0)).toBe(false);
+    expect(component.isAdventureExpanded(0)).toBe(false);
 
-    component.toggleArc(0);
-    expect(component.isArcExpanded(0)).toBe(true);
+    component.toggleAdventure(0);
+    expect(component.isAdventureExpanded(0)).toBe(true);
 
-    component.toggleArc(0);
-    expect(component.isArcExpanded(0)).toBe(false);
+    component.toggleAdventure(0);
+    expect(component.isAdventureExpanded(0)).toBe(false);
   });
 
   it('should ignore arc node ids not present in all nodes', () => {

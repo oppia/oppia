@@ -229,11 +229,19 @@ export class TopicStorySectionComponent
   }
 
   getStoryMetaText(): string {
-    return this.getLessonCountText();
+    const lessonText = this.getLessonCountText();
+    if (this.practiceCount > 0) {
+      return lessonText + ', ' + this.getPracticeCountText();
+    }
+    return lessonText;
   }
 
   getStoryMetaAriaLabel(): string {
-    return this.getLessonCountText() + ' available';
+    const lessonText = this.getLessonCountText();
+    if (this.practiceCount > 0) {
+      return lessonText + ' and ' + this.getPracticeCountText() + ' available';
+    }
+    return lessonText + ' available';
   }
 
   shouldShowAdventureEndTestCard(adventureIndex: number): boolean {
@@ -318,7 +326,7 @@ export class TopicStorySectionComponent
 
         return {
           lessonNumber: index + 1,
-          lessonTitle: node.getTitle(),
+          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
           lessonDescription: node.getDescription(),
           thumbnailUrl: this.getLessonThumbnailUrl(node),
           startUrl: this.getLessonStartUrl(node),
@@ -398,7 +406,7 @@ export class TopicStorySectionComponent
 
       return {
         lessonNumber: index + 1,
-        lessonTitle: node.getTitle(),
+        lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
         lessonDescription: node.getDescription(),
         thumbnailUrl: this.getLessonThumbnailUrl(node),
         startUrl: this.getLessonStartUrl(node),

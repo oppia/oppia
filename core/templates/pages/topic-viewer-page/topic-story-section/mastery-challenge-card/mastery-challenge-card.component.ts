@@ -27,10 +27,6 @@ import './mastery-challenge-card.component.css';
   styleUrls: ['./mastery-challenge-card.component.css'],
 })
 export class MasteryChallengeCardComponent {
-  @Input() title: string = 'Mastery Challenge';
-  @Input() description: string =
-    'Test your knowledge with a challenge that covers everything you have learned in this topic.';
-  @Input() buttonLabel: string = 'Mastery Challenge';
   @Input() actionUrl: string = '#';
 
   constructor(private windowRef: WindowRef) {}

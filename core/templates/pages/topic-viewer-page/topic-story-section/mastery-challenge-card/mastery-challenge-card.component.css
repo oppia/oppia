@@ -143,6 +143,7 @@
   }
 
   .mastery-challenge-button {
+    height: 44px;
     width: 100%;
   }
 }
