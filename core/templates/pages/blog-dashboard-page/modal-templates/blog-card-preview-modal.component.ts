@@ -27,7 +27,7 @@ import './blog-card-preview-modal.component.css';
 @Component({
   selector: 'oppia-blog-card-preview-modal',
   templateUrl: './blog-card-preview-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./blog-card-preview-modal.component.css'],
 })
 export class BlogCardPreviewModalComponent
   extends ConfirmOrCancelModal

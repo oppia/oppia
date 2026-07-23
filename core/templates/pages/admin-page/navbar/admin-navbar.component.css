@@ -4,6 +4,7 @@
   color: #fff;
 }
 
+/* We disable no-descending-specificity here because the selector order overrides base styling appropriately, which is intentional. */
 /* stylelint-disable-next-line no-descending-specificity */
 .admin-navbar .oppia-navbar-profile-admin > li > a:hover,
 .admin-navbar .oppia-navbar-profile-admin > li > a:focus,
