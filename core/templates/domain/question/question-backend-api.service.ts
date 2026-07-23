@@ -252,22 +252,25 @@ export class QuestionBackendApiService {
     questionCount: number,
     offset: number
   ): Promise<PaginatedQuestionsResponse> {
-      const questionDataUrl = this.urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.QUESTION_PLAYER_PAGINATED_URL_TEMPLATE,
-        {
-          skill_ids: skillId,
-          question_count: questionCount.toString(),
-          offset: offset.toString(),
-        }
-      );
-      try {
-        const response = await this.http
-          .get<PaginatedQuestionsBackendResponse>(questionDataUrl)
-          .toPromise();
-        return { questionDicts: cloneDeep(response.question_dicts), more: response.more };
-      } catch (errorResponse) {
-        throw new Error(errorResponse.error.error);
+    const questionDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.QUESTION_PLAYER_PAGINATED_URL_TEMPLATE,
+      {
+        skill_ids: skillId,
+        question_count: questionCount.toString(),
+        offset: offset.toString(),
       }
+    );
+    try {
+      const response = await this.http
+        .get<PaginatedQuestionsBackendResponse>(questionDataUrl)
+        .toPromise();
+      return {
+        questionDicts: cloneDeep(response.question_dicts),
+        more: response.more,
+      };
+    } catch (errorResponse) {
+      throw errorResponse.error.error;
+    }
   }
 
   async fetchTotalQuestionCountForSkillIdsAsync(
