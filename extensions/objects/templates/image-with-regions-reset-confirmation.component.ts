@@ -16,8 +16,9 @@
  * @fileoverview Component for resetting image regions editor.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
@@ -26,7 +27,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
   styleUrls: [],
 })
 export class ImageWithRegionsResetConfirmationModalComponent extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() ngbActiveModal: NgbActiveModal,
+    @Optional()
+    imageWithRegionsResetBottomSheetRef?: MatBottomSheetRef<ImageWithRegionsResetConfirmationModalComponent>
+  ) {
+    super(ngbActiveModal, imageWithRegionsResetBottomSheetRef);
   }
 }
