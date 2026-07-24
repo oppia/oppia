@@ -32,6 +32,7 @@ test.describe.configure({mode: 'serial'});
 test.describe('Site Moderator', function () {
   let siteModerator: Moderator;
   let explorationId: string;
+  let explorationId2: string;
 
   test.beforeAll(async function ({browser}) {
     test.setTimeout(500000); // Setup takes longer than the default timeout.
@@ -73,12 +74,12 @@ test.describe('Site Moderator', function () {
       'End Exploration'
     );
     await explorationEditor.saveExplorationDraft();
-    await explorationEditor.publishExplorationWithMetadata(
+    explorationId2 = await explorationEditor.publishExplorationWithMetadata(
       'Test Exploration Title 2',
       'Test Exploration Goal 2',
       'Algebra'
     );
-    await explorationEditor.playExploration(explorationId);
+    await explorationEditor.playExploration(explorationId2);
     await explorationEditor.giveFeedback('Needs some improvement');
   });
 

@@ -37,6 +37,7 @@ const featuredActivitiesHeaderSelector = '.e2e-test-featured-activities-header';
 const feedbackMessagesHeaderSelector = '.e2e-test-feedback-messages-header';
 const explorationFeedbackTabContainerSelector =
   '.e2e-test-exploration-feedback-card';
+const startNewThreadButtonSelector = '.e2e-test-start-new-thread-button';
 const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const toastMessageSelector = '.e2e-test-toast-message';
@@ -288,13 +289,7 @@ export class Moderator extends BaseUser {
    * Function to check if the user is on the feedback tab of the exploration editor.
    */
   async expectToBeOnFeedbackTab(): Promise<void> {
-    const isOnFeedbackTab = await this.isTextPresentOnPage('Start new thread');
-
-    if (!isOnFeedbackTab) {
-      throw new Error(
-        'User is not on the feedback tab of the exploration editor'
-      );
-    }
+    await this.expectElementToBeVisible(startNewThreadButtonSelector);
     showMessage('User is on the feedback tab of the exploration editor.');
   }
 
