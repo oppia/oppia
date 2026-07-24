@@ -64,8 +64,8 @@ test.describe('Exploration Creator', function () {
     // Before publishing, the Exploration zip file name would be
     // oppia-unpublished_exploration-v{versionNumber}.zip or
     // oppia-unpublished_exploration-v{versionNumber} (numberOfDownloadsSameFile).zip.
-    await explorationEditor.downloadExploration(5);
-    await explorationEditor.downloadExploration(2);
+    await explorationEditor.downloadExploration(5, false);
+    await explorationEditor.downloadExploration(2, false);
 
     // Publish Exploration.
     await explorationEditor.publishExplorationWithMetadata(
@@ -74,11 +74,8 @@ test.describe('Exploration Creator', function () {
       'Algebra'
     );
 
-    // After publishing, the Exploration zip file name would be
-    // oppia-{explorationTitle}-v{versionNumber}.zip or
-    // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip.
-    await explorationEditor.downloadExploration(5);
-    await explorationEditor.downloadExploration(2);
+    await explorationEditor.downloadExploration(5, true);
+    await explorationEditor.downloadExploration(2, true);
   });
 
   test.afterAll(async function () {
