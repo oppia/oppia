@@ -71,7 +71,7 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
 
 import astroid
-from pylint import checkers, interfaces
+from pylint import checkers
 from pylint.checkers import utils as checker_utils
 from pylint.extensions import _check_docs_utils
 
@@ -95,12 +95,10 @@ def read_from_node(node: astroid.scoped_nodes.Module) -> List[str]:
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
+class HangingIndentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.
     """
-
-    __implements__ = interfaces.ITokenChecker
 
     name = 'hanging-indent'
     priority = -1
@@ -230,8 +228,6 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     Args:
         linter: Pylinter. The linter object.
     """
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'parameter_documentation'
     msgs = {
@@ -1334,8 +1330,6 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
     modules are only imported.
     """
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'import-only-modules'
     priority = -1
     msgs = {
@@ -1401,8 +1395,6 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
     for continuation.
     """
 
-    __implements__ = interfaces.IRawChecker
-
     name = 'backslash-continuation'
     priority = -1
     msgs = {
@@ -1439,7 +1431,6 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):  # type: ignore[misc]
     definition.
     """
 
-    __implements__ = interfaces.IAstroidChecker
     name = 'function-args-order'
     priority = -1
     msgs = {
@@ -1484,7 +1475,6 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
     from their respective restricted layers.
     """
 
-    __implements__ = interfaces.IAstroidChecker
     name = 'invalid-import'
     priority = -1
     msgs = {
@@ -1662,7 +1652,6 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checker for single character files and newline at EOF."""
 
-    __implements__ = interfaces.IRawChecker
     name = 'newline-at-eof'
     priority = -1
     msgs = {
@@ -1700,10 +1689,9 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[mi
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
+class SingleLineCommentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
     """Checks if comments follow correct style."""
 
-    __implements__ = interfaces.ITokenChecker
     name = 'incorrectly_styled_comment'
     priority = -1
     msgs = {
@@ -1885,7 +1873,6 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
     (missing-docstring) for missing file overviews.
     """
 
-    __implements__ = interfaces.IAstroidChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
     msgs = {
@@ -1944,12 +1931,10 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
+class SingleLinePragmaChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
     """Custom pylint checker which checks if pylint pragma is used to disable
     a rule for a single line only.
     """
-
-    __implements__ = interfaces.ITokenChecker
 
     name = 'single-line-pragma'
     priority = -1
@@ -1997,8 +1982,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks if MyPy's type ignores are properly
     documented or not.
     """
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'type-ignore-comment'
     priority = -1
@@ -2149,12 +2132,10 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):  # type: ignore[misc]
+class SingleSpaceAfterKeyWordChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
     """Custom pylint checker which checks that there is a single space
     after keywords like `if`, `elif`, `while`, and `yield`.
     """
-
-    __implements__ = interfaces.ITokenChecker
 
     name = 'single-space-after-keyword'
     priority = -1
@@ -2234,8 +2215,6 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         'args_section_end_line_num': 0,
         'func_def_start_line': 0,
     }
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'comment-for-exceptional-types'
     priority = -1
@@ -2626,8 +2605,6 @@ class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
     enforcing use of "if x is not None" instead.
     """
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'inequality-with-none'
     priority = -1
     msgs = {
@@ -2666,8 +2643,6 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
     """Custom pylint checker prohibiting use of "test_only" prefix in function
     names of non-test files.
     """
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'non-test-files-function-name-checker'
     priority = -1
@@ -2708,7 +2683,6 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
     regex checks of functions calls to be removed or replaced.
     """
 
-    __implements__ = interfaces.IAstroidChecker
     name = 'disallowed-function-calls'
     priority = -1
     msgs = {
@@ -2854,8 +2828,6 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
     defined within the class.
     """
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'disallow-handlers-without-schema'
     priority = -1
     msgs = {
@@ -2973,8 +2945,6 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
 class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Check that disallowed imports are not made."""
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'disallowed-imports'
     priority = -1
     msgs = {
@@ -3008,8 +2978,6 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
 # we added an ignore here.
 class PreventStringConcatenationChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checks for string concactenation and encourages string interpolation."""
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'use-string-interpolation'
     priority = -1
