@@ -1011,6 +1011,51 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBe(true);
   });
 
+  it('should backfill a default arc when arc data is missing', () => {
+    mockPlatformFeatureService.status.StoryEditorArcs = {
+      isEnabled: true,
+    };
+
+    component.storyContents = story.getStoryContents();
+    expect(component.storyContents.getArcs().length).toBe(0);
+
+    component._initEditor();
+
+    expect(component.storyContents.getArcs().length).toBe(1);
+    expect(component.storyContents.getArcs()[0].getTitle()).toBe(
+      'All Chapters'
+    );
+    expect(component.storyContents.getArcs()[0].getNodeIds()).toEqual([
+      'node_1',
+      'node_2',
+      'node_3',
+    ]);
+  });
+
+  it('should normalize stale arc node ids and include missing nodes', () => {
+    mockPlatformFeatureService.status.StoryEditorArcs = {
+      isEnabled: true,
+    };
+
+    component.storyContents = story.getStoryContents();
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2', 'ghost_node'])
+    );
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_3'])
+    );
+
+    component._initEditor();
+
+    expect(component.storyContents.getArcs()[0].getNodeIds()).toEqual([
+      'node_2',
+      'node_1',
+    ]);
+    expect(component.storyContents.getArcs()[1].getNodeIds()).toEqual([
+      'node_3',
+    ]);
+  });
+
   it('should return true when node index is zero for isSameArc', () => {
     expect(component.isSameArc(0)).toBe(true);
   });
