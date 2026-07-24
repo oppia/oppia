@@ -218,6 +218,13 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             id=self.PROFILE_ID_1, topic_ids_to_learn=self.TOPIC_IDS
         ).put()
 
+        # Setup for LearnerPlaylistModel.
+        user_models.LearnerPlaylistModel(
+            id=self.PROFILE_ID_1,
+            exploration_ids=self.EXPLORATION_IDS,
+            collection_ids=self.COLLECTION_IDS,
+        ).put()
+
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS[0]),
