@@ -42,6 +42,7 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {AlertsService} from 'services/alerts.service';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -153,6 +154,7 @@ describe('Skill Preview Tab Component', () => {
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let windowDimensionsService: WindowDimensionsService;
+  let alertsService: AlertsService;
 
   let displayedCard = new StateCard(
     '',
@@ -245,6 +247,7 @@ describe('Skill Preview Tab Component', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    alertsService = TestBed.inject(AlertsService);
     questionPlayerEngineService =
       questionPlayerEngineService as unknown as jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
@@ -481,6 +484,48 @@ describe('Skill Preview Tab Component', () => {
       expect(component.page).toBe(3);
       expect(component.loadPage).toHaveBeenCalledWith(3);
     }));
+
+    it(
+      'should show a warning and not call loadPage when ' +
+        'fetchTotalQuestionCountForSkillIdsAsync rejects',
+      fakeAsync(() => {
+        spyOn(
+          questionBackendApiService,
+          'fetchTotalQuestionCountForSkillIdsAsync'
+        ).and.returnValue(Promise.reject('Error fetching total count.'));
+        spyOn(alertsService, 'addWarning').and.callThrough();
+        spyOn(component, 'loadPage').and.stub();
+
+        component.loadTotalQuestionCountAndPage();
+        tick();
+
+        expect(alertsService.addWarning).toHaveBeenCalled();
+        expect(component.loadPage).not.toHaveBeenCalled();
+      })
+    );
+
+    it(
+      'should set questionsFetched to true and show a warning when ' +
+        'fetchQuestionsForSkillPreviewPageAsync rejects',
+      fakeAsync(() => {
+        spyOn(
+          questionBackendApiService,
+          'fetchQuestionsForSkillPreviewPageAsync'
+        ).and.returnValue(
+          Promise.reject('Error fetching paginated questions.')
+        );
+        spyOn(alertsService, 'addWarning').and.callThrough();
+        spyOn(component, 'selectQuestionToPreview').and.stub();
+
+        component.loadPage(1);
+        expect(component.questionsFetched).toBe(false);
+        tick();
+
+        expect(component.questionsFetched).toBe(true);
+        expect(alertsService.addWarning).toHaveBeenCalled();
+        expect(component.selectQuestionToPreview).not.toHaveBeenCalled();
+      })
+    );
   });
 
   describe('firstQuestionOnPageNum getter', () => {
