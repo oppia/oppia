@@ -123,17 +123,10 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.subtopicUrlFragmentExists = false;
     this.subtopicUrlFragmentIsValid = false;
     if (this.topic.getId() && this.subtopic) {
-      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-        this.topicEditorStateService.loadStudyGuide(
-          this.topic.getId(),
-          this.subtopicId
-        );
-      } else {
-        this.topicEditorStateService.loadSubtopicPage(
-          this.topic.getId(),
-          this.subtopicId
-        );
-      }
+      this.topicEditorStateService.loadStudyGuide(
+        this.topic.getId(),
+        this.subtopicId
+      );
       this.skillIds = this.subtopic.getSkillIds();
       this.questionCount = 0;
       if (this.skillIds.length) {
@@ -156,19 +149,10 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.editableThumbnailBgColor = thumbnailBgColor || '';
       this.editableUrlFragment = urlFragment || '';
       this.initialSubtopicUrlFragment = urlFragment || '';
-      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-        this.studyGuide = this.topicEditorStateService.getStudyGuide();
-      } else {
-        this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-      }
+      this.studyGuide = this.topicEditorStateService.getStudyGuide();
       this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
-      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-        var sections = this.studyGuide.getSections();
-        this.sections = sections;
-      } else {
-        var pageContents = this.subtopicPage.getPageContents();
-        this.htmlData = pageContents.getHtml();
-      }
+      var sections = this.studyGuide.getSections();
+      this.sections = sections;
       this.uncategorizedSkillSummaries =
         this.topic.getUncategorizedSkillSummaries();
       this.subtopicUrlFragmentIsValid =
@@ -273,11 +257,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     return skillSummary.getDescription() === null;
   }
 
-  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.ShowRestructuredStudyGuides
-      .isEnabled;
-  }
-
   getSkillEditorUrl(skillId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       this.SKILL_EDITOR_URL_TEMPLATE,
@@ -285,33 +264,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
         skillId: skillId,
       }
     );
-  }
-
-  updateHtmlData(): void {
-    if (this.htmlData !== this.subtopicPage.getPageContents().getHtml()) {
-      var subtitledHtml = cloneDeep(
-        this.subtopicPage.getPageContents().getSubtitledHtml()
-      );
-      subtitledHtml.html = this.htmlData;
-      this.topicUpdateService.setSubtopicPageContentsHtml(
-        this.subtopicPage,
-        this.subtopic.getId(),
-        subtitledHtml
-      );
-      this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
-      this.schemaEditorIsShown = false;
-    }
-  }
-
-  cancelHtmlDataChange(): void {
-    this.htmlData = this.htmlDataBeforeUpdate;
-    this.updateHtmlData();
-    this.schemaEditorIsShown = false;
-  }
-
-  showSchemaEditor(): void {
-    this.schemaEditorIsShown = true;
-    this.htmlDataBeforeUpdate = cloneDeep(this.htmlData);
   }
 
   toggleSubtopicPreview(): void {
@@ -450,22 +402,12 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.subtopicPreviewCardIsShown = false;
     this.subtopicEditorCardIsShown = true;
     this.schemaEditorIsShown = false;
-    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-      this.directiveSubscriptions.add(
-        this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
-          this.studyGuide = this.topicEditorStateService.getStudyGuide();
-          this.sections = this.studyGuide.getSections();
-        })
-      );
-    } else {
-      this.directiveSubscriptions.add(
-        this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
-          this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-          var pageContents = this.subtopicPage.getPageContents();
-          this.htmlData = pageContents.getHtml();
-        })
-      );
-    }
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
+        this.studyGuide = this.topicEditorStateService.getStudyGuide();
+        this.sections = this.studyGuide.getSections();
+      })
+    );
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() => {
         this.initEditor();

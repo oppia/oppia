@@ -34,7 +34,7 @@ import {AppConstants} from 'app.constants';
 import {CreateNewSubtopicModalComponent} from './create-new-subtopic-modal.component';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
@@ -100,11 +100,7 @@ class MockTopicEditorStateService {
 }
 
 class MockPlatformFeatureService {
-  status = {
-    ShowRestructuredStudyGuides: {
-      isEnabled: false,
-    },
-  };
+  status = {};
 }
 
 class MockHtmlLengthService {
@@ -223,10 +219,10 @@ describe('create new subtopic modal', function () {
     expect(component.subtopicId).toBe(1);
     expect(component.hostname).toBe('local');
     expect(component.classroomUrlFragment).toBe('non');
-    expect(component.schemaEditorIsShown).toBe(false);
+
     expect(component.subtopicUrlFragmentExists).toBe(false);
     expect(component.errorMsg).toBe(null);
-    expect(component.htmlData).toBe('');
+
     expect(component.sectionHeadingPlaintext).toBe('');
     expect(component.sectionContentHtml).toBe('');
     expect(component.editableThumbnailFilename).toBe('');
@@ -247,27 +243,10 @@ describe('create new subtopic modal', function () {
     );
   });
 
-  it('should update htmlData when localValueChange is called', () => {
-    component.localValueChange('working fine');
-    expect(component.htmlData).toBe('working fine');
-  });
-
   it('should update sectionContentHtml when localContentValueChange is called', () => {
     component.localContentValueChange('section content');
     expect(component.sectionContentHtml).toBe('section content');
   });
-
-  it(
-    'should show Schema editor when user clicks' +
-      'on "Give a description or explanation of the subtopic." button',
-    () => {
-      let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
-      expect(SUBTOPIC_PAGE_SCHEMA).toEqual(DefaultSubtopicPageSchema);
-
-      component.showSchemaEditor();
-      expect(component.schemaEditorIsShown).toBe(true);
-    }
-  );
 
   it(
     'should update editableThumbnailFilename when ' +
@@ -313,20 +292,7 @@ describe('create new subtopic modal', function () {
     expect(isExceeded).toBe(true);
   });
 
-  it('should check whether subtopic is valid for legacy mode', () => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
-    component.editableThumbnailFilename = 'examplefilename';
-    component.subtopicTitle = 'title';
-    component.htmlData = 'data';
-    component.editableUrlFragment = 'url';
-
-    spyOn(component, 'isUrlFragmentValid').and.returnValue(true);
-    let isSubtopicValid = component.isSubtopicValid();
-    expect(isSubtopicValid).toBe(true);
-  });
-
-  it('should check whether subtopic is valid for restructured study guides mode', () => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+  it('should check whether subtopic is valid', () => {
     component.editableThumbnailFilename = 'examplefilename';
     component.subtopicTitle = 'title';
     component.sectionHeadingPlaintext = 'section heading';
@@ -341,7 +307,7 @@ describe('create new subtopic modal', function () {
   it('should return false when subtopic is not valid', () => {
     component.editableThumbnailFilename = '';
     component.subtopicTitle = '';
-    component.htmlData = '';
+
     component.editableUrlFragment = '';
 
     let isSubtopicValid = component.isSubtopicValid();
@@ -359,14 +325,6 @@ describe('create new subtopic modal', function () {
     expect(subtopicValidationService.isUrlFragmentValid).toHaveBeenCalledWith(
       'valid-url-fragment'
     );
-  });
-
-  it('should check if restructured study guides feature is enabled', () => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
-    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(true);
-
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
-    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
   });
 
   it('should not create subtopic when "Cancel" button clicked', fakeAsync(() => {
@@ -408,50 +366,7 @@ describe('create new subtopic modal', function () {
     expect(component.checkSubtopicExistence).toHaveBeenCalled();
   });
 
-  it('should save create new subtopic in legacy mode when "Create Subtopic" button clicked', () => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
-    component.subtopicId = 123;
-    component.subtopicTitle = 'Test Subtopic';
-    component.editableUrlFragment = 'test-url';
-    component.htmlData = 'test html data';
-
-    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
-      true
-    );
-    spyOn(topicUpdateService, 'addSubtopic');
-    spyOn(topicUpdateService, 'setSubtopicTitle');
-    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
-    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
-    spyOn(topicUpdateService, 'setSubtopicUrlFragment');
-    spyOn(topicUpdateService, 'setSubtopicPageContentsHtml');
-    spyOn(SubtopicPage, 'createDefault').and.callThrough();
-    spyOn(topicEditorStateService, 'setSubtopicPage');
-    spyOn(ngbActiveModal, 'close');
-
-    component.save();
-
-    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
-      topic,
-      'Test Subtopic',
-      'test-url'
-    );
-    expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalledWith(
-      topic,
-      123,
-      'Test Subtopic'
-    );
-    expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalledWith(
-      topic,
-      123,
-      'test-url'
-    );
-    expect(SubtopicPage.createDefault).toHaveBeenCalledWith('1', 123);
-    expect(topicEditorStateService.setSubtopicPage).toHaveBeenCalled();
-    expect(ngbActiveModal.close).toHaveBeenCalledWith(123);
-  });
-
-  it('should save new subtopic in restructured study guides mode when "Create Subtopic" button clicked', () => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+  it('should save new subtopic when "Create Subtopic" button clicked', () => {
     component.subtopicId = 123;
     component.subtopicTitle = 'Test Subtopic';
     component.editableUrlFragment = 'test-url';
@@ -563,5 +478,14 @@ describe('create new subtopic modal', function () {
       123,
       '#FF0000'
     );
+  });
+
+  it('should return schema', () => {
+    expect(component.getSchema()).toEqual(component.SUBTOPIC_PAGE_SCHEMA);
+  });
+
+  it('should update local content value', () => {
+    component.localContentValueChange('test content');
+    expect(component.sectionContentHtml).toEqual('test content');
   });
 });

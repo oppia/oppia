@@ -116,11 +116,6 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.ShowRestructuredStudyGuides
-      .isEnabled;
-  }
-
   ngOnInit(): void {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -144,11 +139,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
     Promise.all([subtopicPromise, topicPromise]).then(
       ([subtopicDataObject, topicDataObject]) => {
-        if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-          this.sections = subtopicDataObject.getSections();
-        } else {
-          this.pageContents = subtopicDataObject.getPageContents();
-        }
+        this.sections = subtopicDataObject.getSections();
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
         this.parentTopicId = subtopicDataObject.getParentTopicId();
         this.pageContextService.setCustomEntityContext(
