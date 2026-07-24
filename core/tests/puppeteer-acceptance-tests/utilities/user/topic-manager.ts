@@ -5851,6 +5851,7 @@ export class TopicManager extends BaseUser {
     title: string,
     visible: boolean = true
   ): Promise<void> {
+    await this.expectChapterListIsVisible();
     await this.page.waitForFunction(
       (titleText: string, shouldBeVisible: boolean) => {
         const headers = document.querySelectorAll('.arc-boundary-title');
@@ -5874,6 +5875,7 @@ export class TopicManager extends BaseUser {
    * @param {number} count - The expected number of adventures.
    */
   async expectAdventureCount(count: number): Promise<void> {
+    await this.expectChapterListIsVisible();
     await this.page.waitForFunction(
       (expectedCount: number) => {
         const headers = document.querySelectorAll('.arc-boundary-header');
@@ -5894,6 +5896,7 @@ export class TopicManager extends BaseUser {
     title: string,
     description?: string
   ): Promise<void> {
+    await this.expectChapterListIsVisible();
     await this.page.waitForFunction(
       (titleText: string) => {
         const headers = document.querySelectorAll('.arc-boundary-header');
