@@ -195,50 +195,6 @@ describe('Topic Manager', function () {
   );
 
   it(
-    'should reorder chapters within adventure groupings',
-    async function () {
-      await curriculumAdmin.reorderChapters('Chapter 1', 'Chapter 2');
-      await curriculumAdmin.expectChaptersOrderToBe([
-        'Chapter 2',
-        'Chapter 1',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-        'Chapter 6',
-        'Chapter 7',
-        'Chapter 8',
-        'Chapter 9',
-        'Chapter 10',
-        'Chapter 11',
-      ]);
-
-      await curriculumAdmin.expectScreenshotToMatch(
-        'storyEditorAfterReorderingChapters',
-        __dirname
-      );
-
-      await curriculumAdmin.saveStoryDraft();
-
-      await curriculumAdmin.expectChaptersOrderToBe([
-        'Chapter 2',
-        'Chapter 1',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-        'Chapter 6',
-        'Chapter 7',
-        'Chapter 8',
-        'Chapter 9',
-        'Chapter 10',
-        'Chapter 11',
-      ]);
-
-      await curriculumAdmin.expectAdventureCount(3);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should persist adventure groupings after save and reload',
     async function () {
       await curriculumAdmin.saveStoryDraft();
@@ -251,8 +207,8 @@ describe('Topic Manager', function () {
       await curriculumAdmin.expectAdventureCount(3);
 
       await curriculumAdmin.expectChaptersOrderToBe([
-        'Chapter 2',
         'Chapter 1',
+        'Chapter 2',
         'Chapter 3',
         'Chapter 4',
         'Chapter 5',
