@@ -704,4 +704,261 @@ describe('TopicLessonCardComponent', () => {
       );
     });
   });
+
+  describe('toggleExpanded', () => {
+    it('should toggle isExpanded from false to true', () => {
+      component.isExpanded = false;
+
+      component.toggleExpanded();
+
+      expect(component.isExpanded).toBeTrue();
+    });
+
+    it('should toggle isExpanded from true to false', () => {
+      component.isExpanded = true;
+
+      component.toggleExpanded();
+
+      expect(component.isExpanded).toBeFalse();
+    });
+  });
+
+  describe('onPracticeButtonClick', () => {
+    it('should navigate to practiceUrl when provided', () => {
+      spyOn(component, 'navigateTo');
+      component.practiceUrl = '/practice/123';
+      component.startUrl = '/explore/123';
+
+      component.onPracticeButtonClick();
+
+      expect(component.navigateTo).toHaveBeenCalledWith('/practice/123');
+    });
+
+    it('should fallback to startUrl when practiceUrl is empty', () => {
+      spyOn(component, 'navigateTo');
+      component.practiceUrl = '';
+      component.startUrl = '/explore/123';
+
+      component.onPracticeButtonClick();
+
+      expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    });
+  });
+
+  describe('onStudyButtonClick', () => {
+    it('should navigate to studyUrl when provided', () => {
+      spyOn(component, 'navigateTo');
+      component.studyUrl = '/study/123';
+      component.startUrl = '/explore/123';
+
+      component.onStudyButtonClick();
+
+      expect(component.navigateTo).toHaveBeenCalledWith('/study/123');
+    });
+
+    it('should fallback to startUrl when studyUrl is empty', () => {
+      spyOn(component, 'navigateTo');
+      component.studyUrl = '';
+      component.startUrl = '/explore/123';
+
+      component.onStudyButtonClick();
+
+      expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    });
+  });
+
+  describe('ngOnChanges with navigatedLessonNumber', () => {
+    it('should auto-expand when navigatedLessonNumber matches lessonNumber', () => {
+      component.lessonNumber = 3;
+      component.isExpanded = false;
+
+      component.ngOnChanges({
+        navigatedLessonNumber: new SimpleChange(null, 3, false),
+      });
+
+      expect(component.isExpanded).toBeTrue();
+    });
+
+    it('should not expand when navigatedLessonNumber does not match', () => {
+      component.lessonNumber = 3;
+      component.isExpanded = false;
+
+      component.ngOnChanges({
+        navigatedLessonNumber: new SimpleChange(null, 5, false),
+      });
+
+      expect(component.isExpanded).toBeFalse();
+    });
+  });
+
+  describe('onStartButtonClick edge cases', () => {
+    it('should navigate directly to startUrl when shouldShowFallbackCta is false', () => {
+      spyOn(component, 'navigateTo');
+      component.startUrl = '/explore/123';
+      component.selectedTextLanguageCode = null;
+
+      component.onStartButtonClick();
+
+      expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    });
+  });
+
+  describe('getFallbackInfoTooltipText edge cases', () => {
+    it('should use DEFAULT_LANGUAGE_CODE when selectedTextLanguageCode is null', () => {
+      component.selectedTextLanguageCode = null;
+      component.availableTextLanguageCodes = ['en', 'fr'];
+      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('fr');
+      languageUtilService.getContentLanguageDescription
+        .withArgs('en')
+        .and.returnValue('English');
+
+      expect(component.getFallbackInfoTooltipText()).toBe(
+        'The story will be played in English.'
+      );
+    });
+
+    it('should return raw language code when both content and audio descriptions are missing', () => {
+      component.selectedTextLanguageCode = 'zh';
+      component.availableTextLanguageCodes = ['en', 'zh'];
+      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+      languageUtilService.getContentLanguageDescription
+        .withArgs('zh')
+        .and.returnValue(null);
+      languageUtilService.getAudioLanguageDescription
+        .withArgs('zh')
+        .and.returnValue(null);
+
+      expect(component.getFallbackInfoTooltipText()).toBe(
+        'The story will be played in zh.'
+      );
+    });
+  });
+
+  describe('getInitialVoiceoverLanguageCode edge cases', () => {
+    it('should use compatible voiceover when session fallback is not in available list', () => {
+      component.availableVoiceoverLanguageCodes = ['fr-CA', 'es'];
+      languageUtilService.getLanguageCodesRelatedToAudioLanguageCode
+        .withArgs('fr-CA')
+        .and.returnValue(['fr']);
+
+      expect(componentRef.getInitialVoiceoverLanguageCode('de', 'fr')).toBe(
+        'fr-CA'
+      );
+    });
+
+    it('should fall back to English when no compatible voiceover found', () => {
+      component.availableVoiceoverLanguageCodes = ['en', 'es'];
+      languageUtilService.getLanguageCodesRelatedToAudioLanguageCode.and.returnValue(
+        []
+      );
+
+      expect(componentRef.getInitialVoiceoverLanguageCode('de', 'fr')).toBe(
+        'en'
+      );
+    });
+
+    it('should use session fallback when it is in the available list', () => {
+      component.availableVoiceoverLanguageCodes = ['fr-CA', 'es'];
+
+      expect(componentRef.getInitialVoiceoverLanguageCode('fr-CA', 'en')).toBe(
+        'fr-CA'
+      );
+    });
+
+    it('should fall back to first available when session fallback is not available and no compatible found', () => {
+      component.availableVoiceoverLanguageCodes = ['es', 'de'];
+
+      expect(componentRef.getInitialVoiceoverLanguageCode('fr-CA', 'en')).toBe(
+        'es'
+      );
+    });
+  });
+
+  describe('isVoiceoverCompatibleWithTextLanguage edge cases', () => {
+    it('should handle regional voiceover codes that match text root codes', () => {
+      expect(
+        componentRef.isVoiceoverCompatibleWithTextLanguage('en-US', 'en')
+      ).toBeTrue();
+    });
+
+    it('should handle regional text codes that match voiceover root codes', () => {
+      expect(
+        componentRef.isVoiceoverCompatibleWithTextLanguage('es', 'es-MX')
+      ).toBeTrue();
+    });
+  });
+
+  describe('shouldShowInfoIcon edge cases', () => {
+    it('should return true when multiple non-English languages are available', () => {
+      component.availableTextLanguageCodes = ['fr', 'es'];
+
+      expect(component.shouldShowInfoIcon).toBeTrue();
+    });
+
+    it('should return false when only the default language code is available', () => {
+      component.availableTextLanguageCodes = ['en'];
+
+      expect(component.shouldShowInfoIcon).toBeFalse();
+    });
+  });
+
+  describe('showCheckpointBar edge cases', () => {
+    it('should return true when in_progress with positive checkpoint count', () => {
+      component.lessonProgressStatus = 'in_progress';
+      component.totalCheckpointsCount = 10;
+
+      expect(component.showCheckpointBar).toBeTrue();
+    });
+
+    it('should return true when completed with positive checkpoint count', () => {
+      component.lessonProgressStatus = 'completed';
+      component.totalCheckpointsCount = 5;
+
+      expect(component.showCheckpointBar).toBeTrue();
+    });
+  });
+
+  describe('ngOnInit expansion logic', () => {
+    it('should expand first lesson by default', () => {
+      component.lessonNumber = 1;
+
+      component.ngOnInit();
+
+      expect(component.isExpanded).toBeTrue();
+    });
+
+    it('should not expand non-first lessons by default', () => {
+      component.lessonNumber = 2;
+
+      component.ngOnInit();
+
+      expect(component.isExpanded).toBeFalse();
+    });
+  });
+
+  describe('saveSessionFallbackLanguageSelection', () => {
+    it('should save with null voiceover when voiceover is null', () => {
+      component.selectedTextLanguageCode = 'fr';
+      component.selectedVoiceoverLanguageCode = null;
+
+      componentRef.saveSessionFallbackLanguageSelection();
+
+      expect(
+        topicSessionFallbackLanguageService.saveFallbackSelection
+      ).toHaveBeenCalledWith('fr', null);
+    });
+  });
+
+  describe('getLanguageDescription edge cases', () => {
+    it('should return raw code when all description services return empty string', () => {
+      languageUtilService.getContentLanguageDescription
+        .withArgs('xx')
+        .and.returnValue('');
+      languageUtilService.getAudioLanguageDescription
+        .withArgs('xx')
+        .and.returnValue('');
+
+      expect(componentRef.getLanguageDescription('xx')).toBe('xx');
+    });
+  });
 });
