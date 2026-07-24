@@ -14,7 +14,6 @@ Pillow==10.1.0
 psutil==7.0.0
 pycodestyle==2.14.0
 pylint==4.0.6
-pylint-quotes==0.2.3
 pytest==8.4.2
 pytest-cov==4.1.0
 pytest-timeout==2.2.0

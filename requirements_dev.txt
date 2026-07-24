@@ -301,12 +301,6 @@ pygments==2.19.2 \
 pylint==4.0.6 \
     --hash=sha256:52f19191bee08bf103f9705ad1a0ece4aa5a0a4ef2bdcbd969375a1e6f6579d5 \
     --hash=sha256:d11a0e1fdb7b1cd46ec5d6fc78fee8b95f28695b2d6140e5809925f61e32ea54
-    # via
-    #   -r requirements_dev.in
-    #   pylint-quotes
-pylint-quotes==0.2.3 \
-    --hash=sha256:2d6bb3fa8a1a85af3af8a0ca875a719ac5bcdb735c45756284699d809c109c95 \
-    --hash=sha256:89decd985d3c019314da630f5e3fe0e0df951c2310525fbd6e710bca329c810e
     # via -r requirements_dev.in
 pytest==8.4.2 \
     --hash=sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01 \
