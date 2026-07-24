@@ -43,6 +43,11 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 describe('RteHelperModalComponent', () => {
   let component: RteHelperModalComponent;
@@ -1059,5 +1064,97 @@ describe('RteHelperModalComponent', () => {
       expect(component.isErrorMessageNonempty()).toBe(true);
       flush();
     }));
+  });
+});
+
+const rteSaveEmitter = new EventEmitter<void>();
+describe('RteHelperModalComponent in bottom sheet mode', () => {
+  let component: RteHelperModalComponent;
+  let fixture: ComponentFixture<RteHelperModalComponent>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let keydownSubject: Subject<KeyboardEvent>;
+
+  const modalData = {
+    componentId: 'Math',
+    customizationArgSpecs: [],
+    attrsCustomizationArgsDict: {},
+    componentIsNewlyCreated: true,
+  };
+
+  beforeEach(waitForAsync(() => {
+    keydownSubject = new Subject<KeyboardEvent>();
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(keydownSubject.asObservable());
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [
+        SharedFormsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        DirectivesModule,
+        NgbModalModule,
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader,
+          },
+        }),
+      ],
+      declarations: [RteHelperModalComponent],
+      providers: [
+        AlertsService,
+        PageContextService,
+        ImageLocalStorageService,
+        AssetsBackendApiService,
+        ImageUploadHelperService,
+        {
+          provide: NgbActiveModal,
+          useValue: jasmine.createSpyObj('activeModal', ['close', 'dismiss']),
+        },
+        {
+          provide: ExternalRteSaveService,
+          useValue: {onExternalRteSave: rteSaveEmitter},
+        },
+        TranslateService,
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {provide: MAT_BOTTOM_SHEET_DATA, useValue: modalData},
+      ],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(RteHelperModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should set properties from the injected bottom sheet data', () => {
+    expect(component.componentId).toEqual('Math');
+    expect(component.componentIsNewlyCreated).toBe(true);
+  });
+
+  it('should dismiss the bottom sheet when Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Escape'}));
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  });
+
+  it('should not dismiss the bottom sheet when a non-Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Enter'}));
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
+  });
+
+  it('should dismiss the bottom sheet with true when newly created and cancelled', () => {
+    component.cancel();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(true);
+  });
+
+  it('should dismiss the bottom sheet with true when deleted', () => {
+    component.delete();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(true);
   });
 });

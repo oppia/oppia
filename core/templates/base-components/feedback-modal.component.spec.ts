@@ -56,6 +56,11 @@ import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {UserInfo} from 'domain/user/user-info.model';
+import {
+  MatBottomSheetRef,
+  MAT_BOTTOM_SHEET_DATA,
+} from '@angular/material/bottom-sheet';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'oppia-image-receiver',
@@ -1401,5 +1406,107 @@ describe('FeedbackModalComponent', () => {
     if (turnstile) {
       expect(turnstile.render).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe('FeedbackModalComponent in bottom sheet mode', () => {
+  let component: FeedbackModalComponent;
+  let fixture: ComponentFixture<FeedbackModalComponent>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+  let keydownSubject: Subject<KeyboardEvent>;
+
+  beforeEach(waitForAsync(() => {
+    keydownSubject = new Subject<KeyboardEvent>();
+    bottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'dismiss',
+      'keydownEvents',
+    ]);
+    bottomSheetRef.keydownEvents.and.returnValue(keydownSubject.asObservable());
+
+    const translateServiceSpy = jasmine.createSpyObj('TranslateService', [
+      'instant',
+    ]);
+    translateServiceSpy.instant.and.callFake((key: string) => key);
+
+    const alertServiceSpy = jasmine.createSpyObj('AlertsService', [
+      'addSuccessMessage',
+      'addWarning',
+    ]);
+
+    const feedbackSessionInfoServiceSpy = jasmine.createSpyObj(
+      'FeedbackSessionInfoService',
+      ['getSessionInfo']
+    );
+
+    const feedbackScreenshotStagingServiceSpy = jasmine.createSpyObj(
+      'FeedbackScreenshotStagingService',
+      ['stageScreenshotAsync', 'clearStagedScreenshot']
+    );
+
+    const insertScriptServiceSpy = jasmine.createSpyObj('InsertScriptService', [
+      'loadScript',
+    ]);
+    insertScriptServiceSpy.loadScript.and.returnValue(true);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, FormsModule, RouterTestingModule],
+      declarations: [
+        FeedbackModalComponent,
+        MockImageReceiverComponent,
+        MockTranslatePipe,
+      ],
+      providers: [
+        PageContextService,
+        PlayerPositionService,
+        LearnerAnswerInfoService,
+        FeedbackBackendApiService,
+        {provide: TranslateService, useValue: translateServiceSpy},
+        {provide: AlertsService, useValue: alertServiceSpy},
+        {
+          provide: FeedbackSessionInfoService,
+          useValue: feedbackSessionInfoServiceSpy,
+        },
+        {provide: UserService, useClass: MockUserService},
+        {provide: WindowRef, useClass: MockWindowRef},
+        {provide: NgbActiveModal, useClass: MockActiveModal},
+        {
+          provide: FeedbackScreenshotStagingService,
+          useValue: feedbackScreenshotStagingServiceSpy,
+        },
+        {provide: InsertScriptService, useValue: insertScriptServiceSpy},
+        {provide: MatBottomSheetRef, useValue: bottomSheetRef},
+        {
+          provide: MAT_BOTTOM_SHEET_DATA,
+          useValue: {feedbackModalType: FeedbackModalType.LESSON_FEEDBACK},
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(FeedbackModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should set the feedback modal type from the injected data', () => {
+    expect(component.feedbackModalType).toBe(FeedbackModalType.LESSON_FEEDBACK);
+  });
+
+  it('should dismiss the bottom sheet when Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Escape'}));
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  });
+
+  it('should not dismiss the bottom sheet when a non-Escape key is pressed', () => {
+    keydownSubject.next(new KeyboardEvent('keydown', {key: 'Enter'}));
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
+  });
+
+  it('should dismiss the bottom sheet on closeModal', () => {
+    component.closeModal();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   });
 });
