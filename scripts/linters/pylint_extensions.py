@@ -1081,7 +1081,10 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         func_node = node.frame()
 
         doc = docstrings_checker.docstringify(func_node.doc_node)
-        if doc.matching_sections() == 0 and self.config.accept_no_return_doc:
+        if (
+            doc.matching_sections() == 0
+            and self.linter.config.accept_no_return_doc
+        ):
             return
 
         is_property = checker_utils.decorated_with_property(func_node)
@@ -1105,7 +1108,10 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         func_node = node.frame()
 
         doc = docstrings_checker.docstringify(func_node.doc_node)
-        if doc.matching_sections() == 0 and self.config.accept_no_yields_doc:
+        if (
+            doc.matching_sections() == 0
+            and self.linter.config.accept_no_yields_doc
+        ):
             return
 
         doc_has_yields = doc.has_yields()
@@ -1168,7 +1174,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             return
 
         if accept_no_param_doc is None:
-            accept_no_param_doc = self.config.accept_no_param_doc
+            accept_no_param_doc = self.linter.config.accept_no_param_doc
         tolerate_missing_params = doc.params_documented_elsewhere()
 
         # Collect the function arguments.
@@ -1295,7 +1301,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             excs: list(str). A list of exception types.
             node: astroid.nodes.FunctionDef. Node to access module content.
         """
-        if self.config.accept_no_raise_doc:
+        if self.linter.config.accept_no_raise_doc:
             return
 
         self._add_raise_message(excs, node)
@@ -1515,7 +1521,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
         """Parse the forbidden imports."""
         module_to_forbidden_imports: List[Tuple[str, str]] = [
             forbidden_import.strip().split(':')
-            for forbidden_import in self.config.forbidden_imports
+            for forbidden_import in self.linter.config.forbidden_imports
         ]
         self._module_to_forbidden_imports = []
         for module_regex, forbidden_imports in module_to_forbidden_imports:
@@ -1757,7 +1763,7 @@ class SingleLineCommentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
         # Check if allowed prefix is used.
         allowed_prefix_is_present = any(
             line[2:].startswith(word)
-            for word in self.config.allowed_comment_prefixes
+            for word in self.linter.config.allowed_comment_prefixes
         )
 
         # Check if comment contains any excluded phrase.
@@ -2086,7 +2092,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
                         error_code = error_code.strip()
                         if (
                             error_code
-                            not in self.config.allowed_type_ignore_error_codes
+                            not in self.linter.config.allowed_type_ignore_error_codes
                         ):
                             encountered_prohibited_error_codes.append(
                                 error_code
@@ -2748,7 +2754,9 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
         """Parse pylint config entries for replacements of disallowed
         functions represented by strings.
         """
-        for entry in self.config.disallowed_functions_and_replacements_str:
+        for (
+            entry
+        ) in self.linter.config.disallowed_functions_and_replacements_str:
             splits = [s.strip() for s in entry.split('=>')]
             assert len(splits) in (1, 2)
             if len(splits) == 1:
@@ -2761,7 +2769,9 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
         functions represented by regex.
         """
         remove_regexes = []
-        for entry in self.config.disallowed_functions_and_replacements_regex:
+        for (
+            entry
+        ) in self.linter.config.disallowed_functions_and_replacements_regex:
             splits = [s.strip() for s in entry.split('=>')]
             assert len(splits) in (1, 2)
             if len(splits) == 1:
