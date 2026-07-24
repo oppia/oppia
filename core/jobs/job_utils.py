@@ -20,6 +20,9 @@ from __future__ import annotations
 
 from core.platform import models
 
+import apache_beam as beam
+from apache_beam.options import pipeline_options
+
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
@@ -36,6 +39,12 @@ if MYPY:  # pragma: no cover
 app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+
+
+def resolve_project_id(pipeline: beam.Pipeline | None) -> str:
+    if pipeline is None:
+        raise ValueError('pipeline must not be None')
+    return pipeline.options.view_as(pipeline_options.GoogleCloudOptions).project
 
 
 # Here we use type Any because argument 'new_values' can accept arbitrary
