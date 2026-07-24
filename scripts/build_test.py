@@ -649,6 +649,43 @@ class BuildTests(test_utils.GenericTestBase):
                 with generate_python_package_swap, sync_angular_css_hashes_swap:
                     build.main(args=['--prod_env'])
 
+    def test_build_with_prod_env_generates_python_package_after_ng_build(
+        self,
+    ) -> None:
+        call_order: List[str] = []
+
+        def mock_build_using_ng() -> None:
+            call_order.append('build_using_ng')
+
+        def mock_generate_python_package() -> None:
+            call_order.append('generate_python_package')
+
+        ensure_files_exist_swap = self.swap(
+            build, '_ensure_files_exist', lambda _: None
+        )
+        build_using_ng_swap = self.swap(
+            build, 'build_using_ng', mock_build_using_ng
+        )
+        generate_python_package_swap = self.swap(
+            build, 'generate_python_package', mock_generate_python_package
+        )
+        modify_constants_swap = self.swap(
+            common, 'modify_constants', lambda **_: None
+        )
+        clean_swap = self.swap(build, 'clean', lambda: None)
+        sync_angular_css_hashes_swap = self.swap(
+            build, 'sync_angular_css_hashes', lambda: None
+        )
+
+        with ensure_files_exist_swap, clean_swap:
+            with modify_constants_swap, build_using_ng_swap:
+                with generate_python_package_swap, sync_angular_css_hashes_swap:
+                    build.main(args=['--prod_env'])
+
+        self.assertEqual(
+            call_order, ['build_using_ng', 'generate_python_package']
+        )
+
     def test_build_with_prod_source_maps(self) -> None:
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', lambda _: None
