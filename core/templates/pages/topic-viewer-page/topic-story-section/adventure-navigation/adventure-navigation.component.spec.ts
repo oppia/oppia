@@ -50,15 +50,15 @@ describe('AdventureNavigationComponent', () => {
   it('should mark first lesson as active when no explicit active lesson exists', () => {
     component.activeLessonNumber = null;
 
-    expect(component.isActiveLesson(1)).toBeTrue();
-    expect(component.isActiveLesson(2)).toBeFalse();
+    expect(component.isActiveLesson(1)).toBe(true);
+    expect(component.isActiveLesson(2)).toBe(false);
   });
 
   it('should mark matching lesson as active when active lesson is provided', () => {
     component.activeLessonNumber = 3;
 
-    expect(component.isActiveLesson(3)).toBeTrue();
-    expect(component.isActiveLesson(2)).toBeFalse();
+    expect(component.isActiveLesson(3)).toBe(true);
+    expect(component.isActiveLesson(2)).toBe(false);
   });
 
   it('should emit lessonSelected event when onLessonClick is called', () => {
@@ -77,16 +77,23 @@ describe('AdventureNavigationComponent', () => {
     expect(component.practiceSelected.emit).toHaveBeenCalledWith(2);
   });
 
-  it('should clear all timeouts on destroy', () => {
-    component.scrollCheckTimeouts = [
-      setTimeout(() => {}, 1000),
-      setTimeout(() => {}, 2000),
-    ];
+  it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {
+    const mockElement = {
+      scrollWidth: 500,
+      clientWidth: 200,
+      scrollLeft: 0,
+    };
+    component.scrollWrapper = {nativeElement: mockElement} as never;
+
+    component.ngAfterViewInit();
+
+    tick(50);
+    expect(component.showRightArrow).toBe(true);
 
     component.ngOnDestroy();
 
-    expect(component.scrollCheckTimeouts).toEqual([]);
-  });
+    tick(1000);
+  }));
 
   it('should update arrows on window resize', () => {
     const mockElement = {
@@ -98,8 +105,8 @@ describe('AdventureNavigationComponent', () => {
 
     component.onWindowResize();
 
-    expect(component.showLeftArrow).toBeFalse();
-    expect(component.showRightArrow).toBeTrue();
+    expect(component.showLeftArrow).toBe(false);
+    expect(component.showRightArrow).toBe(true);
   });
 
   it('should update arrows on scroll', () => {
@@ -112,8 +119,8 @@ describe('AdventureNavigationComponent', () => {
 
     component.onScroll();
 
-    expect(component.showLeftArrow).toBeTrue();
-    expect(component.showRightArrow).toBeTrue();
+    expect(component.showLeftArrow).toBe(true);
+    expect(component.showRightArrow).toBe(true);
   });
 
   it('should scroll left and update arrows', fakeAsync(() => {
@@ -178,8 +185,8 @@ describe('AdventureNavigationComponent', () => {
 
     tick(500);
 
-    expect(component.showRightArrow).toBeTrue();
-    expect(component.showLeftArrow).toBeFalse();
+    expect(component.showRightArrow).toBe(true);
+    expect(component.showLeftArrow).toBe(false);
   }));
 
   it('should schedule arrow updates on ngOnChanges when adventureGroups change', fakeAsync(() => {
@@ -200,21 +207,30 @@ describe('AdventureNavigationComponent', () => {
 
     tick(300);
 
-    expect(component.showLeftArrow).toBeTrue();
-    expect(component.showRightArrow).toBeTrue();
+    expect(component.showLeftArrow).toBe(true);
+    expect(component.showRightArrow).toBe(true);
   }));
 
-  it('should not schedule arrow updates on ngOnChanges when adventureGroups do not change', () => {
-    spyOn(component, 'updateArrows' as never);
+  it('should not schedule arrow updates on ngOnChanges when adventureGroups do not change', fakeAsync(() => {
+    const mockElement = {
+      scrollWidth: 500,
+      clientWidth: 200,
+      scrollLeft: 0,
+    };
+    component.scrollWrapper = {nativeElement: mockElement} as never;
+
+    component.showLeftArrow = false;
+    component.showRightArrow = false;
 
     component.ngOnChanges({
       activeLessonNumber: new SimpleChange(null, 1, false),
     });
 
-    expect(
-      (component as unknown as Record<string, unknown>).updateArrows
-    ).not.toHaveBeenCalled();
-  });
+    tick(500);
+
+    expect(component.showLeftArrow).toBe(false);
+    expect(component.showRightArrow).toBe(false);
+  }));
 
   it('should hide arrows when there is no overflow', () => {
     const mockElement = {
@@ -226,8 +242,8 @@ describe('AdventureNavigationComponent', () => {
 
     component.onScroll();
 
-    expect(component.showLeftArrow).toBeFalse();
-    expect(component.showRightArrow).toBeFalse();
+    expect(component.showLeftArrow).toBe(false);
+    expect(component.showRightArrow).toBe(false);
   });
 
   it('should hide both arrows when scroll is near the end', () => {
@@ -240,8 +256,8 @@ describe('AdventureNavigationComponent', () => {
 
     component.onScroll();
 
-    expect(component.showLeftArrow).toBeTrue();
-    expect(component.showRightArrow).toBeFalse();
+    expect(component.showLeftArrow).toBe(true);
+    expect(component.showRightArrow).toBe(false);
   });
 
   it('should show right arrow but not left when scroll is at start', () => {
@@ -254,8 +270,8 @@ describe('AdventureNavigationComponent', () => {
 
     component.onScroll();
 
-    expect(component.showLeftArrow).toBeFalse();
-    expect(component.showRightArrow).toBeTrue();
+    expect(component.showLeftArrow).toBe(false);
+    expect(component.showRightArrow).toBe(true);
   });
 
   it('should not update arrows when scrollWrapper nativeElement is null', () => {

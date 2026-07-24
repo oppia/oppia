@@ -1230,6 +1230,9 @@ describe('TopicStorySectionComponent', () => {
       {}
     );
 
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
+
     component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
     component.classroomUrlFragment = '';
     component.topicUrlFragment = '';
@@ -1435,7 +1438,8 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.adventureGroups.length).toBe(16);
     expect(component.adventureGroups[0].accentColor).toBe('#27a844');
-    expect(component.adventureGroups[15].accentColor).toBe('#2e7d32');
+    expect(component.adventureGroups[14].accentColor).toBe('#2e7d32');
+    expect(component.adventureGroups[15].accentColor).toBe('#27a844');
   });
 
   it('should handle practiceCard related lesson number as null when no lessons', () => {

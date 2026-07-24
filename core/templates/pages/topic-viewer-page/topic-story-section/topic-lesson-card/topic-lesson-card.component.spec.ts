@@ -770,6 +770,7 @@ describe('TopicLessonCardComponent', () => {
   describe('ngOnChanges with navigatedLessonNumber', () => {
     it('should auto-expand when navigatedLessonNumber matches lessonNumber', () => {
       component.lessonNumber = 3;
+      component.navigatedLessonNumber = 3;
       component.isExpanded = false;
 
       component.ngOnChanges({
@@ -781,6 +782,7 @@ describe('TopicLessonCardComponent', () => {
 
     it('should not expand when navigatedLessonNumber does not match', () => {
       component.lessonNumber = 3;
+      component.navigatedLessonNumber = 5;
       component.isExpanded = false;
 
       component.ngOnChanges({
