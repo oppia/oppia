@@ -18,6 +18,7 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
+import {MockTranslateModule} from 'tests/unit-test-utils';
 import {MasteryChallengeCardComponent} from './mastery-challenge-card.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -37,6 +38,7 @@ describe('MasteryChallengeCardComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MasteryChallengeCardComponent],
+      imports: [MockTranslateModule],
       providers: [
         {
           provide: WindowRef,

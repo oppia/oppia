@@ -19,6 +19,7 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
+import {MockTranslateModule} from 'tests/unit-test-utils';
 import {AdventureNavigationComponent} from './adventure-navigation.component';
 
 describe('AdventureNavigationComponent', () => {
@@ -28,6 +29,7 @@ describe('AdventureNavigationComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AdventureNavigationComponent],
+      imports: [MockTranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
