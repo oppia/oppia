@@ -141,6 +141,8 @@ disable=abstract-method,
         cyclic-import,
 # TODO(#14322): Reinstate this.
         missing-type-doc,
+# TODO(#21214): Reinstate this.
+        too-many-positional-arguments,
 
 [REPORTS]
 
