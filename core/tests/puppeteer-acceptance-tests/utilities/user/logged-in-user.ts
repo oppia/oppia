@@ -38,6 +38,7 @@ const siteAdminPageUrl = testConstants.URLs.AdminPage;
 const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const splashPageUrl = testConstants.URLs.splash;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
+const loginPageUrl = testConstants.URLs.Login;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -160,6 +161,10 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const lessonInfoButton = 'button.oppia-lesson-info';
+const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
+const contributorProfileLink = '.e2e-test-contributor-icon';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
@@ -361,7 +366,6 @@ const mobileGetInvolvedMenuContainerSelector =
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
-
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 
@@ -720,6 +724,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
+  }
+
+  /**
    * This function navigates to the given topic URL and checks if the page displays
    * an 'Error 404' message.
    * @param {string} topicUrlFragment - The URL fragment of the topic to check.
@@ -775,6 +786,10 @@ export class LoggedInUser extends BaseUser {
       const ratingStars = await this.page.$$(ratingStarSelector);
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
+      if (!feedback || feedback.trim() === '') {
+        showMessage('No feedback provided; skipping feedback submission.');
+        return;
+      }
 
       await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
@@ -4804,6 +4819,42 @@ export class LoggedInUser extends BaseUser {
 
     showMessage(
       'All specified chapters are present in the coming soon chapters list'
+    );
+  }
+
+  /**
+   * Opens the lesson info modal.
+   */
+  async openLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoButton, true);
+    await this.clickOnElementWithSelector(lessonInfoButton);
+    await this.expectElementToBeVisible(lessonInfoCardSelector, true);
+  }
+
+  /**
+   * Closes the lesson info modal.
+   */
+  async closeLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(closeLessonInfoButton, true);
+    await this.clickOnElementWithSelector(closeLessonInfoButton);
+    await this.expectElementToBeVisible(lessonInfoCardSelector, false);
+  }
+
+  /**
+   * Navigates to the creator's profile page from the lesson info modal.
+   */
+
+  async visitCreatorProfileFromLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(contributorProfileLink, true);
+
+    await this.clickOnElementWithSelector(contributorProfileLink);
+
+    await this.waitForPageToFullyLoad();
+    const expectedProfilePath: string = '/profile/';
+    await this.page.waitForFunction(
+      (path: string) => window.location.href.includes(path),
+      {},
+      expectedProfilePath
     );
   }
 }

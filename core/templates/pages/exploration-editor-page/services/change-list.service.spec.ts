@@ -16,7 +16,7 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import {async, fakeAsync, flush, TestBed} from '@angular/core/testing';
+import {waitForAsync, fakeAsync, flush, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeListService} from './change-list.service';
 import {LoaderService} from 'services/loader.service';
@@ -141,7 +141,7 @@ describe('Change List Service when changes are mergable', () => {
   let mockExplorationDataService: MockExplorationDataService1;
   let mockEventEmitter = new EventEmitter();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService1();
     TestBed.configureTestingModule({
@@ -690,7 +690,7 @@ describe('Change List Service when changes are not mergable', () => {
   let alertsSpy: jasmine.Spy;
   let mockExplorationDataService: MockExplorationDataService1;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService2();
     TestBed.configureTestingModule({
@@ -755,7 +755,7 @@ describe('Change List Service when internet is available', () => {
   let mockExplorationDataService: MockExplorationDataService3;
   let mockAutosaveInfoModalsService: MockAutosaveInfoModalsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService3();
     mockAutosaveInfoModalsService = new MockAutosaveInfoModalsService();

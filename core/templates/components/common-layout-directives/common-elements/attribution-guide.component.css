@@ -42,8 +42,12 @@ attribution-guide .oppia-cc-icon a.oppia-attribution-link:focus {
 }
 
 .oppia-attribution-guide .oppia-attribution-guide-text {
+  background: none;
+  border: none;
   color: #094142;
+  cursor: pointer;
   font-size: 10px;
+  padding: 0;
   text-decoration: underline;
 }
 

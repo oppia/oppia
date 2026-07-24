@@ -16,7 +16,7 @@
  * @fileoverview Component for the InteractiveMap short response.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseInteractiveMapComponent} from './oppia-short-response-interactive-map.component';
 
@@ -30,7 +30,7 @@ describe('ShortResponseInteractiveMapComponent', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ShortResponseInteractiveMapComponent],
       providers: [

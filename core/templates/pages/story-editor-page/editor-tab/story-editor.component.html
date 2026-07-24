@@ -201,8 +201,61 @@
                 <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
                   <div *ngFor="let node of linearNodesList;index as idx"
                        cdkDrag>
+                    <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && (idx === 0 || !isSameArc(idx))"
+                         class="inline-arc-boundary-row">
+                      <div class="arc-boundary-header"
+                           [style.background-color]="getArcColorForNode(node.getId()).headerBg"
+                           [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
+                        <div class="arc-boundary-info">
+                          <div class="arc-boundary-title-row">
+                            <span class="arc-boundary-flag-badge"
+                                  [style.background-color]="getArcColorForNode(node.getId()).flagBg"
+                                  aria-hidden="true">
+                              <i class="fa fa-flag"></i>
+                            </span>
+                            <span class="arc-boundary-title">
+                              {{ getArcForNode(node.getId()).getTitle() }}
+                            </span>
+                          </div>
+                          <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId()).getDescription()">
+                            {{ getArcForNode(node.getId()).getDescription() }}
+                          </span>
+                          <span class="arc-boundary-chapter-count">
+                            {{ getArcForNode(node.getId()).getNodeIds().length }} chapters
+                          </span>
+                        </div>
+                        <div class="arc-boundary-actions">
+                          <button type="button" class="btn btn-sm arc-edit-button"
+                                  (click)="onEditArcClick(node.getId());$event.stopPropagation()">
+                            <i class="fas fa-pen" aria-hidden="true"></i>
+                            Edit Arc
+                          </button>
+                          <button type="button" class="btn btn-sm arc-remove-button"
+                                  *ngIf="!isFirstArc(node.getId())"
+                                  (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
+                            <i class="far fa-trash-alt" aria-hidden="true"></i>
+                            Remove Arc Boundary
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && idx > 0 && isSameArc(idx)"
+                         class="inline-split-line-row">
+                      <div class="split-line-container">
+                        <div class="split-line"></div>
+                        <button type="button" class="btn btn-sm split-into-arc-button"
+                                (click)="splitIntoArc(idx);$event.stopPropagation()">
+                          <i class="fas fa-cut"></i>
+                          Split Into Arc
+                        </button>
+                        <div class="split-line"></div>
+                      </div>
+                    </div>
                     <div class="story-editor-node"
-                         [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                      [ngClass]="{
+                        'selected-node': (node.getId() === idOfNodeToEdit),
+                        'story-editor-node--no-bottom-border': isStoryEditorArcsFeatureFlagEnabled() && idx < linearNodesList.length - 1 && isSameArc(idx + 1)
+                      }"
                          (click)="navigateToChapterWithId(node.getId(), idx)">
                       <div class="story-editor-node-title">
                         <span> {{ idx+1 }}. </span>
@@ -233,20 +286,15 @@
         </mat-card>
       </div>
 
-      <div class="chapter-list-container" *ngIf="isSerialChapterFeatureFlagEnabled()">
+      <div class="chapter-list-container"
+           *ngIf="isSerialChapterFeatureFlagEnabled() && !isStoryEditorArcsFeatureFlagEnabled()">
         <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card chapter-control-container">
           <div class="story-node-editor-container">
             <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
                  (click)="toggleChapterLists()">
               <span>Chapter Control</span>
-              <i class="fa fa-caret-down"
-                 *ngIf="!chaptersListIsShown"
-                 aria-hidden="true">
-              </i>
-              <i class="fa fa-caret-up"
-                 *ngIf="chaptersListIsShown"
-                 aria-hidden="true">
-              </i>
+              <i class="fa fa-caret-down" *ngIf="!chaptersListIsShown" aria-hidden="true"></i>
+              <i class="fa fa-caret-up"   *ngIf="chaptersListIsShown"  aria-hidden="true"></i>
             </div>
           </div>
           <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content chapter-control-panel">
@@ -256,23 +304,21 @@
                   <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
                   <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                           (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
-                          class="publish-upto-chapter-dropdown e2e-test-publish-up-to-chapter-dropdown">
+                          class="publish-upto-chapter-dropdown e2e-test-publish-up-to-chapter-dropdown"
+                          title="Publish up to chapter selector">
                     <option [value]="-1">None</option>
                     <option *ngFor="let node of linearNodesList;index as idx"
                             [disabled]="!chapterIsPublishable[idx]"
-                            [value]="idx">
-                            {{ idx+1 }}
+                            [value]="idx">{{ idx+1 }}
                     </option>
                   </select>
                 </div>
               </div>
               <div *ngIf="!linearNodesList.length">
-                <p class="no-chapters-message">
-                  This story has no chapters.
-                </p>
+                <p class="no-chapters-message">This story has no chapters.</p>
               </div>
               <div *ngIf="linearNodesList.length">
-                <div  class="story-nodes-container">
+                <div class="story-nodes-container">
                   <table cdkDropList
                          [cdkDropListData]="linearNodesList"
                          (cdkDropListDropped)="drop($event)">
@@ -284,35 +330,206 @@
                       <th>Last Modified or Published</th>
                       <th>Planned Publication Date</th>
                     </tr>
-                    <tr *ngFor="let node of linearNodesList;index as idx"
-                        class="story-node"
-                        [ngClass]="{'published-node': (node.getStatus() === 'Published'),
-                                   'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
-                                   'draft-node': (node.getStatus() === 'Draft')}"
+                    <ng-container *ngFor="let node of linearNodesList;index as idx">
+                      <tr class="story-node"
+                          [ngClass]="{'published-node': node.getStatus() === 'Published',
+                                     'ready-to-publish-node': node.getStatus() === 'Ready To Publish',
+                                     'draft-node': node.getStatus() === 'Draft'}"
+                          (click)="navigateToChapterWithId(node.getId(), idx)"
+                          cdkDrag
+                          [cdkDragDisabled]="isDragAndDropDisabled(node)"
+                          [cdkDragData]="node">
+                        <td class="drag-handler" (click)="$event.stopPropagation()">
+                          <span class="fas fa-grip-vertical draggable-icon-indicator"
+                                *ngIf="node.getStatus() !== 'Published'">
+                          </span>
+                        </td>
+                        <td class="chapter-index">{{ idx+1 }}</td>
+                        <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
+                        <td class="chapter-status e2e-test-chapter-status">{{ node.getStatus() }}</td>
+                        <td class="chapter-last-modified">
+                          {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                          <div *ngIf="node.getStatus() === 'Published'">(published)</div>
+                          <div *ngIf="node.getStatus() === 'Ready To Publish'">(draft modified)</div>
+                          <div *ngIf="node.getStatus() === 'Draft'">(draft added)</div>
+                        </td>
+                        <td class="chapter-planned-publication-date">
+                          {{ node.getPlannedPublicationDateMsecs() != null
+                              ? getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs())
+                              : '-' }}
+                        </td>
+                        <td class="edit-options-container">
+                          <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
+                             (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
+                             aria-label="Chapter edit">
+                          </i>
+                          <div class="chapter-option-box"
+                               *ngIf="selectedChapterIndex === idx"
+                               (mouseleave)="toggleChapterEditOptions(-1)"
+                               (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                            <div class="chapter-edit-option e2e-test-move-chapter-up-button"
+                                 *ngIf="idx !== 0 && linearNodesList[idx-1].getStatus() !== 'Published' && linearNodesList[idx].getStatus() !== 'Published'"
+                                 (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
+                              <span>Move Up</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-move-chapter-down-button"
+                                 *ngIf="idx !== linearNodesList.length-1 && node.getStatus() !== 'Published'"
+                                 (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
+                              <span>Move Down</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-edit-chapter-button"
+                                 (click)="navigateToChapterWithId(node.getId(), idx)">
+                              <span>Edit</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-delete-chapter-button"
+                                 (click)="deleteNode(node.getId());$event.stopPropagation()">
+                              <span>Delete</span>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </table>
+                </div>
+              </div>
+              <button (click)="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
+                + ADD CHAPTER
+              </button>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+
+      <div class="chapter-list-container arc-mode-container"
+           *ngIf="isSerialChapterFeatureFlagEnabled() && isStoryEditorArcsFeatureFlagEnabled()">
+        <mat-card class="oppia-page-card chapter-control-container arc-mode-card">
+          <div class="arc-mode-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
+               (click)="toggleChapterLists()">
+            <span class="arc-mode-card-heading-text">Chapters</span>
+            <i class="fa fa-caret-down" *ngIf="!chaptersListIsShown" aria-hidden="true"></i>
+            <i class="fa fa-caret-up"   *ngIf="chaptersListIsShown"  aria-hidden="true"></i>
+          </div>
+
+          <div *ngIf="chaptersListIsShown" class="arc-mode-card-body">
+            <div class="arc-mode-publish-bar" *ngIf="linearNodesList.length">
+              <label class="arc-mode-publish-label" for="arc-publish-upto">Publish up to Chapter ...</label>
+              <select id="arc-publish-upto"
+                      [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
+                      (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
+                      class="arc-mode-publish-select e2e-test-publish-up-to-chapter-dropdown"
+                      title="Publish up to chapter selector">
+                <option [value]="-1">None</option>
+                <option *ngFor="let node of linearNodesList;index as idx"
+                        [disabled]="!chapterIsPublishable[idx]"
+                        [value]="idx">{{ idx+1 }}
+                </option>
+              </select>
+            </div>
+
+            <p *ngIf="!linearNodesList.length" class="no-chapters-message">
+              This story has no chapters.
+            </p>
+
+            <div *ngIf="linearNodesList.length" class="arc-table-wrapper">
+              <table class="arc-chapter-table">
+                <thead>
+                  <tr class="arc-table-heading">
+                    <th class="col-drag"></th>
+                    <th class="col-num">#</th>
+                    <th class="col-name">Chapter Name</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-modified">Last Modified or Published</th>
+                    <th class="col-date">Planned Publication Date</th>
+                    <th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody cdkDropList
+                       [cdkDropListData]="linearNodesList"
+                       (cdkDropListDropped)="drop($event)">
+                  <ng-container *ngFor="let node of linearNodesList;index as idx">
+
+                    <tr *ngIf="idx === 0 || !isSameArc(idx)" class="arc-header-row">
+                      <td colspan="7" class="arc-header-cell">
+                        <div class="arc-header-card"
+                             [style.background-color]="getArcColorForNode(node.getId()).headerBg"
+                             [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
+                          <div class="arc-header-left">
+                            <span class="arc-flag-badge"
+                                  [style.background-color]="getArcColorForNode(node.getId()).flagBg">
+                              <i class="fa fa-flag" aria-hidden="true"></i>
+                            </span>
+                            <div class="arc-header-text">
+                              <span class="arc-header-title">
+                                {{ getArcForNode(node.getId()).getTitle() }}
+                              </span>
+                              <span class="arc-header-description"
+                                    *ngIf="getArcForNode(node.getId()).getDescription()">
+                                {{ getArcForNode(node.getId()).getDescription() }}
+                              </span>
+                              <span class="arc-header-chapter-count">
+                                {{ getArcForNode(node.getId()).getNodeIds().length }} chapters
+                              </span>
+                            </div>
+                          </div>
+                          <div class="arc-header-actions">
+                            <button type="button" class="arc-action-btn arc-edit-btn"
+                                    (click)="onEditArcClick(node.getId());$event.stopPropagation()">
+                              <i class="fas fa-pen" aria-hidden="true"></i> Edit Arc
+                            </button>
+                            <button type="button" class="arc-action-btn arc-remove-btn"
+                                    *ngIf="!isFirstArc(node.getId())"
+                                    (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
+                              <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Arc Boundary
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr *ngIf="idx > 0 && isSameArc(idx)" class="arc-split-row">
+                      <td colspan="7" class="arc-split-cell">
+                        <div class="arc-split-line-container">
+                          <div class="arc-split-line"></div>
+                          <button type="button" class="arc-split-btn"
+                                  (click)="splitIntoArc(idx);$event.stopPropagation()">
+                            <i class="fas fa-cut" aria-hidden="true"></i> Split Into Arc
+                          </button>
+                          <div class="arc-split-line"></div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr class="arc-chapter-row"
+                        [ngClass]="{
+                          'arc-chapter-row--before-split': idx < linearNodesList.length - 1 && isSameArc(idx + 1)
+                        }"
+                        [style.border-left-color]="getArcColorForNode(node.getId()).rowAccent"
                         (click)="navigateToChapterWithId(node.getId(), idx)"
                         cdkDrag
                         [cdkDragDisabled]="isDragAndDropDisabled(node)"
                         [cdkDragData]="node">
-                      <td class="drag-handler" (click)="$event.stopPropagation()">
+                      <td class="col-drag arc-drag-handle" (click)="$event.stopPropagation()">
                         <span class="fas fa-grip-vertical draggable-icon-indicator"
-                              *ngIf="node.getStatus()!=='Published'">
+                              *ngIf="node.getStatus() !== 'Published'">
                         </span>
                       </td>
-                      <td class="chapter-index"> {{ idx+1 }} </td>
-                      <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
-                      <td class="chapter-status e2e-test-chapter-status">
+                      <td class="col-num arc-chapter-num">{{ idx + 1 }}</td>
+                      <td class="col-name arc-chapter-name e2e-test-chapter-title">{{ node.getTitle() }}</td>
+                      <td class="col-status arc-chapter-status e2e-test-chapter-status">
                         {{ node.getStatus() }}
                       </td>
-                      <td class="chapter-last-modified">
-                          {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
-                        <div *ngIf="node.getStatus()=='Published'">(published)</div>
-                        <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
-                        <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
+                      <td class="col-modified arc-chapter-modified">
+                        {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                        <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Published'">(published)</div>
+                        <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Ready To Publish'">(draft modified)</div>
+                        <div class="arc-modified-sub" *ngIf="node.getStatus() === 'Draft'">(draft added)</div>
                       </td>
-                      <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
-                        getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
+                      <td class="col-date arc-chapter-date">
+                        {{ node.getPlannedPublicationDateMsecs() != null
+                            ? getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs())
+                            : '-' }}
                       </td>
-                      <td class="edit-options-container">
+                      <td class="col-actions" (click)="$event.stopPropagation()">
                         <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
                            (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
                            aria-label="Chapter edit">
@@ -322,12 +539,12 @@
                              (mouseleave)="toggleChapterEditOptions(-1)"
                              (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
                           <div class="chapter-edit-option e2e-test-move-chapter-up-button"
-                               *ngIf="idx!=0 && linearNodesList[idx-1].getStatus()!='Published' && linearNodesList[idx].getStatus()!='Published'"
+                               *ngIf="idx !== 0 && linearNodesList[idx-1].getStatus() !== 'Published' && node.getStatus() !== 'Published'"
                                (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
                             <span>Move Up</span>
                           </div>
                           <div class="chapter-edit-option e2e-test-move-chapter-down-button"
-                               *ngIf="idx!=linearNodesList.length-1 && node.getStatus()!='Published'"
+                               *ngIf="idx !== linearNodesList.length-1 && node.getStatus() !== 'Published'"
                                (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
                             <span>Move Down</span>
                           </div>
@@ -342,15 +559,16 @@
                         </div>
                       </td>
                     </tr>
-                  </table>
-                </div>
-              </div>
-              <button (click)="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
-                + ADD CHAPTER
-              </button>
-            </div>
-          </div>
 
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+
+            <button (click)="createNode()" class="btn arc-add-chapter-btn e2e-test-add-chapter-button">
+              + ADD CHAPTER
+            </button>
+          </div>
         </mat-card>
       </div>
     </div>
@@ -448,6 +666,10 @@
       justify-content: space-between;
       padding: 15px 0;
       position: relative;
+    }
+
+    .story-editor-node--no-bottom-border {
+      border-bottom: none;
     }
 
     .story-editor-node-title {
@@ -822,5 +1044,339 @@
         font-size: 12px;
       }
     }
+
+    .arc-mode-container {
+      width: 35%;
+    }
+
+    .arc-mode-card {
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .arc-mode-card-header {
+      align-items: center;
+      border-bottom: 1px solid #e9edf2;
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 20px;
+    }
+
+    .arc-mode-card-heading-text {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .arc-mode-card-body {
+      padding: 0;
+    }
+
+    .arc-mode-publish-bar {
+      align-items: center;
+      background: #007f8c;
+      border-radius: 6px;
+      color: #fff;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin: 12px 16px 12px auto;
+      padding: 8px 14px;
+      width: fit-content;
+    }
+
+    .arc-mode-publish-label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .arc-mode-publish-select {
+      background: #b8e5ef;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      padding: 2px 6px;
+      width: 72px;
+    }
+
+    .arc-table-wrapper {
+      border: 1px solid #d7dce3;
+      border-radius: 8px;
+      overflow: visible;
+    }
+
+    .arc-chapter-table {
+      border-collapse: collapse;
+      font-size: 14px;
+      table-layout: fixed;
+      width: 100%;
+    }
+
+    .arc-table-heading th {
+      background: #fff;
+      border-bottom: 3px solid #1e1e1e;
+      border-right: 1px solid #e8edf3;
+      color: #363636;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.3;
+      padding: 10px 12px;
+      text-align: left;
+      white-space: normal;
+    }
+
+    .arc-table-heading th:last-child {
+      border-right: none;
+    }
+
+    .arc-table-heading th.col-drag { width: 32px; }
+    .arc-table-heading th.col-num { width: 40px; }
+    .arc-table-heading th.col-name { width: 20%; }
+    .arc-table-heading th.col-status { width: 16%; }
+    .arc-table-heading th.col-modified { width: 24%; }
+    .arc-table-heading th.col-date { width: 21%; }
+    .arc-table-heading th.col-actions {
+      border-right: none;
+      width: 28px;
+    }
+
+    .arc-header-row td,
+    .arc-header-cell {
+      border: none !important;
+      padding: 0 !important;
+    }
+
+    .arc-header-card {
+      align-items: flex-start;
+      border: 1px solid #b8dbbf;
+      border-radius: 0;
+      display: flex;
+      justify-content: space-between;
+      margin: 0;
+      padding: 14px 18px;
+    }
+
+    .arc-header-left {
+      align-items: flex-start;
+      display: flex;
+      gap: 12px;
+    }
+
+    .arc-flag-badge {
+      align-items: center;
+      border-radius: 50%;
+      color: #fff;
+      display: inline-flex;
+      flex-shrink: 0;
+      font-size: 14px;
+      height: 38px;
+      justify-content: center;
+      margin-top: 1px;
+      width: 38px;
+    }
+
+    .arc-header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .arc-header-title {
+      color: #1a2633;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .arc-header-description {
+      color: #4a5568;
+      font-size: 14px;
+      line-height: 1.35;
+      max-width: 400px;
+    }
+
+    .arc-header-chapter-count {
+      color: #6b7a90;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .arc-header-actions {
+      align-items: center;
+      display: flex;
+      flex-shrink: 0;
+      gap: 14px;
+    }
+
+    .arc-action-btn {
+      align-items: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 14px;
+      font-weight: 600;
+      gap: 5px;
+      padding: 0;
+      white-space: nowrap;
+    }
+
+    .arc-edit-btn { color: #198754; }
+    .arc-remove-btn { color: #dc3545; }
+    .arc-action-btn:hover { opacity: .75; }
+
+    /* Split row */
+    .arc-split-row td,
+    .arc-split-cell {
+      border: none !important;
+      padding: 0 !important;
+    }
+
+    .arc-split-line-container {
+      align-items: center;
+      display: flex;
+      padding: 10px 8px;
+    }
+
+    .arc-split-line {
+      border-top: 2px dashed #c9cdd4;
+      flex: 1;
+      height: 0;
+    }
+
+    .arc-split-btn {
+      align-items: center;
+      background: transparent;
+      border: none;
+      color: #1c5cc9;
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 14px;
+      font-weight: 500;
+      gap: 6px;
+      margin: 0 16px;
+      padding: 0;
+      white-space: nowrap;
+    }
+
+    .arc-split-btn:hover { opacity: .75; }
+
+    .arc-chapter-row {
+      border-left: 4px solid #27a844;
+      cursor: pointer;
+      transition: background-color .15s;
+    }
+
+    .arc-chapter-row:hover {
+      background-color: #f5f7fa;
+    }
+
+    .arc-chapter-row td {
+      border-bottom: 1px solid #e9edf2;
+      border-right: 1px solid #eef2f7;
+      padding: 13px 12px;
+      vertical-align: middle;
+    }
+
+    .arc-chapter-row td:last-child {
+      border-right: none;
+    }
+
+    .arc-chapter-row--before-split td {
+      border-bottom: none;
+    }
+
+    .arc-drag-handle {
+      color: #9ca3af;
+      cursor: grab;
+      text-align: center;
+    }
+
+    .arc-drag-handle .draggable-icon-indicator {
+      position: static;
+      top: auto;
+    }
+
+    .arc-chapter-num { color: #6b7a90; font-size: 13px; }
+
+    .arc-chapter-name {
+      color: #1a2633;
+      font-weight: 600;
+    }
+
+    .arc-chapter-status { color: #4a5568; }
+
+    .arc-chapter-modified { color: #4a5568; font-size: 13px; line-height: 1.3; }
+
+    .arc-modified-sub { color: #6b7a90; font-size: 12px; }
+
+    .arc-chapter-date { color: #6b7a90; }
+
+    .arc-chapter-row .col-actions {
+      border-right: none;
+      padding: 0 10px;
+      text-align: center;
+      width: 36px;
+    }
+
+    .arc-add-chapter-btn {
+      background-color: #007f8c;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: 700;
+      margin: 14px 16px 16px;
+    }
+
+    .arc-add-chapter-btn:hover { background-color: #005f6b; color: #fff; }
+
+    .arc-boundary-row td { border: none !important; padding: 0 !important; }
+    .arc-boundary-header {
+      align-items: flex-start;
+      border: 1px solid #b8dbbf;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      padding: 12px 14px;
+    }
+    .arc-boundary-header--odd { background-color: #eef7ef; border-color: #b8dbbf; }
+    .arc-boundary-header--even { background-color: #eef3fb; border-color: #bdd0ed; }
+    .arc-boundary-info { display: flex; flex-direction: column; gap: 2px; }
+    .arc-boundary-title-row { align-items: center; display: flex; gap: 10px; }
+    .arc-boundary-flag-badge {
+      align-items: center;
+      border-radius: 50%;
+      color: #fff;
+      display: inline-flex;
+      flex-shrink: 0;
+      font-size: 13px;
+      height: 34px;
+      justify-content: center;
+      width: 34px;
+    }
+    .arc-boundary-header--odd  .arc-boundary-flag-badge { background-color: #27a844; }
+    .arc-boundary-header--even .arc-boundary-flag-badge { background-color: #2c6ecb; }
+    .arc-boundary-title { color: #1f2d3d; font-size: 17px; font-weight: 700; line-height: 1.2; }
+    .arc-boundary-description { color: #4b5563; font-size: 14px; line-height: 1.3; margin-left: 44px; max-width: 360px; }
+    .arc-boundary-chapter-count { color: #5f7c88; font-size: 12px; font-weight: 600; margin-left: 44px; }
+    .arc-boundary-actions { display: flex; gap: 10px; margin-top: 2px; }
+    .arc-edit-button,
+    .arc-remove-button { background: transparent; border: none; font-size: 14px; font-weight: 600; padding: 0; white-space: nowrap; }
+    .arc-edit-button i, .arc-remove-button i { margin-right: 4px; }
+    .arc-edit-button { color: #198754; }
+    .arc-remove-button { color: #dc3545; }
+    .arc-boundary-divider { border-top: 1px solid #5ca66f; }
+    .split-line-row td { border: none !important; padding: 0 !important; }
+    .split-line-container { align-items: center; display: flex; padding: 12px 0; }
+    .split-line { border-top: 2px dashed #c7cbd1; flex: 1; height: 0; }
+    .split-into-arc-button {
+      background: transparent; border: none; color: #1c5cc9;
+      font-size: 15px; font-weight: 500; margin: 0 14px; padding: 0; white-space: nowrap;
+    }
+    .split-into-arc-button i { font-size: 13px; margin-right: 6px; vertical-align: middle; }
+    .inline-arc-boundary-row { margin: 8px 0; }
+    .inline-split-line-row { margin: 4px 0; }
+    .inline-arc-boundary-row .arc-boundary-header { align-items: flex-start; display: flex; justify-content: space-between; }
   </style>
 </div>

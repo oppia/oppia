@@ -85,7 +85,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() groupedSkillSummaries!: GroupedSkillSummaries;
   @Input() selectedSkillId!: string;
   @Input() selectSkillModalIsShown!: boolean;
-  @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+  @Input() skillIdToRubricsObject!: Record<string, Rubric[]>;
   @Input() skillsCategorizedByTopics!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() skillDescriptionsAreShown!: boolean;
@@ -125,7 +125,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private ngbModal: NgbModal,
     private questionsListService: QuestionsListService,
     private questionUndoRedoService: QuestionUndoRedoService,
-    private questionValidationService: QuestionValidationService,
+    public questionValidationService: QuestionValidationService,
     private skillBackendApiService: SkillBackendApiService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private utilsService: UtilsService,
@@ -580,10 +580,15 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.questionUndoRedoService.getCommittableChangeList()
             )
             .then(
-              () => {
+              (data: Question) => {
+                this.question = data;
                 this.questionUndoRedoService.clearChanges();
                 this.editorIsOpen = false;
                 this.questionIsBeingSaved = false;
+                this.alertsService.addSuccessMessage(
+                  'Question saved successfully.',
+                  2000
+                );
                 this.questionsListService.resetPageNumber();
                 this.questionsListService.getQuestionSummariesAsync(
                   this.selectedSkillId,
@@ -645,7 +650,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionId,
         this.skillLinkageModificationsArray
       )
-      .then(data => {
+      .then(question => {
+        if (question) {
+          this.question = question;
+        }
         this.skillLinkageModificationsArray = [];
         setTimeout(() => {
           this.questionsListService.resetPageNumber();
@@ -666,8 +674,13 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionId,
         this.skillLinkageModificationsArray
       )
-      .then(data => {
+      .then(question => {
+        this.question = question;
         this.skillLinkageModificationsArray = [];
+        this.alertsService.addSuccessMessage(
+          'Question saved successfully.',
+          2000
+        );
       });
   }
 

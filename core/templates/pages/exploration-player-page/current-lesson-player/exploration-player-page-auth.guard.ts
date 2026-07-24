@@ -44,9 +44,32 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve, reject) => {
       const version = route.queryParams.v || null;
       let explorationId = route.paramMap.get('exploration_id') || '';
+      const entityIdRegex = new RegExp(AppConstants.ENTITY_ID_REGEX);
+      if (!entityIdRegex.test(explorationId)) {
+        if (state.url.includes('embed')) {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            }, reject);
+        } else {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/400`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            }, reject);
+        }
+        return;
+      }
       this.accessValidationBackendApiService
         .validateAccessToExplorationPlayerPage(explorationId, version)
         .then(() => {
@@ -89,7 +112,7 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
               .then(() => {
                 this.location.replaceState(state.url);
                 resolve(false);
-              });
+              }, reject);
           }
         });
     });

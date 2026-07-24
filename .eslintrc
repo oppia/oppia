@@ -163,6 +163,7 @@
     "oppia/test-message-style": "error",
     "oppia/no-test-blockers": "error",
     "oppia/no-bypass-security-phrase": "error",
+    "oppia/no-view-encapsulation-none": "error",
     "array-bracket-spacing": [
       "error",
       "never"
