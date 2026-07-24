@@ -21,6 +21,7 @@
 import {Browser} from '@playwright/test';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import {ConsoleReporter} from './console-reporter';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
@@ -197,6 +198,7 @@ export class UserFactory {
       },
     });
     const page = await context.newPage();
+    ConsoleReporter.trackConsoleMessagesInPage(page);
 
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
       LoggedOutUserFactory(page),
@@ -235,6 +237,7 @@ export class UserFactory {
       },
     });
     const page = await context.newPage();
+    ConsoleReporter.trackConsoleMessagesInPage(page);
 
     const user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
       LoggedOutUserFactory(page),
@@ -290,6 +293,7 @@ export class UserFactory {
       },
     });
     const page = await context.newPage();
+    ConsoleReporter.trackConsoleMessagesInPage(page);
 
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
       LoggedOutUserFactory(page),
