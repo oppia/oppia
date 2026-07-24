@@ -327,6 +327,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         }
 
         for (let tempChildNode of updatedChildNodes) {
+          // Skip <br> when building the combined text for sentence parsing.
+          if (tempChildNode.nodeName === 'BR') {
+            continue;
+          }
           textContent += this.getReadableTextFromNode(tempChildNode);
         }
 
@@ -340,6 +344,17 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let pendingWhitespaceNodes: Node[] = [];
 
         for (let childNode of updatedChildNodes) {
+          if (childNode.nodeName === 'BR') {
+            pendingWhitespaceNodes.forEach(n => nodeTemp.appendChild(n));
+            pendingWhitespaceNodes = [];
+            if (spanTagElement.childNodes.length > 0) {
+              nodeTemp.appendChild(spanTagElement);
+              spanTagElement = document.createElement('span');
+            }
+            nodeTemp.appendChild(childNode);
+            continue;
+          }
+
           let currentText = this.getReadableTextFromNode(childNode);
 
           if (

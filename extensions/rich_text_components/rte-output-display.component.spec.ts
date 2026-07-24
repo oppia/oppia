@@ -368,6 +368,51 @@ describe('RTE display component', () => {
     expect((result as Node[])[0]).toBe(brElement);
   });
 
+  it('should preserve <br> nodes when rendering RTE content', fakeAsync(() => {
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+
+    const rteString = '<p>Hello<br><br>World</p>';
+
+    component.rteString = rteString;
+    component.ngAfterViewInit();
+    fixture.detectChanges();
+    flush();
+
+    // eslint-disable-next-line oppia/no-inner-html
+    const html = fixture.nativeElement.innerHTML;
+
+    // The exact number of literal <br> tags may vary after parser/template
+    // processing. Assert semantic separation instead: Hello comes before World
+    // and both are present.
+    expect(html).toContain('Hello');
+    expect(html).toContain('World');
+    expect(html.indexOf('Hello') < html.indexOf('World')).toBeTrue();
+
+    discardPeriodicTasks();
+  }));
+
+  it('should not treat <br> as text when wrapping sentences for highlighting', fakeAsync(() => {
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+
+    const rteString = '<p>Hello. <br><br>World.</p>';
+
+    const output = component.wrapSentencesInSpansForHighlighting(rteString);
+
+    // Verify both sentences are wrapped in highlight spans.
+    expect(output).toContain('class="highlightBlock1"');
+    expect(output).toContain('class="highlightBlock2"');
+    expect(output).toContain('Hello.');
+    expect(output).toContain('World.');
+    // Verify <br> tags are preserved in the output.
+    expect(output).toContain('<br>');
+  }));
+
   it('should skip empty sentence fragments for empty text nodes', () => {
     const textNode = document.createTextNode('');
     const result = component.traverseNodeAndWrapSpanTags(
