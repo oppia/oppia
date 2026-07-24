@@ -42,6 +42,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
 
+app_identity_services = models.Registry.import_app_identity_services()
 auth_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.USER]
 )
@@ -967,12 +968,44 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         init_app_swap = self.swap_with_call_counter(
             firebase_admin, 'initialize_app', returns=self.APP
         )
+        get_application_id_swap = self.swap_with_call_counter(
+            app_identity_services, 'get_application_id', returns='LOL'
+        )
 
-        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+        with (
+            get_app_swap as get_app_counter,
+            init_app_swap as init_app_counter,
+            get_application_id_swap as get_application_id_counter,
+        ):
             firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
         self.assertEqual(init_app_counter.times_called, 1)
+        self.assertEqual(get_application_id_counter.times_called, 1)
+
+    def test_initializes_with_explicit_oppia_project_id_does_not_infer_from_env(
+        self,
+    ) -> None:
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('initialize_app')
+        )
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app', returns=self.APP
+        )
+        get_application_id_swap = self.swap_with_call_counter(
+            app_identity_services, 'get_application_id', returns='LOL'
+        )
+
+        with (
+            get_app_swap as get_app_counter,
+            init_app_swap as init_app_counter,
+            get_application_id_swap as get_application_id_counter,
+        ):
+            firebase_auth_services.establish_firebase_connection('CUSTOM-ID')
+
+        self.assertEqual(get_app_counter.times_called, 1)
+        self.assertEqual(init_app_counter.times_called, 1)
+        self.assertEqual(get_application_id_counter.times_called, 0)
 
     def test_returns_existing_connection(self) -> None:
         get_app_swap = self.swap_with_call_counter(
@@ -1296,8 +1329,11 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.ExpiredSessionCookieError('uh-oh', None),
         )
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
-            auth_domain.StaleAuthSessionError, 'expired'
+        with (
+            always_raise_expired_session_cookie_error,
+            self.assertRaisesRegex(
+                auth_domain.StaleAuthSessionError, 'expired'
+            ),
         ):
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)
@@ -1341,8 +1377,11 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.UserDisabledError('uh-oh'),
         )
 
-        with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
-            auth_domain.UserDisabledError, 'user is being deleted'
+        with (
+            always_raise_expired_session_cookie_error,
+            self.assertRaisesRegex(
+                auth_domain.UserDisabledError, 'user is being deleted'
+            ),
         ):
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)
