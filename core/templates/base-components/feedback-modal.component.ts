@@ -64,6 +64,7 @@ interface TurnstileWindow extends Window {
 @Component({
   selector: 'oppia-feedback-modal',
   templateUrl: './feedback-modal.component.html',
+  styleUrls: ['feedback-modal.component.css'],
 })
 export class FeedbackModalComponent implements OnInit {
   @Input() feedbackModalType!: FeedbackModalType;
@@ -340,7 +341,7 @@ export class FeedbackModalComponent implements OnInit {
           ? 'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
           : 'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -374,7 +375,7 @@ export class FeedbackModalComponent implements OnInit {
       const successMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'
@@ -393,7 +394,7 @@ export class FeedbackModalComponent implements OnInit {
       : null;
 
     const feedbackPayload = PlatformFeedbackModel.createForSubmission({
-      source: 'site',
+      source: 'app',
       reportMessage: this.feedbackText,
       explorationContext: null,
       category: null,
@@ -411,7 +412,7 @@ export class FeedbackModalComponent implements OnInit {
       const successMessage = this.translateService.instant(
         'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
       );
-      this.alertsService.addSuccessMessage(successMessage, 7000);
+      this.alertsService.addSuccessMessage(successMessage, 7000, true);
     } catch (error) {
       const errorMessage = this.translateService.instant(
         'I18N_FEEDBACK_SUBMITTED_ERROR'

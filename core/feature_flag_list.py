@@ -107,6 +107,9 @@ class FeatureNames(enum.Enum):
     EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB = (
         'exploration_editor_new_creator_feedback_tab'
     )
+    TECHNICAL_FEEDBACK_DASHBOARD_ENABLED = (
+        'technical_feedback_dashboard_enabled'
+    )
     STORY_EDITOR_ARCS = 'story_editor_arcs'
 
 
@@ -137,6 +140,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
+    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
+    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -374,6 +379,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new creator feedback tab experience in '
             'the exploration editor along with the updated feedback updates page UI.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED.value: (
+        (
+            'This flag enables the Technical Feedback Dashboard, allowing '
+            'LEAP and CORE tech leads/co-leads to review and manage '
+            'technical feedback submitted by learners.',
             feature_flag_domain.ServerMode.DEV,
         )
     ),
