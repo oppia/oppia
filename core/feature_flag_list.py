@@ -72,7 +72,6 @@ class FeatureNames(enum.Enum):
     HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK = (
         'highlight_sentences_during_automatic_voiceover_playback'
     )
-    SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
         'enable_translation_opps_with_new_opp_models'
     )
@@ -190,7 +189,6 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
