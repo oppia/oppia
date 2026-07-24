@@ -197,6 +197,9 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const practiceTabToggle = '.e2e-test-toggle-practice-tab';
+
 export class CurriculumAdmin extends TopicManager {
   /**
    * Create a basic algebra question in the skill editor page.
@@ -1134,6 +1137,37 @@ export class CurriculumAdmin extends TopicManager {
       );
       await this.clickOnElementWithSelector(closeSaveModalButton);
       await this.expectElementToBeVisible(modalDiv, false);
+    }
+  }
+
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        practiceTabToggle,
+        {timeout: 60000}
+      );
+    } catch (error) {
+      console.error(error instanceof Error ? error.stack : error);
+      throw error;
     }
   }
 
