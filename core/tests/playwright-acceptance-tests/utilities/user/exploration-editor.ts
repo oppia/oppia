@@ -411,9 +411,14 @@ export class ExplorationEditor extends BaseUser {
       });
     } else {
       // Capture BEFORE clicking — at this point exactly one modal exists.
-      const staleModal = this.page.locator('ngb-modal-window');
+      const staleModal = await this.page
+        .locator('ngb-modal-window')
+        .elementHandle()
+        .catch(() => null);
       await this.clickOnElementWithSelector(addAnotherResponseButton);
-      await staleModal.waitFor({state: 'detached'});
+      if (staleModal) {
+        await this.page.waitForFunction(el => !el.isConnected, staleModal);
+      }
     }
   }
 
