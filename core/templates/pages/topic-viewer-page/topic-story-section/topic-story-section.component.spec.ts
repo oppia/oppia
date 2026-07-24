@@ -1464,4 +1464,423 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component._expandedAdventureIndices.size).toBe(0);
   });
+
+  it('should return isPracticeCardVisible from shouldShowAdventureEndTestCard', () => {
+    component.isPracticeCardVisible = true;
+    expect(component.shouldShowAdventureEndTestCard(0)).toBe(true);
+
+    component.isPracticeCardVisible = false;
+    expect(component.shouldShowAdventureEndTestCard(0)).toBe(false);
+  });
+
+  it('should scroll to lesson element when found by getElementById', fakeAsync(() => {
+    const mockElement = document.createElement('div');
+    spyOn(document, 'getElementById').and.returnValue(mockElement);
+    spyOn(mockElement, 'scrollIntoView');
+
+    component.onNavigationLessonSelected(1);
+
+    tick(300);
+
+    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }));
+
+  it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
+    const mockElement = document.createElement('div');
+    spyOn(document, 'getElementById').and.returnValue(mockElement);
+    spyOn(mockElement, 'scrollIntoView');
+
+    component.onNavigationPracticeSelected(0);
+
+    tick(300);
+
+    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }));
+
+  it('should handle buildAdventureGroups when arcs is null', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    storySummary.getArcs.and.returnValue(null);
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.adventureGroups).toEqual([]);
+  });
+
+  it('should sync on storyTitle ngOnChanges input update', () => {
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      storyTitle: new SimpleChange('Old Title', 'New Title', false),
+    });
+
+    expect(component.studyGuideUrl).toBe('/learn/new/study');
+  });
+
+  it('should sync on storyDescription ngOnChanges input update', () => {
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      storyDescription: new SimpleChange('Old', 'New', false),
+    });
+
+    expect(component.studyGuideUrl).toBe('/learn/new/study');
+  });
+
+  it('should sync on classroomUrlFragment ngOnChanges input update', () => {
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      classroomUrlFragment: new SimpleChange('', 'science', false),
+    });
+
+    expect(component.studyGuideUrl).toBe('/learn/new/study');
+  });
+
+  it('should sync on topicUrlFragment ngOnChanges input update', () => {
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      topicUrlFragment: new SimpleChange('', 'biology', false),
+    });
+
+    expect(component.studyGuideUrl).toBe('/learn/new/study');
+  });
+
+  it('should sync on lessonCount ngOnChanges input update', () => {
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      lessonCount: new SimpleChange(0, 5, false),
+    });
+
+    expect(component.studyGuideUrl).toBe('/learn/new/study');
+  });
+
+  it('should return # as lesson start url when only topic fragment is missing', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = '';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].startUrl).toBe('#');
+  });
+
+  it('should return # as lesson start url when only classroom fragment is missing', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('topic');
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].startUrl).toBe('#');
+  });
+
+  it('should not call populateFromInputs on ngOnChanges when only practiceSubtopicIds changes', () => {
+    const initialTitle = component.storyTitle;
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnChanges({
+      practiceSubtopicIds: new SimpleChange([], [1], false),
+    });
+
+    expect(component.storyTitle).toBe(initialTitle);
+  });
+
+  it('should handle getActiveLessonNumber when visitedChapterTitles is null', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    storySummary.getVisitedChapterTitles.and.returnValue(null);
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
+  });
+
+  it('should populate adventureNavigationGroups with lesson numbers and accent colors', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.adventureNavigationGroups.length).toBe(1);
+    expect(component.adventureNavigationGroups[0].lessonNumbers).toEqual([1]);
+    expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
+  });
+
+  it('should handle onNavigationLessonSelected when lesson is not in any adventure', fakeAsync(() => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    spyOn(document, 'getElementById').and.returnValue(null);
+
+    component.onNavigationLessonSelected(999);
+
+    expect(component.activeLessonNumber).toBe(999);
+    expect(component.navigatedLessonNumber).toBe(999);
+
+    tick(300);
+  }));
+
+  it('should set masteryChallengeUrl from practice session url', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 1;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.masteryChallengeUrl).toContain('practice/session');
+  });
+
+  it('should set masteryChallengeUrl to # when fragments are missing', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 1;
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.masteryChallengeUrl).toBe('#');
+  });
+
+  it('should populate lessonCount from storySummary on init', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2', 'Node 3'],
+      [storyNodeSpy]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.lessonCount).toBe(3);
+  });
+
+  it('should populate storyTitle and storyDescription from storySummary', async () => {
+    const storySummary = createStorySummarySpy([], []);
+    storySummary.getTitle.and.returnValue('My Story Title');
+    storySummary.getDescription.and.returnValue('My Story Description');
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.storyTitle).toBe('My Story Title');
+    expect(component.storyDescription).toBe('My Story Description');
+  });
+
+  it('should set lessonProgressStatus from loadChapterProgress for completed node', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node 1');
+    storyNodeSpy.getDescription.and.returnValue('Desc 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(['Node 1'], [storyNodeSpy]);
+    storySummary.isNodeCompleted.and.returnValue(true);
+
+    chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
+      new ChapterProgressSummary('exp_1', 5, 5, true)
+    );
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('completed');
+    expect(component.lessonCards[0].totalCheckpointsCount).toBe(5);
+    expect(component.lessonCards[0].visitedCheckpointsCount).toBe(5);
+  });
 });
