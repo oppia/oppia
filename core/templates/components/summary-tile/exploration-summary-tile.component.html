@@ -123,8 +123,8 @@
               <span *ngIf="numViews">{{ numViews | summarizeNonnegativeNumber }}</span>
               <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
               </span>
-              <span *ngIf="numViews == '1'"  class="views-text">view</span>
-              <span *ngIf="numViews != '1'" class="views-text">views</span>
+              <span *ngIf="numViews === 1"  class="views-text">view</span>
+              <span *ngIf="numViews !== 1" class="views-text">views</span>
             </li>
             <li>
               <span>

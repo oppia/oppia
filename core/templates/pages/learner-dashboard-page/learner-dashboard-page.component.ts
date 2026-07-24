@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
 import {
   trigger,
   state,
@@ -54,8 +54,6 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
-import './learner-dashboard-page.component.css';
-
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
@@ -66,6 +64,7 @@ interface LearnerDashboardExplorationsData {
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
   styleUrls: ['./learner-dashboard-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('slideInOut', [
       state(
@@ -401,6 +400,14 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   setActiveSection(newActiveSectionName: string): void {
+    if (
+      newActiveSectionName ===
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+          .MY_CERTIFICATES &&
+      !this.isCertificateAssessmentEnabled()
+    ) {
+      return;
+    }
     this.activeSection = newActiveSectionName;
     if (
       this.activeSection ===
@@ -574,6 +581,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
   }
 
+  isCertificateAssessmentEnabled(): boolean {
+    return this.platFeatService.status.EnableCertificateAssessment.isEnabled;
+  }
+
   getDashboardTabHeading(): string {
     switch (this.activeSection) {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
@@ -585,6 +596,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .GOALS:
         return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .MY_CERTIFICATES:
+        return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
       default:
         return `No valid I18N key for heading of ${this.activeSection}`;
     }
