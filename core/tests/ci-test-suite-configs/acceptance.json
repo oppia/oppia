@@ -362,8 +362,8 @@
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
@@ -392,8 +392,8 @@
     },
     {
       "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/manage-classroom-progress-in-home-learner-dashboard",
@@ -412,13 +412,13 @@
     },
     {
       "name": "logged-out-learner/play-a-complete-community-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/use-the-feedback-and-help-cards",
@@ -572,8 +572,8 @@
     },
     {
       "name": "community-library-browser/subscribe-to-a-favourite-creator",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/community-library-browser/subscribe-to-a-favourite-creator.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/community-library-browser/subscribe-to-a-favourite-creator.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "topic-manager/access-dashboard-using-profile-dropdown",

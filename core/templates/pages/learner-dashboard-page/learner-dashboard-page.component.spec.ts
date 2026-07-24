@@ -100,6 +100,9 @@ class MockPlatformFeatureService {
       ShowRedesignedLearnerDashboard: {
         isEnabled: false,
       },
+      EnableCertificateAssessment: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -1459,6 +1462,48 @@ describe('Learner dashboard page', () => {
 
       expect(component.getDashboardTabHeading()).toBe(
         'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING'
+      );
+    });
+
+    it('should return certificates greeting when my certificates tab is active and certificate assessment is enabled', () => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        EnableCertificateAssessment: {
+          isEnabled: true,
+        },
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+      });
+
+      component.setActiveSection(
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+      );
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+      );
+    });
+
+    it('should keep the current tab when my certificates is disabled', () => {
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: true,
+        },
+        EnableCertificateAssessment: {
+          isEnabled: false,
+        },
+      });
+
+      component.activeSection =
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME;
+
+      component.setActiveSection(
+        'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION'
+      );
+
+      expect(component.activeSection).toBe(
+        component.LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME
       );
     });
 
