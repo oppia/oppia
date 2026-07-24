@@ -128,6 +128,8 @@ describe('Translation Reviewer V2', function () {
       'Cutting the Pies',
       'Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
@@ -143,6 +145,8 @@ describe('Translation Reviewer V2', function () {
       'Trading Slices',
       'Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE(
       'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)'
     );
@@ -160,6 +164,8 @@ describe('Translation Reviewer V2', function () {
       'Chemical Reactions',
       'States of Matter'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'

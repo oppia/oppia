@@ -222,6 +222,10 @@ describe('Translation Submitter V2', function () {
       'Exploration - Fractions'
     );
 
+    // Skip Exploration Title and Objective cards to reach state content RTE.
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+
     // Bold Text.
     await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
     await translationSubmitter.typeTextForRTE('बोल्ड टेक्स्ट');
