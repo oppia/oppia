@@ -1,19 +1,28 @@
-.admin-navbar .nav > li > a:focus,
 .admin-navbar .oppia-admin-page-dropdown-icon {
+  background-color: #fff;
+  color: #00376d;
+}
+
+.admin-navbar .oppia-navbar-profile-admin .open > a {
+  background-color: #fff;
+  color: #00376d;
+}
+
+.admin-navbar .nav > li > a:focus {
   background-color: #00376d;
   color: #fff;
 }
 
-/* We disable no-descending-specificity here because the selector order overrides base styling appropriately, which is intentional. */
-/* stylelint-disable-next-line no-descending-specificity */
 .admin-navbar .oppia-navbar-profile-admin > li > a:hover,
 .admin-navbar .oppia-navbar-profile-admin > li > a:focus,
-.admin-navbar .oppia-navbar-profile-admin .open > a,
-.admin-navbar .oppia-navbar-profile-admin .open > a:hover,
-.admin-navbar .oppia-navbar-profile-admin .open > a:focus,
 .admin-navbar .oppia-navbar-tabs-admin > li > a:hover,
-.admin-navbar .oppia-navbar-tabs-admin > li > a.active,
-.admin-navbar .oppia-admin-page-dropdown-icon {
+.admin-navbar .oppia-navbar-tabs-admin > li > a.active {
+  background-color: #fff;
+  color: #00376d;
+}
+
+.admin-navbar .oppia-navbar-profile-admin .open > a:hover,
+.admin-navbar .oppia-navbar-profile-admin .open > a:focus {
   background-color: #fff;
   color: #00376d;
 }
