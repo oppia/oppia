@@ -1348,13 +1348,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
         'mypy_imports',
     ]
 
-    # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-    # pylint library and absences of stubs in pylint, forces MyPy to
-    # assume that checker_utils.check_messages function
-    # is untyped. Thus to avoid MyPy's error
-    # (Untyped decorator makes function "visit_importfrom" untyped),
-    # we added an ignore here.
-    @checker_utils.check_messages('import-only-modules')  # type: ignore[misc]
+    @checker_utils.only_required_for_messages('import-only-modules')
     def visit_importfrom(self, node: astroid.nodes.ImportFrom) -> None:
         """Visits all import-from statements in a python file and checks that
         modules are imported. It then adds a message accordingly.
