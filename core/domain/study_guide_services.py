@@ -27,7 +27,6 @@ from core.domain import (
     learner_group_services,
     skill_services,
     study_guide_domain,
-    subtopic_page_services,
     topic_domain,
     topic_fetchers,
 )
@@ -395,20 +394,17 @@ def generate_study_guide_models(
     """
     for subtopic in subtopics:
         if not does_study_guide_model_exist(topic_id, subtopic.id):
-            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-                topic_id, subtopic.id
-            )
             study_guide = study_guide_domain.StudyGuide.create_study_guide(
                 subtopic.id,
                 topic_id,
                 subtopic.title,
-                subtopic_page.page_contents.subtitled_html.html,
+                '',
             )
             save_study_guide(
                 feconf.SYSTEM_COMMITTER_ID,
                 study_guide,
-                'Generated Study Guide model corresponding to Subtopic Page Model with id: %s'
-                % (subtopic_page.id),
+                'Generated Study Guide model for subtopic with id: %s'
+                % (subtopic.id),
                 [
                     study_guide_domain.StudyGuideChange(
                         {

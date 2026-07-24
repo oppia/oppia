@@ -25,6 +25,8 @@ from core.domain import (
     skill_services,
     study_guide_domain,
     study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
     topic_domain,
     topic_fetchers,
     topic_services,
@@ -596,7 +598,25 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
-        self.save_new_subtopic(1, self.admin_id, topic_id_1)
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id_1
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            subtopic_page,
+            'Create new subtopic',
+            [
+                subtopic_page_domain.SubtopicPageChange(
+                    {
+                        'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+                        'topic_id': topic_id_1,
+                        'subtopic_id': 1,
+                    }
+                )
+            ],
+        )
         topic_1 = self.save_new_topic(
             topic_id_1,
             self.admin_id,
@@ -630,7 +650,6 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_subtopic(1, self.admin_id, topic_id_1)
-        self.save_new_study_guide(1, self.admin_id, topic_id_1)
         topic_1 = self.save_new_topic(
             topic_id_1,
             self.admin_id,

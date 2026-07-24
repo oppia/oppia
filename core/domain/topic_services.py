@@ -742,13 +742,7 @@ def _apply_study_guide_change(
                     'property_name': 'page_contents_html',
                     'new_value': (concatenated_html),
                     'old_value': old_value,
-                    'subtopic_id': (
-                        # We use update_subtopic_page_property_cmd
-                        # here to avoid mypy errors. We will replace
-                        # this with a study guide alternative once
-                        # we start using study guides exclusively.
-                        change.subtopic_id
-                    ),
+                    'subtopic_id': change.subtopic_id,
                 }
             )
             modified_subtopic_change_cmds[subtopic_page_id].append(
@@ -876,9 +870,8 @@ def apply_change_list(
         )
     )
     for subtopic_page in modified_subtopic_pages_list:
-        # Ruling out the possibility of None for mypy type checking.
-        assert subtopic_page is not None
-        modified_subtopic_pages[subtopic_page.id] = subtopic_page
+        if subtopic_page is not None:
+            modified_subtopic_pages[subtopic_page.id] = subtopic_page
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
         committer_id,
@@ -889,9 +882,8 @@ def apply_change_list(
             )
         )
         for study_guide in modified_study_guides_list:
-            # Ruling out the possibility of None for mypy type checking.
-            assert study_guide is not None
-            modified_study_guides[study_guide.id] = study_guide
+            if study_guide is not None:
+                modified_study_guides[study_guide.id] = study_guide
 
     def _handle_add_subtopic_cmd(change: change_domain.BaseChange) -> None:
         # Here we use cast because we are narrowing down the type from
@@ -1467,8 +1459,9 @@ def update_topic_and_subtopic_pages(
             'Topic with URL Fragment \'%s\' already exists'
             % updated_topic.url_fragment
         )
-    if old_topic.name != updated_topic.name and does_topic_with_name_exist(
-        updated_topic.name
+    if (
+        old_topic.name != updated_topic.name
+        and does_topic_with_name_exist(updated_topic.name)
     ):
         raise utils.ValidationError(
             'Topic with name \'%s\' already exists' % updated_topic.name
@@ -1479,13 +1472,9 @@ def update_topic_and_subtopic_pages(
     # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
         if subtopic_id not in newly_created_subtopic_ids:
-            if not feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                committer_id,
-            ):
-                subtopic_page_services.delete_subtopic_page(
-                    committer_id, topic_id, subtopic_id
-                )
+            subtopic_page_services.delete_subtopic_page(
+                committer_id, topic_id, subtopic_id
+            )
             study_guide_services.delete_study_guide(
                 committer_id, topic_id, subtopic_id
             )
@@ -1493,13 +1482,11 @@ def update_topic_and_subtopic_pages(
     for (
         subtopic_page_id,
         subtopic_page,
-    ) in updated_subtopic_pages_dict.items():  # pylint: disable=line-too-long
+    ) in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
             subtopic_page_id
         ]
         subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
-        # The following condition prevents the creation of
-        # subtopic pages that were deleted above.
         if subtopic_id not in deleted_subtopic_ids:
             subtopic_page_services.save_subtopic_page(
                 committer_id,
@@ -1912,12 +1899,9 @@ def delete_topic(
         subtopic_page_services.delete_subtopic_page(
             committer_id, topic_id, subtopic['id']
         )
-        if study_guide_services.does_study_guide_model_exist(
-            topic_id, subtopic['id']
-        ):
-            study_guide_services.delete_study_guide(
-                committer_id, topic_id, subtopic['id']
-            )
+        study_guide_services.delete_study_guide(
+            committer_id, topic_id, subtopic['id']
+        )
 
     all_story_references = (
         topic_model.canonical_story_references

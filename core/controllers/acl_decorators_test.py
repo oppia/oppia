@@ -38,7 +38,6 @@ from core.domain import (
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
-    subtopic_page_services,
     suggestion_services,
     topic_domain,
     topic_fetchers,
@@ -5727,20 +5726,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 1, self.topic_id
             )
         )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_1,
-            'Added subtopic',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment',
-                    }
-                )
-            ],
+        self.save_new_study_guide(
+            1, self.admin_id, self.topic_id
         )
         self.save_new_topic(
             self.topic_id,
@@ -5889,10 +5876,10 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        subtopic_swap = self.swap_to_always_return(
-            subtopic_page_services, 'get_subtopic_page_by_id', None
+        study_guide_swap = self.swap_to_always_return(
+            study_guide_services, 'get_study_guide_by_id', None
         )
-        with testapp_swap, subtopic_swap:
+        with testapp_swap, study_guide_swap:
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/%s'
                 % studyguide_url_fragment,

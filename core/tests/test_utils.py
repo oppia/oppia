@@ -4158,6 +4158,7 @@ version: 1
         subtopic_page_services.save_subtopic_page(
             owner_id, subtopic_page, 'Create new subtopic', subtopic_changes
         )
+        self.save_new_study_guide(subtopic_id, owner_id, topic_id)
         return subtopic_page
 
     def save_new_study_guide(

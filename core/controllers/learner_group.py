@@ -23,7 +23,7 @@ from core.domain import (
     learner_group_fetchers,
     learner_group_services,
     story_fetchers,
-    subtopic_page_services,
+    study_guide_services,
     user_services,
 )
 
@@ -350,7 +350,7 @@ class LearnerGroupLearnerProgressHandler(
         )
         subtopic_page_ids = learner_group.subtopic_page_ids
         subtopic_pages_progresses = (
-            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+            study_guide_services.get_multi_users_study_guides_progress(
                 learners_with_progress_sharing_on, subtopic_page_ids
             )
         )
@@ -431,7 +431,7 @@ class LearnerGroupLearnerSpecificProgressHandler(
         )[learner_user_id]
         subtopic_page_ids = learner_group.subtopic_page_ids
         subtopic_pages_progress = (
-            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+            study_guide_services.get_multi_users_study_guides_progress(
                 [learner_user_id], subtopic_page_ids
             )
         )[learner_user_id]
@@ -484,7 +484,7 @@ class LearnerGroupSyllabusHandler(
                 learner_group.story_ids
             )
         )
-        subtopic_summary_dicts = subtopic_page_services.get_learner_group_syllabus_subtopic_page_summaries(
+        subtopic_summary_dicts = study_guide_services.get_learner_group_syllabus_study_guide_summaries(
             learner_group.subtopic_page_ids
         )
 

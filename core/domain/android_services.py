@@ -37,8 +37,8 @@ from core.domain import (
     state_domain,
     story_domain,
     story_services,
-    subtopic_page_domain,
-    subtopic_page_services,
+    study_guide_domain,
+    study_guide_services,
     topic_domain,
     topic_fetchers,
     topic_services,
@@ -186,16 +186,14 @@ def initialize_android_test_data() -> str:
     topic.update_subtopic_url_fragment(1, 'suburl')
     topic.move_skill_id_to_subtopic(None, 1, skill_id)
     topic.update_skill_ids_for_diagnostic_test([skill_id])
-    subtopic_page = (
-        subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-            1, topic_id
-        )
-    )
-    subtopic_page.page_contents.subtitled_html.html = (
+    study_guide = study_guide_domain.StudyGuide.create_study_guide(
+        1,
+        topic_id,
+        'Test Subtopic Title',
         'Example Study Guide. Click <oppia-noninteractive-skillreview '
         'skill_id-with-value="&amp;quot;%s&amp;quot;" text-with-value="'
         '&amp;quot;here&amp;quot;"></oppia-noninteractive-skillreview> to'
-        ' open a concept card.' % skill_id
+        ' open a concept card.' % skill_id,
     )
 
     # Upload local exploration to the datastore and enable feedback.
@@ -256,9 +254,9 @@ def initialize_android_test_data() -> str:
     skill_services.save_new_skill(user_id, skill)
     story_services.save_new_story(user_id, story)
     topic_services.save_new_topic(user_id, topic)
-    subtopic_page_services.save_subtopic_page(
+    study_guide_services.save_study_guide(
         user_id,
-        subtopic_page,
+        study_guide,
         'Added subtopic',
         [
             topic_domain.TopicChange(

@@ -22,7 +22,6 @@ from core.domain import (
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
-    subtopic_page_services,
     topic_domain,
     topic_services,
     translation_domain,
@@ -52,56 +51,6 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 self.subtopic_id_2, self.topic_id
             )
         )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_1,
-            'Added subtopic',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': self.subtopic_id_1,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment',
-                    }
-                )
-            ],
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_2,
-            'Added subtopic',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': self.subtopic_id_2,
-                        'title': 'Sample',
-                        'url_fragment': 'dummy-fragment',
-                    }
-                )
-            ],
-        )
-        subtopic_page_private_topic = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_1, 'topic_id_2'
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            subtopic_page_private_topic,
-            'Added subtopic',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': self.subtopic_id_1,
-                        'title': 'Sample',
-                        'url_fragment': 'dummy-fragment-one',
-                    }
-                )
-            ],
-        )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title', 'url-frag'
         )
@@ -126,6 +75,12 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             subtopics=[subtopic, subtopic2],
             next_subtopic_id=3,
         )
+        self.save_new_study_guide(
+            self.subtopic_id_1, self.admin_id, self.topic_id
+        )
+        self.save_new_study_guide(
+            self.subtopic_id_2, self.admin_id, self.topic_id
+        )
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
             'topic_id_2',
@@ -139,6 +94,9 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic],
             next_subtopic_id=2,
+        )
+        self.save_new_study_guide(
+            self.subtopic_id_1, self.admin_id, 'topic_id_2'
         )
         self.recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
@@ -165,22 +123,6 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 self.recorded_voiceovers_dict
             )
         )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_1,
-            'Updated page contents',
-            [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'subtopic_id': self.subtopic_id_1,
-                        'property_name': 'page_contents_html',
-                        'new_value': '<p>hello world</p>',
-                        'old_value': '',
-                    }
-                )
-            ],
-        )
         self.subtopic_page_2.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict(
                 {'html': '<p>hello world 2</p>', 'content_id': 'content'}
@@ -191,22 +133,6 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 self.recorded_voiceovers_dict
             )
         )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            self.subtopic_page_2,
-            'Updated page contents',
-            [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'subtopic_id': self.subtopic_id_2,
-                        'property_name': 'page_contents_html',
-                        'new_value': '<p>hello world 2</p>',
-                        'old_value': '',
-                    }
-                )
-            ],
-        )
 
         self.topic_id_2 = 'topic_id_2'
         self.subtopic_id_3 = 1
@@ -216,56 +142,6 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         )
         self.study_guide_2 = study_guide_domain.StudyGuide.create_study_guide(
             self.subtopic_id_4, self.topic_id_2, 'heading 2', 'content 2'
-        )
-        study_guide_services.save_study_guide(
-            self.admin_id,
-            self.study_guide_1,
-            'Added study guide',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': self.subtopic_id_3,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment-three',
-                    }
-                )
-            ],
-        )
-        study_guide_services.save_study_guide(
-            self.admin_id,
-            self.study_guide_2,
-            'Added study guide',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': self.subtopic_id_4,
-                        'title': 'Sample',
-                        'url_fragment': 'dummy-fragment-four',
-                    }
-                )
-            ],
-        )
-        study_guide_private_topic = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                self.subtopic_id_3, 'topic_id_3', 'private', 'private content'
-            )
-        )
-        study_guide_services.save_study_guide(
-            self.admin_id,
-            study_guide_private_topic,
-            'Added study guide',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': self.subtopic_id_3,
-                        'title': 'Sample',
-                        'url_fragment': 'dummy-fragment-three',
-                    }
-                )
-            ],
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title', 'url-frag-one'
@@ -304,6 +180,12 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic],
             next_subtopic_id=2,
+        )
+        self.save_new_study_guide(
+            self.subtopic_id_3, self.admin_id, 'topic_id_3'
+        )
+        self.study_guide_1 = study_guide_services.get_study_guide_by_id(
+            self.topic_id_2, self.subtopic_id_3
         )
         self.study_guide_1.update_sections(
             [
@@ -407,25 +289,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_only_subtopic_in_topic(self) -> None:
         topic_id = 'single_subtopic_topic_id'
         subtopic_id = 1
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                subtopic_id, topic_id
-            )
-        )
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id,
-            subtopic_page,
-            'Added subtopic',
-            [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': subtopic_id,
-                        'title': 'Only Subtopic',
-                        'url_fragment': 'only-subtopic-fragment',
-                    }
-                )
-            ],
+        self.save_new_study_guide(
+            subtopic_id, self.admin_id, topic_id
         )
 
         only_subtopic = topic_domain.Subtopic.create_default_subtopic(
@@ -465,14 +330,6 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             '%s/staging/%s/%s'
             % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one')
         )
-        expected_page_contents_dict = {
-            'recorded_voiceovers': self.recorded_voiceovers_dict,
-            'subtitled_html': {
-                'content_id': 'content',
-                'html': '<p>hello world</p>',
-            },
-            'written_translations': self.written_translations_dict,
-        }
         expected_next_subtopic_dict = {
             'thumbnail_bg_color': None,
             'skill_ids': ['skill_id_2'],
@@ -485,7 +342,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 
         expected_dict = {
             'topic_id': 'topic_id',
-            'page_contents': expected_page_contents_dict,
+            'page_contents': {},
             'subtopic_title': 'Subtopic Title',
             'current_subtopic_id': 1,
             'next_subtopic_dict': expected_next_subtopic_dict,
@@ -578,14 +435,6 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             '%s/staging/%s/%s'
             % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two')
         )
-        expected_page_contents_dict = {
-            'recorded_voiceovers': self.recorded_voiceovers_dict,
-            'subtitled_html': {
-                'content_id': 'content',
-                'html': '<p>hello world 2</p>',
-            },
-            'written_translations': self.written_translations_dict,
-        }
         expected_prev_subtopic_dict = {
             'thumbnail_bg_color': None,
             'skill_ids': ['skill_id_1'],
@@ -598,7 +447,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 
         expected_dict = {
             'topic_id': 'topic_id',
-            'page_contents': expected_page_contents_dict,
+            'page_contents': {},
             'subtopic_title': 'Subtopic Title 2',
             'current_subtopic_id': 2,
             'next_subtopic_dict': None,
@@ -639,7 +488,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         self.assertIn('Could not find the resource', response['error'])
 
     def test_cannot_get_with_deleted_subtopic_page(self) -> None:
-        subtopic_page_services.delete_subtopic_page(
+        study_guide_services.delete_study_guide(
             self.admin_id, self.topic_id, 1
         )
         response = self.get_json(
