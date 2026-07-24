@@ -136,20 +136,20 @@ class PracticeSessionsPageDataHandler(
     ) -> List[str]:
         """Returns skill IDs associated with a given story node.
 
+        The node_id parameter maps to a node by its ID suffix (e.g., '1'
+        maps to 'node_1').
+
         Args:
             topic: Topic. The topic object.
-            node_id: str. The node ID.
+            node_id: str. The node ID (1-based index).
 
         Returns:
             list(str). The skill IDs for the node.
         """
         all_nodes = self._get_all_nodes_for_topic(topic)
-        valid_node_ids = [node.id for node in all_nodes]
-        if node_id not in valid_node_ids:
-            return []
-
+        target_node_id = 'node_%s' % node_id
         for node in all_nodes:
-            if node.id == node_id:
+            if node.id == target_node_id:
                 return node.acquired_skill_ids
         return []
 
@@ -158,9 +158,12 @@ class PracticeSessionsPageDataHandler(
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
+        The arc_id parameter maps to an arc by its ID suffix (e.g., '1'
+        maps to 'arc_1').
+
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc ID.
+            arc_id: str. The arc index (e.g., '1').
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
@@ -168,11 +171,8 @@ class PracticeSessionsPageDataHandler(
         arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
             topic
         )
-        valid_arc_ids = [arc.id for _, arc in arcs_with_stories]
-        if arc_id not in valid_arc_ids:
-            return []
-
+        target_arc_id = 'arc_%s' % arc_id
         for story, arc in arcs_with_stories:
-            if arc.id == arc_id:
+            if arc.id == target_arc_id:
                 return story.get_acquired_skill_ids_for_node_ids(arc.node_ids)
         return []
