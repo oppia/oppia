@@ -25,6 +25,7 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const CHAPTER_TITLES = Array.from({length: 11}, (_, i) => `Chapter ${i + 1}`);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
@@ -72,7 +73,7 @@ describe('Topic Manager', function () {
       'Adventure Topic'
     );
 
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < CHAPTER_TITLES.length; i++) {
       await curriculumAdmin.addChapter(`Chapter ${i + 1}`, explorationIds[i]);
     }
 
@@ -82,19 +83,7 @@ describe('Topic Manager', function () {
   it(
     'should create adventures by splitting after chapters 3, 7, and 10',
     async function () {
-      await curriculumAdmin.expectAllChaptersInSingleAdventure([
-        'Chapter 1',
-        'Chapter 2',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-        'Chapter 6',
-        'Chapter 7',
-        'Chapter 8',
-        'Chapter 9',
-        'Chapter 10',
-        'Chapter 11',
-      ]);
+      await curriculumAdmin.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
 
       await curriculumAdmin.expectScreenshotToMatch(
         'storyEditorAllChaptersInSingleAdventure',
@@ -126,19 +115,7 @@ describe('Topic Manager', function () {
         __dirname
       );
 
-      await curriculumAdmin.expectChaptersOrderToBe([
-        'Chapter 1',
-        'Chapter 2',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-        'Chapter 6',
-        'Chapter 7',
-        'Chapter 8',
-        'Chapter 9',
-        'Chapter 10',
-        'Chapter 11',
-      ]);
+      await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -163,19 +140,7 @@ describe('Topic Manager', function () {
         __dirname
       );
 
-      await curriculumAdmin.expectChaptersOrderToBe([
-        'Chapter 1',
-        'Chapter 2',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-        'Chapter 6',
-        'Chapter 7',
-        'Chapter 8',
-        'Chapter 9',
-        'Chapter 10',
-        'Chapter 11',
-      ]);
+      await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -206,19 +171,7 @@ describe('Topic Manager', function () {
 
       await curriculumAdmin.expectAdventureCount(3);
 
-      await curriculumAdmin.expectChaptersOrderToBe([
-        'Chapter 1',
-        'Chapter 2',
-        'Chapter 3',
-        'Chapter 4',
-        'Chapter 5',
-        'Chapter 6',
-        'Chapter 7',
-        'Chapter 8',
-        'Chapter 9',
-        'Chapter 10',
-        'Chapter 11',
-      ]);
+      await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
 
       await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
 
