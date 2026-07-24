@@ -18,6 +18,9 @@
 
 from __future__ import annotations
 
+import json
+
+from core import utils
 from core.domain import (
     email_manager,
     machine_translation_services,
@@ -25,6 +28,8 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
+
+from typing import Dict, Optional
 
 (translation_models,) = models.Registry.import_models(
     [models.Names.TRANSLATION]
@@ -76,6 +81,15 @@ class TranslationProviderRegistryTests(test_utils.GenericTestBase):
 
         with mapping_swap, whitelist_swap:
             self.assertIsNone(self.registry.get_provider_id('hi'))
+
+    def test_get_provider_instance_returns_instance_for_valid_id(
+        self,
+    ) -> None:
+        instance = self.registry.get_provider_instance('azure')
+        self.assertIsNotNone(instance)
+
+    def test_get_provider_instance_returns_none_for_invalid_id(self) -> None:
+        self.assertIsNone(self.registry.get_provider_instance('nonexistent'))
 
 
 class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
@@ -158,6 +172,21 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
             )
             self.assertIsNone(result)
 
+    def test_returns_none_if_no_provider_instance_available(self) -> None:
+        provider_instance_swap = self.swap(
+            machine_translation_services._PROVIDER_REGISTRY,  # pylint: disable=protected-access
+            'get_provider_instance',
+            lambda id: None,
+        )
+
+        with self.mock_provider_id_swap, provider_instance_swap:
+            result = (
+                machine_translation_services.generate_and_cache_translation(
+                    'en', 'hi', 'Hello'
+                )
+            )
+            self.assertIsNone(result)
+
     def test_api_failure_sends_email_and_raises_exception(self) -> None:
         class MockFailingProvider:
             def generate_translation(
@@ -194,3 +223,120 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
         self.assertEqual(len(email_messages), 1)
         self.assertEqual(email_messages[0][0], 'azure')
         self.assertEqual(email_messages[0][1], 'Azure Timeout')
+
+
+class MachineTranslationServicesWrapperTests(test_utils.GenericTestBase):
+    """Tests for thin wrapper functions delegating to translation_services."""
+
+    def test_get_translation_provider_mapping_delegates_correctly(
+        self,
+    ) -> None:
+        mapping_swap = self.swap(
+            translation_services,
+            'get_machine_translation_provider_mapping',
+            lambda: {'hi': 'azure'},
+        )
+        with mapping_swap:
+            self.assertEqual(
+                machine_translation_services.get_translation_provider_mapping(),
+                {'hi': 'azure'},
+            )
+
+    def test_save_translation_provider_mapping_delegates_correctly(
+        self,
+    ) -> None:
+        calls = []
+
+        def mock_save(mapping: Dict[str, str]) -> None:
+            calls.append(mapping)
+
+        save_swap = self.swap(
+            translation_services,
+            'save_machine_translation_provider_mapping',
+            mock_save,
+        )
+        with save_swap:
+            machine_translation_services.save_translation_provider_mapping(
+                {'hi': 'azure'}
+            )
+        self.assertEqual(calls, [{'hi': 'azure'}])
+
+    def test_is_automatic_translation_enabled_delegates_correctly(
+        self,
+    ) -> None:
+        enabled_swap = self.swap(
+            translation_services,
+            'is_automatic_translation_enabled',
+            lambda: True,
+        )
+        with enabled_swap:
+            self.assertTrue(
+                machine_translation_services.is_automatic_translation_enabled()
+            )
+
+    def test_update_translation_automatic_status_delegates_correctly(
+        self,
+    ) -> None:
+        calls = []
+
+        def mock_update(is_enabled: bool) -> None:
+            calls.append(is_enabled)
+
+        update_swap = self.swap(
+            translation_services,
+            'update_automatic_translation_status',
+            mock_update,
+        )
+        with update_swap:
+            machine_translation_services.update_translation_automatic_status(
+                True
+            )
+        self.assertEqual(calls, [True])
+
+    def test_update_machine_translation_policy_delegates_correctly(
+        self,
+    ) -> None:
+        calls = []
+
+        def mock_update_policy(
+            mapping: Optional[Dict[str, str]],
+            is_enabled: Optional[bool],
+        ) -> None:
+            calls.append((mapping, is_enabled))
+
+        update_swap = self.swap(
+            translation_services,
+            'update_machine_translation_policy',
+            mock_update_policy,
+        )
+        with update_swap:
+            machine_translation_services.update_machine_translation_policy(
+                {'hi': 'azure'}, True
+            )
+        self.assertEqual(calls, [({'hi': 'azure'}, True)])
+
+    def test_get_available_providers_for_ui_returns_sorted_list(self) -> None:
+        display_names_json = json.dumps(
+            {'azure': 'Azure', 'gcp': 'Google Cloud'}
+        )
+        whitelist_json = json.dumps({'hi': ['azure', 'gcp'], 'es': ['gcp']})
+
+        def mock_get_file_contents(path: str) -> str:
+            if 'display_names' in path:
+                return display_names_json
+            return whitelist_json
+
+        file_contents_swap = self.swap(
+            utils, 'get_file_contents', mock_get_file_contents
+        )
+        with file_contents_swap:
+            result = (
+                machine_translation_services.get_available_providers_for_ui()
+            )
+        self.assertEqual(
+            result,
+            [
+                {'id': 'azure', 'display_name': 'Azure'},
+                {'id': 'gcp', 'display_name': 'Google Cloud'},
+            ],
+        )

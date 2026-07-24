@@ -49,6 +49,7 @@
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
     "core/tests/puppeteer-acceptance-tests/specs/contributor-dashboard-admin/manage-auto-translation-configuration.spec.ts",
+    "core/templates/pages/contributor-dashboard-admin-page/translation-configuration-tab/translation-configuration-tab.component.css",
     "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/crawl-main-oppia-pages.spec.ts",
     "core/templates/base-components/base-content.component.css",
     "core/templates/components/summary-tile/story-summary-tile.component.css",

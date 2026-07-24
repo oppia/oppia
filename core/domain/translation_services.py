@@ -494,8 +494,10 @@ def update_machine_translation_policy(
     """Updates the machine translation policy settings.
 
     Args:
-        language_to_provider_mapping: dict(str, str)|None. The new language to provider mapping.
-        automatic_translation_is_enabled: bool|None. The new boolean status for automatic translation.
+        language_to_provider_mapping: dict|None, optional. The new
+            mapping from language codes to provider identifiers.
+        automatic_translation_is_enabled: bool|None, optional. The new
+            toggle status for automatic translation suggestions.
     """
     if language_to_provider_mapping is not None:
         mapping_domain_object = (

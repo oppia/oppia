@@ -8999,7 +8999,11 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         email_messages: List[Tuple[str, str]] = []
 
         def mock_send_mail(
-            sender: str, recipient: str, subject: str, body: str, html_body: str
+            unused_sender: str,
+            unused_recipient: str,
+            subject: str,
+            body: str,
+            unused_html_body: str,
         ) -> None:
             email_messages.append((subject, body))
 
