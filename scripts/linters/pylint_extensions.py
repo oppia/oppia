@@ -149,6 +149,7 @@ class HangingIndentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
                     continue
 
                 bracket_count = 0
+                position = 0
                 line_length = len(line)
                 escape_character_found = False
                 in_string = False
