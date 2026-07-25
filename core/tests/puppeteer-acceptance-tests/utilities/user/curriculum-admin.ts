@@ -1796,15 +1796,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.addChapter(chapterTitle, explorationId);
 
     await this.saveStoryDraft();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
-      await this.clickOnElementWithSelector(mobilePublishStoryButton);
-    } else {
-      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
-      await this.clickOnElementWithSelector(publishStoryButton);
-      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
-    }
+    await this.publishStoryDraft();
   }
 
   /**

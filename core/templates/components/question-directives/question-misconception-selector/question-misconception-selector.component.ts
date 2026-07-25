@@ -19,6 +19,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import './question-misconception-selector.component.css';
 import {
   Misconception,
   MisconceptionSkillMap,
@@ -33,6 +34,7 @@ interface UpdatedValues {
 @Component({
   selector: 'oppia-question-misconception-selector',
   templateUrl: './question-misconception-selector.component.html',
+  styleUrls: ['./question-misconception-selector.component.css'],
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Output() updateMisconceptionValues: EventEmitter<UpdatedValues> =

@@ -1776,3 +1776,46 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
             expected_status_int=404,
         )
+
+
+class TechnicalFeedbackDashboardAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test for technical feedback dashboard access validation."""
+
+    def setUp(self) -> None:
+        """Complete the signup process for self.TECH_LEAD_EMAIL."""
+        super().setUp()
+        self.signup(self.TECH_LEAD_EMAIL, self.TECH_LEAD_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+        self.add_user_role(
+            self.TECH_LEAD_USERNAME,
+            feconf.ROLE_ID_TECH_TEAM_LEAD,
+        )
+
+    def test_guest_user_does_not_pass_validation(self) -> None:
+        self.get_json(
+            '%s/can_access_technical_feedback_dashboard'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=401,
+        )
+
+    def test_exploration_editor_does_not_pass_validation(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+        self.get_json(
+            '%s/can_access_technical_feedback_dashboard'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=401,
+        )
+        self.logout()
+
+    def test_tech_lead_passes_validation(self) -> None:
+        self.login(self.TECH_LEAD_EMAIL)
+
+        self.get_html_response(
+            '%s/can_access_technical_feedback_dashboard'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=200,
+        )
+        self.logout()

@@ -1148,7 +1148,7 @@ class AdminHandler(
                 for i in range(len(story_node_dicts))
             ]
             story.story_contents.add_arc(
-                story_domain.Arc('default_arc', 'Arc 1', '', node_ids)
+                story_domain.Arc('default_arc', 'Adventure 1', '', node_ids)
             )
 
             skill_services.save_new_skill(self.user_id, skill_1)
@@ -1478,7 +1478,7 @@ class AdminHandler(
                             {
                                 'cmd': 'create_arc',
                                 'arc_id': 'default_arc',
-                                'title': 'Arc 1',
+                                'title': 'Adventure 1',
                                 'description': '',
                                 'node_ids': existing_node_ids,
                             }
@@ -1620,7 +1620,9 @@ class AdminHandler(
                     node.id for node in story.story_contents.nodes
                 ]
                 story.story_contents.add_arc(
-                    story_domain.Arc('default_arc', 'Arc 1', '', story_node_ids)
+                    story_domain.Arc(
+                        'default_arc', 'Adventure 1', '', story_node_ids
+                    )
                 )
                 skill_services.save_new_skill(self.user_id, skill)
                 story_services.save_new_story(self.user_id, story)
@@ -2296,7 +2298,7 @@ class AdminHandler(
                         {
                             'cmd': 'create_arc',
                             'arc_id': 'default_arc',
-                            'title': 'Arc 1',
+                            'title': 'Adventure 1',
                             'description': '',
                             'node_ids': existing_node_ids,
                         }
