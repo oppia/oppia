@@ -1063,12 +1063,12 @@ class DocstringParameterChecker(checkers.BaseChecker):
         missing_excs = expected_excs - found_excs
         self._add_raise_message(missing_excs, func_node)
 
-    def visit_return(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_return(self, node: astroid.node_classes.Return) -> None:
         """Visits a function node that contains a return statement and verifies
         that the return value and the return type are documented.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.node_classes.Return. Node for a function or
                 method definition in the AST.
         """
         if not docstrings_checker.returns_something(node):
@@ -1093,12 +1093,12 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not (doc.has_rtype() or (doc.has_property_type() and is_property)):
             self.add_message('missing-return-type-doc', node=func_node)
 
-    def visit_yield(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_yield(self, node: astroid.node_classes.Yield) -> None:
         """Visits a function node that contains a yield statement and verifies
         that the yield value and the yield type are documented.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+            node: astroid.node_classes.Yield. Node for a function or
                 method definition in the AST.
         """
         func_node = node.frame()
@@ -1119,13 +1119,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not doc_has_yields_type:
             self.add_message('missing-yield-type-doc', node=func_node)
 
-    def visit_yieldfrom(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_yieldfrom(self, node: astroid.node_classes.YieldFrom) -> None:
         """Visits a function node that contains a yield from statement and
         verifies that the yield from value and the yield from type are
         documented.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node to access module.
+            node: astroid.node_classes.YieldFrom. Node to access module.
         """
         self.visit_yield(node)
 
