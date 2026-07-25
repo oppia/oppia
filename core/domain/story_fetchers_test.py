@@ -632,3 +632,211 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(nodes[0].title, 'Node 1')
         self.assertEqual(nodes[1].id, self.NODE_ID_2)
         self.assertEqual(nodes[1].title, 'Node 2')
+
+    def test_get_all_nodes_for_topic_with_published_stories(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id, self.user_id_admin
+        )
+        all_nodes = story_fetchers.get_all_nodes_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+        self.assertEqual(len(all_nodes), 1)
+        self.assertEqual(all_nodes[0].id, self.NODE_ID_1)
+
+    def test_get_all_nodes_for_topic_excludes_unpublished_stories(
+        self,
+    ) -> None:
+        all_nodes = story_fetchers.get_all_nodes_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+        self.assertEqual(len(all_nodes), 0)
+
+    def test_get_all_nodes_for_topic_with_multiple_stories(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id, self.user_id_admin
+        )
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id_2,
+            self.USER_ID,
+            self.TOPIC_ID,
+            url_fragment='story-two',
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2
+        )
+        story_services.update_story(
+            self.USER_ID,
+            story_id_2,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': self.NODE_ID_1,
+                        'title': 'Title 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': self.NODE_ID_1,
+                        'old_value': None,
+                        'new_value': self.EXP_ID_2,
+                    }
+                ),
+            ],
+            'Added node.',
+        )
+        topic_services.publish_story(
+            self.TOPIC_ID, story_id_2, self.user_id_admin
+        )
+        all_nodes = story_fetchers.get_all_nodes_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+        self.assertEqual(len(all_nodes), 1)
+
+    def test_get_all_arcs_with_stories_for_topic(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id, self.user_id_admin
+        )
+        story_services.update_story(
+            self.USER_ID,
+            self.story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': [self.NODE_ID_1],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+        self.assertEqual(len(arcs_with_stories), 1)
+        story, arc = arcs_with_stories[0]
+        self.assertEqual(story.id, self.story_id)
+        self.assertEqual(arc.id, 'arc_1')
+        self.assertEqual(arc.title, 'Arc 1')
+        self.assertEqual(arc.node_ids, [self.NODE_ID_1])
+
+    def test_get_all_arcs_with_stories_returns_correct_story(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id, self.user_id_admin
+        )
+        story_services.update_story(
+            self.USER_ID,
+            self.story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': [self.NODE_ID_1],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id_2,
+            self.USER_ID,
+            self.TOPIC_ID,
+            url_fragment='story-two',
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2
+        )
+        story_services.update_story(
+            self.USER_ID,
+            story_id_2,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_ADD_STORY_NODE,
+                        'node_id': self.NODE_ID_1,
+                        'title': 'Title 1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'node_id': self.NODE_ID_1,
+                        'old_value': None,
+                        'new_value': self.EXP_ID_2,
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'Same arc id in second story',
+                        'node_ids': [self.NODE_ID_1],
+                    }
+                ),
+            ],
+            'Added node and arc.',
+        )
+        topic_services.publish_story(
+            self.TOPIC_ID, story_id_2, self.user_id_admin
+        )
+
+        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+        self.assertEqual(len(arcs_with_stories), 1)
+        first_story, first_arc = arcs_with_stories[0]
+        self.assertEqual(first_story.id, self.story_id)
+        self.assertEqual(first_arc.id, 'arc_1')
+
+    def test_get_all_arcs_with_stories_excludes_unpublished(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.publish_exploration(self.user_id_admin, self.EXP_ID_1)
+        story_services.update_story(
+            self.USER_ID,
+            self.story_id,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_CREATE_ARC,
+                        'arc_id': 'arc_1',
+                        'title': 'Arc 1',
+                        'description': 'First arc',
+                        'node_ids': [self.NODE_ID_1],
+                    }
+                ),
+            ],
+            'Added arc.',
+        )
+        arcs_with_stories = story_fetchers.get_all_arcs_with_stories_for_topic(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
+        self.assertEqual(len(arcs_with_stories), 0)

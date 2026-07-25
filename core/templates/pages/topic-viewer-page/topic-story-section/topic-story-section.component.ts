@@ -482,6 +482,34 @@ export class TopicStorySectionComponent
     );
   }
 
+  getLessonPracticeUrl(nodeId: string): string {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return '#';
+    }
+    return this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.LESSON_PRACTICE_URL,
+      {
+        classroom_url_fragment: this.classroomUrlFragment,
+        topic_url_fragment: this.topicUrlFragment,
+        node_id: nodeId,
+      }
+    );
+  }
+
+  getEndOfArcUrl(arcId: string): string {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return '#';
+    }
+    return this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.END_OF_ARC_URL,
+      {
+        classroom_url_fragment: this.classroomUrlFragment,
+        topic_url_fragment: this.topicUrlFragment,
+        arc_id: arcId,
+      }
+    );
+  }
+
   private getLessonThumbnailUrl(node: StoryNode): string {
     const thumbnailFilename = node.getThumbnailFilename();
     const storyId = this.storySummary.getId();
