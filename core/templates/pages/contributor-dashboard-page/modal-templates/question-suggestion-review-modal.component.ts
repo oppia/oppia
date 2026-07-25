@@ -19,6 +19,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import './question-suggestion-review.component.css';
 import {
   Misconception,
   MisconceptionSkillMap,
@@ -96,6 +97,7 @@ interface ActiveContributionDict {
 @Component({
   selector: 'oppia-question-suggestion-review-modal',
   templateUrl: './question-suggestion-review.component.html',
+  styleUrls: ['./question-suggestion-review.component.css'],
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal
