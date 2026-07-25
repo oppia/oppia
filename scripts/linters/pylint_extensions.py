@@ -1516,13 +1516,14 @@ class RestrictedImportChecker(checkers.BaseChecker):
             )
 
     def _iterate_forbidden_imports(
-        self, node: astroid.node_classes.Import
+        self,
+        node: astroid.node_classes.Import | astroid.node_classes.ImportFrom,
     ) -> Generator[Tuple[str, Tuple[str, Optional[str]]], None, None]:
         """Yields pairs of module name and forbidden imports.
 
         Args:
-            node: astroid.node_classes.Import. Node for a import statement
-                in the AST.
+            node: astroid.node_classes.Import|astroid.node_classes.ImportFrom. A
+                Node from some `import *` or `import * from *` in the AST.
 
         Yields:
             tuple(str, tuple(str, None)). Yields pair of module name and
@@ -1591,7 +1592,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
                     node, module_name, forbidden_import_names
                 )
 
-    def visit_importfrom(self, node: astroid.node_classes.Import) -> None:
+    def visit_importfrom(self, node: astroid.node_classes.ImportFrom) -> None:
         """Visits all import-from statements in a python file and checks that
         modules are imported. It then adds a message accordingly.
 
