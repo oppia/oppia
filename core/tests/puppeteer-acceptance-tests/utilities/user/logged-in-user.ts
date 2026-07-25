@@ -2721,7 +2721,7 @@ export class LoggedInUser extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    expectedWelcomeModal: boolean = false
+    expectedWelcomeModal: boolean = true
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPageFromCreatorDashboard();

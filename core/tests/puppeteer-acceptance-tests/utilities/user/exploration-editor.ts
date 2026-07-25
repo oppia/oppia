@@ -2958,6 +2958,10 @@ export class ExplorationEditor extends BaseUser {
       {timeout: 60000},
       activeModalBackdropSelector
     );
+    // Defense-in-depth: dismiss the welcome modal if it appears after the
+    // backdrop-zero check passed (race condition where Angular hadn't rendered
+    // it yet). Without this, the modal can block clicks on the state editor.
+    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
       timeout: 60000,
@@ -4984,7 +4988,7 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    flag: boolean = false
+    flag: boolean = true
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
@@ -5116,11 +5120,13 @@ export class ExplorationEditor extends BaseUser {
     const explorationIds: string[] = [];
     for (let i = 0; i < n; i++) {
       const explorationTitle = `Quick Exploration ${i + 1}`;
+      // The welcome modal only appears on the first visit to the editor.
+      const expectWelcomeModal = i === 0;
       const explorationId =
         await this.createAndPublishAMinimalExplorationWithTitle(
           explorationTitle,
           'Algebra',
-          false
+          expectWelcomeModal
         );
       explorationIds.push(explorationId);
     }
