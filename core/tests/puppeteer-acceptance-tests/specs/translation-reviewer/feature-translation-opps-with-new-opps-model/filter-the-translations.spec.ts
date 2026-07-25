@@ -132,9 +132,7 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
@@ -152,9 +150,7 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.typeTextForRTE(
       'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)'
     );
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
@@ -170,9 +166,7 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );

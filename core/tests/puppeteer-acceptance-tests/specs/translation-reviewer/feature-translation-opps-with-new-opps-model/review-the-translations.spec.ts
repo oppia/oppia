@@ -129,9 +129,7 @@ describe('Translation Reviewer V2', function () {
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 3');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
@@ -152,9 +150,7 @@ describe('Translation Reviewer V2', function () {
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
