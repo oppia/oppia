@@ -168,7 +168,7 @@ def possible_exc_types(node: astroid.node_classes.NodeNG) -> Set[str]:
         return set(
             exc for exc in excs if not utils.node_ignores_exception(node, exc)
         )
-    except astroid.node_classes.InferenceError:
+    except astroid.InferenceError:
         return set()
 
 

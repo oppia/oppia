@@ -2915,7 +2915,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
             try:
                 left_inferred = next(node.left.infer())
                 right_inferred = next(node.right.infer())
-            except astroid.exceptions.InferenceError:
+            except astroid.InferenceError:
                 return
             # Ignore operation if either side is inferred to be a datetime obj.
             if any(
