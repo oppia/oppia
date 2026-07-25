@@ -75,7 +75,7 @@
                 [thumbnailUrl]="lessonCard.thumbnailUrl"
                 [startUrl]="lessonCard.startUrl"
                 [studyUrl]="studyGuideUrl"
-                [practiceUrl]="practiceCard.practiceUrl"
+                [practiceUrl]="lessonCard.practiceUrl"
                 [lessonNumber]="lessonCard.lessonNumber"
                 [adventureAccentColor]="adventureGroup.accentColor"
                 [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"
@@ -100,7 +100,7 @@
                 [studyUrl]="practiceCard.studyUrl"
                 [cardBackgroundColor]="adventureGroup.headerBackgroundColor"
                 [cardAccentColor]="adventureGroup.accentColor"
-                [practiceUrl]="practiceCard.practiceUrl">
+                [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)">
               </topic-adventure-end-test-card>
             </div>
           </div>
@@ -117,7 +117,7 @@
             [thumbnailUrl]="lessonCard.thumbnailUrl"
             [startUrl]="lessonCard.startUrl"
             [studyUrl]="studyGuideUrl"
-            [practiceUrl]="practiceCard.practiceUrl"
+            [practiceUrl]="lessonCard.practiceUrl"
             [lessonNumber]="lessonCard.lessonNumber"
             [adventureAccentColor]="'#00645c'"
             [isActiveLesson]="lessonCard.lessonNumber === activeLessonNumber"

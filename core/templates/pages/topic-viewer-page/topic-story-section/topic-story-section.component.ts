@@ -49,6 +49,7 @@ interface LessonCardData {
   lessonDescription: string;
   thumbnailUrl: string;
   startUrl: string;
+  practiceUrl: string;
   nodeId: string;
   lessonProgressStatus:
     | 'not_started'
@@ -70,6 +71,7 @@ interface AdventureGroupData {
   iconBg: string;
   headerBackgroundColor: string;
   headerBorderColor: string;
+  arcId: string;
 }
 
 interface PracticeCardData {
@@ -330,6 +332,9 @@ export class TopicStorySectionComponent
           lessonDescription: node.getDescription(),
           thumbnailUrl: this.getLessonThumbnailUrl(node),
           startUrl: this.getLessonStartUrl(node),
+          practiceUrl: this.getLessonPracticeUrl(
+            node.getId().split('_').pop() || ''
+          ),
           lessonProgressStatus: this.getLessonProgressStatus(node),
           totalCheckpointsCount: totalCheckpoints,
           visitedCheckpointsCount: visitedCheckpoints,
@@ -367,6 +372,7 @@ export class TopicStorySectionComponent
           adventureLessonCards.push(this.lessonCards[nodeIndex]);
         }
       });
+      const arcNumber = arc.id.split('_').pop() || '';
       return {
         adventureTitle: arc.title,
         adventureDescription: arc.description,
@@ -375,6 +381,7 @@ export class TopicStorySectionComponent
         iconBg: paletteColor.iconBg,
         headerBackgroundColor: paletteColor.headerBg,
         headerBorderColor: paletteColor.headerBorder,
+        arcId: arcNumber,
       };
     });
   }
@@ -403,6 +410,7 @@ export class TopicStorySectionComponent
             explorationId
           )
         : null;
+      const nodeNumber = node.getId().split('_').pop() || '';
 
       return {
         lessonNumber: index + 1,
@@ -410,6 +418,7 @@ export class TopicStorySectionComponent
         lessonDescription: node.getDescription(),
         thumbnailUrl: this.getLessonThumbnailUrl(node),
         startUrl: this.getLessonStartUrl(node),
+        practiceUrl: this.getLessonPracticeUrl(nodeNumber),
         nodeId: node.getId(),
         lessonProgressStatus: this.getLessonProgressStatus(node),
         totalCheckpointsCount: progressSummary
@@ -438,7 +447,7 @@ export class TopicStorySectionComponent
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
-    this.masteryChallengeUrl = this.getPracticeSessionUrl();
+    this.masteryChallengeUrl = this.getMasteryChallengeUrl();
 
     if (this.visibleAdventureGroups.length) {
       this._expandedAdventureIndices = new Set([0]);
@@ -447,6 +456,8 @@ export class TopicStorySectionComponent
 
   private getPracticeCardData(): PracticeCardData {
     const nextArcNumber = Math.min(this.adventureGroups.length, 2);
+    const firstArcId =
+      this.adventureGroups.length > 0 ? this.adventureGroups[0].arcId : '';
 
     return {
       practiceTitle: 'Arc 1 Review & Test',
@@ -458,7 +469,7 @@ export class TopicStorySectionComponent
         this.lessonCards.length > 0 ? this.lessonCards[0].lessonNumber : null,
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
-      practiceUrl: this.getPracticeSessionUrl(),
+      practiceUrl: firstArcId ? this.getEndOfArcUrl(firstArcId) : '#',
     };
   }
 
@@ -506,6 +517,19 @@ export class TopicStorySectionComponent
         classroom_url_fragment: this.classroomUrlFragment,
         topic_url_fragment: this.topicUrlFragment,
         arc_id: arcId,
+      }
+    );
+  }
+
+  private getMasteryChallengeUrl(): string {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return '#';
+    }
+    return this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.MASTERY_CHALLENGE_URL,
+      {
+        classroom_url_fragment: this.classroomUrlFragment,
+        topic_url_fragment: this.topicUrlFragment,
       }
     );
   }

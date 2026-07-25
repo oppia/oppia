@@ -709,14 +709,42 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should construct practice session url when fragments and subtopic id present', () => {
-    component.storySummary = createStorySummarySpy([], []);
-    component.lessonCount = 0;
-    component.practiceCount = 1;
-    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
-    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
-      'place-values'
+  it('should construct practice card url when arcs and fragments are present', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
     );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+
+    component.storySummary = storySummary;
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'place-values';
     component.practiceSubtopicIds = [3];
@@ -724,7 +752,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.isPracticeCardVisible).toBe(true);
-    expect(component.practiceCard.practiceUrl).toContain('practice/session');
+    expect(component.practiceCard.practiceUrl).toContain('test/arc/1');
   });
 
   it('should not create practice card when practice count is zero', () => {
@@ -1771,7 +1799,7 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should set masteryChallengeUrl from practice session url', () => {
+  it('should set masteryChallengeUrl from mastery challenge url', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.lessonCount = 0;
     component.practiceCount = 1;
@@ -1781,7 +1809,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.masteryChallengeUrl).toContain('practice/session');
+    expect(component.masteryChallengeUrl).toContain('mastery-challenge');
   });
 
   it('should set masteryChallengeUrl to # when fragments are missing', () => {
