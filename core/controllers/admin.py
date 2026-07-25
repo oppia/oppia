@@ -162,7 +162,7 @@ ARABIC_BLOG_POST_CONTENT = """
     </ul>
 """
 
-SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
+SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(  # pylint: disable=invalid-name
     {
         'id': '%s',
         'title': 'Dummy Exploration',
