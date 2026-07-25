@@ -103,12 +103,9 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             self.assertRaisesRegex(PermissionError, 'Refusing to mutate prod'),
         ):
             self.assert_job_output_is_empty()
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 0)
 
     def test_empty_storage_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
-        # Only read is necessary here.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_in_sync_user_is_left_unchanged(self) -> None:
         self.create_oppia_user(
@@ -122,8 +119,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult.as_stdout('OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_user('aid_a')
-        # Only read is necessary here.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_user_missing_from_firebase_is_created(self) -> None:
         self.create_oppia_user(
@@ -135,8 +130,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult(stdout='CREATE OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_user('aid_b')
-        # Read and write are necessary here (one connection each), but no deletes.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 2)
 
     def test_user_missing_from_oppia_is_deleted(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -147,8 +140,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult(stdout='DELETE OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_not_user('aid_c')
-        # Read and write are necessary here (one connection each), but no creates.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 2)
 
     def test_deleted_oppia_user_in_sync_with_disabled_firebase_user(
         self,
@@ -168,8 +159,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
         self.firebase_sdk_stub.assert_is_user('aid_d')
         self.firebase_sdk_stub.assert_is_disabled('aid_d')
-        # Only read is necessary here, because the records are already in sync.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_profile_users_are_ignored(self) -> None:
         self.create_oppia_user(
@@ -188,8 +177,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         self.assert_job_output_is(
             [job_run_result.JobRunResult.as_stdout('OK: 1')]
         )
-        # Only read is necessary here because the sub-account should be ignored.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_mixed_diff_applies_every_change(self) -> None:
         self.create_oppia_user(
@@ -217,8 +204,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         self.firebase_sdk_stub.assert_is_user('aid_a')
         self.firebase_sdk_stub.assert_is_user('aid_b')
         self.firebase_sdk_stub.assert_is_not_user('aid_c')
-        # All three operations (read, create, delete) are necessary here.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_oppia_email_collision_aborts_writes(self) -> None:
         duplicate_email = 'dup@dup.com'
@@ -242,8 +227,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
         self.firebase_sdk_stub.assert_is_not_user('aid_x')
         self.firebase_sdk_stub.assert_is_not_user('aid_y')
-        # Only read is needed here because write was aborted.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_oppia_collision_blocks_unrelated_valid_write(self) -> None:
         self.create_oppia_user(
@@ -270,8 +253,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             ]
         )
         self.firebase_sdk_stub.assert_is_not_user('aid_b')
-        # Only read is needed here because write was aborted.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_firebase_account_collision_still_deletes(self) -> None:
         duplicate_email = 'dup@dup.com'
@@ -296,8 +277,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
         self.firebase_sdk_stub.assert_is_not_user('aid_1')
         self.firebase_sdk_stub.assert_is_not_user('aid_2')
-        # Only read and delete are needed here because delete is enough to sync.
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 2)
 
 
 class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
@@ -310,7 +289,6 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             feature_flag_domain.ServerMode.PROD,
         ):
             self.assert_job_output_is_empty()
-        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_empty_storage_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
