@@ -26,7 +26,9 @@ from typing import List, TypedDict
 VALID_ASYNC_STATUSES: List[str] = ['Available', 'Not_Ready', 'Blocked']
 MAX_TITLE_LENGTH = 80
 MAX_DESCRIPTION_LENGTH = 500
+MIN_TIME_LIMIT_IN_MINUTES = 5
 MAX_TIME_LIMIT_IN_MINUTES = 60
+MIN_TOTAL_QUESTIONS = 3
 MAX_TOTAL_QUESTIONS = 50
 
 
@@ -148,23 +150,27 @@ class CertificateAssessmentOffering:
             raise utils.ValidationError(
                 'topic_ids must contain only non-empty strings.'
             )
-        if (
-            not isinstance(self.total_questions, int)
-            or self.total_questions < 1
-        ):
+        if not isinstance(self.total_questions, int):
             raise utils.ValidationError(
                 'total_questions must be a positive integer.'
+            )
+        if self.total_questions < MIN_TOTAL_QUESTIONS:
+            raise utils.ValidationError(
+                'total_questions must be greater than or equal to %d.'
+                % MIN_TOTAL_QUESTIONS
             )
         if self.total_questions > MAX_TOTAL_QUESTIONS:
             raise utils.ValidationError(
                 'total_questions must be at most %d.' % MAX_TOTAL_QUESTIONS
             )
-        if (
-            not isinstance(self.time_limit_in_minutes, int)
-            or self.time_limit_in_minutes < 1
-        ):
+        if not isinstance(self.time_limit_in_minutes, int):
             raise utils.ValidationError(
                 'time_limit_in_minutes must be a positive integer.'
+            )
+        if self.time_limit_in_minutes < MIN_TIME_LIMIT_IN_MINUTES:
+            raise utils.ValidationError(
+                'time_limit_in_minutes must be greater than or equal to %d.'
+                % MIN_TIME_LIMIT_IN_MINUTES
             )
         if self.time_limit_in_minutes > MAX_TIME_LIMIT_IN_MINUTES:
             raise utils.ValidationError(
