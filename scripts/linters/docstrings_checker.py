@@ -38,11 +38,13 @@ def space_indentation(s: str) -> int:
     return len(s) - len(s.lstrip(' '))
 
 
-def get_setters_property_name(node: astroid.FunctionDef) -> Optional[str]:
+def get_setters_property_name(
+    node: astroid.scoped_nodes.FunctionDef,
+) -> Optional[str]:
     """Get the name of the property that the given node is a setter for.
 
     Args:
-        node: astroid.FunctionDef. The node to get the property name for.
+        node: astroid.scoped_nodes.FunctionDef. The node with the property name.
 
     Returns:
         str|None. The name of the property that the node is a setter for,
@@ -51,9 +53,9 @@ def get_setters_property_name(node: astroid.FunctionDef) -> Optional[str]:
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
         if (
-            isinstance(decorator_node, astroid.Attribute)
+            isinstance(decorator_node, astroid.node_classes.Attribute)
             and decorator_node.attrname == 'setter'
-            and isinstance(decorator_node.expr, astroid.Name)
+            and isinstance(decorator_node.expr, astroid.node_classes.Name)
         ):
             decorator_name: Optional[str] = decorator_node.expr.name
             return decorator_name
@@ -61,16 +63,16 @@ def get_setters_property_name(node: astroid.FunctionDef) -> Optional[str]:
 
 
 def get_setters_property(
-    node: astroid.FunctionDef,
-) -> Optional[astroid.FunctionDef]:
+    node: astroid.scoped_nodes.FunctionDef,
+) -> Optional[astroid.scoped_nodes.FunctionDef]:
     """Get the property node for the given setter node.
 
     Args:
-        node: astroid.FunctionDef. The node to get the property for.
+        node: astroid.scoped_nodes.FunctionDef. The node with the property.
 
     Returns:
-        astroid.FunctionDef|None. The node relating to the property of
-        the given setter node, or None if one could not be found.
+        astroid.scoped_nodes.FunctionDef|None. The node relating to the property
+        of the given setter node, or None if one could not be found.
     """
     setters_property = None
 
@@ -86,11 +88,11 @@ def get_setters_property(
     return setters_property
 
 
-def returns_something(return_node: astroid.Return) -> bool:
+def returns_something(return_node: astroid.node_classes.Return) -> bool:
     """Check if a return node returns a value other than None.
 
     Args:
-        return_node: astroid.Return. The return node to check.
+        return_node: astroid.node_classes.Return. The return node to check.
 
     Returns:
         bool. True if the return node returns a value other than None, False
@@ -101,10 +103,13 @@ def returns_something(return_node: astroid.Return) -> bool:
     if returns is None:
         return False
 
-    return not (isinstance(returns, astroid.Const) and returns.value is None)
+    return not (
+        isinstance(returns, astroid.node_classes.Const)
+        and returns.value is None
+    )
 
 
-def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
+def possible_exc_types(node: astroid.node_classes.NodeNG) -> Set[str]:
     """Gets all of the possible raised exception types for the given raise node.
     Caught exception types are ignored.
 
@@ -116,31 +121,39 @@ def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
         set(str). A list of exception types.
     """
     excs = []
-    if isinstance(node.exc, astroid.Name):
+    if isinstance(node.exc, astroid.node_classes.Name):
         inferred = utils.safe_infer(node.exc)
         if inferred:
             excs = [inferred.name]
-    elif isinstance(node.exc, astroid.Call) and isinstance(
-        node.exc.func, astroid.Name
+    elif isinstance(node.exc, astroid.node_classes.Call) and isinstance(
+        node.exc.func, astroid.node_classes.Name
     ):
         target = utils.safe_infer(node.exc.func)
-        if isinstance(target, astroid.ClassDef):
+        if isinstance(target, astroid.scoped_nodes.ClassDef):
             excs = [target.name]
-        elif isinstance(target, astroid.FunctionDef):
-            for ret in target.nodes_of_class(astroid.Return):
+        elif isinstance(target, astroid.scoped_nodes.FunctionDef):
+            for ret in target.nodes_of_class(astroid.node_classes.Return):
                 if ret.frame() != target:
                     continue
 
                 val = utils.safe_infer(ret.value)
                 if (
                     val
-                    and isinstance(val, (astroid.Instance, astroid.ClassDef))
+                    and isinstance(
+                        val,
+                        (
+                            astroid.node_classes.Instance,
+                            astroid.scoped_nodes.ClassDef,
+                        ),
+                    )
                     and utils.inherit_from_std_ex(val)
                 ):
                     excs.append(val.name)
     elif node.exc is None:
         handler = node.parent
-        while handler and not isinstance(handler, astroid.ExceptHandler):
+        while handler and not isinstance(
+            handler, astroid.node_classes.ExceptHandler
+        ):
             handler = handler.parent
 
         if handler and handler.type:
@@ -155,7 +168,7 @@ def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
         return set(
             exc for exc in excs if not utils.node_ignores_exception(node, exc)
         )
-    except astroid.InferenceError:
+    except astroid.node_classes.InferenceError:
         return set()
 
 
@@ -179,13 +192,7 @@ def docstringify(docstring: astroid.nodes.Const) -> _check_docs_utils.Docstring:
     return _check_docs_utils.Docstring(docstring)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class GoogleDocstring(_check_docs_utils.GoogleDocstring):  # type: ignore[misc]
+class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """Class for checking whether docstrings follow the Google Python Style
     Guide.
     """

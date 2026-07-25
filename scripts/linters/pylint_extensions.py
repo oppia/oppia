@@ -1008,7 +1008,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         if not node_doc.supports_yields and node.is_generator():
             return
 
-        return_nodes = node.nodes_of_class(astroid.Return)
+        return_nodes = node.nodes_of_class(astroid.node_classes.Return)
         if (node_doc.has_returns() or node_doc.has_rtype()) and not any(
             docstrings_checker.returns_something(ret_node)
             for ret_node in return_nodes
@@ -1046,7 +1046,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 method definition in the AST.
         """
         func_node = node.frame()
-        if not isinstance(func_node, astroid.FunctionDef):
+        if not isinstance(func_node, astroid.scoped_nodes.FunctionDef):
             return
 
         expected_excs = docstrings_checker.possible_exc_types(node)
@@ -1134,7 +1134,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         documented.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node to access module content.
+            node: astroid.scoped_nodes.FunctionDef. Node to access module.
         """
         self.visit_yield(node)
 
@@ -1304,7 +1304,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         Args:
             excs: list(str). A list of exception types.
-            node: astroid.scoped_nodes.FunctionDef. Node to access module content.
+            node: astroid.scoped_nodes.FunctionDef. Node to access module.
         """
         if self.linter.config.accept_no_raise_doc:
             return
@@ -1458,8 +1458,8 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):  # type: ignore[misc]
         function arguments order. It then adds a message accordingly.
 
         Args:
-            node: astroid.scoped_nodes.FunctionDef. Node for a function or method
-                definition in the AST.
+            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+                method definition in the AST.
         """
 
         args_list = [args.name for args in node.args.args]
@@ -1624,7 +1624,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
                     node, module_name, forbidden_import_names
                 )
 
-    def visit_importfrom(self, node: astroid.Import) -> None:
+    def visit_importfrom(self, node: astroid.node_classes.Import) -> None:
         """Visits all import-from statements in a python file and checks that
         modules are imported. It then adds a message accordingly.
 
@@ -1648,13 +1648,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
                     )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[misc]
+class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
     """Checker for single character files and newline at EOF."""
 
     name = 'newline-at-eof'
@@ -1672,11 +1666,11 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[mi
         ),
     }
 
-    def process_module(self, node: astroid.Module) -> None:
+    def process_module(self, node: astroid.scoped_nodes.Module) -> None:
         """Process a module.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
 
         file_content = read_from_node(node)
@@ -1688,13 +1682,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[mi
             self.add_message('newline-at-eof', line=file_length)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class SingleLineCommentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
+class SingleLineCommentChecker(checkers.BaseTokenChecker):
     """Checks if comments follow correct style."""
 
     name = 'incorrectly_styled_comment'
@@ -1865,13 +1853,7 @@ class SingleLineCommentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
             self._check_punctuation(*comments[-1])
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[misc]
+class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     """Checks if there is a single empty line below the fileoverview docstring.
     Note: The check assumes that all files have a file overview. This
     assumption is justified because Pylint has an inbuilt check
@@ -1898,7 +1880,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
         file overview docstring.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         # Check if the given node has docstring.
         if node.doc_node is None:
@@ -1930,13 +1912,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
             )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class SingleLinePragmaChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
+class SingleLinePragmaChecker(checkers.BaseTokenChecker):
     """Custom pylint checker which checks if pylint pragma is used to disable
     a rule for a single line only.
     """
@@ -1977,13 +1953,7 @@ class SingleLinePragmaChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
                     self.add_message('single-line-pragma', line=line_num)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
+class TypeIgnoreCommentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks if MyPy's type ignores are properly
     documented or not.
     """
@@ -2038,7 +2008,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         ),
     )
 
-    def visit_module(self, node: astroid.Module) -> None:
+    def visit_module(self, node: astroid.scoped_nodes.Module) -> None:
         """Visit a module to ensure that there is a comment for each MyPy
         type ignore.
 
@@ -2049,7 +2019,9 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         self._process_module_tokens(tokens, node)
 
     def _process_module_tokens(
-        self, tokens: List[tokenize.TokenInfo], node: astroid.Module
+        self,
+        tokens: List[tokenize.TokenInfo],
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """Checks if the MyPy type ignores present in a module are properly
         documented by a code comment or not. Also, checks for unnecessary code
@@ -2131,13 +2103,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class SingleSpaceAfterKeyWordChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
+class SingleSpaceAfterKeyWordChecker(checkers.BaseTokenChecker):
     """Custom pylint checker which checks that there is a single space
     after keywords like `if`, `elif`, `while`, and `yield`.
     """
@@ -2198,13 +2164,7 @@ class TypeStatusDict(TypedDict):
     func_def_start_line: int
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
+class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is always a comment
     for exceptional types in the backend type annotations.
     """
@@ -2253,7 +2213,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         ),
     }
 
-    def visit_module(self, node: astroid.Module) -> None:
+    def visit_module(self, node: astroid.scoped_nodes.Module) -> None:
         """Visit a module to ensure that there is a comment for each exceptional
         type (cast, Any and object).
 
@@ -2264,7 +2224,9 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         self._process_module_tokens(tokens, node)
 
     def _process_module_tokens(
-        self, tokens: List[tokenize.TokenInfo], node: astroid.Module
+        self,
+        tokens: List[tokenize.TokenInfo],
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """Checks whether an exceptional type in backend type annotations is
         documented. If exceptional type is not documented, then it adds a
@@ -2337,7 +2299,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         line: str,
         line_num: int,
         exceptional_type: str,
-        node: astroid.Module,
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """Checks whether the given exceptional type in a module has been
         documented or not. If the exceptional type is not documented then
@@ -2444,7 +2406,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
                     )
 
     def _add_exceptional_type_error_message(
-        self, exceptional_type: str, line_num: int, node: astroid.Module
+        self,
+        exceptional_type: str,
+        line_num: int,
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """This method should be called only when an exceptional type error is
         encountered. If the exceptional type is Any then 'any-type-used' error
@@ -2465,7 +2430,9 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             self.add_message('cast-func-used', line=line_num, node=node)
 
     def check_comment_is_present_with_object_class(
-        self, tokens: List[tokenize.TokenInfo], node: astroid.Module
+        self,
+        tokens: List[tokenize.TokenInfo],
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """Checks whether the object class in a module has been documented
         or not. If the object class is not documented then adds an error
@@ -2473,7 +2440,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.Module. Node to access module content.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         object_class_status_dict: TypeStatusDict = copy.deepcopy(
             self.EXCEPTIONAL_TYPE_STATUS_DICT
@@ -2501,7 +2468,9 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             )
 
     def check_comment_is_present_with_cast_method(
-        self, tokens: List[tokenize.TokenInfo], node: astroid.Module
+        self,
+        tokens: List[tokenize.TokenInfo],
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """Checks whether the cast method in a module has been documented
         or not. If the cast method is not documented then adds an error
@@ -2553,7 +2522,9 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
                     )
 
     def check_comment_is_present_with_any_type(
-        self, tokens: List[tokenize.TokenInfo], node: astroid.Module
+        self,
+        tokens: List[tokenize.TokenInfo],
+        node: astroid.scoped_nodes.Module,
     ) -> None:
         """Checks whether the Any type in a module has been documented
         or not. If the Any type is not documented then adds an error
@@ -2561,7 +2532,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
 
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
-            node: astroid.Module. Node to access module content.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         import_status_dict: ImportStatusDict = {
             'single_line_import': False,
@@ -2599,13 +2570,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
+class InequalityWithNoneChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "if x != None" and
     enforcing use of "if x is not None" instead.
     """
@@ -2621,11 +2586,11 @@ class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
     }
 
-    def visit_compare(self, node: astroid.Compare) -> None:
+    def visit_compare(self, node: astroid.node_classes.Compare) -> None:
         """Called for comparisons (a != b).
 
         Args:
-            node: astroid.Compare. A node indicating comparison.
+            node: astroid.node_classes.Compare. A node indicating comparison.
         """
 
         ops = node.ops
@@ -2638,13 +2603,7 @@ class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('inequality-with-none', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[misc]
+class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "test_only" prefix in function
     names of non-test files.
     """
@@ -2661,13 +2620,13 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
         )
     }
 
-    def visit_functiondef(self, node: astroid.FunctionDef) -> None:
+    def visit_functiondef(self, node: astroid.scoped_nodes.FunctionDef) -> None:
         """Visit every function definition and ensure their name doesn't have
         test_only as its prefix.
 
         Args:
-            node: astroid.FunctionDef. A node for a function or method
-                definition in the AST.
+            node: astroid.scoped_nodes.FunctionDef. A node for a function or
+                method definition in the AST.
         """
         modnode = node.root()
         if modnode.name.endswith('_test'):
@@ -2677,13 +2636,7 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
             self.add_message('non-test-files-function-name-checker', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
+class DisallowedFunctionsChecker(checkers.BaseChecker):
     """Custom pylint checker for language specific general purpose
     regex checks of functions calls to be removed or replaced.
     """
@@ -2791,12 +2744,12 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 r'{}'.format('|'.join(remove_regexes))
             )
 
-    def visit_call(self, node: astroid.Call) -> None:
+    def visit_call(self, node: astroid.node_classes.Call) -> None:
         """Visit a function call to ensure that the call is
         not using any disallowed functions.
 
         Args:
-            node: astroid.Call. Node to access call content.
+            node: astroid.node_classes.Call. Node to access call content.
         """
         func = node.func.as_string()
         if func in self.funcs_to_replace_str:
@@ -2826,13 +2779,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
                     break
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
+class DisallowHandlerWithoutSchema(checkers.BaseChecker):
     """Custom pylint checker prohibiting handlers which do not have schema
     defined within the class.
     """
@@ -2947,13 +2894,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
             )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
+class DisallowedImportsChecker(checkers.BaseChecker):
     """Check that disallowed imports are not made."""
 
     name = 'disallowed-imports'
@@ -2981,13 +2922,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class PreventStringConcatenationChecker(checkers.BaseChecker):  # type: ignore[misc]
+class PreventStringConcatenationChecker(checkers.BaseChecker):
     """Checks for string concactenation and encourages string interpolation."""
 
     name = 'use-string-interpolation'
@@ -3000,14 +2935,16 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):  # type: ignore[m
         ),
     }
 
-    def visit_binop(self, node: astroid.BinOp) -> None:
+    def visit_binop(self, node: astroid.node_classes.BinOp) -> None:
         """Visits a binary operation node in the AST
         then checks if it's a string concatenation operation.
 
-        Args: node: astroid.BinOp The binary operation node to check.
+        Args:
+            node: astroid.node_classes.BinOp. The binary operation node to
+                check.
         """
 
-        if isinstance(node, astroid.BinOp) and node.op == '+':
+        if isinstance(node, astroid.node_classes.BinOp) and node.op == '+':
             try:
                 left_inferred = next(node.left.infer())
                 right_inferred = next(node.right.infer())
@@ -3016,7 +2953,8 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):  # type: ignore[m
             # Ignore operation if either side is inferred to be a datetime obj.
             if any(
                 isinstance(
-                    inferred, (astroid.Instance, astroid.node_classes.Const)
+                    inferred,
+                    (astroid.node_classes.Instance, astroid.node_classes.Const),
                 )
                 and isinstance(inferred.pytype(), str)
                 and 'datetime.datetime' in inferred.pytype()
