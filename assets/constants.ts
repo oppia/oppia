@@ -7386,13 +7386,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Practice lesson-specific questions to reinforce what you have learned on Oppia."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Practice lesson-specific questions to reinforce what you have learned on Oppia."
         }
       ]
     },
@@ -7408,13 +7408,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Take an end-of-arc test to assess your understanding of the lessons in this arc on Oppia."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Take an end-of-arc test to assess your understanding of the lessons in this arc on Oppia."
         }
       ]
     },
@@ -7430,13 +7430,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Test your mastery of a topic with a comprehensive challenge covering all lessons on Oppia."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Test your mastery of a topic with a comprehensive challenge covering all lessons on Oppia."
         }
       ]
     },
