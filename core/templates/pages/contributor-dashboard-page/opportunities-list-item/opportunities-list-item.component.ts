@@ -16,7 +16,13 @@
  * @fileoverview Component for the item view of an opportunity.
  */
 
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
@@ -37,6 +43,8 @@ export interface ExplorationOpportunity {
   translationWordCount?: number;
   isPinned?: boolean;
   topicName: string;
+  reviewerOnlyContentCount?: number;
+  userIsReviewer?: boolean;
 }
 
 @Component({
@@ -115,6 +123,16 @@ export class OpportunitiesListItemComponent {
           this.windowDimensionsService.getWidth() <= this.mobileBreakpoint;
       });
 
+    this.initOpportunityData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.opportunity) {
+      this.initOpportunityData();
+    }
+  }
+
+  initOpportunityData(): void {
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
@@ -167,8 +185,9 @@ export class OpportunitiesListItemComponent {
             this.opportunity.totalCount;
 
           if (this.opportunityButtonDisabled) {
-            // @ts-ignore
             if (
+              !this.opportunity.userIsReviewer &&
+              this.opportunity.reviewerOnlyContentCount !== undefined &&
               this.opportunity.reviewerOnlyContentCount > 0 &&
               this.cardsAvailable === 0
             ) {

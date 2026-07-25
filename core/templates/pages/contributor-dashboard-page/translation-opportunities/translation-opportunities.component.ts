@@ -110,6 +110,7 @@ export class TranslationOpportunitiesComponent {
         totalCount: totalCount,
         translationsCount: translationsCount,
         reviewerOnlyContentCount: reviewerOnlyContentCount,
+        userIsReviewer: this.userIsReviewer,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
