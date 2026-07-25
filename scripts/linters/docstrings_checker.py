@@ -120,51 +120,51 @@ def possible_exc_types(node: astroid.node_classes.Raise) -> Set[str]:
     Returns:
         set(str). A list of exception types.
     """
-    excs = []
-    if isinstance(node.exc, astroid.node_classes.Name):
-        inferred = utils.safe_infer(node.exc)
-        if inferred:
-            excs = [inferred.name]
-    elif isinstance(node.exc, astroid.node_classes.Call) and isinstance(
-        node.exc.func, astroid.node_classes.Name
-    ):
-        target = utils.safe_infer(node.exc.func)
-        if isinstance(target, astroid.scoped_nodes.ClassDef):
-            excs = [target.name]
-        elif isinstance(target, astroid.scoped_nodes.FunctionDef):
-            for ret in target.nodes_of_class(astroid.node_classes.Return):
-                if ret.frame() != target:
-                    continue
-
-                val = utils.safe_infer(ret.value)
-                if (
-                    val
-                    and isinstance(
-                        val,
-                        (
-                            astroid.node_classes.Instance,
-                            astroid.scoped_nodes.ClassDef,
-                        ),
-                    )
-                    and utils.inherit_from_std_ex(val)
-                ):
-                    excs.append(val.name)
-    elif node.exc is None:
-        handler = node.parent
-        while handler and not isinstance(
-            handler, astroid.node_classes.ExceptHandler
-        ):
-            handler = handler.parent
-
-        if handler and handler.type:
-            inferred_excs = astroid.unpack_infer(handler.type)
-            excs = [
-                exc.name
-                for exc in inferred_excs
-                if exc is not astroid.Uninferable
-            ]
-
     try:
+        excs = []
+        if isinstance(node.exc, astroid.node_classes.Name):
+            inferred = utils.safe_infer(node.exc)
+            if inferred:
+                excs = [inferred.name]
+        elif isinstance(node.exc, astroid.node_classes.Call) and isinstance(
+            node.exc.func, astroid.node_classes.Name
+        ):
+            target = utils.safe_infer(node.exc.func)
+            if isinstance(target, astroid.scoped_nodes.ClassDef):
+                excs = [target.name]
+            elif isinstance(target, astroid.scoped_nodes.FunctionDef):
+                for ret in target.nodes_of_class(astroid.node_classes.Return):
+                    if ret.frame() != target:
+                        continue
+
+                    val = utils.safe_infer(ret.value)
+                    if (
+                        val
+                        and isinstance(
+                            val,
+                            (
+                                astroid.node_classes.Instance,
+                                astroid.scoped_nodes.ClassDef,
+                            ),
+                        )
+                        and utils.inherit_from_std_ex(val)
+                    ):
+                        excs.append(val.name)
+        elif node.exc is None:
+            handler = node.parent
+            while handler and not isinstance(
+                handler, astroid.node_classes.ExceptHandler
+            ):
+                handler = handler.parent
+
+            if handler and handler.type:
+                inferred_excs = astroid.unpack_infer(handler.type)
+                excs = [
+                    exc.name
+                    for exc in inferred_excs
+                    if exc is not astroid.Uninferable
+                ]
+
         return set(
             exc for exc in excs if not utils.node_ignores_exception(node, exc)
         )
