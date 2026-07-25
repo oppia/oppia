@@ -188,7 +188,7 @@ class CreateFirebaseRecords(beam.PTransform):  # type: ignore[misc]
         import_users_fn = (
             _emulator_import_users
             if constants.EMULATOR_MODE
-            else firebase_auth.import_users
+            else lambda batch: firebase_auth.import_users(batch)
         )
 
         return (
@@ -196,7 +196,8 @@ class CreateFirebaseRecords(beam.PTransform):  # type: ignore[misc]
             | beam.Map(lambda record: record.to_import())
             | beam.combiners.ToList()
             | beam.ParDo(
-                do_fn := _BatchedDoFn(self.project_id), import_users_fn
+                do_fn := _BatchedDoFn(self.project_id),
+                import_users_fn,
             ).with_outputs(do_fn.OK_TAG, do_fn.ERR_TAG)
             | job_result_transforms.FromTaggedOutputs(
                 do_fn.OK_TAG, do_fn.ERR_TAG, prefix='CREATE'
@@ -224,7 +225,7 @@ class DeleteFirebaseRecords(beam.PTransform):  # type: ignore[misc]
             | beam.combiners.ToList()
             | beam.ParDo(
                 do_fn := _BatchedDoFn(self.project_id),
-                firebase_auth.delete_users,
+                lambda batch: firebase_auth.delete_users(batch),
             ).with_outputs(do_fn.OK_TAG, do_fn.ERR_TAG)
             | job_result_transforms.FromTaggedOutputs(
                 do_fn.OK_TAG, do_fn.ERR_TAG, prefix='DELETE'
