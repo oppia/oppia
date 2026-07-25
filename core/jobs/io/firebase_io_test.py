@@ -31,6 +31,8 @@ from core.platform.auth import (
 )
 
 import apache_beam as beam
+import firebase_admin.auth as firebase_auth
+from firebase_admin import exceptions as firebase_exceptions
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -461,3 +463,67 @@ class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
             ),
             [job_run_result.JobRunResult(stdout='DELETE OK: 2')],
         )
+
+    def test_delete_reports_expected_failure(self) -> None:
+        self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
+        self.firebase_sdk_stub.create_user(uid='uid_b', email='b@b.com')
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'delete_users',
+                firebase_exceptions.InternalError('uh-oh'),
+            ),
+        ):
+            self.assert_pcoll_equal(
+                (
+                    self.pipeline
+                    | beam.Create(
+                        [
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_a',
+                                email='uid_a@a.com',
+                                disabled=False,
+                            ),
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_b',
+                                email='uid_b@a.com',
+                                disabled=False,
+                            ),
+                        ]
+                    )
+                    | firebase_io.DeleteFirebaseRecords('test')
+                ),
+                [
+                    job_run_result.JobRunResult.as_stderr(
+                        'DELETE ERROR: at slice=[0:2]: uh-oh',
+                    ),
+                ],
+            )
+
+    def test_delete_raises_unexpected_errors(self) -> None:
+        self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
+        self.firebase_sdk_stub.create_user(uid='uid_b', email='b@b.com')
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'delete_users',
+                MemoryError('uh-oh'),
+            ),
+            self.assertRaisesRegex(RuntimeError, 'unexpectedly raised!'),
+        ):
+            self.assert_pcoll_empty(
+                self.pipeline
+                | beam.Create(
+                    [
+                        firebase_domain.FirebaseRecord(
+                            auth_id='uid_a', email='uid_a@a.com', disabled=False
+                        ),
+                        firebase_domain.FirebaseRecord(
+                            auth_id='uid_b', email='uid_b@a.com', disabled=False
+                        ),
+                    ]
+                )
+                | firebase_io.DeleteFirebaseRecords('test')
+            )

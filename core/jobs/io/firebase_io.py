@@ -296,8 +296,8 @@ class _BatchedDoFn(_DoFnWithConnection, Generic[_InputT, _OutputT]):
                 )
 
             except Exception as e:
-                raise ValueError(
-                    f'{batch_processing_fn.__qualname__}() unexpectedly raised!'
+                raise RuntimeError(
+                    f'{batch_processing_fn.__name__}() unexpectedly raised!'
                 ) from e
 
             else:
