@@ -6597,9 +6597,9 @@ export default {
         }
       ]
     },
-    "CERTIFICATE_OFFERING_DASHBOARD": {
-      "ROUTE": "certificate-offering-dashboard",
-      "TITLE": "Certificate Offering Dashboard | Oppia",
+    "CERTIFICATE_CREATOR_DASHBOARD": {
+      "ROUTE": "certificate-creator-dashboard",
+      "TITLE": "Certificate Creator Dashboard | Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",

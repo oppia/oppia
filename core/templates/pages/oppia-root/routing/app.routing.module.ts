@@ -553,12 +553,12 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CERTIFICATE_OFFERING_DASHBOARD.ROUTE,
+      .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-assessment-dashboard-page/certificate-offering-dashboard-page.module'
-      ).then(m => m.CertificateOfferingDashboardPageModule),
+        'pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module'
+      ).then(m => m.CertificateCreatorDashboardPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
