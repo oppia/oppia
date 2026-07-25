@@ -518,7 +518,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         properly formatted.
 
         Args:
-            node: astroid.node.FunctionDef. Node for a function or
+            node: astroid.scoped_nodes.FunctionDef. Node for a function or
                 method definition in the AST.
             node_doc: Docstring|GoogleDocstring. Pylint Docstring class instance
                 representing a node's docstring.
@@ -705,8 +705,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
         argument parameters in the docstring.
 
         Args:
-            node: astroid.node.FunctionDef. Node for a function or method
-                definition in the AST.
+            node: astroid.scoped_nodes.FunctionDef. Node for a function or
+                method definition in the AST.
             docstring: list(str). Function docstring in splitted by newlines.
         """
         blank_line_counter = 0
