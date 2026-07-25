@@ -106,6 +106,7 @@ const subjectInterestTagsInPreferencesPage = '.e2e-test-subject-interest-chip';
 const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
 const explorationLanguagePerferenceChipsSelector =
   '.e2e-test-exploration-language-preference-chips';
+const subscribedCreatorSelector = '.e2e-test-subscription-name';
 const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const preferencesContainerSelector = '.e2e-test-preferences-container';
@@ -2465,6 +2466,19 @@ export class LoggedInUser extends BaseUser {
     showMessage(
       `Subscribed to the creator${username ? ` (${username})` : ''}.`
     );
+  }
+
+  /**
+   * Checks whether the subscribed creators include the given creator.
+   * Requires the user to be on the preferences page.
+   * @param {string} creatorName - The creator name to check.
+   */
+  async expectSubscribedCreatorsToContain(creatorName: string): Promise<void> {
+    const subscribedCreator = this.page
+      .locator(subscribedCreatorSelector)
+      .filter({hasText: creatorName});
+
+    await expect(subscribedCreator).toBeVisible();
   }
 
   /**
