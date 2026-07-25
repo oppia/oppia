@@ -493,7 +493,10 @@ class BaseTranslatableObject:
             _,
             translatable_content,
         ) in content_id_to_translatable_content.items():
-            if translatable_content.is_data_format_list():
+            if (
+                translatable_content.is_data_format_list()
+                or translatable_content.content_type == ContentType.RULE.value
+            ):
                 count += 1
         return count
 
