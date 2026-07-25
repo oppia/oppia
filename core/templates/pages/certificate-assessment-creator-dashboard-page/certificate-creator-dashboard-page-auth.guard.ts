@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Guard that redirects to 404 when the certificate offering
+ * @fileoverview Guard that redirects to 404 when the certificate creator
  * dashboard feature is disabled.
  */
 
@@ -40,7 +40,7 @@ class CertificateAssessmentFeatureDisabledError extends Error {
 @Injectable({
   providedIn: 'root',
 })
-export class CertificateOfferingDashboardPageAuthGuard implements CanActivate {
+export class CertificateCreatorDashboardPageAuthGuard implements CanActivate {
   constructor(
     private platformFeatureService: PlatformFeatureService,
     private router: Router,

@@ -1,8 +1,8 @@
-.oppia-certificate-offering-dashboard {
+.oppia-certificate-creator-dashboard {
   padding-bottom: 2rem;
 }
 
-.oppia-certificate-offering-hero {
+.oppia-certificate-creator-hero {
   align-items: flex-start;
   display: flex;
   gap: 1rem;
@@ -11,7 +11,7 @@
   padding: 7.5rem 0 0 0;
 }
 
-.oppia-certificate-offering-description {
+.oppia-certificate-creator-description {
   color: #5f6368;
   font-size: 1.05rem;
   margin-bottom: 0;
@@ -26,7 +26,7 @@
   padding: 4px 8px;
 }
 
-.oppia-certificate-offering-card {
+.oppia-certificate-creator-card {
   background: #fff;
   border: 1px solid #e9ecef;
   border-radius: 10px;
@@ -38,7 +38,7 @@
   width: 100% !important;
 }
 
-.oppia-certificate-offering-table thead th {
+.oppia-certificate-creator-table thead th {
   background: #f2f4f6;
   border: 1px solid #dfe3e8;
   color: #495057;
@@ -48,7 +48,7 @@
   vertical-align: middle;
 }
 
-.oppia-certificate-offering-table td {
+.oppia-certificate-creator-table td {
   padding: 18px 20px;
   padding-bottom: 1rem;
   padding-top: 1rem;
@@ -56,8 +56,8 @@
   vertical-align: middle;
 }
 
-.oppia-certificate-offering-table tbody td,
-.oppia-certificate-offering-table tbody tr {
+.oppia-certificate-creator-table tbody td,
+.oppia-certificate-creator-table tbody tr {
   border: 1px solid #dfe3e8;
 }
 
@@ -122,7 +122,7 @@
   gap: 0.5rem;
 }
 
-.oppia-certificate-offering-table {
+.oppia-certificate-creator-table {
   border: 1px solid #dfe3e8;
   width: 100%;
 }
@@ -192,7 +192,7 @@
   min-height: 56px;
 }
 
-.oppia-certificate-offering-dashboard .btn.btn-primary.oppia-new-certificate-btn {
+.oppia-certificate-creator-dashboard .btn.btn-primary.oppia-new-certificate-btn {
   background-color: #00645c !important;
   border-color: #00645c !important;
   color: #fff !important;
@@ -200,15 +200,15 @@
   white-space: nowrap;
 }
 
-.oppia-certificate-offering-dashboard .btn.btn-primary.oppia-new-certificate-btn:focus,
-.oppia-certificate-offering-dashboard .btn.btn-primary.oppia-new-certificate-btn:hover {
+.oppia-certificate-creator-dashboard .btn.btn-primary.oppia-new-certificate-btn:focus,
+.oppia-certificate-creator-dashboard .btn.btn-primary.oppia-new-certificate-btn:hover {
   background-color: #004d47 !important;
   border-color: #004d47 !important;
   color: #fff !important;
 }
 
 @media screen and (max-width: 767px) {
-  .oppia-certificate-offering-hero {
+  .oppia-certificate-creator-hero {
     align-items: stretch;
     flex-direction: column;
     margin-top: 1.5rem;
@@ -220,7 +220,7 @@
 }
 
 @media screen and (max-width: 768px) {
-  .oppia-certificate-offering-hero {
+  .oppia-certificate-creator-hero {
     padding-top: 3rem;
   }
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for CertificateOfferingDashboardPageComponent.
+ * @fileoverview Unit tests for CertificateCreatorDashboardPageComponent.
  */
 
 import {
@@ -28,11 +28,12 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 
-import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
+import {CertificateCreatorDashboardPageComponent} from './certificate-creator-dashboard-page.component';
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-interface CertificateOfferingSummary {
+interface CertificateSummary {
   certificateId: string;
   title: string;
   topicsLabel: string;
@@ -40,17 +41,17 @@ interface CertificateOfferingSummary {
   status: string;
 }
 
-describe('CertificateOfferingDashboardPageComponent', () => {
-  let component: CertificateOfferingDashboardPageComponent;
-  let fixture: ComponentFixture<CertificateOfferingDashboardPageComponent>;
+describe('CertificateCreatorDashboardPageComponent', () => {
+  let component: CertificateCreatorDashboardPageComponent;
+  let fixture: ComponentFixture<CertificateCreatorDashboardPageComponent>;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let ngbModal: NgbModal;
 
-  const makeOffering = (
+  const makeCertificate = (
     id: string,
     title = `Certificate ${id}`
-  ): CertificateOfferingSummary => ({
+  ): CertificateSummary => ({
     certificateId: id,
     title,
     topicsLabel: '1',
@@ -60,8 +61,8 @@ describe('CertificateOfferingDashboardPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
-      declarations: [CertificateOfferingDashboardPageComponent],
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [CertificateCreatorDashboardPageComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
@@ -99,9 +100,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
   // that don't care about the initial load can simply never call
   // detectChanges() and interact with the component instance directly.
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      CertificateOfferingDashboardPageComponent
-    );
+    fixture = TestBed.createComponent(CertificateCreatorDashboardPageComponent);
     component = fixture.componentInstance;
     alertsService = TestBed.inject(AlertsService);
     certificateAssessmentOfferingBackendApiService = TestBed.inject(
@@ -114,7 +113,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
     fixture.detectChanges();
     flushMicrotasks();
 
-    expect(component instanceof CertificateOfferingDashboardPageComponent).toBe(
+    expect(component instanceof CertificateCreatorDashboardPageComponent).toBe(
       true
     );
   }));
@@ -324,7 +323,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
   }));
 
   it('should delete certificate offering and remove it locally', fakeAsync(() => {
-    component.certificateOfferings = [makeOffering('dummy_id')];
+    component.certificateOfferings = [makeCertificate('dummy_id')];
     const deleteSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'deleteCertificateAssessmentOfferingAsync'
@@ -341,7 +340,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
 
   it('should reset to the last page if deleting empties the current page', fakeAsync(() => {
     component.certificateOfferings = Array.from({length: 6}, (_, i) =>
-      makeOffering(`cert_${i}`)
+      makeCertificate(`cert_${i}`)
     );
     component.currentPage = 2;
     spyOn(
@@ -358,7 +357,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
   }));
 
   it('should show warning when certificate deletion fails and keep existing offerings', fakeAsync(() => {
-    const initialOfferings = [makeOffering('dummy_id', 'Certificate Title')];
+    const initialOfferings = [makeCertificate('dummy_id', 'Certificate Title')];
     component.certificateOfferings = [...initialOfferings];
     const deleteSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
@@ -377,7 +376,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
   describe('pagination', () => {
     beforeEach(() => {
       component.certificateOfferings = Array.from({length: 7}, (_, i) =>
-        makeOffering(`cert_${i}`)
+        makeCertificate(`cert_${i}`)
       );
     });
 
