@@ -70,6 +70,7 @@ const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 
+const errorPageHeading = '.e2e-test-error-page-heading';
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
 const conceptCardLinkSelector = '.e2e-test-concept-card-link';
@@ -1508,6 +1509,30 @@ export class LoggedOutUser extends BaseUser {
     expect(await this.isElementVisible(practiceSessionContainerSelector)).toBe(
       true
     );
+  }
+
+  /**
+   * This function verifies that the user is on the correct classroom page.
+   * @param {number} statusCode The status code of the error page.
+   */
+  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
+    await this.expectElementToBeVisible(errorPageHeading);
+
+    const errorText = await this.getTextContent(errorPageHeading);
+
+    if (!errorText) {
+      throw new Error(`Error text is not visible. URL: ${this.page.url()}`);
+    }
+
+    const currentStatusCode = Number(errorText.split(' ')[1]);
+
+    if (currentStatusCode !== statusCode) {
+      throw new Error(
+        `Expected status code to be ${statusCode}, found: ${currentStatusCode}`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
   }
 
   /**
