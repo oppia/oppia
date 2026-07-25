@@ -26,7 +26,7 @@ from __future__ import annotations
 import operator
 
 from core.domain import feature_flag_domain
-from core.jobs import base_jobs
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import firebase_io
 from core.jobs.transforms import firebase_transforms, job_result_transforms
 from core.jobs.types import job_run_result
@@ -56,10 +56,12 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
                 'Refusing to mutate production Firebase authentication server.'
             )
 
+        project_id = job_utils.resolve_project_id(self.pipeline)
+
         firebase_records = (
             self.pipeline
             | 'Get records directly from the Firebase server'
-            >> firebase_io.GetRecordsDirectlyFromFirebase()
+            >> firebase_io.GetRecordsDirectlyFromFirebase(project_id)
         )
         oppia_records, auth_pairs = operator.itemgetter(
             firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS,
@@ -107,11 +109,15 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult('WOULD DELETE')
             )
         else:
-            del_results = del_records | firebase_io.DeleteFirebaseRecords()
             add_results = (
                 add_records
-                | beam.WaitOn(del_results)
-                | firebase_io.CreateFirebaseRecords()
+                | beam.WaitOn(
+                    del_results := (
+                        del_records
+                        | firebase_io.DeleteFirebaseRecords(project_id)
+                    )
+                )
+                | firebase_io.CreateFirebaseRecords(project_id)
             )
 
         remaining_results = (

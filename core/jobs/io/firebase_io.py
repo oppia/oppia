@@ -19,12 +19,13 @@
 from __future__ import annotations
 
 import hashlib
+import itertools
 from collections import abc
 
 from core.constants import constants
 from core.jobs.io import ndb_io
-from core.jobs.transforms import firebase_transforms
-from core.jobs.types import firebase_domain
+from core.jobs.transforms import job_result_transforms
+from core.jobs.types import firebase_domain, job_run_result
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -32,6 +33,7 @@ import apache_beam as beam
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
 from apache_beam import pvalue
+from typing import Callable, Generic, TypeVar
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -40,23 +42,6 @@ if MYPY:  # pragma: no cover
 auth_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.USER]
 )
-
-
-# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class GetRecordsDirectlyFromFirebase(beam.PTransform):  # type: ignore[misc]
-    """Gets the collection of records directly from the Firebase server."""
-
-    def expand(
-        self, pbegin: pvalue.PBegin
-    ) -> beam.PCollection[firebase_domain.FirebaseRecord]:
-        """Returns all of the records directly from Firebase."""
-
-        return (
-            pbegin
-            | 'Allocate exactly one worker' >> beam.Create([None])
-            | 'Get Firebase records' >> beam.ParDo(_ExportFirebaseRecords())
-            | 'Reshuffle records to improve parallelization' >> beam.Reshuffle()
-        )
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -163,105 +148,212 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
             yield record
 
 
-class CreateFirebaseRecords(
-    firebase_transforms.FirebaseBatchOperation[
-        firebase_auth.ImportUserRecord, firebase_auth.UserImportResult
-    ]
-):
-    """Creates accounts in Firebase in batches and reports the results."""
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class GetRecordsDirectlyFromFirebase(beam.PTransform):  # type: ignore[misc]
+    """Gets the collection of records directly from the Firebase server."""
 
-    OK_TAG = f'CREATE {firebase_transforms.FirebaseBatchOperation.OK_TAG}'
-    ERR_TAG = f'CREATE {firebase_transforms.FirebaseBatchOperation.ERR_TAG}'
+    def __init__(self, project_id: str, label: str | None = None) -> None:
+        super().__init__(label=label)
+        self.project_id = project_id
 
-    def get_batch_input(
-        self, record: firebase_domain.FirebaseRecord
-    ) -> firebase_auth.ImportUserRecord:
-        """Returns an ImportUserRecord with fields copied from the record."""
+    def expand(
+        self, pbegin: pvalue.PBegin
+    ) -> beam.PCollection[firebase_domain.FirebaseRecord]:
+        """Returns all of the records directly from Firebase."""
 
-        return record.to_import()
+        do_fn = _ExportFirebaseRecords(self.project_id)
 
-    def run_batch_operation(
-        self, users: list[firebase_auth.ImportUserRecord]
-    ) -> firebase_auth.UserImportResult:
-        """Imports the given users into Firebase."""
-
-        if constants.EMULATOR_MODE:
-            return self._handle_batched_items_within_emulator(users)
-        return firebase_auth.import_users(users)
-
-    def _handle_batched_items_within_emulator(
-        self, records: list[firebase_auth.ImportUserRecord]
-    ) -> firebase_auth.UserImportResult:
-        """Creating users needs to be handled differently within EMULATOR_MODE.
-
-        When we migrated to Firebase Authentication we decided that, while Oppia
-        is running locally against the Firebase Authentication Emulator, users
-        should be created using email & password for authentication. This is
-        intentionally inconsistent with production, where we use Single Sign-On
-        (i.e. Google Sign-In) instead. This was done so that developers wouldn't
-        need to keep sensitive auth credentials on their local file system.
-
-        NOTE: Since the `import_users` API doesn't accept a raw password field,
-        we need to call the `create_user` API, which DOES accept one, instead.
-
-        Args:
-            records: list[ImportUserRecord]. The batch of records to create.
-
-        Returns:
-            UserImportResult. The result of the create operation.
-        """
-
-        errors = []
-        for i, record in enumerate(records):
-            user_email = record.email or ''
-            # HINT: `md5(email)` used for consistency with the frontend.
-            # See: core/templates/services/auth.service.ts.
-            user_password = hashlib.md5(user_email.encode()).hexdigest()
-            try:
-                firebase_auth.create_user(
-                    uid=record.uid,
-                    disabled=record.disabled,
-                    email=user_email,
-                    password=user_password,
-                )
-            except (ValueError, firebase_exceptions.FirebaseError) as e:
-                errors.append({'index': i, 'message': str(e)})
-
-        return firebase_auth.UserImportResult({'error': errors}, len(records))
-
-
-class DeleteFirebaseRecords(
-    firebase_transforms.FirebaseBatchOperation[
-        str, firebase_auth.DeleteUsersResult
-    ]
-):
-    """Deletes accounts from Firebase in batches and reports the results."""
-
-    OK_TAG = f'DELETE {firebase_transforms.FirebaseBatchOperation.OK_TAG}'
-    ERR_TAG = f'DELETE {firebase_transforms.FirebaseBatchOperation.ERR_TAG}'
-
-    def get_batch_input(self, record: firebase_domain.FirebaseRecord) -> str:
-        """Returns the Firebase auth ID of the given record."""
-
-        return record.auth_id
-
-    def run_batch_operation(
-        self, uids: list[str]
-    ) -> firebase_auth.DeleteUsersResult:
-        """Deletes the given users from Firebase by their UIDs."""
-
-        return firebase_auth.delete_users(uids)
+        return (
+            pbegin
+            | 'Allocate exactly one worker' >> beam.Create([None])
+            | 'Get Firebase records' >> beam.ParDo(do_fn)
+            | 'Reshuffle records to improve parallelization' >> beam.Reshuffle()
+        )
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _ExportFirebaseRecords(beam.DoFn):  # type: ignore[misc]
+class CreateFirebaseRecords(beam.PTransform):  # type: ignore[misc]
+    """Creates accounts in Firebase in batches and reports the results."""
+
+    def __init__(self, project_id: str, label: str | None = None) -> None:
+        super().__init__(label=label)
+        self.project_id = project_id
+
+    def expand(
+        self,
+        records: beam.PCollection[firebase_domain.FirebaseRecord],
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Creates accounts in Firebase in batches and reports the results."""
+
+        import_users_fn = (
+            _emulator_import_users
+            if constants.EMULATOR_MODE
+            else firebase_auth.import_users
+        )
+
+        return (
+            records
+            | beam.Map(lambda record: record.to_import())
+            | beam.combiners.ToList()
+            | beam.ParDo(
+                do_fn := _BatchedDoFn(self.project_id), import_users_fn
+            ).with_outputs(do_fn.OK_TAG, do_fn.ERR_TAG)
+            | job_result_transforms.FromTaggedOutputs(
+                do_fn.OK_TAG, do_fn.ERR_TAG, prefix='CREATE'
+            )
+        )
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class DeleteFirebaseRecords(beam.PTransform):  # type: ignore[misc]
+    """Deletes accounts from Firebase in batches and reports the results."""
+
+    def __init__(self, project_id: str, label: str | None = None) -> None:
+        super().__init__(label=label)
+        self.project_id = project_id
+
+    def expand(
+        self,
+        records: beam.PCollection[firebase_domain.FirebaseRecord],
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Creates accounts in Firebase in batches and reports the results."""
+
+        return (
+            records
+            | beam.Map(lambda record: record.auth_id)
+            | beam.combiners.ToList()
+            | beam.ParDo(
+                do_fn := _BatchedDoFn(self.project_id),
+                firebase_auth.delete_users,
+            ).with_outputs(do_fn.OK_TAG, do_fn.ERR_TAG)
+            | job_result_transforms.FromTaggedOutputs(
+                do_fn.OK_TAG, do_fn.ERR_TAG, prefix='DELETE'
+            )
+        )
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class _ConnectedDoFn(beam.DoFn):  # type: ignore[misc]
+    """Establishes a connection to Firebase before process begins."""
+
+    def __init__(self, project_id: str) -> None:
+        super().__init__()
+        self.project_id = project_id
+
+    def setup(self):
+        super().setup()
+        firebase_auth_services.establish_firebase_connection(self.project_id)
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class _ExportFirebaseRecords(_ConnectedDoFn):  # type: ignore[misc]
     """Exports all Firebase records directly from the Firebase server."""
 
     def process(self, _: None) -> abc.Iterable[firebase_domain.FirebaseRecord]:
         """Yields all of the records directly from Firebase."""
 
-        firebase_auth_services.establish_firebase_connection()
         yield from (
             firebase_domain.FirebaseRecord.from_export(user)
             for user in firebase_auth.list_users().iterate_all()
         )
+
+
+_InputT = TypeVar('_InputT', bound=str | firebase_auth.ImportUserRecord)
+_OutputT = TypeVar(
+    '_OutputT',
+    bound=firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult,
+)
+
+
+class _BatchedDoFn(_ConnectedDoFn, Generic[_InputT, _OutputT]):
+    """Executes a batch operation against Firebase and returns the results."""
+
+    OK_TAG = 'OK'
+    ERR_TAG = 'ERROR'
+    BATCH_LIMIT = 1000
+
+    def process(
+        self,
+        inputs: list[_InputT],
+        batch_processing_fn: Callable[[_InputT], _OutputT],
+    ) -> abc.Iterator[pvalue.TaggedOutput]:
+        """Common batch processing logic for Firebase Admin SDK operations."""
+        if not inputs:
+            return
+
+        input_iter = iter(inputs)
+        input_offset = 0
+        failure_count = 0
+
+        while batch := list(itertools.islice(input_iter, self.BATCH_LIMIT)):
+            try:
+                output = batch_processing_fn(batch)
+
+            except (ValueError, firebase_exceptions.FirebaseError) as e:
+                failure_count += len(batch)
+                yield beam.TaggedOutput(
+                    self.ERR_TAG,
+                    f'at slice=[{input_offset}:{input_offset + len(batch)}]: {e}',
+                )
+
+            except Exception as e:
+                raise ValueError(
+                    f'{batch_processing_fn.__qualname__}() unexpectedly raised!'
+                ) from e
+
+            else:
+                failure_count += output.failure_count
+                yield from (
+                    beam.TaggedOutput(
+                        self.ERR_TAG,
+                        f'at index=[{input_offset + e.index}]: {e.reason}',
+                    )
+                    for e in output.errors
+                )
+
+            finally:
+                input_offset += len(batch)
+
+        if input_offset > failure_count:
+            yield beam.TaggedOutput(self.OK_TAG, input_offset - failure_count)
+
+
+def _emulator_import_users(
+    records: list[firebase_auth.ImportUserRecord],
+) -> firebase_auth.UserImportResult:
+    """Creating users needs to be handled differently within EMULATOR_MODE.
+
+    When we migrated to Firebase Authentication we decided that, while Oppia
+    is running locally against the Firebase Authentication Emulator, users
+    should be created using email & password for authentication. This is
+    intentionally inconsistent with production, where we use Single Sign-On
+    (i.e. Google Sign-In) instead. This was done so that developers wouldn't
+    need to keep sensitive auth credentials on their local file system.
+
+    NOTE: Since the `import_users` API doesn't accept a raw password field,
+    we need to call the `create_user` API, which DOES accept one, instead.
+
+    Args:
+        records: list[ImportUserRecord]. The batch of records to create.
+
+    Returns:
+        UserImportResult. The result of the create operation.
+    """
+
+    errors = []
+    for i, record in enumerate(records):
+        user_email = record.email or ''
+        # HINT: `md5(email)` used for consistency with the frontend.
+        # See: core/templates/services/auth.service.ts.
+        user_password = hashlib.md5(user_email.encode()).hexdigest()
+        try:
+            firebase_auth.create_user(
+                uid=record.uid,
+                disabled=record.disabled,
+                email=user_email,
+                password=user_password,
+            )
+        except (ValueError, firebase_exceptions.FirebaseError) as e:
+            errors.append({'index': i, 'message': str(e)})
+
+    return firebase_auth.UserImportResult({'error': errors}, len(records))
