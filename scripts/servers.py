@@ -635,10 +635,10 @@ def managed_portserver() -> Iterator[psutil.Process]:
             # receiving this signal.
             try:
                 proc.send_signal(signal.SIGINT)
-            except OSError as e:
+            except OSError:
                 # Raises when the process has already shutdown, in which case we
                 # can just ignore and exit normally.
-                del e
+                pass
             else:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).
