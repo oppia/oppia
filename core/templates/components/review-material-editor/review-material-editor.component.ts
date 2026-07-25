@@ -27,6 +27,7 @@ import {
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import './review-material-editor.component.css';
 
 interface HtmlSchema {
   type: 'html';
@@ -40,6 +41,7 @@ interface BindableDict {
 @Component({
   selector: 'oppia-review-material-editor',
   templateUrl: './review-material-editor.component.html',
+  styleUrls: ['./review-material-editor.component.css'],
 })
 export class ReviewMaterialEditorComponent implements OnInit {
   @Output() onSaveExplanation: EventEmitter<SubtitledHtml> = new EventEmitter();

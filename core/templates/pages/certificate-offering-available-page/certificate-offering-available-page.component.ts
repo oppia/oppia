@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate offering available page component
+ * @fileoverview Certificate offering available page component.
  */
 
 import {Component, Input} from '@angular/core';
@@ -24,4 +24,5 @@ import './certificate-offering-available-page.component.css';
 })
 export class AvailableCertificateOfferingPageComponent {
   @Input() classroomUrlFragment: string = '';
+  certificateId: string = 'temporary_certificate_id';
 }
