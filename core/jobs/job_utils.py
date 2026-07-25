@@ -21,9 +21,8 @@ from __future__ import annotations
 from core.platform import models
 
 import apache_beam as beam
-from apache_beam.options import pipeline_options
-
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+from apache_beam.options import pipeline_options
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
 from typing import Any, List, Optional, Tuple, Type, Union, cast
@@ -42,6 +41,17 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 def resolve_project_id(pipeline: beam.Pipeline | None) -> str:
+    """Returns the Google Cloud Project ID for the given pipeline.
+
+    Args:
+        pipeline: beam.Pipeline|None. The Apache Beam pipeline.
+
+    Returns:
+        str. The Google Cloud Project ID.
+
+    Raises:
+        ValueError. When the pipeline is None.
+    """
     if pipeline is None:
         raise ValueError('pipeline must not be None')
     gcp_options = pipeline.options.view_as(pipeline_options.GoogleCloudOptions)

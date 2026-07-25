@@ -65,7 +65,7 @@ class FirebaseConnectionTestBase(
 class GetRecordsDirectlyFromFirebaseTests(FirebaseConnectionTestBase):
     def test_get_with_no_firebase_users_returns_empty(self) -> None:
         self.assert_pcoll_empty(
-            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase("test")
+            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase('test')
         )
 
     def test_get_with_multiple_firebase_users_returns_all(self) -> None:
@@ -80,7 +80,7 @@ class GetRecordsDirectlyFromFirebaseTests(FirebaseConnectionTestBase):
         )
 
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase("test"),
+            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase('test'),
             [
                 firebase_domain.FirebaseRecord(
                     auth_id='uid_a', email='a@a.com', disabled=False
@@ -352,7 +352,7 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([])
-            | firebase_io.CreateFirebaseRecords("test")
+            | firebase_io.CreateFirebaseRecords('test')
         )
 
     def test_create_outside_emulator_uses_import_users(self) -> None:
@@ -374,7 +374,7 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                             ),
                         ]
                     )
-                    | firebase_io.CreateFirebaseRecords("test")
+                    | firebase_io.CreateFirebaseRecords('test')
                 ),
                 [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
@@ -398,7 +398,7 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                             ),
                         ]
                     )
-                    | firebase_io.CreateFirebaseRecords("test")
+                    | firebase_io.CreateFirebaseRecords('test')
                 ),
                 [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
@@ -419,7 +419,7 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                             ),
                         ]
                     )
-                    | firebase_io.CreateFirebaseRecords("test")
+                    | firebase_io.CreateFirebaseRecords('test')
                 ),
                 [
                     job_run_result.JobRunResult(
@@ -437,7 +437,7 @@ class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([])
-            | firebase_io.DeleteFirebaseRecords("test")
+            | firebase_io.DeleteFirebaseRecords('test')
         )
 
     def test_delete_reports_success_count(self) -> None:
@@ -457,7 +457,7 @@ class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
                         ),
                     ]
                 )
-                | firebase_io.DeleteFirebaseRecords("test")
+                | firebase_io.DeleteFirebaseRecords('test')
             ),
             [job_run_result.JobRunResult(stdout='DELETE OK: 2')],
         )

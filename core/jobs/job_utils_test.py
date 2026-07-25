@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core.jobs import job_options
-from core.jobs import job_utils
+from core.jobs import job_options, job_utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -62,10 +61,10 @@ class ResolveProjectIdTests(test_utils.TestBase):
             app_identity_services, 'get_application_id', 'LOL'
         ):
             pipeline = beam.Pipeline(options=job_options.JobOptions())
-            self.assertEquals(job_utils.resolve_project_id(pipeline), 'LOL')
+            self.assertEqual(job_utils.resolve_project_id(pipeline), 'LOL')
 
     def test_none_pipeline_raises_value_error(self) -> None:
-        with self.assertRaisesRegexp(ValueError, 'must not be None'):
+        with self.assertRaisesRegex(ValueError, 'must not be None'):
             job_utils.resolve_project_id(None)
 
 
