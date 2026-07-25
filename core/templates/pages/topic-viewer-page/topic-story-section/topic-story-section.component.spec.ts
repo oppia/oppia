@@ -748,6 +748,7 @@ describe('TopicStorySectionComponent', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'place-values';
     component.practiceSubtopicIds = [3];
+    component.practiceCount = 1;
 
     component.ngOnInit();
 
