@@ -1186,4 +1186,18 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.save();
     expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   }));
+
+  it('should dismiss the bottom sheet on save in math mode', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    component.ngOnInit();
+    flush();
+    component.save();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  }));
 });
