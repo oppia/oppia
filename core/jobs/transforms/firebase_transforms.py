@@ -18,25 +18,12 @@
 
 from __future__ import annotations
 
-import abc as abstract_base_classes
-import itertools
 from collections import abc
 
-from core.jobs.transforms import job_result_transforms
-from core.jobs.types import firebase_domain, job_run_result
-from core.platform.auth import firebase_auth_services
+from core.jobs.types import firebase_domain
 
 import apache_beam as beam
-import firebase_admin.auth as firebase_auth
-import firebase_admin.exceptions as firebase_exceptions
-from apache_beam import pvalue
-from typing import Generic, TypedDict, TypeVar
-
-InputT = TypeVar('InputT', bound=str | firebase_auth.ImportUserRecord)
-OutputT = TypeVar(
-    'OutputT',
-    bound=firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult,
-)
+from typing import TypedDict
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -239,89 +226,3 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
             f'Oppia users ({user_ids=!r}) are sharing the same Firebase '
             f'account ({auth_id=!r})'
         )
-
-
-class FirebaseBatchOperation(
-    # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks types.
-    beam.PTransform,  # type: ignore[misc]
-    Generic[InputT, OutputT],
-    abstract_base_classes.ABC,
-):
-    """Executes a batch operation against Firebase and returns the results."""
-
-    OK_TAG = 'OK'
-    ERR_TAG = 'ERROR'
-    BATCH_LIMIT = 1000
-
-    def expand(
-        self, records: beam.PCollection[firebase_domain.FirebaseRecord]
-    ) -> beam.PCollection[job_run_result.JobRunResult]:
-
-        return (
-            records
-            | beam.Map(self.get_batch_input)
-            | beam.combiners.ToList()
-            | beam.FlatMap(self._yield_run_batch_operation_output).with_outputs(
-                self.OK_TAG,
-                self.ERR_TAG,
-            )
-            | job_result_transforms.FromTaggedOutputs(
-                self.OK_TAG,
-                self.ERR_TAG,
-            )
-        )
-
-    @abstract_base_classes.abstractmethod
-    def get_batch_input(self, record: firebase_domain.FirebaseRecord) -> InputT:
-        """Virtual function to extract the relevant FirebaseRecord fields."""
-        del record
-        raise NotImplementedError('Subclasses must implement get_batch_input()')
-
-    @abstract_base_classes.abstractmethod
-    def run_batch_operation(self, input_batch: list[InputT]) -> OutputT:
-        """Virtual function to call a specific Firebase Admin SDK operation."""
-        del input_batch
-        raise NotImplementedError(
-            'Subclasses must implement run_batch_operation()'
-        )
-
-    def _yield_run_batch_operation_output(
-        self, inputs: list[InputT]
-    ) -> abc.Iterator[pvalue.TaggedOutput]:
-        """Common batch processing logic for Firebase Admin SDK operations."""
-
-        if not inputs:
-            return
-
-        firebase_auth_services.establish_firebase_connection()
-
-        input_iter = iter(inputs)
-        input_offset = 0
-        failure_count = 0
-
-        while batch := list(itertools.islice(input_iter, self.BATCH_LIMIT)):
-            try:
-                output = self.run_batch_operation(batch)
-
-            except (ValueError, firebase_exceptions.FirebaseError) as e:
-                failure_count += len(batch)
-                yield beam.TaggedOutput(
-                    self.ERR_TAG,
-                    f'at slice=[{input_offset}:{input_offset + len(batch)}]: {e}',
-                )
-
-            else:
-                failure_count += output.failure_count
-                yield from (
-                    beam.TaggedOutput(
-                        self.ERR_TAG,
-                        f'at index=[{input_offset + e.index}]: {e.reason}',
-                    )
-                    for e in output.errors
-                )
-
-            finally:
-                input_offset += len(batch)
-
-        if input_offset > failure_count:
-            yield beam.TaggedOutput(self.OK_TAG, input_offset - failure_count)

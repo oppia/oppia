@@ -86,13 +86,19 @@ datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-def establish_firebase_connection() -> None:
+def establish_firebase_connection(oppia_project_id: str | None = None) -> None:
     """Establishes the connection to Firebase needed by the rest of the SDK.
 
     All Firebase operations require an "app", the abstraction used for a
     Firebase server connection. The initialize_app() function raises an error
     when it's called more than once, however, so we make this function
     idempotent by trying to "get" the app first.
+
+    Args:
+        oppia_project_id: str|None. The project ID of the Oppia instance. This
+            is only needed when called from outside of the Google App Engine
+            environment, such as within an Apache Beam job. Otherwise, if None,
+            the value will be inferred from the App Engine environment.
 
     Raises:
         ValueError. The Firebase app has a genuine problem.
@@ -102,9 +108,13 @@ def establish_firebase_connection() -> None:
             firebase_admin.get_app()
         except ValueError as error:
             if 'initialize_app' in str(error):
-                oppia_project_id = app_identity_services.get_application_id()
                 firebase_admin.initialize_app(
-                    options={'projectId': oppia_project_id}
+                    options={
+                        'projectId': (
+                            oppia_project_id
+                            or app_identity_services.get_application_id()
+                        )
+                    }
                 )
             else:
                 raise

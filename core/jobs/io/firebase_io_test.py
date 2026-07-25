@@ -31,6 +31,8 @@ from core.platform.auth import (
 )
 
 import apache_beam as beam
+import firebase_admin.auth as firebase_auth
+from firebase_admin import exceptions as firebase_exceptions
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -65,9 +67,8 @@ class FirebaseConnectionTestBase(
 class GetRecordsDirectlyFromFirebaseTests(FirebaseConnectionTestBase):
     def test_get_with_no_firebase_users_returns_empty(self) -> None:
         self.assert_pcoll_empty(
-            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase()
+            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase('test')
         )
-        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_get_with_multiple_firebase_users_returns_all(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -81,7 +82,7 @@ class GetRecordsDirectlyFromFirebaseTests(FirebaseConnectionTestBase):
         )
 
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase(),
+            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase('test'),
             [
                 firebase_domain.FirebaseRecord(
                     auth_id='uid_a', email='a@a.com', disabled=False
@@ -94,7 +95,6 @@ class GetRecordsDirectlyFromFirebaseTests(FirebaseConnectionTestBase):
                 ),
             ],
         )
-        self.establish_firebase_connection_mock.assert_called_once()
 
 
 class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
@@ -354,9 +354,8 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([])
-            | firebase_io.CreateFirebaseRecords()
+            | firebase_io.CreateFirebaseRecords('test')
         )
-        self.establish_firebase_connection_mock.assert_not_called()
 
     def test_create_outside_emulator_uses_import_users(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', False):
@@ -377,11 +376,10 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                             ),
                         ]
                     )
-                    | firebase_io.CreateFirebaseRecords()
+                    | firebase_io.CreateFirebaseRecords('test')
                 ),
                 [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
-        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_create_within_emulator_uses_create_user(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', True):
@@ -402,11 +400,10 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                             ),
                         ]
                     )
-                    | firebase_io.CreateFirebaseRecords()
+                    | firebase_io.CreateFirebaseRecords('test')
                 ),
                 [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
-        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_create_within_emulator_reports_per_record_failure(self) -> None:
         self.firebase_sdk_stub.create_user(uid='uid_a', email='uid_a@a.com')
@@ -424,7 +421,7 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                             ),
                         ]
                     )
-                    | firebase_io.CreateFirebaseRecords()
+                    | firebase_io.CreateFirebaseRecords('test')
                 ),
                 [
                     job_run_result.JobRunResult(
@@ -435,7 +432,6 @@ class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
                     ),
                 ],
             )
-        self.establish_firebase_connection_mock.assert_called_once()
 
 
 class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
@@ -443,9 +439,8 @@ class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([])
-            | firebase_io.DeleteFirebaseRecords()
+            | firebase_io.DeleteFirebaseRecords('test')
         )
-        self.establish_firebase_connection_mock.assert_not_called()
 
     def test_delete_reports_success_count(self) -> None:
         self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
@@ -464,8 +459,71 @@ class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
                         ),
                     ]
                 )
-                | firebase_io.DeleteFirebaseRecords()
+                | firebase_io.DeleteFirebaseRecords('test')
             ),
             [job_run_result.JobRunResult(stdout='DELETE OK: 2')],
         )
-        self.establish_firebase_connection_mock.assert_called_once()
+
+    def test_delete_reports_expected_failure(self) -> None:
+        self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
+        self.firebase_sdk_stub.create_user(uid='uid_b', email='b@b.com')
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'delete_users',
+                firebase_exceptions.InternalError('uh-oh'),
+            ),
+        ):
+            self.assert_pcoll_equal(
+                (
+                    self.pipeline
+                    | beam.Create(
+                        [
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_a',
+                                email='uid_a@a.com',
+                                disabled=False,
+                            ),
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_b',
+                                email='uid_b@a.com',
+                                disabled=False,
+                            ),
+                        ]
+                    )
+                    | firebase_io.DeleteFirebaseRecords('test')
+                ),
+                [
+                    job_run_result.JobRunResult.as_stderr(
+                        'DELETE ERROR: at slice=[0:2]: uh-oh',
+                    ),
+                ],
+            )
+
+    def test_delete_raises_unexpected_errors(self) -> None:
+        self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
+        self.firebase_sdk_stub.create_user(uid='uid_b', email='b@b.com')
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'delete_users',
+                MemoryError('uh-oh'),
+            ),
+            self.assertRaisesRegex(RuntimeError, 'unexpectedly raised!'),
+        ):
+            self.assert_pcoll_empty(
+                self.pipeline
+                | beam.Create(
+                    [
+                        firebase_domain.FirebaseRecord(
+                            auth_id='uid_a', email='uid_a@a.com', disabled=False
+                        ),
+                        firebase_domain.FirebaseRecord(
+                            auth_id='uid_b', email='uid_b@a.com', disabled=False
+                        ),
+                    ]
+                )
+                | firebase_io.DeleteFirebaseRecords('test')
+            )
