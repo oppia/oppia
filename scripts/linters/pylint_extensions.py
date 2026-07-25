@@ -510,7 +510,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     def check_typeinfo(
         self,
         node: astroid.scoped_nodes.FunctionDef,
-        node_doc: _check_docs_utils.Docstring,
+        node_doc: _check_docs_utils.GoogleDocstring,
     ) -> None:
         """Checks whether all parameters in a function definition are
         properly formatted.
@@ -518,8 +518,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
         Args:
             node: astroid.node.FunctionDef. Node for a function or
                 method definition in the AST.
-            node_doc: Docstring. Pylint Docstring class instance representing
-                a node's docstring.
+            node_doc: GoogleDocstring. Pylint Docstring class instance
+                representing a node's docstring.
         """
         # The regexes are taken from the pylint codebase and are modified
         # according to our needs. Link: https://github.com/PyCQA/pylint/blob/
@@ -569,7 +569,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if node_doc.has_params():
             entries = (
                 node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_param_section
+                    node_doc.re_param_section
                 )
             )
             for entry in entries:
@@ -588,7 +588,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if node_doc.has_returns():
             entries = (
                 node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_returns_section
+                    node_doc.re_returns_section
                 )
             )
             entries = [''.join(entries)]
@@ -604,7 +604,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if node_doc.has_yields():
             entries = (
                 node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_yields_section
+                    node_doc.re_yields_section
                 )
             )
             entries = [''.join(entries)]
@@ -620,7 +620,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if node_doc.exceptions():
             entries = (
                 node_doc._parse_section(  # pylint: disable=protected-access
-                    _check_docs_utils.GoogleDocstring.re_raise_section
+                    node_doc.re_raise_section
                 )
             )
             for entry in entries:
@@ -1351,7 +1351,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
 
         try:
             imported_module = node.do_import_module(node.modname)
-        except astroid.AstroidBuildingException:
+        except astroid.AstroidBuildingError:
             return
 
         if node.modname in self.EXCLUDED_IMPORT_MODULES:
