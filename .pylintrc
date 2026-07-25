@@ -8,6 +8,10 @@ init-hook='import sys; sys.path.append(".")'
 # Checks for correct docstring style
 load-plugins=pylint.extensions.docstyle, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
 
+[STRING]
+
+check-quote-consistency=yes
+
 [BASIC]
 
 # Regular expression which should only match correct function names
@@ -120,6 +124,7 @@ disable=abstract-method,
         no-else-return,
         no-member,
         too-many-arguments,
+        too-many-positional-arguments,
         too-many-boolean-expressions,
         too-many-branches,
         too-many-instance-attributes,
@@ -141,8 +146,6 @@ disable=abstract-method,
         cyclic-import,
 # TODO(#14322): Reinstate this.
         missing-type-doc,
-# TODO(#21214): Reinstate this.
-        too-many-positional-arguments,
 
 [REPORTS]
 
