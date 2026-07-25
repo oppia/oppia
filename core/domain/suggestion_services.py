@@ -218,9 +218,15 @@ def create_suggestion(
 
     status = suggestion_models.STATUS_IN_REVIEW
 
-    if target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        exploration = exp_fetchers.get_exploration_by_id(target_id)
+    exploration = (
+        exp_fetchers.get_exploration_by_id(target_id)
+        if target_type == feconf.ENTITY_TYPE_EXPLORATION
+        else None
+    )
+
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+        assert exploration is not None
+
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -246,6 +252,8 @@ def create_suggestion(
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        assert exploration is not None
+
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,

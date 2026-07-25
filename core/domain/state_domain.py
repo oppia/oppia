@@ -1374,6 +1374,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     )
                 rule_spec_till_now.append(rule_spec.to_dict())
 
+                whole = 0
                 if rule_spec.rule_type not in inputs_without_fractions:
                     num = rule_spec.inputs['f']['numerator']
                     den = rule_spec.inputs['f']['denominator']
@@ -2495,20 +2496,20 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             Returns:
                 dict. The unmodified customization argument value.
             """
+            class_obj: SubtitledUnicode | SubtitledHtml | None = None
             if (
                 schema_obj_type
                 == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
             ):
-                class_obj: Union[SubtitledUnicode, SubtitledHtml] = (
-                    SubtitledUnicode(
-                        ca_value['content_id'], ca_value['unicode_str']
-                    )
+                class_obj = SubtitledUnicode(
+                    ca_value['content_id'], ca_value['unicode_str']
                 )
 
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 class_obj = SubtitledHtml(
                     ca_value['content_id'], ca_value['html']
                 )
+            assert class_obj is not None
             return class_obj
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(

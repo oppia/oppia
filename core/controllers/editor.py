@@ -1784,6 +1784,7 @@ class LearnerAnswerInfoHandler(
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.NotFoundException
 
+        state_reference = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')
             if not state_name:
@@ -1801,6 +1802,7 @@ class LearnerAnswerInfoHandler(
             'learner_answer_info_id'
         ]
 
+        assert state_reference is not None
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id
         )

@@ -31,7 +31,7 @@ MYPY = True
 if MYPY:
     from mypy_imports import question_models
 
-(question_model,) = models.Registry.import_models([models.Names.QUESTION])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):

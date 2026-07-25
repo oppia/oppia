@@ -158,6 +158,7 @@ def _save_activity_rights(
         constants.ACTIVITY_TYPE_EXPLORATION,
     )
 
+    model = None
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
         _save_exploration_rights(
@@ -169,6 +170,7 @@ def _save_activity_rights(
             activity_rights.id, strict=True
         )
 
+    assert model is not None
     model.owner_ids = activity_rights.owner_ids
     model.editor_ids = activity_rights.editor_ids
     model.viewer_ids = activity_rights.viewer_ids
@@ -1380,10 +1382,12 @@ def _change_activity_status(
 
     old_status = activity_rights.status
     activity_rights.status = new_status
+    cmd_type = None
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         cmd_type = rights_domain.CMD_CHANGE_EXPLORATION_STATUS
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         cmd_type = rights_domain.CMD_CHANGE_COLLECTION_STATUS
+    assert cmd_type is not None
     commit_cmds = [
         {'cmd': cmd_type, 'old_status': old_status, 'new_status': new_status}
     ]

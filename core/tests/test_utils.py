@@ -2582,7 +2582,8 @@ class GenericTestBase(AppEngineTestBase):
     # utils.dict_from_yaml can isolate differences quickly.
 
     SAMPLE_YAML_CONTENT: str = (
-        ("""author_notes: ''
+        (
+            """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -2653,7 +2654,8 @@ states_schema_version: %d
 tags: []
 title: Title
 version: 1
-""")
+"""
+        )
         % (
             feconf.DEFAULT_INIT_STATE_NAME,
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
@@ -3190,6 +3192,8 @@ version: 1
                 msg='Expected params to be a dict, received %s' % params,
             )
 
+        response = None
+
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
@@ -3211,7 +3215,7 @@ version: 1
             )
         elif http_method != 'GET':
             raise Exception('Invalid http method %s' % http_method)
-
+        assert response is not None
         self.assertIn(response.status_int, expected_status_int_list)
 
         return response
@@ -3445,21 +3449,20 @@ version: 1
             webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
-        if upload_files is not None:
-            encoded_upload_files = tuple(
-                tuple(
-                    f.encode('utf-8') if isinstance(f, str) else f
-                    for f in upload_file
-                )
-                for upload_file in upload_files
+        encoded_upload_files = tuple(
+            tuple(
+                f.encode('utf-8') if isinstance(f, str) else f
+                for f in upload_file
             )
+            for upload_file in (upload_files or ())
+        )
 
         return app.post(
             url,
             params=data,
             headers=headers,
             status=expected_status_int,
-            upload_files=(encoded_upload_files if upload_files else None),
+            upload_files=encoded_upload_files,
             expect_errors=expect_errors,
         )
 
