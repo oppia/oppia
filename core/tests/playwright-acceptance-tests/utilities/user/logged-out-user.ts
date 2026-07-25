@@ -183,6 +183,11 @@ const returnToStoryFromLastStateSelector =
 const tagsContainerSelector = '.exploration-tags span';
 const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
 
+// Community Library.
+const communityLibraryHeading = '.e2e-test-library-main-header';
+const communityLibraryGroupHeader = '.e2e-test-library-group-header';
+const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
+
 // Home Page Selectors.
 const homePageHeadingSelector =
   '.e2e-test-splash-page .e2e-test-home-page-title';
@@ -772,6 +777,58 @@ export class LoggedOutUser extends BaseUser {
       collapsibleRTEContent
     );
     expect(collapsibleRTEContentText).toContain(content);
+  }
+
+  /**
+   * Function to verify the community library group header is present.
+   * @param {string[]} groupHeaders - The group headers to verify.
+   */
+  async expectCommunityLibraryGroupHeaderToContain(
+    groupHeaders: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityLibraryGroupHeader);
+
+    const communityLibraryGroupHeaderText = await this.page.$$eval(
+      communityLibraryGroupHeader,
+      el => el.map(el => el.textContent)
+    );
+
+    for (const groupHeader of groupHeaders) {
+      if (
+        communityLibraryGroupHeaderText?.some(el =>
+          el?.trim().includes(groupHeader)
+        ) === false
+      ) {
+        throw new Error(
+          `Failed: Community library group header does not contain ${groupHeader}.\nActual: ${communityLibraryGroupHeaderText}`
+        );
+      }
+      showMessage(
+        `Success: Community library group header contains ${groupHeader}.`
+      );
+    }
+  }
+
+  /**
+   * Function to verify the community library heading is present.
+   * @param {string} heading - The heading to verify.
+   */
+  async expectCommunityLibraryHeadingToBePresent(
+    heading: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityLibraryHeading);
+
+    const communityLibraryHeadingText = await this.getTextContent(
+      communityLibraryHeading
+    );
+
+    if (communityLibraryHeadingText?.trim() !== heading) {
+      throw new Error(
+        `Expected community library heading to be ${heading}, but found ${communityLibraryHeadingText}`
+      );
+    }
+
+    showMessage(`Success: Community library heading is ${heading}.`);
   }
 
   /**
@@ -1766,6 +1823,48 @@ export class LoggedOutUser extends BaseUser {
         return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
       },
       {selector: audioSliderSelector, value: currentSliderValue + 12}
+    );
+  }
+
+  /**
+   * Filters lessons by multiple categories.
+   * @param {string[]} categoryNames - The names of the categories to filter by.
+   */
+  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
+    await this.clickOnElementWithSelector(categoryFilterDropdownToggler);
+    await this.waitForStaticAssetsToLoad();
+
+    await this.expectElementToBeVisible(unselectedFilterOptionsSelector);
+    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
+    let foundMatch = false;
+
+    for (const option of filterOptions) {
+      const optionText = await this.getTextContent(option);
+
+      if (categoryNames.includes(optionText.trim())) {
+        foundMatch = true;
+        await this.clickOnElement(option);
+      }
+    }
+
+    if (!foundMatch) {
+      throw new Error(
+        `No match found for categories: ${categoryNames.join(', ')}`
+      );
+    }
+
+    await this.clickOnElementWithSelector(searchInputSelector);
+    await this.page.keyboard.press('Enter');
+
+    await this.page.waitForFunction(
+      (categoryNames: string[]) => {
+        // Check if URL contains all the categories. Added %22 to remove false positives.
+        return categoryNames.every(category =>
+          window.location.href.includes(`%22${category}%22`)
+        );
+      },
+      categoryNames,
+      {timeout: 60000}
     );
   }
 
