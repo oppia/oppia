@@ -1157,4 +1157,33 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.delete();
     expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(true);
   });
+
+  it('should dismiss the bottom sheet with false when cancelled and not newly created', fakeAsync(() => {
+    component.componentId = 'link';
+    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.customizationArgSpecs = [
+      {name: 'filepath', default_value: ''},
+      {name: 'caption', default_value: ''},
+      {name: 'alt', default_value: ''},
+    ];
+    component.ngOnInit();
+    flush();
+    component.componentIsNewlyCreated = false;
+    component.cancel();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith(false);
+  }));
+
+  it('should dismiss the bottom sheet with the customization args on save', fakeAsync(() => {
+    component.componentId = 'link';
+    component.attrsCustomizationArgsDict = {alt: '', caption: '', filepath: ''};
+    component.customizationArgSpecs = [
+      {name: 'filepath', default_value: ''},
+      {name: 'caption', default_value: ''},
+      {name: 'alt', default_value: ''},
+    ];
+    component.ngOnInit();
+    flush();
+    component.save();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  }));
 });
