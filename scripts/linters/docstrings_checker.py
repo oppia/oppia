@@ -173,14 +173,14 @@ def possible_exc_types(node: astroid.node_classes.Raise) -> Set[str]:
 
 
 def docstringify(
-    docstring: astroid.node_classes.Const,
+    docstring: astroid.node_classes.Const | None,
 ) -> _check_docs_utils.Docstring:
     """Converts a docstring node to its Docstring object
     as defined in the pylint library.
 
     Args:
-        docstring: astroid.node_classes.Const. Docstring for a particular class
-            or function.
+        docstring: astroid.node_classes.Const | None. Docstring for a particular
+            class or function.
 
     Returns:
         Docstring. Pylint Docstring class instance representing

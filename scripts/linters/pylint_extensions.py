@@ -1093,13 +1093,15 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not (doc.has_rtype() or (doc.has_property_type() and is_property)):
             self.add_message('missing-return-type-doc', node=func_node)
 
-    def visit_yield(self, node: astroid.node_classes.Yield) -> None:
+    def visit_yield(
+        self, node: astroid.node_classes.Yield | astroid.node_classes.YieldFrom
+    ) -> None:
         """Visits a function node that contains a yield statement and verifies
         that the yield value and the yield type are documented.
 
         Args:
-            node: astroid.node_classes.Yield. Node for a function or
-                method definition in the AST.
+            node: astroid.node_classes.Yield|astroid.node_classes.YieldFrom. A
+                Node for a function or method definition in the AST.
         """
         func_node = node.frame()
 
@@ -1540,15 +1542,15 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
     def _add_invalid_import_message(
         self,
-        node: astroid.node_classes.Import,
+        node: astroid.node_classes.Import | astroid.node_classes.ImportFrom,
         module_name: str,
         forbidden_import_names: Tuple[str, Optional[str]],
     ) -> None:
         """Adds pylint message about the invalid import.
 
         Args:
-            node: astroid.node_classes.Import. Node for a import statement
-                in the AST.
+            node: astroid.node_classes.Import|astroid.node_classes.ImportFrom. A
+                Node for a import statement in the AST.
             module_name: str. The module that was checked.
             forbidden_import_names: tuple(str, str|None). The import that
                 was invalid.
