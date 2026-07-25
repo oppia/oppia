@@ -684,14 +684,16 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
-    lambda recipient_username: 'Hi %s,' % recipient_username
-)
-DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = lambda sender_username: (
-    'Thanks!<br>%s (Oppia moderator)' % sender_username
-)
-DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = lambda exp_title: (
-    'Your Oppia exploration "%s" has been unpublished' % exp_title
+DEFAULT_SALUTATION_HTML_FN: Callable[  # pylint: disable=invalid-name
+    [str], str
+] = lambda recipient_username: f'Hi {recipient_username},'
+DEFAULT_SIGNOFF_HTML_FN: Callable[  # pylint: disable=invalid-name
+    [str], str
+] = lambda sender_username: f'Thanks!<br>{sender_username} (Oppia moderator)'
+DEFAULT_EMAIL_SUBJECT_FN: Callable[  # pylint: disable=invalid-name
+    [str], str
+] = (
+    lambda exp_title: f'Your Oppia exploration "{exp_title}" has been unpublished'
 )
 
 VALID_MODERATOR_ACTIONS: Dict[

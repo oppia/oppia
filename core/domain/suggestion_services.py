@@ -97,11 +97,11 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 # email.
 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
-SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[
+SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[  # pylint: disable=invalid-name
     [suggestion_registry.SuggestionTranslateContent], str
 ] = lambda suggestion: suggestion.change_cmd.translation_html
 
-SUGGESTION_ADD_QUESTION_HTML: Callable[
+SUGGESTION_ADD_QUESTION_HTML: Callable[  # pylint: disable=invalid-name
     [suggestion_registry.SuggestionAddQuestion], str
 ] = lambda suggestion: suggestion.change_cmd.question_dict[
     'question_state_data'
