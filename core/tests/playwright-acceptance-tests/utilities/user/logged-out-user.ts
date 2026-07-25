@@ -66,6 +66,9 @@ const attributionHtmlCodeSelector = '.attribution-html-code';
 const attributionPrintTextSelector = '.attribution-print-text';
 const closeAttributionModalButton = '.attribution-modal button';
 const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
+const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
+const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
@@ -1116,6 +1119,95 @@ export class LoggedOutUser extends BaseUser {
     for (const tag of expectedTags) {
       if (!tags.includes(tag)) {
         throw new Error(`Tag ${tag} not found.`);
+      }
+    }
+  }
+
+  /**
+   * Checks if an exploration has a specific rating.
+   *
+   * @param {number} expectedRating - The expected rating of the exploration.
+   * @param {string} expectedExplorationName - The name of the exploration to check.
+   */
+  async expectLessonsToHaveRating(
+    expectedRating: number,
+    expectedExplorationName: string
+  ): Promise<void> {
+    try {
+      await this.expectElementToBeVisible(lessonCardSelector);
+      const cards = await this.page.$$(lessonCardSelector);
+      for (const card of cards) {
+        await card.waitForSelector(lessonCardTitleSelector);
+        const titleElement = await card.$(lessonCardTitleSelector);
+        if (!titleElement) {
+          throw new Error('Title element not found in lesson card.');
+        }
+        const titleText = await this.getTextContent(titleElement);
+        if (titleText === expectedExplorationName) {
+          await card.waitForSelector(explorationRatingSelector);
+          const ratingElement = await card.$(explorationRatingSelector);
+          if (ratingElement) {
+            const ratingSpan = await ratingElement.$('span:nth-child(2)');
+            if (!ratingSpan) {
+              throw new Error(
+                `Rating span not found for exploration "${expectedExplorationName}".`
+              );
+            }
+            const ratingText = await this.getTextContent(ratingSpan);
+            const rating = parseFloat(ratingText);
+            if (rating !== expectedRating) {
+              throw new Error(
+                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+              );
+            }
+            return;
+          }
+        }
+      }
+      throw new Error(
+        `Exploration "${expectedExplorationName}" not found in exploration titles.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to check rating of exploration: ${error}`
+      );
+      if (error instanceof Error) {
+        newError.stack = error.stack;
+      }
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if the views of a lesson card matches the expected views.
+   * @param {number} expectedViews - The expected views of the card.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async expectLessonViewsToBe(
+    expectedViews: number,
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardSelector);
+    const cards = await this.page.$$(lessonCardSelector);
+    for (const card of cards) {
+      await card.waitForSelector(lessonCardTitleSelector);
+      const titleElement = await card.$(lessonCardTitleSelector);
+      if (!titleElement) {
+        throw new Error('Title element not found in lesson card.');
+      }
+      const titleText = await this.getTextContent(titleElement);
+      if (titleText === explorationName) {
+        await card.waitForSelector(explorationViewsSelector);
+        const views = await card.$eval(explorationViewsSelector, el =>
+          parseInt(el?.textContent?.trim() ?? '0', 10)
+        );
+
+        if (views !== expectedViews) {
+          throw new Error(
+            `Expected views to be ${expectedViews}, but found ${views}`
+          );
+        }
+        return;
       }
     }
   }

@@ -155,6 +155,10 @@ const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
+const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
+const previousCardButton = '.e2e-test-back-button';
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 
@@ -588,6 +592,27 @@ export class ExplorationEditor extends BaseUser {
         break;
       }
     }
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   * @param {boolean} skipVerification - Whether to skip verification of the card content.
+   */
+  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+    try {
+      await this.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        await this.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    if (skipVerification) {
+      return;
+    }
+    await this.expectElementToBeVisible(previousCardButton);
   }
 
   /**
