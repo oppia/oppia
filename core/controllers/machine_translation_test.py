@@ -382,3 +382,32 @@ class TranslationProviderMappingHandlerTests(test_utils.GenericTestBase):
             policy_calls, [({'hi': 'azure', 'es': 'google'}, None)]
         )
         self.logout()
+
+    def test_put_fails_gracefully_on_internal_exception(self) -> None:
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        def mock_update_policy_raises(
+            language_to_provider_mapping: Optional[Dict[str, str]] = None,
+            automatic_translation_is_enabled: Optional[bool] = None,
+        ) -> None:
+            raise Exception('Datastore write failed unexpectedly.')
+
+        domain_swap = self.swap(
+            machine_translation_services,
+            'update_machine_translation_policy',
+            mock_update_policy_raises,
+        )
+
+        with self.feature_flag_swap, domain_swap:
+            csrf_token = self.get_new_csrf_token()
+            response = self.put_json(
+                '/translation-provider-mapping',
+                self.valid_payload,
+                csrf_token=csrf_token,
+                expected_status_int=500,
+            )
+
+        self.assertEqual(
+            response['error'], 'Datastore write failed unexpectedly.'
+        )
+        self.logout()
