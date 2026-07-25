@@ -738,8 +738,7 @@ class TranslatableContentsHandlerV2(
             # (such as answer choices) requires reviewer privileges.
             if language_code not in reviewable_language_codes and (
                 content.is_data_format_list()
-                or content.content_type
-                == translation_domain.ContentType.RULE.value
+                or content.content_type == translation_domain.ContentType.RULE
             ):
                 continue
 
