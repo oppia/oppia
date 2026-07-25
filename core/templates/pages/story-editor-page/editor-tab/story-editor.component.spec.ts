@@ -208,6 +208,9 @@ describe('Story Editor Component having three story nodes', () => {
       'fractions'
     );
     spyOn(storyEditorStateService, 'getTopicName').and.returnValue('addition');
+    mockPlatformFeatureService.status.StoryEditorArcs = {
+      isEnabled: false,
+    };
     component.ngOnInit();
   });
 

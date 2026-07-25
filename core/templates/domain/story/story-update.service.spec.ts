@@ -121,6 +121,7 @@ describe('Story update service', () => {
       'emit'
     ).and.stub();
 
+    mockPlatformFeatureService.status.StoryEditorArcs.isEnabled = false;
     _sampleStory = Story.createFromBackendDict(sampleStoryBackendObject);
   });
 

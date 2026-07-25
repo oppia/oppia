@@ -141,7 +141,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
     FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
     FeatureNames.TECHNICAL_FEEDBACK_DASHBOARD_ENABLED,
-    FeatureNames.STORY_EDITOR_ARCS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
