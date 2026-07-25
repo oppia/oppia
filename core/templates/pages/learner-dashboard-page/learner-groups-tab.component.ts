@@ -16,7 +16,13 @@
  * @fileoverview Component for learner groups tab in the Learner Dashboard page.
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewEncapsulation,
+} from '@angular/core';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -30,11 +36,11 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {ViewLearnerGroupInvitationModalComponent} from './modal-templates/view-learner-group-invitation-modal.component';
 import {ViewLearnerGroupDetailsModalComponent} from './modal-templates/view-learner-group-details-modal.component';
 
-import './learner-groups-tab.component.css';
-
 @Component({
   selector: 'oppia-learner-groups-tab',
   templateUrl: './learner-groups-tab.component.html',
+  styleUrls: ['./learner-groups-tab.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LearnerGroupsTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();

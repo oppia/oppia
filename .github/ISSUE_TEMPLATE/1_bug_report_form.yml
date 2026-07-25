@@ -12,18 +12,21 @@ body:
       value: |
         Before filing a new issue, **please do a quick search** to check that it hasn't already been filed on the issue tracker. You can do this by going to [this link](https://github.com/oppia/oppia/issues) and typing some words related to the issue in the search box next to the "New issue" button.
   - type: textarea
+    id: describe-the-bug
     attributes:
       label: Describe the bug
       description: A concise description of what issue you're experiencing. **Example:** "When I click on the 'Sign in' button, I expect to be redirected to the login page, but instead I get a 404 error."
     validations:
       required: true
   - type: input
+    id: page-url
     attributes:
       label: URL of the page where the issue is observed.
       description: The URL of the specific page where you are experiencing the issue (or N/A if not applicable).
     validations:
       required: true
   - type: textarea
+    id: steps-to-reproduce
     attributes:
       label: Steps To Reproduce
       description: |
@@ -35,12 +38,14 @@ body:
     validations:
       required: true
   - type: textarea
+    id: expected-behavior
     attributes:
       label: Expected Behavior
       description: A clear and concise description of what you expected to happen. **Example:** "I expect to be redirected to the login page."
     validations:
       required: true
   - type: textarea
+    id: screenshots-videos
     attributes:
       label: Screenshots/Videos
       description: |
@@ -50,6 +55,7 @@ body:
     validations:
       required: false
   - type: dropdown
+    id: device
     attributes:
       label: What device are you using?
       description: Please select the device you're using.
@@ -60,6 +66,7 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: operating-system
     attributes:
       label: Operating System
       description: Please select the operating system you're using. **Example:** "Windows". If you're using multiple Operating systems, please select all that apply.
@@ -74,6 +81,7 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: browsers
     attributes:
       label: What browsers are you seeing the problem on?
       description: Please select the browser you're using. If you're using multiple browsers, please select all that apply.
@@ -89,12 +97,14 @@ body:
     validations:
       required: false
   - type: input
+    id: browser-version
     attributes:
       label: Browser version
       description: Please enter the version of the browser you're using. **Example:** "90.0.4430.212". You can find this by clicking on the three dots in the top right corner of your browser and selecting "Help" or "About". If you're using multiple browsers, please enter the version for each browser. **Example:** "90.0.4430.212 (Chrome), 88.1.1 (Firefox)"
     validations:
       required: false
   - type: textarea
+    id: additional-context
     attributes:
       label: Additional context
       description: |
@@ -104,6 +114,7 @@ body:
     validations:
       required: false
   - type: textarea
+    id: tips-for-developers
     attributes:
       label: Tips for developers
       description: Please leave this section as-is.

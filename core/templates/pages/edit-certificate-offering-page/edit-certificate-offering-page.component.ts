@@ -42,6 +42,7 @@ import './edit-certificate-offering-page.component.css';
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
   templateUrl: './edit-certificate-offering-page.component.html',
+  styleUrls: ['./edit-certificate-offering-page.component.css'],
 })
 export class EditCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
@@ -49,6 +50,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   isCertificateValid: boolean = true;
+  isLoadingCertificateOffering: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -76,7 +78,9 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       this.alertsService.addWarning(
         'The certificate offering could not be loaded.'
       );
-      this.router.navigate(['/certificate-offering-dashboard']);
+      this.router.navigate(['/certificate-creator-dashboard']);
+    } finally {
+      this.isLoadingCertificateOffering = false;
     }
   }
 
@@ -128,6 +132,8 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       );
       modalRef.componentInstance.action =
         CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
+      modalRef.componentInstance.currentAsyncStatus =
+        this.certificateAssessmentOffering.asyncStatus;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
@@ -144,6 +150,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
           title: this.certificateAssessmentOffering.title,
           description: this.certificateAssessmentOffering.description,
           classroom_id: this.certificateAssessmentOffering.classroomId,
+          topic_ids: Object.keys(this.certificateAssessmentOffering.topicData),
           topic_data: this.certificateAssessmentOffering.topicData,
           demonstrates: this.certificateAssessmentOffering.demonstrates,
           total_questions: this.certificateAssessmentOffering.totalQuestions,
@@ -198,6 +205,6 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   }
 
   private navigateToCertificateOfferingDashboard(): void {
-    this.router.navigate(['/certificate-offering-dashboard']);
+    this.router.navigate(['/certificate-creator-dashboard']);
   }
 }

@@ -22,6 +22,7 @@ import {
   OnInit,
   ViewChild,
   OnDestroy,
+  ViewEncapsulation,
 } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -44,7 +45,6 @@ import {
 } from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
-import './story-viewer-page.component.css';
 import {StoryNode} from 'domain/story/story-node.model';
 import constants from 'assets/constants';
 
@@ -59,6 +59,7 @@ interface IconParametersArray {
   selector: 'oppia-story-viewer-page',
   templateUrl: './story-viewer-page.component.html',
   styleUrls: ['./story-viewer-page.component.css'],
+  encapsulation: ViewEncapsulation.Emulated,
 })
 export class StoryViewerPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
