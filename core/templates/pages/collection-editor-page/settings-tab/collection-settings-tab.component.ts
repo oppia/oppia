@@ -17,6 +17,7 @@
  */
 
 import {Component} from '@angular/core';
+import './collection-settings-tab.component.css';
 
 @Component({
   selector: 'collection-settings-tab',

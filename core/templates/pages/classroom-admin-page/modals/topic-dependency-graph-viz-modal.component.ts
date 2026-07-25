@@ -30,6 +30,7 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 import {TopicIdToPrerequisiteTopicIds} from '../existing-classroom.model';
 import {TopicIdToTopicName} from '../existing-classroom.model';
+import './topic-dependency-graph-viz-modal.component.css';
 
 interface NodeData {
   y0: number;
@@ -45,6 +46,7 @@ interface NodeData {
 @Component({
   selector: 'oppia-topics-dependency-graph',
   templateUrl: './topic-dependency-graph-viz-modal.component.html',
+  styleUrls: ['./topic-dependency-graph-viz-modal.component.css'],
 })
 export class TopicsDependencyGraphModalComponent extends ConfirmOrCancelModal {
   constructor(
