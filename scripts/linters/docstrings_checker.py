@@ -165,9 +165,8 @@ def possible_exc_types(node: astroid.node_classes.Raise) -> Set[str]:
                     if exc is not astroid.Uninferable
                 ]
 
-        return set(
-            exc for exc in excs if not utils.node_ignores_exception(node, exc)
-        )
+        return {e for e in excs if not utils.node_ignores_exception(node, e)}
+
     except astroid.InferenceError:
         return set()
 
