@@ -109,12 +109,12 @@ def returns_something(return_node: astroid.node_classes.Return) -> bool:
     )
 
 
-def possible_exc_types(node: astroid.node_classes.NodeNG) -> Set[str]:
+def possible_exc_types(node: astroid.node_classes.Raise) -> Set[str]:
     """Gets all of the possible raised exception types for the given raise node.
     Caught exception types are ignored.
 
     Args:
-        node: astroid.node_classes.NodeNG. The raise
+        node: astroid.node_classes.Raise. The raise
             to find exception types for.
 
     Returns:
@@ -172,13 +172,15 @@ def possible_exc_types(node: astroid.node_classes.NodeNG) -> Set[str]:
         return set()
 
 
-def docstringify(docstring: astroid.nodes.Const) -> _check_docs_utils.Docstring:
+def docstringify(
+    docstring: astroid.node_classes.Const,
+) -> _check_docs_utils.Docstring:
     """Converts a docstring node to its Docstring object
     as defined in the pylint library.
 
     Args:
-        docstring: astroid.nodes.Const. Docstring for a particular class or
-            function.
+        docstring: astroid.node_classes.Const. Docstring for a particular class
+            or function.
 
     Returns:
         Docstring. Pylint Docstring class instance representing
