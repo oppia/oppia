@@ -478,6 +478,53 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         self.assertEqual(json_response['next_subtopic_dict'], None)
         self.assertEqual(json_response['prev_subtopic_dict'], None)
 
+    def test_get_with_valid_skill_ids(self) -> None:
+        skill_id = 'test_skill_id'
+        self.save_new_skill(skill_id, self.admin_id, description='Test Skill')
+        json_response = self.get_json(
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee'),
+            params={'skill_ids': '["test_skill_id"]'},
+        )
+        self.assertEqual(json_response['skill_ids'], ['test_skill_id'])
+
+    def test_get_fails_with_nonexistent_skill_ids(self) -> None:
+        response = self.get_json(
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee'),
+            params={'skill_ids': '["nonexistent_skill"]'},
+            expected_status_int=404,
+        )
+        self.assertIn('Could not find the resource', response['error'])
+
+    def test_get_fails_with_invalid_skill_ids_shape(self) -> None:
+        response = self.get_json(
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee'),
+            params={'skill_ids': '[1, 2]'},
+            expected_status_int=400,
+        )
+        self.assertIn(
+            'Invalid skill IDs',
+            response['error'],
+        )
+
+    def test_get_with_valid_skill_ids_and_study_guides(self) -> None:
+        skill_id_one = 'skill_id_one'
+        self.save_new_skill(
+            skill_id_one, self.admin_id, description='Skill One'
+        )
+        json_response = self.get_json(
+            '%s/staging/%s/%s'
+            % (
+                feconf.SUBTOPIC_DATA_HANDLER,
+                'nameone',
+                'sub-url-frag-onee',
+            ),
+            params={'skill_ids': '["skill_id_one"]'},
+        )
+        self.assertEqual(json_response['skill_ids'], ['skill_id_one'])
+
     def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s'
@@ -584,13 +631,13 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         )
         self.assertIn('Could not find the resource', response['error'])
 
-    def test_cannot_get_with_deleted_subtopic_page(self) -> None:
-        subtopic_page_services.delete_subtopic_page(
-            self.admin_id, self.topic_id, 1
+    def test_cannot_get_with_deleted_study_guide(self) -> None:
+        study_guide_services.delete_study_guide(
+            self.admin_id, self.topic_id_2, 1
         )
         response = self.get_json(
             '%s/staging/%s/%s'
-            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee'),
             expected_status_int=404,
         )
         self.assertIn('Could not find the resource', response['error'])
