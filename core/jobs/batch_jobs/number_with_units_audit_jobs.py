@@ -89,16 +89,14 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
     ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from an exploration."""
         for state_dict in model.states.values():
-            for unit in self._extract_units_from_state_dict(state_dict):
-                yield unit
+            yield from self._extract_units_from_state_dict(state_dict)
 
     def _extract_units_from_question(
         self, model: question_models.QuestionModel
     ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from a question."""
         state_dict = model.question_state_data
-        for unit in self._extract_units_from_state_dict(state_dict):
-            yield unit
+        yield from self._extract_units_from_state_dict(state_dict)
 
     def _extract_units_from_state_dict(
         self, state_dict: state_domain.StateDict
