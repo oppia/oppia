@@ -89,13 +89,7 @@ def read_from_node(node: astroid.scoped_nodes.Module) -> List[str]:
     return [line.decode('utf-8') for line in node.stream().readlines()]
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class HangingIndentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
+class HangingIndentChecker(checkers.BaseTokenChecker):
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.
     """
@@ -204,15 +198,7 @@ class HangingIndentChecker(checkers.BaseTokenChecker):  # type: ignore[misc]
                     )
 
 
-# The following class was derived from
-# https://github.com/PyCQA/pylint/blob/377cc42f9e3116ff97cddd4567d53e9a3e24ebf9/pylint/extensions/docparams.py#L26
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
+class DocstringParameterChecker(checkers.BaseChecker):
     """Checker for Sphinx, Google, or Numpy style docstrings
 
     * Check that all function, method and constructor parameters are mentioned
@@ -1330,13 +1316,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
+class ImportOnlyModulesChecker(checkers.BaseChecker):
     """Checker for import-from statements. It checks that
     modules are only imported.
     """
@@ -1389,13 +1369,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
                 )
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
+class BackslashContinuationChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that backslash is not used
     for continuation.
     """
@@ -1425,13 +1399,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('backslash-continuation', line=line_num + 1)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class FunctionArgsOrderChecker(checkers.BaseChecker):  # type: ignore[misc]
+class FunctionArgsOrderChecker(checkers.BaseChecker):
     """Custom pylint checker which checks the order of arguments in function
     definition.
     """
@@ -1469,13 +1437,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):  # type: ignore[misc]
             self.add_message('function-args-order-cls', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
-class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
+class RestrictedImportChecker(checkers.BaseChecker):
     """Custom pylint checker which checks layers importing modules
     from their respective restricted layers.
     """
@@ -1516,7 +1478,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
         ),
     )
 
-    def __init__(self, linter: Optional[lint.PyLinter] = None) -> None:
+    def __init__(self, linter: lint.PyLinter) -> None:
         super().__init__(linter=linter)
         self._module_to_forbidden_imports: List[
             Tuple[str, List[Tuple[str, Optional[str]]]]
@@ -2697,7 +2659,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
         ),
     )
 
-    def __init__(self, linter: Optional[lint.PyLinter] = None) -> None:
+    def __init__(self, linter: lint.PyLinter) -> None:
         super().__init__(linter=linter)
         self.funcs_to_replace_str: Dict[str, str] = {}
         self.funcs_to_remove_str: Set[str] = set()
