@@ -78,6 +78,15 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   // acceptance tests. This is outside our control because it is
   // controlled by Donorbox.
   escapeRegExp("[Report Only] Refused to frame 'https://www.recaptcha.net/'"),
+  // The browser auto-requests favicon.ico while the signup page is open.
+  // At that point the user is only "partially logged in" (Firebase auth
+  // done, Oppia signup form not yet submitted), so the backend's
+  // partially-logged-in check (base.py) returns 401 for FaviconHandler.
+  // This happens on every test that signs up a new user and is harmless.
+  escapeRegExp(
+    'http://localhost:8181/favicon.ico Failed to load resource: the ' +
+      'server responded with a status of 401 (Unauthorized)'
+  ),
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [
