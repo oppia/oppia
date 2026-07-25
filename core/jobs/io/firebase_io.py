@@ -161,7 +161,7 @@ class GetRecordsDirectlyFromFirebase(beam.PTransform):  # type: ignore[misc]
     ) -> beam.PCollection[firebase_domain.FirebaseRecord]:
         """Returns all of the records directly from Firebase."""
 
-        do_fn = _ExportFirebaseRecords(self.project_id)
+        do_fn = _FetchFirebaseRecords(self.project_id)
 
         return (
             pbegin
@@ -185,20 +185,15 @@ class CreateFirebaseRecords(beam.PTransform):  # type: ignore[misc]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Creates accounts in Firebase in batches and reports the results."""
 
-        import_users_fn = (
-            _emulator_import_users
-            if constants.EMULATOR_MODE
-            else lambda batch: firebase_auth.import_users(batch)
-        )
+        do_fn = _BatchedDoFn(self.project_id)
 
         return (
             records
             | beam.Map(lambda record: record.to_import())
             | beam.combiners.ToList()
-            | beam.ParDo(
-                do_fn := _BatchedDoFn(self.project_id),
-                import_users_fn,
-            ).with_outputs(do_fn.OK_TAG, do_fn.ERR_TAG)
+            | beam.ParDo(do_fn, _import_users).with_outputs(
+                do_fn.OK_TAG, do_fn.ERR_TAG
+            )
             | job_result_transforms.FromTaggedOutputs(
                 do_fn.OK_TAG, do_fn.ERR_TAG, prefix='CREATE'
             )
@@ -219,14 +214,15 @@ class DeleteFirebaseRecords(beam.PTransform):  # type: ignore[misc]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Creates accounts in Firebase in batches and reports the results."""
 
+        do_fn = _BatchedDoFn(self.project_id)
+
         return (
             records
             | beam.Map(lambda record: record.auth_id)
             | beam.combiners.ToList()
-            | beam.ParDo(
-                do_fn := _BatchedDoFn(self.project_id),
-                lambda batch: firebase_auth.delete_users(batch),
-            ).with_outputs(do_fn.OK_TAG, do_fn.ERR_TAG)
+            | beam.ParDo(do_fn, _delete_users).with_outputs(
+                do_fn.OK_TAG, do_fn.ERR_TAG
+            )
             | job_result_transforms.FromTaggedOutputs(
                 do_fn.OK_TAG, do_fn.ERR_TAG, prefix='DELETE'
             )
@@ -234,7 +230,7 @@ class DeleteFirebaseRecords(beam.PTransform):  # type: ignore[misc]
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _ConnectedDoFn(beam.DoFn):  # type: ignore[misc]
+class _DoFnWithConnection(beam.DoFn):  # type: ignore[misc]
     """Establishes a connection to Firebase before process begins."""
 
     def __init__(self, project_id: str) -> None:
@@ -246,7 +242,7 @@ class _ConnectedDoFn(beam.DoFn):  # type: ignore[misc]
         firebase_auth_services.establish_firebase_connection(self.project_id)
 
 
-class _ExportFirebaseRecords(_ConnectedDoFn):
+class _FetchFirebaseRecords(_DoFnWithConnection):
     """Exports all Firebase records directly from the Firebase server."""
 
     def process(self, _: None) -> abc.Iterable[firebase_domain.FirebaseRecord]:
@@ -258,14 +254,17 @@ class _ExportFirebaseRecords(_ConnectedDoFn):
         )
 
 
-_InputT = TypeVar('_InputT', bound=str | firebase_auth.ImportUserRecord)
+_InputT = TypeVar(
+    '_InputT',
+    bound=firebase_auth.ImportUserRecord | str,
+)
 _OutputT = TypeVar(
     '_OutputT',
-    bound=firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult,
+    bound=firebase_auth.UserImportResult | firebase_auth.DeleteUsersResult,
 )
 
 
-class _BatchedDoFn(_ConnectedDoFn, Generic[_InputT, _OutputT]):
+class _BatchedDoFn(_DoFnWithConnection, Generic[_InputT, _OutputT]):
     """Executes a batch operation against Firebase and returns the results."""
 
     OK_TAG = 'OK'
@@ -318,30 +317,40 @@ class _BatchedDoFn(_ConnectedDoFn, Generic[_InputT, _OutputT]):
             yield beam.TaggedOutput(self.OK_TAG, input_offset - failure_count)
 
 
-def _emulator_import_users(
-    records: list[firebase_auth.ImportUserRecord],
+def _import_users(
+    record_batch: list[firebase_auth.ImportUserRecord],
 ) -> firebase_auth.UserImportResult:
-    """Creating users needs to be handled differently within EMULATOR_MODE.
+    """Delegates to the Firebase Admin SDK to import the given batch of users.
 
-    When we migrated to Firebase Authentication we decided that, while Oppia
-    is running locally against the Firebase Authentication Emulator, users
-    should be created using email & password for authentication. This is
-    intentionally inconsistent with production, where we use Single Sign-On
-    (i.e. Google Sign-In) instead. This was done so that developers wouldn't
-    need to keep sensitive auth credentials on their local file system.
+    Apache Beam cannot pickle global imported functions, but we want to pass
+    functions as arguments to the `_BatchedDoFn` so that we can re-use the
+    scaffolding for the batching logic. We work around this by wrapping the call
+    to import_users() in this top-level function which _can_ be pickled.
 
-    NOTE: Since the `import_users` API doesn't accept a raw password field,
-    we need to call the `create_user` API, which DOES accept one, instead.
+    https://beam.apache.org/documentation/sdks/python-pipeline-dependencies/#pickling-and-managing-the-main-session
 
     Args:
-        records: list[ImportUserRecord]. The batch of records to create.
+        record_batch: list[ImportUserRecord]. The batch of records to create.
 
     Returns:
         UserImportResult. The result of the create operation.
     """
 
+    if not constants.EMULATOR_MODE:
+        return firebase_auth.import_users(record_batch)
+
+    # NOTE: Since the `import_users` API doesn't accept a raw password field, we
+    # need to call the `create_user` API, which DOES accept one, instead.
+    #
+    # When we migrated to Firebase Authentication we decided that, while Oppia
+    # is running locally against the Firebase Authentication Emulator, users
+    # should be created using email & password for authentication. This is
+    # intentionally inconsistent with production, where we use Single Sign-On
+    # (i.e. Google Sign-In) instead. This was done so that developers wouldn't
+    # need to keep sensitive auth credentials on their local file system.
+
     errors = []
-    for i, record in enumerate(records):
+    for i, record in enumerate(record_batch):
         user_email = record.email or ''
         # HINT: `md5(email)` used for consistency with the frontend.
         # See: core/templates/services/auth.service.ts.
@@ -356,4 +365,25 @@ def _emulator_import_users(
         except (ValueError, firebase_exceptions.FirebaseError) as e:
             errors.append({'index': i, 'message': str(e)})
 
-    return firebase_auth.UserImportResult({'error': errors}, len(records))
+    return firebase_auth.UserImportResult({'error': errors}, len(record_batch))
+
+
+def _delete_users(
+    id_batch: list[str],
+) -> firebase_auth.DeleteUsersResult:
+    """Delegates to the Firebase Admin SDK to delete the given batch of users.
+
+    Apache Beam cannot pickle global imported functions, but we want to pass
+    functions as arguments to the `_BatchedDoFn` so that we can re-use the
+    scaffolding for the batching logic. We work around this by wrapping the call
+    to delete_users() in this top-level function which _can_ be pickled.
+
+    https://beam.apache.org/documentation/sdks/python-pipeline-dependencies/#pickling-and-managing-the-main-session
+
+    Args:
+        id_batch: list[str]. The batch of user IDs to delete.
+
+    Returns:
+        firebase_auth.DeleteUsersResult. The result of the delete operation.
+    """
+    return firebase_auth.delete_users(id_batch)
