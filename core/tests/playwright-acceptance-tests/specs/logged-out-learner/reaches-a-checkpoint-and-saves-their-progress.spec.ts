@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * EL.CP. Learner reaches a checkpoint and saves their progress
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {
@@ -33,19 +34,22 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-describe('Logged-out User', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutLearner: LoggedOutUser;
   let progressUrl: string;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor213',
-      'exploration_editor213@example.com'
+      'exploration_editor213@example.com',
+      browser
     );
 
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
@@ -62,7 +66,6 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
-    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.updateCardContent(
       'Give fraction with denominator 2.'
     );
@@ -86,6 +89,7 @@ describe('Logged-out User', function () {
       '1/2 here 1 is the numerator and 2 is the denominator.',
       true
     );
+    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
@@ -105,7 +109,7 @@ describe('Logged-out User', function () {
     );
   });
 
-  it('should be able to resume progress using 72-hour link.', async function () {
+  test('should be able to resume progress using 72-hour link.', async function () {
     await loggedOutLearner.playExploration(explorationId);
     await loggedOutLearner.continueToNextCard();
 
@@ -129,12 +133,12 @@ describe('Logged-out User', function () {
     );
   });
 
-  it('should be able to sign up to permanently save the progress', async function () {
+  test('should be able to sign up to permanently save the progress', async function () {
     await loggedOutLearner.openLessonInfoModal();
     await loggedOutLearner.saveProgress();
     await loggedOutLearner.clickOnCreateAccountButtonInSaveProgressModal();
     await loggedOutLearner.expectToBeOnLoginPage();
-    await loggedOutLearner.goThoroughSignUpProcess(
+    await loggedOutLearner.goThroughSignUpProcess(
       'learner@example.com',
       'learner'
     );
@@ -148,7 +152,7 @@ describe('Logged-out User', function () {
     await loggedOutLearner.expectSignInButtonToBePresent(false);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

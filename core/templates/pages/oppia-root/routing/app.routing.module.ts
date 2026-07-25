@@ -553,12 +553,12 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CERTIFICATE_OFFERING_DASHBOARD.ROUTE,
+      .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-assessment-dashboard-page/certificate-offering-dashboard-page.module'
-      ).then(m => m.CertificateOfferingDashboardPageModule),
+        'pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module'
+      ).then(m => m.CertificateCreatorDashboardPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
@@ -603,10 +603,12 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
 }
 
 // Register all routes for topic landing page.
-for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
-  for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
+for (const [key, values] of Object.entries(
+  AppConstants.AVAILABLE_LANDING_PAGES
+)) {
+  for (const value of values) {
     routes.push({
-      path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
+      path: key + '/' + value,
       loadChildren: () =>
         import(
           'pages/landing-pages/topic-landing-page/topic-landing-page.module'

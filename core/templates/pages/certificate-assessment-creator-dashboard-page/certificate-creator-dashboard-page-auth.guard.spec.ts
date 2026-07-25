@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CertificateOfferingDashboardPageAuthGuard.
+ * @fileoverview Tests for CertificateCreatorDashboardPageAuthGuard.
  */
 
 import {Location} from '@angular/common';
@@ -26,7 +26,7 @@ import {
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {AppConstants} from 'app.constants';
-import {CertificateOfferingDashboardPageAuthGuard} from './certificate-offering-dashboard-page-auth.guard';
+import {CertificateCreatorDashboardPageAuthGuard} from './certificate-creator-dashboard-page-auth.guard';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockRouter {
@@ -35,8 +35,8 @@ class MockRouter {
   }
 }
 
-describe('CertificateOfferingDashboardPageAuthGuard', () => {
-  let guard: CertificateOfferingDashboardPageAuthGuard;
+describe('CertificateCreatorDashboardPageAuthGuard', () => {
+  let guard: CertificateCreatorDashboardPageAuthGuard;
   let platformFeatureService: PlatformFeatureService;
   let router: Router;
   let location: Location;
@@ -57,7 +57,7 @@ describe('CertificateOfferingDashboardPageAuthGuard', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       providers: [
-        CertificateOfferingDashboardPageAuthGuard,
+        CertificateCreatorDashboardPageAuthGuard,
         {
           provide: PlatformFeatureService,
           useValue: platformFeatureServiceSpy,
@@ -67,7 +67,7 @@ describe('CertificateOfferingDashboardPageAuthGuard', () => {
       ],
     });
 
-    guard = TestBed.inject(CertificateOfferingDashboardPageAuthGuard);
+    guard = TestBed.inject(CertificateCreatorDashboardPageAuthGuard);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
@@ -101,7 +101,7 @@ describe('CertificateOfferingDashboardPageAuthGuard', () => {
 
     let canActivateResult: boolean | null = null;
     const stateSnapshot = {
-      url: '/certificate-offering-dashboard',
+      url: '/certificate-creator-dashboard',
     } as RouterStateSnapshot;
 
     guard
@@ -117,7 +117,7 @@ describe('CertificateOfferingDashboardPageAuthGuard', () => {
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
     expect(replaceStateSpy).toHaveBeenCalledWith(
-      '/certificate-offering-dashboard'
+      '/certificate-creator-dashboard'
     );
   }));
 });

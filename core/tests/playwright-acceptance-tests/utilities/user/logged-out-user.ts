@@ -28,6 +28,7 @@ const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
 
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
 const mobileNavbarButtonSelector = '.text-uppercase';
@@ -44,6 +45,15 @@ const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const previousCardButton = '.e2e-test-back-button';
 const lessonLanguageSelector = '.oppia-content-language-selector';
+const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
+const saveProgressButton = '.save-progress-btn';
+const saveProgressBtnTooltipSelector = '.save-progress-btn-tooltip';
+const signInBoxInSaveProressModalSelector = '.sign-in-box';
+const signInButton = '.conversation-skin-login-button-text';
+const singInButtonInProgressModal = '.sign-in-link';
+const profilePictureSelector = '.e2e-test-profile-dropdown';
+
+const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
 const conceptCardLinkSelector = '.e2e-test-concept-card-link';
 const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
@@ -77,6 +87,9 @@ const formErrorContainer = '.e2e-test-form-error-container';
 const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
 const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
 const progressRemainderModalSelector = '.oppia-progress-reminder-modal';
+const progressReminderModalHeaderSelector =
+  '.e2e-test-progress-reminder-continue-text';
+const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 
 const communityLibraryLinkInNavbarSelector =
   '.e2e-test-topnb-go-to-community-library-link';
@@ -111,6 +124,17 @@ const playVoiceoverButton = '.e2e-test-play-circle';
 const voiceoverDropdown = '.e2e-test-audio-bar';
 const pauseVoiceoverButton = '.e2e-test-pause-circle';
 
+// Topic page.
+const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
+const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
+const practiceTabLink = '.e2e-test-practice-tab-link';
+const practiceContainer = '.e2e-test-practice-tab-container';
+const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
+const practiceSessionContainerSelector = 'practice-session-page';
+const startPracticeButtonSelector = '.e2e-test-practice-start-button';
+const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
+const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Changes the language of the lesson.
@@ -139,6 +163,17 @@ export class LoggedOutUser extends BaseUser {
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Click on create account button in save progress modal
+   */
+  async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector);
+    await this.waitForElementToStabilize(lessonInfoSignUpButtonSelector);
+    await this.clickOnElementWithSelector(lessonInfoSignUpButtonSelector);
+
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector, false);
   }
 
   /**
@@ -385,6 +420,73 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Continue to next practice question
+   */
+  async continueToNextPracticeQuestion(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    await this.expectElementToBeVisible(currentCardContentSelector);
+
+    const initialHeading = await this.page.$eval(
+      practiceQuestionHeaderSelector,
+      el => el?.textContent?.trim() ?? ''
+    );
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        await this.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    await this.page.waitForFunction(
+      ({selector, heading}: {selector: string; heading: string}) => {
+        const element = document.querySelector(selector);
+        // In case of last question, the element should be hidden,
+        // else it should have different heading.
+        return !element || element.textContent?.trim() !== heading;
+      },
+      {selector: practiceQuestionHeaderSelector, heading: initialHeading},
+      {timeout: 60000}
+    );
+  }
+
+  /**
+   * Copies the progress URL to the clipboard and returns the copied text. (To be used when save progress modal is opened.)
+   */
+  async copyProgressUrl(): Promise<string> {
+    try {
+      // OverridePermissions is used to allow clipboard access.
+      await this.page
+        .context()
+        .grantPermissions(['clipboard-read', 'clipboard-write'], {
+          origin: 'http://localhost:8181',
+        });
+
+      // Click on the copy button.
+      await this.waitForPageToFullyLoad();
+      await this.expectElementToBeVisible(copyProgressUrlButton);
+      await this.clickOnElementWithSelector(copyProgressUrlButton);
+
+      // Reading the clipboard data.
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the exploration URL.');
+      }
+
+      return clipboardData;
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Expands the voiceover bar by clicking on the dropdown.
    */
   async expandVoiceoverBar(): Promise<void> {
@@ -547,7 +649,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if button with "left arrow" icon is present to move back to previous lesson card.
-   * @param visibility - Boolean value representing should be visible or not.
+   * @param {boolean} visibility - Boolean value representing should be visible or not.
    */
   async expectGoBackToPreviousCardButton(
     visibility: boolean = true
@@ -556,8 +658,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if the lesson info modal header matches the expected header.
+   * @param {string} header - The expected header.
+   */
+  async expectLessonInfoModalHeaderToBe(header: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalHeaderSelector);
+    await this.expectTextContentToMatch(lessonInfoModalHeaderSelector, header);
+  }
+
+  /**
    * Checks if the lesson info text is present.
-   * @param lessonText - The expected lesson info text.
+   * @param {string} lessonText - The expected lesson info text.
    */
   async expectLessonInfoTextToBe(lessonText: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -568,6 +679,81 @@ export class LoggedOutUser extends BaseUser {
       lessonInfoTextSelector,
       lessonText
     );
+  }
+
+  /**
+   * Checks if the progress reminder modal text matches the expected text.
+   * @param {string} expectedText - The expected text.
+   */
+  async expectProgressReminderModalTextToBe(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(progressReminderModalHeaderSelector);
+    await this.expectTextContentToMatch(
+      progressReminderModalHeaderSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the save progress button is visible.
+   */
+  async expectSaveProgressButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(saveProgressButton);
+  }
+
+  /**
+   * Checks if the sign-in button is present on the page.
+   */
+  async expectSignInButtonToBePresent(present: boolean = true): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    try {
+      await this.expectElementToBeVisible(signInButton, true, this.page, 5000);
+    } catch (error) {
+      try {
+        await this.page.waitForSelector(singInButtonInProgressModal, {
+          timeout: 5000,
+        });
+
+        showMessage('Sign-in button present.');
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('Timeout') &&
+          !present
+        ) {
+          showMessage('Sign-in button not present.');
+          return;
+        }
+
+        throw new Error(
+          'Sign-in button not found.\n' +
+            `Original error: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
+
+    if (!present) {
+      throw new Error('Sign-in button is present, expected to be absent.');
+    }
+  }
+
+  /**
+   * Expects the subtopics in the practice tab to contain the expected subtopics.
+   * @param {string[]} subtopicNames The expected subtopics.
+   */
+  async expectSubtopicListInPracticeTabToContain(
+    subtopicNames: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(subtopicListItemInPracticeTabSelector);
+    const subtopicsInList = await this.page.$$eval(
+      subtopicListItemInPracticeTabSelector,
+      subtopics => subtopics.map(subtopic => subtopic.textContent?.trim())
+    );
+
+    for (const subtopicName of subtopicNames) {
+      expect(subtopicsInList).toContain(subtopicName);
+    }
   }
 
   /**
@@ -605,6 +791,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expects the tab title in the topic page to be the expected tab title.
+   * @param {string} expectedTabTitle The expected tab title.
+   */
+  async expectTabTitleInTopicPageToBe(expectedTabTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(tabTitleInTopicPageSelector);
+
+    await this.page.waitForFunction(
+      ({
+        selector,
+        expectedTabTitle,
+      }: {
+        selector: string;
+        expectedTabTitle: string;
+      }) => {
+        const tabTitle = document.querySelector(selector)?.textContent?.trim();
+        return tabTitle === expectedTabTitle;
+      },
+      {selector: tabTitleInTopicPageSelector, expectedTabTitle},
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Checks if the text content of an element matches the expected value.
    * @param {string} selector - The CSS selector to find the element.
    * @param {string} value - The expected text content value.
@@ -634,6 +843,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that the user is currently in a practice session.
+   */
+  async expectToBeInPracticeSession(): Promise<void> {
+    expect(await this.isElementVisible(practiceSessionContainerSelector)).toBe(
+      true
+    );
+  }
+
+  /**
+   * Function to verify that the user is on the login page.
+   */
+  async expectToBeOnLoginPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        const currentURL = window.location.href;
+        return currentURL.includes(url);
+      },
+      testConstants.URLs.Login,
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Verifies that the current page URL includes the expected page pathname.
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
@@ -648,6 +880,13 @@ export class LoggedOutUser extends BaseUser {
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
     }
+  }
+
+  /**
+   * Expects the profile picture to be present.
+   */
+  async expectProfilePictureToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(profilePictureSelector);
   }
 
   /**
@@ -908,7 +1147,30 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Goes through the sign up process.
+   * @param {string} email - The email to sign up with.
+   * @param {string} username - The username to sign up with.
+   */
+  async goThroughSignUpProcess(email: string, username: string): Promise<void> {
+    await this.expectElementToBeVisible(testConstants.SignInDetails.inputField);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
+    await this.clickOnElementWithText('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle'});
+    await this.typeInInputField('input.e2e-test-username-input', username);
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-agree-to-terms-checkbox'
+    );
+    await this.expectElementToBeVisible(
+      'button.e2e-test-register-user:not([disabled])'
+    );
+    await this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON);
+    await this.page.waitForNavigation({waitUntil: 'networkidle'});
+    await this.expectElementToBeVisible('button.e2e-test-register-user', false);
+  }
+
+  /**
    * Function to navigate to the classroom page.
+   * @param {string} urlFragment - The URL fragment for the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
     await this.goto(`${classroomsPageUrl}/${urlFragment}`);
@@ -950,6 +1212,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Navigates to the community library page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
   async navigateToCommunityLibraryPage(
     verifyURL: boolean = true
@@ -963,6 +1226,29 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToHome(verifyURL: boolean = true): Promise<void> {
     await this.goto(homeUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the practice tab in the topic page.
+   */
+  async navigateToPracticeTabInTopic(): Promise<void> {
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.reloadPage();
+      await this.expectElementToBeVisible(practiceTabLink);
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.expectElementToBeVisible(practiceContainer);
+    await this.expectElementToBeVisible(practiceTabButtonSelector);
+    await this.clickOnElementWithSelector(practiceTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(practiceTabContainerSelector);
+
+    showMessage('Navigated to practice tab in topic page.');
   }
 
   /**
@@ -1143,6 +1429,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Saves the progress.(To be used when save progress modal is opened.)
+   */
+  async saveProgress(): Promise<void> {
+    await this.expectElementToBeVisible(saveProgressButton);
+
+    // TODO(#26357): Remove this wait once the frontend race condition is fixed.
+    // The saveProgressBtnTooltipSelector div is rendered directly below the
+    // button in a flex column when checkpointStatusArray[0] === 'in-progress'.
+    // This happens when the modal opens before Angular's async checkpoint
+    // service has updated completedCheckpointsCount. While the tooltip is
+    // present, elementFromPoint at the button's center returns the tooltip div
+    // instead of the button, causing waitForElementToBeClickable to time out.
+    // We wait here until the tooltip disappears (i.e. completedCheckpointsCount
+    // has been updated to reflect the reached checkpoint).
+    await this.expectElementToBeVisible(saveProgressBtnTooltipSelector, false);
+
+    await this.clickOnElementWithSelector(saveProgressButton);
+
+    await this.expectElementToBeVisible(signInBoxInSaveProressModalSelector);
+  }
+
+  /**
    * Searches for a lesson in the search bar present in the community library.
    * @param {string} lessonName - The name of the lesson to search for.
    */
@@ -1266,6 +1574,59 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.expectElementToBeVisible(loginPromptContainer, false);
+  }
+
+  /**
+   * Starts an exploration with a progress URL.
+   * @param {string} progressUrl - The URL to navigate to.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async startExplorationUsingProgressUrl(
+    progressUrl: string,
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(progressUrl, verifyURL);
+  }
+
+  /**
+   * Starts a practice session for the given subtopics.
+   * @param {string[]} subtopicNames - The names of the subtopics to start a practice session for.
+   */
+  async startPracticeSession(subtopicNames: string[]): Promise<void> {
+    await this.expectElementToBeVisible(subtopicListItemInPracticeTabSelector);
+
+    const subtopicElements = await this.page.$$(
+      subtopicListItemInPracticeTabSelector
+    );
+
+    const subtopicsAdded = new Set<string>();
+
+    for (const subtopicElement of subtopicElements) {
+      const subtopicName = await subtopicElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (!subtopicName) {
+        continue;
+      }
+      if (subtopicNames.includes(subtopicName)) {
+        const labelElement = await subtopicElement.$('label');
+
+        if (labelElement) {
+          await this.clickOnElement(labelElement);
+          await this.page.waitForFunction(
+            (element: HTMLInputElement | null) => element?.checked === true,
+            await labelElement.$('input'),
+            {timeout: 60000}
+          );
+
+          subtopicsAdded.add(subtopicName);
+        }
+      }
+    }
+
+    await this.expectElementToBeVisible(startPracticeButtonSelector);
+    await this.clickOnElementWithSelector(startPracticeButtonSelector);
+    await this.expectElementToBeVisible(startPracticeButtonSelector, false);
   }
 
   /**

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * CL.5 Subscribe to a favourite creator
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -26,25 +27,33 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Community Library Browser', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Community Library Browser', function () {
   let communityLibraryBrowser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: ExplorationEditor & CurriculumAdmin;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(500000); // Setup takes longer than the default timeout.
+
     communityLibraryBrowser = await UserFactory.createNewUser(
       'communityLibraryBrowser',
-      'community_library_browser@example.com'
+      'community_library_browser@example.com',
+      browser
     );
     curriculumAdmin = await UserFactory.createNewUser(
       'currAdm',
       'curriculum_adm@example.com',
+      browser,
       [testConstants.Roles.CURRICULUM_ADMIN]
     );
 
     const explorationId =
       await curriculumAdmin.createAndPublishExplorationWithCards(
         'Solving problems without calculator',
-        'Algebra'
+        'Algebra',
+        2,
+        true
       );
 
     await curriculumAdmin.createAndPublishTopic(
@@ -64,9 +73,9 @@ describe('Community Library Browser', function () {
       'math',
       'Fractions'
     );
-  }, 500000);
+  });
 
-  it('should be able to subscribe to creators', async function () {
+  test('should be able to subscribe to creators', async function () {
     // Start a community lesson.
     await communityLibraryBrowser.navigateToClassroomPage('math');
     await communityLibraryBrowser.selectAndOpenTopic('Fractions');
@@ -86,7 +95,7 @@ describe('Community Library Browser', function () {
     await communityLibraryBrowser.expectSubscribedCreatorsToContain('currAdm');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

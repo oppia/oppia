@@ -36,6 +36,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Subscription} from 'rxjs';
+import './state-content-editor.component.css';
 
 interface HTMLSchema {
   type: string;
@@ -48,6 +49,7 @@ interface HTMLSchema {
 @Component({
   selector: 'oppia-state-content-editor',
   templateUrl: './state-content-editor.component.html',
+  styleUrls: ['./state-content-editor.component.css'],
 })
 export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();
