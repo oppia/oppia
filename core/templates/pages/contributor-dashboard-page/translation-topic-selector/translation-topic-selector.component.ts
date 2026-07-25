@@ -28,6 +28,7 @@ import {
 } from '@angular/core';
 
 import {AppConstants} from 'app.constants';
+import './translation-topic-selector.component.css';
 import {
   ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len
@@ -36,6 +37,7 @@ import {
 @Component({
   selector: 'translation-topic-selector',
   templateUrl: './translation-topic-selector.component.html',
+  styleUrls: ['./translation-topic-selector.component.css'],
 })
 export class TranslationTopicSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
