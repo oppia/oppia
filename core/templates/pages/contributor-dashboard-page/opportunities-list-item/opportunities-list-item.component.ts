@@ -103,6 +103,7 @@ export class OpportunitiesListItemComponent {
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;
+  tooltipText: string = 'All available translations are currently in review.';
 
   ngOnInit(): void {
     this.onMobile =
@@ -164,6 +165,20 @@ export class OpportunitiesListItemComponent {
             this.opportunity.translationsCount +
               this.opportunity.inReviewCount ===
             this.opportunity.totalCount;
+
+          if (this.opportunityButtonDisabled) {
+            // @ts-ignore
+            if (
+              this.opportunity.reviewerOnlyContentCount > 0 &&
+              this.cardsAvailable === 0
+            ) {
+              this.tooltipText =
+                'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.';
+            } else {
+              this.tooltipText =
+                'All available translations are currently in review.';
+            }
+          }
         } else {
           this.progressBarStyle = {width: this.progressPercentage};
         }

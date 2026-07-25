@@ -146,6 +146,15 @@ export class TranslationOpportunitiesComponent {
       windowClass: 'forced-modal-stack',
     });
     modalRef.componentInstance.opportunity = opportunity;
+
+    modalRef.result.then(
+      () => {
+        this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+      },
+      () => {
+        this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+      }
+    );
   }
 
   ngOnInit(): void {
