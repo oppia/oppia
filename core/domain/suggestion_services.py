@@ -82,10 +82,8 @@ if MYPY:  # pragma: no cover
         suggestion_registry.SuggestionAddQuestion,
     ]
 
-(feedback_models, suggestion_models, user_models) = (
-    models.Registry.import_models(
-        [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
-    )
+feedback_models, suggestion_models, user_models = models.Registry.import_models(
+    [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
 )
 
 transaction_services = models.Registry.import_transaction_services()
@@ -1125,6 +1123,36 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
         feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG,
     )
+
+
+def auto_reject_translation_suggestions_for_skill_ids(
+    skill_ids: List[str],
+) -> None:
+    """Rejects all translation suggestions with target IDs matching the
+    supplied skill IDs. These suggestions are being rejected because
+    their corresponding skill was removed or deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
+
+    Args:
+        skill_ids: list(str). The skill IDs corresponding to the target IDs
+            of the translation suggestions.
+    """
+    for skill_id in skill_ids:
+        suggestions = query_suggestions(
+            [
+                ('suggestion_type', feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                ('target_type', feconf.ENTITY_TYPE_SKILL),
+                ('target_id', skill_id),
+                ('status', suggestion_models.STATUS_IN_REVIEW),
+            ]
+        )
+        if suggestions:
+            suggestion_ids = [s.suggestion_id for s in suggestions]
+            reject_suggestions(
+                suggestion_ids,
+                feconf.SUGGESTION_BOT_USER_ID,
+                suggestion_models.DELETED_SKILL_REJECT_MESSAGE,
+            )
 
 
 def auto_reject_translation_suggestions_for_content_ids(

@@ -64,7 +64,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(suggestion_models, feedback_models, opportunity_models, user_models) = (
+suggestion_models, feedback_models, opportunity_models, user_models = (
     models.Registry.import_models(
         [
             models.Names.SUGGESTION,
@@ -5855,6 +5855,40 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         skill_services.delete_skill(self.author_id, skill_id)
 
         # Suggestion should be rejected after corresponding skill is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)]
+        )
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED
+        )
+
+    def test_auto_reject_translation_suggestions_for_skill_ids(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Explanation',
+            'content_id': 'explanation',
+            'language_code': 'hi',
+            'content_html': '<p>Explanation</p>',
+            'translation_html': '<p>Hindi Explanation</p>',
+            'data_format': 'html',
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            1,
+            self.author_id,
+            change_dict,
+            'Skill translation suggestion',
+        )
+
+        suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
+            [skill_id]
+        )
+
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', skill_id)]
         )

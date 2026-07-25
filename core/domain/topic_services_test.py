@@ -27,6 +27,7 @@ from core.domain import (
     exp_services,
     feature_flag_services,
     fs_services,
+    opportunity_services,
     question_domain,
     rights_manager,
     skill_domain,
@@ -53,10 +54,10 @@ from typing import Dict, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import topic_models
+    from mypy_imports import opportunity_models, topic_models
 
-(topic_models, story_models) = models.Registry.import_models(
-    [models.Names.TOPIC, models.Names.STORY]
+opportunity_models, topic_models, story_models = models.Registry.import_models(
+    [models.Names.OPPORTUNITY, models.Names.TOPIC, models.Names.STORY]
 )
 
 
@@ -2537,6 +2538,31 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_commit_log_entry.commit_message,
             'Removed %s from uncategorized skill ids' % self.skill_id_1,
         )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_add_and_delete_uncategorized_skill_with_new_models(self) -> None:
+        self.save_new_skill(
+            'skill_id_3', self.user_id_admin, description='Skill 3'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_3'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_3', strict=False
+        )
+        self.assertIsNotNone(model)
+
+        topic_services.delete_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_3'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_3', strict=False
+        )
+        self.assertIsNone(model)
 
     def test_delete_canonical_story(self) -> None:
         topic_services.delete_canonical_story(

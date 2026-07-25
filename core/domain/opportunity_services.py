@@ -899,6 +899,56 @@ def _create_exploration_opportunities(
         )
 
 
+def add_new_skill_opportunities(topic_id: str, skill_ids: List[str]) -> None:
+    """Creates new skill translation opportunities corresponding to the supplied
+    topic and skill IDs.
+
+    Args:
+        topic_id: str. ID of the topic.
+        skill_ids: list(str). A list of skill IDs for which new translation
+            opportunities are to be created.
+    """
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: skill_ids}, topic_ids=[topic_id]
+        )
+
+
+def update_skill_opportunity_on_skill_change(skill_id: str) -> None:
+    """Updates the skill translation opportunity model when skill contents
+    or misconceptions change.
+
+    Args:
+        skill_id: str. The skill ID.
+    """
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        model_id = f'{feconf.ENTITY_TYPE_SKILL}.{skill_id}'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        if model is not None:
+            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            if skill is not None:
+                content_count = skill.get_content_count()
+                translation_counts = (
+                    translation_services.get_translation_counts(
+                        feconf.TranslatableEntityType.SKILL, skill
+                    )
+                )
+                compute_translation_opportunity_models_with_updated_entity(
+                    feconf.ENTITY_TYPE_SKILL,
+                    skill_id,
+                    content_count,
+                    translation_counts,
+                )
+
+
 def compute_opportunity_models_with_updated_exploration(
     exp_id: str, content_count: int, translation_counts: Dict[str, int]
 ) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:

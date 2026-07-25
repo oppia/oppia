@@ -18,9 +18,10 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
+    opportunity_services,
     question_domain,
     skill_domain,
     skill_fetchers,
@@ -40,10 +41,12 @@ from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import question_models, skill_models
+    from mypy_imports import opportunity_models, question_models, skill_models
 
-(skill_models, question_models) = models.Registry.import_models(
-    [models.Names.SKILL, models.Names.QUESTION]
+opportunity_models, skill_models, question_models = (
+    models.Registry.import_models(
+        [models.Names.OPPORTUNITY, models.Names.SKILL, models.Names.QUESTION]
+    )
 )
 
 SuggestionChangeDictType = Dict[
@@ -1117,6 +1120,28 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill_services.get_skill_summary_by_id(self.SKILL_ID, strict=False),
             None,
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_skill_deletes_v2_translation_opportunity(self) -> None:
+        opportunity_services.add_new_skill_opportunities(
+            'topic_id', [self.SKILL_ID]
+        )
+        model_id = f'skill.{self.SKILL_ID}'
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                model_id, strict=False
+            )
+        )
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                model_id, strict=False
+            )
         )
 
     def test_delete_skill_marked_deleted(self) -> None:

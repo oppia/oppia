@@ -1555,6 +1555,23 @@ def delete_uncategorized_skill(
         change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id,
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        all_topics = topic_fetchers.get_all_topics()
+        skill_in_other_topic = any(
+            topic.id != topic_id
+            and uncategorized_skill_id in topic.get_all_skill_ids()
+            for topic in all_topics
+        )
+        if not skill_in_other_topic:
+            opportunity_services.delete_translation_opportunities(
+                {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]}
+            )
+            suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
+                [uncategorized_skill_id]
+            )
 
 
 def add_uncategorized_skill(
@@ -1581,6 +1598,9 @@ def add_uncategorized_skill(
         topic_id,
         change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id,
+    )
+    opportunity_services.add_new_skill_opportunities(
+        topic_id, [uncategorized_skill_id]
     )
 
 
@@ -1949,6 +1969,30 @@ def delete_topic(
             topic_id
         )
     )
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        if topic is not None:
+            topic_skills = topic.get_all_skill_ids()
+            all_other_topics = [
+                t for t in topic_fetchers.get_all_topics() if t.id != topic_id
+            ]
+            skills_to_clean_up = [
+                skill_id
+                for skill_id in topic_skills
+                if not any(
+                    skill_id in t.get_all_skill_ids() for t in all_other_topics
+                )
+            ]
+            if skills_to_clean_up:
+                opportunity_services.delete_translation_opportunities(
+                    {feconf.ENTITY_TYPE_SKILL: skills_to_clean_up}
+                )
+                suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
+                    skills_to_clean_up
+                )
 
 
 def delete_topic_summary(topic_id: str) -> None:

@@ -2581,3 +2581,50 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             'exp_1'
         )
         self.assertNotIn('hi', model.incomplete_translation_language_codes)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_add_new_skill_opportunities(self) -> None:
+        opportunity_services.add_new_skill_opportunities(
+            'topic_id_1', ['skill_id_1']
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_1'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_update_skill_opportunity_on_skill_change(self) -> None:
+        opportunity_services.add_new_skill_opportunities(
+            'topic_id_1', ['skill_id_1']
+        )
+        opportunity_services.update_skill_opportunity_on_skill_change(
+            'skill_id_1'
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNotNone(model)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_update_skill_opportunity_on_skill_change_nonexistent_does_nothing(
+        self,
+    ) -> None:
+        opportunity_services.update_skill_opportunity_on_skill_change(
+            'nonexistent_skill'
+        )
