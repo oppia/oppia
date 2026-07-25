@@ -1028,12 +1028,12 @@ class DocstringParameterChecker(checkers.BaseChecker):
         ) and not node.is_generator():
             self.add_message('redundant-yields-doc', node=node)
 
-    def visit_raise(self, node: astroid.scoped_nodes.FunctionDef) -> None:
+    def visit_raise(self, node: astroid.node_classes.Raise) -> None:
         """Visits a function node that raises an exception and verifies that all
         exceptions raised in the function definition are documented.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node for a function or
+            node: astroid.node_classes.Raise. Node for a function or
                 method definition in the AST.
         """
         func_node = node.frame()
