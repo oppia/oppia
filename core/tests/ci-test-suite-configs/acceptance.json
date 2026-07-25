@@ -372,8 +372,8 @@
     },
     {
       "name": "logged-out-learner/pick-a-lesson-to-learn",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/search-for-a-specific-exploration",

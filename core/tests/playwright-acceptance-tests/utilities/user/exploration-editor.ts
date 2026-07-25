@@ -42,6 +42,7 @@ const solutionInputTextArea =
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -496,6 +497,17 @@ export class ExplorationEditor extends BaseUser {
     );
     await this.clickOnElementWithSelector(submitSolutionButton);
     await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
+   * Add a text input interaction to the card.
+   */
+  async addTextInputInteraction(): Promise<void> {
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithSelector(textInputInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Text input interaction has been added successfully.');
   }
 
   /**
