@@ -27,7 +27,7 @@ import './collection-local-nav.component.css';
 @Component({
   selector: 'collection-local-nav',
   templateUrl: './collection-local-nav.component.html',
-  styleUrls: [],
+  styleUrls: ['./collection-local-nav.component.css'],
 })
 export class CollectionLocalNavComponent implements OnInit, OnDestroy {
   canEdit: boolean = false;

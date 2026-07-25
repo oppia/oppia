@@ -22,7 +22,7 @@ import './collection-settings-tab.component.css';
 @Component({
   selector: 'collection-settings-tab',
   templateUrl: './collection-settings-tab.component.html',
-  styleUrls: [],
+  styleUrls: ['./collection-settings-tab.component.css'],
 })
 export class CollectionSettingsTabComponent {
   constructor() {}
