@@ -44,7 +44,8 @@ datastore_services = models.Registry.import_datastore_services()
 def resolve_project_id(pipeline: beam.Pipeline | None) -> str:
     if pipeline is None:
         raise ValueError('pipeline must not be None')
-    return pipeline.options.view_as(pipeline_options.GoogleCloudOptions).project
+    gcp_options = pipeline.options.view_as(pipeline_options.GoogleCloudOptions)
+    return str(gcp_options.project)
 
 
 # Here we use type Any because argument 'new_values' can accept arbitrary

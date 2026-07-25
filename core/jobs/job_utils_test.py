@@ -57,14 +57,14 @@ class CoreModel(base_models.BaseModel):
 
 class ResolveProjectIdTests(test_utils.TestBase):
 
-    def test_pipeline_with_valid_options_returns_project_id(self):
+    def test_pipeline_with_valid_options_returns_project_id(self) -> None:
         with self.swap_to_always_return(
             app_identity_services, 'get_application_id', 'LOL'
         ):
             pipeline = beam.Pipeline(options=job_options.JobOptions())
             self.assertEquals(job_utils.resolve_project_id(pipeline), 'LOL')
 
-    def test_none_pipeline_raises_value_error(self):
+    def test_none_pipeline_raises_value_error(self) -> None:
         with self.assertRaisesRegexp(ValueError, 'must not be None'):
             job_utils.resolve_project_id(None)
 

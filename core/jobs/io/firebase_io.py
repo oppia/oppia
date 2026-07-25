@@ -240,13 +240,12 @@ class _ConnectedDoFn(beam.DoFn):  # type: ignore[misc]
         super().__init__()
         self.project_id = project_id
 
-    def setup(self):
+    def setup(self) -> None:
         super().setup()
         firebase_auth_services.establish_firebase_connection(self.project_id)
 
 
-# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class _ExportFirebaseRecords(_ConnectedDoFn):  # type: ignore[misc]
+class _ExportFirebaseRecords(_ConnectedDoFn):
     """Exports all Firebase records directly from the Firebase server."""
 
     def process(self, _: None) -> abc.Iterable[firebase_domain.FirebaseRecord]:
@@ -275,7 +274,7 @@ class _BatchedDoFn(_ConnectedDoFn, Generic[_InputT, _OutputT]):
     def process(
         self,
         inputs: list[_InputT],
-        batch_processing_fn: Callable[[_InputT], _OutputT],
+        batch_processing_fn: Callable[[list[_InputT]], _OutputT],
     ) -> abc.Iterator[pvalue.TaggedOutput]:
         """Common batch processing logic for Firebase Admin SDK operations."""
         if not inputs:
