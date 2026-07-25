@@ -99,14 +99,26 @@
       </div>
     </div>
     <div class="oppia-translation-error-section">
-      <div *ngIf="isFormulaAsText(activeWrittenTranslation)" class="alert alert-warning e2e-test-formula-as-text-warning">
-        <i class="fas fa-exclamation-triangle mr-1"></i>
-        <span>
-          <strong>Warning:</strong>
-          Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using the
-          <strong>Math Formula (x²)</strong>
-          tool from the editor toolbar above.
-        </span>
+      <div *ngIf="isFormulaAsText(activeWrittenTranslation)" class="alert alert-warning e2e-test-formula-as-text-warning d-flex justify-content-between align-items-center">
+        <div *ngIf="!mathWarningIsMinimized">
+          <i class="fas fa-exclamation-triangle mr-1"></i>
+          <span>
+            <strong>Warning:</strong>
+            Plain-text math formulas may render scrambled in Right-to-Left (RTL) languages. We strongly recommend using the
+            <strong>Math Formula (x²)</strong>
+            tool from the editor toolbar above.
+          </span>
+        </div>
+        <div *ngIf="mathWarningIsMinimized">
+          <i class="fas fa-exclamation-triangle mr-2" title="Plain-text math expressions detected."></i>
+          <span class="d-none d-sm-inline">&nbsp;Math expression warning</span>
+        </div>
+        <i class="fas"
+           [ngClass]="mathWarningIsMinimized ? 'fa-angle-down' : 'fa-angle-up'"
+           (click)="toggleMathWarning()"
+           style="cursor: pointer;"
+           [title]="mathWarningIsMinimized ? 'Expand warning' : 'Minimize warning'">
+        </i>
       </div>
       <p *ngIf="hasImgCopyError">
         All images should be copied.

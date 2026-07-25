@@ -115,6 +115,7 @@ export class TranslationModalComponent {
   @Input() modifyTranslationOpportunity!: ModifyTranslationOpportunity;
   activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
+  mathWarningIsMinimized: boolean = false;
   activeContentType!: string;
   activeRuleDescription!: string;
   uploadingTranslation: boolean = false;
@@ -457,6 +458,10 @@ export class TranslationModalComponent {
       return false;
     }
     return this.mathFormulaDetectionService.isFormulaAsText(htmlString);
+  }
+
+  toggleMathWarning(): void {
+    this.mathWarningIsMinimized = !this.mathWarningIsMinimized;
   }
 
   isCopyModeActive(): boolean {

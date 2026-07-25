@@ -206,6 +206,16 @@ describe('StateHintsEditorComponent', () => {
     });
   });
 
+  describe('toggleMathWarning', () => {
+    it('should toggle mathWarningIsMinimized', () => {
+      expect(component.mathWarningIsMinimized).toBeFalse();
+      component.toggleMathWarning();
+      expect(component.mathWarningIsMinimized).toBeTrue();
+      component.toggleMathWarning();
+      expect(component.mathWarningIsMinimized).toBeFalse();
+    });
+  });
+
   describe('when saving or submitting formula as text', () => {
     it('should save content directly when onSaveContentButtonClicked is called', () => {
       spyOn(component, 'saveContent');

@@ -1609,5 +1609,15 @@ describe('Translation Modal Component', () => {
         expect(component.activeModal.close).not.toHaveBeenCalled();
       }));
     });
+
+    describe('toggleMathWarning', () => {
+      it('should toggle mathWarningIsMinimized', () => {
+        expect(component.mathWarningIsMinimized).toBeFalse();
+        component.toggleMathWarning();
+        expect(component.mathWarningIsMinimized).toBeTrue();
+        component.toggleMathWarning();
+        expect(component.mathWarningIsMinimized).toBeFalse();
+      });
+    });
   });
 });

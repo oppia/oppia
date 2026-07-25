@@ -56,6 +56,7 @@ export class StateContentEditorComponent implements OnInit {
   @Input() stateContentPlaceholder!: string;
   @Input() stateContentSaveButtonPlaceholder!: string;
   cardHeightLimitWarningIsShown!: boolean;
+  mathWarningIsMinimized: boolean = false;
   contentId!: string | null;
   contentEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
@@ -143,6 +144,10 @@ export class StateContentEditorComponent implements OnInit {
 
   isFormulaAsText(htmlString: string | string[]): boolean {
     return this.mathFormulaDetectionService.isFormulaAsText(htmlString);
+  }
+
+  toggleMathWarning(): void {
+    this.mathWarningIsMinimized = !this.mathWarningIsMinimized;
   }
 
   onSaveContentButtonClicked(): void {
