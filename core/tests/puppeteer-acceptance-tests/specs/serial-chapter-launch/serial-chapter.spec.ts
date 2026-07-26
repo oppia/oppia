@@ -94,6 +94,7 @@ describe('Logged-In Learner', function () {
       'Place Values subtopics',
       'Place Values skills'
     );
+    await curriculumAdmin.createQuestionsForSkill('Place Values skills', 7);
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
     await curriculumAdmin.publishClassroom('Math');
 

@@ -209,9 +209,9 @@
                         <div class="arc-boundary-info">
                           <div class="arc-boundary-title-row">
                             <span class="arc-boundary-flag-badge"
-                                  [style.background-color]="getArcColorForNode(node.getId()).flagBg"
+                                  [style.background-color]="getArcColorForNode(node.getId()).iconBg"
                                   aria-hidden="true">
-                              <i class="fa fa-flag"></i>
+                              <i class="fa fa-book"></i>
                             </span>
                             <span class="arc-boundary-title">
                               {{ getArcForNode(node.getId()).getTitle() }}
@@ -228,13 +228,13 @@
                           <button type="button" class="btn btn-sm arc-edit-button"
                                   (click)="onEditArcClick(node.getId());$event.stopPropagation()">
                             <i class="fas fa-pen" aria-hidden="true"></i>
-                            Edit Arc
+                            Edit Adventure
                           </button>
                           <button type="button" class="btn btn-sm arc-remove-button"
                                   *ngIf="!isFirstArc(node.getId())"
                                   (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
                             <i class="far fa-trash-alt" aria-hidden="true"></i>
-                            Remove Arc Boundary
+                            Remove Adventure Boundary
                           </button>
                         </div>
                       </div>
@@ -246,7 +246,7 @@
                         <button type="button" class="btn btn-sm split-into-arc-button"
                                 (click)="splitIntoArc(idx);$event.stopPropagation()">
                           <i class="fas fa-cut"></i>
-                          Split Into Arc
+                          Split Into Adventure
                         </button>
                         <div class="split-line"></div>
                       </div>
@@ -455,8 +455,8 @@
                              [style.border-color]="getArcColorForNode(node.getId()).headerBorder">
                           <div class="arc-header-left">
                             <span class="arc-flag-badge"
-                                  [style.background-color]="getArcColorForNode(node.getId()).flagBg">
-                              <i class="fa fa-flag" aria-hidden="true"></i>
+                                  [style.background-color]="getArcColorForNode(node.getId()).iconBg">
+                              <i class="fa fa-book" aria-hidden="true"></i>
                             </span>
                             <div class="arc-header-text">
                               <span class="arc-header-title">
@@ -474,12 +474,12 @@
                           <div class="arc-header-actions">
                             <button type="button" class="arc-action-btn arc-edit-btn"
                                     (click)="onEditArcClick(node.getId());$event.stopPropagation()">
-                              <i class="fas fa-pen" aria-hidden="true"></i> Edit Arc
+                              <i class="fas fa-pen" aria-hidden="true"></i> Edit Adventure
                             </button>
                             <button type="button" class="arc-action-btn arc-remove-btn"
                                     *ngIf="!isFirstArc(node.getId())"
                                     (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
-                              <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Arc Boundary
+                              <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Adventure Boundary
                             </button>
                           </div>
                         </div>
@@ -492,7 +492,7 @@
                           <div class="arc-split-line"></div>
                           <button type="button" class="arc-split-btn"
                                   (click)="splitIntoArc(idx);$event.stopPropagation()">
-                            <i class="fas fa-cut" aria-hidden="true"></i> Split Into Arc
+                            <i class="fas fa-cut" aria-hidden="true"></i> Split Into Adventure
                           </button>
                           <div class="arc-split-line"></div>
                         </div>
