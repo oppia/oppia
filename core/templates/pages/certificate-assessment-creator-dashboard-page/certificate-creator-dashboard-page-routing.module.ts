@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Routing module for certificate offering dashboard.
+ * @fileoverview Routing module for certificate creator dashboard.
  */
 
 import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 
-import {CertificateOfferingDashboardPageAuthGuard} from './certificate-offering-dashboard-page-auth.guard';
-import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
+import {CertificateCreatorDashboardPageAuthGuard} from './certificate-creator-dashboard-page-auth.guard';
+import {CertificateCreatorDashboardPageRootComponent} from './certificate-creator-dashboard-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: CertificateOfferingDashboardPageRootComponent,
-    canActivate: [CertificateOfferingDashboardPageAuthGuard],
+    component: CertificateCreatorDashboardPageRootComponent,
+    canActivate: [CertificateCreatorDashboardPageAuthGuard],
   },
 ];
 
@@ -34,4 +34,4 @@ const routes: Route[] = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class CertificateOfferingDashboardPageRoutingModule {}
+export class CertificateCreatorDashboardPageRoutingModule {}

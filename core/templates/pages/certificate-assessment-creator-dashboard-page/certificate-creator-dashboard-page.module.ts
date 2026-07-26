@@ -13,31 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for certificate offering dashboard.
+ * @fileoverview Module for certificate Creator dashboard.
  */
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
-import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
-import {CertificateOfferingDashboardPageRoutingModule} from './certificate-offering-dashboard-page-routing.module';
-import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
+import {CertificateCreatorDashboardPageComponent} from './certificate-creator-dashboard-page.component';
+import {CertificateCreatorDashboardPageRoutingModule} from './certificate-creator-dashboard-page-routing.module';
+import {CertificateCreatorDashboardPageRootComponent} from './certificate-creator-dashboard-page-root.component';
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 
 @NgModule({
   imports: [
     SharedComponentsModule,
     CommonModule,
-    CertificateOfferingDashboardPageRoutingModule,
+    CertificateCreatorDashboardPageRoutingModule,
   ],
   declarations: [
-    CertificateOfferingDashboardPageRootComponent,
-    CertificateOfferingDashboardPageComponent,
+    CertificateCreatorDashboardPageRootComponent,
+    CertificateCreatorDashboardPageComponent,
     DeleteCertificateOfferingModalComponent,
   ],
   entryComponents: [
-    CertificateOfferingDashboardPageRootComponent,
-    CertificateOfferingDashboardPageComponent,
+    CertificateCreatorDashboardPageRootComponent,
+    CertificateCreatorDashboardPageComponent,
     DeleteCertificateOfferingModalComponent,
   ],
 })
-export class CertificateOfferingDashboardPageModule {}
+export class CertificateCreatorDashboardPageModule {}
