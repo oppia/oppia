@@ -1927,6 +1927,8 @@ def delete_topic(
     # Delete the summary of the topic (regardless of whether
     # force_deletion is True or not).
     delete_topic_summary(topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
@@ -1973,7 +1975,6 @@ def delete_topic(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is not None:
             topic_skills = topic.get_all_skill_ids()
             all_other_topics = [

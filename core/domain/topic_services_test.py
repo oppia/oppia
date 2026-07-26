@@ -27,7 +27,6 @@ from core.domain import (
     exp_services,
     feature_flag_services,
     fs_services,
-    opportunity_services,
     question_domain,
     rights_manager,
     skill_domain,
@@ -2564,6 +2563,44 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(model)
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_uncategorized_skill_when_skill_in_another_topic_with_new_models(
+        self,
+    ) -> None:
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.user_id,
+            name='Topic Two',
+            description='Description',
+            url_fragment='topic-two',
+        )
+        self.save_new_skill(
+            'skill_id_4', self.user_id_admin, description='Skill 4'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_4'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, topic_id_2, 'skill_id_4'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_4', strict=False
+        )
+        self.assertIsNotNone(model)
+
+        topic_services.delete_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_4'
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_4', strict=False
+        )
+        self.assertIsNotNone(model)
+
     def test_delete_canonical_story(self) -> None:
         topic_services.delete_canonical_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1
@@ -2695,6 +2732,59 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             suggestion_services.get_suggestion_by_id(
                 suggestion.suggestion_id, strict=False
+            )
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_delete_topic_with_new_models(self) -> None:
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.user_id,
+            name='Topic Two',
+            description='Description',
+            url_fragment='topic-two',
+        )
+        self.save_new_skill(
+            'skill_id_5', self.user_id_admin, description='Skill 5'
+        )
+        self.save_new_skill(
+            'skill_id_6', self.user_id_admin, description='Skill 6'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_5'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_6'
+        )
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, topic_id_2, 'skill_id_6'
+        )
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'skill.skill_id_5', strict=False
+            )
+        )
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'skill.skill_id_6', strict=False
+            )
+        )
+
+        topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
+
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'skill.skill_id_5', strict=False
+            )
+        )
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'skill.skill_id_6', strict=False
             )
         )
 
