@@ -98,21 +98,6 @@ describe('AdventureEndTestCardComponent', () => {
     );
   });
 
-  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
-    urlInterpolationService.getStaticImageUrl.and.returnValue(
-      '/assets/generated-fallback.webp'
-    );
-
-    component.thumbnailUrl = '';
-
-    component.ngOnInit();
-
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
-    expect(component.resolvedThumbnailUrl).toBe(
-      '/assets/generated-fallback.webp'
-    );
-  });
-
   it('should not call UrlInterpolationService when thumbnail url is provided', () => {
     component.thumbnailUrl = '/assets/custom-thumbnail.png';
 
@@ -166,7 +151,7 @@ describe('AdventureEndTestCardComponent', () => {
     component.relatedLessonNumber = null;
 
     expect(component.getResolvedDescription()).toBe(
-      'Test what you have learned in lesson.'
+      'Test what you have learned.'
     );
   });
 

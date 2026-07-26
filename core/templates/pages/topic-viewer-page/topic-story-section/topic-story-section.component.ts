@@ -37,7 +37,6 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -194,8 +193,7 @@ export class TopicStorySectionComponent
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
-    private platformFeatureService: PlatformFeatureService,
-    private windowRef: WindowRef
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -472,42 +470,21 @@ export class TopicStorySectionComponent
   }
 
   private getPracticeCardData(): PracticeCardData {
-    const nextArcNumber = Math.min(this.adventureGroups.length, 2);
     const firstArcId =
       this.adventureGroups.length > 0 ? this.adventureGroups[0].arcId : '';
 
     return {
       practiceTitle: 'Adventure 1 Review & Test',
       practiceDescription:
-        'Test what you have learned in Adventure 1 to unlock Adventure ' +
-        nextArcNumber +
-        '.',
+        this.adventureGroups.length > 1
+          ? 'Test what you have learned in Adventure 1 to unlock Adventure 2.'
+          : 'Test what you have learned in Adventure 1.',
       relatedLessonNumber:
         this.lessonCards.length > 0 ? this.lessonCards[0].lessonNumber : null,
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
       practiceUrl: firstArcId ? this.getEndOfArcUrl(firstArcId) : '#',
     };
-  }
-
-  private getPracticeSessionUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-
-    const practiceSubtopicId = this.practiceSubtopicIds[0];
-    if (practiceSubtopicId === undefined) {
-      return '#';
-    }
-
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-        stringified_subtopic_ids: JSON.stringify([practiceSubtopicId]),
-      }
-    );
   }
 
   getLessonPracticeUrl(nodeId: string): string {
@@ -625,23 +602,26 @@ export class TopicStorySectionComponent
 
     this.adventureNavigationGroups = this.adventureGroups
       .map(group => {
-        const publishedLessons = group.lessonCards.filter(
-          card => card.isPublished
+        const visibleLessons = group.lessonCards.filter(
+          card => !card.isComingSoon
         );
 
         return {
-          lessons: publishedLessons.map(card => {
+          lessons: visibleLessons.map(card => {
             return {
               lessonNumber: card.lessonNumber,
             };
           }),
           accentColor: group.accentColor,
-          showPractice: publishedLessons.length > 0,
+          showPractice: visibleLessons.length > 0,
         };
       })
       .filter(group => group.lessons.length > 0);
 
-    if (this.visibleAdventureGroups.length) {
+    if (
+      this.visibleAdventureGroups.length &&
+      this._expandedAdventureIndices.size === 0
+    ) {
       this._expandedAdventureIndices = new Set([0]);
     }
   }

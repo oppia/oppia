@@ -6,8 +6,7 @@
        [ngStyle]="{'background-color': adventureAccentColor}">
     <img class="topic-lesson-card-image"
          [src]="resolvedThumbnailUrl"
-         alt="{{ getThumbnailAltText() }}"
-         title="{{ getThumbnailAltText() }}">
+         alt="{{ getThumbnailAltText() }}">
   </div>
   <div class="topic-lesson-card-content" [class.collapsed]="!isExpanded">
     <div class="topic-lesson-card-copy">
@@ -22,9 +21,11 @@
         <div class="topic-lesson-card-header">
           <div class="topic-lesson-card-title-with-labels">
             <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
-            <span class="topic-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">NEW</span>
+            <span class="topic-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">
+              {{ 'I18N_TOPIC_VIEWER_LESSON_NEW_LABEL' | translate }}
+            </span>
             <span class="topic-lesson-card-coming-soon-label" *ngIf="isComingSoonLesson">
-              COMING SOON
+              {{ 'I18N_TOPIC_VIEWER_LESSON_COMING_SOON_LABEL' | translate }}
             </span>
           </div>
           <p class="topic-lesson-card-description" *ngIf="isExpanded || isComingSoonSectionCard">
@@ -37,8 +38,9 @@
                 [class.disabled-chevron]="isComingSoonSectionCard"
                 [disabled]="isComingSoonSectionCard"
                 (click)="toggleExpanded()"
-                aria-label="Toggle lesson card details">
-          <i class="material-icons">expand_more</i>
+                [attr.aria-expanded]="isExpanded"
+                [attr.aria-label]="'I18N_TOPIC_VIEWER_TOGGLE_LESSON_DETAILS' | translate">
+          <i class="material-icons" aria-hidden="true">expand_more</i>
         </button>
       </div>
     </div>
@@ -78,14 +80,14 @@
                     type="button"
                     [disabled]="isComingSoonLesson || (!practiceUrl && !startUrl)"
                     (click)="onPracticeButtonClick()">
-              <i class="material-icons topic-lesson-card-btn-icon">edit</i>
+              <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">edit</i>
               {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
             </button>
             <button class="topic-lesson-card-secondary-button"
                     type="button"
                     [disabled]="isComingSoonLesson || (!studyUrl && !startUrl)"
                     (click)="onStudyButtonClick()">
-              <i class="material-icons topic-lesson-card-btn-icon">menu_book</i>
+              <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">menu_book</i>
               {{ 'I18N_TOPIC_VIEWER_STUDY_BUTTON' | translate }}
             </button>
           </div>
@@ -93,7 +95,7 @@
                   type="button"
                   [disabled]="isComingSoonLesson || !startUrl"
                   (click)="onStartButtonClick()">
-            <i class="material-icons topic-lesson-card-btn-icon">play_arrow</i>
+            <i class="material-icons topic-lesson-card-btn-icon" aria-hidden="true">play_arrow</i>
             {{ 'I18N_TOPIC_VIEWER_PLAY_LESSON_BUTTON' | translate }}
           </button>
         </div>

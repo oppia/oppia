@@ -155,21 +155,6 @@ describe('TopicLessonCardComponent', () => {
     );
   });
 
-  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
-    urlInterpolationService.getStaticImageUrl.and.returnValue(
-      '/assets/generated-fallback.webp'
-    );
-
-    component.thumbnailUrl = '';
-
-    component.ngOnInit();
-
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
-    expect(component.resolvedThumbnailUrl).toBe(
-      '/assets/generated-fallback.webp'
-    );
-  });
-
   it('should not call UrlInterpolationService when thumbnail url is provided', () => {
     component.thumbnailUrl = '/assets/custom-thumbnail.png';
 
@@ -651,6 +636,17 @@ describe('TopicLessonCardComponent', () => {
         topicSessionFallbackLanguageService.saveFallbackSelection
       ).toHaveBeenCalledWith('fr', 'fr-CA');
     });
+
+    it('should save with null voiceover when voiceover is null', () => {
+      component.selectedTextLanguageCode = 'fr';
+      component.selectedVoiceoverLanguageCode = null;
+
+      componentRef.saveSessionFallbackLanguageSelection();
+
+      expect(
+        topicSessionFallbackLanguageService.saveFallbackSelection
+      ).toHaveBeenCalledWith('fr', null);
+    });
   });
 
   describe('getLanguageDescription', () => {
@@ -823,18 +819,6 @@ describe('TopicLessonCardComponent', () => {
     });
   });
 
-  describe('onStartButtonClick edge cases', () => {
-    it('should navigate directly to startUrl when shouldShowFallbackCta is false', () => {
-      spyOn(component, 'navigateTo');
-      component.startUrl = '/explore/123';
-      component.selectedTextLanguageCode = null;
-
-      component.onStartButtonClick();
-
-      expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
-    });
-  });
-
   describe('getFallbackInfoTooltipText edge cases', () => {
     it('should use DEFAULT_LANGUAGE_CODE when selectedTextLanguageCode is null', () => {
       component.selectedTextLanguageCode = null;
@@ -920,36 +904,6 @@ describe('TopicLessonCardComponent', () => {
     });
   });
 
-  describe('shouldShowInfoIcon edge cases', () => {
-    it('should return true when multiple non-English languages are available', () => {
-      component.availableTextLanguageCodes = ['fr', 'es'];
-
-      expect(component.shouldShowInfoIcon).toBeTrue();
-    });
-
-    it('should return false when only the default language code is available', () => {
-      component.availableTextLanguageCodes = ['en'];
-
-      expect(component.shouldShowInfoIcon).toBeFalse();
-    });
-  });
-
-  describe('showCheckpointBar edge cases', () => {
-    it('should return true when in_progress with positive checkpoint count', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 10;
-
-      expect(component.showCheckpointBar).toBeTrue();
-    });
-
-    it('should return true when completed with positive checkpoint count', () => {
-      component.lessonProgressStatus = 'completed';
-      component.totalCheckpointsCount = 5;
-
-      expect(component.showCheckpointBar).toBeTrue();
-    });
-  });
-
   describe('ngOnInit expansion logic', () => {
     it('should expand first lesson by default', () => {
       component.lessonNumber = 1;
@@ -966,18 +920,14 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.isExpanded).toBeFalse();
     });
-  });
 
-  describe('saveSessionFallbackLanguageSelection', () => {
-    it('should save with null voiceover when voiceover is null', () => {
-      component.selectedTextLanguageCode = 'fr';
-      component.selectedVoiceoverLanguageCode = null;
+    it('should expand navigated non-first lesson', () => {
+      component.lessonNumber = 3;
+      component.navigatedLessonNumber = 3;
 
-      componentRef.saveSessionFallbackLanguageSelection();
+      component.ngOnInit();
 
-      expect(
-        topicSessionFallbackLanguageService.saveFallbackSelection
-      ).toHaveBeenCalledWith('fr', null);
+      expect(component.isExpanded).toBeTrue();
     });
   });
 

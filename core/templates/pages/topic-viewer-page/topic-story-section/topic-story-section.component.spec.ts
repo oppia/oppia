@@ -1122,17 +1122,7 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should mark ready-to-publish lesson as coming soon when serial learner flag is enabled', () => {
-    (
-      component as unknown as {
-        platformFeatureService: {
-          status: {
-            SerialChapterLaunchLearnerView: {
-              isEnabled: boolean;
-            };
-          };
-        };
-      }
-    ).platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+    platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
@@ -1471,12 +1461,16 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should handle adventure navigation practice selected', fakeAsync(() => {
-    spyOn(document, 'getElementById').and.returnValue(null);
+  it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
+    const getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(
+      null
+    );
 
     component.onNavigationPracticeSelected(0);
 
     tick(300);
+
+    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-0');
   }));
 
   it('should select first not_started lesson as active when no in_progress', () => {
@@ -2227,17 +2221,7 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return false from isChapterReadyToPublish when getStatus throws and serial flag enabled', () => {
-    (
-      component as unknown as {
-        platformFeatureService: {
-          status: {
-            SerialChapterLaunchLearnerView: {
-              isEnabled: boolean;
-            };
-          };
-        };
-      }
-    ).platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+    platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',

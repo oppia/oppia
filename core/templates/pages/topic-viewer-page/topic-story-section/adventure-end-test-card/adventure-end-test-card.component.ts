@@ -35,7 +35,7 @@ export class AdventureEndTestCardComponent implements OnInit {
   @Input() relatedLessonNumber: number | null = null;
   @Input() thumbnailUrl: string = '';
   @Input() studyUrl: string = '';
-  @Input() practiceUrl: string = '#';
+  @Input() practiceUrl: string = '';
   @Input() cardBackgroundColor: string = '#ecf7f6';
   @Input() cardAccentColor: string = '#0b776d';
 
@@ -62,9 +62,10 @@ export class AdventureEndTestCardComponent implements OnInit {
       return this.practiceDescription;
     }
 
-    const lessonSuffix =
-      this.relatedLessonNumber !== null ? ` ${this.relatedLessonNumber}` : '';
-    return `Test what you have learned in lesson${lessonSuffix}.`;
+    if (this.relatedLessonNumber !== null) {
+      return `Test what you have learned in lesson ${this.relatedLessonNumber}.`;
+    }
+    return 'Test what you have learned.';
   }
 
   getThumbnailAltText(): string {

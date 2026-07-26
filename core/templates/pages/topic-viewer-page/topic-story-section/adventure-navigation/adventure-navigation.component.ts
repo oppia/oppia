@@ -116,8 +116,7 @@ export class AdventureNavigationComponent
     const el = this.scrollWrapper?.nativeElement;
     if (el) {
       el.scrollBy({left: -200, behavior: 'smooth'});
-      // Update arrows after scroll completes.
-      setTimeout(() => this.updateArrows(), 500);
+      this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 500));
     }
   }
 
@@ -125,8 +124,7 @@ export class AdventureNavigationComponent
     const el = this.scrollWrapper?.nativeElement;
     if (el) {
       el.scrollBy({left: 200, behavior: 'smooth'});
-      // Update arrows after scroll completes.
-      setTimeout(() => this.updateArrows(), 500);
+      this.scrollCheckTimeouts.push(setTimeout(() => this.updateArrows(), 500));
     }
   }
 

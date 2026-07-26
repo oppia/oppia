@@ -7,19 +7,11 @@
 .topic-lesson-language-selector {
   display: flex;
   flex-direction: column;
-  width: 468px;
-}
-
-.topic-lesson-language-selector-row {
-  align-items: flex-start;
-  display: flex;
-  gap: 8px;
-  min-width: auto;
-  overflow: visible;
+  max-width: 468px;
   width: 100%;
 }
 
-.topic-lesson-language-selector-row--compact {
+.topic-lesson-language-selector-row {
   align-items: flex-start;
   display: flex;
   gap: 8px;

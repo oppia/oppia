@@ -1,4 +1,4 @@
-<div class="topic-lesson-language-selector-row topic-lesson-language-selector-row--compact">
+<div class="topic-lesson-language-selector-row">
   <div class="topic-lesson-language-selector-select-container">
     <i class="fas fa-file-alt topic-lesson-language-selector-leading-icon"
        aria-hidden="true">
@@ -38,7 +38,7 @@
       <span class="topic-lesson-language-selector-selected-value">
         {{
           getValidSelectedVoiceoverLanguageCode()
-            ? getLanguageDescription(getValidSelectedVoiceoverLanguageCode() || '')
+            ? getLanguageDescription(getValidSelectedVoiceoverLanguageCode())
             : ('I18N_LANGUAGE_SELECTOR_AUDIO_LABEL' | translate)
         }}
       </span>

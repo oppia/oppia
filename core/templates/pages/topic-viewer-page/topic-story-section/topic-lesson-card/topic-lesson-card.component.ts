@@ -83,8 +83,11 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
-    // Expand only the first lesson by default.
-    this.isExpanded = !this.isComingSoonSectionCard && this.lessonNumber === 1;
+    // Expand the first lesson by default, or the navigated lesson.
+    this.isExpanded =
+      !this.isComingSoonSectionCard &&
+      (this.lessonNumber === 1 ||
+        this.navigatedLessonNumber === this.lessonNumber);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -127,7 +130,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       return;
     }
 
-    if (!this.shouldShowFallbackCta() || !this.selectedTextLanguageCode) {
+    if (!this.selectedTextLanguageCode) {
       this.navigateTo(this.startUrl);
       return;
     }
