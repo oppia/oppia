@@ -103,18 +103,18 @@
   gap: 6px;
   height: 48px;
   justify-content: center;
-   min-width: 220px;
-   outline: none;
-   padding: 0 20px;
-   text-decoration: none;
- }
+  min-width: 220px;
+  outline: none;
+  padding: 0 20px;
+  text-decoration: none;
+}
 
- .adventure-end-test-card-practice-button:focus-visible {
-   outline: 2px solid #3730a3;
-   outline-offset: 2px;
- }
+.adventure-end-test-card-practice-button:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}
 
- @media (min-width: 769px) {
+@media (min-width: 769px) {
   .adventure-end-test-card-content {
     justify-content: center;
   }

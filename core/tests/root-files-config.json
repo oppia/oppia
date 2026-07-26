@@ -73,6 +73,7 @@
     "core/templates/pages/topic-viewer-page/topic-viewer-page.component.css",
     "core/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css",
     "core/templates/pages/topic-viewer-page/topic-story-section/adventure-navigation/adventure-navigation.component.css",
+    "core/templates/pages/topic-viewer-page/topic-story-section/topic-lesson-card/language-selector.component.css",
     "core/templates/pages/topic-viewer-page/topic-story-section/topic-lesson-card/topic-lesson-card.component.css",
     "core/templates/pages/topic-viewer-page/topic-story-section/topic-story-section.component.css",
     "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
