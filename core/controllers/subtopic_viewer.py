@@ -21,16 +21,29 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     feature_flag_services,
+    skill_fetchers,
     study_guide_services,
     subtopic_page_domain,
     subtopic_page_services,
     topic_fetchers,
 )
 
-from typing import Dict
+from typing import Dict, List, Optional, TypedDict
 
 
-class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class SubtopicPageDataHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of SubtopicPageDataHandler's
+    normalized_request dictionary.
+    """
+
+    skill_ids: Optional[List[str]]
+
+
+class SubtopicPageDataHandler(
+    base.BaseHandler[
+        Dict[str, str], SubtopicPageDataHandlerNormalizedRequestDict
+    ]
+):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
@@ -55,7 +68,17 @@ class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'skill_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString',
+                },
+                'default_value': None,
+            },
+        }
+    }
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(  # pylint: disable=arguments-differ
@@ -91,6 +114,19 @@ class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             'recorded_voiceovers': {'voiceovers_mapping': {}},
             'written_translations': {'translations_mapping': {}},
         }
+
+        assert self.normalized_request is not None
+        skill_ids = self.normalized_request.get('skill_ids')
+        if skill_ids is not None:
+            if not isinstance(skill_ids, list) or not all(
+                isinstance(skill_id, str) for skill_id in skill_ids
+            ):
+                raise self.InvalidInputException('Invalid skill IDs')
+            try:
+                skill_fetchers.get_multi_skills(skill_ids)
+            except Exception as e:
+                raise self.NotFoundException(e)
+
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
             self.user_id,
@@ -120,6 +156,7 @@ class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'current_subtopic_id': subtopic_id,
                 'next_subtopic_dict': next_subtopic_dict,
                 'prev_subtopic_dict': prev_subtopic_dict,
+                'skill_ids': skill_ids,
             }
         )
         self.render_json(self.values)

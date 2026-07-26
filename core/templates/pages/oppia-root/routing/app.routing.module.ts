@@ -24,6 +24,7 @@ import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
+import {PracticeSessionAccessGuard} from 'pages/practice-session-page/practice-session-page-auth.guard';
 import {TechnicalFeedbackDashboardPageComponentAuthGuard} from 'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.component-auth.guard';
 
 // All paths must be defined in constants.ts file.
@@ -144,6 +145,31 @@ const routes: Route[] = [
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NODE_PRACTICE_SESSION
+      .ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MASTERY_CHALLENGE.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
@@ -553,12 +579,12 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CERTIFICATE_OFFERING_DASHBOARD.ROUTE,
+      .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-assessment-dashboard-page/certificate-offering-dashboard-page.module'
-      ).then(m => m.CertificateOfferingDashboardPageModule),
+        'pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module'
+      ).then(m => m.CertificateCreatorDashboardPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
@@ -603,10 +629,12 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
 }
 
 // Register all routes for topic landing page.
-for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
-  for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
+for (const [key, values] of Object.entries(
+  AppConstants.AVAILABLE_LANDING_PAGES
+)) {
+  for (const value of values) {
     routes.push({
-      path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
+      path: key + '/' + value,
       loadChildren: () =>
         import(
           'pages/landing-pages/topic-landing-page/topic-landing-page.module'

@@ -25,11 +25,14 @@ from core.domain import (
     learner_group_services,
     skill_domain,
     skill_fetchers,
+    story_domain,
+    story_fetchers,
+    topic_domain,
     topic_fetchers,
     user_services,
 )
 
-from typing import Dict, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
@@ -310,40 +313,152 @@ class ManageOwnAccountValidationHandler(
 class PracticeSessionAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates access to practice seesion page."""
+    """Validates access to practice session page."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'node_id': {
+            'schema': {'type': 'basestring'},
+            'default_value': None,
+        },
+        'arc_id': {
+            'schema': {'type': 'basestring'},
+            'default_value': None,
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_subtopic_ids': {
-                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
-            }
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString',
+                },
+                'default_value': None,
+            },
         }
     }
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _: str) -> None:  # pylint: disable=arguments-differ
+    def get(self, _: str, **kwargs: str) -> None:
+
         """Handles GET requests."""
 
         assert self.normalized_request is not None
         subtopics = self.normalized_request.get('selected_subtopic_ids')
+        node_id = self.request.route_kwargs.get('node_id')
+        arc_id = self.request.route_kwargs.get('arc_id')
+
+        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        assert isinstance(topic_url_fragment, str)
+        topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
+        assert topic is not None
+
+        if node_id is not None:
+            self._validate_node_id(topic, node_id)
+            return
+
+        if arc_id is not None:
+            self._validate_arc_id(topic, arc_id)
+            return
+
+        if subtopics is None:
+            # Legacy practice session without subtopics should fail.
+            is_legacy_path = (
+                'practice/session' in self.request.path
+                or self.request.path.endswith('practice/session')
+            )
+            if is_legacy_path:
+                raise self.InvalidInputException(
+                    'Expected selected_subtopic_ids.'
+                )
+            # Mastery challenge - just validate topic access (done by decorator).
+            return
 
         if not isinstance(subtopics, list) or not all(
             isinstance(s, int) for s in subtopics
         ):
             raise self.InvalidInputException('Invalid subtopic IDs')
 
-        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
-        topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
-
         subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
 
         for subtopic_id in subtopics:
             if subtopic_id not in subtopics_ids:
                 raise self.NotFoundException
+
+    def _get_all_nodes_for_topic(
+        self, topic: topic_domain.Topic
+    ) -> List[story_domain.StoryNode]:
+        """Returns nodes from the first published story in the topic.
+
+        Args:
+            topic: Topic. The topic object.
+
+        Returns:
+            list(StoryNode). All nodes in order.
+        """
+        return story_fetchers.get_all_nodes_for_topic(topic)
+
+    def _get_all_arcs_for_topic(
+        self, topic: topic_domain.Topic
+    ) -> List[story_domain.Arc]:
+        """Returns arcs from the first published story in the topic.
+
+        Args:
+            topic: Topic. The topic object.
+
+        Returns:
+            list(Arc). All arcs in order.
+        """
+        return [
+            arc
+            for _, arc in story_fetchers.get_all_arcs_with_stories_for_topic(
+                topic
+            )
+        ]
+
+    def _validate_node_id(
+        self, topic: topic_domain.Topic, node_id: str
+    ) -> None:
+        """Validates that the given node ID exists in the first story.
+
+        The node_id parameter is a 1-based index that maps to the nth node
+        in the first published story of the topic.
+
+        Args:
+            topic: Topic. The topic object.
+            node_id: str. The node ID (1-based index) to validate.
+
+        Raises:
+            NotFoundException. The node ID was not found.
+        """
+        all_nodes = self._get_all_nodes_for_topic(topic)
+        valid_indices = {node.id.replace('node_', '') for node in all_nodes}
+        if node_id not in valid_indices:
+            raise self.NotFoundException(
+                'Node with id %s is not part of this topic.' % node_id
+            )
+
+    def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
+        """Validates that the given arc ID exists in the first story.
+
+        The arc_id parameter is a 1-based index that maps to the nth arc
+        in the first published story of the topic.
+
+        Args:
+            topic: Topic. The topic object.
+            arc_id: str. The arc index (e.g., '1') to validate.
+
+        Raises:
+            NotFoundException. The arc ID was not found.
+        """
+        all_arcs = self._get_all_arcs_for_topic(topic)
+        valid_indices = {arc.id.replace('arc_', '') for arc in all_arcs}
+        if arc_id not in valid_indices:
+            raise self.NotFoundException(
+                'Arc with id %s is not part of this topic.' % arc_id
+            )
 
 
 class ProfileExistsValidationHandler(
