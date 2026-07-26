@@ -104,7 +104,7 @@ mat-icon.unpin-icon {
   height: 60px;
   justify-content: center;
   opacity: 0.8;
-  padding: auto 2px;
+  padding: 0 2px;
   text-align: center;
   width: 92px;
 }

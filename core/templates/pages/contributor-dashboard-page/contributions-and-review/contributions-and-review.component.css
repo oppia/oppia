@@ -290,7 +290,7 @@ span.sort-questions-select .sort-options {
     width: 100px;
   }
   .oppia-contributions-dropdown-section {
-    padding: auto 2vw;
+    padding: 0 2vw;
     width: 100%;
   }
 }
