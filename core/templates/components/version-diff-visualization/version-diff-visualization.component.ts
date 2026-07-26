@@ -23,6 +23,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {State} from 'domain/state/state.model';
 import {StateDiffModalComponent} from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 import {StateLink} from 'pages/exploration-editor-page/services/exploration-diff.service';
+import './version-diff-visualization.component.css';
 
 interface NodesData {
   [key: string]: {
@@ -94,6 +95,7 @@ interface DiffGraphData {
 @Component({
   selector: 'oppia-version-diff-visualization',
   templateUrl: './version-diff-visualization.component.html',
+  styleUrls: ['./version-diff-visualization.component.css'],
 })
 export class VersionDiffVisualizationComponent implements OnInit {
   // An object with the following properties:
