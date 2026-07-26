@@ -653,7 +653,7 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
         translatable_content_list = translation_domain.TranslatableContent(
             'content_id_2',
             translation_domain.ContentType.CONTENT,
-            translation_domain.TranslatableContentFormat.LIST_OF_DEF_STR,
+            translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING,
             [],
         )
         self.assertTrue(translatable_content_list.is_reviewer_only())
