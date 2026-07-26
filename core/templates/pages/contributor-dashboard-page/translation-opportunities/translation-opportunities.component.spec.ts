@@ -481,7 +481,7 @@ describe('Translation opportunities component', () => {
       'emit'
     );
 
-    let resolveModal: (value?: any) => void;
+    let resolveModal: (value?: unknown) => void = () => {};
     translationModal.result = new Promise((resolve, reject) => {
       resolveModal = resolve;
     });
@@ -493,7 +493,7 @@ describe('Translation opportunities component', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
     ).not.toHaveBeenCalled();
 
-    resolveModal!();
+    resolveModal();
     tick();
 
     expect(
@@ -521,7 +521,7 @@ describe('Translation opportunities component', () => {
       'emit'
     );
 
-    let rejectModal: (reason?: any) => void;
+    let rejectModal: (reason?: unknown) => void = () => {};
     translationModal.result = new Promise((resolve, reject) => {
       rejectModal = reject;
     });
@@ -533,7 +533,7 @@ describe('Translation opportunities component', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
     ).not.toHaveBeenCalled();
 
-    rejectModal!();
+    rejectModal();
     tick();
 
     expect(
