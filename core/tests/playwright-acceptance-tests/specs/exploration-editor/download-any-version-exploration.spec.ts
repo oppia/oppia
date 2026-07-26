@@ -76,8 +76,16 @@ test.describe('Exploration Creator', function () {
     // After publishing, the Exploration zip file name would be
     // oppia-{explorationTitle}-v{versionNumber}.zip or
     // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip.
-    await explorationEditor.downloadExploration(5, true);
-    await explorationEditor.downloadExploration(2, true);
+    await explorationEditor.downloadExploration(
+      5,
+      true,
+      'Publish with an interaction'
+    );
+    await explorationEditor.downloadExploration(
+      2,
+      true,
+      'Publish with an interaction'
+    );
   });
 
   test.afterAll(async function () {

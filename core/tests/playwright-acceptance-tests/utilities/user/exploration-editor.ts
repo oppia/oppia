@@ -1324,7 +1324,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async downloadExploration(
     explorationVersion: number,
-    isExplorationPublished: boolean
+    isExplorationPublished: boolean,
+    explorationTitle?: string
   ): Promise<void> {
     await this.expectElementToBeVisible(historyListContent);
     const historyItems = await this.page.$$(historyListContent);
@@ -1343,8 +1344,8 @@ export class ExplorationEditor extends BaseUser {
         historyListOptions,
         historyItem
       );
-      await dropdownButton.evaluate(el => (el as HTMLElement).click());
-      await this.page.waitForTimeout(1000);
+      await this.clickOnElement(dropdownButton);
+      await this.expectElementToBeVisible(downloadExplorationButton);
 
       const downloadButton = await this.getElementInParent(
         downloadExplorationButton,
@@ -1358,7 +1359,7 @@ export class ExplorationEditor extends BaseUser {
 
       const suggestedFilename = download.suggestedFilename();
       const expectedPrefix = isExplorationPublished
-        ? 'oppia-Publishwithaninteraction-v'
+        ? `oppia-${explorationTitle?.replace(/\s+/g, '')}-v`
         : 'oppia-unpublished_exploration-v';
       if (!suggestedFilename.startsWith(expectedPrefix)) {
         throw new Error(
