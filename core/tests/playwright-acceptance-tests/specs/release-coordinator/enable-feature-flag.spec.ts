@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,24 +19,29 @@
  * RC.RD Enable feature flag.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const dummyFeatureFlagName = 'dummy_feature_flag_for_e2e_tests';
 
-describe('Release Coordinator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(900000);
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'releaseCoordinator@example.com',
+      browser,
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
   });
 
-  it('should be able to view feature flags', async function () {
+  test('should be able to view feature flags', async function () {
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
     await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagToBePresent(dummyFeatureFlagName);
@@ -51,8 +56,7 @@ describe('Release Coordinator', function () {
     );
   });
 
-  it('should be able to force enable a feature flag', async function () {
-    // Enable the feature flag.
+  test('should be able to force enable a feature flag', async function () {
     await releaseCoordinator.enableFeatureFlag(dummyFeatureFlagName);
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
@@ -62,8 +66,8 @@ describe('Release Coordinator', function () {
       dummyFeatureFlagName,
       'disabled'
     );
-    // Verify that data is persisted on reload.
-    await releaseCoordinator.page.reload();
+
+    await releaseCoordinator.reloadPage();
     await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
@@ -76,7 +80,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.verifyDummyHandlerStatusInFeaturesTab(true);
   });
 
-  it('should be able to remove force-enabling of feature flag', async function () {
+  test('should be able to remove force-enabling of feature flag', async function () {
     await releaseCoordinator.enableFeatureFlag(dummyFeatureFlagName, false);
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
@@ -88,8 +92,7 @@ describe('Release Coordinator', function () {
       0
     );
 
-    // Verify that data is persisted on reload.
-    await releaseCoordinator.page.reload();
+    await releaseCoordinator.reloadPage();
     await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
@@ -101,12 +104,10 @@ describe('Release Coordinator', function () {
       0
     );
 
-    // Verify that dummy handler tag is removed.
     await releaseCoordinator.verifyDummyHandlerStatusInFeaturesTab(false);
   });
 
-  it('should be able to set a percentage rollout', async function () {
-    // Set a rollout percentage.
+  test('should be able to set a percentage rollout', async function () {
     await releaseCoordinator.editFeatureRolloutPercentage(
       dummyFeatureFlagName,
       50
@@ -121,8 +122,7 @@ describe('Release Coordinator', function () {
       50
     );
 
-    // Check that data is persisted on reload.
-    await releaseCoordinator.page.reload();
+    await releaseCoordinator.reloadPage();
     await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
@@ -134,7 +134,6 @@ describe('Release Coordinator', function () {
       50
     );
 
-    // Reset the rollout percentage.
     await releaseCoordinator.editFeatureRolloutPercentage(
       dummyFeatureFlagName,
       0
@@ -150,32 +149,24 @@ describe('Release Coordinator', function () {
     );
   });
 
-  it('should be able to set rollout to a user group', async function () {
+  test('should be able to set rollout to a user group', async function () {
     await releaseCoordinator.navigateToMiscTab();
     await releaseCoordinator.addUserGroup('group1');
-    // TODO(#23330): Currently, adding a user to user group is not working.
-    // Once fixed, add a part to add user 'anotherUser' to user group 'group1'.
-    // Also, try adding the user again to the same user group. It should throw an error.
-    // Also, try using an invalid username. It should throw an error.
-
-    // Try to create a duplicate user group.
     await releaseCoordinator.addUserGroup('group1');
     await releaseCoordinator.expectUserGroupCreationErrorToBe(
       "The user group 'group1' already exists."
     );
 
-    // Create another user group.
     await releaseCoordinator.addUserGroup('group2');
     await releaseCoordinator.expectUserGroupToBePresent('group1');
     await releaseCoordinator.expectUserGroupToBePresent('group2');
 
-    // Remove the user group 'group2'.
     await releaseCoordinator.removeUserGroup('group2');
     await releaseCoordinator.expectUserGroupToBePresent('group1');
     await releaseCoordinator.expectUserGroupToBePresent('group2', false);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

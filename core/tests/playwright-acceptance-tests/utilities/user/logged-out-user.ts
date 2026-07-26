@@ -31,6 +31,7 @@ const homeUrl = testConstants.URLs.Home;
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
+const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const mobileNavbarButtonSelector = '.text-uppercase';
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const languageDropdown = '.e2e-test-language-dropdown';
@@ -1764,6 +1765,25 @@ export class LoggedOutUser extends BaseUser {
 
     // While mouse is over pause button, the pause button doesn't change its state.
     await this.page.mouse.move(10, 10);
+  }
+
+  /**
+   * Checks if the promo bar is visible and if the promotion content is correct.
+   * @param {boolean} visible - Whether the promo bar should be visible or not.
+   * @param {string} promotionContent - The expected promotion content.
+   */
+  async expectPromoBarToBeVisible(
+    visible: boolean = true,
+    promotionContent?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(promoBarTextSelector, visible);
+
+    if (visible && promotionContent) {
+      await this.expectTextContentToBe(
+        promoBarTextSelector,
+        promotionContent
+      );
+    }
   }
 }
 
