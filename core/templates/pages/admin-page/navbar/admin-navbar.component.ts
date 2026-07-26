@@ -23,10 +23,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UserService} from 'services/user.service';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 import {AppConstants} from 'app.constants';
+import './admin-navbar.component.css';
 
 @Component({
   selector: 'oppia-admin-navbar',
   templateUrl: './admin-navbar.component.html',
+  styleUrls: ['./admin-navbar.component.css'],
 })
 export class AdminNavbarComponent implements OnInit {
   // This property is initialized using Angular lifecycle hooks

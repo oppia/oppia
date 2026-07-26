@@ -721,6 +721,25 @@ export class BaseUser {
   }
 
   /**
+   * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} textContent - The expected text content.
+   */
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      ({selector, value}: {selector: string; value: string}) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {selector, value: textContent},
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Finds child element in parent by matching text values.
    * @param {Page | ElementHandle | undefined} parentElement - Element we're searching through.
    * @param {Record<string, string>} selectors - Relevant selectors.

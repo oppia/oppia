@@ -375,6 +375,25 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{'id': 'story_id', 'version': 1, 'payload': story.to_dict()}],
             )
 
+    def test_get_story_migration_returns_correct_json(self) -> None:
+        story = self.save_new_story('story_id', 'user_id', 'Title')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=story_migration&'
+                    'activities_data=[{"id": "story_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200,
+                ),
+                [
+                    {
+                        'id': 'story_id',
+                        'version': 1,
+                        'payload': story.to_dict_for_android(),
+                    }
+                ],
+            )
+
     def test_get_skill_returns_correct_json(self) -> None:
         skill = self.save_new_skill('skill_id', 'user_id', 'Description')
         with self.secrets_swap:

@@ -107,6 +107,7 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
     payload: Union[
         exp_domain.ExplorationDictForAndroid,
         story_domain.StoryDict,
+        story_domain.StoryDictForAndroid,
         skill_domain.SkillDict,
         subtopic_page_domain.SubtopicPageDict,
         study_guide_domain.StudyGuideAndroidDict,
@@ -161,6 +162,7 @@ class AndroidActivityHandler(
                         constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
                         constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS,
                         constants.ACTIVITY_TYPE_STORY,
+                        constants.ACTIVITY_TYPE_STORY_MIGRATION,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
                         constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
@@ -445,6 +447,12 @@ class AndroidActivityHandler(
                         ids_and_versions
                     )
                 )
+            elif activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION:
+                fetched_entities = (
+                    story_fetchers.get_multiple_stories_by_ids_and_version(
+                        ids_and_versions
+                    )
+                )
             elif activity_type == constants.ACTIVITY_TYPE_SKILL:
                 fetched_entities = (
                     skill_fetchers.get_multiple_skills_by_ids_and_version(
@@ -459,11 +467,23 @@ class AndroidActivityHandler(
                 )
 
             for activity_data, entity in zip(activities_data, fetched_entities):
-                response_dict: ActivityDataResponseDict = {
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': entity.to_dict() if entity is not None else None,
-                }
+                if (
+                    activity_type == constants.ACTIVITY_TYPE_STORY_MIGRATION
+                    and isinstance(entity, story_domain.Story)
+                ):
+                    response_dict: ActivityDataResponseDict = {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': entity.to_dict_for_android(),
+                    }
+                else:
+                    response_dict = {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            entity.to_dict() if entity is not None else None
+                        ),
+                    }
                 activities.append(response_dict)
 
         self.render_json(activities)
