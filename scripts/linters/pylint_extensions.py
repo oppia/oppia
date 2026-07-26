@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0042.
+presubmit checks. Next message id would be C0045.
 """
 
 from __future__ import annotations
@@ -72,6 +72,7 @@ ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
 
 import astroid
 from pylint import checkers
+from pylint.checkers import strings as string_utils
 from pylint.checkers import utils as checker_utils
 from pylint.extensions import _check_docs_utils
 
@@ -2940,6 +2941,122 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
                 self.add_message('use-string-interpolation', node=node)
 
 
+class QuoteConventionChecker(
+    checkers.BaseTokenChecker, checkers.BaseRawFileChecker
+):
+    """Checks convention for single-quote, triple-quote, and docstrings.
+
+    Replaces the unmaintained `pylint-quotes` plugin. Enforces the conventions
+    that plugin was configured with (string-quote=single, triple-quote=double,
+    docstring-quote=double):
+        * short strings always use single quotes ('); an interior single quote
+          must be backslash-escaped rather than switched to double quotes;
+        * triple-quoted, non-docstring strings use double quotes (\"\"\");
+        * docstrings use double quotes (\"\"\").
+
+    Quote extraction reuses the helpers Pylint ships for its own `string`
+    checker (`pylint.checkers.strings`), so only the convention policy lives
+    here.
+    """
+
+    name = 'string-quotes'
+    priority = -1
+    msgs = {
+        'C0042': (
+            'Invalid string quote `%s`, should be `\'`',
+            'invalid-string-quote',
+            'Used when the string quote character is not `\'`',
+        ),
+        'C0043': (
+            'Invalid triple quote `%s`, should be `"""`',
+            'invalid-triple-quote',
+            'Used when the triple quote characters are not `"""`',
+        ),
+        'C0044': (
+            'Invalid docstring quote `%s`, should be `"""`',
+            'invalid-docstring-quote',
+            'Used when the docstring quote characters are not `"""`',
+        ),
+    }
+
+    NODE_TYPES_WITH_CHECKED_DOCS = (
+        astroid.scoped_nodes.ClassDef,
+        astroid.scoped_nodes.FunctionDef,
+        astroid.scoped_nodes.AsyncFunctionDef,
+    )
+
+    def __init__(self, linter: lint.PyLinter) -> None:
+        super().__init__(linter)
+        # Start positions (row, col) of every docstring string token in the
+        # module, populated from the AST before the tokens are classified.
+        self._docstring_token_positions: Set[Tuple[int, int]] = set()
+
+    def process_module(self, node: astroid.scoped_nodes.Module) -> None:
+        """Records the source position of every docstring in the module.
+
+        Pylint calls `process_module` (a raw-file-checker hook) before
+        `process_tokens` for a given module, so these positions are available
+        by the time `process_tokens` begins to classify any string tokens.
+
+        Args:
+            node: scoped_nodes.Module. The module node being linted.
+        """
+        nodes_with_checked_docs = (
+            node,
+            *node.nodes_of_class(self.NODE_TYPES_WITH_CHECKED_DOCS),
+        )
+        self._docstring_token_positions = {
+            (n.doc_node.lineno, n.doc_node.col_offset)
+            for n in nodes_with_checked_docs
+            if n.doc_node is not None
+            and n.doc_node.lineno is not None
+            and n.doc_node.col_offset is not None
+        }
+
+    def process_tokens(self, tokens: List[tokenize.TokenInfo]) -> None:
+        """Checks the quote characters used by every string token.
+
+        Args:
+            tokens: list(TokenInfo). The tokens of the module being linted.
+        """
+        for token_type, token, position, _, _ in tokens:
+            # TODO(#21214): Also inspect FSTRING_START tokens once we run on
+            # Python 3.12+, where PEP 701 tokenizes f-strings separately and
+            # their quotes would otherwise escape this STRING-only check.
+            if token_type != tokenize.STRING:
+                continue
+
+            try:
+                delimiter = string_utils._get_quote_delimiter(
+                    token
+                )  # pylint: disable=protected-access
+            except ValueError:
+                continue
+
+            if position in self._docstring_token_positions:
+                if delimiter != '"':
+                    self.add_message(
+                        'invalid-docstring-quote',
+                        line=position[0],
+                        args=(delimiter * 3,),
+                    )
+            elif string_utils._is_long_string(
+                token
+            ):  # pylint: disable=protected-access
+                if delimiter != '"':
+                    self.add_message(
+                        'invalid-triple-quote',
+                        line=position[0],
+                        args=(delimiter * 3,),
+                    )
+            elif delimiter != "'":
+                self.add_message(
+                    'invalid-string-quote',
+                    line=position[0],
+                    args=(delimiter,),
+                )
+
+
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
 
@@ -2965,3 +3082,4 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))
     linter.register_checker(PreventStringConcatenationChecker(linter))
+    linter.register_checker(QuoteConventionChecker(linter))

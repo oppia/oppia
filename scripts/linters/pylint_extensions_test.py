@@ -46,13 +46,11 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """self.post_json('/some/\\url',
+            tmp.write("""self.post_json('/some/\\url',
                 self.payload, expect_errors=True, expected_status_int=401)
                 if (a > 1 and
                         b > 2):
-                """
-            )
+                """)
         node_break_after_hanging_indent.file = filename
         node_break_after_hanging_indent.path = filename
 
@@ -72,14 +70,12 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """self.post_json('/some/\\url',
+            tmp.write("""self.post_json('/some/\\url',
                 self.payload, expect_errors=True, expected_status_int=401)
 
                 if (a > 1 and
                         b > 2):  # pylint: disable=invalid-name
-                """
-            )
+                """)
         node_break_after_hanging_indent.file = filename
         node_break_after_hanging_indent.path = filename
 
@@ -99,16 +95,14 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """\"\"\"Some multiline
+            tmp.write("""\"\"\"Some multiline
                 docstring.
                 \"\"\"
                 # Load JSON.
                 master_translation_dict = json.loads(
                pylint_utils.get_file_contents(os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
-                """
-            )
+                """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -124,11 +118,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """self.post_json(  # Random comment
+            tmp.write("""self.post_json(  # Random comment
                 '(',
-                self.payload, expect_errors=True, expected_status_int=401)"""
-            )
+                self.payload, expect_errors=True, expected_status_int=401)""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -146,11 +138,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """self.post_json(func(  # Random comment
+            tmp.write("""self.post_json(func(  # Random comment
                 '(',
-                self.payload, expect_errors=True, expected_status_int=401))"""
-            )
+                self.payload, expect_errors=True, expected_status_int=401))""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -168,11 +158,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """self.post_json([  # Random comment
+            tmp.write("""self.post_json([  # Random comment
                 '(',
-                '', '', ''])"""
-            )
+                '', '', ''])""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -188,8 +176,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 if 5 > 7:
                     self.post_json([
                     '(',
@@ -197,8 +184,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
                 def func(arg1,
                     arg2, arg3):
-                    a = 2 / 2"""
-            )
+                    a = 2 / 2""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -230,13 +216,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
                         a = 1 + 2
-                """
-            )
+                """)
         node_no_newline_below_class_docstring.file = filename
         node_no_newline_below_class_docstring.path = filename
 
@@ -260,15 +244,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
 
 
                         a = 1 + 2
-                """
-            )
+                """)
         node_excessive_newline_below_class_docstring.file = filename
         node_excessive_newline_below_class_docstring.path = filename
 
@@ -292,15 +274,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
                         # This is a comment.
                         def func():
                             a = 1 + 2
-                """
-            )
+                """)
         node_inline_comment_after_class_docstring.file = filename
         node_inline_comment_after_class_docstring.path = filename
 
@@ -324,14 +304,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(
                             dummy_class):
                         \"\"\"This is a docstring.\"\"\"
                         a = 1 + 2
-                """
-            )
+                """)
         node_multiline_class_argument_with_incorrect_style.file = filename
         node_multiline_class_argument_with_incorrect_style.path = filename
 
@@ -355,15 +333,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(
                             dummy_class):
                         \"\"\"This is a docstring.\"\"\"
 
                         a = 1 + 2
-                """
-            )
+                """)
         node_multiline_class_argument_with_correct_style.file = filename
         node_multiline_class_argument_with_correct_style.path = filename
 
@@ -380,14 +356,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
                         \"\"\"This is a multiline docstring.\"\"\"
 
                         a = 1 + 2
-                """
-            )
+                """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -404,12 +378,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
                         a = 1 + 2
-                """
-            )
+                """)
         node_class_with_no_docstring.file = filename
         node_class_with_no_docstring.path = filename
 
@@ -426,15 +398,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
 
                         \"\"\"This is a multiline docstring.\"\"\"
 
                         a = 1 + 2
-                """
-            )
+                """)
         node_newline_before_docstring_with_correct_style.file = filename
         node_newline_before_docstring_with_correct_style.path = filename
 
@@ -451,14 +421,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     class ClassName(dummy_class):
 
                         \"\"\"This is a multiline docstring.\"\"\"
                         a = 1 + 2
-                """
-            )
+                """)
         node_newline_before_docstring_with_incorrect_style.file = filename
         node_newline_before_docstring_with_incorrect_style.path = filename
 
@@ -477,16 +445,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             temp_file.close()
 
     def test_malformed_args_section(self) -> None:
-        node_malformed_args_section = astroid.extract_node(
-            """def func(arg): #@
+        node_malformed_args_section = astroid.extract_node("""def func(arg): #@
                 \"\"\"Does nothing.
 
                 Args:
                     arg: Argument description.
                 \"\"\"
                 a = True
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='malformed-args-section', node=node_malformed_args_section
@@ -500,16 +466,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_malformed_returns_section(self) -> None:
-        node_malformed_returns_section = astroid.extract_node(
-            """def func(): #@
+        node_malformed_returns_section = astroid.extract_node("""def func(): #@
                 \"\"\"Return True.
 
                 Returns:
                     arg: Argument description.
                 \"\"\"
                 return True
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='malformed-returns-section',
@@ -524,16 +488,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_malformed_yields_section(self) -> None:
-        node_malformed_yields_section = astroid.extract_node(
-            """def func(): #@
+        node_malformed_yields_section = astroid.extract_node("""def func(): #@
                 \"\"\"Yield true.
 
                 Yields:
                     yields: Argument description.
                 \"\"\"
                 yield True
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='malformed-yields-section',
@@ -548,16 +510,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_malformed_raises_section(self) -> None:
-        node_malformed_raises_section = astroid.extract_node(
-            """def func(): #@
+        node_malformed_raises_section = astroid.extract_node("""def func(): #@
                 \"\"\"Raise an exception.
 
                 Raises:
                     Exception: Argument description.
                 \"\"\"
                 raise Exception()
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='malformed-raises-section',
@@ -595,16 +555,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formated_args_argument(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(*args): #@
+        node_with_no_error_message = astroid.extract_node("""def func(*args): #@
                 \"\"\"Does nothing.
 
                 Args:
                     *args: list(*). Description.
                 \"\"\"
                 a = True
-        """
-        )
+        """)
 
         with self.checker_test_object.assertAddsMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -612,16 +570,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formated_args_section(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                 \"\"\"Does nothing.
 
                 Args:
                     arg: argument. Description.
                 \"\"\"
                 a = True
-        """
-        )
+        """)
 
         with self.checker_test_object.assertAddsMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -629,16 +585,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formated_returns_section(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(): #@
+        node_with_no_error_message = astroid.extract_node("""def func(): #@
                 \"\"\"Does nothing.
 
                 Returns:
                     int. Argument escription.
                 \"\"\"
                 return args
-        """
-        )
+        """)
 
         with self.checker_test_object.assertAddsMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -646,16 +600,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formated_yields_section(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(): #@
+        node_with_no_error_message = astroid.extract_node("""def func(): #@
                 \"\"\"Does nothing.
 
                 Yields:
                     arg. Argument description.
                 \"\"\"
                 yield args
-        """
-        )
+        """)
 
         with self.checker_test_object.assertAddsMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -663,12 +615,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_space_after_docstring(self) -> None:
-        node_space_after_docstring = astroid.extract_node(
-            """def func():
+        node_space_after_docstring = astroid.extract_node("""def func():
                     \"\"\" Hello world.\"\"\"
                     Something
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='space-after-triple-quote', node=node_space_after_docstring
@@ -682,13 +632,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_two_lines_empty_docstring_raise_correct_message(self) -> None:
-        node_with_docstring = astroid.extract_node(
-            """def func():
+        node_with_docstring = astroid.extract_node("""def func():
                     \"\"\"
                     \"\"\"
                     pass
-        """
-        )
+        """)
         message = testutils.MessageTest(
             msg_id='single-line-docstring-span-two-lines',
             node=node_with_docstring,
@@ -723,12 +671,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_no_period_at_end(self) -> None:
-        node_no_period_at_end = astroid.extract_node(
-            """def func(): #@
+        node_no_period_at_end = astroid.extract_node("""def func(): #@
                     \"\"\"This is a docstring\"\"\"
                     Something
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='no-period-used', node=node_no_period_at_end
@@ -742,14 +688,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_empty_line_before_end_of_docstring(self) -> None:
-        node_empty_line_before_end = astroid.extract_node(
-            """def func(): #@
+        node_empty_line_before_end = astroid.extract_node("""def func(): #@
                     \"\"\"This is a docstring.
 
                     \"\"\"
                     Something
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='empty-line-before-end', node=node_empty_line_before_end
@@ -763,16 +707,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_no_period_at_end_of_a_multiline_docstring(self) -> None:
-        node_no_period_at_end = astroid.extract_node(
-            """def func(arg): #@
+        node_no_period_at_end = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Args:
                             arg: variable. Desciption
                     \"\"\"
                     Something
-        """
-        )
+        """)
 
         no_period_at_end_message = testutils.MessageTest(
             msg_id='no-period-used', node=node_no_period_at_end
@@ -791,15 +733,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_no_newline_at_end_of_multi_line_docstring(self) -> None:
-        node_no_newline_at_end = astroid.extract_node(
-            """def func(arg): #@
+        node_no_newline_at_end = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Args:
                             arg: variable. Description.\"\"\"
                     Something
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='no-newline-used-at-end', node=node_no_newline_at_end
@@ -858,15 +798,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_no_newline_above_return(self) -> None:
-        node_with_no_space_above_return = astroid.extract_node(
-            """def func(): #@
+        node_with_no_space_above_return = astroid.extract_node("""def func(): #@
                 \"\"\"Returns something.
                 Returns:
                     returns_something. Description.
                 \"\"\"
                 return something
-        """
-        )
+        """)
 
         message = testutils.MessageTest(
             msg_id='single-space-above-returns',
@@ -961,8 +899,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_excessive_newline_above_args(self) -> None:
-        node_with_two_newline = astroid.extract_node(
-            """def func(arg): #@
+        node_with_two_newline = astroid.extract_node("""def func(arg): #@
                     \"\"\"Returns something.
 
 
@@ -979,8 +916,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"
                     return True
                     yield something
-        """
-        )
+        """)
 
         single_space_above_args_message = testutils.MessageTest(
             msg_id='single-space-above-args', node=node_with_two_newline
@@ -1005,8 +941,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_return_in_comment(self) -> None:
-        node_with_return_in_comment = astroid.extract_node(
-            """def func(arg): #@
+        node_with_return_in_comment = astroid.extract_node("""def func(arg): #@
                     \"\"\"Returns something.
 
                     Args:
@@ -1017,8 +952,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"
                     "Returns: something"
                     return something
-        """
-        )
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -1026,13 +960,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_function_with_no_args(self) -> None:
-        node_with_no_args = astroid.extract_node(
-            """def func():
+        node_with_no_args = astroid.extract_node("""def func():
                 \"\"\"Do something.\"\"\"
 
                 a = 1 + 2
-        """
-        )
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -1040,8 +972,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_placed_newline(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                     \"\"\"Returns something.
 
                     Args:
@@ -1059,8 +990,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     raise something
                     yield something
                     return something
-        """
-        )
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -1190,8 +1120,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_malformed_parameter_docstring(self) -> None:
-        invalid_parameter_name = astroid.extract_node(
-            """def func(arg): #@
+        invalid_parameter_name = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Raises:
@@ -1199,8 +1128,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                             schema is not valid.
                     \"\"\"
                     Something
-        """
-        )
+        """)
 
         malformed_raises_message = testutils.MessageTest(
             msg_id='malformed-raises-section', node=invalid_parameter_name
@@ -1216,12 +1144,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formed_single_line_docstring(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.\"\"\"
                     Something
-        """
-        )
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -1229,16 +1155,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formed_multi_line_docstring(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Args:
                             arg: variable. Description.
                     \"\"\"
                     Something
-        """
-        )
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
@@ -1246,8 +1170,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
     def test_well_formed_multi_line_description_docstring(self) -> None:
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Args:
@@ -1257,16 +1180,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                                 sequence for the key.
                     \"\"\"
                     Something
-        """
-        )
+        """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_error_message
             )
 
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Raises:
@@ -1278,15 +1199,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                             query. The query to be encoded.
                     \"\"\"
                     Something
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_error_message
             )
 
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg):
+        node_with_no_error_message = astroid.extract_node("""def func(arg):
                     \"\"\"This is a docstring.
 
                         Returns:
@@ -1303,15 +1222,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                         return Something
                     else:
                         yield something
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_error_message
             )
 
-        node_with_no_error_message = astroid.extract_node(
-            """def func(arg): #@
+        node_with_no_error_message = astroid.extract_node("""def func(arg): #@
                     \"\"\"This is a docstring.
 
                         Returns:
@@ -1330,8 +1247,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                         return Something
                     else:
                         yield (a, b)
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_error_message
@@ -1343,8 +1259,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             pylint_extensions.DocstringParameterChecker
         )
         self.checker_test_object.setup_method()
-        invalid_args_description_node = astroid.extract_node(
-            """
+        invalid_args_description_node = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1358,8 +1273,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='8-space-indentation-for-arg-in-descriptions-doc',
@@ -1376,8 +1290,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 invalid_args_description_node
             )
 
-        invalid_param_indentation_node = astroid.extract_node(
-            """
+        invalid_param_indentation_node = astroid.extract_node("""
         def func(test_var_one): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1389,8 +1302,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='4-space-indentation-for-arg-parameters-doc',
@@ -1403,8 +1315,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 invalid_param_indentation_node
             )
 
-        invalid_header_indentation_node = astroid.extract_node(
-            """
+        invalid_header_indentation_node = astroid.extract_node("""
         def func(test_var_one): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1416,8 +1327,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='incorrect-indentation-for-arg-header-doc',
@@ -1435,8 +1345,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             pylint_extensions.DocstringParameterChecker
         )
         self.checker_test_object.setup_method()
-        valid_free_form_node = astroid.extract_node(
-            """
+        valid_free_form_node = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1453,15 +1362,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 valid_free_form_node
             )
 
-        valid_indentation_node = astroid.extract_node(
-            """
+        valid_indentation_node = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1475,15 +1382,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 valid_indentation_node
             )
 
-        valid_indentation_with_kw_args_node = astroid.extract_node(
-            """
+        valid_indentation_with_kw_args_node = astroid.extract_node("""
         def func( #@
             test_var_one,
             *,
@@ -1500,8 +1405,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(
                 valid_indentation_with_kw_args_node
@@ -1513,8 +1417,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             pylint_extensions.DocstringParameterChecker
         )
         self.checker_test_object.setup_method()
-        valid_func_node, valid_return_node = astroid.extract_node(
-            """
+        valid_func_node, valid_return_node = astroid.extract_node("""
         def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1527,21 +1430,18 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(valid_func_node)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_return_node)
 
-        valid_func_node, valid_yield_node = astroid.extract_node(
-            """
+        valid_func_node, valid_yield_node = astroid.extract_node("""
         def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.\"\"\"
             result = test_var_one + test_var_two
             yield result #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(valid_func_node)
         with self.checker_test_object.assertNoMessages():
@@ -1550,8 +1450,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_return(valid_yield_node)
 
         missing_yield_type_func_node, missing_yield_type_yield_node = (
-            astroid.extract_node(
-                """
+            astroid.extract_node("""
         class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
@@ -1565,8 +1464,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"
                 result = test_var_one + test_var_two
                 yield result #@
-        """
-            )
+        """)
         )
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -1597,8 +1495,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             )
 
         missing_return_type_func_node, missing_return_type_return_node = (
-            astroid.extract_node(
-                """
+            astroid.extract_node("""
         class Test:
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
@@ -1612,8 +1509,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"
                 result = test_var_one + test_var_two
                 return result #@
-        """
-            )
+        """)
         )
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -1643,8 +1539,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_return_type_return_node
             )
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         def func(test_var_one, test_var_two):
             \"\"\"Function to test docstring parameters.
 
@@ -1656,14 +1551,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 Exception. An exception.
             \"\"\"
             raise Exception #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
         missing_raise_type_func_node, missing_raise_type_raise_node = (
-            astroid.extract_node(
-                """
+            astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test raising exceptions.
 
@@ -1672,8 +1565,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 test_var_two: str. Second test variable.
             \"\"\"
             raise Exception #@
-        """
-            )
+        """)
         )
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -1687,17 +1579,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_raise_type_raise_node
             )
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         class Test:
             raise Exception #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         class Test():
             @property
             def decorator_func(self):
@@ -1707,45 +1596,37 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             @property
             def func(self):
                 raise Exception #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         class Test():
             def func(self):
                 raise Exception #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         def func():
             try:
                 raise Exception #@
             except Exception:
                 pass
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test raising exceptions.\"\"\"
             raise Exception #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         def my_func(self):
             \"\"\"This is a docstring.
             :raises NameError: Never.
@@ -1754,13 +1635,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 return RuntimeError(val)
             raise ex_func('hi') #@
             raise NameError('hi')
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         from unknown import Unknown
         def my_func(self):
             \"\"\"This is a docstring.
@@ -1768,13 +1647,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             raise Unknown('hi') #@
             raise NameError('hi')
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node(
-            """
+        valid_raise_node = astroid.extract_node("""
         def my_func(self):
             \"\"\"This is a docstring.
             :raises NameError: Never.
@@ -1785,33 +1662,27 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 return RuntimeError(val)
             raise ex_func('hi') #@
             raise NameError('hi')
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_return_node = astroid.extract_node(
-            """
+        valid_return_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test return values.\"\"\"
             return None #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_return_node)
 
-        valid_return_node = astroid.extract_node(
-            """
+        valid_return_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test return values.\"\"\"
             return #@
-        """
-        )
+        """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_return_node)
 
-        missing_param_func_node = astroid.extract_node(
-            """
+        missing_param_func_node = astroid.extract_node("""
         def func(test_var_one, test_var_two, *args, **kwargs): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1824,8 +1695,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='missing-param-doc',
@@ -1838,8 +1708,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_param_func_node
             )
 
-        missing_param_func_node = astroid.extract_node(
-            """
+        missing_param_func_node = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1852,8 +1721,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='missing-param-doc',
@@ -1886,8 +1754,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_param_func_node
             )
 
-        class_node, multiple_constructor_func_node = astroid.extract_node(
-            """
+        class_node, multiple_constructor_func_node = astroid.extract_node("""
         class Test(): #@
             \"\"\"Function to test docstring parameters.
 
@@ -1911,8 +1778,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"
                 result = test_var_one + test_var_two
                 return result
-        """
-        )
+        """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='multiple-constructor-doc',
@@ -1929,13 +1795,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.linter.config.accept_no_raise_doc = (
             False
         )
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
         def my_func(self):
             \"\"\"This is a docstring.\"\"\"
             raise RuntimeError('hi')
-        """
-        )
+        """)
         raise_node = node.body[0]
         func_node = raise_node.frame()
         with self.checker_test_object.assertAddsMessages(
@@ -1957,21 +1821,17 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
             pylint_extensions.ImportOnlyModulesChecker
         )
         checker_test_object.setup_method()
-        importfrom_node1 = astroid.extract_node(
-            """
+        importfrom_node1 = astroid.extract_node("""
             from os import path #@
             import sys
-        """
-        )
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node1)
 
-        importfrom_node2 = astroid.extract_node(
-            """
+        importfrom_node2 = astroid.extract_node("""
             from os import error #@
             import sys
-        """
-        )
+        """)
         with checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='import-only-modules',
@@ -1982,27 +1842,21 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_importfrom(importfrom_node2)
 
-        importfrom_node3 = astroid.extract_node(
-            """
+        importfrom_node3 = astroid.extract_node("""
             from invalid_module import invalid_module #@
-        """
-        )
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node3)
 
-        importfrom_node4 = astroid.extract_node(
-            """
+        importfrom_node4 = astroid.extract_node("""
             from constants import constants #@
-        """
-        )
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node4)
 
-        importfrom_node5 = astroid.extract_node(
-            """
+        importfrom_node5 = astroid.extract_node("""
             from os import invalid_module #@
-        """
-        )
+        """)
         with checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='import-only-modules',
@@ -2030,11 +1884,9 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
             pylint_extensions.ImportOnlyModulesChecker
         )
         checker_test_object.setup_method()
-        importfrom_node = astroid.extract_node(
-            """
+        importfrom_node = astroid.extract_node("""
             from __future__ import invalid_module #@
-        """
-        )
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node)
 
@@ -2084,23 +1936,19 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
             pylint_extensions.FunctionArgsOrderChecker
         )
         checker_test_object.setup_method()
-        functiondef_node1 = astroid.extract_node(
-            """
+        functiondef_node1 = astroid.extract_node("""
         def test(self,test_var_one, test_var_two): #@
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_functiondef(functiondef_node1)
 
-        functiondef_node2 = astroid.extract_node(
-            """
+        functiondef_node2 = astroid.extract_node("""
         def test(test_var_one, test_var_two, self): #@
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='function-args-order-self', node=functiondef_node2
@@ -2109,13 +1957,11 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
 
-        functiondef_node3 = astroid.extract_node(
-            """
+        functiondef_node3 = astroid.extract_node("""
         def test(test_var_one, test_var_two, cls): #@
             result = test_var_one + test_var_two
             return result
-        """
-        )
+        """)
         with checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='function-args-order-cls', node=functiondef_node3
@@ -2157,11 +2003,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.open()
 
     def test_forbid_domain_import_in_storage_module(self) -> None:
-        node_err_import = astroid.extract_node(
-            """
+        node_err_import = astroid.extract_node("""
             import core.domain.activity_domain #@
-            """
-        )
+            """)
         node_err_import.root().name = 'oppia.core.storage.topic'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2174,21 +2018,17 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_import(node_err_import)
 
     def test_allow_platform_import_in_storage_module(self) -> None:
-        node_no_err_import = astroid.extract_node(
-            """
+        node_no_err_import = astroid.extract_node("""
             import core.platform.email.mailgun_email_services #@
-        """
-        )
+        """)
         node_no_err_import.root().name = 'oppia.core.storage.topic'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_import(node_no_err_import)
 
     def test_forbid_domain_from_import_in_storage_module(self) -> None:
-        node_err_importfrom = astroid.extract_node(
-            """
+        node_err_importfrom = astroid.extract_node("""
             from core.domain import activity_domain #@
-        """
-        )
+        """)
         node_err_importfrom.root().name = 'oppia.core.storage.topic'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2203,11 +2043,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_allow_platform_from_import_in_storage_module(self) -> None:
-        node_no_err_importfrom = astroid.extract_node(
-            """
+        node_no_err_importfrom = astroid.extract_node("""
             from core.platform.email import mailgun_email_services #@
-        """
-        )
+        """)
         node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
@@ -2215,11 +2053,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_forbid_controllers_import_in_domain_module(self) -> None:
-        node_err_import = astroid.extract_node(
-            """
+        node_err_import = astroid.extract_node("""
             import core.controllers.acl_decorators #@
-        """
-        )
+        """)
         node_err_import.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2232,21 +2068,17 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_import(node_err_import)
 
     def test_allow_platform_import_in_domain_module(self) -> None:
-        node_no_err_import = astroid.extract_node(
-            """
+        node_no_err_import = astroid.extract_node("""
             import core.platform.email.mailgun_email_services_test #@
-        """
-        )
+        """)
         node_no_err_import.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_import(node_no_err_import)
 
     def test_forbid_controllers_from_import_in_domain_module(self) -> None:
-        node_err_importfrom = astroid.extract_node(
-            """
+        node_err_importfrom = astroid.extract_node("""
             from core.controllers import acl_decorators #@
-            """
-        )
+            """)
         node_err_importfrom.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2261,11 +2093,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_allow_platform_from_import_in_domain_module(self) -> None:
-        node_no_err_importfrom = astroid.extract_node(
-            """
+        node_no_err_importfrom = astroid.extract_node("""
             from core.platform.email import mailgun_email_services_test #@
-        """
-        )
+        """)
         node_no_err_importfrom.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
@@ -2273,11 +2103,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_forbid_service_import_in_domain_file(self) -> None:
-        node_err_import = astroid.extract_node(
-            """
+        node_err_import = astroid.extract_node("""
             import core.domain.exp_services #@
-            """
-        )
+            """)
         node_err_import.root().name = 'oppia.core.domain.exp_domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2290,21 +2118,17 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_import(node_err_import)
 
     def test_allow_domain_file_import_in_domain_file(self) -> None:
-        node_no_err_import = astroid.extract_node(
-            """
+        node_no_err_import = astroid.extract_node("""
             import core.domain.collection_domain #@
-            """
-        )
+            """)
         node_no_err_import.root().name = 'oppia.core.domain.topic_domain'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_import(node_no_err_import)
 
     def test_forbid_cleaner_from_import_in_domain_file(self) -> None:
-        node_err_importfrom = astroid.extract_node(
-            """
+        node_err_importfrom = astroid.extract_node("""
             from core.domain import html_cleaner #@
-            """
-        )
+            """)
         node_err_importfrom.root().name = 'oppia.core.domain.collection_domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2319,11 +2143,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_allow_domain_file_from_import_in_domain_file(self) -> None:
-        node_no_err_importfrom = astroid.extract_node(
-            """
+        node_no_err_importfrom = astroid.extract_node("""
             from core.domain import exp_domain #@
-            """
-        )
+            """)
         node_no_err_importfrom.root().name = 'oppia.core.domain.story_domain'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
@@ -2331,11 +2153,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_forbid_platform_import_in_controllers_module(self) -> None:
-        node_err_import = astroid.extract_node(
-            """
+        node_err_import = astroid.extract_node("""
             import core.platform #@
-        """
-        )
+        """)
         node_err_import.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2348,11 +2168,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_import(node_err_import)
 
     def test_forbid_storage_import_in_controllers_module(self) -> None:
-        node_err_import = astroid.extract_node(
-            """
+        node_err_import = astroid.extract_node("""
             import core.storage #@
-        """
-        )
+        """)
         node_err_import.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2365,21 +2183,17 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_import(node_err_import)
 
     def test_allow_domain_import_in_controllers_module(self) -> None:
-        node_no_err_import = astroid.extract_node(
-            """
+        node_no_err_import = astroid.extract_node("""
             import core.domain #@
-        """
-        )
+        """)
         node_no_err_import.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_import(node_no_err_import)
 
     def test_forbid_platform_from_import_in_controllers_module(self) -> None:
-        node_no_err_importfrom = astroid.extract_node(
-            """
+        node_no_err_importfrom = astroid.extract_node("""
             from core.platform import models #@
-        """
-        )
+        """)
         node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2394,11 +2208,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_forbid_storage_from_import_in_controllers_module(self) -> None:
-        node_no_err_importfrom = astroid.extract_node(
-            """
+        node_no_err_importfrom = astroid.extract_node("""
             from core.storage.user import gae_models as user_models #@
-        """
-        )
+        """)
         node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -2413,11 +2225,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             )
 
     def test_allow_domain_from_import_in_controllers_module(self) -> None:
-        node_no_err_importfrom = astroid.extract_node(
-            """
+        node_no_err_importfrom = astroid.extract_node("""
             from core.domain import user_services #@
-        """
-        )
+        """)
         node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
@@ -2438,10 +2248,8 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """c = 'something dummy'
-                """
-            )
+            tmp.write("""c = 'something dummy'
+                """)
         node_missing_newline_at_eof.file = filename
         node_missing_newline_at_eof.path = filename
 
@@ -2512,13 +2320,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 suggestion.change.new_value = (  # type: ignore[attr-defined]
                     new_content
                 ) #@
-                """
-            )
+                """)
         node_function_with_type_ignore_only.file = filename
 
         message = testutils.MessageTest(
@@ -2539,13 +2345,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 suggestion.change.new_value = (  # type: ignore[some-new-ignore]
                     new_content
                 ) #@
-                """
-            )
+                """)
         node_with_prohibited_error_code.file = filename
 
         message = testutils.MessageTest(
@@ -2567,8 +2371,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use MyPy ignore because ...
                 suggestion.change.new_value = (  # type: ignore[attr-defined]
                     new_content
@@ -2582,8 +2385,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 func_only_accept_str('hi')  # type: ignore[attr-defined]
 
                 #@
-                """
-            )
+                """)
         node_with_prohibited_type_ignore_error_code.file = filename
 
         message = testutils.MessageTest(
@@ -2607,13 +2409,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 suggestion.change.new_value = (  # type: ignore[arg-type, truthy-bool] pylint: disable=line-too-long
                     new_content
                 ) #@
-                """
-            )
+                """)
         node_with_prohibited_error_code_in_combined_form.file = filename
 
         message = testutils.MessageTest(
@@ -2637,13 +2437,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 suggestion.change.new_value = (  # type: ignore[return-none, truthy-bool] pylint: disable=line-too-long
                     new_content
                 ) #@
-                """
-            )
+                """)
         node_with_multiple_prohibited_error_code_in_combined_form.file = (
             filename
         )
@@ -2670,8 +2468,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use MyPy ignore because ...
                 suggestion.change.new_value = (   # type: ignore[attr-defined]
                     new_content
@@ -2690,8 +2487,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                     new_content
                 )
                 #@
-                """
-            )
+                """)
         node_function_with_extra_comment.file = filename
 
         message1 = testutils.MessageTest(
@@ -2717,8 +2513,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use MyPy ignore because ...
                 suggestion.change.new_value = (   # type: ignore[attr-defined]
                     new_content
@@ -2732,8 +2527,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 # Here we use MyPy ignore because ...
                 func_only_accept_str('hi')   # type: ignore[attr-defined]
                 #@
-                """
-            )
+                """)
         node_function_with_extra_comment2.file = filename
 
         message = testutils.MessageTest(
@@ -2754,14 +2548,12 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 suggestion.change.new_value = (  # pylint: disable=line-too-long type: ignore[attr-defined]
                     new_content
                 )
                 #@
-                """
-            )
+                """)
         node_with_type_ignore.file = filename
 
         message = testutils.MessageTest(
@@ -2780,8 +2572,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use MyPy ignore because attributes on BaseChange
                 # class are defined dynamically.
                 suggestion.change.new_value = (  # type: ignore[attr-defined]
@@ -2793,8 +2584,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 # MyPy to throw an error. Thus to avoid the error, we used
                 # ignore here.
                 func_only_accept_str(1234)  # type: ignore[arg-type] #@
-                """
-            )
+                """)
         node_with_type_ignore_in_single_form.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -2808,8 +2598,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use MyPy ignore because ...
                 suggestion.change.new_value = (  # type: ignore[attr-defined, list-item]
                     new_content
@@ -2818,8 +2607,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 # Here we use MyPy ignore because ...
                 func_only_accept_str(1234)  # type: ignore[arg-type]
                 #@
-                """
-            )
+                """)
         node_with_type_ignore_in_combined_form.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -2836,8 +2624,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use MyPy ignore because stubs of this lib are not
                 # available yet.
 
@@ -2856,8 +2643,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
 
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_ignore_and_more_than_fifteen_gap.file = filename
 
         message1 = testutils.MessageTest(
@@ -2884,15 +2670,13 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
 
                 def foo(exp_id: str) -> str:  # type: ignore
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_generic_type_ignore.file = filename
 
         message1 = testutils.MessageTest(
@@ -2921,8 +2705,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
@@ -2935,8 +2718,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 # are not available yet.
                 def foo(exp_id: str) -> str:  # type: ignore[misc]
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_both_generic_and_non_generic_type_ignores.file = filename
 
         message1 = testutils.MessageTest(
@@ -2958,15 +2740,13 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
 
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_ignore_having_todo.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -2995,13 +2775,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 schema_dict: Dict[str, Any] = {
                     'key': 'value'
                 } #@
-                """
-            )
+                """)
         node_with_any_type.file = filename
 
         message = testutils.MessageTest(
@@ -3020,11 +2798,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 func(variable_123: object) #@
-                """
-            )
+                """)
         node_with_object_type.file = filename
 
         message = testutils.MessageTest(
@@ -3043,11 +2819,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 func(cast(str, change.new_value)) #@
-                """
-            )
+                """)
         node_with_cast_method.file = filename
 
         message = testutils.MessageTest(
@@ -3068,8 +2842,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 schema_dict: Dict[str, Any] = {
                     'key': 'value'
                 }
@@ -3087,8 +2860,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 new_string = 'hi'
 
                 change_value = cast(str, change.new_value) #@
-                """
-            )
+                """)
         node_with_combined_types.file = filename
 
         message1 = testutils.MessageTest(
@@ -3123,12 +2895,10 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 def foo(*args: Any) -> None:
                     pass #@
-                """
-            )
+                """)
         node_with_any_type_arg.file = filename
 
         message = testutils.MessageTest(
@@ -3148,12 +2918,10 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 def foo(*args: str) -> Any:
                     pass #@
-                """
-            )
+                """)
         node_with_any_type_return.file = filename
 
         message = testutils.MessageTest(
@@ -3173,12 +2941,10 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 def foo(*args: Any) -> Any:
                     pass #@
-                """
-            )
+                """)
         node_with_any_type_return_and_args.file = filename
 
         message = testutils.MessageTest(
@@ -3198,8 +2964,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 def foo(*args: Any) -> Any:
                     pass
 
@@ -3208,8 +2973,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
                 def foo2(*args: str) -> Any:
                     pass #@
-                """
-            )
+                """)
         node_with_multiple_any_type_functions.file = filename
 
         message = testutils.MessageTest(
@@ -3236,11 +3000,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 from typing import Any, cast #@
-                """
-            )
+                """)
         node_with_any_and_cast_imported.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3254,13 +3016,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 from typing import (
                     Any, Dict, List, Optional, cast
                 ) #@
-                """
-            )
+                """)
         node_with_any_and_cast_in_multi_line_import.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3277,8 +3037,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 from typing import Any
 
                 # Here we use type Any because, this function can take
@@ -3299,8 +3058,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     # Here we use type Any because, new_value can accept any
                     # value.
                     new_value: Any = 'hi' #@
-                """
-            )
+                """)
         node_with_any_type_and_comment.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3314,8 +3072,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 from typing import Any, cast
 
                 # Here we use type Any because, this function can take
@@ -3341,8 +3098,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     variable_123: object
                 ) -> None:
                     pass #@
-                """
-            )
+                """)
         node_with_cast_method_and_comment.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3357,14 +3113,12 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
                 def foo(exp_id: object) -> object:
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_multiple_objects_in_func.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3381,8 +3135,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
 
@@ -3401,8 +3154,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
                 def foo(exp_id: str) -> object:
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_object_and_more_than_expected_gap.file = filename
 
         message = testutils.MessageTest(
@@ -3422,8 +3174,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
 
@@ -3435,8 +3186,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
                 def foo(exp_id: str) -> object:
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_object_and_less_than_fifteen_gap.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3453,15 +3203,13 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 # TODO(#sll): Here we use object because stubs of this lib
                 # are not available yet. So, instead of Any we used object
                 # here.
                 def foo(exp_id: object) -> object:
                     return 'hi' #@
-                """
-            )
+                """)
         node_with_object_and_todo_comment.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3476,15 +3224,13 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 from unittest import mock
 
                 def test_something() -> None:
                     with mock.patch.object(SomeClass, 'method'):
                         pass
-                """
-            )
+                """)
         node_with_mock_patch_object.file = filename
 
         with self.checker_test_object.assertNoMessages():
@@ -3510,13 +3256,11 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# This is a multiline
+            tmp.write("""# This is a multiline
                 # comment/
 
                 # Comment.
-                """
-            )
+                """)
         node_invalid_punctuation.file = filename
         node_invalid_punctuation.path = filename
 
@@ -3537,10 +3281,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """#Something.
-                """
-            )
+            tmp.write("""#Something.
+                """)
         node_no_space_at_beginning.file = filename
         node_no_space_at_beginning.path = filename
 
@@ -3559,12 +3301,10 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
 
                     # something.
-                """
-            )
+                """)
         node_no_capital_letter_at_beginning.file = filename
         node_no_capital_letter_at_beginning.path = filename
 
@@ -3585,12 +3325,10 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
                 # pylint: disable
                 a = 1 + 2  # pylint: disable
-                """
-            )
+                """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
 
@@ -3607,10 +3345,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """a = 1 + 2  # type: ignore[some-rule]
-                """
-            )
+            tmp.write("""a = 1 + 2  # type: ignore[some-rule]
+                """)
 
         node_inline_comment_with_allowed_pragma.file = filename
         node_inline_comment_with_allowed_pragma.path = filename
@@ -3632,10 +3368,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
-                """
-            )
+            tmp.write("""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
+                """)
 
         node_inline_comment_with_allowed_pragma.file = filename
         node_inline_comment_with_allowed_pragma.path = filename
@@ -3655,10 +3389,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """a = 1 + 2  # not_a_valid_pragma
-                """
-            )
+            tmp.write("""a = 1 + 2  # not_a_valid_pragma
+                """)
 
         node_inline_comment_with_invalid_pragma.file = filename
         node_inline_comment_with_invalid_pragma.path = filename
@@ -3682,12 +3414,10 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
 
                 # variable_name is used.
-                """
-            )
+                """)
         node_variable_name_in_comment.file = filename
         node_variable_name_in_comment.path = filename
 
@@ -3704,12 +3434,10 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
 
                 # v2 is used.
-                """
-            )
+                """)
         node_comment_with_version_info.file = filename
         node_comment_with_version_info.path = filename
 
@@ -3726,12 +3454,10 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
 
                 # str. variable is type of str.
-                """
-            )
+                """)
         node_data_type_in_comment.file = filename
         node_data_type_in_comment.path = filename
 
@@ -3748,13 +3474,11 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
                     \"\"\"# str. variable is type of str.\"\"\"
                     \"\"\"# str. variable is type
                     of str.\"\"\"
-                """
-            )
+                """)
         node_comment_inside_docstring.file = filename
         node_comment_inside_docstring.path = filename
 
@@ -3771,14 +3495,12 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """# coding: utf-8
+            tmp.write("""# coding: utf-8
 
                 # Multi
                 # line
                 # comment.
-                """
-            )
+                """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -3806,13 +3528,11 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     \"\"\" this file does something \"\"\"
                     import something
                     import random
-                """
-            )
+                """)
         node_no_empty_line_below_fileoverview.file = filename
         node_no_empty_line_below_fileoverview.path = filename
         node_no_empty_line_below_fileoverview.fromlineno = 2
@@ -3837,16 +3557,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
 
                     \"\"\" this file does something \"\"\"
 
 
                     import something
                     from something import random
-                """
-            )
+                """)
         node_extra_empty_lines_below_fileoverview.file = filename
         node_extra_empty_lines_below_fileoverview.path = filename
         node_extra_empty_lines_below_fileoverview.fromlineno = 2
@@ -3873,15 +3591,13 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     #this comment has a unicode character \u2713
                     \"\"\" this file does \u2715 something \"\"\"
 
 
                     from something import random
-                """
-            )
+                """)
         node_extra_empty_lines_below_fileoverview.file = filename
         node_extra_empty_lines_below_fileoverview.path = filename
         node_extra_empty_lines_below_fileoverview.fromlineno = 3
@@ -3908,14 +3624,12 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     #this comment has a unicode character \u2713
                     \"\"\" this file does \u2715 something \"\"\"
                     import something
                     import random
-                """
-            )
+                """)
         node_no_empty_line_below_fileoverview.file = filename
         node_no_empty_line_below_fileoverview.path = filename
         node_no_empty_line_below_fileoverview.fromlineno = 3
@@ -3940,14 +3654,12 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     \"\"\" this file does something \"\"\"
 
                     import something
                     import random
-                """
-            )
+                """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
         node_with_no_error_message.fromlineno = 2
@@ -3965,12 +3677,10 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     import something
                     import random
-                """
-            )
+                """)
         node_file_with_no_file_overview.file = filename
         node_file_with_no_file_overview.path = filename
 
@@ -3987,10 +3697,8 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
-                    \"\"\" this file does something \"\"\"   """
-            )
+            tmp.write("""
+                    \"\"\" this file does something \"\"\"   """)
         node_file_overview_at_end_of_file.file = filename
         node_file_overview_at_end_of_file.path = filename
         node_file_overview_at_end_of_file.fromlineno = 2
@@ -4026,15 +3734,13 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     # pylint: disable=invalid-name
                     def funcName():
                         \"\"\" # pylint: disable=test-purpose\"\"\"
                         pass
                     # pylint: enable=invalid-name
-                """
-            )
+                """)
         node_pragma_for_multiline.file = filename
         node_pragma_for_multiline.path = filename
 
@@ -4055,8 +3761,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     # pylint: disable=single-line-pragma
                     def func():
                         \"\"\"
@@ -4064,8 +3769,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                         \"\"\"
                         pass
                     # pylint: enable=single-line-pragma
-                """
-            )
+                """)
         node_enable_single_line_pragma_for_multiline.file = filename
         node_enable_single_line_pragma_for_multiline.path = filename
 
@@ -4086,8 +3790,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     # pylint: disable=invalid-name, single-line-pragma
                     def funcName():
                         \"\"\"
@@ -4095,8 +3798,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                         \"\"\"
                         pass
                     # pylint: enable=invalid_name, single-line-pragma
-                """
-            )
+                """)
         node_enable_single_line_pragma_with_invalid_name.file = filename
         node_enable_single_line_pragma_with_invalid_name.path = filename
 
@@ -4117,12 +3819,10 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     def funcName():  # pylint: disable=single-line-pragma
                         pass
-                """
-            )
+                """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
@@ -4139,8 +3839,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                     # pylint:disable=single-line-pragma
                     def func():
                         \"\"\"
@@ -4148,8 +3847,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                         \"\"\"
                         pass
                     # pylint:     enable=single-line-pragma
-                """
-            )
+                """)
         node_no_and_extra_space_before_pylint.file = filename
         node_no_and_extra_space_before_pylint.path = filename
 
@@ -4179,8 +3877,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 if(False):
                     pass
                 elif(True):
@@ -4189,8 +3886,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
                     pass
                 yield(1)
                 return True if(True) else False
-                """
-            )
+                """)
         node_no_space_after_keyword.file = filename
         node_no_space_after_keyword.path = filename
 
@@ -4229,8 +3925,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 if  False:
                     pass
                 elif  True:
@@ -4239,8 +3934,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
                     pass
                 yield  1
                 return True if  True else False
-                """
-            )
+                """)
         node_multiple_spaces_after_keyword.file = filename
         node_multiple_spaces_after_keyword.path = filename
 
@@ -4279,8 +3973,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w', encoding='utf-8') as tmp:
-            tmp.write(
-                """
+            tmp.write("""
                 if False:
                     pass
                 elif True:
@@ -4289,8 +3982,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
                     pass
                 yield 1
                 return True if True else False
-                """
-            )
+                """)
         node_single_space_after_keyword.file = filename
         node_single_space_after_keyword.path = filename
 
@@ -4313,12 +4005,10 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_inequality_op_on_none_adds_message(self) -> None:
-        if_node = astroid.extract_node(
-            """
+        if_node = astroid.extract_node("""
             if x != None: #@
                 pass
-            """
-        )
+            """)
         compare_node = if_node.test
         not_equal_none_message = testutils.MessageTest(
             msg_id='inequality-with-none', node=compare_node
@@ -4329,14 +4019,12 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_compare(compare_node)
 
     def test_inequality_op_on_none_with_wrapped_none_adds_message(self) -> None:
-        if_node = astroid.extract_node(
-            """
+        if_node = astroid.extract_node("""
             if x != ( #@
                 None
             ):
                 pass
-            """
-        )
+            """)
         compare_node = if_node.test
         not_equal_none_message = testutils.MessageTest(
             msg_id='inequality-with-none', node=compare_node
@@ -4347,12 +4035,10 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_compare(compare_node)
 
     def test_usage_of_is_not_on_none_does_not_add_message(self) -> None:
-        if_node = astroid.extract_node(
-            """
+        if_node = astroid.extract_node("""
             if x is not None: #@
                 pass
-            """
-        )
+            """)
         compare_node = if_node.test
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
@@ -4378,12 +4064,10 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         ]
         self.checker_test_object.checker.open()
 
-        call1, call2 = astroid.extract_node(
-            """
+        call1, call2 = astroid.extract_node("""
         example_func() #@
         a.example_attr() #@
-        """
-        )
+        """)
 
         message_remove_example_func = testutils.MessageTest(
             msg_id='remove-disallowed-function-calls',
@@ -4416,13 +4100,11 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         ]
         self.checker_test_object.checker.open()
 
-        call1, call2, call3 = astroid.extract_node(
-            """
+        call1, call2, call3 = astroid.extract_node("""
             datetime.datetime.now() #@
             self.assertEquals() #@
             b.a.next() #@
-        """
-        )
+        """)
 
         message_replace_disallowed_datetime = testutils.MessageTest(
             msg_id='replace-disallowed-function-calls',
@@ -4455,12 +4137,10 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         ) = [r'.*example_func', r'.*\..*example_attr']
         self.checker_test_object.checker.open()
 
-        call1, call2 = astroid.extract_node(
-            """
+        call1, call2 = astroid.extract_node("""
         somethingexample_func() #@
         c.someexample_attr() #@
-        """
-        )
+        """)
 
         message_remove_example_func = testutils.MessageTest(
             msg_id='remove-disallowed-function-calls',
@@ -4493,14 +4173,12 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         ]
         self.checker_test_object.checker.open()
 
-        call1, call2, call3, call4 = astroid.extract_node(
-            """
+        call1, call2, call3, call4 = astroid.extract_node("""
         somethingexample_func() #@
         d.example_attr() #@
         d.example_attr() #@
         d.b.example_attr() #@
-        """
-        )
+        """)
 
         message_replace_example_func = testutils.MessageTest(
             msg_id='replace-disallowed-function-calls',
@@ -4556,12 +4234,10 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
     def test_function_def_for_test_file_with_test_only_adds_no_msg(
         self,
     ) -> None:
-        def_node = astroid.extract_node(
-            """
+        def_node = astroid.extract_node("""
             def test_only_some_random_function(param1, param2):
                 pass
-            """
-        )
+            """)
         def_node.root().name = 'random_module_test'
 
         with self.checker_test_object.assertNoMessages():
@@ -4570,12 +4246,10 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
     def test_function_def_for_test_file_without_test_only_adds_no_msg(
         self,
     ) -> None:
-        def_node = astroid.extract_node(
-            """
+        def_node = astroid.extract_node("""
             def some_random_function(param1, param2):
                 pass
-            """
-        )
+            """)
         def_node.root().name = 'random_module_test'
 
         with self.checker_test_object.assertNoMessages():
@@ -4584,12 +4258,10 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
     def test_function_def_for_non_test_file_with_test_only_adds_msg(
         self,
     ) -> None:
-        def_node = astroid.extract_node(
-            """
+        def_node = astroid.extract_node("""
             def test_only_some_random_function(param1, param2):
                 pass
-            """
-        )
+            """)
         def_node.root().name = 'random_module_nontest'
         non_test_function_name_message = testutils.MessageTest(
             msg_id='non-test-files-function-name-checker', node=def_node
@@ -4603,12 +4275,10 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
     def test_function_def_for_non_test_file_without_test_only_adds_no_msg(
         self,
     ) -> None:
-        def_node = astroid.extract_node(
-            """
+        def_node = astroid.extract_node("""
             def some_random_function(param1, param2):
                 pass
-            """
-        )
+            """)
         def_node.root().name = 'random_module_nontest'
 
         with self.checker_test_object.assertNoMessages():
@@ -4627,16 +4297,14 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
     def test_schema_handlers_without_request_args_raise_error(self) -> None:
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMAS = None
 
             class FakeClass(BaseHandler):
                 URL_PATH_ARGS_SCHEMAS = {}
-            """
-        )
+            """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='no-schema-for-handler-args',
@@ -4651,16 +4319,14 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
     def test_schema_handlers_without_url_path_args_raise_error(self) -> None:
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMAS = None
 
             class FakeClass(BaseHandler):
                 HANDLER_ARGS_SCHEMAS = {}
-            """
-        )
+            """)
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -4676,8 +4342,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
     def test_handlers_with_valid_schema_do_not_raise_error(self) -> None:
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMAS = None
@@ -4685,8 +4350,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             class FakeClass(BaseHandler):
                 URL_PATH_ARGS_SCHEMAS = {}
                 HANDLER_ARGS_SCHEMAS = {'GET': {}}
-            """
-        )
+            """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_classdef(
@@ -4699,8 +4363,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         for missing schemas.
         """
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMAS = None
@@ -4708,8 +4371,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             class SessionBeginHandler(BaseHandler):
                 def get(self):
                     return
-            """
-        )
+            """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_classdef(
@@ -4723,8 +4385,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         defined locally in the class.
         """
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMAS = None
@@ -4735,8 +4396,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
             class FakeClass(BaseClass):
                 HANDLER_ARGS_SCHEMAS = {}
-            """
-        )
+            """)
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -4755,8 +4415,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         dict type.
         """
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMA = None
@@ -4768,8 +4427,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             class FakeClass(BaseClass):
                 URL_PATH_ARGS_SCHEMAS = 5
                 HANDLER_ARGS_SCHEMAS = {}
-            """
-        )
+            """)
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -4788,8 +4446,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         dict type.
         """
 
-        schemaless_class_node = astroid.extract_node(
-            """
+        schemaless_class_node = astroid.extract_node("""
             class BaseHandler():
                 HANDLER_ARGS_SCHEMAS = None
                 URL_PATH_ARGS_SCHEMAS = None
@@ -4801,8 +4458,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             class FakeClass(BaseClass):
                 URL_PATH_ARGS_SCHEMAS = {}
                 HANDLER_ARGS_SCHEMAS = 10
-            """
-        )
+            """)
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -4843,12 +4499,10 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
     def test_importing_text_from_typing_in_multi_line_raises_error(
         self,
     ) -> None:
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             from typing import (
                 Any, Dict, List, Optional, Sequence, Text, TypeVar)
-            """
-        )
+            """)
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
                 msg_id='disallowed-text-import',
@@ -4859,11 +4513,9 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_importfrom(node)
 
     def test_non_import_of_text_from_typing_does_not_raise_error(self) -> None:
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             from typing import Any, Dict, List, Optional
-            """
-        )
+            """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(node)
 
@@ -4880,11 +4532,9 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def test_encourages_interpolation_when_joining_multiple_strings(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             a = 'a' + 'b' #@
-            """
-        )
+            """)
 
         expression_node = node.value
 
@@ -4900,13 +4550,11 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def test_encourages_interpolation_for_string_variable_concatenation(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             var1 = 'Super'
             var2 = 'man'
             hero = var1 + var2 #@
-            """
-        )
+            """)
 
         expression_node = node.value
 
@@ -4922,11 +4570,9 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def test_does_not_encourage_string_interpolation_for_addition(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             total = 5 + 5 #@
-            """
-        )
+            """)
 
         expression_node = node.value
         with self.checker_test_object.assertNoMessages():
@@ -4935,11 +4581,9 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def test_does_not_encourage_string_interpolation_for_one_side_string_concatenation(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             result = 'super' + 500 #@
-            """
-        )
+            """)
 
         expression_node = node.value
         with self.checker_test_object.assertNoMessages():
@@ -4948,11 +4592,9 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def test_does_not_encourage_string_interpolation_with_undefined_variable(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             undefined_var + 'somthing here' #@
-            """
-        )
+            """)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(node)
@@ -4960,17 +4602,177 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def test_does_not_encourage_string_interpolation_with_datetime_addition(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
         from datetime import datetime, timedelta
         new_date = datetime.today() + timedelta(days=1) #@
-        """
-        )
+        """)
 
         expression_node = node.value
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
+
+
+class QuoteConventionCheckerTests(unittest.TestCase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.QuoteConventionChecker
+        )
+        self.checker_test_object.setup_method()
+
+    def _assert_messages(
+        self, source: str, *messages: testutils.MessageTest
+    ) -> None:
+        """Runs the checker on the source and asserts the emitted messages.
+
+        The module is parsed once so that both the docstring positions (from
+        the AST, via process_module) and the string tokens (via process_tokens)
+        come from the same source, mirroring how Pylint drives the checker.
+
+        Args:
+            source: str. The module source to lint.
+            *messages: MessageTest. The messages expected to be emitted, in
+                order. Pass none to assert that the source is clean.
+        """
+        node = astroid.parse(source)
+        self.checker_test_object.checker.process_module(node)
+        with self.checker_test_object.assertAddsMessages(*messages):
+            self.checker_test_object.checker.process_tokens(
+                pylint_utils.tokenize_module(node)
+            )
+
+    def test_single_quoted_short_string_is_allowed(self) -> None:
+        self._assert_messages("x = 'single'\n")
+
+    def test_double_quoted_short_string_is_flagged(self) -> None:
+        self._assert_messages(
+            'x = "double"\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+        )
+
+    def test_interior_single_quote_must_be_escaped_not_double_quoted(
+        self,
+    ) -> None:
+        # Unlike pylint-quotes, double quotes are not tolerated just because the
+        # body contains a single quote; the single quote must be escaped.
+        self._assert_messages(
+            'x = "it\'s"\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+        )
+
+    def test_single_quoted_string_with_escaped_quote_is_allowed(self) -> None:
+        self._assert_messages("x = 'it\\'s'\n")
+
+    def test_prefixed_double_quoted_string_is_flagged(self) -> None:
+        self._assert_messages(
+            'x = rb"bytes"\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+        )
+
+    def test_double_quoted_triple_string_is_allowed(self) -> None:
+        self._assert_messages('x = """triple"""\n')
+
+    def test_single_quoted_triple_string_is_flagged(self) -> None:
+        self._assert_messages(
+            "x = '''triple'''\n",
+            testutils.MessageTest(
+                msg_id='invalid-triple-quote', line=1, args=("'''",)
+            ),
+        )
+
+    def test_double_quoted_docstrings_are_allowed(self) -> None:
+        self._assert_messages(
+            '"""Module docstring."""\n'
+            '\n'
+            '\n'
+            'class Foo:\n'
+            '    """Class docstring."""\n'
+            '\n'
+            '    def method(self):\n'
+            '        """Method docstring."""\n'
+            '        return None\n'
+        )
+
+    def test_single_quoted_module_docstring_is_flagged(self) -> None:
+        self._assert_messages(
+            "'''Module docstring.'''\n",
+            testutils.MessageTest(
+                msg_id='invalid-docstring-quote', line=1, args=("'''",)
+            ),
+        )
+
+    def test_double_quoted_file_level_docstring_after_header_is_allowed(
+        self,
+    ) -> None:
+        # The module docstring is the file-level docstring, and it follows the
+        # copyright header comments rather than being the very first line.
+        self._assert_messages(
+            '# coding: utf-8\n'
+            '#\n'
+            '# Copyright 2018 The Oppia Authors.\n'
+            '\n'
+            '"""File overview docstring."""\n'
+            '\n'
+            'import os\n'
+        )
+
+    def test_single_quoted_file_level_docstring_after_header_is_flagged(
+        self,
+    ) -> None:
+        self._assert_messages(
+            '# coding: utf-8\n'
+            '#\n'
+            '# Copyright 2018 The Oppia Authors.\n'
+            '\n'
+            "'''File overview docstring.'''\n"
+            '\n'
+            'import os\n',
+            testutils.MessageTest(
+                msg_id='invalid-docstring-quote', line=5, args=("'''",)
+            ),
+        )
+
+    def test_single_quoted_function_docstring_is_flagged(self) -> None:
+        self._assert_messages(
+            'def foo():\n'
+            "    '''Function docstring.'''\n"
+            '    return None\n',
+            testutils.MessageTest(
+                msg_id='invalid-docstring-quote', line=2, args=("'''",)
+            ),
+        )
+
+    def test_single_quoted_triple_string_is_not_treated_as_docstring(
+        self,
+    ) -> None:
+        # A triple-quoted string that is not the first statement is a plain
+        # triple-quoted string, not a docstring.
+        self._assert_messages(
+            'def foo():\n' '    x = 1\n' "    return '''not a docstring'''\n",
+            testutils.MessageTest(
+                msg_id='invalid-triple-quote', line=3, args=("'''",)
+            ),
+        )
+
+    def test_multiple_violations_are_all_reported(self) -> None:
+        self._assert_messages(
+            'x = "double"\n' "y = '''triple'''\n",
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+            testutils.MessageTest(
+                msg_id='invalid-triple-quote', line=2, args=("'''",)
+            ),
+        )
 
 
 def build_module_node(doc: str | None = 'Custom test') -> astroid.nodes.Module:
