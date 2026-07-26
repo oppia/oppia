@@ -223,10 +223,8 @@ describe('TopicStorySectionComponent', () => {
     component.lessonCount = 2;
     component.practiceCount = 1;
 
-    expect(component.getStoryMetaText()).toBe('2 lessons, 1 practice');
-    expect(component.getStoryMetaAriaLabel()).toBe(
-      '2 lessons and 1 practice available'
-    );
+    expect(component.getStoryMetaText()).toBe('2 lessons');
+    expect(component.getStoryMetaAriaLabel()).toBe('2 lessons available');
   });
 
   it('should set study guide url on init', () => {
@@ -736,9 +734,12 @@ describe('TopicStorySectionComponent', () => {
     component.practiceCount = 1;
     expect(component.getLessonCountText()).toBe('1 lesson');
     expect(component.getPracticeCountText()).toBe('1 practice');
-    expect(component.getStoryMetaAriaLabel()).toBe(
-      '1 lesson and 1 practice available'
-    );
+    expect(component.getStoryMetaAriaLabel()).toBe('1 lesson available');
+  });
+
+  it('should pluralize practice count text', () => {
+    component.practiceCount = 2;
+    expect(component.getPracticeCountText()).toBe('2 practices');
   });
 
   it('should construct practice card url when arcs and fragments are present', () => {
@@ -964,7 +965,7 @@ describe('TopicStorySectionComponent', () => {
     await fixture.whenStable();
 
     expect(component.lessonCards.length).toBe(1);
-    expect(component.lessonCards[0].lessonTitle).toBe('Lesson 1: Node title 1');
+    expect(component.lessonCards[0].lessonTitle).toBe('Node title 1');
   });
 
   it('should handle loadChapterProgress with no exploration IDs gracefully', async () => {
@@ -2156,5 +2157,119 @@ describe('TopicStorySectionComponent', () => {
 
     const arcUrl = component.getEndOfArcUrl('1');
     expect(arcUrl).toBe('#');
+  });
+
+  it('should return false from isNewChapterLabelVisible when service throws', () => {
+    chapterLabelVisibilityService.isNewChapterLabelVisible.and.throwError(
+      'Service error'
+    );
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].isNewLabelVisible).toBeFalse();
+  });
+
+  it('should return false from isChapterPublished when getStatus throws', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getStatus.and.throwError('Status error');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].isPublished).toBeFalse();
+  });
+
+  it('should return false from isChapterReadyToPublish when getStatus throws and serial flag enabled', () => {
+    (
+      component as unknown as {
+        platformFeatureService: {
+          status: {
+            SerialChapterLaunchLearnerView: {
+              isEnabled: boolean;
+            };
+          };
+        };
+      }
+    ).platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getStatus.and.throwError('Status error');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    // When getStatus throws and serial flag is enabled, isComingSoon falls back to false
+    // (getExplorationId is set so it won't be coming_soon via the null check)
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
   });
 });

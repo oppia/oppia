@@ -150,9 +150,9 @@
       </ng-template>
 
       <section
-        class="coming-soon-chapters-section e2e-test-coming-soon-chapters"
-        *ngIf="comingSoonLessonCards.length > 0"
-        [attr.aria-label]="'Coming soon chapters'">
+               class="coming-soon-chapters-section e2e-test-coming-soon-chapters"
+               *ngIf="comingSoonLessonCards.length > 0"
+               [attr.aria-label]="'Coming soon chapters'">
         <div class="coming-soon-chapters-header">
           <div class="coming-soon-chapters-icon" aria-hidden="true">
             <i class="material-icons">schedule</i>
@@ -165,9 +165,9 @@
           </div>
         </div>
         <div
-          class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
-          [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
-          *ngFor="let lessonCard of comingSoonLessonCards">
+             class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
+             [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
+             *ngFor="let lessonCard of comingSoonLessonCards">
           <topic-lesson-card
             [lessonTitle]="lessonCard.lessonTitle"
             [lessonDescription]="lessonCard.lessonDescription"

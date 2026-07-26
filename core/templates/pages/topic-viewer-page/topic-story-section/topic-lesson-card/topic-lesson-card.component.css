@@ -208,18 +208,6 @@
   width: 100%;
 }
 
-.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button,
-.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button {
-  background: #d7d8de;
-  border-color: #b8bac7;
-  color: #6f7387;
-}
-
-.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button:disabled,
-.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button:disabled {
-  opacity: 1;
-}
-
 .topic-lesson-card-progress oppia-checkpoint-bar {
   display: block;
   height: 100%;
@@ -260,6 +248,18 @@
   justify-content: center;
   min-width: 88px;
   padding: 0 12px;
+}
+
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button,
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button {
+  background: #d7d8de;
+  border-color: #b8bac7;
+  color: #6f7387;
+}
+
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button:disabled,
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button:disabled {
+  opacity: 1;
 }
 
 .topic-lesson-card-btn-icon {

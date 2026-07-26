@@ -8,10 +8,10 @@
       <i class="material-icons">chevron_left</i>
     </button>
 
-        <div class="adventure-navigation-wrapper"
-          [class.adventure-navigation-wrapper--centered]="!hasHorizontalOverflow"
-          #scrollWrapper
-          (scroll)="onScroll()">
+    <div class="adventure-navigation-wrapper"
+         [class.adventure-navigation-wrapper--centered]="!hasHorizontalOverflow"
+         #scrollWrapper
+         (scroll)="onScroll()">
       <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx"
            [ngStyle]="{'border-color': adventureGroup.accentColor}">
         <topic-adventure-circle-badge *ngFor="let lesson of adventureGroup.lessons"
