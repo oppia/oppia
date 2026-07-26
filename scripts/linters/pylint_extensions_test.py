@@ -4973,6 +4973,174 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_binop(expression_node)
 
 
+class QuoteConventionCheckerTests(unittest.TestCase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.QuoteConventionChecker
+        )
+        self.checker_test_object.setup_method()
+
+    def _assert_messages(
+        self, source: str, *messages: testutils.MessageTest
+    ) -> None:
+        """Runs the checker on the source and asserts the emitted messages.
+
+        The module is parsed once so that both the docstring positions (from
+        the AST, via process_module) and the string tokens (via process_tokens)
+        come from the same source, mirroring how Pylint drives the checker.
+
+        Args:
+            source: str. The module source to lint.
+            *messages: MessageTest. The messages expected to be emitted, in
+                order. Pass none to assert that the source is clean.
+        """
+        node = astroid.parse(source)
+        self.checker_test_object.checker.process_module(node)
+        with self.checker_test_object.assertAddsMessages(*messages):
+            self.checker_test_object.checker.process_tokens(
+                pylint_utils.tokenize_module(node)
+            )
+
+    def test_single_quoted_short_string_is_allowed(self) -> None:
+        self._assert_messages('x = \'single\'\n')
+
+    def test_double_quoted_short_string_is_flagged(self) -> None:
+        self._assert_messages(
+            'x = "double"\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+        )
+
+    def test_interior_single_quote_must_be_escaped_not_double_quoted(
+        self,
+    ) -> None:
+        # Unlike pylint-quotes, double quotes are not tolerated just because the
+        # body contains a single quote; the single quote must be escaped.
+        self._assert_messages(
+            'x = "it\'s"\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+        )
+
+    def test_single_quoted_string_with_escaped_quote_is_allowed(self) -> None:
+        self._assert_messages('x = \'it\\\'s\'\n')
+
+    def test_prefixed_double_quoted_string_is_flagged(self) -> None:
+        self._assert_messages(
+            'x = rb"bytes"\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+        )
+
+    def test_double_quoted_triple_string_is_allowed(self) -> None:
+        self._assert_messages('x = """triple"""\n')
+
+    def test_single_quoted_triple_string_is_flagged(self) -> None:
+        self._assert_messages(
+            'x = \'\'\'triple\'\'\'\n',
+            testutils.MessageTest(
+                msg_id='invalid-triple-quote', line=1, args=('\'\'\'',)
+            ),
+        )
+
+    def test_double_quoted_docstrings_are_allowed(self) -> None:
+        self._assert_messages(
+            '"""Module docstring."""\n'
+            '\n'
+            '\n'
+            'class Foo:\n'
+            '    """Class docstring."""\n'
+            '\n'
+            '    def method(self):\n'
+            '        """Method docstring."""\n'
+            '        return None\n'
+        )
+
+    def test_single_quoted_module_docstring_is_flagged(self) -> None:
+        self._assert_messages(
+            '\'\'\'Module docstring.\'\'\'\n',
+            testutils.MessageTest(
+                msg_id='invalid-docstring-quote', line=1, args=('\'\'\'',)
+            ),
+        )
+
+    def test_double_quoted_file_level_docstring_after_header_is_allowed(
+        self,
+    ) -> None:
+        # The module docstring is the file-level docstring, and it follows the
+        # copyright header comments rather than being the very first line.
+        self._assert_messages(
+            '# coding: utf-8\n'
+            '#\n'
+            '# Copyright 2018 The Oppia Authors.\n'
+            '\n'
+            '"""File overview docstring."""\n'
+            '\n'
+            'import os\n'
+        )
+
+    def test_single_quoted_file_level_docstring_after_header_is_flagged(
+        self,
+    ) -> None:
+        self._assert_messages(
+            '# coding: utf-8\n'
+            '#\n'
+            '# Copyright 2018 The Oppia Authors.\n'
+            '\n'
+            '\'\'\'File overview docstring.\'\'\'\n'
+            '\n'
+            'import os\n',
+            testutils.MessageTest(
+                msg_id='invalid-docstring-quote', line=5, args=('\'\'\'',)
+            ),
+        )
+
+    def test_single_quoted_function_docstring_is_flagged(self) -> None:
+        self._assert_messages(
+            (
+                'def foo():\n'
+                '    \'\'\'Function docstring.\'\'\'\n'
+                '    return None\n'
+            ),
+            testutils.MessageTest(
+                msg_id='invalid-docstring-quote', line=2, args=('\'\'\'',)
+            ),
+        )
+
+    def test_single_quoted_triple_string_is_not_treated_as_docstring(
+        self,
+    ) -> None:
+        # A triple-quoted string that is not the first statement is a plain
+        # triple-quoted string, not a docstring.
+        self._assert_messages(
+            (
+                'def foo():\n'
+                '    x = 1\n'
+                '    return \'\'\'not a docstring\'\'\'\n'
+            ),
+            testutils.MessageTest(
+                msg_id='invalid-triple-quote', line=3, args=('\'\'\'',)
+            ),
+        )
+
+    def test_multiple_violations_are_all_reported(self) -> None:
+        self._assert_messages(
+            'x = "double"\ny = \'\'\'triple\'\'\'\n',
+            testutils.MessageTest(
+                msg_id='invalid-string-quote', line=1, args=('"',)
+            ),
+            testutils.MessageTest(
+                msg_id='invalid-triple-quote', line=2, args=('\'\'\'',)
+            ),
+        )
+
+
 def build_module_node(doc: str | None = 'Custom test') -> astroid.nodes.Module:
     """Returns a Module node with the given docstring.
 
