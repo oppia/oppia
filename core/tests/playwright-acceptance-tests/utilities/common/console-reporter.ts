@@ -48,14 +48,14 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   ),
   // This error covers cases where the PencilCode site is unreachable,
   // e.g. an invalid/expired SSL certificate (net::ERR_CERT_*) or a
-  // network-level failure such as a connection timeout
-  // (net::ERR_CONNECTION_TIMED_OUT), which has been observed on CI
-  // runners. We match on any net::ERR_* code rather than a specific one,
-  // since PencilCode is a third-party site and the exact failure mode is
-  // out of our control.
+  // connection timeout (net::ERR_CONNECTION_TIMED_OUT), both of which
+  // have been observed on CI runners. We only match these specific
+  // codes, rather than any net::ERR_*, so that an unrelated failure
+  // (e.g. a typo'd URL causing net::ERR_NAME_NOT_RESOLVED) would still
+  // surface as a test failure instead of being silently ignored.
   new RegExp(
     escapeRegExp('https://pencilcode.net/lib/pencilcodeembed.js') +
-      '.*Failed to load resource: net::ERR_.*'
+      '.*Failed to load resource: net::ERR_(CERT_\\w+|CONNECTION_TIMED_OUT).*'
   ),
   // This is the follow-on error logged by InsertScriptService when the
   // PencilCode script above fails to load. Same root cause as the
