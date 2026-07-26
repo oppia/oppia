@@ -60,18 +60,19 @@
                        [(localValue)]="stateContentService.displayed._html">
   </schema-based-editor>
   <div *ngIf="isFormulaAsText(stateContentService.displayed._html)"
-       class="alert alert-warning e2e-test-formula-as-text-warning mt-2 d-flex justify-content-between align-items-center">
+       class="alert alert-warning e2e-test-formula-as-text-warning mt-2 d-flex justify-content-between"
+       [ngClass]="mathWarningIsMinimized ? 'align-items-center' : 'align-items-start'">
     <div *ngIf="!mathWarningIsMinimized">
       <i class="fas fa-exclamation-triangle mr-1"></i>
       <span>
-        This content contains plain-text math expressions. Consider using the
-        <strong>Math Formula (x²)</strong>
+        This content contains plain-text math expressions. Consider using<br>
+        the <strong>Math Formula (x²)</strong>
         component to ensure correct rendering across all languages.
       </span>
     </div>
     <div *ngIf="mathWarningIsMinimized">
       <i class="fas fa-exclamation-triangle mr-2" title="Plain-text math expressions detected."></i>
-      <span class="d-none d-sm-inline">&nbsp;Math expression warning</span>
+      <span>&nbsp;Math expression warning</span>
     </div>
     <i class="fas"
        [ngClass]="mathWarningIsMinimized ? 'fa-angle-down' : 'fa-angle-up'"
