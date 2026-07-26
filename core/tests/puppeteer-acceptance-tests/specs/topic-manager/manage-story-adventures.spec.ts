@@ -13,7 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test for story editor adventures (arcs).
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1mDDP9joYRWjYExWghmPcqV4RTut6BOMqqUHOkxL_npI/edit?tab=t.4t336fwwj9ly
+ *
+ * TM.SA Manage story adventures in the story editor.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -81,7 +84,7 @@ describe('Topic Manager', function () {
   }, 2100000);
 
   it(
-    'should create adventures by splitting after chapters 3, 7, and 10',
+    'should create a new adventure from existing chapters',
     async function () {
       await curriculumAdmin.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
 
@@ -92,26 +95,10 @@ describe('Topic Manager', function () {
 
       await curriculumAdmin.splitIntoAdventure('Chapter 3');
       await curriculumAdmin.expectAdventureCount(2);
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
+      await curriculumAdmin.expectAdventureHeaderToBeVisible('Adventure 2');
 
       await curriculumAdmin.expectScreenshotToMatch(
         'storyEditorAfterSplitAtChapter3',
-        __dirname
-      );
-
-      await curriculumAdmin.splitIntoAdventure('Chapter 7');
-      await curriculumAdmin.expectAdventureCount(3);
-
-      await curriculumAdmin.expectScreenshotToMatch(
-        'storyEditorAfterSplitAtChapter7',
-        __dirname
-      );
-
-      await curriculumAdmin.splitIntoAdventure('Chapter 10');
-      await curriculumAdmin.expectAdventureCount(4);
-
-      await curriculumAdmin.expectScreenshotToMatch(
-        'storyEditorAfterSplitAtChapter10',
         __dirname
       );
 
@@ -141,6 +128,20 @@ describe('Topic Manager', function () {
       );
 
       await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
+
+      await curriculumAdmin.saveStoryDraft();
+
+      await curriculumAdmin.openStoryEditor(
+        'The Adventure Story',
+        'Adventure Topic'
+      );
+
+      await curriculumAdmin.expectAdventureToHave(
+        'Part Two',
+        'The second part of the story'
+      );
+
+      await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -149,7 +150,7 @@ describe('Topic Manager', function () {
     'should remove an adventure boundary',
     async function () {
       await curriculumAdmin.removeAdventureBoundary();
-      await curriculumAdmin.expectAdventureCount(3);
+      await curriculumAdmin.expectAdventureCount(1);
 
       await curriculumAdmin.expectScreenshotToMatch(
         'storyEditorAfterRemovingAdventureBoundary',
@@ -160,8 +161,15 @@ describe('Topic Manager', function () {
   );
 
   it(
-    'should persist adventure groupings after save and reload',
+    'should save changes in the story with adventure groupings',
     async function () {
+      await curriculumAdmin.splitIntoAdventure('Chapter 3');
+      await curriculumAdmin.expectAdventureCount(2);
+      await curriculumAdmin.expectAdventureHeaderToBeVisible('Adventure 2');
+
+      await curriculumAdmin.splitIntoAdventure('Chapter 7');
+      await curriculumAdmin.expectAdventureCount(3);
+
       await curriculumAdmin.saveStoryDraft();
 
       await curriculumAdmin.openStoryEditor(
