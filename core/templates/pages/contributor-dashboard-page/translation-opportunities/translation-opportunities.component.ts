@@ -75,8 +75,7 @@ export class TranslationOpportunitiesComponent {
   } {
     const opportunitiesDicts: TranslationOpportunity[] = [];
     const untranslatableOpportunitiesDicts: TranslationOpportunity[] = [];
-    for (const index in opportunities) {
-      const opportunity = opportunities[index];
+    for (const opportunity of opportunities) {
       const subheading = opportunity.getOpportunitySubheading();
       const heading = opportunity.getOpportunityHeading();
       const languageCode =
