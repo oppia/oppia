@@ -1355,7 +1355,7 @@ export class ExplorationEditor extends BaseUser {
         historyItem
       );
 
-      //Use Playwright's download event to reliably capture the file.
+      // Use Playwright's download event to reliably capture the file.
       const downloadPromise = this.page.waitForEvent('download');
       await this.clickOnElement(downloadButton);
       const download = await downloadPromise;
