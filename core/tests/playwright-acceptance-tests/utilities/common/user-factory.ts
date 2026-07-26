@@ -36,6 +36,20 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
+import {
+  ContributorAdmin,
+  ContributorAdminFactory,
+} from '../user/contributor-admin';
+import {Contributor, ContributorFactory} from '../user/contributor';
+import {
+  TranslationSubmitter,
+  TranslationSubmitterFactory,
+} from '../user/translation-submitter';
+import {
+  TranslationReviewer,
+  TranslationReviewerFactory,
+} from '../user/translation-reviewer';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -51,6 +65,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.TRANSLATION_COORDINATOR]: TranslationCoordinatorFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
 } as const;
 
@@ -81,7 +96,11 @@ type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
   CurriculumAdmin &
-  TopicManager;
+  TopicManager &
+  ContributorAdmin &
+  Contributor &
+  TranslationSubmitter &
+  TranslationReviewer;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -155,6 +174,13 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.TRANSLATION_COORDINATOR:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TRANSLATION_COORDINATOR,
+            args
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -204,6 +230,10 @@ export class UserFactory {
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
+      ContributorAdminFactory(page),
+      ContributorFactory(page),
+      TranslationSubmitterFactory(page),
+      TranslationReviewerFactory(page),
     ]);
 
     user.username = username;

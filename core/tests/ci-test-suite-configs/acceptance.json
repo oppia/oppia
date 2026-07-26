@@ -647,8 +647,8 @@
     },
     {
       "name": "translation-coordinator/manage-contributors-translation-review-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "practice-question-coordinator/manage-contributors-question-review-submission-rights",
