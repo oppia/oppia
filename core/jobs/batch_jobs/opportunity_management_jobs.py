@@ -361,6 +361,59 @@ class PopulateSkillOpportunityModelPropertiesJob(base_jobs.JobBase):
         )
 
 
+class AuditPopulateSkillOpportunityModelPropertiesJob(base_jobs.JobBase):
+    """Job that audits PopulateSkillOpportunityModelPropertiesJob."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit."""
+        skill_opportunity_models = (
+            self.pipeline
+            | 'Get all non-deleted skill opportunity models'
+            >> ndb_io.GetModels(
+                opportunity_models.SkillOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+        )
+
+        topic_rights_models = (
+            self.pipeline
+            | 'Get all non-deleted topic rights models'
+            >> ndb_io.GetModels(
+                topic_models.TopicRightsModel.get_all(include_deleted=False)
+            )
+        )
+
+        topic_models_list = (
+            self.pipeline
+            | 'Get all non-deleted topic models'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+        )
+
+        topic_rights_list = beam.pvalue.AsList(topic_rights_models)
+        topic_models_as_list = beam.pvalue.AsList(topic_models_list)
+
+        populated_models_results = skill_opportunity_models | beam.Map(
+            PopulateSkillOpportunityModelPropertiesJob._populate_properties,
+            topic_rights_models=topic_rights_list,
+            topic_models_list=topic_models_as_list,
+        )
+
+        unused_updated_models = (
+            populated_models_results
+            | 'Filter OK results' >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap results' >> beam.Map(lambda res: res.unwrap())
+        )
+
+        return populated_models_results | 'Transform to JobRunResults' >> (
+            job_result_transforms.ResultsToJobRunResults(
+                'SKILL OPPORTUNITY MODEL AUDITED'
+            )
+        )
+
+
 class DeleteExplorationOpportunitySummariesJob(base_jobs.JobBase):
     """Job that deletes ExplorationOpportunitySummaryModels."""
 
