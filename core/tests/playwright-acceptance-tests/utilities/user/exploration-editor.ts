@@ -1349,14 +1349,13 @@ export class ExplorationEditor extends BaseUser {
         state: 'visible',
         timeout: 30000,
       });
-      //await this.expectElementToBeVisible(downloadExplorationButton);
 
       const downloadButton = await this.getElementInParent(
         downloadExplorationButton,
         historyItem
       );
 
-      // Use Playwright's download event to reliably capture the file.
+      //Use Playwright's download event to reliably capture the file.
       const downloadPromise = this.page.waitForEvent('download');
       await this.clickOnElement(downloadButton);
       const download = await downloadPromise;
