@@ -1,4 +1,7 @@
-<div class="topic-lesson-card" [attr.aria-label]="lessonTitle || 'Lesson card'" [class.collapsed]="!isExpanded">
+<div class="topic-lesson-card"
+     [attr.aria-label]="lessonTitle || 'Lesson card'"
+  [class.collapsed]="!isExpanded"
+  [class.coming-soon-section-card]="isComingSoonSectionCard">
   <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded"
        [ngStyle]="{'background-color': adventureAccentColor}">
     <img class="topic-lesson-card-image"
@@ -17,19 +20,31 @@
                                       [textColor]="isExpanded ? '#fff' : '#6b7280'">
         </topic-adventure-circle-badge>
         <div class="topic-lesson-card-header">
-          <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
-          <p class="topic-lesson-card-description" *ngIf="isExpanded">{{ lessonDescription }}</p>
+          <div class="topic-lesson-card-title-with-labels">
+            <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
+            <span class="topic-lesson-card-new-label" *ngIf="isNewLessonLabelVisible">NEW</span>
+            <span class="topic-lesson-card-coming-soon-label" *ngIf="isComingSoonLesson">
+              COMING SOON
+            </span>
+          </div>
+          <p class="topic-lesson-card-description" *ngIf="isExpanded || isComingSoonSectionCard">
+            {{ isComingSoonLesson ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : lessonDescription }}
+          </p>
         </div>
         <button class="topic-lesson-card-chevron-badge"
                 type="button"
                 [class.expanded]="isExpanded"
+                [class.disabled-chevron]="isComingSoonSectionCard"
+                [disabled]="isComingSoonSectionCard"
                 (click)="toggleExpanded()"
                 aria-label="Toggle lesson card details">
           <i class="material-icons">expand_more</i>
         </button>
       </div>
     </div>
-    <div class="topic-lesson-card-footer" [class.collapsed]="!isExpanded">
+        <div class="topic-lesson-card-footer"
+          [class.collapsed]="!isExpanded"
+          [class.coming-soon-footer]="isComingSoonSectionCard">
       <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
         <oppia-checkpoint-bar
           [totalCheckpointsCount]="totalCheckpointsCount"
@@ -41,13 +56,13 @@
         <div class="topic-lesson-card-actions-left">
           <span
                 class="topic-lesson-card-fallback-info-icon"
-                *ngIf="shouldShowFallbackCta()"
+                *ngIf="shouldShowFallbackCta() && !isComingSoonLesson"
                 [matTooltip]="getFallbackInfoTooltipText()"
                 tabindex="0">
             <i class="material-icons">info_outline</i>
           </span>
           <topic-lesson-language-selector class="topic-lesson-language-selector"
-            *ngIf="shouldShowInfoIcon"
+            *ngIf="shouldShowInfoIcon && !isComingSoonLesson"
             [availableTextLanguageCodes]="availableTextLanguageCodes"
             [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
             [voiceoverLanguageAccentDescriptions]="availableVoiceoverLanguageAccentDescriptions"
@@ -61,14 +76,14 @@
           <div class="topic-lesson-card-secondary-buttons">
             <button class="topic-lesson-card-secondary-button"
                     type="button"
-                    [disabled]="!practiceUrl && !startUrl"
+                  [disabled]="isComingSoonLesson || (!practiceUrl && !startUrl)"
                     (click)="onPracticeButtonClick()">
               <i class="material-icons topic-lesson-card-btn-icon">edit</i>
               {{ 'I18N_TOPIC_VIEWER_PRACTICE_BUTTON' | translate }}
             </button>
             <button class="topic-lesson-card-secondary-button"
                     type="button"
-                    [disabled]="!studyUrl && !startUrl"
+                  [disabled]="isComingSoonLesson || (!studyUrl && !startUrl)"
                     (click)="onStudyButtonClick()">
               <i class="material-icons topic-lesson-card-btn-icon">menu_book</i>
               {{ 'I18N_TOPIC_VIEWER_STUDY_BUTTON' | translate }}
@@ -76,7 +91,7 @@
           </div>
           <button class="topic-lesson-card-start-button"
                   type="button"
-                  [disabled]="!startUrl"
+              [disabled]="isComingSoonLesson || !startUrl"
                   (click)="onStartButtonClick()">
             <i class="material-icons topic-lesson-card-btn-icon">play_arrow</i>
             {{ 'I18N_TOPIC_VIEWER_PLAY_LESSON_BUTTON' | translate }}

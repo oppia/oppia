@@ -85,6 +85,7 @@
                 [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
                 [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
                 [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+                [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
                 [navigatedLessonNumber]="navigatedLessonNumber">
               </topic-lesson-card>
             </div>
@@ -110,7 +111,7 @@
       <ng-template #flatLessonList>
         <div class="story-lesson-card-wrapper"
              [id]="'lesson-' + lessonCard.lessonNumber"
-             *ngFor="let lessonCard of lessonCards">
+             *ngFor="let lessonCard of availableLessonCards">
           <topic-lesson-card
             [lessonTitle]="lessonCard.lessonTitle"
             [lessonDescription]="lessonCard.lessonDescription"
@@ -127,6 +128,7 @@
             [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
             [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
             [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
             [navigatedLessonNumber]="navigatedLessonNumber">
           </topic-lesson-card>
         </div>
@@ -146,6 +148,48 @@
           </topic-adventure-end-test-card>
         </div>
       </ng-template>
+
+      <section
+        class="coming-soon-chapters-section e2e-test-coming-soon-chapters"
+        *ngIf="comingSoonLessonCards.length > 0"
+        [attr.aria-label]="'Coming soon chapters'">
+        <div class="coming-soon-chapters-header">
+          <div class="coming-soon-chapters-icon" aria-hidden="true">
+            <i class="material-icons">schedule</i>
+          </div>
+          <div class="coming-soon-chapters-heading-text">
+            <h4 class="coming-soon-chapters-title">COMING SOON CHAPTERS</h4>
+            <p class="coming-soon-chapters-count">
+              {{ comingSoonLessonCards.length }} chapter{{ comingSoonLessonCards.length === 1 ? '' : 's' }}
+            </p>
+          </div>
+        </div>
+        <div
+          class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
+          [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
+          *ngFor="let lessonCard of comingSoonLessonCards">
+          <topic-lesson-card
+            [lessonTitle]="lessonCard.lessonTitle"
+            [lessonDescription]="lessonCard.lessonDescription"
+            [thumbnailUrl]="lessonCard.thumbnailUrl"
+            [startUrl]="lessonCard.startUrl"
+            [studyUrl]="studyGuideUrl"
+            [practiceUrl]="lessonCard.practiceUrl"
+            [lessonNumber]="lessonCard.lessonNumber"
+            [adventureAccentColor]="'#6b7280'"
+            [isActiveLesson]="false"
+            [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+            [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
+            [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount"
+            [availableTextLanguageCodes]="lessonCard.availableTextLanguageCodes"
+            [availableVoiceoverLanguageCodes]="lessonCard.availableVoiceoverLanguageCodes"
+            [availableVoiceoverLanguageAccentDescriptions]="lessonCard.availableVoiceoverLanguageAccentDescriptions"
+            [isNewLessonLabelVisible]="lessonCard.isNewLabelVisible"
+            [isComingSoonSectionCard]="true"
+            [navigatedLessonNumber]="navigatedLessonNumber">
+          </topic-lesson-card>
+        </div>
+      </section>
 
       <topic-mastery-challenge-card
         [actionUrl]="masteryChallengeUrl">

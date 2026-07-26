@@ -34,10 +34,14 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+import constants from 'assets/constants';
 
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
@@ -58,6 +62,9 @@ interface LessonCardData {
     | 'coming_soon';
   totalCheckpointsCount: number;
   visitedCheckpointsCount: number;
+  isComingSoon: boolean;
+  isPublished: boolean;
+  isNewLabelVisible: boolean;
   availableTextLanguageCodes: string[];
   availableVoiceoverLanguageCodes: string[];
   availableVoiceoverLanguageAccentDescriptions: {[accentCode: string]: string};
@@ -84,8 +91,11 @@ interface PracticeCardData {
 }
 
 interface AdventureNavigationGroupData {
-  lessonNumbers: number[];
+  lessons: {
+    lessonNumber: number;
+  }[];
   accentColor: string;
+  showPractice: boolean;
 }
 
 @Component({
@@ -109,8 +119,11 @@ export class TopicStorySectionComponent
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
+  availableLessonCards: LessonCardData[] = [];
+  comingSoonLessonCards: LessonCardData[] = [];
   adventureGroups: AdventureGroupData[] = [];
   visibleAdventureGroups: AdventureGroupData[] = [];
+  comingSoonAdventureGroups: AdventureGroupData[] = [];
   adventureNavigationGroups: AdventureNavigationGroupData[] = [];
   activeLessonNumber: number | null = null;
   practiceCard: PracticeCardData = {
@@ -154,7 +167,9 @@ export class TopicStorySectionComponent
 
     // Scroll to the lesson card after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el = document.getElementById('lesson-' + lessonNumber);
+      const el =
+        document.getElementById('lesson-' + lessonNumber) ||
+        document.getElementById('coming-soon-lesson-' + lessonNumber);
       if (el) {
         el.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
@@ -178,6 +193,8 @@ export class TopicStorySectionComponent
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
+    private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef
   ) {}
 
@@ -231,19 +248,11 @@ export class TopicStorySectionComponent
   }
 
   getStoryMetaText(): string {
-    const lessonText = this.getLessonCountText();
-    if (this.practiceCount > 0) {
-      return lessonText + ', ' + this.getPracticeCountText();
-    }
-    return lessonText;
+    return this.getLessonCountText();
   }
 
   getStoryMetaAriaLabel(): string {
-    const lessonText = this.getLessonCountText();
-    if (this.practiceCount > 0) {
-      return lessonText + ' and ' + this.getPracticeCountText() + ' available';
-    }
-    return lessonText + ' available';
+    return this.getLessonCountText() + ' available';
   }
 
   shouldShowAdventureEndTestCard(adventureIndex: number): boolean {
@@ -269,7 +278,7 @@ export class TopicStorySectionComponent
   private getLessonProgressStatus(
     node: StoryNode
   ): 'not_started' | 'in_progress' | 'completed' | 'coming_soon' {
-    if (!node.getExplorationId()) {
+    if (this.isChapterDisplayedAsComingSoon(node) || !node.getExplorationId()) {
       return 'coming_soon';
     }
 
@@ -312,6 +321,7 @@ export class TopicStorySectionComponent
       .getAllNodes()
       .map((node: StoryNode, index: number) => {
         const explorationId = node.getExplorationId();
+        const lessonProgressStatus = this.getLessonProgressStatus(node);
         let totalCheckpoints = 0;
         let visitedCheckpoints = 0;
 
@@ -328,17 +338,24 @@ export class TopicStorySectionComponent
 
         return {
           lessonNumber: index + 1,
-          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+          lessonTitle: node.getTitle(),
           lessonDescription: node.getDescription(),
           thumbnailUrl: this.getLessonThumbnailUrl(node),
-          startUrl: this.getLessonStartUrl(node),
-          practiceUrl: this.getLessonPracticeUrl(
-            node.getId().split('_').pop() || ''
-          ),
-          lessonProgressStatus: this.getLessonProgressStatus(node),
+          startUrl:
+            lessonProgressStatus === 'coming_soon'
+              ? '#'
+              : this.getLessonStartUrl(node),
+          practiceUrl:
+            lessonProgressStatus === 'coming_soon'
+              ? '#'
+              : this.getLessonPracticeUrl(node.getId().split('_').pop() || ''),
+          lessonProgressStatus,
           totalCheckpointsCount: totalCheckpoints,
           visitedCheckpointsCount: visitedCheckpoints,
           nodeId: node.getId(),
+          isComingSoon: lessonProgressStatus === 'coming_soon',
+          isPublished: this.isChapterPublished(node),
+          isNewLabelVisible: this.isNewChapterLabelVisible(node),
           availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
           availableVoiceoverLanguageCodes:
             node.getAvailableVoiceoverLanguageCodes(),
@@ -349,7 +366,7 @@ export class TopicStorySectionComponent
 
     const allNodes = this.storySummary.getAllNodes();
     this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.visibleAdventureGroups = this.adventureGroups;
+    this.updateVisibleSections();
   }
 
   private buildAdventureGroups(allNodes: StoryNode[]): AdventureGroupData[] {
@@ -405,6 +422,7 @@ export class TopicStorySectionComponent
     const allNodes = this.storySummary.getAllNodes();
     this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
       const explorationId = node.getExplorationId();
+      const lessonProgressStatus = this.getLessonProgressStatus(node);
       const progressSummary = explorationId
         ? this.chapterProgressLoaderService.getChapterProgressSummary(
             explorationId
@@ -414,19 +432,28 @@ export class TopicStorySectionComponent
 
       return {
         lessonNumber: index + 1,
-        lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+        lessonTitle: node.getTitle(),
         lessonDescription: node.getDescription(),
         thumbnailUrl: this.getLessonThumbnailUrl(node),
-        startUrl: this.getLessonStartUrl(node),
-        practiceUrl: this.getLessonPracticeUrl(nodeNumber),
+        startUrl:
+          lessonProgressStatus === 'coming_soon'
+            ? '#'
+            : this.getLessonStartUrl(node),
+        practiceUrl:
+          lessonProgressStatus === 'coming_soon'
+            ? '#'
+            : this.getLessonPracticeUrl(nodeNumber),
         nodeId: node.getId(),
-        lessonProgressStatus: this.getLessonProgressStatus(node),
+        lessonProgressStatus,
         totalCheckpointsCount: progressSummary
           ? progressSummary.totalCheckpoints
           : 0,
         visitedCheckpointsCount: progressSummary
           ? progressSummary.visitedCheckpoints
           : 0,
+        isComingSoon: lessonProgressStatus === 'coming_soon',
+        isPublished: this.isChapterPublished(node),
+        isNewLabelVisible: this.isNewChapterLabelVisible(node),
         availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
         availableVoiceoverLanguageCodes:
           node.getAvailableVoiceoverLanguageCodes(),
@@ -436,22 +463,12 @@ export class TopicStorySectionComponent
     });
 
     this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.visibleAdventureGroups = this.adventureGroups;
-    this.adventureNavigationGroups = this.visibleAdventureGroups.map(group => {
-      return {
-        lessonNumbers: group.lessonCards.map(card => card.lessonNumber),
-        accentColor: group.accentColor,
-      };
-    });
+    this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
     this.masteryChallengeUrl = this.getMasteryChallengeUrl();
-
-    if (this.visibleAdventureGroups.length) {
-      this._expandedAdventureIndices = new Set([0]);
-    }
   }
 
   private getPracticeCardData(): PracticeCardData {
@@ -460,9 +477,9 @@ export class TopicStorySectionComponent
       this.adventureGroups.length > 0 ? this.adventureGroups[0].arcId : '';
 
     return {
-      practiceTitle: 'Arc 1 Review & Test',
+      practiceTitle: 'Adventure 1 Review & Test',
       practiceDescription:
-        'Test what you have learned in Arc 1 to unlock Arc ' +
+        'Test what you have learned in Adventure 1 to unlock Adventure ' +
         nextArcNumber +
         '.',
       relatedLessonNumber:
@@ -575,9 +592,102 @@ export class TopicStorySectionComponent
       return notStartedLesson.lessonNumber;
     }
 
-    return this.lessonCards.length > 0
-      ? this.lessonCards[0].lessonNumber
+    return this.availableLessonCards.length > 0
+      ? this.availableLessonCards[0].lessonNumber
       : null;
+  }
+
+  private updateVisibleSections(): void {
+    this.availableLessonCards = this.lessonCards.filter(
+      lesson => !lesson.isComingSoon
+    );
+    this.comingSoonLessonCards = this.lessonCards.filter(
+      lesson => lesson.isComingSoon
+    );
+
+    this.visibleAdventureGroups = this.adventureGroups
+      .map(group => {
+        return {
+          ...group,
+          lessonCards: group.lessonCards.filter(card => !card.isComingSoon),
+        };
+      })
+      .filter(group => group.lessonCards.length > 0);
+
+    this.comingSoonAdventureGroups = this.adventureGroups
+      .map(group => {
+        return {
+          ...group,
+          lessonCards: group.lessonCards.filter(card => card.isComingSoon),
+        };
+      })
+      .filter(group => group.lessonCards.length > 0);
+
+    this.adventureNavigationGroups = this.adventureGroups
+      .map(group => {
+        const publishedLessons = group.lessonCards.filter(
+          card => card.isPublished
+        );
+
+        return {
+          lessons: publishedLessons.map(card => {
+            return {
+              lessonNumber: card.lessonNumber,
+            };
+          }),
+          accentColor: group.accentColor,
+          showPractice: publishedLessons.length > 0,
+        };
+      })
+      .filter(group => group.lessons.length > 0);
+
+    if (this.visibleAdventureGroups.length) {
+      this._expandedAdventureIndices = new Set([0]);
+    }
+  }
+
+  private isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
+  private isChapterReadyToPublish(node: StoryNode): boolean {
+    try {
+      return node.getStatus() === constants.STORY_NODE_STATUS_READY_TO_PUBLISH;
+    } catch {
+      return false;
+    }
+  }
+
+  private isChapterPublished(node: StoryNode): boolean {
+    try {
+      return node.getStatus() === constants.STORY_NODE_STATUS_PUBLISHED;
+    } catch {
+      return false;
+    }
+  }
+
+  private isChapterDisplayedAsComingSoon(node: StoryNode): boolean {
+    if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return this.isChapterReadyToPublish(node);
+    }
+
+    return !node.getExplorationId();
+  }
+
+  private isNewChapterLabelVisible(node: StoryNode): boolean {
+    if (this.isChapterDisplayedAsComingSoon(node)) {
+      return false;
+    }
+
+    try {
+      return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+        node,
+        this.storySummary
+      );
+    } catch {
+      return false;
+    }
   }
 
   private getLessonStartUrl(node: StoryNode): string {

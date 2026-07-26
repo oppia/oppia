@@ -34,6 +34,8 @@ import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/servi
 import {UrlService} from 'services/contextual/url.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
@@ -52,6 +54,14 @@ describe('TopicStorySectionComponent', () => {
   };
   let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
   let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
+  let chapterLabelVisibilityService: jasmine.SpyObj<ChapterLabelVisibilityService>;
+  let platformFeatureService: {
+    status: {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: boolean;
+      };
+    };
+  };
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
@@ -86,6 +96,20 @@ describe('TopicStorySectionComponent', () => {
       'TopicSessionFallbackLanguageService',
       ['clearSelection']
     );
+    chapterLabelVisibilityService = jasmine.createSpyObj(
+      'ChapterLabelVisibilityService',
+      ['isNewChapterLabelVisible']
+    );
+    chapterLabelVisibilityService.isNewChapterLabelVisible.and.returnValue(
+      false
+    );
+    platformFeatureService = {
+      status: {
+        SerialChapterLaunchLearnerView: {
+          isEnabled: false,
+        },
+      },
+    };
 
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent, MockTranslatePipe],
@@ -101,6 +125,14 @@ describe('TopicStorySectionComponent', () => {
         {
           provide: TopicSessionFallbackLanguageService,
           useValue: topicSessionFallbackLanguageService,
+        },
+        {
+          provide: ChapterLabelVisibilityService,
+          useValue: chapterLabelVisibilityService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: platformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -747,6 +779,7 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = storySummary;
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'place-values';
+    component.practiceCount = 1;
     component.practiceSubtopicIds = [3];
     component.practiceCount = 1;
 
@@ -1085,6 +1118,93 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.lessonCards[0].lessonProgressStatus).toBe('coming_soon');
     expect(component.lessonCards[0].startUrl).toBe('#');
+  });
+
+  it('should mark ready-to-publish lesson as coming soon when serial learner flag is enabled', () => {
+    (
+      component as unknown as {
+        platformFeatureService: {
+          status: {
+            SerialChapterLaunchLearnerView: {
+              isEnabled: boolean;
+            };
+          };
+        };
+      }
+    ).platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Coming Soon Node');
+    storyNodeSpy.getDescription.and.returnValue('Description');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getStatus.and.returnValue('Ready To Publish');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Coming Soon Node'],
+      [storyNodeSpy]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].lessonProgressStatus).toBe('coming_soon');
+    expect(component.comingSoonLessonCards.length).toBe(1);
+    expect(component.availableLessonCards.length).toBe(0);
+  });
+
+  it('should use chapter label visibility service for new lesson labels', () => {
+    chapterLabelVisibilityService.isNewChapterLabelVisible.and.returnValue(
+      true
+    );
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].isNewLabelVisible).toBeTrue();
   });
 
   it('should not call loadChapterProgress on first change of storySummary', () => {
@@ -1744,6 +1864,7 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getStatus',
       'getAvailableTextLanguageCodes',
       'getAvailableVoiceoverLanguageCodes',
       'getAvailableVoiceoverLanguageAccentDescriptions',
@@ -1753,6 +1874,7 @@ describe('TopicStorySectionComponent', () => {
     storyNodeSpy.getThumbnailFilename.and.returnValue(null);
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getStatus.and.returnValue('Published');
     storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
     storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
     storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
@@ -1778,8 +1900,92 @@ describe('TopicStorySectionComponent', () => {
     await fixture.whenStable();
 
     expect(component.adventureNavigationGroups.length).toBe(1);
-    expect(component.adventureNavigationGroups[0].lessonNumbers).toEqual([1]);
+    expect(component.adventureNavigationGroups[0].lessons).toEqual([
+      {
+        lessonNumber: 1,
+      },
+    ]);
     expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
+    expect(component.adventureNavigationGroups[0].showPractice).toBeTrue();
+  });
+
+  it('should exclude non-published lessons from adventure navigation groups', () => {
+    const publishedNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    publishedNodeSpy.getTitle.and.returnValue('Published Node');
+    publishedNodeSpy.getDescription.and.returnValue('Desc');
+    publishedNodeSpy.getThumbnailFilename.and.returnValue(null);
+    publishedNodeSpy.getExplorationId.and.returnValue('exp_1');
+    publishedNodeSpy.getId.and.returnValue('node_1');
+    publishedNodeSpy.getStatus.and.returnValue('Published');
+    publishedNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    publishedNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    publishedNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const draftNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    draftNodeSpy.getTitle.and.returnValue('Draft Node');
+    draftNodeSpy.getDescription.and.returnValue('Desc');
+    draftNodeSpy.getThumbnailFilename.and.returnValue(null);
+    draftNodeSpy.getExplorationId.and.returnValue('exp_2');
+    draftNodeSpy.getId.and.returnValue('node_2');
+    draftNodeSpy.getStatus.and.returnValue('Draft');
+    draftNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    draftNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    draftNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Published Node', 'Draft Node'],
+      [publishedNodeSpy, draftNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.adventureNavigationGroups).toEqual([
+      {
+        lessons: [{lessonNumber: 1}],
+        accentColor: '#27a844',
+        showPractice: true,
+      },
+    ]);
   });
 
   it('should handle onNavigationLessonSelected when lesson is not in any adventure', fakeAsync(() => {

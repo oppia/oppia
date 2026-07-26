@@ -65,17 +65,17 @@
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
   font-size: 24px;
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 500;
+  line-height: 24px;
   margin: 0;
 }
 
 .adventure-end-test-card-description {
-  color: #595959;
+  color: #3d3d3d;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 400;
-  line-height: 1.35;
+  line-height: 24px;
   margin: 0;
   max-width: 520px;
   overflow-wrap: break-word;
@@ -132,18 +132,19 @@
   }
 
   .adventure-end-test-card-description {
-    color: #3b3b3b;
-    font-size: 20px;
+    color: #3d3d3d;
+    font-size: 17px;
     font-weight: 400;
     letter-spacing: 0;
-    line-height: 30px;
+    line-height: 24px;
     margin-top: -8px;
     max-width: 500px;
   }
 
   .adventure-end-test-card-actions {
+    align-self: center;
     margin-right: 14px;
-    margin-top: 50px;
+    margin-top: 10px;
   }
 }
 
@@ -178,8 +179,8 @@
   }
 
   .adventure-end-test-card-title {
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 20px;
+    line-height: 24px;
   }
 
   .adventure-end-test-card-title-row {
@@ -187,8 +188,8 @@
   }
 
   .adventure-end-test-card-description {
-    font-size: 14px;
-    line-height: 1.35;
+    font-size: 15px;
+    line-height: 22px;
     max-width: none;
   }
 

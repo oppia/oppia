@@ -62,6 +62,8 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() availableVoiceoverLanguageAccentDescriptions: {
     [accentCode: string]: string;
   } = {};
+  @Input() isNewLessonLabelVisible: boolean = false;
+  @Input() isComingSoonSectionCard: boolean = false;
   @Input() navigatedLessonNumber: number | null = null;
 
   resolvedThumbnailUrl: string = '';
@@ -82,7 +84,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
     this.initializeLanguageSelection();
     // Expand only the first lesson by default.
-    this.isExpanded = this.lessonNumber === 1;
+    this.isExpanded = !this.isComingSoonSectionCard && this.lessonNumber === 1;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -94,7 +96,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     }
     if (changes.navigatedLessonNumber) {
       // Auto-expand this lesson if it's the navigated lesson from the navbar.
-      if (this.navigatedLessonNumber === this.lessonNumber) {
+      if (
+        !this.isComingSoonSectionCard &&
+        this.navigatedLessonNumber === this.lessonNumber
+      ) {
         this.isExpanded = true;
       }
     }
@@ -107,6 +112,10 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     );
   }
 
+  get isComingSoonLesson(): boolean {
+    return this.lessonProgressStatus === 'coming_soon';
+  }
+
   navigateTo(url: string): void {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);
@@ -114,7 +123,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onStartButtonClick(): void {
-    if (!this.startUrl) {
+    if (!this.startUrl || this.isComingSoonLesson) {
       return;
     }
 
@@ -132,14 +141,23 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   onPracticeButtonClick(): void {
+    if (this.isComingSoonLesson) {
+      return;
+    }
     this.navigateTo(this.practiceUrl || this.startUrl);
   }
 
   onStudyButtonClick(): void {
+    if (this.isComingSoonLesson) {
+      return;
+    }
     this.navigateTo(this.studyUrl || this.startUrl);
   }
 
   toggleExpanded(): void {
+    if (this.isComingSoonSectionCard) {
+      return;
+    }
     this.isExpanded = !this.isExpanded;
   }
 

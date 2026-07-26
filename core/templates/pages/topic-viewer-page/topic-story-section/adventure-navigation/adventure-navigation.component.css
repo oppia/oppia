@@ -25,6 +25,10 @@
   scrollbar-width: none;
 }
 
+.adventure-navigation-wrapper--centered {
+  justify-content: center;
+}
+
 .adventure-navigation-wrapper::-webkit-scrollbar {
   display: none;
 }
@@ -91,8 +95,22 @@
   flex: 0 0 auto;
 }
 
+.adventure-navigation-mastery-group {
+  align-items: center;
+  border: 2.5px solid #f5a623;
+  border-radius: 36px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  padding: 8px 14px;
+}
+
 .adventure-navigation-clickable {
   cursor: pointer;
+}
+
+.adventure-navigation-coming-soon {
+  opacity: 0.65;
 }
 
 .adventure-navigation-clickable:focus-visible {
@@ -108,6 +126,10 @@
 
   .adventure-navigation-group {
     gap: 8px;
+    padding: 6px 12px;
+  }
+
+  .adventure-navigation-mastery-group {
     padding: 6px 12px;
   }
 
@@ -135,6 +157,10 @@
 
   .adventure-navigation-group {
     gap: 6px;
+    padding: 5px 10px;
+  }
+
+  .adventure-navigation-mastery-group {
     padding: 5px 10px;
   }
 

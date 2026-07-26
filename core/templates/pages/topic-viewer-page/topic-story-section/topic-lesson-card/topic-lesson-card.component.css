@@ -21,6 +21,16 @@
   overflow: visible;
 }
 
+.topic-lesson-card.coming-soon-section-card {
+  background: #d9d9de;
+  border: 1px solid #d1d1d7;
+  border-radius: 8px;
+}
+
+.topic-lesson-card.coming-soon-section-card.collapsed {
+  border-radius: 8px;
+}
+
 .topic-lesson-card-thumbnail {
   align-self: stretch;
   flex: 0 0 auto;
@@ -56,6 +66,11 @@
   padding: 14px 18px;
 }
 
+.topic-lesson-card.coming-soon-section-card .topic-lesson-card-content,
+.topic-lesson-card.coming-soon-section-card .topic-lesson-card-content.collapsed {
+  background: #d9d9de;
+}
+
 .topic-lesson-card-copy {
   display: flex;
   flex: 1;
@@ -89,6 +104,35 @@
   min-width: 0;
 }
 
+.topic-lesson-card-title-with-labels {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topic-lesson-card-new-label {
+  background: #1f7a42;
+  border-radius: 999px;
+  color: #fff;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 3px 10px;
+}
+
+.topic-lesson-card-coming-soon-label {
+  background: #d6c9ff;
+  border-radius: 999px;
+  color: #2046a6;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 3px 10px;
+}
+
 .topic-lesson-card-chevron-badge {
   align-items: center;
   background: #fff;
@@ -107,6 +151,14 @@
 
 .topic-lesson-card-chevron-badge:hover {
   background: #fff;
+}
+
+.topic-lesson-card-chevron-badge.disabled-chevron,
+.topic-lesson-card-chevron-badge:disabled {
+  border-color: #d4d7de;
+  color: #7a7f8d;
+  cursor: default;
+  opacity: 1;
 }
 
 .topic-lesson-card-chevron-badge .material-icons {
@@ -135,7 +187,7 @@
   color: #3d3d3d;
   font-family: Roboto, Arial, sans-serif;
   font-size: 17px;
-  line-height: 1.25;
+  line-height: 24px;
   margin: 0;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -154,6 +206,18 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
+}
+
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button,
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button {
+  background: #d7d8de;
+  border-color: #b8bac7;
+  color: #6f7387;
+}
+
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-secondary-button:disabled,
+.topic-lesson-card-footer.coming-soon-footer .topic-lesson-card-start-button:disabled {
+  opacity: 1;
 }
 
 .topic-lesson-card-progress oppia-checkpoint-bar {
@@ -300,14 +364,34 @@
     padding: 14px 16px;
   }
 
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-content.collapsed {
+    padding: 12px 14px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-title-row.collapsed {
+    align-items: flex-start;
+  }
+
   .topic-lesson-card-title {
-    font-size: 20px;
+    font-size: 24px;
     line-height: 24px;
   }
 
   .topic-lesson-card-description {
-    font-size: 15px;
-    line-height: 1.3;
+    font-size: 17px;
+    line-height: 24px;
+  }
+
+  .topic-lesson-card-coming-soon-label {
+    font-size: 11px;
+    line-height: 1;
+    padding: 4px 8px;
+  }
+
+  .topic-lesson-card-new-label {
+    font-size: 11px;
+    line-height: 1;
+    padding: 4px 8px;
   }
 
   .topic-lesson-card-progress {
@@ -334,6 +418,16 @@
     font-size: 12px;
     margin-top: 6px;
   }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-chevron-badge {
+    flex: 0 0 40px;
+    height: 40px;
+    width: 40px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-chevron-badge .material-icons {
+    font-size: 22px;
+  }
 }
 
 @media (max-width: 450px) {
@@ -356,8 +450,25 @@
     padding: 12px;
   }
 
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-content,
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-content.collapsed {
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
   .topic-lesson-card-copy {
     gap: 4px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-copy,
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-content.collapsed .topic-lesson-card-copy {
+    gap: 6px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-title-row,
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-title-row.collapsed {
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .topic-lesson-card-title {
@@ -369,6 +480,24 @@
   .topic-lesson-card-description {
     font-size: 13px;
     line-height: 18px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-header {
+    gap: 4px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-title-with-labels {
+    gap: 6px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-coming-soon-label {
+    font-size: 10px;
+    padding: 4px 7px;
+  }
+
+  .topic-lesson-card-new-label {
+    font-size: 10px;
+    padding: 4px 7px;
   }
 
   .topic-lesson-card-progress {
@@ -409,8 +538,18 @@
     width: 38px;
   }
 
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-chevron-badge {
+    flex: 0 0 36px;
+    height: 36px;
+    width: 36px;
+  }
+
   .topic-lesson-card-chevron-badge .material-icons {
     font-size: 24px;
+  }
+
+  .topic-lesson-card.coming-soon-section-card .topic-lesson-card-chevron-badge .material-icons {
+    font-size: 20px;
   }
 
   .topic-lesson-language-selector-wrapper {

@@ -185,31 +185,31 @@
   border-radius: 50%;
   color: #fff;
   display: flex;
-  flex: 0 0 44px;
-  height: 44px;
+  flex: 0 0 52px;
+  height: 52px;
   justify-content: center;
-  min-width: 44px;
-  width: 44px;
+  min-width: 52px;
+  width: 52px;
 }
 
 .adventure-flag-icon .material-icons {
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
 }
 
 .adventure-header-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
   min-width: 0;
 }
 
 .adventure-title {
   color: #1f2937;
-  font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 24px;
   margin: 0;
   overflow-wrap: break-word;
 }
@@ -218,6 +218,8 @@
   color: #1f2937;
   font-family: Roboto, Arial, sans-serif;
   font-size: 13px;
+  font-weight: 400;
+  line-height: normal;
   margin: 0;
   opacity: 0.8;
 }
@@ -274,6 +276,68 @@
 
 .adventure-lessons .story-lesson-card-wrapper:first-child {
   margin-top: 0;
+}
+
+.coming-soon-chapters-section {
+  background: #efeafc;
+  border: 1px solid #ddd3f7;
+  border-radius: 10px;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.coming-soon-chapters-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.coming-soon-chapters-icon {
+  align-items: center;
+  background: #4f1fc2;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  flex: 0 0 52px;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.coming-soon-chapters-icon .material-icons {
+  font-size: 30px;
+}
+
+.coming-soon-chapters-heading-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.coming-soon-chapters-title {
+  color: #4600c3;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin: 0;
+}
+
+.coming-soon-chapters-count {
+  color: #1f2937;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.coming-soon-lesson-card-wrapper {
+  margin-top: 10px;
 }
 
 topic-coming-soon-chapters,
@@ -354,6 +418,39 @@ topic-mastery-challenge-card {
     margin-top: 12px;
   }
 
+  .coming-soon-chapters-title {
+    font-size: 20px;
+    line-height: 22px;
+  }
+
+  .coming-soon-chapters-count {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .coming-soon-chapters-section {
+    padding: 14px;
+  }
+
+  .coming-soon-chapters-header {
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .coming-soon-chapters-heading-text {
+    gap: 6px;
+  }
+
+  .coming-soon-chapters-icon {
+    flex: 0 0 44px;
+    height: 44px;
+    width: 44px;
+  }
+
+  .coming-soon-chapters-icon .material-icons {
+    font-size: 26px;
+  }
+
   .adventure-header {
     padding: 12px 14px;
   }
@@ -374,7 +471,8 @@ topic-mastery-challenge-card {
   }
 
   .adventure-title {
-    font-size: 16px;
+    font-size: 20px;
+    line-height: 24px;
   }
 
   .adventure-completion-text {
@@ -433,6 +531,7 @@ topic-mastery-challenge-card {
     border-radius: 12px;
     border-bottom-left-radius: 0;
     flex: 1;
+
     font-size: 13px;
     line-height: 1.4;
     max-width: none;
@@ -493,11 +592,51 @@ topic-mastery-challenge-card {
     min-height: 462px;
   }
 
+  .coming-soon-chapters-section {
+    border-radius: 8px;
+    margin-top: 14px;
+    padding: 12px;
+  }
+
+  .coming-soon-chapters-header {
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .coming-soon-chapters-icon {
+    flex: 0 0 40px;
+    height: 40px;
+    width: 40px;
+  }
+
+  .coming-soon-chapters-icon .material-icons {
+    font-size: 22px;
+  }
+
+  .coming-soon-chapters-heading-text {
+    gap: 4px;
+  }
+
+  .coming-soon-chapters-title {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .coming-soon-chapters-count {
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  .coming-soon-lesson-card-wrapper {
+    margin-top: 8px;
+  }
+
   .story-lesson-card-wrapper {
-    margin-top: auto;
+    margin-top: 8px;
   }
 
   .story-practice-card-wrapper {
-    margin-top: auto;
+    margin-top: 8px;
   }
 }

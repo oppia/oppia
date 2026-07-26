@@ -200,7 +200,13 @@ describe('AdventureNavigationComponent', () => {
     component.ngOnChanges({
       adventureGroups: new SimpleChange(
         [],
-        [{lessonNumbers: [1], accentColor: '#000'}],
+        [
+          {
+            lessons: [{lessonNumber: 1}],
+            accentColor: '#000',
+            showPractice: true,
+          },
+        ],
         false
       ),
     });

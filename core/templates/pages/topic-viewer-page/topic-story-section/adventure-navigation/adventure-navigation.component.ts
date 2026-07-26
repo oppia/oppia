@@ -31,8 +31,11 @@ import {
 } from '@angular/core';
 
 interface AdventureNavigationGroup {
-  lessonNumbers: number[];
+  lessons: {
+    lessonNumber: number;
+  }[];
   accentColor: string;
+  showPractice: boolean;
 }
 
 @Component({
@@ -52,6 +55,7 @@ export class AdventureNavigationComponent
 
   showLeftArrow: boolean = false;
   showRightArrow: boolean = false;
+  hasHorizontalOverflow: boolean = false;
 
   private scrollCheckTimeouts: ReturnType<typeof setTimeout>[] = [];
 
@@ -87,10 +91,12 @@ export class AdventureNavigationComponent
   private updateArrows(): void {
     const el = this.scrollWrapper?.nativeElement;
     if (!el) {
+      this.hasHorizontalOverflow = false;
       return;
     }
 
     const hasOverflow = el.scrollWidth > el.clientWidth;
+    this.hasHorizontalOverflow = hasOverflow;
 
     if (!hasOverflow) {
       // No overflow, hide both arrows.

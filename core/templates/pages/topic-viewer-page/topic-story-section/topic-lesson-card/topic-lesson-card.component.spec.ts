@@ -237,6 +237,14 @@ describe('TopicLessonCardComponent', () => {
     });
   });
 
+  it('should expose isComingSoonLesson based on lesson progress status', () => {
+    component.lessonProgressStatus = 'coming_soon';
+    expect(component.isComingSoonLesson).toBeTrue();
+
+    component.lessonProgressStatus = 'not_started';
+    expect(component.isComingSoonLesson).toBeFalse();
+  });
+
   describe('onStartButtonClick', () => {
     beforeEach(() => {
       component.startUrl = '/explore/123';
@@ -743,6 +751,17 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
     });
+
+    it('should not navigate when lesson is coming soon', () => {
+      spyOn(component, 'navigateTo');
+      component.lessonProgressStatus = 'coming_soon';
+      component.practiceUrl = '/practice/123';
+      component.startUrl = '/explore/123';
+
+      component.onPracticeButtonClick();
+
+      expect(component.navigateTo).not.toHaveBeenCalled();
+    });
   });
 
   describe('onStudyButtonClick', () => {
@@ -764,6 +783,17 @@ describe('TopicLessonCardComponent', () => {
       component.onStudyButtonClick();
 
       expect(component.navigateTo).toHaveBeenCalledWith('/explore/123');
+    });
+
+    it('should not navigate when lesson is coming soon', () => {
+      spyOn(component, 'navigateTo');
+      component.lessonProgressStatus = 'coming_soon';
+      component.studyUrl = '/study/123';
+      component.startUrl = '/explore/123';
+
+      component.onStudyButtonClick();
+
+      expect(component.navigateTo).not.toHaveBeenCalled();
     });
   });
 
