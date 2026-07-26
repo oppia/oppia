@@ -247,11 +247,6 @@
         <td mat-cell *matCellDef="let element" class="task-run-data"> {{element.getEventName()}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="languageAccent">
-        <th mat-header-cell *matHeaderCellDef> Language Accent </th>
-        <td mat-cell *matCellDef="let element" class="task-run-data"> {{element.getEventName()}} </td>
-      </ng-container>
-
       <ng-container matColumnDef="numberOfRetries">
         <th mat-header-cell *matHeaderCellDef> Number of retries </th>
         <td mat-cell *matCellDef="let element" class="metadata-alignment"> {{element.currentRetryAttempt}} </td>

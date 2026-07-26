@@ -31,6 +31,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     email_deletion_jobs,
     exp_migration_jobs,
     exp_search_indexing_jobs,
+    exp_end_state_normalization_jobs,
     exploration_voiceover_sync_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
