@@ -1246,14 +1246,14 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       ['node_1']
     );
     expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
     expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Arc 1'
+      'Adventure 1'
     );
     expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
       'Description 1'
@@ -1270,7 +1270,7 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       ['node_1']
     );
@@ -1278,7 +1278,7 @@ describe('Story update service', () => {
       {
         cmd: 'create_arc',
         arc_id: 'arc_1',
-        title: 'Arc 1',
+        title: 'Adventure 1',
         description: 'Description 1',
         node_ids: ['node_1'],
       },
@@ -1289,7 +1289,7 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       ['node_1']
     );
@@ -1302,7 +1302,7 @@ describe('Story update service', () => {
     expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
     expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Arc 1'
+      'Adventure 1'
     );
     expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
       'Description 1'
@@ -1313,7 +1313,7 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
@@ -1322,7 +1322,7 @@ describe('Story update service', () => {
       {
         cmd: 'create_arc',
         arc_id: 'arc_1',
-        title: 'Arc 1',
+        title: 'Adventure 1',
         description: 'Description 1',
         node_ids: [],
       },
@@ -1337,22 +1337,22 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Arc 1'
+      'Adventure 1'
     );
 
-    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Arc Title');
+    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Adventure Title');
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'New Arc Title'
+      'New Adventure Title'
     );
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Arc 1'
+      'Adventure 1'
     );
   });
 
@@ -1360,23 +1360,23 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
-    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Arc Title');
+    storyUpdateService.renameArc(_sampleStory, 'arc_1', 'New Adventure Title');
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'create_arc',
         arc_id: 'arc_1',
-        title: 'Arc 1',
+        title: 'Adventure 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
         cmd: 'rename_arc',
         arc_id: 'arc_1',
-        new_title: 'New Arc Title',
+        new_title: 'New Adventure Title',
       },
     ]);
   });
@@ -1385,19 +1385,19 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Arc 1'
+      'Adventure 1'
     );
 
     storyUpdateService.updateArcProperty(
       _sampleStory,
       'arc_1',
       'title',
-      'Arc 1',
+      'Adventure 1',
       'New Title'
     );
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
@@ -1406,7 +1406,7 @@ describe('Story update service', () => {
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
-      'Arc 1'
+      'Adventure 1'
     );
   });
 
@@ -1414,7 +1414,7 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
@@ -1446,7 +1446,7 @@ describe('Story update service', () => {
       storyUpdateService.createArc(
         _sampleStory,
         'arc_1',
-        'Arc 1',
+        'Adventure 1',
         'Description 1',
         []
       );
@@ -1454,14 +1454,14 @@ describe('Story update service', () => {
         _sampleStory,
         'arc_1',
         'title',
-        'Arc 1',
+        'Adventure 1',
         'New Title'
       );
       expect(undoRedoService.getCommittableChangeList()).toEqual([
         {
           cmd: 'create_arc',
           arc_id: 'arc_1',
-          title: 'Arc 1',
+          title: 'Adventure 1',
           description: 'Description 1',
           node_ids: [],
         },
@@ -1469,7 +1469,7 @@ describe('Story update service', () => {
           cmd: 'update_arc_property',
           arc_id: 'arc_1',
           property_name: 'title',
-          old_value: 'Arc 1',
+          old_value: 'Adventure 1',
           new_value: 'New Title',
         },
       ]);
@@ -1492,7 +1492,7 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
@@ -1512,14 +1512,14 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
     storyUpdateService.createArc(
       _sampleStory,
       'arc_2',
-      'Arc 2',
+      'Adventure 2',
       'Description 2',
       []
     );
@@ -1541,14 +1541,14 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       []
     );
     storyUpdateService.createArc(
       _sampleStory,
       'arc_2',
-      'Arc 2',
+      'Adventure 2',
       'Description 2',
       []
     );
@@ -1557,14 +1557,14 @@ describe('Story update service', () => {
       {
         cmd: 'create_arc',
         arc_id: 'arc_1',
-        title: 'Arc 1',
+        title: 'Adventure 1',
         description: 'Description 1',
         node_ids: [],
       },
       {
         cmd: 'create_arc',
         arc_id: 'arc_2',
-        title: 'Arc 2',
+        title: 'Adventure 2',
         description: 'Description 2',
         node_ids: [],
       },
@@ -1579,14 +1579,14 @@ describe('Story update service', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
-      'Arc 1',
+      'Adventure 1',
       'Description 1',
       ['node_1', 'node_2']
     );
     storyUpdateService.createArc(
       _sampleStory,
       'arc_2',
-      'Arc 2',
+      'Adventure 2',
       'Description 2',
       []
     );
@@ -1625,14 +1625,14 @@ describe('Story update service', () => {
       storyUpdateService.createArc(
         _sampleStory,
         'arc_1',
-        'Arc 1',
+        'Adventure 1',
         'Description 1',
         ['node_1', 'node_2']
       );
       storyUpdateService.createArc(
         _sampleStory,
         'arc_2',
-        'Arc 2',
+        'Adventure 2',
         'Description 2',
         []
       );
@@ -1641,14 +1641,14 @@ describe('Story update service', () => {
         {
           cmd: 'create_arc',
           arc_id: 'arc_1',
-          title: 'Arc 1',
+          title: 'Adventure 1',
           description: 'Description 1',
           node_ids: ['node_1', 'node_2'],
         },
         {
           cmd: 'create_arc',
           arc_id: 'arc_2',
-          title: 'Arc 2',
+          title: 'Adventure 2',
           description: 'Description 2',
           node_ids: [],
         },
@@ -1662,7 +1662,13 @@ describe('Story update service', () => {
   );
 
   it('should keep node in target arc on undo when old arc is missing', () => {
-    storyUpdateService.createArc(_sampleStory, 'arc_1', 'Arc 1', 'Desc', []);
+    storyUpdateService.createArc(
+      _sampleStory,
+      'arc_1',
+      'Adventure 1',
+      'Desc',
+      []
+    );
 
     storyUpdateService.moveNodeToArc(_sampleStory, 'node_1', 'arc_1');
     expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
