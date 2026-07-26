@@ -111,7 +111,6 @@ describe('Translation Submitter V2', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );

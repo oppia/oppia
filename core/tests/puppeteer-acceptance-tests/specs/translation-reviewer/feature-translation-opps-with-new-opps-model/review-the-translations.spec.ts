@@ -133,7 +133,6 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
@@ -154,7 +153,6 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {

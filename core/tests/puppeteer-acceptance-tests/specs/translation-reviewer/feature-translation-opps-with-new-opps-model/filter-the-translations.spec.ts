@@ -136,7 +136,6 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
@@ -154,7 +153,6 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
 
     // Add translations to "Chemical Reactions" in Hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
@@ -170,7 +168,6 @@ describe('Translation Reviewer V2', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
   }, 1200000);
 
   it('should be able to filter by topic', async function () {
