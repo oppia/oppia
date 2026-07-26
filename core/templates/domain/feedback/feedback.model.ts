@@ -85,8 +85,8 @@ export enum ReportType {
 export type DashboardType = 'creator' | 'technical';
 
 export enum TechnicalTeamType {
-  LEAP = 'LEAP',
-  CORE = 'CORE',
+  TECH_EXTERNAL = 'tech-external',
+  TECH_INTERNAL = 'tech-internal',
 }
 
 export interface PlatformFeedbackBackendDict {
@@ -298,8 +298,8 @@ export const FEEDBACK_STATUS_LABELS: Record<FeedbackStatus, string> = {
 };
 
 export const TECHNICAL_TEAM_LABELS: Record<TechnicalTeamType, string> = {
-  [TechnicalTeamType.LEAP]: 'LEAP',
-  [TechnicalTeamType.CORE]: 'CORE',
+  [TechnicalTeamType.TECH_EXTERNAL]: 'LEAP',
+  [TechnicalTeamType.TECH_INTERNAL]: 'CORE',
 };
 
 export const CATEGORY_LABELS: Record<string, string> = {
