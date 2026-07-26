@@ -144,6 +144,16 @@ class TranslatableContent:
             self.content_format.value
         )
 
+    def is_reviewer_only(self) -> bool:
+        """Checks whether the content is translatable only by reviewers.
+
+        Returns:
+            bool. Whether the content is translatable only by reviewers.
+        """
+        return (
+            self.is_data_format_list() or self.content_type == ContentType.RULE
+        )
+
 
 class TranslatedContent:
     """Class representing a translation of translatable content. For example,
@@ -493,10 +503,7 @@ class BaseTranslatableObject:
             _,
             translatable_content,
         ) in content_id_to_translatable_content.items():
-            if (
-                translatable_content.is_data_format_list()
-                or translatable_content.content_type == ContentType.RULE
-            ):
+            if translatable_content.is_reviewer_only():
                 count += 1
         return count
 

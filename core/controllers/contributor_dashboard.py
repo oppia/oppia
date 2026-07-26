@@ -736,9 +736,9 @@ class TranslatableContentsHandlerV2(
             # Skip list-format content if the user does not have reviewer
             # rights for the selected language. Translating list contents
             # (such as answer choices) requires reviewer privileges.
-            if language_code not in reviewable_language_codes and (
-                content.is_data_format_list()
-                or content.content_type == translation_domain.ContentType.RULE
+            if (
+                language_code not in reviewable_language_codes
+                and content.is_reviewer_only()
             ):
                 continue
 

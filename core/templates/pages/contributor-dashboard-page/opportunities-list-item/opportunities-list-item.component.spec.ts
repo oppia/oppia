@@ -323,5 +323,30 @@ describe('Opportunities List Item Component', () => {
         exploration_id: '1',
       });
     });
+
+    describe('when totalCount is 0 (all remaining content is reviewer-only)', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 0;
+        opportunity.translationsCount = 0;
+        opportunity.inReviewCount = 0;
+        opportunity.reviewerOnlyContentCount = 5;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should set progressPercentage to 100% to avoid division by zero', () => {
+        expect(component.progressPercentage).toBe('100%');
+        expect(component.cardsAvailable).toBe(0);
+      });
+
+      it('should disable the button and show the correct generic tooltip', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.'
+        );
+      });
+    });
   });
 });

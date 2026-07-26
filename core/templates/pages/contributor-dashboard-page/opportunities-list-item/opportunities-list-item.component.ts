@@ -133,6 +133,7 @@ export class OpportunitiesListItemComponent {
   }
 
   initOpportunityData(): void {
+    this.correspondingOpportunityDeleted = false;
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
@@ -158,14 +159,23 @@ export class OpportunitiesListItemComponent {
           this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         ) {
           this.translationProgressBar = true;
-          const translatedPercentage =
-            (this.opportunity.translationsCount / this.opportunity.totalCount) *
-            100;
-          const inReviewTranslationsPercentage =
-            (this.opportunity.inReviewCount / this.opportunity.totalCount) *
-            100;
-          const untranslatedPercentage =
-            100 - (translatedPercentage + inReviewTranslationsPercentage);
+          let translatedPercentage = 100;
+          let inReviewTranslationsPercentage = 0;
+          let untranslatedPercentage = 0;
+
+          if (this.opportunity.totalCount > 0) {
+            translatedPercentage =
+              (this.opportunity.translationsCount /
+                this.opportunity.totalCount) *
+              100;
+            inReviewTranslationsPercentage =
+              (this.opportunity.inReviewCount / this.opportunity.totalCount) *
+              100;
+            untranslatedPercentage =
+              100 - (translatedPercentage + inReviewTranslationsPercentage);
+          } else {
+            this.progressPercentage = '100%';
+          }
 
           this.cardsAvailable =
             this.opportunity.totalCount -

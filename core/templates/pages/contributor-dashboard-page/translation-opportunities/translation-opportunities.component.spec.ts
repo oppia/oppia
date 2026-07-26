@@ -143,6 +143,7 @@ describe('Translation opportunities component', () => {
     translationModal = TestBed.createComponent(
       TranslationModalComponent
     ) as unknown as NgbModalRef;
+    translationModal.result = Promise.resolve();
     httpTestingController = TestBed.inject(HttpTestingController);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService
@@ -456,6 +457,8 @@ describe('Translation opportunities component', () => {
       expect(opportunitiesDicts[0].totalCount).toEqual(10);
       // ProgressPercentage = (3 / 10) * 100 = 30.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
+      // Should correctly propagate userIsReviewer to the presentation layer.
+      expect(opportunitiesDicts[0].userIsReviewer).toBeTrue();
     }
   );
 
@@ -473,9 +476,13 @@ describe('Translation opportunities component', () => {
     });
     component.ngOnInit();
     tick();
+
+    spyOn(component.reloadOpportunitiesEventEmitter, 'emit');
+
     component.onClickButton('2');
     tick();
     expect(modalService.open).toHaveBeenCalled();
+    expect(component.reloadOpportunitiesEventEmitter.emit).toHaveBeenCalled();
   }));
 
   it('should not open translation modal when user is not logged', fakeAsync(() => {

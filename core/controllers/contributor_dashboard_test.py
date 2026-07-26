@@ -1585,6 +1585,109 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             # Assert that the output matches the expected output.
             self.assertEqual(output, expected_output)
 
+    def test_handler_with_translatable_contents_in_rule_format_should_be_skipped(
+        self,
+    ) -> None:
+        mock_get_translatable_text_return_value = {
+            'Introduction': {
+                'content_01': translation_domain.TranslatableContent(
+                    content_id='content_01',
+                    content_type=translation_domain.ContentType.RULE,
+                    content_format=(
+                        translation_domain.TranslatableContentFormat.UNICODE_STRING
+                    ),
+                    content_value='rule_input_1',
+                )
+            },
+            'End State': {
+                'content_03': translation_domain.TranslatableContent(
+                    content_id='content_03',
+                    content_type=translation_domain.ContentType.CONTENT,
+                    content_format=(
+                        translation_domain.TranslatableContentFormat.HTML
+                    ),
+                    content_value='<p>Not a rule content.</p>',
+                )
+            },
+        }
+
+        with unittest.mock.patch.object(
+            translation_services,
+            'get_translatable_text',
+            return_value=mock_get_translatable_text_return_value,
+        ):
+            # Send a GET request to retrieve the content as a non-reviewer.
+            output = self.get_json(
+                '/gettranslatabletexthandler',
+                params={'language_code': 'hi', 'exp_id': '0'},
+            )
+
+            expected_output = {
+                'version': 1,
+                'state_names_to_content_id_mapping': {
+                    'End State': {
+                        'content_03': {
+                            'content_value': '<p>Not a rule content.</p>',
+                            'content_id': 'content_03',
+                            'content_format': 'html',
+                            'content_type': 'content',
+                            'interaction_id': None,
+                            'rule_type': None,
+                        }
+                    }
+                },
+            }
+            self.assertEqual(output, expected_output)
+
+    def test_handler_with_rule_format_should_be_returned_for_reviewer(
+        self,
+    ) -> None:
+        mock_get_translatable_text_return_value = {
+            'Introduction': {
+                'content_01': translation_domain.TranslatableContent(
+                    content_id='content_01',
+                    content_type=translation_domain.ContentType.RULE,
+                    content_format=(
+                        translation_domain.TranslatableContentFormat.UNICODE_STRING
+                    ),
+                    content_value='rule_input_1',
+                )
+            }
+        }
+
+        self.login(self.OWNER_EMAIL)
+        user_services.allow_user_to_review_translation_in_language(
+            self.owner_id, 'hi'
+        )
+
+        with unittest.mock.patch.object(
+            translation_services,
+            'get_translatable_text',
+            return_value=mock_get_translatable_text_return_value,
+        ):
+            output = self.get_json(
+                '/gettranslatabletexthandler',
+                params={'language_code': 'hi', 'exp_id': '0'},
+            )
+
+            expected_output = {
+                'version': 1,
+                'state_names_to_content_id_mapping': {
+                    'Introduction': {
+                        'content_01': {
+                            'content_value': 'rule_input_1',
+                            'content_id': 'content_01',
+                            'content_format': 'unicode',
+                            'content_type': 'rule',
+                            'interaction_id': None,
+                            'rule_type': None,
+                        }
+                    }
+                },
+            }
+            self.assertEqual(output, expected_output)
+        self.logout()
+
     def test_handler_returns_correct_data(self) -> None:
         exp_services.update_exploration(
             self.owner_id,

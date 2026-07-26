@@ -641,6 +641,31 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
             translation_domain.ContentType.CONTENT,
         )
 
+    def test_is_reviewer_only(self) -> None:
+        translatable_content_ordinary = translation_domain.TranslatableContent(
+            'content_id_1',
+            translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.HTML,
+            'My name is Jhon.',
+        )
+        self.assertFalse(translatable_content_ordinary.is_reviewer_only())
+
+        translatable_content_list = translation_domain.TranslatableContent(
+            'content_id_2',
+            translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.LIST_OF_DEF_STR,
+            [],
+        )
+        self.assertTrue(translatable_content_list.is_reviewer_only())
+
+        translatable_content_rule = translation_domain.TranslatableContent(
+            'content_id_3',
+            translation_domain.ContentType.RULE,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            'rule_input',
+        )
+        self.assertTrue(translatable_content_rule.is_reviewer_only())
+
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
