@@ -339,16 +339,24 @@ describe('Learner dashboard page', () => {
       });
       // Generate completed explorations.
       for (let i = 0; i < 10; i++) {
-        learnerDashboardExplorationsData.completed_explorations_list[i] =
-          Exploration.createFromBackendDict(
-            Object.assign(explorationDict, {
-              id: i + 1,
-              title: titleList[i],
-              category: categoryList[i],
-            }),
-            loggerService,
-            urlInterpolationService
-          );
+        learnerDashboardExplorationsData.completed_explorations_list[i] = {
+          id: Number(i + 1).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
       }
 
       // Generate incomplete explorations.
@@ -377,14 +385,19 @@ describe('Learner dashboard page', () => {
 
       // Generate completed collections.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardCollectionsData.completed_collections_list[i] =
-          // TODO(#10875): Fix type mismatch.
-          Collection.create(
-            Object.assign(collectionDict, {
-              title: titleList[i],
-              category: categoryList[i],
-            }) as CollectionBackendDict
-          );
+        learnerDashboardCollectionsData.completed_collections_list[i] = {
+          id: Number(i + 1).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          last_updated_msec: 0,
+          created_on: 0,
+          language_code: 'en',
+          objective: 'an objective',
+          status: 'public',
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
       }
 
       // Generate incomplete collections.
@@ -1434,7 +1447,7 @@ describe('Learner dashboard page', () => {
       fixture.detectChanges();
 
       expect(component.getDashboardTabHeading()).toBe(
-        'No valid I18N key for heading of INVALID_SECTION'
+        'No valid I18N key for heading of I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION'
       );
     });
 
