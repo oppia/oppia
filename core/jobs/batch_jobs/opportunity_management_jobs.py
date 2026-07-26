@@ -396,7 +396,7 @@ class AuditPopulateSkillOpportunityModelPropertiesJob(base_jobs.JobBase):
         topic_models_as_list = beam.pvalue.AsList(topic_models_list)
 
         populated_models_results = skill_opportunity_models | beam.Map(
-            PopulateSkillOpportunityModelPropertiesJob._populate_properties,
+            PopulateSkillOpportunityModelPropertiesJob._populate_properties,  # pylint: disable=protected-access
             topic_rights_models=topic_rights_list,
             topic_models_list=topic_models_as_list,
         )
