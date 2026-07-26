@@ -46,15 +46,16 @@ const CONSOLE_ERRORS_TO_IGNORE = [
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
       'relyingparty/verifyPassword?key=fake-api-key'
   ),
-  // This error covers cases where the PencilCode site's SSL certificate
-  // is not valid (e.g. it has expired, or its issuing authority is not
-  // trusted). We match on any net::ERR_CERT_* code rather than a single
-  // one, since which specific code Chromium reports depends on exactly
-  // how the certificate is invalid at the time of the request. In such
-  // cases, we ignore the error since it is out of our control.
+  // This error covers cases where the PencilCode site is unreachable,
+  // e.g. an invalid/expired SSL certificate (net::ERR_CERT_*) or a
+  // network-level failure such as a connection timeout
+  // (net::ERR_CONNECTION_TIMED_OUT), which has been observed on CI
+  // runners. We match on any net::ERR_* code rather than a specific one,
+  // since PencilCode is a third-party site and the exact failure mode is
+  // out of our control.
   new RegExp(
     escapeRegExp('https://pencilcode.net/lib/pencilcodeembed.js') +
-      '.*Failed to load resource: net::ERR_CERT_.*'
+      '.*Failed to load resource: net::ERR_.*'
   ),
   // This is the follow-on error logged by InsertScriptService when the
   // PencilCode script above fails to load. Same root cause as the
