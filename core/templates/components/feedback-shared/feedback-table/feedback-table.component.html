@@ -1,0 +1,84 @@
+<div *ngIf="feedbackSummaries.length > 0" class="oppia-feedback-table-container">
+
+  <div class="oppia-feedback-table-scroll">
+    <table class="w-100">
+      <thead>
+        <tr>
+          <th class="oppia-feedback-table-th oppia-feedback-table-col-status">
+            Status
+          </th>
+
+          <th class="oppia-feedback-table-th oppia-feedback-table-col-desc">
+            Description
+          </th>
+
+          <th class="oppia-feedback-table-th oppia-feedback-table-col-source">
+            Source
+          </th>
+
+          <th *ngIf="feedbackCardConfig.showCategory"
+              class="oppia-feedback-table-th oppia-feedback-table-col-category">
+            Category
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let feedback of feedbackSummaries"
+            class="oppia-feedback-table-row"
+            (click)="rowClick.emit(feedback.id)">
+
+          <td class="oppia-feedback-table-td oppia-feedback-table-col-status">
+            <oppia-feedback-chip [value]="feedback.status"
+                                 [type]="'status'">
+            </oppia-feedback-chip>
+          </td>
+
+          <td class="oppia-feedback-table-td oppia-feedback-table-col-desc">
+            <span class="oppia-feedback-table-desc">
+              {{ feedback.report_message_preview }}
+            </span>
+          </td>
+
+          <td class="oppia-feedback-table-td oppia-feedback-table-col-source">
+            {{ getSourceLabel(feedback.source) }}
+          </td>
+
+          <td *ngIf="feedbackCardConfig.showCategory"
+              class="oppia-feedback-table-td oppia-feedback-table-col-category">
+            <span class="oppia-feedback-table-chip-category">
+              <oppia-feedback-chip [value]="feedback.category"
+                                   [type]="'category'">
+              </oppia-feedback-chip>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="oppia-feedback-table-pagination">
+    <span class="oppia-feedback-table-pagination-label">
+      Page {{ currentPage }}
+    </span>
+
+    <button class="oppia-feedback-table-pagination-btn"
+            [disabled]="currentPage <= 1"
+            (click)="previousPage.emit()">
+      <i class="fas fa-angle-left"></i> Prev
+    </button>
+
+    <button class="oppia-feedback-table-pagination-btn"
+            [disabled]="!moreFeedbackAvailable"
+            (click)="nextPage.emit()">
+      Next
+      <i class="fas fa-angle-right"></i>
+    </button>
+  </div>
+
+</div>
+
+<ng-container *ngIf="feedbackSummaries.length === 0">
+  <oppia-feedback-empty-state class="oppia-feedback-empty-state">
+  </oppia-feedback-empty-state>
+</ng-container>

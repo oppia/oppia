@@ -51,6 +51,7 @@ import {
 import {
   FeedbackSessionInfo,
   FeedbackModalType,
+  ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
 import {AlertsService} from 'services/alerts.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -433,7 +434,7 @@ describe('FeedbackModalComponent', () => {
   it('should show technical logs in lesson issue mode when category enables it', () => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
-    component.selectCategory('broken_layout_or_image');
+    component.selectCategory(ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE);
 
     expect(component.shouldShowTechnicalLogs).toBe(true);
   });
@@ -441,7 +442,7 @@ describe('FeedbackModalComponent', () => {
   it('should not show technical logs in lesson issue mode when category disables it', () => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
-    component.selectCategory('typo');
+    component.selectCategory(ReportAnIssueCategory.TYPO);
 
     expect(component.shouldShowTechnicalLogs).toBe(false);
   });
@@ -602,43 +603,49 @@ describe('FeedbackModalComponent', () => {
 
   it('should select typo category and disable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('typo');
+    component.selectCategory(ReportAnIssueCategory.TYPO);
 
-    expect(component.category).toBe('typo');
+    expect(component.category).toBe(ReportAnIssueCategory.TYPO);
     expect(component.showTechnicalLogsCheckbox).toBe(false);
   });
 
   it('should select broken_layout_or_image category and enable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('broken_layout_or_image');
+    component.selectCategory(ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE);
 
-    expect(component.category).toBe('broken_layout_or_image');
+    expect(component.category).toBe(
+      ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE
+    );
     expect(component.showTechnicalLogsCheckbox).toBe(true);
   });
 
   it('should select confusing_or_incorrect_answer category and disable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('confusing_or_incorrect_answer');
+    component.selectCategory(
+      ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER
+    );
 
-    expect(component.category).toBe('confusing_or_incorrect_answer');
+    expect(component.category).toBe(
+      ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER
+    );
     expect(component.showTechnicalLogsCheckbox).toBe(false);
   });
 
   it('should select other_or_not_sure category and enable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('other_or_not_sure');
+    component.selectCategory(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
 
-    expect(component.category).toBe('other_or_not_sure');
+    expect(component.category).toBe(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
     expect(component.showTechnicalLogsCheckbox).toBe(true);
   });
 
   it('should update category when a different chip is selected', () => {
     createComponent();
-    component.selectCategory('typo');
-    expect(component.category).toBe('typo');
+    component.selectCategory(ReportAnIssueCategory.TYPO);
+    expect(component.category).toBe(ReportAnIssueCategory.TYPO);
 
-    component.selectCategory('other_or_not_sure');
-    expect(component.category).toBe('other_or_not_sure');
+    component.selectCategory(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
+    expect(component.category).toBe(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
   });
 
   it('should fail validation for empty feedback text', () => {
@@ -922,7 +929,7 @@ describe('FeedbackModalComponent', () => {
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
     component.isUserLoggedIn = true;
     component.feedbackText = 'Lesson issue report';
-    component.category = 'typo';
+    component.category = ReportAnIssueCategory.TYPO;
     component.includeTechnicalLogs = true;
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -1205,7 +1212,7 @@ describe('FeedbackModalComponent', () => {
     component.screenshotFilename = 'screenshot.png';
     component.screenshotPreviewDataUrl = 'data:image/png;base64,image';
     component.feedbackText = 'Some text';
-    component.category = 'typo';
+    component.category = ReportAnIssueCategory.TYPO;
     component.formError = 'Some error';
     component.includeTechnicalLogs = false;
 

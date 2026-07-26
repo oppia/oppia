@@ -684,3 +684,11 @@ indexes:
   - name: entity_type
   - name: incomplete_translation_language_codes
   - name: created_on
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: destination_dashboard
+  - name: status
+  - name: created_on
+    direction: desc

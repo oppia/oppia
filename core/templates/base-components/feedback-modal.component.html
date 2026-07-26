@@ -73,29 +73,29 @@
         <div class="oppia-flag-category-chips" aria-label="Issue category">
           <button type="button"
                   class="oppia-flag-category-chip"
-                  [class.selected]="category === 'typo'"
-                  (click)="selectCategory('typo')">
+                  [class.selected]="category === ReportAnIssueCategory.TYPO"
+                  (click)="selectCategory(ReportAnIssueCategory.TYPO)">
             <mat-icon aria-hidden="true">spellcheck</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_TYPO' | translate }}
           </button>
           <button type="button"
                   class="oppia-flag-category-chip"
-                  [class.selected]="category === 'broken_layout_or_image'"
-                  (click)="selectCategory('broken_layout_or_image')">
+                  [class.selected]="category === ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE"
+                  (click)="selectCategory(ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE)">
             <mat-icon aria-hidden="true">broken_image</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_BROKEN_LAYOUT' | translate }}
           </button>
           <button type="button"
                   class="oppia-flag-category-chip"
-                  [class.selected]="category === 'confusing_or_incorrect_answer'"
-                  (click)="selectCategory('confusing_or_incorrect_answer')">
+                  [class.selected]="category === ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER"
+                  (click)="selectCategory(ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER)">
             <mat-icon aria-hidden="true">error_outline</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_CONFUSING' | translate }}
           </button>
           <button type="button"
                   class="oppia-flag-category-chip"
-                  [class.selected]="category === 'other_or_not_sure'"
-                  (click)="selectCategory('other_or_not_sure')">
+                  [class.selected]="category === ReportAnIssueCategory.OTHER_OR_NOT_SURE"
+                  (click)="selectCategory(ReportAnIssueCategory.OTHER_OR_NOT_SURE)">
             <mat-icon aria-hidden="true">help_outline</mat-icon>
             {{ 'I18N_REPORT_LESSON_BUG_CATEGORY_OTHER' | translate }}
           </button>

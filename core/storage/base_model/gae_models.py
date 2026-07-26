@@ -2295,6 +2295,8 @@ class BaseFeedbackModel(BaseModel):
         next_cursor_str: Optional[str] = None
         if len(results) < page_size:
             more = False
+        elif next_cursor and more:
+            more = bool(query.fetch_page(1, start_cursor=next_cursor)[0])
         if next_cursor and more:
             raw_next_cursor = next_cursor.urlsafe()
             next_cursor_str = (
