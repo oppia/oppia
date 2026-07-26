@@ -458,7 +458,7 @@ describe('Translation opportunities component', () => {
       // ProgressPercentage = (3 / 10) * 100 = 30.00.
       expect(opportunitiesDicts[0].progressPercentage).toEqual('30.00');
       // Should correctly propagate userIsReviewer to the presentation layer.
-      expect(opportunitiesDicts[0].userIsReviewer).toBeTrue();
+      expect(opportunitiesDicts[0].userIsReviewer).toBe(true);
     }
   );
 
@@ -477,12 +477,17 @@ describe('Translation opportunities component', () => {
     component.ngOnInit();
     tick();
 
-    spyOn(component.reloadOpportunitiesEventEmitter, 'emit');
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
 
     component.onClickButton('2');
     tick();
     expect(modalService.open).toHaveBeenCalled();
-    expect(component.reloadOpportunitiesEventEmitter.emit).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
   }));
 
   it('should not open translation modal when user is not logged', fakeAsync(() => {
