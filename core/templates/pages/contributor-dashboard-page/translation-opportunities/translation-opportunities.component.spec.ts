@@ -143,7 +143,6 @@ describe('Translation opportunities component', () => {
     translationModal = TestBed.createComponent(
       TranslationModalComponent
     ) as unknown as NgbModalRef;
-    translationModal.result = Promise.resolve();
     httpTestingController = TestBed.inject(HttpTestingController);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService
@@ -462,7 +461,7 @@ describe('Translation opportunities component', () => {
     }
   );
 
-  it('should open translation modal when clicking button', fakeAsync(() => {
+  it('should open translation modal and reload opportunities on resolve', fakeAsync(() => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en'
     );
@@ -482,9 +481,61 @@ describe('Translation opportunities component', () => {
       'emit'
     );
 
+    let resolveModal: (value?: any) => void;
+    translationModal.result = new Promise((resolve, reject) => {
+      resolveModal = resolve;
+    });
+
     component.onClickButton('2');
     tick();
     expect(modalService.open).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).not.toHaveBeenCalled();
+
+    resolveModal!();
+    tick();
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
+  }));
+
+  it('should reload opportunities when translation modal is rejected', fakeAsync(() => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en'
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(loggedInUserInfo);
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslationOpportunitiesAsync'
+    ).and.resolveTo({
+      opportunities: opportunitiesArray,
+      more: false,
+    });
+    component.ngOnInit();
+    tick();
+
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+
+    let rejectModal: (reason?: any) => void;
+    translationModal.result = new Promise((resolve, reject) => {
+      rejectModal = reject;
+    });
+
+    component.onClickButton('2');
+    tick();
+    expect(modalService.open).toHaveBeenCalled();
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).not.toHaveBeenCalled();
+
+    rejectModal!();
+    tick();
+
     expect(
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
     ).toHaveBeenCalled();
