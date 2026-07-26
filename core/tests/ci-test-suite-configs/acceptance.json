@@ -477,8 +477,8 @@
     },
     {
       "name": "logged-out-learner/complete-the-embedded-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player",
