@@ -48,13 +48,20 @@ const CONSOLE_ERRORS_TO_IGNORE = [
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
       'relyingparty/verifyPassword?key=fake-api-key'
   ),
-  // This error covers the case when the PencilCode site uses an
-  // invalid SSL certificate (which can happen when it expires).
-  // In such cases, we ignore the error since it is out of our control.
-  escapeRegExp(
-    'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
-      'load resource: net::ERR_CERT_DATE_INVALID'
+  // This error covers cases where the PencilCode site's SSL certificate
+  // is not valid (e.g. it has expired, or its issuing authority is not
+  // trusted). We match on any net::ERR_CERT_* code rather than a single
+  // one, since which specific code Chromium reports depends on exactly
+  // how the certificate is invalid at the time of the request. In such
+  // cases, we ignore the error since it is out of our control.
+  new RegExp(
+    escapeRegExp('https://pencilcode.net/lib/pencilcodeembed.js') +
+      '.*Failed to load resource: net::ERR_CERT_.*'
   ),
+  // This is the follow-on error logged by InsertScriptService when the
+  // PencilCode script above fails to load. Same root cause as the
+  // ERR_CERT_* rule, so it is ignored for the same reason.
+  new RegExp('Script loading failed: PENCILCODE'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
   // with a status of 405", this happens when the HTTP method used for a
