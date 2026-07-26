@@ -53,4 +53,25 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
     ).toBe('Available certificate offering');
   });
+
+  it('should link assessment buttons to the certificate assessment page', () => {
+    fixture.detectChanges();
+
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('button')
+    ) as HTMLButtonElement[];
+
+    const assessmentButtons = buttons.filter(b =>
+      ['Continue to assessment', 'Retry assessment'].includes(
+        b.textContent?.trim() || ''
+      )
+    );
+
+    expect(assessmentButtons.length).toBe(2);
+    assessmentButtons.forEach(button => {
+      expect(button.getAttribute('ng-reflect-router-link')).toContain(
+        '/certificate-assessment'
+      );
+    });
+  });
 });
