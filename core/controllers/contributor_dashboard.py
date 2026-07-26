@@ -891,7 +891,7 @@ class TranslatableTextHandler(
             )
         if language_code not in reviewable_language_codes:
             state_names_to_content_id_mapping = (
-                self._get_state_names_to_not_set_content_id_mapping(
+                self._remove_reviewer_only_content_from_mapping(
                     state_names_to_content_id_mapping
                 )
             )
@@ -910,14 +910,14 @@ class TranslatableTextHandler(
 
         self.render_json(self.values)
 
-    def _get_state_names_to_not_set_content_id_mapping(
+    def _remove_reviewer_only_content_from_mapping(
         self,
         state_names_to_content_id_mapping: Dict[
             str, Dict[str, translation_domain.TranslatableContent]
         ],
     ) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
-        minus any contents of which the data is set of strings.
+        minus any contents that are translatable only by reviewers.
 
         Args:
             state_names_to_content_id_mapping:
@@ -940,7 +940,7 @@ class TranslatableTextHandler(
                 content_id,
                 translatable_item,
             ) in content_id_to_translatable_item.items():
-                if not translatable_item.is_data_format_list():
+                if not translatable_item.is_reviewer_only():
                     content_id_to_not_set_translatable_item[content_id] = (
                         translatable_item
                     )
