@@ -6590,7 +6590,7 @@ export default {
           "CONTENT": "View and manage technical feedback submissions to improve the Oppia platform."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "View and manage technical feedback submissions to improve the Oppia platform."
@@ -6607,7 +6607,7 @@ export default {
           "CONTENT": "Manage and view all certificate assessment offerings on Oppia's dashboard."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Manage and view all certificate assessment offerings on Oppia's dashboard."
         }
@@ -6625,7 +6625,7 @@ export default {
           "CONTENT": "Take a certificate assessment in Oppia and review what you have learned from your classroom."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Take a certificate assessment in Oppia and review what you have learned from your classroom."
@@ -6643,7 +6643,7 @@ export default {
           "CONTENT": "Create a new certificate assessment offering for learners on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create a new certificate assessment offering for learners on Oppia."
@@ -6660,7 +6660,7 @@ export default {
           "CONTENT": "Edit an existing certificate assessment offering on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Edit an existing certificate assessment offering on Oppia."
         }
@@ -6677,7 +6677,7 @@ export default {
           "CONTENT": "Administrative panel for managing Oppia platform settings, users, and configurations."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Administrative panel for managing Oppia platform settings, users, and configurations."
@@ -6695,7 +6695,7 @@ export default {
           "CONTENT": "Review what you have learned by taking a practice test on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Review what you have learned by taking a practice test on Oppia."
@@ -6711,13 +6711,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Study a subtopic lesson on Oppia with a guided study guide."
+          "CONTENT": "Dive deeper into a topic with a focused lesson and study materials on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Study a subtopic lesson on Oppia with a guided study guide."
+          "CONTENT": "Dive deeper into a topic with a focused lesson and study materials on Oppia."
         }
       ]
     },
@@ -6732,7 +6732,7 @@ export default {
           "CONTENT": "Create and edit collections of lessons on Oppia's collection editor."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create and edit collections of lessons on Oppia's collection editor."
@@ -6750,7 +6750,7 @@ export default {
           "CONTENT": "Oppia is currently undergoing scheduled maintenance. Please check back later."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Oppia is currently undergoing scheduled maintenance. Please check back later."
@@ -6769,7 +6769,7 @@ export default {
           "CONTENT": "Create and edit stories to build learning journeys on Oppia's story editor."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create and edit stories to build learning journeys on Oppia's story editor."
@@ -6796,7 +6796,7 @@ export default {
           "CONTENT": "View and manage your created explorations and collections on the Oppia creator dashboard."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "View and manage your created explorations and collections on the Oppia creator dashboard."
@@ -6814,7 +6814,7 @@ export default {
           "CONTENT": "Contribute translations, questions, and other content to improve lessons on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Contribute translations, questions, and other content to improve lessons on Oppia."
@@ -6832,7 +6832,7 @@ export default {
           "CONTENT": "Take a diagnostic test to identify your current skill level and get personalized lesson recommendations."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Take a diagnostic test to identify your current skill level and get personalized lesson recommendations."
@@ -6850,7 +6850,7 @@ export default {
           "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
@@ -6868,7 +6868,7 @@ export default {
           "CONTENT": "Manage and track learner group activities and progress on the Oppia facilitator dashboard."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Manage and track learner group activities and progress on the Oppia facilitator dashboard."
@@ -6886,7 +6886,7 @@ export default {
           "CONTENT": "Moderation tools for reviewing and managing content and users on the Oppia platform."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Moderation tools for reviewing and managing content and users on the Oppia platform."
@@ -6904,7 +6904,7 @@ export default {
           "CONTENT": "Learn about Oppia's mission to provide free, high-quality education to learners worldwide."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Learn about Oppia's mission to provide free, high-quality education to learners worldwide."
@@ -6979,7 +6979,7 @@ export default {
           "CONTENT": "Download the Oppia Android app to learn anywhere, even without an internet connection."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Download the Oppia Android app to learn anywhere, even without an internet connection."
@@ -6997,7 +6997,7 @@ export default {
           "CONTENT": "Manage contributor roles, review submissions, and oversee content contributions on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Manage contributor roles, review submissions, and oversee content contributions on Oppia."
@@ -7033,7 +7033,7 @@ export default {
           "CONTENT": "Manage classroom curricula, topics, and course structure on the Oppia admin panel."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Manage classroom curricula, topics, and course structure on the Oppia admin panel."
@@ -7051,7 +7051,7 @@ export default {
           "CONTENT": "Edit and manage skills with the Skill Editor in Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Edit and manage skills with the Skill Editor in Oppia."
         }
@@ -7062,7 +7062,7 @@ export default {
       "TITLE": "I18N_DONATE_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
           "CONTENT": "Your donation helps fund free, localized educational resources for children in under-resourced communities."
@@ -7110,7 +7110,7 @@ export default {
           "CONTENT": "Explore and learn a topic with structured lessons and study materials on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Explore and learn a topic with structured lessons and study materials on Oppia."
@@ -7128,7 +7128,7 @@ export default {
           "CONTENT": "Track your learning progress, view enrolled lessons, and continue where you left off on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Track your learning progress, view enrolled lessons, and continue where you left off on Oppia."
@@ -7166,7 +7166,7 @@ export default {
       "TITLE": "I18N_PARTNERSHIPS_PAGE_TITLE",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
           "CONTENT": "Discover how schools and non-profit organizations leverage Oppia's offline capability to eliminate learning deficits."
@@ -7192,13 +7192,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+          "CONTENT": "Learn how to participate in the Oppia community and start creating free lessons for learners worldwide."
         },
         {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+          "CONTENT": "Learn how to participate in the Oppia community and start creating free lessons for learners worldwide."
         }
       ]
     },
@@ -7235,7 +7235,7 @@ export default {
           "CONTENT": "View and manage all topics and skills across the Oppia platform."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "View and manage all topics and skills across the Oppia platform."
@@ -7250,13 +7250,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+          "CONTENT": "Learn how to participate in the Oppia community and start creating free lessons for learners worldwide."
         },
         {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+          "CONTENT": "Learn how to participate in the Oppia community and start creating free lessons for learners worldwide."
         }
       ]
     },
@@ -7268,13 +7268,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+          "CONTENT": "Oppia is a non-profit open-source learning platform. Read our terms for creating and sharing lessons."
         },
         {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+          "CONTENT": "Oppia is a non-profit open-source learning platform. Read our terms for creating and sharing lessons."
         }
       ]
     },
@@ -7307,13 +7307,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+          "CONTENT": "Discover free lessons on any subject, created by educators and the Oppia community. Start learning today."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Looking to learn something new? Learn any subject of your choice created by professors, teachers and Oppia users! Free lessons are always available for any topic and level you want."
+          "CONTENT": "Discover free lessons on any subject, created by educators and the Oppia community. Start learning today."
         }
       ]
     },
@@ -7328,7 +7328,7 @@ export default {
           "CONTENT": "Discover the latest lessons and explorations recently published by creators on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Discover the latest lessons and explorations recently published by creators on Oppia."
@@ -7346,7 +7346,7 @@ export default {
           "CONTENT": "Search for free lessons on math, science, and more across Oppia's community library."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Search for free lessons on math, science, and more across Oppia's community library."
@@ -7367,7 +7367,7 @@ export default {
           "CONTENT": "Practice what you have learned with interactive questions and exercises on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Practice what you have learned with interactive questions and exercises on Oppia."
@@ -7389,7 +7389,7 @@ export default {
           "CONTENT": "Practice lesson-specific questions to reinforce what you have learned on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Practice lesson-specific questions to reinforce what you have learned on Oppia."
@@ -7408,13 +7408,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Take an end-of-arc test to assess your understanding of the lessons in this arc on Oppia."
+          "CONTENT": "Take a test to assess your understanding of the lessons in this section on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "Take an end-of-arc test to assess your understanding of the lessons in this arc on Oppia."
+          "CONTENT": "Take a test to assess your understanding of the lessons in this section on Oppia."
         }
       ]
     },
@@ -7433,7 +7433,7 @@ export default {
           "CONTENT": "Test your mastery of a topic with a comprehensive challenge covering all lessons on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Test your mastery of a topic with a comprehensive challenge covering all lessons on Oppia."
@@ -7451,7 +7451,7 @@ export default {
           "CONTENT": "Create and manage blog posts on the Oppia blog dashboard."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create and manage blog posts on the Oppia blog dashboard."
@@ -7469,7 +7469,7 @@ export default {
           "CONTENT": "Explore the highest-rated free lessons and courses available on Oppia's library."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Explore the highest-rated free lessons and courses available on Oppia's library."
@@ -7488,7 +7488,7 @@ export default {
           "CONTENT": "Help others learn new things. Create lessons through explorations and share your knowledge with the community."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Help others learn new things. Create lessons through explorations and share your knowledge with the community."
@@ -7507,12 +7507,12 @@ export default {
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
-          "CONTENT": "Change your Oppia profile settings and preferences"
+          "CONTENT": "Change your Oppia profile settings and preferences."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
-          "CONTENT": "Change your Oppia profile settings and preferences"
+          "CONTENT": "Change your Oppia profile settings and preferences."
         }
       ]
     },
@@ -7523,12 +7523,12 @@ export default {
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
-          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
-          "CONTENT": "With Oppia,learn and give feedback to improve the lessons"
+          "CONTENT": "With Oppia, learn and give feedback to improve the lessons."
         }
       ]
     },
@@ -7552,7 +7552,7 @@ export default {
           "CONTENT": "Manage feature flags, release cycles, and platform rollouts on the Oppia release coordinator."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Manage feature flags, release cycles, and platform rollouts on the Oppia release coordinator."
@@ -7574,7 +7574,7 @@ export default {
       "TITLE": "I18N_VOLUNTEER_PAGE_TITLE",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
           "CONTENT": "Contribute your translation, engineering, or content design skills to make education accessible to all."
@@ -7608,7 +7608,7 @@ export default {
           "CONTENT": "Browse free lessons in this classroom and start learning with Oppia today."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Browse free lessons in this classroom and start learning with Oppia today."
@@ -7626,7 +7626,7 @@ export default {
           "CONTENT": "Browse all available classrooms on Oppia and find a subject to start learning."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Browse all available classrooms on Oppia and find a subject to start learning."
@@ -7644,7 +7644,7 @@ export default {
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
@@ -7662,7 +7662,7 @@ export default {
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
@@ -7681,7 +7681,7 @@ export default {
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
@@ -7703,7 +7703,7 @@ export default {
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
@@ -7721,7 +7721,7 @@ export default {
           "CONTENT": "Manage blog content, authors, and publication settings on the Oppia blog admin panel."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Manage blog content, authors, and publication settings on the Oppia blog admin panel."
@@ -7739,7 +7739,7 @@ export default {
           "CONTENT": "Manage and approve voiceover submissions for lessons on the Oppia platform."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Manage and approve voiceover submissions for lessons on the Oppia platform."
@@ -7757,7 +7757,7 @@ export default {
           "CONTENT": "Create a learner group to organize and track group learning progress on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Create a learner group to organize and track group learning progress on Oppia."
@@ -7775,7 +7775,7 @@ export default {
           "CONTENT": "Edit learner group settings, syllabus, and member details on Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Edit learner group settings, syllabus, and member details on Oppia."
@@ -7805,7 +7805,7 @@ export default {
           "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
         }
@@ -7817,7 +7817,7 @@ export default {
       "LIGHTWEIGHT": true,
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
           "CONTENT": "Empowering children globally through free, high-quality, story-based adaptive lessons."
