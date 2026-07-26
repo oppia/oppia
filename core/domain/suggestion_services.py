@@ -244,10 +244,16 @@ def create_suggestion(
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        category = (
+            exploration.category
+            if target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            else target_type
+        )
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
-            exploration.category,
+            category,
         )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
@@ -266,8 +272,12 @@ def create_suggestion(
         # It resolves the generic placeholder state name to the correct exploration
         # state name by matching content IDs.
         if (
-            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
-            or state_name not in exploration.states
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            and (
+                state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+                or state_name not in exploration.states
+            )
         ):
             for s_name, state in exploration.states.items():
                 if (
@@ -280,13 +290,17 @@ def create_suggestion(
                     change_cmd = new_change_cmd
                     break
 
-        content_html = exploration.get_content_html(state_name, content_id)
-        if content_html != change_cmd['content_html']:
+        if (
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+        ):
+            content_html = exploration.get_content_html(state_name, content_id)
+            if content_html != change_cmd['content_html']:
 
-            raise Exception(
-                'The Exploration content has changed since this translation '
-                'was submitted.'
-            )
+                raise Exception(
+                    'The Exploration content has changed since this translation '
+                    'was submitted.'
+                )
 
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
@@ -302,19 +316,23 @@ def create_suggestion(
 
         # Do not allow creating a suggestion if the content has already been
         # translated and is up-to-date.
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            target_id,
-            exploration.version,
-            language_code,
-        )
-        if content_id in entity_translation.translations:
-            if not entity_translation.translations[content_id].needs_update:
-                raise Exception(
-                    'The content with content_id %s has already been '
-                    'translated to %s and is up-to-date.'
-                    % (content_id, language_code)
-                )
+        if (
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+        ):
+            entity_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                target_id,
+                exploration.version,
+                language_code,
+            )
+            if content_id in entity_translation.translations:
+                if not entity_translation.translations[content_id].needs_update:
+                    raise Exception(
+                        'The content with content_id %s has already been '
+                        'translated to %s and is up-to-date.'
+                        % (content_id, language_code)
+                    )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
