@@ -1345,10 +1345,6 @@ export class ExplorationEditor extends BaseUser {
         historyItem
       );
       await this.clickOnElement(dropdownButton);
-      await historyItem.waitForSelector(downloadExplorationButton, {
-        state: 'visible',
-        timeout: 30000,
-      });
 
       const downloadButton = await this.getElementInParent(
         downloadExplorationButton,
