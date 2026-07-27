@@ -6,7 +6,7 @@
 
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
-  padding: 0 20px;
+  padding: 0 10px;
   position: relative;
 }
 
@@ -16,6 +16,13 @@
   top: 2px;
   width: 100px;
 }
+
+.feedback-wrapper {
+  position: relative;
+  padding-left: 20px;
+  box-sizing: border-box;
+}
+
 
 .conversation-skin-oppia-feedback-container {
   background-color: rgba(224,242,241,1);
@@ -29,8 +36,9 @@
   border-bottom-right-radius: 0;
 }
 
-.conversation-skin-oppia-feedback-content {
-  padding: 12px;
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  padding: 8px;
   word-wrap: break-word;
 }
 

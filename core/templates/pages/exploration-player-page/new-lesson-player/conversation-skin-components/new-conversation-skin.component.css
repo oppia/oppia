@@ -113,12 +113,14 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 oppia-card-navigation-control {
   bottom: 0;
+  left: 0;
   position: fixed;
   width: calc(100vw - 83px);
   z-index: 100;
 }
 
 .expanded-sidebar {
+  left: 0;
   width: calc(100vw - 243px);
 }
 
@@ -128,10 +130,12 @@ oppia-card-navigation-control {
 
 @media(max-width: 767px) {
   oppia-card-navigation-control {
+    left: 0;
     width: 100vw;
   }
 
   .expanded-sidebar {
+    left: 0;
     width: 100vw;
   }
 }
