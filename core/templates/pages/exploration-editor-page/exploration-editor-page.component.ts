@@ -816,8 +816,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     ).then(improvementsTabIsEnabledResponse => {
       this.improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
     });
-
-    this.initExplorationPage();
   }
 
   isImprovementsTabEnabled(): boolean {
