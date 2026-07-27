@@ -1,32 +1,29 @@
+.contributor-dashboard-admin-navbar .oppia-contributor-dashboard-admin-page-dropdown-icon {
+  background-color: #fff;
+  color: #00376d;
+}
+
 .contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin .open > a {
   background-color: #fff;
   color: #00376d;
 }
 
-.contributor-dashboard-admin-navbar .oppia-navbar-tabs-contributor-dashboard-admin > li > a:hover,
-.contributor-dashboard-admin-navbar .oppia-navbar-tabs-contributor-dashboard-admin > li > a.active {
-  background-color: #fff;
-  color: #00376d;
-}
-
-.contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin > li > a:hover,
-.contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin > li > a:focus {
-  background-color: #fff;
-  color: #00376d;
-}
-
-.contributor-dashboard-admin-navbar .nav > li > a:focus,
-.contributor-dashboard-admin-navbar .oppia-contributor-dashboard-admin-page-dropdown-icon {
+/* stylelint-disable-next-line no-descending-specificity */
+.contributor-dashboard-admin-navbar .nav > li > a:focus {
   background-color: #00376d;
   color: #fff;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
+.contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin > li > a:hover,
+.contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin > li > a:focus,
+.contributor-dashboard-admin-navbar .oppia-navbar-tabs-contributor-dashboard-admin > li > a:hover,
 .contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin .open > a:hover,
-.contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin .open > a:focus {
+.contributor-dashboard-admin-navbar .oppia-navbar-profile-contributor-dashboard-admin .open > a:focus,
+.contributor-dashboard-admin-navbar .oppia-navbar-tabs-contributor-dashboard-admin > li > a.active {
   background-color: #fff;
   color: #00376d;
 }
-
 .oppia-navbar-tabs-contributor-dashboard-admin .dropdown-toggle::after {
   color: #fff;
 }

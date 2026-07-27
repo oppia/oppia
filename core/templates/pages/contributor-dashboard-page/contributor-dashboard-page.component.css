@@ -1,6 +1,19 @@
+/* stylelint-disable-next-line no-descending-specificity */
+.oppia-active-opportunities-tab a {
+  color: #00645d;
+  text-decoration: none;
+}
+/* stylelint-disable-next-line no-descending-specificity */
+.oppia-active-opportunities-tab a:hover {
+  color: #00645d;
+}
+
 .oppia-tabs-container {
   padding-top: 5px;
   text-align: center;
+}
+.oppia-tabs-container a:focus-visible {
+  border: 3px dotted black;
 }
 .oppia-language-container {
   display: flex;
@@ -13,7 +26,7 @@
 .oppia-user-and-rights {
   display: flex;
   flex-direction: row;
-  padding: 0 20px;
+  padding: auto 20px;
   padding-bottom: 30px;
   padding-left: 20px;
   width: 100%;
@@ -186,10 +199,6 @@ button.oppia-autofocus:focus {
   transition: color 200ms ease-out;
   width: 100%;
 }
-.oppia-active-opportunities-tab a {
-  color: #00645d;
-  text-decoration: none;
-}
 .oppia-active-tab-highlighter {
   height: 0;
   margin-top: 5px;
@@ -208,12 +217,6 @@ button.oppia-autofocus:focus {
 .oppia-opportunities-tabs-text:hover {
   color: #00645d;
   text-decoration: none;
-}
-.oppia-active-opportunities-tab a:hover {
-  color: #00645d;
-}
-.oppia-tabs-container a:focus-visible {
-  border: 3px dotted black;
 }
 .oppia-review-item-detail-container {
   background-color: #00645d;
@@ -308,7 +311,7 @@ button.oppia-autofocus:focus {
   .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
     font-size: 18px;
     margin-right: 0;
-    padding: 0;
+    padding: auto 0;
     width: 175px;
   }
   .oppia-opportunities-tabs-list {
@@ -388,7 +391,7 @@ button.oppia-autofocus:focus {
   .oppia-dropdown-container {
     align-items: flex-start;
     flex-direction: column;
-    padding: 0 2vw;
+    padding: auto 2vw;
     width: 100%;
   }
   .oppia-opportunities-tab-item {
