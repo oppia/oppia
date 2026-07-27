@@ -33,7 +33,6 @@ import {
   PlatformFeedbackDetailResponse,
   SOURCE_LABELS,
   TECHNICAL_TEAM_LABELS,
-  TechnicalTeamType,
 } from 'domain/feedback/feedback.model';
 import './feedback-detail-page.component.css';
 
@@ -115,9 +114,9 @@ export class FeedbackDetailPageComponent {
   }
 
   getDestinationLabel(
-    destinationDashboard: TechnicalTeamType | 'creator'
+    destinationDashboard: 'tech-external' | 'tech-internal' | 'curriculum'
   ): string {
-    return destinationDashboard === 'creator'
+    return destinationDashboard === 'curriculum'
       ? 'Creator'
       : this.teamLabels[destinationDashboard];
   }
@@ -256,7 +255,7 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueBrowserVersion(): string {
     const userAgent =
-      this.feedbackDetailResponse?.session_info?.environment_json.user_agent;
+      this.feedbackDetailResponse?.session_info?.environment.user_agent;
     return userAgent || 'Not provided';
   }
 
