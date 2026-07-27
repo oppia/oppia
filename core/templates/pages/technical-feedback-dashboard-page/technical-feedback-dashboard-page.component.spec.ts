@@ -60,7 +60,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
   let mockDetailResponse: PlatformFeedbackDetailResponse = {
     id: 'report1',
     report_message: 'Sample report',
-    source: 'platform',
+    source: 'app',
     status: FeedbackStatus.OPEN,
     platform: 'web',
     destination_dashboard: TechnicalTeamType.TECH_EXTERNAL,

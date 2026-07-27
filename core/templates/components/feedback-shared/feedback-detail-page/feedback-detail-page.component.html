@@ -65,7 +65,7 @@
               <a [href]="screenshotDataUrl"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="btn btn-secondary btn-sm oppia-feedback-detail-button">
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
                 Open screenshot in new tab
               </a>
             </div>
@@ -100,13 +100,13 @@
                  [href]="getReportedLessonUrl()"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="btn btn-secondary btn-sm oppia-feedback-detail-button">
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
                 Open reported lesson version
               </a>
               <a *ngIf="getReportedStateEditorUrl()"
                  [href]="getReportedStateEditorUrl()"
                  target="_blank" rel="noopener noreferrer"
-                 class="btn btn-secondary btn-sm oppia-feedback-detail-button">
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
                 Open current state in editor
               </a>
             </div>
@@ -187,7 +187,7 @@
                           type="button"
                           [disabled]="statusOption === feedback.status"
                           [attr.aria-pressed]="statusOption === feedback.status"
-                          class="btn btn-secondary btn-sm oppia-feedback-detail-status-button"
+                          class="btn btn-primary oppia-feedback-detail-status-button"
                           (click)="onStatusOptionClick(statusOption)">
                     {{ statusLabels[statusOption] }}
                   </button>

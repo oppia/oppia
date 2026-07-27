@@ -86,7 +86,9 @@ describe('FeedbackDetailPageComponent', () => {
     environment: {
       client_time_msecs: 1234567893,
       timezone_offset_mins: -330,
-      user_agent: 'Mozilla/5.0 Chrome/136.0',
+      user_agent:
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 ' +
+        '(KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36',
       viewport: {
         width: 1920,
         height: 1080,
@@ -104,6 +106,23 @@ describe('FeedbackDetailPageComponent', () => {
 
   const getGithubTransferUrlFromSpy = (githubTransferSpy: jasmine.Spy): URL => {
     return new URL(githubTransferSpy.calls.mostRecent().args[0] as string);
+  };
+
+  const getGithubIssueQueryParamsForUserAgent = (
+    userAgent: string
+  ): URLSearchParams => {
+    component.feedbackDetailResponse = {
+      ...mockDetailResponse,
+      session_info: {
+        ...feedbackSessionInfo,
+        environment: {
+          ...feedbackSessionInfo.environment,
+          user_agent: userAgent,
+        },
+      },
+    };
+
+    return new URL(component.getGithubIssueUrl()).searchParams;
   };
 
   beforeEach(async () => {
@@ -262,6 +281,9 @@ describe('FeedbackDetailPageComponent', () => {
     expect(queryParams.get('screenshots-videos')).toBe(
       'No screenshot was attached to this report.'
     );
+    expect(queryParams.get('device')).toBe('Desktop');
+    expect(queryParams.get('operating-system')).toBe('Other');
+    expect(queryParams.get('browsers')).toBe('Other');
     expect(queryParams.get('browser-version')).toBe('Not provided');
     expect(queryParams.get('additional-context')).toContain(
       'No session logs were attached to this report.'
@@ -327,13 +349,88 @@ describe('FeedbackDetailPageComponent', () => {
     expect(queryParams.get('screenshots-videos')).toContain(
       'Screenshot URL: data:image/png;base64,screenshot-data'
     );
-    expect(queryParams.get('browser-version')).toBe('Mozilla/5.0 Chrome/136.0');
+    expect(queryParams.get('device')).toBe('Desktop');
+    expect(queryParams.get('operating-system')).toBe('Linux');
+    expect(queryParams.get('browsers')).toBe('Chrome');
+    expect(queryParams.get('browser-version')).toBe('150.0.0.0');
     expect(queryParams.get('additional-context')).toContain(
-      '"user_agent": "Mozilla/5.0 Chrome/136.0"'
+      '"user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 ' +
+        '(KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"'
     );
     expect(queryParams.get('additional-context')).toContain(
       'Session logs included: Yes'
     );
+  });
+
+  it('should derive GitHub issue environment fields from common user agents', () => {
+    const userAgentTestCases: {
+      userAgent: string;
+      expectedDevice: string;
+      expectedOperatingSystem: string;
+      expectedBrowser: string;
+      expectedBrowserVersion: string;
+    }[] = [
+      {
+        userAgent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+          '(KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36 ' +
+          'Edg/150.1.2.3',
+        expectedDevice: 'Desktop',
+        expectedOperatingSystem: 'Windows',
+        expectedBrowser: 'Edge',
+        expectedBrowserVersion: '150.1.2.3',
+      },
+      {
+        userAgent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:150.0) ' +
+          'Gecko/20100101 Firefox/150.0',
+        expectedDevice: 'Desktop',
+        expectedOperatingSystem: 'MacOS',
+        expectedBrowser: 'Firefox',
+        expectedBrowserVersion: '150.0',
+      },
+      {
+        userAgent:
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) ' +
+          'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 ' +
+          'Mobile/15E148 Safari/604.1',
+        expectedDevice: 'Mobile',
+        expectedOperatingSystem: 'IOS',
+        expectedBrowser: 'Safari',
+        expectedBrowserVersion: '18.0',
+      },
+      {
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 ' +
+          '(KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36',
+        expectedDevice: 'Mobile',
+        expectedOperatingSystem: 'Android',
+        expectedBrowser: 'Chrome',
+        expectedBrowserVersion: '150.0.0.0',
+      },
+      {
+        userAgent: 'unknown-user-agent-value',
+        expectedDevice: 'Desktop',
+        expectedOperatingSystem: 'Other',
+        expectedBrowser: 'Other',
+        expectedBrowserVersion: 'Not provided',
+      },
+    ];
+
+    userAgentTestCases.forEach(testCase => {
+      const queryParams = getGithubIssueQueryParamsForUserAgent(
+        testCase.userAgent
+      );
+
+      expect(queryParams.get('device')).toBe(testCase.expectedDevice);
+      expect(queryParams.get('operating-system')).toBe(
+        testCase.expectedOperatingSystem
+      );
+      expect(queryParams.get('browsers')).toBe(testCase.expectedBrowser);
+      expect(queryParams.get('browser-version')).toBe(
+        testCase.expectedBrowserVersion
+      );
+    });
   });
 
   it('should return without performing any action when reply is sent', () => {

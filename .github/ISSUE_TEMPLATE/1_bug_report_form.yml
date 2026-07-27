@@ -59,7 +59,7 @@ body:
     attributes:
       label: What device are you using?
       description: Please select the device you're using.
-      multiple: true
+      multiple: false
       options:
         - Desktop
         - Mobile
@@ -69,8 +69,8 @@ body:
     id: operating-system
     attributes:
       label: Operating System
-      description: Please select the operating system you're using. **Example:** "Windows". If you're using multiple Operating systems, please select all that apply.
-      multiple: true
+      description: Please select the operating system you're using. **Example:** "Windows".
+      multiple: false
       options:
         - Windows
         - MacOS
@@ -84,8 +84,8 @@ body:
     id: browsers
     attributes:
       label: What browsers are you seeing the problem on?
-      description: Please select the browser you're using. If you're using multiple browsers, please select all that apply.
-      multiple: true
+      description: Please select the browser you're using.
+      multiple: false
       options:
         - Chrome
         - Firefox

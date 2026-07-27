@@ -36,6 +36,11 @@ import {
 } from 'domain/feedback/feedback.model';
 import './feedback-detail-page.component.css';
 
+interface BrowserDetails {
+  name: string;
+  version: string;
+}
+
 @Component({
   selector: 'oppia-feedback-detail-page',
   templateUrl: './feedback-detail-page.component.html',
@@ -133,20 +138,19 @@ export class FeedbackDetailPageComponent {
           response.category
         )}`
       : '[BUG]: User feedback report';
-    const params = new URLSearchParams({
-      template: '1_bug_report_form.yml',
-      title: title,
-      'describe-the-bug': this.getGithubIssueDescription(),
-      'page-url': response?.page_url || 'Not provided',
-      'steps-to-reproduce': this.getGithubIssueSteps(),
-      'expected-behavior': this.getGithubIssueExpectedBehavior(),
-      'screenshots-videos': this.getGithubIssueScreenshotDetails(),
-      device: 'Desktop',
-      'operating-system': 'Other',
-      browsers: 'Other',
-      'browser-version': this.getGithubIssueBrowserVersion(),
-      'additional-context': this.getGithubIssueAdditionalContext(),
-    });
+    const params = new URLSearchParams();
+    params.append('template', '1_bug_report_form.yml');
+    params.append('title', title);
+    params.append('describe-the-bug', this.getGithubIssueDescription());
+    params.append('page-url', response?.page_url || 'Not provided');
+    params.append('steps-to-reproduce', this.getGithubIssueSteps());
+    params.append('expected-behavior', this.getGithubIssueExpectedBehavior());
+    params.append('screenshots-videos', this.getGithubIssueScreenshotDetails());
+    params.append('device', this.getGithubIssueDevice());
+    params.append('operating-system', this.getGithubIssueOperatingSystem());
+    params.append('browsers', this.getGithubIssueBrowserName());
+    params.append('browser-version', this.getGithubIssueBrowserVersion());
+    params.append('additional-context', this.getGithubIssueAdditionalContext());
 
     return `https://github.com/oppia/oppia/issues/new?${params.toString()}`;
   }
@@ -236,9 +240,104 @@ export class FeedbackDetailPageComponent {
   }
 
   private getGithubIssueBrowserVersion(): string {
-    const userAgent =
-      this.feedbackDetailResponse?.session_info?.environment?.user_agent;
-    return userAgent || 'Not provided';
+    return this.getBrowserDetailsFromUserAgent().version;
+  }
+
+  private getGithubIssueBrowserName(): string {
+    return this.getBrowserDetailsFromUserAgent().name;
+  }
+
+  private getGithubIssueOperatingSystem(): string {
+    const userAgent = this.getUserAgent();
+    if (!userAgent) {
+      return 'Other';
+    }
+
+    if (userAgent.includes('Android')) {
+      return 'Android';
+    }
+    if (userAgent.includes('Windows')) {
+      return 'Windows';
+    }
+    if (
+      userAgent.includes('iPhone') ||
+      userAgent.includes('iPad') ||
+      userAgent.includes('iPod')
+    ) {
+      return 'IOS';
+    }
+    if (userAgent.includes('Mac OS X') || userAgent.includes('Macintosh')) {
+      return 'MacOS';
+    }
+    if (userAgent.includes('Linux')) {
+      return 'Linux';
+    }
+
+    return 'Other';
+  }
+
+  private getGithubIssueDevice(): string {
+    const userAgent = this.getUserAgent();
+    if (!userAgent) {
+      return 'Desktop';
+    }
+
+    return /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)
+      ? 'Mobile'
+      : 'Desktop';
+  }
+
+  private getBrowserDetailsFromUserAgent(): BrowserDetails {
+    const userAgent = this.getUserAgent();
+    if (!userAgent) {
+      return {
+        name: 'Other',
+        version: 'Not provided',
+      };
+    }
+
+    const edgeMatch = userAgent.match(/Edg(?:A|iOS)?\/([0-9.]+)/);
+    if (edgeMatch) {
+      return {
+        name: 'Edge',
+        version: edgeMatch[1],
+      };
+    }
+
+    const firefoxMatch = userAgent.match(/Firefox\/([0-9.]+)/);
+    if (firefoxMatch) {
+      return {
+        name: 'Firefox',
+        version: firefoxMatch[1],
+      };
+    }
+
+    const chromeMatch = userAgent.match(/(?:Chrome|CriOS)\/([0-9.]+)/);
+    if (chromeMatch) {
+      return {
+        name: 'Chrome',
+        version: chromeMatch[1],
+      };
+    }
+
+    const safariMatch = userAgent.match(/Version\/([0-9.]+).*Safari\//);
+    if (safariMatch) {
+      return {
+        name: 'Safari',
+        version: safariMatch[1],
+      };
+    }
+
+    return {
+      name: 'Other',
+      version: 'Not provided',
+    };
+  }
+
+  private getUserAgent(): string | null {
+    return (
+      this.feedbackDetailResponse?.session_info?.environment?.user_agent ?? null
+    );
   }
 
   private getGithubIssueSessionLogJson(): string {
