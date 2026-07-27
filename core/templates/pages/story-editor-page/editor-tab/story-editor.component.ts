@@ -341,6 +341,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     const arc = this.storyContents.getArcs()[arcIndex];
     const modalRef = this.ngbModal.open(EditArcModalComponent, {
       backdrop: 'static',
+      windowClass: 'oppia-edit-arc-modal',
     });
     modalRef.componentInstance.arcTitle = arc.getTitle();
     modalRef.componentInstance.arcDescription = arc.getDescription();

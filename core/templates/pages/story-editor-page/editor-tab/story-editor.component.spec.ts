@@ -864,6 +864,7 @@ describe('Story Editor Component having three story nodes', () => {
 
     expect(modalSpy).toHaveBeenCalledWith(EditArcModalComponent, {
       backdrop: 'static',
+      windowClass: 'oppia-edit-arc-modal',
     });
     expect(updateArcPropertySpy).toHaveBeenCalledTimes(2);
   }));

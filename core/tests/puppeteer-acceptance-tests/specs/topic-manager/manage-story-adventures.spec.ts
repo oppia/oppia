@@ -110,10 +110,17 @@ describe('Topic Manager', function () {
   it(
     'should edit an adventure metadata',
     async function () {
-      await curriculumAdmin.editAdventure(
+      await curriculumAdmin.fillEditAdventureModal(
         'Part Two',
         'The second part of the story'
       );
+
+      await curriculumAdmin.expectScreenshotToMatch(
+        'storyEditorEditAdventureModal',
+        __dirname
+      );
+
+      await curriculumAdmin.saveEditAdventureModal();
 
       await curriculumAdmin.expectAdventureToHave(
         'Part Two',

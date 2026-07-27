@@ -5790,13 +5790,15 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Opens the edit adventure modal and updates the adventure's title and
-   * description. Clicks the Edit Arc button on the second adventure header
-   * (the first non-default adventure).
+   * Opens the edit modal for the first non-default adventure and fills in its
+   * title and description without saving.
    * @param {string} title - The new title for the adventure.
    * @param {string} description - The new description for the adventure.
    */
-  async editAdventure(title: string, description?: string): Promise<void> {
+  async fillEditAdventureModal(
+    title: string,
+    description?: string
+  ): Promise<void> {
     const editButtons = await this.page.$$(arcEditButtonSelector);
     if (editButtons.length < 2) {
       throw new Error(
@@ -5819,9 +5821,24 @@ export class TopicManager extends BaseUser {
         description
       );
     }
+  }
 
+  /** Saves the adventure metadata and closes the edit modal. */
+  async saveEditAdventureModal(): Promise<void> {
     await this.clickOnElementWithSelector(saveEditArcButtonSelector);
     await this.expectElementToBeVisible(editArcTitleFieldSelector, false);
+  }
+
+  /**
+   * Opens the edit adventure modal and updates the adventure's title and
+   * description. Clicks the Edit Arc button on the second adventure header
+   * (the first non-default adventure).
+   * @param {string} title - The new title for the adventure.
+   * @param {string} description - The new description for the adventure.
+   */
+  async editAdventure(title: string, description?: string): Promise<void> {
+    await this.fillEditAdventureModal(title, description);
+    await this.saveEditAdventureModal();
     showMessage(
       `Adventure edited: title="${title}", description="${description || ''}".`
     );
