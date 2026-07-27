@@ -20,6 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FeedbackDetailPageComponent} from './feedback-detail-page.component';
 import {DateTimeFormatService} from 'services/date-time-format.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {FeedbackSharedModule} from '../feedback-shared.module';
 import {
   FeedbackStatus,
@@ -34,6 +35,7 @@ describe('FeedbackDetailPageComponent', () => {
   let component: FeedbackDetailPageComponent;
   let fixture: ComponentFixture<FeedbackDetailPageComponent>;
   let dateTimeFormatService: DateTimeFormatService;
+  let windowRef: WindowRef;
   const mockDetailResponse: PlatformFeedbackDetailResponse = {
     id: 'report1',
     report_message: 'Sample report',
@@ -135,6 +137,12 @@ describe('FeedbackDetailPageComponent', () => {
     fixture = TestBed.createComponent(FeedbackDetailPageComponent);
     component = fixture.componentInstance;
     dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    windowRef = TestBed.inject(WindowRef);
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        origin: 'https://www.oppia.org',
+      },
+    } as unknown as Window);
     fixture.detectChanges();
   });
 
@@ -270,7 +278,7 @@ describe('FeedbackDetailPageComponent', () => {
     expect(githubIssueUrl.origin + githubIssueUrl.pathname).toBe(
       'https://github.com/oppia/oppia/issues/new'
     );
-    expect(queryParams.get('template')).toBe('1_bug_report_form.yml');
+    expect(queryParams.get('template')).toBe('6_technical_feedback_report.yml');
     expect(queryParams.get('title')).toBe(
       '[BUG]: User feedback report: Not provided'
     );
@@ -324,6 +332,8 @@ describe('FeedbackDetailPageComponent', () => {
         '',
         'Transferred from the Oppia Technical feedback dashboard.',
         'Report ID: report1',
+        'Feedback report: https://www.oppia.org/technical-feedback-dashboard/' +
+          'tech-external/report1',
         `Submitted: ${formattedDate}`,
         'Source: App',
         'Category: Other / Not Sure',

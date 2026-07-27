@@ -34,6 +34,7 @@ import {
   SOURCE_LABELS,
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import './feedback-detail-page.component.css';
 
 interface BrowserDetails {
@@ -48,7 +49,10 @@ interface BrowserDetails {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackDetailPageComponent {
-  constructor(private dateTimeFormatService: DateTimeFormatService) {}
+  constructor(
+    private dateTimeFormatService: DateTimeFormatService,
+    private windowRef: WindowRef
+  ) {}
   @Input() feedbackDetailResponse!: PlatformFeedbackDetailResponse;
   @Input() feedbackDetailPageConfig!: FeedbackCardConfig;
   @Input() screenshotDataUrl: string | null = null;
@@ -139,7 +143,7 @@ export class FeedbackDetailPageComponent {
         )}`
       : '[BUG]: User feedback report';
     const params = new URLSearchParams();
-    params.append('template', '1_bug_report_form.yml');
+    params.append('template', '6_technical_feedback_report.yml');
     params.append('title', title);
     params.append('describe-the-bug', this.getGithubIssueDescription());
     params.append('page-url', response?.page_url || 'Not provided');
@@ -163,12 +167,22 @@ export class FeedbackDetailPageComponent {
       '',
       'Transferred from the Oppia Technical feedback dashboard.',
       `Report ID: ${response.id}`,
+      `Feedback report: ${this.getFeedbackReportUrl()}`,
       `Submitted: ${this.formatDate(response.created_on_msecs)}`,
       `Source: ${this.getSourceLabel(response.source)}`,
       `Category: ${this.getCategoryLabel(response.category)}`,
       `Platform: ${this.getPlatformLabel(response.platform)}`,
       `Dashboard: ${this.getDestinationLabel(response.destination_dashboard)}`,
     ].join('\n');
+  }
+
+  private getFeedbackReportUrl(): string {
+    const response = this.feedbackDetailResponse;
+    const reportPath = `/technical-feedback-dashboard/${encodeURIComponent(
+      response.destination_dashboard
+    )}/${encodeURIComponent(response.id)}`;
+
+    return `${this.windowRef.nativeWindow.location.origin}${reportPath}`;
   }
 
   private getGithubIssueSteps(): string {
