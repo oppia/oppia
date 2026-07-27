@@ -341,7 +341,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
 
     paramMapSubject.next(
       convertToParamMap({
-        team: TechnicalTeamType.CORE,
+        team: TechnicalTeamType.TECH_INTERNAL,
         reportId: 'report1',
       })
     );
@@ -354,7 +354,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
 
     expect(updateFeedbackStatusSpy).toHaveBeenCalledWith(
       'technical',
-      TechnicalTeamType.CORE,
+      TechnicalTeamType.TECH_INTERNAL,
       'report1',
       FeedbackStatus.FIXED
     );
@@ -374,7 +374,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
 
     paramMapSubject.next(
       convertToParamMap({
-        team: TechnicalTeamType.CORE,
+        team: TechnicalTeamType.TECH_INTERNAL,
         reportId: 'report1',
       })
     );
@@ -388,7 +388,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
 
     expect(updateFeedbackStatusSpy).toHaveBeenCalledWith(
       'technical',
-      TechnicalTeamType.CORE,
+      TechnicalTeamType.TECH_INTERNAL,
       'report1',
       FeedbackStatus.TRANSFERRED_TO_GITHUB
     );

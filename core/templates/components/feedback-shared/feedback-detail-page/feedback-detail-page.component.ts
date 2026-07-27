@@ -98,10 +98,6 @@ export class FeedbackDetailPageComponent {
     return this.feedbackDetailResponse?.session_info ?? null;
   }
 
-  get hasTechnicalLogs(): boolean {
-    return this.feedbackDetailResponse?.session_info !== null;
-  }
-
   getCategoryLabel(category: string | null): string {
     if (!category) {
       return 'Not provided';
@@ -119,10 +115,6 @@ export class FeedbackDetailPageComponent {
     return destinationDashboard === 'curriculum'
       ? 'Creator'
       : this.teamLabels[destinationDashboard];
-  }
-
-  getOptionalText(value: string | null): string {
-    return value || 'Not provided';
   }
 
   onStatusOptionClick(status: FeedbackStatus): void {
@@ -161,9 +153,6 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueDescription(): string {
     const response = this.feedbackDetailResponse;
-    if (response === null) {
-      return 'Feedback details were not available when this issue was created.';
-    }
 
     return [
       response.report_message,
@@ -180,9 +169,6 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueSteps(): string {
     const response = this.feedbackDetailResponse;
-    if (response === null) {
-      return 'Not provided by the feedback report.';
-    }
 
     const issueLines = [
       '1. Review the transferred feedback report details.',
@@ -192,9 +178,7 @@ export class FeedbackDetailPageComponent {
       issueLines.push(
         `3. Check exploration ${response.lesson_metadata.exploration_id}, ` +
           `state "${response.lesson_metadata.state_name}".`,
-        `4. Learner answer at report time: ${this.getOptionalText(
-          response.lesson_metadata.learner_current_answer
-        )}`
+        `4. Learner answer at report time: ${response.lesson_metadata.learner_current_answer}`
       );
     } else {
       issueLines.push('3. Use the report message and session logs to triage.');
@@ -209,7 +193,7 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueScreenshotDetails(): string {
     const response = this.feedbackDetailResponse;
-    if (response === null || !response.screenshot_filename) {
+    if (!response.screenshot_filename) {
       return 'No screenshot was attached to this report.';
     }
     return [
@@ -222,21 +206,19 @@ export class FeedbackDetailPageComponent {
       `Screenshot entity ID: ${
         response.screenshot_entity_id || 'Not provided'
       }`,
+      `Screenshot URL: ${this.screenshotDataUrl}`,
     ].join('\n');
   }
 
   private getGithubIssueAdditionalContext(): string {
     const response = this.feedbackDetailResponse;
-    if (response === null) {
-      return 'Feedback details were not available when this issue was created.';
-    }
 
     return [
       '## Feedback metadata',
       '',
       `Report ID: ${response.id}`,
       `Screenshot entity ID: ${response.screenshot_entity_id || 'Not provided'}`,
-      `Session logs included: ${this.hasTechnicalLogs ? 'Yes' : 'No'}`,
+      `Session logs included: ${this.sessionInfo ? 'Yes' : 'No'}`,
       '',
       '## Privacy warning',
       '',
@@ -268,6 +250,8 @@ export class FeedbackDetailPageComponent {
     return JSON.stringify(sessionInfo, null, 2) ?? 'Unable to serialize logs.';
   }
 
+  // TODO[#24716]: Stub right now, will be done in the creator feedback tab and
+  // My suggestions tab's PR.
   onReplySend(): void {
     return;
   }

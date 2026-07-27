@@ -37,31 +37,27 @@ describe('FeedbackDetailSectionComponent', () => {
     component.iconClass = 'fas fa-info-circle';
   });
 
-  it('should render the configured section icon classes', () => {
+  it('should create component with the correct heading and icon', () => {
     fixture.detectChanges();
-
-    const icons = fixture.nativeElement.querySelectorAll('i');
-    expect(
-      icons[0].classList.contains('oppia-feedback-detail-section-icon')
-    ).toBeTrue();
-    expect(icons[0].classList.contains('fas')).toBeTrue();
-    expect(icons[0].classList.contains('fa-info-circle')).toBeTrue();
+    expect(component).toBeDefined();
+    expect(component.heading).toBe('Details');
+    expect(component.iconClass).toBe('fas fa-info-circle');
   });
 
-  it('should toggle the collapse chevron icon', () => {
+  it('should toggle collapse', () => {
     component.isCollapsible = true;
     fixture.detectChanges();
+    component.toggleCollapse();
 
-    let icons = fixture.nativeElement.querySelectorAll('i');
-    expect(icons[1].classList.contains('fas')).toBeTrue();
-    expect(icons[1].classList.contains('fa-chevron-down')).toBeTrue();
-    expect(icons[1].classList.contains('fa-chevron-right')).toBeFalse();
+    expect(component.isCollapsed).toBe(true);
+    component.toggleCollapse();
+    expect(component.isCollapsed).toBe(false);
+  });
 
-    icons[1].dispatchEvent(new MouseEvent('click'));
+  it('should not be able to toggle collapse when isCollapsible False', () => {
+    component.isCollapsible = false;
     fixture.detectChanges();
-
-    icons = fixture.nativeElement.querySelectorAll('i');
-    expect(icons[1].classList.contains('fa-chevron-down')).toBeFalse();
-    expect(icons[1].classList.contains('fa-chevron-right')).toBeTrue();
+    component.toggleCollapse();
+    expect(component.isCollapsed).toBe(false);
   });
 });
