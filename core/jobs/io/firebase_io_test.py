@@ -102,9 +102,10 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
         self,
     ) -> tuple[
         beam.PCollection[firebase_domain.FirebaseRecord],
+        beam.PCollection[str],
         beam.PCollection[tuple[str, str]],
     ]:
-        """Applies the transform and returns just the recreated records."""
+        """Applies the transform and returns its records, problems, and pairs."""
 
         output = (
             self.pipeline
@@ -112,15 +113,20 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
         )
         return (
             output[firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS],
+            output[firebase_io.RecreateRecordsFromOppiaModels.TAG_PROBLEMS],
             output[firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS],
         )
 
     def test_run_without_oppia_models_returns_empty_records(self) -> None:
-        records, _ = self.get_tagged_outputs()
+        records, _, _ = self.get_tagged_outputs()
         self.assert_pcoll_empty(records)
 
+    def test_run_without_oppia_models_returns_empty_problems(self) -> None:
+        _, problems, _ = self.get_tagged_outputs()
+        self.assert_pcoll_empty(problems)
+
     def test_run_without_oppia_models_returns_empty_auth_pairs(self) -> None:
-        _, auth_pairs = self.get_tagged_outputs()
+        _, _, auth_pairs = self.get_tagged_outputs()
         self.assert_pcoll_empty(auth_pairs)
 
     def test_get_with_single_model_pair_returns_record(self) -> None:
@@ -139,7 +145,7 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        records, _ = self.get_tagged_outputs()
+        records, _, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
             records,
             [
@@ -169,7 +175,7 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        records, _ = self.get_tagged_outputs()
+        records, _, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
             records,
             [
@@ -207,7 +213,7 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        records, _ = self.get_tagged_outputs()
+        records, _, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
             records,
             [
@@ -252,7 +258,7 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        records, _ = self.get_tagged_outputs()
+        records, _, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
             records,
             [
@@ -291,10 +297,11 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        _, auth_pairs = self.get_tagged_outputs()
+        _, _, auth_pairs = self.get_tagged_outputs()
         self.assert_pcoll_equal(auth_pairs, [('fb_a', 'uid_a')])
 
-    def test_get_with_missing_auth_details_raises_value_error(self) -> None:
+    def _put_missing_auth_details_models(self) -> None:
+        """Persists a settings model with no matching auth details model."""
         self.put_multi(
             [
                 self.create_model(
@@ -305,11 +312,29 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        with self.assertRaisesRegex(ValueError, 'needs exactly one'):
-            records, _ = self.get_tagged_outputs()
-            self.assert_pcoll_equal(records, [])
+    def test_get_with_missing_auth_details_produces_no_records(self) -> None:
+        self._put_missing_auth_details_models()
 
-    def test_get_with_missing_settings_raises_value_error(self) -> None:
+        records, _, _ = self.get_tagged_outputs()
+        self.assert_pcoll_empty(records)
+
+    def test_get_with_missing_auth_details_reports_problem(self) -> None:
+        self._put_missing_auth_details_models()
+
+        _, problems, _ = self.get_tagged_outputs()
+        self.assert_pcoll_equal(
+            problems,
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'user_id=\'uid_a\' needs exactly one UserAuthDetailsModel '
+                    '(found 0) and exactly one UserSettingsModel (found 1) '
+                    '(surfaced by: zip() argument 2 is longer than argument 1)'
+                )
+            ],
+        )
+
+    def _put_missing_settings_models(self) -> None:
+        """Persists an auth details model with no matching settings model."""
         self.put_multi(
             [
                 self.create_model(
@@ -320,13 +345,29 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        with self.assertRaisesRegex(ValueError, 'needs exactly one'):
-            records, _ = self.get_tagged_outputs()
-            self.assert_pcoll_equal(records, [])
+    def test_get_with_missing_settings_produces_no_records(self) -> None:
+        self._put_missing_settings_models()
 
-    def test_get_with_inconsistent_deleted_status_raises_value_error(
-        self,
-    ) -> None:
+        records, _, _ = self.get_tagged_outputs()
+        self.assert_pcoll_empty(records)
+
+    def test_get_with_missing_settings_reports_problem(self) -> None:
+        self._put_missing_settings_models()
+
+        _, problems, _ = self.get_tagged_outputs()
+        self.assert_pcoll_equal(
+            problems,
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'user_id=\'uid_a\' needs exactly one UserAuthDetailsModel '
+                    '(found 1) and exactly one UserSettingsModel (found 0) '
+                    '(surfaced by: zip() argument 2 is shorter than argument 1)'
+                )
+            ],
+        )
+
+    def _put_inconsistent_deleted_status_models(self) -> None:
+        """Persists a model pair whose deleted statuses disagree."""
         self.put_multi(
             [
                 self.create_model(
@@ -344,9 +385,31 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             ]
         )
 
-        with self.assertRaisesRegex(ValueError, 'Failed to rebuild record'):
-            records, _ = self.get_tagged_outputs()
-            self.assert_pcoll_equal(records, [])
+    def test_get_with_inconsistent_deleted_status_produces_no_records(
+        self,
+    ) -> None:
+        self._put_inconsistent_deleted_status_models()
+
+        records, _, _ = self.get_tagged_outputs()
+        self.assert_pcoll_empty(records)
+
+    def test_get_with_inconsistent_deleted_status_reports_problem(
+        self,
+    ) -> None:
+        self._put_inconsistent_deleted_status_models()
+
+        _, problems, _ = self.get_tagged_outputs()
+        self.assert_pcoll_equal(
+            problems,
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'Failed to rebuild record for user_id=\'uid_a\' because: '
+                    'user_auth_details_model.id=\'uid_a\' with deleted=True '
+                    'must match user_settings_model.id=\'uid_a\' with '
+                    'deleted=False'
+                )
+            ],
+        )
 
 
 class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):

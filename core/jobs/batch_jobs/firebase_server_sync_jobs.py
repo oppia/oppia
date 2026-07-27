@@ -63,8 +63,9 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             | 'Get records directly from the Firebase server'
             >> firebase_io.GetRecordsDirectlyFromFirebase(project_id)
         )
-        oppia_records, auth_pairs = operator.itemgetter(
+        oppia_records, oppia_problems, auth_pairs = operator.itemgetter(
             firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS,
+            firebase_io.RecreateRecordsFromOppiaModels.TAG_PROBLEMS,
             firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS,
         )(
             self.pipeline
@@ -130,7 +131,12 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             )
         )
 
-        return (add_results, del_results, remaining_results) | beam.Flatten()
+        return (
+            add_results,
+            del_results,
+            remaining_results,
+            oppia_problems,
+        ) | beam.Flatten()
 
 
 class AuditFirebaseServerSyncJob(FirebaseServerSyncJobBase):

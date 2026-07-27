@@ -32,6 +32,7 @@ from core.platform.auth import firebase_auth_services
 import apache_beam as beam
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
+import result
 from apache_beam import pvalue
 from typing import Callable, Generic, TypeVar
 
@@ -50,11 +51,14 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
 
     Attributes:
         TAG_RECORDS: str. Tag for the PCollection of recreated records.
+        TAG_PROBLEMS: str. Tag for the PCollection of problems encountered
+            with Oppia's models (e.g. missing or inconsistent models).
         TAG_AUTH_PAIRS: str. Tag for the PCollection of (Firebase ID, User ID)
             pairs.
     """
 
     TAG_RECORDS = 'records'
+    TAG_PROBLEMS = 'problems'
     TAG_AUTH_PAIRS = 'auth_pairs'
 
     def expand(self, pbegin: pvalue.PBegin) -> dict[str, beam.PCollection]:
@@ -63,6 +67,9 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
         Returns:
             dict. A dict with two PCollections:
                 TAG_RECORDS: PCollection[FirebaseRecord]. The recreated records.
+                TAG_PROBLEMS: PCollection[JobRunResult]. The problems
+                    encountered with the Oppia models (e.g. missing or
+                    inconsistent models).
                 TAG_AUTH_PAIRS: PCollection[tuple[str, str]]. The collection of
                     (Firebase ID, User ID) pairs from each Firebase-linked user.
         """
@@ -94,12 +101,19 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
             >> beam.Map(lambda m: (m.id, m))
         )
 
+        [oks, errs] = (
+            (keyed_user_auth_details_models, keyed_user_settings_models)
+            | beam.CoGroupByKey()
+            | beam.FlatMapTuple(self._yield_recreated_records_from_oppia_models)
+            | beam.Partition(lambda res, _: int(res.is_err()), 2)
+        )
+
         return {
-            self.TAG_RECORDS: (
-                (keyed_user_auth_details_models, keyed_user_settings_models)
-                | beam.CoGroupByKey()
-                | beam.FlatMapTuple(
-                    self._yield_recreated_records_from_oppia_models
+            self.TAG_RECORDS: oks | beam.Map(lambda res: res.unwrap()),
+            self.TAG_PROBLEMS: errs
+            | beam.Map(
+                lambda res: job_run_result.JobRunResult.as_stderr(
+                    res.unwrap_err()
                 )
             ),
             self.TAG_AUTH_PAIRS: (
@@ -118,7 +132,7 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
             abc.Iterable[auth_models.UserAuthDetailsModel],
             abc.Iterable[user_models.UserSettingsModel],
         ],
-    ) -> abc.Iterable[firebase_domain.FirebaseRecord]:
+    ) -> abc.Iterable[result.Result[firebase_domain.FirebaseRecord, str]]:
         """Yields a FirebaseRecord for the given user_id if possible."""
 
         user_auth_details_model_iter, user_settings_model_iter = grouped_models
@@ -131,21 +145,26 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
                 strict=True,
             )
         except ValueError as e:
-            raise ValueError(
+            yield result.Err(
                 f'{user_id=!r} needs exactly one UserAuthDetailsModel '
                 f'(found {len(user_auth_details_models)}) and exactly one '
-                f'UserSettingsModel (found {len(user_settings_models)})'
-            ) from e
+                f'UserSettingsModel (found {len(user_settings_models)}) '
+                f'(surfaced by: {e})'
+            )
+            return
 
         try:
             record = firebase_domain.FirebaseRecord.from_oppia_models(
                 user_auth_details_model, user_settings_model
             )
         except ValueError as e:
-            raise ValueError(f'Failed to rebuild record for {user_id=}') from e
+            yield result.Err(
+                f'Failed to rebuild record for {user_id=} because: {e}'
+            )
+            return
 
         if record:
-            yield record
+            yield result.Ok(record)
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
