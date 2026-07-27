@@ -195,8 +195,12 @@ export class FeedbackDetailPageComponent {
     if (response.lesson_metadata) {
       issueLines.push(
         `3. Check exploration ${response.lesson_metadata.exploration_id}, ` +
-          `state "${response.lesson_metadata.state_name}".`,
-        `4. Learner answer at report time: ${response.lesson_metadata.learner_current_answer}`
+          `state "${response.lesson_metadata.state_name}",` +
+          `version "${response.lesson_metadata.exploration_version}".`,
+        `4. Learner answer at report time: ${response.lesson_metadata.learner_current_answer}`,
+        `Quick Links for the exploration reported:`,
+        `1. Open reported Lesson version: ${this.windowRef.nativeWindow.location.origin}${this.getReportedLessonUrl()}`,
+        `2. Open the state in editor: ${this.windowRef.nativeWindow.location.origin}${this.getReportedStateEditorUrl()}`
       );
     } else {
       issueLines.push('3. Use the report message and session logs to triage.');
@@ -224,7 +228,7 @@ export class FeedbackDetailPageComponent {
       `Screenshot entity ID: ${
         response.screenshot_entity_id || 'Not provided'
       }`,
-      `Screenshot URL: ${this.screenshotDataUrl}`,
+      `Screenshot URL: ${this.windowRef.nativeWindow.location.origin}${this.screenshotDataUrl}`,
     ].join('\n');
   }
 

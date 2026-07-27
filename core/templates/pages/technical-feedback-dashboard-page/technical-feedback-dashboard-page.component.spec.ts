@@ -42,6 +42,7 @@ import {AppConstants} from 'app.constants';
 import {BehaviorSubject} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {ReportType} from '../../domain/feedback/feedback.model';
 
 describe('TechnicalFeedbackDashboardPageComponent', () => {
   let component: TechnicalFeedbackDashboardPageComponent;
@@ -60,7 +61,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
   let mockDetailResponse: PlatformFeedbackDetailResponse = {
     id: 'report1',
     report_message: 'Sample report',
-    source: 'app',
+    source: ReportType.APP,
     status: FeedbackStatus.OPEN,
     platform: 'web',
     destination_dashboard: TechnicalTeamType.TECH_EXTERNAL,
