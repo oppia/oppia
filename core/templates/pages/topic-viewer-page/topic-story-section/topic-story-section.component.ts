@@ -38,7 +38,6 @@ import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.s
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import constants from 'assets/constants';
 
@@ -192,8 +191,7 @@ export class TopicStorySectionComponent
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
-    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
-    private platformFeatureService: PlatformFeatureService
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService
   ) {}
 
   ngOnInit(): void {
@@ -603,7 +601,7 @@ export class TopicStorySectionComponent
     this.adventureNavigationGroups = this.adventureGroups
       .map(group => {
         const visibleLessons = group.lessonCards.filter(
-          card => !card.isComingSoon
+          card => !card.isComingSoon && card.isPublished
         );
 
         return {
@@ -626,14 +624,14 @@ export class TopicStorySectionComponent
     }
   }
 
-  private isSerialChapterFeatureLearnerFlagEnabled(): boolean {
-    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
-      .isEnabled;
-  }
-
   private isChapterReadyToPublish(node: StoryNode): boolean {
     try {
-      return node.getStatus() === constants.STORY_NODE_STATUS_READY_TO_PUBLISH;
+      return (
+        this.hasStoryNodeStatus(
+          node,
+          constants.STORY_NODE_STATUS_READY_TO_PUBLISH
+        ) || this.hasStoryNodeStatus(node, 'Ready To Publish')
+      );
     } catch {
       return false;
     }
@@ -641,15 +639,34 @@ export class TopicStorySectionComponent
 
   private isChapterPublished(node: StoryNode): boolean {
     try {
-      return node.getStatus() === constants.STORY_NODE_STATUS_PUBLISHED;
+      return (
+        this.hasStoryNodeStatus(node, constants.STORY_NODE_STATUS_PUBLISHED) ||
+        this.hasStoryNodeStatus(node, 'Published')
+      );
     } catch {
       return false;
     }
   }
 
+  private hasStoryNodeStatus(node: StoryNode, expectedStatus: string): boolean {
+    const status = node.getStatus();
+    if (!status) {
+      return false;
+    }
+
+    return (
+      this.normalizeStoryNodeStatus(status) ===
+      this.normalizeStoryNodeStatus(expectedStatus)
+    );
+  }
+
+  private normalizeStoryNodeStatus(status: string): string {
+    return status.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
   private isChapterDisplayedAsComingSoon(node: StoryNode): boolean {
-    if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
-      return this.isChapterReadyToPublish(node);
+    if (this.isChapterReadyToPublish(node)) {
+      return true;
     }
 
     return !node.getExplorationId();
