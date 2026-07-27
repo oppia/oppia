@@ -21,6 +21,8 @@ from __future__ import annotations
 import datetime
 import logging
 
+import pytest
+
 from core import feconf, utils
 from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
@@ -346,10 +348,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.user_settings.profile_name_for_certificate = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(
+        with pytest.raises(
             utils.ValidationError,
-            'Expected profile_name_for_certificate to be a string,'
-            ' received %s' % self.user_settings.profile_name_for_certificate,
+            match=f'Expected profile_name_for_certificate to be a string, received {self.user_settings.profile_name_for_certificate}',
         ):
             self.user_settings.validate()
 

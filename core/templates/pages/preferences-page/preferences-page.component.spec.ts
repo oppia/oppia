@@ -243,6 +243,9 @@ describe('Preferences Page Component', () => {
         'profile-image-url-webp'
       );
       expect(formValues.userBio).toEqual(preferencesData.user_bio);
+      expect(formValues.profileNameForCertificate).toEqual(
+        preferencesData.profile_name_for_certificate
+      );
       expect(formValues.defaultDashboard).toEqual(
         preferencesData.default_dashboard
       );

@@ -325,6 +325,9 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         user_model = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        user_model.profile_name_for_certificate = 'non-empty-certificate-name'
+        user_model.update_timestamps()
+        user_model.put()
         user_data = user_model.export_data(user_model.id)
         expected_user_data = {
             'email': self.USER_3_EMAIL,
@@ -351,7 +354,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             ),
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
             'has_viewed_lesson_info_modal_once': False,
-            'profile_name_for_certificate': None,
+            'profile_name_for_certificate': 'non-empty-certificate-name',
         }
         self.assertEqual(expected_user_data, user_data)
 
