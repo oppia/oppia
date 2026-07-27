@@ -207,7 +207,7 @@ def get_acceptance_test_suites_from_acceptance_directory() -> (
         (PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY, 'playwright'),
     ]:
         acceptance_test_files = glob.glob(
-            os.path.join(test_specs_directory, '**/*.spec.ts')
+            os.path.join(test_specs_directory, '**/*.spec.ts'), recursive=True
         )
 
         for module in acceptance_test_files:
