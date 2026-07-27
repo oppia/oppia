@@ -15,11 +15,11 @@
       </div>
       <div class="oppia-feedback-detail-topbar-end">
         <oppia-feedback-chip [value]="feedback.status"
-                              [type]="'status'">
+                             [type]="'status'">
         </oppia-feedback-chip>
         <oppia-feedback-chip *ngIf="feedback.category"
-                              [value]="feedback.category"
-                              [type]="'category'">
+                             [value]="feedback.category"
+                             [type]="'category'">
         </oppia-feedback-chip>
       </div>
     </header>
@@ -142,7 +142,7 @@
           <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
             <div class="oppia-feedback-detail-message-text">{{ feedback.report_message }}</div>
           </oppia-feedback-detail-section>
-          
+
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"
                                          heading="Replies"
                                          [isCollapsible]="true"
@@ -154,7 +154,7 @@
             <oppia-feedback-detail-section heading="Actions"
                                            [isCollapsible]="true"
                                            iconClass="fas fa-cogs">
-              <section *ngIf="feedbackDetailPageConfig.showResponse" 
+              <section *ngIf="feedbackDetailPageConfig.showResponse"
                        class="oppia-feedback-detail-reply-row">
                 <label class="oppia-feedback-detail-actions-label" for="reply-textarea">
                   Reply to reporter
@@ -164,7 +164,8 @@
                           [(ngModel)]="replyText"
                           [disabled]="isSendingReply"
                           rows="2"
-                          placeholder="Write a reply the reporter will see..."></textarea>
+                          placeholder="Write a reply the reporter will see...">
+                </textarea>
                 <div class="oppia-feedback-detail-reply-send-row">
                   <button type="button"
                           class="btn btn-success oppia-feedback-detail-button"

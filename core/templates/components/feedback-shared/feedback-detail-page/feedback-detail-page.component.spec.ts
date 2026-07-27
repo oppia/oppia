@@ -102,6 +102,10 @@ describe('FeedbackDetailPageComponent', () => {
     },
   };
 
+  const getGithubTransferUrlFromSpy = (githubTransferSpy: jasmine.Spy): URL => {
+    return new URL(githubTransferSpy.calls.mostRecent().args[0] as string);
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FeedbackSharedModule, HttpClientTestingModule],
@@ -151,10 +155,13 @@ describe('FeedbackDetailPageComponent', () => {
     component.feedbackDetailResponse = {
       ...mockDetailResponse,
       source: ReportType.LESSON,
-      lesson_metadata: mockLessonMetadata,
+      lesson_metadata: {
+        ...mockLessonMetadata,
+        exploration_id: 'exp id',
+      },
     };
     const url = component.getReportedLessonUrl();
-    expect(url).toBe('/explore/exp1?v=1');
+    expect(url).toBe('/explore/exp%20id?v=1');
   });
 
   it('should return early the Reported state editor URL if no lesson metadata', () => {
@@ -167,10 +174,14 @@ describe('FeedbackDetailPageComponent', () => {
     component.feedbackDetailResponse = {
       ...mockDetailResponse,
       source: ReportType.LESSON,
-      lesson_metadata: mockLessonMetadata,
+      lesson_metadata: {
+        ...mockLessonMetadata,
+        exploration_id: 'exp id',
+        state_name: 'Introduction & review',
+      },
     };
     const url = component.getReportedStateEditorUrl();
-    expect(url).toBe('/create/exp1#/gui/state1');
+    expect(url).toBe('/create/exp%20id#/gui/Introduction%20%26%20review');
   });
 
   it('should get sessionInfo when sessionInfo is not null', () => {
@@ -188,14 +199,16 @@ describe('FeedbackDetailPageComponent', () => {
     expect(component.getCategoryLabel(category)).toBe('Broken Layout / Image');
   });
 
-  it('should get correct category label for null category', () => {
-    const category = null;
+  it('should get fallback category labels', () => {
+    const category: ReportAnIssueCategory | null = null;
     expect(component.getCategoryLabel(category)).toBe('Not provided');
+    expect(component.getCategoryLabel('new_category')).toBe('new_category');
   });
 
   it('should get correct source label', () => {
     const source = ReportType.APP;
     expect(component.getSourceLabel(source)).toBe('App');
+    expect(component.getSourceLabel('new_source')).toBe('new_source');
   });
 
   it('should get correct destination label', () => {
@@ -218,18 +231,112 @@ describe('FeedbackDetailPageComponent', () => {
     expect(githubTransferSpy).not.toHaveBeenCalled();
   });
 
-  it('should emit GitHub transfer URL for transferred status', () => {
+  it('should emit GitHub transfer URL for transferred status when no session logs and metadata', () => {
     const statusChangeSpy = spyOn(component.statusChange, 'emit');
     const githubTransferSpy = spyOn(component.githubTransfer, 'emit');
-    component.feedbackDetailResponse = mockDetailResponse;
+    component.feedbackDetailResponse = {
+      ...mockDetailResponse,
+      category: null,
+      page_url: '',
+    };
 
     component.onStatusOptionClick(FeedbackStatus.TRANSFERRED_TO_GITHUB);
 
     expect(statusChangeSpy).not.toHaveBeenCalled();
-    expect(githubTransferSpy).toHaveBeenCalledWith(
-      jasmine.stringMatching(
-        'https://github.com/oppia/oppia/issues/new?'
-      ) as string
+    expect(githubTransferSpy).toHaveBeenCalledTimes(1);
+
+    const githubIssueUrl = getGithubTransferUrlFromSpy(githubTransferSpy);
+    const queryParams = githubIssueUrl.searchParams;
+
+    expect(githubIssueUrl.origin + githubIssueUrl.pathname).toBe(
+      'https://github.com/oppia/oppia/issues/new'
     );
+    expect(queryParams.get('template')).toBe('1_bug_report_form.yml');
+    expect(queryParams.get('title')).toBe(
+      '[BUG]: User feedback report: Not provided'
+    );
+    expect(queryParams.get('page-url')).toBe('Not provided');
+    expect(queryParams.get('steps-to-reproduce')).toContain(
+      'Use the report message and session logs to triage.'
+    );
+    expect(queryParams.get('screenshots-videos')).toBe(
+      'No screenshot was attached to this report.'
+    );
+    expect(queryParams.get('browser-version')).toBe('Not provided');
+    expect(queryParams.get('additional-context')).toContain(
+      'No session logs were attached to this report.'
+    );
+  });
+
+  it('should emit GitHub transfer URL when session logs and metadata are present', () => {
+    const statusChangeSpy = spyOn(component.statusChange, 'emit');
+    const githubTransferSpy = spyOn(component.githubTransfer, 'emit');
+    const formattedDate = 'Jan 15, 1970, 11:56:07 PM';
+    spyOn(
+      dateTimeFormatService,
+      'getLocaleAbbreviatedDatetimeString'
+    ).and.returnValue(formattedDate);
+    component.feedbackDetailResponse = {
+      ...mockDetailResponse,
+      session_info: feedbackSessionInfo,
+      lesson_metadata: mockLessonMetadata,
+      screenshot_filename: 'screenshot',
+      screenshot_entity_id: 'entity_id',
+    };
+    component.screenshotDataUrl = 'data:image/png;base64,screenshot-data';
+
+    component.onStatusOptionClick(FeedbackStatus.TRANSFERRED_TO_GITHUB);
+
+    expect(statusChangeSpy).not.toHaveBeenCalled();
+    expect(githubTransferSpy).toHaveBeenCalledTimes(1);
+
+    const githubIssueUrl = getGithubTransferUrlFromSpy(githubTransferSpy);
+    const queryParams = githubIssueUrl.searchParams;
+
+    expect(queryParams.get('title')).toBe(
+      '[BUG]: User feedback report: Other / Not Sure'
+    );
+    expect(queryParams.get('describe-the-bug')).toBe(
+      [
+        'Sample report',
+        '',
+        'Transferred from the Oppia Technical feedback dashboard.',
+        'Report ID: report1',
+        `Submitted: ${formattedDate}`,
+        'Source: App',
+        'Category: Other / Not Sure',
+        'Platform: Web',
+        'Dashboard: LEAP',
+      ].join('\n')
+    );
+    expect(queryParams.get('steps-to-reproduce')).toContain(
+      'Check exploration exp1, state "state1".'
+    );
+    expect(queryParams.get('steps-to-reproduce')).toContain(
+      'Learner answer at report time: answer1'
+    );
+    expect(queryParams.get('expected-behavior')).toBe(
+      'The reported user-facing problem should not occur.'
+    );
+    expect(queryParams.get('screenshots-videos')).toContain(
+      'Screenshot filename: screenshot'
+    );
+    expect(queryParams.get('screenshots-videos')).toContain(
+      'Screenshot entity ID: entity_id'
+    );
+    expect(queryParams.get('screenshots-videos')).toContain(
+      'Screenshot URL: data:image/png;base64,screenshot-data'
+    );
+    expect(queryParams.get('browser-version')).toBe('Mozilla/5.0 Chrome/136.0');
+    expect(queryParams.get('additional-context')).toContain(
+      '"user_agent": "Mozilla/5.0 Chrome/136.0"'
+    );
+    expect(queryParams.get('additional-context')).toContain(
+      'Session logs included: Yes'
+    );
+  });
+
+  it('should return without performing any action when reply is sent', () => {
+    expect(component.onReplySend()).toBeUndefined();
   });
 });

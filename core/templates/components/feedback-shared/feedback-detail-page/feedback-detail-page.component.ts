@@ -250,7 +250,7 @@ export class FeedbackDetailPageComponent {
     return JSON.stringify(sessionInfo, null, 2) ?? 'Unable to serialize logs.';
   }
 
-  // TODO[#24716]: Stub right now, will be done in the creator feedback tab and
+  // TODO(#24716): Stub right now, will be done in the creator feedback tab and
   // My suggestions tab's PR.
   onReplySend(): void {
     return;
