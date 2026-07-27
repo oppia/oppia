@@ -146,7 +146,9 @@ describe('Opportunities List Item Component', () => {
 
       it('should not set progressPercentage if it is undefined', () => {
         let opportunity = component.opportunity as ExplorationOpportunity;
-        opportunity.progressPercentage = undefined as unknown as number;
+        Object.defineProperty(opportunity, 'progressPercentage', {
+          value: undefined,
+        });
         component.progressPercentage = 'default';
         fixture.detectChanges();
         component.ngOnInit();
@@ -155,7 +157,9 @@ describe('Opportunities List Item Component', () => {
 
       it('should not set progressPercentage if it is null', () => {
         let opportunity = component.opportunity as ExplorationOpportunity;
-        opportunity.progressPercentage = null as unknown as number;
+        Object.defineProperty(opportunity, 'progressPercentage', {
+          value: null,
+        });
         component.progressPercentage = 'default';
         fixture.detectChanges();
         component.ngOnInit();
@@ -416,7 +420,7 @@ describe('Opportunities List Item Component', () => {
         opportunity.totalCount = 10;
         opportunity.translationsCount = 5;
         opportunity.inReviewCount = 5;
-        opportunity.reviewerOnlyContentCount = undefined as unknown as number;
+        opportunity.reviewerOnlyContentCount = undefined;
         opportunity.userIsReviewer = false;
         fixture.detectChanges();
         component.ngOnInit();
@@ -427,6 +431,34 @@ describe('Opportunities List Item Component', () => {
         expect(component.tooltipText).toBe(
           'All available translations are currently in review.'
         );
+      });
+    });
+
+    describe('ngOnChanges', () => {
+      it('should call initOpportunityData when opportunity changes', () => {
+        spyOn(component, 'initOpportunityData');
+        component.ngOnChanges({
+          opportunity: {
+            previousValue: null,
+            currentValue: 'new value',
+            firstChange: false,
+            isFirstChange: () => false,
+          } as any,
+        });
+        expect(component.initOpportunityData).toHaveBeenCalled();
+      });
+
+      it('should not call initOpportunityData when opportunity does not change', () => {
+        spyOn(component, 'initOpportunityData');
+        component.ngOnChanges({
+          otherProperty: {
+            previousValue: null,
+            currentValue: 'new value',
+            firstChange: false,
+            isFirstChange: () => false,
+          } as any,
+        });
+        expect(component.initOpportunityData).not.toHaveBeenCalled();
       });
     });
   });
