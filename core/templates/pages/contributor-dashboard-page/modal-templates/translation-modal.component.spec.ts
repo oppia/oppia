@@ -471,6 +471,19 @@ describe('Translation Modal Component', () => {
     expect(handler(event)).toBeUndefined();
   });
 
+  it('should reset the image save destination when the modal is destroyed', () => {
+    pageContextService.setImageSaveDestinationToLocalStorage();
+    expect(pageContextService.getImageSaveDestination()).toBe(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
+
+    component.ngOnDestroy();
+
+    expect(pageContextService.getImageSaveDestination()).toBe(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+  });
+
   describe('when initialized', () => {
     describe('with an rtl language', () => {
       beforeEach(fakeAsync(() => {
@@ -1376,6 +1389,7 @@ describe('Translation Modal Component', () => {
               useValue: {
                 setImageSaveDestinationToLocalStorage: () => {},
                 setCustomEntityContext: () => {},
+                resetImageSaveDestination: () => {},
                 getEntityType: () => 'exploration',
                 getEntityId: () => '1',
                 getImageSaveDestination: () => 'localStorage',

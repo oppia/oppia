@@ -408,26 +408,26 @@ describe('Search bar component', () => {
     () => {
       spyOn(searchService, 'executeSearchQuery');
       spyOn(searchService, 'getSearchUrlQueryString').and.returnValue('');
-      spyOn(windowRef.nativeWindow.history, 'pushState');
+      const pushStateSpy = spyOn(windowRef.nativeWindow.history, 'pushState');
 
       component.searchQuery = '';
 
       windowRef.nativeWindow.location = new URL('http://localhost/search/find');
       component.onSearchQueryChangeExec();
 
-      expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+      expect(pushStateSpy).not.toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.href).toEqual(
         'http://localhost/search/find'
       );
 
-      windowRef.nativeWindow.history.pushState.calls.reset();
+      pushStateSpy.calls.reset();
 
       windowRef.nativeWindow.location = new URL(
         'http://localhost/not/search/find'
       );
       component.onSearchQueryChangeExec();
 
-      expect(windowRef.nativeWindow.history.pushState).not.toHaveBeenCalled();
+      expect(pushStateSpy).not.toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.href).toEqual(
         'http://localhost/not/search/find'
       );
@@ -475,10 +475,12 @@ describe('Search bar component', () => {
       callb(['en', 'es']);
       return null;
     });
-    spyOn(translateService.onLangChange, 'subscribe').and.callFake(callb => {
-      callb();
-      return null;
-    });
+    spyOn(translateService.onLangChange, 'subscribe').and.callFake(
+      (callb: () => void) => {
+        callb();
+        return null;
+      }
+    );
     spyOn(
       classroomBackendApiService.onInitializeTranslation,
       'subscribe'

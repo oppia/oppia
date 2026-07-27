@@ -29,7 +29,10 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {EventEmitter} from '@angular/core';
-import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
+import {
+  OppiaRteNode,
+  OppiaRteParserService,
+} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -229,7 +232,7 @@ describe('RTE display component', () => {
   }));
 
   it('should return early when rteString is null', () => {
-    component.rteString = null as unknown as string;
+    (component as {rteString: string | null}).rteString = null;
 
     expect(() => {
       // This throws "Property '_updateNode' is private". We need to
@@ -1071,4 +1074,37 @@ describe('RTE display component', () => {
       component.getElementMatchingClassAndTextContent(undefined)
     ).toBeNull();
   });
+
+  it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {
+    const mockNode = new OppiaRteNode('oppia-noninteractive-image');
+    // Override the readonly selector property to simulate an unknown
+    // component selector that is not in the supported component map.
+    Object.defineProperty(mockNode, 'selector', {
+      value: 'oppia-noninteractive-unknown',
+      writable: false,
+      configurable: true,
+    });
+    mockNode.children = [];
+
+    spyOn(rteParserService, 'constructFromDomParser').and.returnValue(mockNode);
+    spyOn(component, 'isHighlightSentencesFeatureEnabled').and.returnValue(
+      false
+    );
+
+    component.rteString = '<p>test</p>';
+    const changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: '<p>test</p>',
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    };
+
+    component.ngOnChanges(changes);
+    tick(100);
+
+    expect(mockNode.portal).toBeUndefined();
+    discardPeriodicTasks();
+  }));
 });

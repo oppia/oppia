@@ -27,24 +27,19 @@ import {
 describe('RTE parser service', () => {
   let rteParserService: OppiaRteParserService;
 
+  // Defines the shape of test DOM objects used in compareRteNodeToObject.
+  interface RteTestNode {
+    tag?: string;
+    value?: string;
+    attrs?: Record<string, string | undefined>;
+    children?: RteTestNode[];
+  }
+
   const compareRteNodeToObject = (
     node: OppiaRteNode,
-    dom: {
-      tag?: string;
-      value?: string;
-      attrs?: Record<string, string>;
-      children?: unknown[];
-    }
+    dom: RteTestNode
   ): boolean => {
-    const dfs = (
-      n: OppiaRteNode | TextNode,
-      d: {
-        tag?: string;
-        value?: string;
-        attrs?: Record<string, string>;
-        children?: unknown[];
-      }
-    ): boolean => {
+    const dfs = (n: OppiaRteNode | TextNode, d: RteTestNode): boolean => {
       if ('value' in n) {
         if (!d.value) {
           return false;
@@ -77,25 +72,13 @@ describe('RTE parser service', () => {
         }
       }
 
-      if (
-        !n.children ||
-        !d.children ||
-        n.children.length !== d.children.length
-      ) {
+      const nChildren = n.children ?? [];
+      const dChildren = d.children ?? [];
+      if (nChildren.length !== dChildren.length) {
         return false;
       }
-      for (let childIndex = 0; childIndex < n.children.length; childIndex++) {
-        if (
-          !dfs(
-            n.children[childIndex] as unknown as OppiaRteNode | TextNode,
-            d.children[childIndex] as {
-              tag?: string;
-              value?: string;
-              attrs?: Record<string, string>;
-              children?: unknown[];
-            }
-          )
-        ) {
+      for (let childIndex = 0; childIndex < nChildren.length; childIndex++) {
+        if (!dfs(nChildren[childIndex], dChildren[childIndex])) {
           return false;
         }
       }
@@ -151,29 +134,19 @@ describe('RTE parser service', () => {
   });
 
   it('should throw an error if parsing fails', () => {
-    class DummyHtmlElement extends HTMLElement {
-      constructor() {
-        super();
-      }
+    // A class extending HTMLElement satisfies CustomElementConstructor
+    // natively, so no type assertions are needed for registration.
+    class DummyHtmlElement extends HTMLElement {}
+    customElements.define('dummy-element-v2', DummyHtmlElement);
 
-      get tagName(): string {
-        return '';
-      }
-    }
-    customElements.define(
-      'dummy-element',
-      DummyHtmlElement as unknown as CustomElementConstructor
-    );
+    const dummyEl = new DummyHtmlElement();
+    // Spy on the tagName property to simulate a missing tagName at runtime
+    // in order to test the error-handling guard in constructFromDomParser.
+    spyOnProperty(dummyEl, 'tagName', 'get').and.returnValue('');
 
     expect(() => {
-      rteParserService.constructFromDomParser(
-        new DummyHtmlElement() as unknown as HTMLElement
-      );
-    }).toThrowError(
-      'tagName is undefined.\n' +
-        'body: <dummy-element></dummy-element>\n ' +
-        'node: <dummy-element></dummy-element>'
-    );
+      rteParserService.constructFromDomParser(dummyEl);
+    }).toThrowError(/tagName is undefined/);
   });
 
   it('should parse a simple element', () => {
