@@ -32,6 +32,7 @@ import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Exploration} from 'domain/exploration/exploration.model';
 import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ParamSpecs} from '../../../domain/exploration/param-specs.model';
@@ -957,7 +958,7 @@ describe('Contribution and review service', () => {
   });
 
   describe('updateQuestionSuggestionAsync', () => {
-    const questionStateData = {
+    const questionStateData: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',

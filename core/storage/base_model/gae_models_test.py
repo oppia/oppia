@@ -470,6 +470,12 @@ class TestVersionedModel(base_models.VersionedModel):
     description = datastore_services.StringProperty(indexed=True)
 
 
+class TestBaseFeedbackModel(base_models.BaseFeedbackModel):
+    """Model that inherits BaseFeedbackModel for testing."""
+
+    ID_PREFIX = 'feedback.test'
+
+
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
@@ -1159,6 +1165,23 @@ class BaseModelTests(test_utils.GenericTestBase):
 class BaseFeedbackModelTests(test_utils.GenericTestBase):
     """Tests for BaseFeedbackModel."""
 
+    def _create_feedback_model(
+        self,
+        model_id: str,
+    ) -> None:
+        """Creates a TestBaseFeedbackModel with the given creation time."""
+        model = TestBaseFeedbackModel(
+            id=model_id,
+            author_id='user_id',
+            feedback_text='Feedback text',
+            status=feconf.STATUS_CHOICES_OPEN,
+            exploration_id='exp_id',
+            lesson_metadata_schema_version=1,
+            lesson_metadata={},
+        )
+        model.update_timestamps()
+        model.put()
+
     def test_get_deletion_policy(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
@@ -1213,3 +1236,57 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
             'ID_PREFIX',
         ):
             base_models.BaseFeedbackModel._generate_new_id()  # pylint: disable=protected-access
+
+    def test_fetch_page_returns_cursor_for_next_page(self) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_3', 'feedback_2'],
+        )
+        self.assertIsNotNone(next_cursor)
+        self.assertTrue(more)
+
+    def test_fetch_page_returns_no_cursor_when_final_page_is_full(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_2', 'feedback_1'],
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_fetch_page_accepts_cursor_for_later_page(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+        self._create_feedback_model('feedback_3')
+
+        _, next_cursor, _ = TestBaseFeedbackModel.fetch_page(page_size=2)
+        assert next_cursor is not None
+
+        feedback_models, final_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2, cursor=next_cursor
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_1'],
+        )
+        self.assertIsNone(final_cursor)
+        self.assertFalse(more)

@@ -145,6 +145,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """Handles GET requests."""
             pass
 
+    class MockJsonHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        def get(self) -> None:
+            """Handles GET requests."""
+            self.render_json({'success': True})
+
     class MockPostHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -487,6 +496,34 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 response.location,
                 'http://localhost/logout?redirect_url=/splash',
             )
+
+    def test_partially_logged_in_json_request_returns_json_error(self) -> None:
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock-json',
+                        self.MockJsonHandler,
+                        name='MockJsonHandler',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+        login_context = self.login_context(self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+
+        with login_context:
+            response = self.get_json('/mock-json', expected_status_int=401)
+
+        self.assertEqual(
+            response,
+            {
+                'error': (
+                    'You must complete signup before accessing this resource.'
+                ),
+                'status_code': 401,
+            },
+        )
 
     def test_no_partially_logged_in_redirect_from_logout(self) -> None:
         login_context = self.login_context(self.PARTIALLY_LOGGED_IN_USER_EMAIL)
