@@ -38,6 +38,7 @@ export interface AvailableCertificate {
 export class AvailableCertificateOfferingPageComponent {
   @Input() classroomUrlFragment: string = '';
 
+  // TODO(#24717-M2.12): Replace hardcoded UI placeholder data with actual backend-fetched data.
   availableCertificates: AvailableCertificate[] = [
     {
       id: 'everyday_arithmetic_number_confidence',

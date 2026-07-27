@@ -4,12 +4,12 @@
     <div class="col-4">
       <button type="button" class="btn btn-primary oppia-certificate-offering-available-page-exit-button"
               [routerLink]="['/learn', classroomUrlFragment]">
-        Exit
+        {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_EXIT_BUTTON_TEXT' | translate }}
       </button>
     </div>
     <div class="text-center">
       <h1 tabindex="0" class="mb-0">
-        Certificate Assessment
+        {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_HEADING' | translate }}
       </h1>
     </div>
     <!-- Empty column balances the Exit column so the title centers on the
@@ -19,13 +19,12 @@
 
   <section class="container oppia-certificate-offering-available-page-panel">
     <p class="oppia-certificate-offering-available-page-intro oppia-certificate-offering-available-page-intro-large">
-      Certificate assessments let you demonstrate your understanding and earn certificates
-      you can share with others.
+      {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_INTRO_TEXT' | translate }}
     </p>
 
-    <h2>Available Certificates</h2>
+    <h2>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_AVAILABLE_CERTIFICATES_HEADING' | translate }}</h2>
     <p class="oppia-certificate-offering-available-page-intro">
-      Each certificate focuses on a different set of skills. Select a certificate to learn more.
+      {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_SUBHEADING_TEXT' | translate }}
     </p>
 
     <div class="oppia-certificate-offering-available-page-tiles">
@@ -53,24 +52,24 @@
                [ngSwitch]="certificate.status">
             <span *ngSwitchCase="'passed'"
                   class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--passed">
-              Passed
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED' | translate }}
             </span>
             <span *ngSwitchCase="'failed'"
                   class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--failed">
-              Not Passed
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED' | translate }}
             </span>
             <span *ngSwitchCase="'not_attempted'"
                   class="oppia-certificate-offering-available-page-status oppia-certificate-offering-available-page-status--not-attempted">
-              Not Attempted
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_NOT_ATTEMPTED' | translate }}
             </span>
 
             <p *ngIf="certificate.status === 'passed'"
                class="oppia-certificate-offering-available-page-status-date">
-              Passed on {{ certificate.passedOnDate }}
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON' | translate: { date: certificate.passedOnDate } }}
             </p>
             <p *ngIf="certificate.status === 'failed'"
                class="oppia-certificate-offering-available-page-status-date">
-              Failed on {{ certificate.failedOnDate }}
+              {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON' | translate: { date: certificate.failedOnDate } }}
             </p>
           </div>
         </div>
@@ -78,40 +77,40 @@
         <div class="oppia-certificate-offering-available-page-tile-bottom"
              [ngSwitch]="certificate.status">
           <ng-container *ngSwitchCase="'passed'">
-            <p>You've earned this certificate. You can view it or retry the assessment.</p>
+            <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_PASSED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
               <button type="button" class="btn btn-primary">
-                Check Score
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
                       class="btn btn-outline-primary"
                       [routerLink]="certificate.assessmentRoute">
-                Retry Assessment
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
             </div>
           </ng-container>
 
           <ng-container *ngSwitchCase="'failed'">
-            <p>You didn't pass this time. Review the material and try again when you're ready.</p>
+            <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FAILED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
               <button type="button" class="btn btn-primary">
-                Check Score
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT' | translate }}
               </button>
               <button type="button"
                       class="btn btn-outline-primary"
                       [routerLink]="certificate.assessmentRoute">
-                Retry Assessment
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
             </div>
           </ng-container>
 
           <ng-container *ngSwitchCase="'not_attempted'">
-            <p>Earn this certificate by passing the assessment.</p>
+            <p>{{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_NOT_ATTEMPTED_DESCRIPTION' | translate }}</p>
             <div class="oppia-certificate-offering-available-page-actions">
               <button type="button"
                       class="btn btn-primary"
                       [routerLink]="certificate.assessmentRoute">
-                Continue to Assessment
+                {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT' | translate }}
               </button>
             </div>
           </ng-container>
@@ -121,8 +120,7 @@
 
     <p class="oppia-certificate-offering-available-page-footnote">
       <em>
-        Note: Oppia certificates reflect demonstrated proficiency within the Oppia learning
-        platform and are not an accredited academic credential.
+        {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_FOOTNOTE_TEXT' | translate }}
       </em>
     </p>
   </section>

@@ -20,6 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('AvailableCertificateOfferingPageComponent', () => {
   let component: AvailableCertificateOfferingPageComponent;
@@ -28,7 +29,10 @@ describe('AvailableCertificateOfferingPageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [AvailableCertificateOfferingPageComponent],
+      declarations: [
+        AvailableCertificateOfferingPageComponent,
+        MockTranslatePipe,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
@@ -48,10 +52,19 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       fixture.nativeElement.querySelectorAll('button')
     ).map(button => (button as HTMLButtonElement).textContent?.trim() || '');
 
-    expect(buttons.includes('Continue to Assessment')).toBe(true);
+    expect(
+      buttons.includes(
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT'
+      )
+    ).toBe(true);
+    expect(
+      buttons.includes(
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_EXIT_BUTTON_TEXT'
+      )
+    ).toBe(true);
     expect(
       fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
-    ).toBe('Certificate Assessment');
+    ).toBe('I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_HEADING');
   });
 
   it('should render a tile for each available certificate', () => {
@@ -70,7 +83,11 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       )
     ).map(el => (el as HTMLElement).textContent?.trim());
 
-    expect(statusEls).toEqual(['Passed', 'Not Attempted', 'Not Passed']);
+    expect(statusEls).toEqual([
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED',
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_NOT_ATTEMPTED',
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED',
+    ]);
 
     const dateEls = Array.from(
       fixture.nativeElement.querySelectorAll(
@@ -79,8 +96,8 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     ).map(el => (el as HTMLElement).textContent?.trim());
 
     expect(dateEls).toEqual([
-      'Passed on Jan 16, 2026',
-      'Failed on Feb 2, 2026',
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON',
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON',
     ]);
   });
 
@@ -90,9 +107,10 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       fixture.nativeElement.querySelectorAll('button')
     ) as HTMLButtonElement[];
     const assessmentButtons = buttons.filter(b =>
-      ['Continue to Assessment', 'Retry Assessment'].includes(
-        b.textContent?.trim() || ''
-      )
+      [
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT',
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT',
+      ].includes(b.textContent?.trim() || '')
     );
 
     expect(assessmentButtons.length).toBe(
@@ -111,7 +129,9 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       fixture.nativeElement.querySelectorAll('button')
     ) as HTMLButtonElement[];
     const checkScoreButtons = buttons.filter(
-      b => b.textContent?.trim() === 'Check Score'
+      b =>
+        b.textContent?.trim() ===
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT'
     );
     const passedOrFailedCount = component.availableCertificates.filter(
       c => c.status === 'passed' || c.status === 'failed'
@@ -126,7 +146,9 @@ describe('AvailableCertificateOfferingPageComponent', () => {
       '.oppia-certificate-offering-available-page-exit-button'
     ) as HTMLButtonElement;
 
-    expect(exitButton.textContent?.trim()).toBe('Exit');
+    expect(exitButton.textContent?.trim()).toBe(
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_EXIT_BUTTON_TEXT'
+    );
     expect(exitButton.getAttribute('ng-reflect-router-link')).toContain('math');
   });
 
