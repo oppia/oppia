@@ -26,7 +26,6 @@
 .oppia-user-and-rights {
   display: flex;
   flex-direction: row;
-  padding: auto 20px;
   padding-bottom: 30px;
   padding-left: 20px;
   width: 100%;
@@ -311,7 +310,6 @@ button.oppia-autofocus:focus {
   .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
     font-size: 18px;
     margin-right: 0;
-    padding: auto 0;
     width: 175px;
   }
   .oppia-opportunities-tabs-list {
@@ -391,7 +389,6 @@ button.oppia-autofocus:focus {
   .oppia-dropdown-container {
     align-items: flex-start;
     flex-direction: column;
-    padding: auto 2vw;
     width: 100%;
   }
   .oppia-opportunities-tab-item {
