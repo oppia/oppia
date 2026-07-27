@@ -368,5 +368,45 @@ describe('Opportunities List Item Component', () => {
         );
       });
     });
+
+    describe('when button is disabled and user is a reviewer', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 5;
+        opportunity.reviewerOnlyContentCount = 5;
+        opportunity.userIsReviewer = true;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should show the default tooltip because reviewer can still review', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'All available translations are currently in review.'
+        );
+      });
+    });
+
+    describe('when button is disabled and reviewerOnlyContentCount is undefined', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 5;
+        opportunity.reviewerOnlyContentCount = undefined as unknown as number;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should show the default tooltip when reviewer count is not present', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'All available translations are currently in review.'
+        );
+      });
+    });
   });
 });

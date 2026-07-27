@@ -198,8 +198,7 @@ export class OpportunitiesListItemComponent {
             if (
               !this.opportunity.userIsReviewer &&
               this.opportunity.reviewerOnlyContentCount !== undefined &&
-              this.opportunity.reviewerOnlyContentCount > 0 &&
-              this.cardsAvailable === 0
+              this.opportunity.reviewerOnlyContentCount > 0
             ) {
               this.tooltipText =
                 'There are no more cards available for translation. The remaining cards require reviewer privileges to translate.';
