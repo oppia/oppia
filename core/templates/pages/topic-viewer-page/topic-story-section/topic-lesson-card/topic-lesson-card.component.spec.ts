@@ -264,6 +264,16 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.navigateTo).not.toHaveBeenCalled();
     });
+
+    it('should not navigate when lesson is coming soon', () => {
+      spyOn(component, 'navigateTo');
+      component.startUrl = '/explore/123';
+      component.lessonProgressStatus = 'coming_soon';
+
+      component.onStartButtonClick();
+
+      expect(component.navigateTo).not.toHaveBeenCalled();
+    });
   });
 
   describe('onSelectedTextLanguageCodeChange', () => {
@@ -525,6 +535,27 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.selectedTextLanguageCode).toBe('fr');
     });
+
+    it('should re-initialize on ngOnChanges when only voiceover language codes change', () => {
+      component.availableTextLanguageCodes = ['en'];
+      component.availableVoiceoverLanguageCodes = [];
+
+      component.ngOnInit();
+
+      expect(component.selectedTextLanguageCode).toBe('en');
+
+      component.availableVoiceoverLanguageCodes = ['fr', 'es'];
+
+      component.ngOnChanges({
+        availableVoiceoverLanguageCodes: new SimpleChange(
+          [],
+          ['fr', 'es'],
+          false
+        ),
+      });
+
+      expect(component.selectedTextLanguageCode).toBe('en');
+    });
   });
 
   describe('isVoiceoverCompatibleWithTextLanguage', () => {
@@ -725,6 +756,15 @@ describe('TopicLessonCardComponent', () => {
 
       expect(component.isExpanded).toBeFalse();
     });
+
+    it('should not toggle when isComingSoonSectionCard is true', () => {
+      component.isExpanded = false;
+      component.isComingSoonSectionCard = true;
+
+      component.toggleExpanded();
+
+      expect(component.isExpanded).toBeFalse();
+    });
   });
 
   describe('onPracticeButtonClick', () => {
@@ -813,6 +853,19 @@ describe('TopicLessonCardComponent', () => {
 
       component.ngOnChanges({
         navigatedLessonNumber: new SimpleChange(null, 5, false),
+      });
+
+      expect(component.isExpanded).toBeFalse();
+    });
+
+    it('should not expand navigated lesson when isComingSoonSectionCard is true', () => {
+      component.lessonNumber = 3;
+      component.navigatedLessonNumber = 3;
+      component.isExpanded = false;
+      component.isComingSoonSectionCard = true;
+
+      component.ngOnChanges({
+        navigatedLessonNumber: new SimpleChange(null, 3, false),
       });
 
       expect(component.isExpanded).toBeFalse();
@@ -915,6 +968,15 @@ describe('TopicLessonCardComponent', () => {
 
     it('should not expand non-first lessons by default', () => {
       component.lessonNumber = 2;
+
+      component.ngOnInit();
+
+      expect(component.isExpanded).toBeFalse();
+    });
+
+    it('should not expand first lesson when isComingSoonSectionCard is true', () => {
+      component.lessonNumber = 1;
+      component.isComingSoonSectionCard = true;
 
       component.ngOnInit();
 
