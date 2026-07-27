@@ -614,7 +614,8 @@ const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 const sitemapXmlLocTag = '<loc>';
 
 const metaOgTitleSelector = 'meta[property="og:title"]';
-const metaDescriptionSelector = 'meta[name="description"]';
+const metaDescriptionSelector =
+  'meta[name="description"], meta[itemprop="description"]';
 const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
 
@@ -7552,13 +7553,14 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // If an expected description is provided, assert meta description matches it.
+    // Some routes populate description via itemprop while others use name.
     if (expected.description !== undefined) {
       const description = await this.page.$eval(metaDescriptionSelector, el =>
         el.getAttribute('content')
       );
       if (description !== expected.description) {
         throw new Error(
-          `meta name=\"description\" mismatch. Expected: "${expected.description}", Found: "${description}"`
+          `meta description mismatch (name/itemprop). Expected: "${expected.description}", Found: "${description}"`
         );
       }
     }
