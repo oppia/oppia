@@ -4,7 +4,7 @@
     <header class="oppia-feedback-detail-topbar">
       <div class="oppia-feedback-detail-topbar-start">
         <button type="button"
-                class="oppia-feedback-detail-icon-button oppia-feedback-detail-back-btn"
+                class="btn btn-secondary btn-sm oppia-feedback-detail-back-btn"
                 aria-label="Back to feedback dashboard"
                 (click)="goBack.emit()">
           <i class="fas fa-angle-left" aria-hidden="true"></i>
@@ -27,7 +27,6 @@
     <div class="oppia-feedback-detail-scroll-area">
       <div class="oppia-feedback-detail-columns">
 
-        <!-- LEFT COLUMN -->
         <div class="oppia-feedback-detail-col">
           <oppia-feedback-detail-section heading="Details"
                                          [isCollapsible]="true"
@@ -66,7 +65,7 @@
               <a [href]="screenshotDataUrl"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="oppia-feedback-detail-button oppia-feedback-detail-button-secondary">
+                 class="btn btn-secondary btn-sm oppia-feedback-detail-button">
                 Open screenshot in new tab
               </a>
             </div>
@@ -101,13 +100,13 @@
                  [href]="getReportedLessonUrl()"
                  target="_blank"
                  rel="noopener noreferrer"
-                 class="oppia-feedback-detail-button oppia-feedback-detail-button-secondary">
+                 class="btn btn-secondary btn-sm oppia-feedback-detail-button">
                 Open reported lesson version
               </a>
               <a *ngIf="getReportedStateEditorUrl()"
                  [href]="getReportedStateEditorUrl()"
                  target="_blank" rel="noopener noreferrer"
-                 class="oppia-feedback-detail-button oppia-feedback-detail-button-secondary">
+                 class="btn btn-secondary btn-sm oppia-feedback-detail-button">
                 Open current state in editor
               </a>
             </div>
@@ -118,19 +117,19 @@
             <ng-container *ngIf="sessionInfo as logs; else noSessionInfo">
               <div class="oppia-feedback-detail-log-block">
                 <div class="oppia-feedback-detail-log-heading">Environment</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.environment_json | json }}</pre>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.environment | json }}</pre>
               </div>
               <div class="oppia-feedback-detail-log-block">
                 <div class="oppia-feedback-detail-log-heading">Console logs</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.console_logs_json | json }}</pre>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.console_logs | json }}</pre>
               </div>
               <div class="oppia-feedback-detail-log-block">
                 <div class="oppia-feedback-detail-log-heading">Failed requests</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.failed_requests_json | json }}</pre>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.failed_requests | json }}</pre>
               </div>
               <div class="oppia-feedback-detail-log-block">
                 <div class="oppia-feedback-detail-log-heading">Navigation history</div>
-                <pre class="oppia-feedback-detail-log-content">{{ logs.navigation_history_json | json }}</pre>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.navigation_history | json }}</pre>
               </div>
             </ng-container>
             <ng-template #noSessionInfo>
@@ -139,7 +138,6 @@
           </oppia-feedback-detail-section>
         </div>
 
-        <!-- RIGHT COLUMN -->
         <div class="oppia-feedback-detail-col">
           <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
             <div class="oppia-feedback-detail-message-text">{{ feedback.report_message }}</div>
@@ -152,7 +150,6 @@
                                          class="oppia-feedback-detail-replies-bar">
           </oppia-feedback-detail-section>
 
-          <!-- Wrapped in a div for reliable sticky/flex behavior -->
           <div class="oppia-feedback-detail-actions-bar">
             <oppia-feedback-detail-section heading="Actions"
                                            [isCollapsible]="true"
@@ -170,7 +167,7 @@
                           placeholder="Write a reply the reporter will see..."></textarea>
                 <div class="oppia-feedback-detail-reply-send-row">
                   <button type="button"
-                          class="oppia-feedback-detail-button oppia-feedback-detail-button-primary"
+                          class="btn btn-success oppia-feedback-detail-button"
                           [disabled]="!replyText.trim() || isSendingReply"
                           (click)="onReplySend()">
                     <span *ngIf="!isSendingReply">Send</span>
@@ -189,8 +186,7 @@
                           type="button"
                           [disabled]="statusOption === feedback.status"
                           [attr.aria-pressed]="statusOption === feedback.status"
-                          class="oppia-feedback-detail-button oppia-feedback-detail-status-button"
-                          [ngClass]="'oppia-feedback-detail-status-button-' + statusOption"
+                          class="btn btn-secondary btn-sm oppia-feedback-detail-status-button"
                           (click)="onStatusOptionClick(statusOption)">
                     {{ statusLabels[statusOption] }}
                   </button>

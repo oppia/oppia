@@ -255,7 +255,7 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueBrowserVersion(): string {
     const userAgent =
-      this.feedbackDetailResponse?.session_info?.environment.user_agent;
+      this.feedbackDetailResponse?.session_info?.environment?.user_agent;
     return userAgent || 'Not provided';
   }
 

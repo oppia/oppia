@@ -36,7 +36,7 @@ describe('FeedbackDetailPageComponent', () => {
     source: ReportType.APP,
     status: FeedbackStatus.OPEN,
     platform: 'web',
-    destination_dashboard: 'LEAP',
+    destination_dashboard: 'tech-external',
     page_url: '/learn/math',
     category: ReportAnIssueCategory.OTHER_OR_NOT_SURE,
     lesson_metadata: null,

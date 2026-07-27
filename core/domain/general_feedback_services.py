@@ -116,12 +116,10 @@ def _platform_feedback_model_to_domain(
     session_info: Optional[Dict[str, object]] = None
     if session_info_model is not None:
         session_info = {
-            'console_logs_json': session_info_model.console_logs or [],
-            'failed_requests_json': (session_info_model.failed_requests or []),
-            'navigation_history_json': (
-                session_info_model.navigation_history or []
-            ),
-            'environment_json': session_info_model.environment or {},
+            'console_logs': session_info_model.console_logs or [],
+            'failed_requests': (session_info_model.failed_requests or []),
+            'navigation_history': (session_info_model.navigation_history or []),
+            'environment': session_info_model.environment or {},
         }
 
     return general_feedback_domain.PlatformFeedback(

@@ -105,8 +105,8 @@ export class TechnicalFeedbackDashboardPageComponent {
       AppConstants.ENTITY_TYPE.FEEDBACK,
       response.screenshot_entity_id,
       response.screenshot_filename
-      );
-}
+    );
+  }
 
   private hasSameServerFilters(filterState: FeedbackFilterState): boolean {
     return (
@@ -245,7 +245,9 @@ export class TechnicalFeedbackDashboardPageComponent {
           };
         }
         this.alertsService.addSuccessMessage(
-          `Feedback status updated to ${status}.`
+          `Feedback status updated to ${status}.`,
+          7000,
+          true
         );
       });
   }
