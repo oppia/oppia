@@ -142,6 +142,27 @@ describe('Opportunities List Item Component', () => {
 
       it('should initialize progressPercentage to 0%', () => {
         expect(component.progressPercentage).toBe('0%');
+      });
+
+      it('should not set progressPercentage if it is undefined', () => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.progressPercentage = undefined as unknown as number;
+        component.progressPercentage = 'default';
+        fixture.detectChanges();
+        component.ngOnInit();
+        expect(component.progressPercentage).toBe('default');
+      });
+
+      it('should not set progressPercentage if it is null', () => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.progressPercentage = null as unknown as number;
+        component.progressPercentage = 'default';
+        fixture.detectChanges();
+        component.ngOnInit();
+        expect(component.progressPercentage).toBe('default');
+      });
+
+      it('should initialize progressBarStyle to 0%', () => {
         expect(component.progressBarStyle).toEqual({
           width: '0%',
         });
