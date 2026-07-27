@@ -348,5 +348,25 @@ describe('Opportunities List Item Component', () => {
         );
       });
     });
+
+    describe('when button is disabled and there is no reviewer-only content', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 5;
+        opportunity.reviewerOnlyContentCount = 0;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should disable the button and show the default tooltip when all translations are in review', () => {
+        expect(component.opportunityButtonDisabled).toBe(true);
+        expect(component.tooltipText).toBe(
+          'All available translations are currently in review.'
+        );
+      });
+    });
   });
 });
