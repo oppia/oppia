@@ -22,6 +22,7 @@ import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {of} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SimpleChange} from '@angular/core';
 
 import {
   ExplorationOpportunity,
@@ -438,12 +439,7 @@ describe('Opportunities List Item Component', () => {
       it('should call initOpportunityData when opportunity changes', () => {
         spyOn(component, 'initOpportunityData');
         component.ngOnChanges({
-          opportunity: {
-            previousValue: null,
-            currentValue: 'new value',
-            firstChange: false,
-            isFirstChange: () => false,
-          } as any,
+          opportunity: new SimpleChange(null, 'new value', false),
         });
         expect(component.initOpportunityData).toHaveBeenCalled();
       });
@@ -451,12 +447,7 @@ describe('Opportunities List Item Component', () => {
       it('should not call initOpportunityData when opportunity does not change', () => {
         spyOn(component, 'initOpportunityData');
         component.ngOnChanges({
-          otherProperty: {
-            previousValue: null,
-            currentValue: 'new value',
-            firstChange: false,
-            isFirstChange: () => false,
-          } as any,
+          otherProperty: new SimpleChange(null, 'new value', false),
         });
         expect(component.initOpportunityData).not.toHaveBeenCalled();
       });
