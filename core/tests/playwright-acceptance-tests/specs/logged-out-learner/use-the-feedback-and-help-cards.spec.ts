@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * EL.HC. Learner can use the feedback and help cards
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {
@@ -34,17 +35,20 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutLearner: LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
@@ -61,7 +65,6 @@ describe('Logged-Out Learner', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
-    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.updateCardContent(
       'Give fraction with denominator 2.'
     );
@@ -86,6 +89,7 @@ describe('Logged-Out Learner', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong, try again!'
     );
+    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.addHintToState('We can have any numerator.');
     await explorationEditor.addHintToState('Numerator is the number on top.');
 
@@ -113,7 +117,7 @@ describe('Logged-Out Learner', function () {
     );
   });
 
-  it('should be able to see the first card', async function () {
+  test('should be able to see the first card', async function () {
     // Navigate to Lesson Player.
     await loggedOutLearner.navigateToCommunityLibraryPage();
     await loggedOutLearner.searchForLessonInSearchBar(
@@ -128,11 +132,11 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent();
   });
 
-  it('should be able to check the concept card', async function () {
+  test('should be able to check the concept card', async function () {
     // TODO(#22740): Concept card isn't working properly.
   });
 
-  it('should be able to continue to next card', async function () {
+  test('should be able to continue to next card', async function () {
     await loggedOutLearner.continueToNextCard();
     await loggedOutLearner.expectCardContentToMatch(
       'Give fraction with denominator 2.'
@@ -143,17 +147,16 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectFractionInputToBeVisible();
     await loggedOutLearner.expectSubmitButtonToBe('Visible');
     await loggedOutLearner.expectScreenshotToMatch(
-      'fractionInputInLessonPlayer',
-      __dirname
+      'fractionInputInLessonPlayer'
     );
   });
 
-  it('should be able to get feedback on the incorrect answer', async function () {
+  test('should be able to get feedback on the incorrect answer', async function () {
     await loggedOutLearner.submitAnswer('1/4');
     await loggedOutLearner.expectOppiaFeedbackToBe('Wrong, try again!');
   });
 
-  it('should be able to get a hint or solution when user gets stuck', async function () {
+  test('should be able to get a hint or solution when user gets stuck', async function () {
     await loggedOutLearner.submitAnswer('ABC');
     await loggedOutLearner.expectErrorMessageForWrongInputToBe(
       'Please only use numerical digits, spaces or forward slashes (/)'
@@ -178,7 +181,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.closeSolutionModal();
   });
 
-  it('should be able to learn again on wrong answer', async function () {
+  test('should be able to learn again on wrong answer', async function () {
     await loggedOutLearner.submitAnswer('2/9');
     await loggedOutLearner.expectNextCardButtonTextToBe('LEARN AGAIN');
     await loggedOutLearner.continueToNextCard();
@@ -188,7 +191,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.continueToNextCard();
   });
 
-  it('should be able to submit a correct answer and see the celebration pop-up', async function () {
+  test('should be able to submit a correct answer and see the celebration pop-up', async function () {
     await loggedOutLearner.submitAnswer('1/2');
 
     await loggedOutLearner.continueToNextCard();
@@ -197,7 +200,7 @@ describe('Logged-Out Learner', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

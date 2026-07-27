@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * EL.SL. Learner can share the lesson from the lesson player
  */
 
-import {showMessage} from '../../utilities/common/show-message';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
@@ -40,29 +40,31 @@ const EXPLORATION_ATTRIBUTION_HTML = (explorationId: string | null) =>
 const EXPLORATION_ATTRIBUTION_PRINT =
   '"Algebra Basics" by explorationEditor. Oppia. http://localhost:8181/explore/';
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
+  // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+  // in mobile viewport which is required for testing the feedback messages tab),
+  // remove this part of skipping the test and make the test to run in mobile viewport as well.
+  // Also, attribution cannot be generated in mobile devices, so keep that part skipped in mobile
+  // tests.
+  // see: https://github.com/oppia/oppia/issues/19443
+  test.skip(
+    () => process.env.MOBILE === 'true',
+    'Test skipped in mobile viewport'
+  );
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
   let explorationId: string | null;
 
-  beforeAll(async function () {
-    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
-    // in mobile viewport which is required for testing the feedback messages tab),
-    // remove this part of skipping the test and make the test to run in mobile viewport as well.
-    // Also, attribution cannot be generated in mobile devices, so keep that part skipped in mobile
-    // tests.
-    // see: https://github.com/oppia/oppia/issues/19443
-    if (process.env.MOBILE === 'true') {
-      showMessage('Test skipped in mobile viewport');
-      process.exit(0);
-    }
-
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
@@ -113,7 +115,7 @@ describe('Logged-Out Learner', function () {
     }
   });
 
-  it('should be able to share the lesson using copy link', async function () {
+  test('should be able to share the lesson using copy link', async function () {
     await loggedOutUser.playExploration(explorationId);
     await loggedOutUser.continueToNextCard();
 
@@ -124,25 +126,25 @@ describe('Logged-Out Learner', function () {
     await loggedOutUser.expectAttributionInPrintToBe(
       EXPLORATION_ATTRIBUTION_PRINT
     );
-    await loggedOutUser.expectScreenshotToMatch('attributionModel', __dirname);
+    await loggedOutUser.expectScreenshotToMatch('attributionModel');
     await loggedOutUser.closeAttributionModal();
   });
 
-  it('should be able to share the lesson on Google Classroom', async function () {
+  test('should be able to share the lesson on Google Classroom', async function () {
     await loggedOutUser.shareExplorationAndVerifyRedirect(
       'Classroom',
       explorationId
     );
   });
 
-  it('should be able to share the lesson on Facebook', async function () {
+  test('should be able to share the lesson on Facebook', async function () {
     await loggedOutUser.shareExplorationAndVerifyRedirect(
       'Facebook',
       explorationId
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

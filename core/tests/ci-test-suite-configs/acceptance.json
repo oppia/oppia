@@ -422,13 +422,13 @@
     },
     {
       "name": "logged-out-learner/use-the-feedback-and-help-cards",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/sets-goal-on-learner-dashboard",
