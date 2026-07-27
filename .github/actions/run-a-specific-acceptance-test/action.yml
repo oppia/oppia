@@ -41,7 +41,7 @@ runs:
     - name: Clean up stale Oppia server process before rerun
       shell: bash
       run: |
-        for port in 8181 9200; do
+        for port in 8181 9200 6379 8089 9099 8000; do
           for i in 1 2 3; do
             if ! fuser ${port}/tcp >/dev/null 2>&1; then
               echo "Port ${port} is free."
