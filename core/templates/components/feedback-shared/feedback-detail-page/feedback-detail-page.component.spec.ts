@@ -313,7 +313,7 @@ describe('FeedbackDetailPageComponent', () => {
       screenshot_filename: 'screenshot',
       screenshot_entity_id: 'entity_id',
     };
-    component.screenshotDataUrl = 'data:image/png;base64,screenshot-data';
+    component.screenshotDataUrl = '/image/abc';
 
     component.onStatusOptionClick(FeedbackStatus.TRANSFERRED_TO_GITHUB);
 
@@ -342,7 +342,7 @@ describe('FeedbackDetailPageComponent', () => {
       ].join('\n')
     );
     expect(queryParams.get('steps-to-reproduce')).toContain(
-      'Check exploration exp1, state "state1".'
+      'Check exploration exp1, state "state1",version "1".'
     );
     expect(queryParams.get('steps-to-reproduce')).toContain(
       'Learner answer at report time: answer1'
@@ -357,7 +357,7 @@ describe('FeedbackDetailPageComponent', () => {
       'Screenshot entity ID: entity_id'
     );
     expect(queryParams.get('screenshots-videos')).toContain(
-      'Screenshot URL: data:image/png;base64,screenshot-data'
+      'Screenshot URL: https://www.oppia.org/image/abc'
     );
     expect(queryParams.get('device')).toBe('Desktop');
     expect(queryParams.get('operating-system')).toBe('Linux');

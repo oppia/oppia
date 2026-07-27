@@ -17,6 +17,7 @@
  */
 
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
+import './feedback-detail-section.component.css';
 
 @Component({
   selector: 'oppia-feedback-detail-section',
