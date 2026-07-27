@@ -119,6 +119,12 @@ const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
+const previewTabButton = '.e2e-test-preview-tab';
+const previewTabContainer = '.e2e-test-preview-tab-container';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const interactionDiv = '.e2e-test-interaction';
+const textInputField = '.e2e-test-text-input';
+const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -374,6 +380,26 @@ export class ExplorationEditor extends BaseUser {
       await this.expectElementToBeVisible(addInteractionModalSelector, false);
     }
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Add a text input interaction to the card.
+   */
+  async addTextInputInteraction(): Promise<void> {
+    await this.addInteraction(INTERACTION_TYPES.TEXT_INPUT);
+  }
+
+  /**
+   * Update the optional text input interaction content.
+   * @param {string} content - The text input interaction content.
+   */
+  async updateTextInputInteraction(content: string): Promise<void> {
+    await this.expectElementToBeVisible(interactionDiv);
+    await this.clickOnElementWithSelector(interactionDiv);
+    await this.expectElementToBeVisible(textInputField);
+    await this.typeInInputField(textInputField, content);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
   }
 
   /**
@@ -985,6 +1011,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to exploration editor with a specific exploration ID.
+   * @param {string | null} explorationId - ID of the exploration.
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseUrl}/create/${explorationId}`;
+    await this.goto(editorUrl);
+    showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
    * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
@@ -1034,6 +1075,46 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(translationTabContainer);
+  }
+
+  /**
+   * Function to navigate to the preview tab.
+   */
+  async navigateToPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobilePreviewTabButton);
+    } else {
+      await this.expectElementToBeVisible(previewTabButton);
+      await this.clickOnElementWithSelector(previewTabButton);
+    }
+
+    await this.expectElementToBeVisible(previewTabContainer);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Expects the node warning sign to be visible or not visible.
+   * @param {boolean} visible - Whether the node warning sign should be visible or not.
+   */
+  async expectNodeWarningSignToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping node warning sign check on mobile viewport, ' +
+          'as nodes are not visible on mobile viewport.'
+      );
+      return;
+    }
+
+    await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
   }
 
   /**

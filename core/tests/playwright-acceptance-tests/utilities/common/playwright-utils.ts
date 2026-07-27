@@ -27,6 +27,7 @@ const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -1238,6 +1239,37 @@ export class BaseUser {
     showMessage(
       `Element ${elementDesc} did not stabilize within ${timeout} ms`
     );
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage The expected text of the upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
+    );
+  }
+
+  /**
+   * Checks if an element has the expected attribute value.
+   * @param {string} selector - The selector of the element.
+   * @param {string} attributeName - The name of the attribute.
+   * @param {string} expectedValue - The expected value of the attribute.
+   */
+  async expectElementAttributeToBe(
+    selector: string,
+    attributeName: string,
+    expectedValue: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const actualValue =
+      (await this.page.locator(selector).getAttribute(attributeName)) || '';
+    expect(actualValue.trim()).toBe(expectedValue.trim());
   }
 }
 

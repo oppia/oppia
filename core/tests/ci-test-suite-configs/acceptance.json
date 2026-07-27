@@ -552,8 +552,8 @@
     },
     {
       "name": "voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles",

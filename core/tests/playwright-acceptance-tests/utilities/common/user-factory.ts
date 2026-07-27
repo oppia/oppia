@@ -36,6 +36,10 @@ import {
 } from '../user/curriculum-admin';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
+import {
+  VoiceoverSubmitter,
+  VoiceoverSubmitterFactory,
+} from '../user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,6 +56,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -81,7 +86,8 @@ type BasicRolesUser = LoggedOutUser &
   LoggedInUser &
   ExplorationEditor &
   CurriculumAdmin &
-  TopicManager;
+  TopicManager &
+  VoiceoverSubmitter;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -155,6 +161,17 @@ export class UserFactory {
             args as string
           );
           break;
+        case ROLES.VOICEOVER_SUBMITTER:
+          if (typeof args !== 'string') {
+            throw new Error(
+              'Exploration ID is required to assign a voiceover submitter.'
+            );
+          }
+          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
+            args as string,
+            user.username
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -204,6 +221,7 @@ export class UserFactory {
       ExplorationEditorFactory(page),
       CurriculumAdminFactory(page),
       TopicManagerFactory(page),
+      VoiceoverSubmitterFactory(page),
     ]);
 
     user.username = username;
