@@ -184,7 +184,7 @@
   "I18N_ASSESSMENT_INSTRUCTION_AUTO_SUBMIT": "Instruction telling the learner their assessment is auto-submitted when the timer runs out.",
   "I18N_ASSESSMENT_INSTRUCTION_FINAL_SUBMISSION": "Instruction telling the learner their answers are only final once they click Submit Assessment.",
   "I18N_ASSESSMENT_INSTRUCTION_MULTIPLE_ATTEMPTS": "Instruction telling the learner they may retake the assessment.",
-  "I18N_ASSESSMENT_INSTRUCTION_NAVIGATION": "Instruction explaining how to navigate between questions using the Back and Next arrows.",
+  "I18N_ASSESSMENT_INSTRUCTION_NAVIGATION": "Instruction explaining how to navigate between questions using the Back (←) and Next (→) arrows.",
   "I18N_ASSESSMENT_INSTRUCTION_NEW_ATTEMPT": "Instruction explaining that restarting the assessment begins a new attempt.",
   "I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME": "Instruction telling the learner questions are shown one at a time.",
   "I18N_ASSESSMENT_INSTRUCTION_PROGRESS_NOT_SAVED": "Instruction warning the learner that progress is lost if they exit or lose connection before submitting.",

@@ -184,7 +184,7 @@
     "I18N_ASSESSMENT_INSTRUCTION_AUTO_SUBMIT": "If the timer runs out, your assessment will be auto-submitted.",
     "I18N_ASSESSMENT_INSTRUCTION_FINAL_SUBMISSION": "Your answers are final only when you click \"Submit Assessment\" at the end of the assessment.",
     "I18N_ASSESSMENT_INSTRUCTION_MULTIPLE_ATTEMPTS": "You may take the assessment multiple times. If you don't pass, we recommend reviewing the lessons before trying again.",
-    "I18N_ASSESSMENT_INSTRUCTION_NAVIGATION": "Use the Back (<-) and Next (->) arrows to move between questions.",
+    "I18N_ASSESSMENT_INSTRUCTION_NAVIGATION": "Use the Back (←) and Next (→) arrows to move between questions.",
     "I18N_ASSESSMENT_INSTRUCTION_NEW_ATTEMPT": "In that case, you can start the assessment again later, which will begin a new attempt.",
     "I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME": "You'll see one question at a time.",
     "I18N_ASSESSMENT_INSTRUCTION_PROGRESS_NOT_SAVED": "If your internet connection drops or you exit the assessment before submitting, your progress will not be saved.",
