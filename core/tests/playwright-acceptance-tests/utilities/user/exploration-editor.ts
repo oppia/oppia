@@ -436,13 +436,15 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(addNewResponseButton);
       });
     } else {
+      // Capture BEFORE clicking — at this point exactly one modal exists.
+      const staleModal = await this.page
+        .locator('ngb-modal-window')
+        .elementHandle()
+        .catch(() => null);
       await this.clickOnElementWithSelector(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.waitForNetworkIdle();
+      if (staleModal) {
+        await this.page.waitForFunction(el => !el.isConnected, staleModal);
+      }
     }
   }
 

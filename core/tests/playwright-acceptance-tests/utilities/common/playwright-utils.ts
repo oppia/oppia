@@ -380,6 +380,43 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the element value matches the expected value.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector of the element.
+   * @param {string} value - The expected value.
+   */
+  async expectElementValueToBe(
+    selector: string | ElementHandle,
+    value: string
+  ): Promise<void> {
+    // Change the selector to the actual element.
+    if (typeof selector === 'string') {
+      await this.expectElementToBeVisible(selector);
+      selector = await this.getElementInParent(selector);
+    }
+
+    // Wait until the element value matches the expected value.
+    try {
+      await this.page.waitForFunction(
+        ({element, value}: {element: Node; value: string}) => {
+          const el = element as HTMLInputElement | HTMLTextAreaElement;
+          return el.value.trim() === value;
+        },
+        {element: selector, value},
+        {timeout: 60000}
+      );
+    } catch (error) {
+      const actualValue = await (selector as ElementHandle).evaluate(
+        el => (el as HTMLInputElement).value
+      );
+      throw new Error(
+        `Element does not have the expected value "${value}". ` +
+          `Found "${actualValue}".\n` +
+          `Original Error: ${error instanceof Error ? error.stack : String(error)}`
+      );
+    }
+  }
+
+  /**
    * This function checks if the viewport is at mobile width.
    */
   isViewportAtMobileWidth(): boolean {
