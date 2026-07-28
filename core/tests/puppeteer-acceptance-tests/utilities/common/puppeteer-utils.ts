@@ -374,6 +374,13 @@ export class BaseUser {
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
+
+    // Defensive synchronization step: Force a page reload after logging in.
+    // This ensures that the Angular app re-bootstraps, causing CsrfTokenService
+    // to fetch and hydrate a fresh, valid token for the new session, preventing
+    // "Session has expired" errors during rapid user switching.
+    await this.page.reload({waitUntil: 'load'});
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -1003,6 +1010,18 @@ export class BaseUser {
   async logout(): Promise<void> {
     await this.goto(testConstants.URLs.Logout);
     await this.page.waitForSelector(testConstants.Dashboard.MainDashboard);
+
+    // Hard-code a state wipe into the logout mechanism to aggressively clear
+    // the browser context. This prevents stale session data from contaminating
+    // the next user's session when rapid user switching occurs.
+    await this.page.evaluate(() => {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+    });
+    const cookies = await this.page.cookies();
+    if (cookies.length > 0) {
+      await this.page.deleteCookie(...cookies);
+    }
   }
 
   /**
