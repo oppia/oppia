@@ -1327,6 +1327,10 @@ export class ExplorationEditor extends BaseUser {
     await imageRegionHelper.selectArea(5, 50, 90, 45);
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.expectElementToBeVisible(addInteractionModalSelector, false);
+
+    // Update correct response.
+    await this.expectModalTitleToBe('Add Response');
+    await this.addResponseDetailsInResponseModal(feedback, nextCard, true);
   }
 
   async customizeItemSelectionInteraction(
