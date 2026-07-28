@@ -5830,21 +5830,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Opens the edit adventure modal and updates the adventure's title and
-   * description. Clicks the Edit Arc button on the second adventure header
-   * (the first non-default adventure).
-   * @param {string} title - The new title for the adventure.
-   * @param {string} description - The new description for the adventure.
-   */
-  async editAdventure(title: string, description?: string): Promise<void> {
-    await this.fillEditAdventureModal(title, description);
-    await this.saveEditAdventureModal();
-    showMessage(
-      `Adventure edited: title="${title}", description="${description || ''}".`
-    );
-  }
-
-  /**
    * Removes the last adventure boundary by clicking the Remove Arc Boundary
    * button on the last non-default adventure header. The chapters from the
    * removed adventure are merged into the previous adventure.

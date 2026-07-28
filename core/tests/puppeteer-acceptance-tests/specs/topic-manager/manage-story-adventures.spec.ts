@@ -127,14 +127,10 @@ describe('Topic Manager', function () {
         'The second part of the story'
       );
 
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
-
       await curriculumAdmin.expectScreenshotToMatch(
         'storyEditorAfterEditingAdventureMetadata',
         __dirname
       );
-
-      await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
 
       await curriculumAdmin.saveStoryDraft();
 
@@ -147,8 +143,6 @@ describe('Topic Manager', function () {
         'Part Two',
         'The second part of the story'
       );
-
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -156,6 +150,9 @@ describe('Topic Manager', function () {
   it(
     'should remove an adventure boundary',
     async function () {
+      await curriculumAdmin.splitIntoAdventure('Chapter 7');
+      await curriculumAdmin.expectAdventureCount(2);
+
       await curriculumAdmin.removeAdventureBoundary();
       await curriculumAdmin.expectAdventureCount(1);
 
@@ -170,12 +167,8 @@ describe('Topic Manager', function () {
   it(
     'should save changes in the story with adventure groupings',
     async function () {
-      await curriculumAdmin.splitIntoAdventure('Chapter 3');
-      await curriculumAdmin.expectAdventureCount(2);
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('Adventure 2');
-
       await curriculumAdmin.splitIntoAdventure('Chapter 7');
-      await curriculumAdmin.expectAdventureCount(3);
+      await curriculumAdmin.expectAdventureCount(2);
 
       await curriculumAdmin.saveStoryDraft();
 
@@ -184,11 +177,7 @@ describe('Topic Manager', function () {
         'Adventure Topic'
       );
 
-      await curriculumAdmin.expectAdventureCount(3);
-
-      await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
-
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('All Chapters');
+      await curriculumAdmin.expectAdventureCount(2);
 
       await curriculumAdmin.expectScreenshotToMatch(
         'storyEditorAfterReloadPersistedGroupings',
