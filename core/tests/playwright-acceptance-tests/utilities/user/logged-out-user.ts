@@ -27,6 +27,9 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const splashPageUrl = testConstants.URLs.splash;
+const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerUrl = testConstants.URLs.Volunteer;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -36,6 +39,9 @@ const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const languageDropdown = '.e2e-test-language-dropdown';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const navbarGetInvolvedTabVolunteerButton =
+  'a.e2e-test-navbar-get-involved-menu-volunteer-button';
 
 const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
@@ -73,6 +79,26 @@ const mobileSidebarOpenSelector = '.e2e-test-sidebar-menu-open';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
+const mobileSidebarExpandGetInvolvedMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileSidebarGetInvolvedMenuVolunteerButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
+
+const applyToVolunteerButtonAtTheTopOfVolunteerPage =
+  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
+const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
+  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
+const tabsPreviousButtonInVolunteerPage =
+  '.e2e-test-volunteer-page-tabs-prev-btn';
+const tabsNextButtonInVolunteerPage = '.e2e-test-volunteer-page-tabs-next-btn';
+const tabsFirstVolunteerExpectationsInVolunteerPage =
+  '.e2e-test-volunteer-page-first-expectations';
+const tabsSecondVolunteerExpectationsInVolunteerPage =
+  '.e2e-test-volunteer-page-second-expectations';
+// This is an external component's selector so it is not prefixed with "e2e-test".
+const tabsLabelsInVolunteerPage = '.mat-tab-label';
+const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
 
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
@@ -302,6 +328,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Clicks the Apply to Volunteer button at the top of the Volunteer page and
+   * verifies that it opens the Volunteer form.
+   */
+  async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
+    await this.clickLinkButtonToNewTab(
+      applyToVolunteerButtonAtTheTopOfVolunteerPage,
+      volunteerFormUrl
+    );
+  }
+
+  /**
+   * Clicks the Apply to Volunteer button at the bottom of the Volunteer page
+   * and verifies that it opens the Volunteer form.
+   */
+  async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
+    await this.clickLinkButtonToNewTab(
+      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
+      volunteerFormUrl
+    );
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    * @param {string} button - The selector of the button to click.
    * @param {string} expectedDestinationPageUrl - The expected URL of the destination page after clicking the button.
@@ -314,6 +362,60 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(button, useSelector);
     await this.expectPageURLToContain(expectedDestinationPageUrl);
+  }
+
+  /**
+   * Clicks a link and verifies that it opens the expected URL in a new tab.
+   * Closes the new tab after verification.
+   * @param {string} linkSelector - The selector of the link to click.
+   * @param {string} expectedUrl - The expected URL in the new tab.
+   */
+  private async clickLinkButtonToNewTab(
+    linkSelector: string,
+    expectedUrl: string
+  ): Promise<void> {
+    const [newTabPage] = await Promise.all([
+      this.page.context().waitForEvent('page'),
+      this.clickOnElementWithSelector(linkSelector),
+    ]);
+
+    try {
+      await expect(newTabPage).toHaveURL(expectedUrl);
+    } finally {
+      await newTabPage.close();
+    }
+  }
+
+  /**
+   * Clicks the Volunteer button in the Get Involved menu and verifies that the
+   * Volunteer page opens.
+   */
+  async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.waitForAngularStability();
+      await this.page
+        .locator(mobileSidebarExpandGetInvolvedMenuButton)
+        .dispatchEvent('click');
+      await this.expectElementToBeVisible(
+        mobileSidebarGetInvolvedMenuVolunteerButton
+      );
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuVolunteerButton,
+        volunteerUrl
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+      await this.expectElementToBeVisible(navbarGetInvolvedTabVolunteerButton);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabVolunteerButton,
+        volunteerUrl
+      );
+    }
+
+    await this.expectElementToBeVisible(volunteerPageHeadingSelector);
   }
 
   /**
@@ -1186,6 +1288,64 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that the Volunteer page's expectation tabs can be toggled.
+   */
+  async expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage(): Promise<void> {
+    await this.expectElementToBeVisible(tabsSectionInVolunteerPage);
+    const firstVolunteerExpectations = this.page.locator(
+      tabsFirstVolunteerExpectationsInVolunteerPage
+    );
+    const secondVolunteerExpectations = this.page.locator(
+      tabsSecondVolunteerExpectationsInVolunteerPage
+    );
+
+    await expect(firstVolunteerExpectations).toBeVisible();
+    await expect(firstVolunteerExpectations).toContainText(
+      'Outreach volunteer expectations'
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(tabsNextButtonInVolunteerPage);
+    } else {
+      await this.page
+        .locator(tabsSectionInVolunteerPage)
+        .locator(tabsLabelsInVolunteerPage)
+        .nth(1)
+        .click();
+    }
+
+    await expect(secondVolunteerExpectations).toBeVisible();
+    await expect(secondVolunteerExpectations).toContainText(
+      'Software volunteer expectations'
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(tabsPreviousButtonInVolunteerPage);
+    } else {
+      await this.page
+        .locator(tabsSectionInVolunteerPage)
+        .locator(tabsLabelsInVolunteerPage)
+        .first()
+        .click();
+    }
+
+    await expect(firstVolunteerExpectations).toBeVisible();
+    await expect(firstVolunteerExpectations).toContainText(
+      'Outreach volunteer expectations'
+    );
+  }
+
+  /**
+   * Verifies that the Volunteer page contains the specified heading.
+   * @param {string} heading - The expected heading text.
+   */
+  async expectVolunteerPageHeadingToContain(heading: string): Promise<void> {
+    await expect(
+      this.page.locator(volunteerPageHeadingSelector).filter({hasText: heading})
+    ).toBeVisible();
+  }
+
+  /**
    * Checks if the voiceover is skippable.
    */
   async expectVoiceoverIsSkippable(): Promise<void> {
@@ -1393,6 +1553,24 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToHome(verifyURL: boolean = true): Promise<void> {
     await this.goto(homeUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the splash page.
+   * @param {string} expectedUrl - The expected URL after navigation.
+   */
+  async navigateToSplashPage(expectedUrl: string = homeUrl): Promise<void> {
+    // The splash page redirects logged-out users to the home page, so URL
+    // verification is performed after the redirect.
+    await this.goto(splashPageUrl, false);
+    await expect(this.page).toHaveURL(expectedUrl);
+  }
+
+  /**
+   * Navigates to the Volunteer page.
+   */
+  async navigateToVolunteerPage(): Promise<void> {
+    await this.goto(volunteerUrl);
   }
 
   /**
