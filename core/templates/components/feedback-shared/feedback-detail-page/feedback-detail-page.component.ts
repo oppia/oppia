@@ -198,7 +198,7 @@ export class FeedbackDetailPageComponent {
           `state '${response.lesson_metadata.state_name}',` +
           `version '${response.lesson_metadata.exploration_version}'.`,
         `4. Learner answer at report time: ${response.lesson_metadata.learner_current_answer}`,
-        `Quick Links for the exploration reported:`,
+        'Quick Links for the exploration reported:',
         `1. Open reported Lesson version: ${this.windowRef.nativeWindow.location.origin}${this.getReportedLessonUrl()}`,
         `2. Open the state in editor: ${this.windowRef.nativeWindow.location.origin}${this.getReportedStateEditorUrl()}`
       );
