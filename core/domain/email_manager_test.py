@@ -9018,6 +9018,9 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
 
         subject, body = email_messages[0]
 
-        self.assertEqual(subject, 'Machine Translation API Failure: Azure')
-        self.assertIn('provider "azure" has failed.', body)
+        self.assertEqual(
+            subject,
+            '[Action Required]: Automatic Translation Failed: Azure Translator',
+        )
+        self.assertIn('provider "Azure Translator" has failed.', body)
         self.assertIn('Timeout Exception 504', body)

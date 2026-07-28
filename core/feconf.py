@@ -613,6 +613,14 @@ ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # The email address for the translation technical support group.
 TRANSLATION_TECH_SUPPORT_EMAIL = 'translations-tech-support@oppia.org'
+# Human-readable display names for machine translation providers, keyed by the
+# provider ID used in the language-to-provider mapping (e.g. 'azure', 'gcp').
+# To add a new provider: add an entry here with the provider's display name.
+# To remove a provider: delete its entry here.
+MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES = {
+    'azure': 'Azure Translator',
+    'gcp': 'Google Cloud Translate',
+}
 CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 
-from core import utils
+from core import feconf, utils
 from core.domain import (
     email_manager,
     machine_translation_services,
@@ -316,20 +316,18 @@ class MachineTranslationServicesWrapperTests(test_utils.GenericTestBase):
         self.assertEqual(calls, [({'hi': 'azure'}, True)])
 
     def test_get_available_providers_for_ui_returns_sorted_list(self) -> None:
-        display_names_json = json.dumps(
-            {'azure': 'Azure', 'gcp': 'Google Cloud'}
-        )
+        mock_display_names = {'azure': 'Azure', 'gcp': 'Google Cloud'}
         whitelist_json = json.dumps({'hi': ['azure', 'gcp'], 'es': ['gcp']})
 
-        def mock_get_file_contents(path: str) -> str:
-            if 'display_names' in path:
-                return display_names_json
-            return whitelist_json
-
-        file_contents_swap = self.swap(
-            utils, 'get_file_contents', mock_get_file_contents
+        feconf_swap = self.swap(
+            feconf,
+            'MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES',
+            mock_display_names,
         )
-        with file_contents_swap:
+        file_contents_swap = self.swap(
+            utils, 'get_file_contents', lambda path: whitelist_json
+        )
+        with feconf_swap, file_contents_swap:
             result = (
                 machine_translation_services.get_available_providers_for_ui()
             )

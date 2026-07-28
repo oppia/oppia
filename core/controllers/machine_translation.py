@@ -48,7 +48,7 @@ class MachineTranslationGenerateHandler(
         }
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.can_suggest_changes
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
 

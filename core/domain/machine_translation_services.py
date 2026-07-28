@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import logging
 
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     email_manager,
@@ -247,11 +247,6 @@ def get_available_providers_for_ui() -> List[Dict[str, str]]:
     Returns:
         list(dict(str, str)). A list of dicts with provider ids and display names.
     """
-    provider_display_names: Dict[str, str] = json.loads(
-        utils.get_file_contents(
-            'assets/translation_provider_display_names.json'
-        )
-    )
     whitelist: Dict[str, List[str]] = json.loads(
         utils.get_file_contents('assets/auto_translation_provider_mapping.json')
     )
@@ -262,7 +257,7 @@ def get_available_providers_for_ui() -> List[Dict[str, str]]:
         [
             {
                 'id': pid,
-                'display_name': provider_display_names.get(
+                'display_name': feconf.MACHINE_TRANSLATION_PROVIDER_DISPLAY_NAMES.get(
                     pid, pid.capitalize()
                 ),
             }
@@ -279,8 +274,10 @@ def update_machine_translation_policy(
     """Updates the machine translation policy settings.
 
     Args:
-        language_to_provider_mapping: dict(str, str)|None. The new mapping.
-        automatic_translation_is_enabled: bool|None. The new toggle status.
+        language_to_provider_mapping: dict|None, optional. The new
+            mapping from language codes to provider identifiers.
+        automatic_translation_is_enabled: bool|None, optional. The new
+            toggle status for automatic translation suggestions.
     """
     translation_services.update_machine_translation_policy(
         language_to_provider_mapping, automatic_translation_is_enabled

@@ -3128,7 +3128,14 @@ def send_emails_to_voiceover_tech_leads(
 # To remove a provider: delete its entry — the function will fall back to
 # generic troubleshooting guidance automatically.
 MACHINE_TRANSLATION_PROVIDERS = {
-    'google': {
+    'azure': {
+        'display_name': 'Azure Translator',
+        'documentation_link': (
+            'https://learn.microsoft.com/en-us/azure/ai-services/'
+            'translator/reference/v3-0-reference#errors'
+        ),
+    },
+    'gcp': {
         'display_name': 'Google Cloud',
         'documentation_link': (
             'https://docs.cloud.google.com/translate/troubleshooting'
@@ -3151,7 +3158,9 @@ def send_machine_translation_failure_email(
     display_name = provider_config.get('display_name', provider_id.capitalize())
     documentation_link = provider_config.get('documentation_link')
 
-    email_subject = 'Machine Translation API Failure: %s' % display_name
+    email_subject = (
+        '[Action Required]: Automatic Translation Failed: %s' % display_name
+    )
 
     if documentation_link:
         documentation_line = (
@@ -3184,4 +3193,5 @@ def send_machine_translation_failure_email(
         feconf.TRANSLATION_TECH_SUPPORT_EMAIL,
         email_subject,
         email_body,
+        email_body.replace('\n', '<br/>'),
     )

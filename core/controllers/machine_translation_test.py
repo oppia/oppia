@@ -60,6 +60,17 @@ class MachineTranslationGenerateHandlerTests(test_utils.GenericTestBase):
             lambda: True,
         )
 
+    def test_post_fails_if_user_is_not_logged_in(self) -> None:
+        """Verifies that unauthenticated callers cannot trigger paid API calls."""
+        with self.feature_flag_swap, self.admin_toggle_swap:
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '/generate-translation',
+                self.payload,
+                csrf_token=csrf_token,
+                expected_status_int=401,
+            )
+
     def test_post_fails_if_feature_flag_disabled(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL, is_super_admin=True)
 
