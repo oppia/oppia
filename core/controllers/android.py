@@ -439,6 +439,7 @@ class AndroidActivityHandler(
                         skill_domain.Skill,
                         question_domain.Question,
                         topic_domain.Topic,
+                        exp_domain.Exploration,
                     ]
                 ]
             ] = []
