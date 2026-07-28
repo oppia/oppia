@@ -1016,7 +1016,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.expectElementToBeVisible(skillQuestionTab);
       await this.clickAndWaitForNavigation(skillQuestionTab, true);
     }
-    await this.expectElementToBeAttachedInDOM(addQuestionButton);
+    await this.expectElementToBeVisible(addQuestionButton);
   }
 
   /**
