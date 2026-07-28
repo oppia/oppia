@@ -35,6 +35,7 @@ import {Question} from 'domain/question/question.model';
 import {EditabilityService} from 'services/editability.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {QuestionEditorComponent} from './question-editor.component';
+import {InteractionData} from 'interactions/customization-args-defs';
 
 describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
@@ -307,8 +308,8 @@ describe('Question Editor Component', () => {
     spyOn(stateEditorService, 'setInteractionId');
     spyOn(stateEditorService, 'setInteractionCustomizationArgs');
 
-    let newInteractionData = {
-      interactionId: 'Text Input',
+    let newInteractionData: InteractionData = {
+      interactionId: 'TextInput',
       customizationArgs: 'Customization Args',
     };
     component.saveInteractionData(newInteractionData);

@@ -28,6 +28,7 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     question_domain,
+    question_services,
     rights_manager,
     skill_domain,
     skill_fetchers,
@@ -49,7 +50,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1468,6 +1469,166 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin
             )
+
+    def _create_story_with_node_and_exploration(
+        self,
+        story_id: str,
+        story_title: str,
+        exp_id: str,
+    ) -> str:
+        """Creates a story with a single node linked to an exploration.
+
+        Args:
+            story_id: str. The story ID.
+            story_title: str. The story title.
+            exp_id: str. The exploration ID.
+
+        Returns:
+            str. The node ID of the created node.
+        """
+        self.save_new_story(
+            story_id, self.user_id, self.TOPIC_ID, title=story_title
+        )
+        topic_services.add_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, story_id
+        )
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Chapter 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': exp_id,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.user_id_admin, story_id, change_list, 'Added story node.'
+        )
+        self.save_new_default_exploration(
+            exp_id, self.user_id_admin, title='title'
+        )
+        self.publish_exploration(self.user_id_admin, exp_id)
+        return 'node_1'
+
+    def test_publish_story_fails_when_skill_has_less_than_10_questions(
+        self,
+    ) -> None:
+        story_id = 'storskill1'
+        exp_id = 'skill_check1'
+        node_id = self._create_story_with_node_and_exploration(
+            story_id, 'Story With Skill', exp_id
+        )
+
+        skill_id = 'skill_1'
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': node_id,
+                    # Here we use cast because mypy expects List[str] but [] is List[<nothing>].
+                    'old_value': cast(List[str], []),
+                    'new_value': [skill_id],
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.user_id_admin,
+            story_id,
+            change_list,
+            'Added skill to node.',
+        )
+
+        with self.swap_to_always_return(
+            question_services, 'get_total_question_count_for_skill_ids', 9
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Skill %s has only 9 questions. Each skill linked to a '
+                'story node must have at least 10 questions before '
+                'publishing.' % skill_id,
+            ):
+                topic_services.publish_story(
+                    self.TOPIC_ID, story_id, self.user_id_admin
+                )
+
+    def test_publish_story_succeeds_when_skill_has_at_least_10_questions(
+        self,
+    ) -> None:
+        story_id = 'stor10qids'
+        exp_id = 'exp10q'
+        node_id = self._create_story_with_node_and_exploration(
+            story_id, 'Story With Enough Questions', exp_id
+        )
+
+        skill_id = 'skill_1'
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': node_id,
+                    # Here we use cast because mypy expects List[str] but [] is List[<nothing>].
+                    'old_value': cast(List[str], []),
+                    'new_value': [skill_id],
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.user_id_admin,
+            story_id,
+            change_list,
+            'Added skill to node.',
+        )
+
+        with self.swap_to_always_return(
+            question_services, 'get_total_question_count_for_skill_ids', 10
+        ):
+            topic_services.publish_story(
+                self.TOPIC_ID, story_id, self.user_id_admin
+            )
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertTrue(
+            any(
+                ref.story_id == story_id and ref.story_is_published
+                for ref in topic.canonical_story_references
+            )
+        )
+
+    def test_publish_story_succeeds_when_no_acquired_skill_ids(self) -> None:
+        story_id = 'stornoskls'
+        exp_id = 'expnoskls'
+        self._create_story_with_node_and_exploration(
+            story_id, 'Story Without Skills', exp_id
+        )
+
+        topic_services.publish_story(
+            self.TOPIC_ID, story_id, self.user_id_admin
+        )
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertTrue(
+            any(
+                ref.story_id == story_id and ref.story_is_published
+                for ref in topic.canonical_story_references
+            )
+        )
 
     def test_update_topic(self) -> None:
         # Save a dummy image on filesystem, to be used as thumbnail.

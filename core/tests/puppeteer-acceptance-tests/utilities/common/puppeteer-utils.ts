@@ -61,17 +61,6 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
 
-interface ClickDetails {
-  position: {x: number; y: number};
-  timeInMilliseconds: number;
-}
-
-declare global {
-  interface Window {
-    logClick: (clickDetails: ClickDetails) => void;
-  }
-}
-
 export type ModalUserInteractions = (
   _this: BaseUser,
   container: string
@@ -321,7 +310,13 @@ export class BaseUser {
   private async setupClickLogger(): Promise<void> {
     await this.page.exposeFunction(
       'logClick',
-      ({position: {x, y}, timeInMilliseconds}: ClickDetails) => {
+      ({
+        position: {x, y},
+        timeInMilliseconds,
+      }: {
+        position: {x: number; y: number};
+        timeInMilliseconds: number;
+      }) => {
         // eslint-disable-next-line no-console
         console.log(
           `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
@@ -938,14 +933,27 @@ export class BaseUser {
     await this.page.select(selector, option);
   }
 
-  /**
-   * This function navigates to the given URL.
-   */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
-    await this.page.goto(url, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    const currentUrl = this.page.url();
+
+    // Normalize: only treat as "same page" if the URL matches exactly
+    // or continues with /, ?, or #.
+    const isSamePage =
+      currentUrl === url ||
+      currentUrl === `${url}/` ||
+      currentUrl.startsWith(`${url}?`);
+
+    if (isSamePage) {
+      await this.page.reload({
+        waitUntil: ['networkidle2', 'load'],
+        timeout: 60000,
+      });
+    } else {
+      await this.page.goto(url, {
+        waitUntil: ['networkidle2', 'load'],
+        timeout: 60000,
+      });
+    }
 
     if (verifyURL) {
       await this.page.waitForFunction(

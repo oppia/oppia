@@ -21,6 +21,7 @@ import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -69,8 +70,7 @@ const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
-// TODO(#23019): Required selector for code below.
-// const stateContentSelector = '.e2e-test-actual-state-content';
+const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 
 const toastMessage = '.e2e-test-toast-message';
@@ -82,7 +82,6 @@ const mobilePublishButtonSelector = 'button.e2e-test-mobile-publish-button';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
-('h3.e2e-test-controls-bar-settings-container');
 
 const tagsField = '.e2e-test-chip-list-tags';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
@@ -114,6 +113,42 @@ const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
 const outcomeDestWhenStuckSelector =
   '.protractor-test-open-outcome-dest-if-stuck-editor';
+
+const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
+const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
+const mainTabButton = '.e2e-test-main-tab';
+const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
+const editTranslationSelector = 'div.e2e-test-edit-translation';
+const stateTranslationEditorSelector =
+  'div.e2e-test-state-translation-editor schema-based-editor';
+const saveTranslationButton = 'button.e2e-test-save-translation';
+const activeTranslationTab = '.e2e-test-active-translation-tab';
+const translationTabButton = '.e2e-test-translation-tab';
+const translationTabContainer = '.e2e-test-translation-tab-container';
+const translationModeButton = 'button.e2e-test-translation-mode';
+const dismissTranslationWelcomeModalSelector =
+  'button.e2e-test-translation-tab-dismiss-welcome-modal';
+
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
+const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
+const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
+const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+const voiceoverLanguageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+
+const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+const skillNameInput = '.e2e-test-skill-name-input';
+
+const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
+
+const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
+const oppiaWebURL = 'https://www.oppia.org';
 
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
@@ -174,29 +209,133 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Updates an exploration description containing all RTE elements.
+   */
+  async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
+    // Click on RTE.
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
+
+    const rteEditor = new RTEEditor(this);
+    // Add Bold text.
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+    await this.typeInInputField(stateContentInputField, 'Bold text');
+    await this.page.keyboard.press('Enter');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+
+    // Add Italic text.
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+    await this.typeInInputField(stateContentInputField, 'Italic text');
+    await this.page.keyboard.press('Enter');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+
+    // Add Numbered List.
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Bulleted List.
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Pre formatted Text.
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
+    await this.typeInInputField(stateContentInputField, 'Pre formatted text');
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.press('Enter');
+
+    // Add Block Quote.
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+    await this.typeInInputField(stateContentInputField, 'Block Quote text');
+    await this.page.keyboard.press('Enter');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+
+    // Add Collapsible Block.
+    await rteEditor.addCollapsibleBlockRTE();
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('ArrowRight');
+
+    // Add Image.
+    await rteEditor.addImageRTE(
+      testConstants.data.profilePicture,
+      'Test Image',
+      'Test Image Caption'
+    );
+    await this.waitForNetworkIdle();
+
+    await this.page.keyboard.press('ArrowRight');
+
+    // Video.
+    await rteEditor.addVideoRTE(oppiaYouTubeVideoUrl);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('ArrowRight');
+
+    // Add Link.
+    await rteEditor.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Math Formula.
+    await rteEditor.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    if (textareaElement) {
+      await this.typeInInputField(textareaElement, 'x^2 + y^2 = z^2');
+    }
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Concept Card.
+    await rteEditor.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.waitForNetworkIdle();
+    const skillSearchElement = await this.page.$(skillNameInput);
+    if (skillSearchElement) {
+      await this.typeInInputField(skillSearchElement, 'Math');
+    }
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Tab Contents.
+    await rteEditor.addTabContentsRTE();
+    await this.page.keyboard.press('ArrowRight');
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
+  }
+
+  /**
    * Function to add a hint for a state card.
    * @param {string} hint - The hint to be added for the current card.
    */
   async addHintToState(hint: string): Promise<void> {
-    await this.page.waitForSelector(addHintButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(addHintButton);
     await this.clickOnElementWithSelector(addHintButton);
     await this.typeInInputField(stateContentInputField, hint);
     await this.clickOnElementWithSelector(saveHintButton);
-    await this.page.waitForSelector(saveHintButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(saveHintButton, false);
   }
 
   /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
-   * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
+   * @param {boolean} skipInteractionCustomization - Whether to skip interaction customization.
    */
   async addInteraction(
     interactionToAdd: string,
-    skipInteractionCustoization: boolean = true
+    skipInteractionCustomization: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
 
@@ -211,23 +350,22 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    await this.page.waitForLoadState('networkidle');
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
     // Wait for active tab panel fade transition to complete.
-    await this.page.waitForSelector('css=.tab-pane.active.show', {
-      timeout: 90000,
-    });
+    await this.expectElementToBeVisible('css=.tab-pane.active.show');
 
-    const interactionElement = await this.page.waitForSelector(
+    const interactionElement = await this.expectElementToBeVisible(
       `xpath=//*[contains(normalize-space(text()), "${tileText}")]`,
-      {timeout: 90000}
+      true,
+      this.page,
+      90000
     );
     if (!interactionElement) {
       throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
     }
     await this.clickOnElement(interactionElement);
-    if (skipInteractionCustoization) {
+    if (skipInteractionCustomization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
       );
@@ -240,10 +378,10 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Adds the response details in the response modal.
-   * @param feedback The feedback to be added in the response modal.
-   * @param destination The destination to be added in the response modal.
-   * @param responseIsCorrect The response is correct or not.
-   * @param isLastResponse Whether the response is the last response or not.
+   * @param {string} feedback The feedback to be added in the response modal.
+   * @param {string} destination The destination to be added in the response modal.
+   * @param {boolean} responseIsCorrect The response is correct or not.
+   * @param {boolean} isLastResponse Whether the response is the last response or not.
    */
   async addResponseDetailsInResponseModal(
     feedback: string,
@@ -263,25 +401,24 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     }
     if (isLastResponse) {
-      await this.page.waitForSelector(addNewResponseButton, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(addNewResponseButton);
       await this.clickOnElementWithSelector(addNewResponseButton);
-      await this.page
-        .waitForSelector(responseModalHeaderSelector, {
-          state: 'hidden',
-        })
-        .catch(async () => {
-          await this.clickOnElementWithSelector(addNewResponseButton);
-        });
+      await this.expectElementToBeVisible(
+        responseModalHeaderSelector,
+        false
+      ).catch(async () => {
+        await this.clickOnElementWithSelector(addNewResponseButton);
+      });
     } else {
+      // Capture BEFORE clicking — at this point exactly one modal exists.
+      const staleModal = await this.page
+        .locator('ngb-modal-window')
+        .elementHandle()
+        .catch(() => null);
       await this.clickOnElementWithSelector(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.page.waitForLoadState('networkidle');
+      if (staleModal) {
+        await this.page.waitForFunction(el => !el.isConnected, staleModal);
+      }
     }
   }
 
@@ -333,12 +470,16 @@ export class ExplorationEditor extends BaseUser {
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.page.waitForSelector(solutionSelector, {state: 'visible'});
+    await this.expectElementToBeVisible(solutionSelector);
     await this.typeInInputField(solutionSelector, answer);
-    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.expectElementToBeVisible(
+      `${submitAnswerButton}:not([disabled])`
+    );
     await this.clickOnElementWithSelector(submitAnswerButton);
     await this.typeInInputField(stateContentInputField, answerExplanation);
-    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.expectElementToBeVisible(
+      `${submitSolutionButton}:not([disabled])`
+    );
     await this.clickOnElementWithSelector(submitSolutionButton);
 
     await this.expectElementToBeVisible(submitSolutionButton, false);
@@ -346,20 +487,66 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Adds a solution explanation to the current state card and saves it.
-   * @param explanation - The solution explanation to add to the state card.
+   * @param {string} explanation - The solution explanation to add to the state card.
    */
   async addSolutionExplanationAndSave(explanation: string): Promise<void> {
     await this.typeInInputField(stateContentInputField, explanation);
-    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.expectElementToBeVisible(
+      `${submitSolutionButton}:not([disabled])`
+    );
     await this.clickOnElementWithSelector(submitSolutionButton);
-    await this.page.waitForSelector(submitSolutionButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(submitSolutionButton, false);
+  }
+
+  /**
+   * Function to add a voiceover for specific content of the current card.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
+   */
+  async addVoiceoverToContent(
+    language: string,
+    languageAccent: string,
+    contentType: string,
+    voiceoverFilePath: string
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOnElementWithText(contentType);
+    }
+
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelectorAndText(
+      voiceoverLanguageOptionSelector,
+      language
+    );
+
+    await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
+    await this.clickOnElementWithSelectorAndText(
+      voiceoverLanguageAccentOptionSelector,
+      languageAccent
+    );
+
+    await this.clickOnElementWithSelector(addManualVoiceoverButton);
+    await this.uploadFile(voiceoverFilePath);
+    await this.waitForElementToStabilize(saveUploadedAudioButton);
+    await this.clickOnElementWithSelector(saveUploadedAudioButton);
+    await this.waitForNetworkIdle();
+
+    await this.expectElementToBeVisible(saveUploadedAudioButton, false);
   }
 
   /**
    * Changes tab in interaction selection modal.
-   * @param interactionType Interaction type to change tab.
+   * @param {INTERACTION_TYPES} interactionType - Interaction type to change tab.
    */
   async changeTabInInteractionSelectionModal(
     interactionType: INTERACTION_TYPES
@@ -396,6 +583,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} explorationTitle - The title of the exploration.
    * @param {string} category - The category of the exploration.,
    * @param {number} numberOfCards - The number of cards to create.
+   * @param {boolean} expectedWelcomeModal - Whether to expect the welcome modal.
    */
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
@@ -464,8 +652,8 @@ export class ExplorationEditor extends BaseUser {
    * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
    *
-   * @param content - content of the exploration
-   * @param interaction - the interaction to be added to the exploration
+   * @param {string} content - content of the exploration
+   * @param {string} interaction - the interaction to be added to the exploration
    */
   async createMinimalExploration(
     content: string,
@@ -492,8 +680,23 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to dismiss translation tab welcome modal.
+   */
+  async dismissTranslationTabWelcomeModal(): Promise<void> {
+    await this.expectElementToBeVisible(dismissTranslationWelcomeModalSelector);
+    await this.clickOnElementWithSelector(
+      dismissTranslationWelcomeModalSelector
+    );
+    await this.expectElementToBeVisible(
+      dismissTranslationWelcomeModalSelector,
+      false
+    );
+    showMessage('Translation tutorial pop-up closed successfully.');
+  }
+
+  /**
    * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
@@ -506,17 +709,15 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
-   * @param {string} [directToCard] - The card to direct to (optional).
-   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
+   * @param {string} directToCard - The card to direct to (optional).
+   * @param {string} directToCardWhenStuck - The card to direct to when the learner is stuck (optional).
    */
   async editDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    await this.page.waitForSelector(defaultFeedbackTab, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(defaultFeedbackTab);
     await this.clickOnElementWithSelector(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
@@ -527,8 +728,8 @@ export class ExplorationEditor extends BaseUser {
 
     if (directToCard) {
       await this.clickOnElementWithSelector(openOutcomeDestButton);
-      await this.page.selectOption(destinationSelectorDropdown, directToCard);
-      await this.page.click(saveDestinationButtonSelector);
+      await this.select(destinationSelectorDropdown, directToCard);
+      await this.clickOnElementWithSelector(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
@@ -540,12 +741,80 @@ export class ExplorationEditor extends BaseUser {
         addDestinationStateWhenStuckInput,
         directToCardWhenStuck
       );
-      await this.page.click(saveStuckDestinationButtonSelector);
+      await this.clickOnElementWithSelector(saveStuckDestinationButtonSelector);
       await this.expectElementToBeVisible(
         saveStuckDestinationButtonSelector,
         false
       );
     }
+  }
+
+  /**
+   * Function to edit a translation for specific content of the current card.
+   * @param {string} language - Language for which the translation has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} translation - The translation which will be added for the content.
+   * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
+   */
+  async editTranslationOfContent(
+    language: string,
+    contentType: string,
+    translation: string,
+    feedbackIndex?: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
+
+    await this.expectElementToBeVisible(voiceoverLanguageOptionSelector);
+    await this.clickOnElementWithSelectorAndText(
+      voiceoverLanguageOptionSelector,
+      language
+    );
+
+    await this.expectElementToBeVisible(translationModeButton);
+    await this.clickOnElementWithSelector(translationModeButton);
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOnElementWithText(contentType);
+    }
+    await this.clickOnElementWithSelector(editTranslationSelector);
+    switch (contentType) {
+      case 'Content':
+      case 'Hint':
+      case 'Solution':
+        await this.clickOnElementWithSelector(stateContentInputField);
+        await this.typeInInputField(stateContentInputField, translation);
+        break;
+      case 'Interaction':
+        await this.clickOnElementWithSelector(stateTranslationEditorSelector);
+        await this.typeInInputField(
+          stateTranslationEditorSelector,
+          translation
+        );
+        break;
+      case 'Feedback':
+        await this.clickOnElementWithSelector(
+          `.e2e-test-feedback-${feedbackIndex}`
+        );
+        await this.clickOnElementWithSelector(editTranslationSelector);
+        await this.clickOnElementWithSelector(stateContentInputField);
+        await this.typeInInputField(stateContentInputField, translation);
+        break;
+      default:
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+    await this.page.evaluate(() =>
+      window.scrollTo(0, document.body.scrollHeight)
+    );
+    await this.clickOnElementWithSelector(saveTranslationButton, {force: true});
+
+    await this.waitForNetworkIdle();
+    await this.expectElementToBeVisible(saveTranslationButton, false);
   }
 
   /**
@@ -575,7 +844,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} selector - The CSS selector for the input field.
    */
   async getInputType(selector: string): Promise<string> {
-    const inputField = await this.page.$(selector);
+    const inputField = await this.expectElementToBeVisible(selector);
     if (!inputField) {
       throw new Error(`Input field not found for selector: ${selector}`);
     }
@@ -588,6 +857,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
+   * @param {boolean} retry - Whether to retry navigation if it fails (default: true).
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
@@ -618,7 +888,7 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(explorationStateGraphModalSelector);
     }
-    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    await this.expectElementToBeVisible(scopedStateNodeGroupSelector);
     elements = await this.page.$$(scopedStateNodeGroupSelector);
 
     const cardNames = await Promise.all(
@@ -641,7 +911,10 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Click on the node background rect which has the click handler.
-    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    const nodeBackground = await this.getElementInParent(
+      '.e2e-test-node-background',
+      nodeGroup
+    );
     if (!nodeBackground) {
       throw new Error(
         `Could not find clickable background for card: ${cardName}`
@@ -651,7 +924,6 @@ export class ExplorationEditor extends BaseUser {
       el.scrollIntoView({block: 'center', inline: 'center'})
     );
     await this.clickOnElement(nodeBackground);
-    await this.page.waitForLoadState('networkidle');
 
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
@@ -678,18 +950,51 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to the editor tab.
+   */
+  async navigateToEditorTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown, {
+        force: true,
+      });
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.page.locator(mobileMainTabButton).dispatchEvent('click');
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.page.click(dropdownToggleIcon, {force: true});
+      }
+    } else {
+      await this.expectElementToBeVisible(mainTabButton);
+      await this.clickOnElementWithSelector(mainTabButton);
+    }
+
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.expectElementToBeVisible(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+    await this.clickOnElementWithSelector(createExplorationButtonSelector);
     await this.page.waitForURL(url => url.href.includes(`${baseUrl}/create/`), {
       timeout: 10000,
     });
-    // Puppeteer used waitForNetworkIdle here via clickAndWaitForNavigation.
-    // Without this, Angular hasn't finished bootstrapping the modal
-    // by the time dismissWelcomeModal fires.
-    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -697,6 +1002,40 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
+  }
+
+  /**
+   * Function to navigate to the translations tab.
+   */
+  async navigateToTranslationsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickAndWaitForNavigation(mobileTranslationTabButton, true);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.clickOnElementWithSelector(dropdownToggleIcon);
+      }
+    } else {
+      await this.expectElementToBeVisible(translationTabButton);
+      await this.clickAndWaitForNavigation(translationTabButton, true);
+    }
+
+    await this.expectElementToBeVisible(translationTabContainer);
   }
 
   /**
@@ -710,11 +1049,7 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(stateContentInputField, false);
-
-    // TODO(#23019): Currently, the content automatically changes spaces in the
-    // card content. So, skipping the post-check. Once the issue is resolved,
-    // uncomment the following line.
-    // await this.expectTextContentToContain(stateContentSelector, content);
+    await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
   }
 
@@ -735,11 +1070,12 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
 
-      await this.page.waitForSelector(
-        `${mobileSaveChangesButtonSelector}:not([disabled])`,
-        {state: 'visible'}
+      await this.expectElementToBeVisible(
+        `${mobileSaveChangesButtonSelector}:not([disabled])`
       );
-      await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector);
+      await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector, {
+        force: true,
+      });
     } else {
       await this.expectElementToBeVisible(saveChangesButton);
       await this.clickOnElementWithSelector(saveChangesButton);
@@ -763,9 +1099,7 @@ export class ExplorationEditor extends BaseUser {
    * Sets a state as a checkpoint in the exploration.
    */
   async setTheStateAsCheckpoint(): Promise<void> {
-    await this.page.waitForSelector(setAsCheckpointButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(setAsCheckpointButton);
 
     let checkboxState = await this.page.$eval(
       `${setAsCheckpointButton} input.mat-checkbox-input`,
@@ -876,7 +1210,7 @@ export class ExplorationEditor extends BaseUser {
       );
       if (errorSavingExplorationElement) {
         await this.clickOnElementWithSelector(errorSavingExplorationModal);
-        await this.page.waitForLoadState('networkidle');
+        await this.waitForNetworkIdle();
       }
       await publishExploration();
       return await confirmPublish();
@@ -903,50 +1237,21 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
-        await this.page.waitForSelector(multipleChoiceResponseDropdown, {
-          state: 'visible',
-          timeout: 5000,
-        });
+        await this.expectElementToBeVisible(multipleChoiceResponseDropdown);
         await this.clickOnElementWithSelector(multipleChoiceResponseDropdown);
-        await this.page.waitForSelector(multipleChoiceResponseOption, {
-          state: 'visible',
-        });
-
-        await this.page.evaluate(
-          ({
-            answer,
-            multipleChoiceResponseOption,
-          }: {
-            answer: string;
-            multipleChoiceResponseOption: string;
-          }) => {
-            const optionElements = Array.from(
-              document.querySelectorAll(multipleChoiceResponseOption)
-            );
-            const element = optionElements.find(
-              el => el.textContent?.trim() === answer
-            ) as HTMLElement;
-            if (element) {
-              element.click();
-            } else {
-              throw new Error(`Cannot find "${answer}" in options.`);
-            }
-          },
-          {answer, multipleChoiceResponseOption}
+        await this.clickOnElementWithSelectorAndText(
+          multipleChoiceResponseOption,
+          answer
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
-        await this.page.waitForSelector(responseModalBodySelector, {
-          state: 'visible',
-        });
+        await this.expectElementToBeVisible(responseModalBodySelector);
         await this.clickOnElementWithSelector(addResponseOptionButton);
-        await this.page.waitForSelector(textInputInteractionOption);
-        await this.page.type(textInputInteractionOption, answer);
+        await this.expectElementToBeVisible(textInputInteractionOption);
+        await this.typeInInputField(textInputInteractionOption, answer);
         break;
       case INTERACTION_TYPES.FRACTION_INPUT:
-        await this.page.waitForSelector(intEditorField, {
-          state: 'visible',
-        });
+        await this.expectElementToBeVisible(intEditorField);
         await this.clearAllTextFrom(intEditorField);
         await this.typeInInputField(intEditorField, answer);
         break;
@@ -966,9 +1271,7 @@ export class ExplorationEditor extends BaseUser {
   async updateDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string
   ): Promise<void> {
-    await this.page.waitForSelector(openOutcomeFeedBackEditor, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(openOutcomeFeedBackEditor);
     await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
     await this.clickOnElementWithSelector(stateContentInputField);
     await this.typeInInputField(
@@ -977,9 +1280,7 @@ export class ExplorationEditor extends BaseUser {
     );
     await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
 
-    await this.page.waitForSelector(saveOutcomeDestButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
   }
 
   /**

@@ -38,7 +38,7 @@ import {StateEditorConstants} from '../state-editor.constants';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './state-solution-editor.component.css';
 
 interface DeleteValue {
   index: number;
@@ -48,6 +48,7 @@ interface DeleteValue {
 @Component({
   selector: 'oppia-state-solution-editor',
   templateUrl: './state-solution-editor.component.html',
+  styleUrls: ['./state-solution-editor.component.css'],
 })
 export class StateSolutionEditorComponent implements OnInit {
   // The state property is null until a solution is specified or removed.
@@ -91,9 +92,13 @@ export class StateSolutionEditorComponent implements OnInit {
     this.SOLUTION_EDITOR_FOCUS_LABEL =
       'currentCorrectAnswerEditorHtmlForSolutionEditor';
     this.stateEditorService.updateStateSolutionEditorInitialised();
+    const interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error('Expected interactionId to be non-null.');
+    }
     this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
+        interactionId,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
@@ -140,6 +145,9 @@ export class StateSolutionEditorComponent implements OnInit {
     if (solution === null) {
       throw new Error('Expected solution to be non-null.');
     }
+    if (interactionId === null) {
+      throw new Error('Expected interactionId to be non-null.');
+    }
     const solutionSummary = solution.getSummary(
       interactionId,
       this.stateCustomizationArgsService.savedMemento
@@ -157,10 +165,10 @@ export class StateSolutionEditorComponent implements OnInit {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let savedMemento = this.stateInteractionIdService.savedMemento;
-    return (
-      Boolean(savedMemento) &&
-      INTERACTION_SPECS[savedMemento as InteractionSpecsKey].is_linear
-    );
+    if (savedMemento === null) {
+      throw new Error('Expected savedMemento to be non-null.');
+    }
+    return Boolean(savedMemento) && INTERACTION_SPECS[savedMemento].is_linear;
   }
 
   onSaveSolution(value: Solution | null): void {

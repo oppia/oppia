@@ -1,0 +1,20 @@
+<div class="assessment-conversation-skin">
+  <div class="assessment-progress-bar">
+    <div class="assessment-progress-fill" [style.width.%]="progressPercentage"></div>
+  </div>
+  <p class="assessment-progress-text">
+    Question {{currentQuestionIndex + 1}} of {{totalQuestions}}
+  </p>
+  <div class="assessment-question-card">
+    <h3>{{currentQuestion.prompt}}</h3>
+    <ul>
+      <li *ngFor="let choice of currentQuestion.choices">{{choice}}</li>
+    </ul>
+    <button *ngIf="!isLastQuestion" class="btn btn-primary" (click)="onNextQuestion()">
+      Next
+    </button>
+    <button *ngIf="isLastQuestion" class="btn btn-primary" (click)="onSubmitAssessment()">
+      Submit
+    </button>
+  </div>
+</div>

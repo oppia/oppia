@@ -56,17 +56,19 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import './state-interaction-editor.component.css';
 
 export interface InitializeAnswerGroups {
-  interactionId: string;
+  interactionId: InteractionSpecsKey | null;
   answerGroups: AnswerGroup[];
-  defaultOutcome: Outcome;
+  defaultOutcome: Outcome | null;
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
 }
 
 @Component({
   selector: 'oppia-state-interaction-editor',
   templateUrl: './state-interaction-editor.component.html',
+  styleUrls: ['./state-interaction-editor.component.css'],
 })
 export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @Output() markAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter<
@@ -75,7 +77,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   @Output() onSaveInteractionData = new EventEmitter<InteractionData>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
-  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveSolution = new EventEmitter<Solution | null>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
 
@@ -90,7 +92,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   hasLoaded!: boolean;
   interactionEditorIsShown!: boolean;
-  interactionId!: string;
+  interactionId!: InteractionSpecsKey | null;
   interactionIsDisabled!: boolean;
   interactionPreviewHtml!: string;
   windowIsNarrow!: boolean;
@@ -153,7 +155,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) ?? undefined
+      )
     );
   }
 
@@ -202,6 +204,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.savedMemento;
     if (hasInteractionIdChanged) {
       if (
+        this.stateInteractionIdService.displayed &&
         INTERACTION_SPECS[this.stateInteractionIdService.displayed].is_terminal
       ) {
         this.updateDefaultTerminalStateContentIfEmpty();
@@ -220,11 +223,13 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     // is not yet determined at this stage of the customization modal save
     // process, but the emitter expects a value.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
-    this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento,
-      this.stateCustomizationArgsService.savedMemento
-    );
-
+    const savedInteractionId = this.stateInteractionIdService.savedMemento;
+    if (savedInteractionId !== null) {
+      this.interactionDetailsCacheService.set(
+        savedInteractionId,
+        this.stateCustomizationArgsService.savedMemento
+      );
+    }
     // This must be called here so that the rules are updated before the
     // state graph is recomputed.
     if (hasInteractionIdChanged) {
@@ -239,7 +244,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) ?? undefined
+      )
     );
   }
 
@@ -284,17 +289,20 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
             null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
-          this.interactionDetailsCacheService.removeDetails(
-            this.stateInteractionIdService.savedMemento
-          );
+          const savedInteractionId =
+            this.stateInteractionIdService.savedMemento;
+          if (savedInteractionId !== null) {
+            this.interactionDetailsCacheService.removeDetails(
+              savedInteractionId
+            );
+          }
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
 
-          let interactionData: InteractionData = {
+          this.onSaveInteractionData.emit({
             interactionId: this.stateInteractionIdService.displayed,
             customizationArgs: this.stateCustomizationArgsService.displayed,
-          };
-          this.onSaveInteractionData.emit(interactionData);
+          });
 
           this.stateSolutionService.saveDisplayedValue();
           this.onSaveSolution.emit(
@@ -349,7 +357,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id as string,
+          interactionId: stateData.interaction.id,
           answerGroups: stateData.interaction.answerGroups,
           defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
