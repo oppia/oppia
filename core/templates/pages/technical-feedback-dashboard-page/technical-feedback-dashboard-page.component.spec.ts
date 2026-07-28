@@ -24,6 +24,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {RouterTestingModule} from '@angular/router/testing';
 import {
+  CreatorFeedbackType,
   TechnicalTeamType,
   FeedbackFilterState,
   FeedbackStatus,
@@ -123,6 +124,7 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
       searchText: '',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.REPORT,
       dateRange: {
         start: null,
         end: null,
@@ -157,6 +159,15 @@ describe('TechnicalFeedbackDashboardPageComponent', () => {
     component.ngOnInit();
     expect(component instanceof TechnicalFeedbackDashboardPageComponent).toBe(
       true
+    );
+  });
+
+  it('should not show compliment status in technical feedback filters', () => {
+    expect(component.filterConfig.statusOptions).not.toContain(
+      FeedbackStatus.COMPLIMENT
+    );
+    expect(component.filterConfig.statusOptions).toContain(
+      FeedbackStatus.TRANSFERRED_TO_GITHUB
     );
   });
 

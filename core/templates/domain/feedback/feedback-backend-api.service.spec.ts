@@ -25,6 +25,7 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {
+  CreatorFeedbackType,
   ReportType,
   LessonFeedbackModel,
   PlatformFeedbackModel,
@@ -77,6 +78,7 @@ describe('Feedback backend api service', () => {
       end: new Date('2021-02-01'),
     },
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.REPORT,
   };
 
   const filterState2 = {
@@ -87,6 +89,7 @@ describe('Feedback backend api service', () => {
       end: new Date('2021-02-01'),
     },
     technicalTeam: TechnicalTeamType.TECH_INTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.REPORT,
   };
 
   const filterState3 = {
@@ -97,6 +100,7 @@ describe('Feedback backend api service', () => {
       end: null,
     },
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.REPORT,
   };
 
   const detailedReportResponse = {
@@ -113,6 +117,23 @@ describe('Feedback backend api service', () => {
     session_info: null,
     screenshot_filename: null,
     screenshot_entity_id: null,
+    created_on_msecs: 123456,
+  };
+
+  const detailedLessonFeedbackResponse = {
+    id: 'test_feedback_id',
+    feedback_text: 'Test feedback',
+    status: FeedbackStatus.OPEN,
+    lesson_metadata: {
+      exploration_id: 'test_exploration_id',
+      exploration_version: 1,
+      state_name: 'Introduction',
+      state_index: 0,
+      learner_current_answer: null,
+    },
+    parent_feedback_id: null,
+    response_list: [],
+    unread_response_count: 0,
     created_on_msecs: 123456,
   };
 
@@ -443,6 +464,49 @@ describe('Feedback backend api service', () => {
         request.method === 'POST' &&
         request.url ===
           '/platform-feedback/technical/tech-external/test_report_id'
+    );
+
+    expect(req.request.body).toEqual({
+      status: 'fixed',
+    });
+
+    req.flush({success: true});
+    flushMicrotasks();
+    expect(onSuccess).toHaveBeenCalledWith({success: true});
+  }));
+
+  it('should fetch details of lesson feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .fetchLessonFeedbackDetailAsync('test_exploration_id', 'test_feedback_id')
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'GET' &&
+        request.url === '/feedback/test_exploration_id/test_feedback_id'
+    );
+
+    req.flush(detailedLessonFeedbackResponse);
+    flushMicrotasks();
+
+    expect(onSuccess).toHaveBeenCalledWith(detailedLessonFeedbackResponse);
+  }));
+
+  it('should update status of lesson feedback', fakeAsync(() => {
+    const onSuccess = jasmine.createSpy('onSuccess');
+    feedbackBackendApiService
+      .updateLessonFeedbackStatusAsync(
+        'test_exploration_id',
+        'test_feedback_id',
+        'fixed'
+      )
+      .then(onSuccess);
+
+    const req = httpTestingController.expectOne(
+      request =>
+        request.method === 'POST' &&
+        request.url === '/feedback/test_exploration_id/test_feedback_id'
     );
 
     expect(req.request.body).toEqual({

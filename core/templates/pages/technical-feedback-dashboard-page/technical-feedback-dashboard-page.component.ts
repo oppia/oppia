@@ -27,6 +27,7 @@ import {
   FeedbackFilterConfig,
   FeedbackFilterState,
   FeedbackStatus,
+  CreatorFeedbackType,
   PlatformFeedbackBackendResponse,
   PlatformFeedbackDetailResponse,
   PlatformFeedbackSummary,
@@ -69,6 +70,7 @@ export class TechnicalFeedbackDashboardPageComponent {
     searchText: '',
     status: FeedbackStatus.OPEN,
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.REPORT,
     dateRange: {
       start: null,
       end: null,

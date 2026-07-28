@@ -38,6 +38,16 @@ import {ThreadDataBackendApiService} from './services/thread-data-backend-api.se
 import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {
+  CreatorFeedbackType,
+  FeedbackStatus,
+  LessonFeedbackDetailResponse,
+  PlatformFeedbackDetailResponse,
+  ReportType,
+} from 'domain/feedback/feedback.model';
+import {PageContextService} from 'services/page-context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Feedback Tab Component', () => {
   let component: FeedbackTabComponent;
@@ -48,7 +58,10 @@ describe('Feedback Tab Component', () => {
   let editabilityService: EditabilityService;
   let explorationStatesService: ExplorationStatesService;
   let threadDataBackendApiService: ThreadDataBackendApiService;
+  let feedbackBackendApiService: FeedbackBackendApiService;
+  let pageContextService: PageContextService;
   let userService: UserService;
+  let windowRef: WindowRef;
   let ngbModal: NgbModal;
 
   class MockNgbModal {
@@ -84,8 +97,11 @@ describe('Feedback Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
+    feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
+    pageContextService = TestBed.inject(PageContextService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
     userService = TestBed.inject(UserService);
+    windowRef = TestBed.inject(WindowRef);
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({
@@ -102,6 +118,7 @@ describe('Feedback Tab Component', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+    windowRef.nativeWindow.location.hash = '';
   });
 
   it('should get threads after feedback threads are available', fakeAsync(() => {

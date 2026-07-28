@@ -21,6 +21,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FeedbackFilterBarComponent} from './feedback-filter-bar.component';
 import {FeedbackSharedModule} from '../feedback-shared.module';
 import {
+  CreatorFeedbackType,
   FeedbackStatus,
   TechnicalTeamType,
 } from '../../../domain/feedback/feedback.model';
@@ -41,8 +42,14 @@ describe('FeedbackFilterBarComponent', () => {
 
     component.config = {
       showTeamFilter: true,
+      showCreatorFeedbackTypeFilter: true,
       showDateRangeFilter: true,
       showSearchBar: true,
+      statusOptions: [
+        FeedbackStatus.OPEN,
+        FeedbackStatus.FIXED,
+        FeedbackStatus.NOT_ACTIONABLE,
+      ],
     };
     spyOn(component.filterChange, 'emit');
 
@@ -51,6 +58,7 @@ describe('FeedbackFilterBarComponent', () => {
     component.searchText = 'test';
     component.selectedStatus = FeedbackStatus.OPEN;
     component.selectedTechnicalTeam = TechnicalTeamType.TECH_EXTERNAL;
+    component.selectedCreatorFeedbackType = CreatorFeedbackType.REPORT;
     component.fromDate = '2021-01-01';
     component.toDate = '2021-01-02';
   });
@@ -59,12 +67,21 @@ describe('FeedbackFilterBarComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should use status options from the filter config', () => {
+    expect(component.statusOptions).toEqual([
+      FeedbackStatus.OPEN,
+      FeedbackStatus.FIXED,
+      FeedbackStatus.NOT_ACTIONABLE,
+    ]);
+  });
+
   it('should apply filters for the filters selected', () => {
     component.applyFilters();
     expect(component.filterChange.emit).toHaveBeenCalledWith({
       searchText: 'test',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.REPORT,
       dateRange: {
         start: new Date('2021-01-01'),
         end: new Date('2021-01-02'),
@@ -79,12 +96,16 @@ describe('FeedbackFilterBarComponent', () => {
     expect(component.selectedTechnicalTeam).toEqual(
       TechnicalTeamType.TECH_EXTERNAL
     );
+    expect(component.selectedCreatorFeedbackType).toEqual(
+      CreatorFeedbackType.REPORT
+    );
     expect(component.fromDate).toEqual('');
     expect(component.toDate).toEqual('');
     expect(component.filterChange.emit).toHaveBeenCalledWith({
       searchText: '',
       status: FeedbackStatus.OPEN,
       technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+      creatorFeedbackType: CreatorFeedbackType.REPORT,
       dateRange: {
         start: null,
         end: null,

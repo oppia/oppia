@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from core import feconf
+
 from typing import Dict, List, Optional, TypedDict
 
 
@@ -65,6 +67,16 @@ class LessonFeedbackDict(TypedDict):
     response_list: List[LessonFeedbackResponseDict]
     unread_response_count: int
     created_on_msecs: float
+
+
+class LessonFeedbackSummaryDict(TypedDict):
+    """Lightweight dict representation of a LessonFeedback."""
+
+    id: str
+    feedback_text_preview: str
+    status: str
+    source: str
+    unread_response_count: int
 
 
 class PlatformFeedbackDict(TypedDict):
@@ -121,8 +133,8 @@ class PlatformFeedbackSummaryDict(TypedDict):
     category: Optional[str]
 
 
-class PlatformFeedbackListRequestDict(TypedDict):
-    """Normalized payload for PlatformFeedbackListHandler GET."""
+class GeneralFeedbackListRequestDict(TypedDict):
+    """Normalized payload for LessonFeedbackListHandler and PlatformFeedbackListHandler GET."""
 
     status: str
     cursor: Optional[str]
@@ -194,6 +206,24 @@ class LessonFeedback:
             'created_on_msecs': self.created_on_msecs,
         }
 
+    def to_summary_dict(self) -> LessonFeedbackSummaryDict:
+        """Returns a lightweight summary dict for use in list views.
+
+        Returns:
+            LessonFeedbackSummaryDict. A summary dict representation of the
+            object.
+        """
+        feedback_text_preview = self.feedback_text
+        if len(feedback_text_preview) > 100:
+            feedback_text_preview = feedback_text_preview[:97] + '...'
+        return {
+            'id': self.id,
+            'feedback_text_preview': feedback_text_preview,
+            'status': self.status,
+            'source': feconf.SOURCE_LESSON,
+            'unread_response_count': self.unread_response_count,
+        }
+
 
 class PlatformFeedback:
     """Domain object for a lesson issue report or site issue report.
@@ -254,7 +284,7 @@ class PlatformFeedback:
         self.lesson_metadata = lesson_metadata
         self.include_technical_logs = include_technical_logs
         self.session_info = (
-            session_info if destination_dashboard != 'creator' else None
+            session_info if destination_dashboard != 'curriculum' else None
         )
         self.screenshot_filename = screenshot_filename
         self.screenshot_entity_id = screenshot_entity_id
@@ -279,7 +309,7 @@ class PlatformFeedback:
             'include_technical_logs': self.include_technical_logs,
             'session_info': (
                 self.session_info
-                if self.destination_dashboard != 'creator'
+                if self.destination_dashboard != 'curriculum'
                 else None
             ),
             'screenshot_filename': self.screenshot_filename,

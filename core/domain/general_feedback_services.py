@@ -255,6 +255,137 @@ def create_lesson_feedback(
     return _lesson_feedback_model_to_domain(model)
 
 
+def get_lesson_feedback(
+    feedback_id: str,
+) -> Optional[general_feedback_domain.LessonFeedback]:
+    """Returns the full LessonFeedback domain object for the given ID.
+
+    Args:
+        feedback_id: str. The ID of the lesson feedback to retrieve.
+
+    Returns:
+        Optional[LessonFeedback]. The retrieved feedback, or None if not found.
+    """
+    model = general_feedback_models.LessonFeedbackModel.get(
+        feedback_id, strict=False
+    )
+    if model is None:
+        return None
+    return _lesson_feedback_model_to_domain(model)
+
+
+def get_lesson_feedback_summaries(
+    exp_id: str,
+    status_filter: Optional[str] = feconf.STATUS_CHOICES_OPEN,
+    cursor: Optional[str] = None,
+    date_from_msecs: Optional[float] = None,
+    date_to_msecs: Optional[float] = None,
+) -> Tuple[
+    List[general_feedback_domain.LessonFeedbackSummaryDict],
+    Optional[str],
+    bool,
+]:
+    """Returns a page of lesson feedback summaries with optional filters.
+
+    Used by the Creator Dashboard GET.
+
+    Args:
+        exp_id: str. The exploration id to retrieve feedback for.
+        status_filter: Optional[str]. If provided, only return reports with
+            this status. Otherwise, open status reports are shown.
+        cursor: Optional[str]. Pagination cursor from a previous response.
+        date_from_msecs: Optional[float]. If provided, only return reports
+            created after this time.
+        date_to_msecs: Optional[float]. If provided, only return reports
+            created before this time.
+
+    Returns:
+        tuple(summaries, next_cursor, more). Where:
+            summaries: list(LessonFeedbackSummaryDict). The feedback
+                summaries on the page.
+            next_cursor: str|None. The cursor for the next page, or None.
+            more: bool. Whether more results exist.
+    """
+    exploration_id = exp_id
+    date_from = (
+        utils.convert_millisecs_time_to_datetime_object(date_from_msecs)
+        if date_from_msecs is not None
+        else None
+    )
+    date_to = (
+        utils.convert_millisecs_time_to_datetime_object(date_to_msecs)
+        if date_to_msecs is not None
+        else None
+    )
+    model_list, next_cursor, more = (
+        general_feedback_models.LessonFeedbackModel.fetch_page(
+            page_size=20,
+            cursor=cursor,
+            exploration_id=exploration_id,
+            status_filter=status_filter,
+            date_from=date_from,
+            date_to=date_to,
+        )
+    )
+    # Here we use cast because PlatformFeedbackModel.fetch_page() inherits its
+    # return annotation from BaseFeedbackModel.fetch_page().
+    summaries = [
+        _lesson_feedback_model_to_domain(
+            cast(general_feedback_models.LessonFeedbackModel, model)
+        ).to_summary_dict()
+        for model in model_list
+    ]
+    return summaries, next_cursor, more
+
+
+def _update_lesson_feedback_model_status(
+    model: general_feedback_models.LessonFeedbackModel,
+    new_status: str,
+) -> general_feedback_domain.LessonFeedback:
+    """Updates the status of a lesson feedback model.
+
+    Args:
+        model: LessonFeedbackModel. The model to update.
+        new_status: str. The new status value.
+
+    Returns:
+        LessonFeedback. The updated report.
+    """
+    model.status = new_status
+    model.update_timestamps()
+    model.put()
+    return _lesson_feedback_model_to_domain(model)
+
+
+def update_lesson_feedback_status(
+    feedback_id: str,
+    new_status: str,
+    exp_id: str,
+) -> Optional[general_feedback_domain.LessonFeedback]:
+    """Updates the status of a lesson feedback.
+
+    Args:
+        feedback_id: str. ID of the LessonFeedbackModel to update.
+        new_status: str. The new status value. Must be a valid status choice.
+        exp_id: str. The exploration from which the feedback is being
+            accessed.
+
+    Returns:
+        Optional[LessonFeedback]. The updated report, or None if not found.
+    """
+    if new_status not in feconf.STATUS_CHOICES:
+        raise ValueError('Invalid status: %s' % new_status)
+
+    model = general_feedback_models.LessonFeedbackModel.get(
+        feedback_id, strict=False
+    )
+    if model is None:
+        return None
+    if model.lesson_metadata['exploration_id'] != exp_id:
+        raise ValueError('Invalid exploration ID: %s' % exp_id)
+    return _update_lesson_feedback_model_status(model, new_status)
+
+
 def create_platform_report(
     feedback_text: str,
     source: str,

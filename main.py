@@ -1094,6 +1094,14 @@ URLS = [
         general_feedback.LessonFeedbackSubmitHandler,
     ),
     get_redirect_route(
+        r'%s/<exploration_id>/<feedback_id>' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackListHandler,
+    ),
+    get_redirect_route(
         r'%s' % feconf.PLATFORM_FEEDBACK_URL,
         general_feedback.PlatformFeedbackSubmitHandler,
     ),

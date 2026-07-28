@@ -122,6 +122,187 @@ class LessonFeedbackSubmitHandler(
         self.render_json({'id': feedback.id})
 
 
+class LessonFeedbackDetailHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles retrieval of lesson feedback for the Creator Feedback Tab.
+
+    GET /feedback/<exploration_id>/<feedback_id>
+    POST /feedback/<exploration_id>/<feedback_id>
+
+    URL path args:
+        exploration_id: str. The exploration ID of the requested feedback.
+        feedback_id: str. The feedback identifier.
+
+    POST payload:
+        status: str. The new moderation status.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+        'feedback_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+            },
+        },
+    }
+
+    @acl_decorators.can_edit_exploration
+    def get(
+        self,
+        exploration_id: str,
+        feedback_id: str,
+    ) -> None:
+        feedback = general_feedback_services.get_lesson_feedback(feedback_id)
+        if feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+        if feedback.lesson_metadata['exploration_id'] != exploration_id:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist for exploration %s.'
+                % (feedback_id, exploration_id)
+            )
+        self.render_json(feedback.to_dict())
+
+    @acl_decorators.can_edit_exploration
+    def post(
+        self,
+        exploration_id: str,
+        feedback_id: str,
+    ) -> None:
+        assert self.normalized_payload is not None
+        payload = self.normalized_payload
+        status = payload['status']
+        try:
+            updated_feedback = (
+                general_feedback_services.update_lesson_feedback_status(
+                    feedback_id=feedback_id,
+                    new_status=status,
+                    exp_id=exploration_id,
+                )
+            )
+        except ValueError as e:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            ) from e
+        if updated_feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+        self.render_json({'success': True})
+
+
+class LessonFeedbackListHandler(
+    base.BaseHandler[
+        Dict[str, str], general_feedback_domain.GeneralFeedbackListRequestDict
+    ]
+):
+    """Handles retrieval of Lesson feedback for the Creator.
+
+    GET /lesson-feedback/<exploration_id>
+
+    URL path args:
+        exploration_id: str. The exploration id to retrieve feedback for.
+
+    Query params:
+        status: Optional[str]. Filters feedback by status.
+        cursor: Optional[str]. Pagination cursor returned by a previous
+            request.
+        date_from_msecs: Optional[float]. Filters feedback from this date.
+        date_to_msecs: Optional[float]. Filters feedback until this date.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+                'default_value': feconf.STATUS_CHOICES_OPEN,
+            },
+            'cursor': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None,
+            },
+            'date_from_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+            'date_to_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+        },
+    }
+
+    @acl_decorators.can_edit_exploration
+    def get(
+        self,
+        exploration_id: str,
+    ) -> None:
+        assert self.normalized_request is not None
+        req = self.normalized_request
+        status = req.get('status')
+        cursor = req.get('cursor')
+        date_from_msecs = req.get('date_from_msecs')
+        date_to_msecs = req.get('date_to_msecs')
+        summaries, next_cursor, more = (
+            general_feedback_services.get_lesson_feedback_summaries(
+                exp_id=exploration_id,
+                status_filter=status,
+                cursor=cursor,
+                date_from_msecs=date_from_msecs,
+                date_to_msecs=date_to_msecs,
+            )
+        )
+        self.render_json(
+            {
+                'summaries': summaries,
+                'next_cursor': next_cursor,
+                'more': more,
+            }
+        )
+
+
 class PlatformFeedbackSubmitHandler(
     base.BaseHandler[
         general_feedback_domain.PlatformFeedbackSubmitPayloadDict,
@@ -278,7 +459,7 @@ class PlatformFeedbackSubmitHandler(
 
 class PlatformFeedbackListHandler(
     base.BaseHandler[
-        Dict[str, str], general_feedback_domain.PlatformFeedbackListRequestDict
+        Dict[str, str], general_feedback_domain.GeneralFeedbackListRequestDict
     ]
 ):
     """Handles retrieval of platform feedback for the Creator and Technical

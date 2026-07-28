@@ -28,6 +28,7 @@
 <ng-template #detailView>
   <oppia-feedback-detail-page [feedbackDetailResponse]="feedbackDetailResponse"
                               [feedbackDetailPageConfig]="cardConfig"
+                              [statusOptions]="filterConfig.statusOptions"
                               [screenshotDataUrl]="screenshotDataUrl"
                               (statusChange)="onStatusChange($event)"
                               (githubTransfer)="onGithubTransfer($event)"

@@ -27,6 +27,7 @@ import {
 } from '@angular/core';
 import {CATEGORY_LABELS, SOURCE_LABELS} from 'domain/feedback/feedback.model';
 import type {
+  LessonFeedbackSummary,
   PlatformFeedbackSummary,
   FeedbackCardConfig,
 } from 'domain/feedback/feedback.model';
@@ -39,7 +40,9 @@ import './feedback-table.component.css';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackTableComponent {
-  @Input() feedbackSummaries: PlatformFeedbackSummary[] = [];
+  @Input() feedbackSummaries:
+    | PlatformFeedbackSummary[]
+    | LessonFeedbackSummary[] = [];
   @Input() currentPage = 1;
   @Input() feedbackCardConfig!: FeedbackCardConfig;
   @Input() moreFeedbackAvailable = false;
@@ -56,5 +59,25 @@ export class FeedbackTableComponent {
 
   getSourceLabel(source: string): string {
     return SOURCE_LABELS[source];
+  }
+
+  getFeedbackDescription(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string {
+    if ('report_message_preview' in feedback) {
+      return feedback.report_message_preview;
+    }
+
+    return feedback.feedback_text_preview;
+  }
+
+  getFeedbackCategory(
+    feedback: PlatformFeedbackSummary | LessonFeedbackSummary
+  ): string | null {
+    if ('category' in feedback) {
+      return feedback.category;
+    }
+
+    return null;
   }
 }

@@ -26,11 +26,14 @@ import {
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {
   CATEGORY_LABELS,
+  ALL_FEEDBACK_STATUS_OPTIONS,
   FEEDBACK_STATUS_LABELS,
   FeedbackCardConfig,
   FeedbackSessionInfo,
   FeedbackStatus,
+  LessonFeedbackDetailResponse,
   PlatformFeedbackDetailResponse,
+  ReportType,
   SOURCE_LABELS,
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
@@ -53,8 +56,11 @@ export class FeedbackDetailPageComponent {
     private dateTimeFormatService: DateTimeFormatService,
     private windowRef: WindowRef
   ) {}
-  @Input() feedbackDetailResponse!: PlatformFeedbackDetailResponse;
+  @Input() feedbackDetailResponse!:
+    | PlatformFeedbackDetailResponse
+    | LessonFeedbackDetailResponse;
   @Input() feedbackDetailPageConfig!: FeedbackCardConfig;
+  @Input() statusOptions: FeedbackStatus[] = ALL_FEEDBACK_STATUS_OPTIONS;
   @Input() screenshotDataUrl: string | null = null;
   @Output() goBack = new EventEmitter<void>();
   @Output() statusChange = new EventEmitter<FeedbackStatus>();
@@ -64,7 +70,6 @@ export class FeedbackDetailPageComponent {
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
   readonly sourceLabels = SOURCE_LABELS;
   readonly teamLabels = TECHNICAL_TEAM_LABELS;
-  readonly statusOptions = Object.values(FeedbackStatus);
   readonly transferredToGithubStatus = FeedbackStatus.TRANSFERRED_TO_GITHUB;
 
   replyText: string = '';
@@ -104,7 +109,51 @@ export class FeedbackDetailPageComponent {
   }
 
   get sessionInfo(): FeedbackSessionInfo | null {
-    return this.feedbackDetailResponse?.session_info ?? null;
+    if ('session_info' in this.feedbackDetailResponse) {
+      return this.feedbackDetailResponse.session_info ?? null;
+    }
+
+    return null;
+  }
+
+  getFeedbackMessage(): string {
+    if ('report_message' in this.feedbackDetailResponse) {
+      return this.feedbackDetailResponse.report_message;
+    }
+
+    return this.feedbackDetailResponse.feedback_text;
+  }
+
+  getFeedbackSource(): ReportType {
+    if ('source' in this.feedbackDetailResponse) {
+      return this.feedbackDetailResponse.source;
+    }
+
+    return ReportType.LESSON;
+  }
+
+  getFeedbackCategory(): string | null {
+    if ('category' in this.feedbackDetailResponse) {
+      return this.feedbackDetailResponse.category;
+    }
+
+    return null;
+  }
+
+  getFeedbackPlatform(): 'web' | 'android' | null {
+    if ('platform' in this.feedbackDetailResponse) {
+      return this.feedbackDetailResponse.platform;
+    }
+
+    return 'web';
+  }
+
+  getFeedbackPageUrl(): string | null {
+    if ('page_url' in this.feedbackDetailResponse) {
+      return this.feedbackDetailResponse.page_url;
+    }
+
+    return null;
   }
 
   getCategoryLabel(category: string | null): string {
@@ -126,6 +175,12 @@ export class FeedbackDetailPageComponent {
       : this.teamLabels[destinationDashboard];
   }
 
+  private isPlatformFeedbackDetailResponse(
+    response: PlatformFeedbackDetailResponse | LessonFeedbackDetailResponse
+  ): response is PlatformFeedbackDetailResponse {
+    return 'report_message' in response;
+  }
+
   onStatusOptionClick(status: FeedbackStatus): void {
     if (status === FeedbackStatus.TRANSFERRED_TO_GITHUB) {
       this.githubTransfer.emit(this.getGithubIssueUrl());
@@ -137,6 +192,9 @@ export class FeedbackDetailPageComponent {
 
   getGithubIssueUrl(): string {
     const response = this.feedbackDetailResponse;
+    if (!this.isPlatformFeedbackDetailResponse(response)) {
+      return '';
+    }
     const title = response
       ? `[BUG]: User feedback report: ${this.getCategoryLabel(
           response.category
@@ -161,6 +219,9 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueDescription(): string {
     const response = this.feedbackDetailResponse;
+    if (!this.isPlatformFeedbackDetailResponse(response)) {
+      return '';
+    }
 
     return [
       response.report_message,
@@ -176,8 +237,23 @@ export class FeedbackDetailPageComponent {
     ].join('\n');
   }
 
-  private getFeedbackReportUrl(): string {
+  private getFeedbackReportUrl(): string | null {
     const response = this.feedbackDetailResponse;
+    if (!('destination_dashboard' in response)) {
+      return null;
+    }
+    if (
+      response.destination_dashboard === 'curriculum' &&
+      response.lesson_metadata
+    ) {
+      const reportPath =
+        `/create/${encodeURIComponent(
+          response.lesson_metadata.exploration_id
+        )}` + `#/feedback/${encodeURIComponent(response.id)}`;
+
+      return `${this.windowRef.nativeWindow.location.origin}${reportPath}`;
+    }
+
     const reportPath = `/technical-feedback-dashboard/${encodeURIComponent(
       response.destination_dashboard
     )}/${encodeURIComponent(response.id)}`;
@@ -187,6 +263,9 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueSteps(): string {
     const response = this.feedbackDetailResponse;
+    if (!this.isPlatformFeedbackDetailResponse(response)) {
+      return '';
+    }
 
     const issueLines = [
       '1. Review the transferred feedback report details.',
@@ -215,6 +294,9 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueScreenshotDetails(): string {
     const response = this.feedbackDetailResponse;
+    if (!('screenshot_filename' in response)) {
+      return 'No screenshot was attached to this report.';
+    }
     if (!response.screenshot_filename) {
       return 'No screenshot was attached to this report.';
     }
@@ -234,6 +316,9 @@ export class FeedbackDetailPageComponent {
 
   private getGithubIssueAdditionalContext(): string {
     const response = this.feedbackDetailResponse;
+    if (!('screenshot_entity_id' in response)) {
+      return '';
+    }
 
     return [
       '## Feedback metadata',
@@ -353,13 +438,20 @@ export class FeedbackDetailPageComponent {
   }
 
   private getUserAgent(): string | null {
-    return (
-      this.feedbackDetailResponse?.session_info?.environment?.user_agent ?? null
-    );
+    const response = this.feedbackDetailResponse;
+    if (!this.isPlatformFeedbackDetailResponse(response)) {
+      return null;
+    }
+
+    return response.session_info?.environment?.user_agent ?? null;
   }
 
   private getGithubIssueSessionLogJson(): string {
-    const sessionInfo = this.feedbackDetailResponse?.session_info;
+    const response = this.feedbackDetailResponse;
+    if (!this.isPlatformFeedbackDetailResponse(response)) {
+      return 'No session logs were attached to this report.';
+    }
+    const sessionInfo = response.session_info;
     if (!sessionInfo) {
       return 'No session logs were attached to this report.';
     }

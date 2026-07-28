@@ -17,8 +17,8 @@
         <oppia-feedback-chip [value]="feedback.status"
                              [type]="'status'">
         </oppia-feedback-chip>
-        <oppia-feedback-chip *ngIf="feedback.category"
-                             [value]="feedback.category"
+        <oppia-feedback-chip *ngIf="getFeedbackCategory()"
+                             [value]="getFeedbackCategory()"
                              [type]="'category'">
         </oppia-feedback-chip>
       </div>
@@ -39,25 +39,25 @@
               <span class="oppia-feedback-detail-field-label">Status</span>
               <span class="oppia-feedback-detail-field-value">{{ statusLabels[feedback.status] }}</span>
             </div>
-            <div class="oppia-feedback-detail-field" *ngIf="feedback.category">
+            <div class="oppia-feedback-detail-field" *ngIf="getFeedbackCategory()">
               <span class="oppia-feedback-detail-field-label">Category</span>
-              <span class="oppia-feedback-detail-field-value">{{ categoryLabels[feedback.category] }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ getCategoryLabel(getFeedbackCategory()) }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
               <span class="oppia-feedback-detail-field-label">Source</span>
-              <span class="oppia-feedback-detail-field-value">{{ sourceLabels[feedback.source] }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ getSourceLabel(getFeedbackSource()) }}</span>
             </div>
-            <div class="oppia-feedback-detail-field">
+            <div class="oppia-feedback-detail-field" *ngIf="getFeedbackPlatform()">
               <span class="oppia-feedback-detail-field-label">Platform</span>
-              <span class="oppia-feedback-detail-field-value">{{ getPlatformLabel(feedback.platform) }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ getPlatformLabel(getFeedbackPlatform()) }}</span>
             </div>
-            <div class="oppia-feedback-detail-field" *ngIf="feedback.page_url">
+            <div class="oppia-feedback-detail-field" *ngIf="getFeedbackPageUrl()">
               <span class="oppia-feedback-detail-field-label">Page URL</span>
-              <a [href]="feedback.page_url"
+              <a [href]="getFeedbackPageUrl()"
                  target="_blank"
                  rel="noopener noreferrer"
                  class="oppia-feedback-detail-field-value oppia-feedback-detail-link">
-                {{ feedback.page_url }}
+                {{ getFeedbackPageUrl() }}
               </a>
             </div>
             <div class="oppia-feedback-detail-screenshot" *ngIf="screenshotDataUrl">
@@ -140,7 +140,7 @@
 
         <div class="oppia-feedback-detail-col">
           <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
-            <div class="oppia-feedback-detail-message-text">{{ feedback.report_message }}</div>
+            <div class="oppia-feedback-detail-message-text">{{ getFeedbackMessage() }}</div>
           </oppia-feedback-detail-section>
 
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"

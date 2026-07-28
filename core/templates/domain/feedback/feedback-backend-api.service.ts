@@ -29,6 +29,8 @@ import {
   LessonFeedbackModel,
   PlatformFeedbackModel,
   FeedbackSubmitResponse,
+  LessonFeedbackBackendResponse,
+  LessonFeedbackDetailResponse,
   PlatformFeedbackBackendResponse,
   DashboardType,
   FeedbackFilterState,
@@ -126,6 +128,81 @@ export class FeedbackBackendApiService {
       .toPromise();
   }
 
+  private async fetchLessonFeedbackListAsync(
+    expId: string,
+    cursor: string | null,
+    statusFilter: string | null,
+    dateFromMsecs: number | null,
+    dateToMsecs: number | null
+  ): Promise<LessonFeedbackBackendResponse> {
+    let params = new HttpParams();
+    if (cursor) {
+      params = params.set('cursor', cursor);
+    }
+    if (statusFilter) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs) {
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    }
+    if (dateToMsecs) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+
+    const url = [this.lessonFeedbackUrl, encodeURIComponent(expId)].join('/');
+    return await this.http
+      .get<LessonFeedbackBackendResponse>(url, {
+        params,
+      })
+      .toPromise();
+  }
+
+  async fetchCreatorLessonFeedbackListAsync(
+    explorationId: string,
+    filterState: FeedbackFilterState,
+    cursor: string | null = null
+  ): Promise<LessonFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+
+    return await this.fetchLessonFeedbackListAsync(
+      explorationId,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchLessonFeedbackDetailAsync(
+    explorationId: string,
+    feedbackId: string
+  ): Promise<LessonFeedbackDetailResponse> {
+    const url = [
+      this.lessonFeedbackUrl,
+      encodeURIComponent(explorationId),
+      encodeURIComponent(feedbackId),
+    ].join('/');
+    return await this.http.get<LessonFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async updateLessonFeedbackStatusAsync(
+    explorationId: string,
+    feedbackId: string,
+    newStatus: string
+  ): Promise<SuccessResponse> {
+    const url = [
+      this.lessonFeedbackUrl,
+      encodeURIComponent(explorationId),
+      encodeURIComponent(feedbackId),
+    ].join('/');
+    return await this.http
+      .post<SuccessResponse>(url, {
+        status: newStatus,
+      })
+      .toPromise();
+  }
+
   private async fetchPlatformFeedbackListAsync(
     dashboardType: DashboardType,
     dashboardId: string,
@@ -185,7 +262,7 @@ export class FeedbackBackendApiService {
     const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
 
     return await this.fetchPlatformFeedbackListAsync(
-      'creator',
+      'curriculum',
       explorationId,
       cursor,
       filterState.status,
