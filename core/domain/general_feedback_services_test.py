@@ -33,6 +33,25 @@ if MYPY:  # pragma: no cover
     [models.Names.GENERAL_FEEDBACK]
 )
 
+# Here we use object because session-info diagnostics are heterogeneous
+# JSON-like payloads (nested dict/list values) from client logs.
+VALID_SESSION_INFO: Dict[str, object] = {
+    'console_logs': [],
+    'failed_requests': [],
+    'navigation_history': [],
+    'environment': {
+        'client_time_msecs': 1767225602000,
+        'timezone_offset_mins': -330,
+        'user_agent': 'Mozilla/5.0',
+        'viewport': {'width': 1920, 'height': 1080},
+        'page': {
+            'url': 'http://oppia.org/explore/exp_001',
+            'title': 'Fractions',
+        },
+        'locale': {'language_code': 'en', 'direction': 'ltr'},
+    },
+}
+
 
 class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
     """Tests for general feedback services."""
@@ -347,10 +366,10 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             source='lesson',
             category=feconf.CATEGORY_TYPO,
             lesson_metadata=self.get_lesson_metadata(),
-            session_info=None,
+            session_info=VALID_SESSION_INFO,
             screenshot_filename=None,
             screenshot_entity_id=None,
-            include_technical_logs=False,
+            include_technical_logs=True,
             page_url='https://oppia.org/learn',
         )
 
@@ -362,6 +381,10 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         assert retrieved_report is not None
         self.assertEqual(retrieved_report.id, report.id)
         self.assertEqual(retrieved_report.report_message, 'There is a typo.')
+        self.assertEqual(
+            retrieved_report.session_info,
+            VALID_SESSION_INFO,
+        )
 
     def test_get_platform_feedback_returns_none_for_missing_report(
         self,
