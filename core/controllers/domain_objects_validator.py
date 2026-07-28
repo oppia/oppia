@@ -43,7 +43,7 @@ from core.domain import (
     stats_domain,
 )
 
-from typing import Dict, Mapping, Optional, Union
+from typing import Dict, Mapping
 
 
 def validate_suggestion_change(
@@ -268,36 +268,6 @@ def validate_question_state_dict(
     return question_state_dict
 
 
-def validate_email_dashboard_data(
-    data: Dict[str, Optional[Union[bool, int]]],
-) -> Dict[str, Optional[Union[bool, int]]]:
-    """Validates email dashboard data.
-
-    Args:
-        data: dict. Data that needs to be validated.
-
-    Returns:
-        dict. Returns the dict after validation.
-
-    Raises:
-        Exception. The key in 'data' is not one of the allowed keys.
-    """
-    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-    possible_keys = [predicate['backend_attr'] for predicate in predicates]
-
-    for key, value in data.items():
-        if value is None:
-            continue
-        if key not in possible_keys:
-            # Raise exception if key is not one of the allowed keys.
-            raise Exception('400 Invalid input for query.')
-    # The method returns a dict containing fields of email dashboard
-    # query params. This dict represents the UserQueryParams class, which is a
-    # namedtuple. Hence the fields of the dict are being validated as a part of
-    # schema validation before saving new user queries in the handler.
-    return data
-
-
 def validate_task_entries(
     task_entries: improvements_domain.TaskEntryDict,
 ) -> improvements_domain.TaskEntryDict:
@@ -443,7 +413,7 @@ def validate_general_feedback_page_url(page_url: str) -> str:
 
 # Here we use object because session-info diagnostics are heterogeneous
 # JSON-like payloads (nested dict/list values) from client logs.
-def validate_general_feedback_session_info_log_entries(
+def validate_feedback_session_info_log_entries(
     session_info: Dict[str, object],
 ) -> Dict[str, object]:
     """Validates the session info log entries for feedback submission.
@@ -461,54 +431,53 @@ def validate_general_feedback_session_info_log_entries(
         raise base.BaseHandler.InvalidInputException(
             'Session info contains unknown keys: %s' % ', '.join(unknown_keys)
         )
-    console_logs_json = session_info.get('console_logs_json', [])
-    if not isinstance(console_logs_json, list):
+    console_logs = session_info.get('console_logs', [])
+    if not isinstance(console_logs, list):
         raise base.BaseHandler.InvalidInputException(
-            'console_logs_json should be a list.'
+            'console_logs should be a list.'
         )
-    failed_requests_json = session_info.get('failed_requests_json', [])
-    if not isinstance(failed_requests_json, list):
+    failed_requests = session_info.get('failed_requests', [])
+    if not isinstance(failed_requests, list):
         raise base.BaseHandler.InvalidInputException(
-            'failed_requests_json should be a list.'
+            'failed_requests should be a list.'
         )
-    navigation_history_json = session_info.get('navigation_history_json', [])
-    if not isinstance(navigation_history_json, list):
+    navigation_history = session_info.get('navigation_history', [])
+    if not isinstance(navigation_history, list):
         raise base.BaseHandler.InvalidInputException(
-            'navigation_history_json should be a list.'
+            'navigation_history should be a list.'
         )
-    environment_json = session_info.get('environment_json', {})
-    if not isinstance(environment_json, dict):
+    environment = session_info.get('environment', {})
+    if not isinstance(environment, dict):
         raise base.BaseHandler.InvalidInputException(
-            'environment_json should be a dict.'
+            'environment should be a dict.'
         )
     if (
-        len(console_logs_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
-        or len(failed_requests_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
-        or len(navigation_history_json) > feconf.MAX_NAVIGATION_HISTORY_ENTRIES
+        len(console_logs) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
+        or len(failed_requests) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
+        or len(navigation_history) > feconf.MAX_NAVIGATION_HISTORY_ENTRIES
     ):
         raise base.BaseHandler.InvalidInputException(
             'Session info log entries exceed maximum allowed limit.'
         )
 
-    for entry in console_logs_json:
+    for entry in console_logs:
         if not isinstance(entry, dict):
             raise base.BaseHandler.InvalidInputException(
-                'console_logs_json should be a list of dicts.'
+                'console_logs should be a list of dicts.'
             )
         error_message = entry.get('error_message')
         if not isinstance(error_message, str):
             raise base.BaseHandler.InvalidInputException(
-                'error_message in console_logs_json should be a string.'
+                'error_message in console_logs should be a string.'
             )
         if len(error_message) > feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH:
             raise base.BaseHandler.InvalidInputException(
-                'error_message in console_logs_json exceeds maximum length of %d characters.'
+                'error_message in console_logs exceeds maximum length of %d characters.'
                 % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH
             )
         if not isinstance(entry.get('timestamp_msecs'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info console_logs_json.timestamp_msecs '
-                'should be an int.'
+                'Session info console_logs.timestamp_msecs should be an int.'
             )
         log_level = entry.get('log_level')
         if log_level is not None and log_level not in (
@@ -519,111 +488,110 @@ def validate_general_feedback_session_info_log_entries(
             'debug',
         ):
             raise base.BaseHandler.InvalidInputException(
-                'Invalid log_level in console_logs_json.'
+                'Invalid log_level in console_logs.'
             )
         stack_trace = entry.get('stack_trace')
         if stack_trace is not None:
             if not isinstance(stack_trace, str):
                 raise base.BaseHandler.InvalidInputException(
-                    'stack_trace in console_logs_json should be a string.'
+                    'stack_trace in console_logs should be a string.'
                 )
             if len(stack_trace) > feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH:
                 raise base.BaseHandler.InvalidInputException(
-                    'stack_trace in console_logs_json exceeds maximum length of %d characters.'
+                    'stack_trace in console_logs exceeds maximum length of %d characters.'
                     % feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH
                 )
-    for entry in failed_requests_json:
+    for entry in failed_requests:
         if not isinstance(entry, dict):
             raise base.BaseHandler.InvalidInputException(
-                'failed_requests_json should be a list of dicts.'
+                'failed_requests should be a list of dicts.'
             )
         url = entry.get('url')
         if not isinstance(url, str):
             raise base.BaseHandler.InvalidInputException(
-                'url in failed_requests_json should be a string.'
+                'url in failed_requests should be a string.'
             )
         if len(url) > feconf.MAX_PAGE_URL_LENGTH:
             raise base.BaseHandler.InvalidInputException(
-                'url in failed_requests_json exceeds maximum length of %d characters.'
+                'url in failed_requests exceeds maximum length of %d characters.'
                 % feconf.MAX_PAGE_URL_LENGTH
             )
         method = entry.get('method')
         if not isinstance(method, str):
             raise base.BaseHandler.InvalidInputException(
-                'method in failed_requests_json should be a string.'
+                'method in failed_requests should be a string.'
             )
         if len(method) > feconf.MAX_SESSION_INFO_METHOD_LENGTH:
             raise base.BaseHandler.InvalidInputException(
-                'method in failed_requests_json exceeds maximum length of %d characters.'
+                'method in failed_requests exceeds maximum length of %d characters.'
                 % feconf.MAX_SESSION_INFO_METHOD_LENGTH
             )
         if not isinstance(entry.get('status_code'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info failed_requests_json.status_code '
-                'should be an int.'
+                'Session info failed_requests.status_code should be an int.'
             )
         if not isinstance(entry.get('timestamp_msecs'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info failed_requests_json.timestamp_msecs '
+                'Session info failed_requests.timestamp_msecs '
                 'should be an int.'
             )
         status_text = entry.get('status_text')
         if status_text is not None:
             if not isinstance(status_text, str):
                 raise base.BaseHandler.InvalidInputException(
-                    'status_text in failed_requests_json should be a string.'
+                    'status_text in failed_requests should be a string.'
                 )
             if len(status_text) > feconf.MAX_SESSION_INFO_STATUS_TEXT_LENGTH:
                 raise base.BaseHandler.InvalidInputException(
-                    'status_text in failed_requests_json exceeds maximum length of %d characters.'
+                    'status_text in failed_requests exceeds maximum length of %d characters.'
                     % feconf.MAX_SESSION_INFO_STATUS_TEXT_LENGTH
                 )
         error_message = entry.get('error_message')
         if error_message is not None:
             if not isinstance(error_message, str):
                 raise base.BaseHandler.InvalidInputException(
-                    'error_message in failed_requests_json should be a string.'
+                    'error_message in failed_requests should be a string.'
                 )
             if len(error_message) > feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH:
                 raise base.BaseHandler.InvalidInputException(
-                    'error_message in failed_requests_json exceeds maximum length of %d characters.'
+                    'error_message in failed_requests exceeds maximum length of %d characters.'
                     % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH
                 )
-    for entry in navigation_history_json:
+    for entry in navigation_history:
         if not isinstance(entry, dict):
             raise base.BaseHandler.InvalidInputException(
-                'navigation_history_json should be a list of dicts.'
+                'navigation_history should be a list of dicts.'
             )
         path = entry.get('path')
         if not isinstance(path, str):
             raise base.BaseHandler.InvalidInputException(
-                'path in navigation_history_json should be a string.'
+                'path in navigation_history should be a string.'
             )
         if len(path) > feconf.MAX_PAGE_URL_LENGTH:
             raise base.BaseHandler.InvalidInputException(
-                'path in navigation_history_json exceeds maximum length of %d characters.'
+                'path in navigation_history exceeds maximum length of %d characters.'
                 % feconf.MAX_PAGE_URL_LENGTH
             )
         if not isinstance(entry.get('timestamp_msecs'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info navigation_history_json.timestamp_msecs '
+                'Session info navigation_history.timestamp_msecs '
                 'should be an int.'
             )
 
-    user_agent = environment_json.get('user_agent')
+    user_agent = environment.get('user_agent')
     if not isinstance(user_agent, str):
         raise base.BaseHandler.InvalidInputException(
-            'user_agent in environment_json should be a string.'
+            'user_agent in environment should be a string.'
         )
     if len(user_agent) > feconf.MAX_SESSION_INFO_USER_AGENT_LENGTH:
         raise base.BaseHandler.InvalidInputException(
-            'user_agent in environment_json exceeds maximum length of %d characters.'
+            'user_agent in environment exceeds maximum length of %d characters.'
             % feconf.MAX_SESSION_INFO_USER_AGENT_LENGTH
         )
-    page = environment_json.get('page')
+    page = environment.get('page')
     if not isinstance(page, dict):
         raise base.BaseHandler.InvalidInputException(
-            'page in environment_json should be a dict.'
+            'page in environment should be a dict.'
         )
     for key in ('url', 'title'):
         if not isinstance(page.get(key), str):
@@ -637,7 +605,7 @@ def validate_general_feedback_session_info_log_entries(
 
     normalized_page_url = validate_general_feedback_page_url(page['url'])
 
-    viewport_info = environment_json.get('viewport')
+    viewport_info = environment.get('viewport')
     if not isinstance(viewport_info, dict):
         raise base.BaseHandler.InvalidInputException(
             'Session info viewport should be a dict.'
@@ -648,7 +616,7 @@ def validate_general_feedback_session_info_log_entries(
                 'Session info viewport.%s should be an int.' % key
             )
 
-    locale_info = environment_json.get('locale')
+    locale_info = environment.get('locale')
     if not isinstance(locale_info, dict):
         raise base.BaseHandler.InvalidInputException(
             'Session info locale should be a dict.'
@@ -668,8 +636,8 @@ def validate_general_feedback_session_info_log_entries(
             'Session info locale.direction should be "ltr" or "rtl".'
         )
 
-    client_time_msecs = environment_json.get('client_time_msecs')
-    timezone_offset_mins = environment_json.get('timezone_offset_mins')
+    client_time_msecs = environment.get('client_time_msecs')
+    timezone_offset_mins = environment.get('timezone_offset_mins')
     if not isinstance(client_time_msecs, int):
         raise base.BaseHandler.InvalidInputException(
             'Session info client_time_msecs should be an int.'
@@ -680,10 +648,10 @@ def validate_general_feedback_session_info_log_entries(
         )
 
     return {
-        'console_logs_json': console_logs_json,
-        'failed_requests_json': failed_requests_json,
-        'navigation_history_json': navigation_history_json,
-        'environment_json': {
+        'console_logs': console_logs,
+        'failed_requests': failed_requests,
+        'navigation_history': navigation_history,
+        'environment': {
             'client_time_msecs': client_time_msecs,
             'timezone_offset_mins': timezone_offset_mins,
             'user_agent': user_agent,
@@ -703,111 +671,116 @@ def validate_general_feedback_session_info_log_entries(
     }
 
 
-# Here we use object because session-info diagnostics are heterogeneous
-# JSON-like payloads (nested dict/list values) from client logs.
-def validate_general_feedback_submit_payload_coupling(
-    payload: general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict,
+def validate_lesson_feedback_submit_payload_coupling(
+    payload: general_feedback_domain.FeedbackSubmitPayloadDict,
 ) -> None:
-    """Validates the coupling between different fields of the payload for
-    feedback submission.
+    """Validates cross-field constraints for FeedbackSubmitHandler POST payload."""
+    feedback_text = payload.get('feedback_text', '')
+    if not isinstance(feedback_text, str) or not feedback_text.strip():
+        raise base.BaseHandler.InvalidInputException(
+            'feedback_text must not be empty.'
+        )
 
-    Args:
-        payload: dict. The payload to be validated.
-    """
-    include_session_info = bool(payload.get('include_session_info'))
+    lesson_metadata = payload.get('lesson_metadata')
+    if lesson_metadata is None:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata is required for lesson feedback.'
+        )
+
+    validate_lesson_metadata_fields(lesson_metadata)
+
+
+def validate_platform_feedback_submit_payload_coupling(
+    payload: general_feedback_domain.PlatformFeedbackSubmitPayloadDict,
+) -> None:
+    """Validates cross-field constraints for PlatformFeedbackSubmitHandler POST."""
+    report_message = payload.get('report_message', '')
+    if not isinstance(report_message, str) or not report_message.strip():
+        raise base.BaseHandler.InvalidInputException(
+            'report_message must not be empty.'
+        )
+
+    source = payload.get('source')
+    lesson_metadata = payload.get('lesson_metadata')
+    if source == 'lesson':
+        if lesson_metadata is None:
+            raise base.BaseHandler.InvalidInputException(
+                'lesson_metadata is required for lesson reports.'
+            )
+        validate_lesson_metadata_fields(lesson_metadata)
+
+    elif source == 'app':
+        category = payload.get('category')
+        if category is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'category must be omitted for site reports.'
+            )
+        if lesson_metadata is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'lesson_metadata must be omitted for site reports.'
+            )
+
+    include_technical_logs = payload.get('include_technical_logs', False)
     session_info = payload.get('session_info')
-    if include_session_info and session_info is None:
+
+    if include_technical_logs and session_info is None:
         raise base.BaseHandler.InvalidInputException(
-            'Session info must be provided if include_session_info is True.'
+            'session_info must be provided when include_technical_logs is True.'
         )
-
-    if not include_session_info and session_info is not None:
+    if not include_technical_logs and session_info is not None:
         raise base.BaseHandler.InvalidInputException(
-            'Session info should not be provided when '
-            'include_session_info is False.'
+            'session_info must be omitted when include_technical_logs is False.'
         )
-
-    description = payload.get('description')
-    if not isinstance(description, str) or not description.strip():
-        raise base.BaseHandler.InvalidInputException('Description is required.')
-
-    category = payload.get('category')
-    target_type = payload.get('target_type')
-    target_id = payload.get('target_id')
-
-    if category == 'lesson':
-        if target_type != 'exploration':
-            raise base.BaseHandler.InvalidInputException(
-                'Lesson feedback requires target_type=exploration.'
-            )
-
-        if not target_id:
-            raise base.BaseHandler.InvalidInputException(
-                'Lesson feedback requires target_id.'
-            )
-
-    elif category == 'platform':
-        if target_type != 'general':
-            raise base.BaseHandler.InvalidInputException(
-                'Platform feedback requires target_type=general.'
-            )
-
-        if target_id is not None:
-            raise base.BaseHandler.InvalidInputException(
-                'Platform feedback should not specify target_id.'
-            )
 
     screenshot_filename = payload.get('screenshot_filename')
     screenshot_file = payload.get('screenshot_file')
 
-    if screenshot_filename is None and screenshot_file:
-        raise base.BaseHandler.InvalidInputException(
-            'Screenshot file requires a screenshot filename.'
-        )
-
     if screenshot_filename is not None and screenshot_file is None:
         raise base.BaseHandler.InvalidInputException(
-            'Screenshot filename requires screenshot file data.'
+            'screenshot_file is required when screenshot_filename is provided.'
         )
-
-    if (
-        screenshot_filename is not None
-        and isinstance(screenshot_filename, str)
-        and re.fullmatch(
-            utils.get_image_filename_regex_pattern(),
-            screenshot_filename,
-        )
-        is None
-    ):
+    if screenshot_file is not None and screenshot_filename is None:
         raise base.BaseHandler.InvalidInputException(
-            'Screenshot filename is invalid.'
+            'screenshot_filename is required when screenshot_file is provided.'
+        )
+    if screenshot_filename is not None and isinstance(screenshot_filename, str):
+        if (
+            re.fullmatch(
+                utils.get_image_filename_regex_pattern(),
+                screenshot_filename,
+            )
+            is None
+        ):
+            raise base.BaseHandler.InvalidInputException(
+                'screenshot_filename is invalid.'
+            )
+
+
+def validate_lesson_metadata_fields(
+    lesson_metadata: general_feedback_domain.LessonMetadataDict,
+) -> general_feedback_domain.LessonMetadataDict:
+    """Validates field presence and types within a lesson_metadata dict."""
+    exploration_id = lesson_metadata.get('exploration_id')
+    if not isinstance(exploration_id, str) or not exploration_id:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata.exploration_id must be a non-empty string.'
         )
 
+    exploration_version = lesson_metadata.get('exploration_version')
+    if not isinstance(exploration_version, int) or exploration_version < 0:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata.exploration_version must be an integer.'
+        )
 
-def validate_general_feedback_screenshot_file(
-    screenshot_file: Optional[Dict[str, str]],
-) -> Optional[Dict[str, str]]:
-    """Validates the screenshot file.
+    state_name = lesson_metadata.get('state_name')
+    if not isinstance(state_name, str) or not state_name:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata.state_name must be a non-empty string.'
+        )
 
-    Args:
-        screenshot_file: dict. The screenshot file to be validated.
-
-    Returns:
-        dict. The validated screenshot file.
-    """
-    if screenshot_file is None:
-        return None
-
-    files = screenshot_file
-
-    if len(files) > 1:
-        raise utils.ValidationError('Only one screenshot file is allowed.')
-
-    for filename, encoded_data in files.items():
-        if not isinstance(filename, str):
-            raise utils.ValidationError('Filename should be a string.')
-
-        if not isinstance(encoded_data, str):
-            raise utils.ValidationError('Screenshot data should be a string.')
-
-    return files
+    state_index = lesson_metadata.get('state_index')
+    if not isinstance(state_index, int) or state_index < 0:
+        raise base.BaseHandler.InvalidInputException(
+            'lesson_metadata.state_index must be a non-negative integer.'
+        )
+    return lesson_metadata

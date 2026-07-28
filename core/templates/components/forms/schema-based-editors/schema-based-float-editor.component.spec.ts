@@ -70,12 +70,10 @@ describe('Schema based float editor component', function () {
       {
         id: 'is_at_least',
         min_value: 1.1,
-        max_value: 2.2,
       },
       {
         id: 'is_at_most',
         max_value: 3.5,
-        min_value: 4.4,
       },
     ];
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);

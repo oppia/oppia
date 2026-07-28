@@ -212,14 +212,17 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'name': 'blog-admin/assign-roles',
                                 'module': 'blog-admin/assign-roles.spec.ts',
+                                'framework': 'puppeteer',
                             },
                             {
                                 'name': 'blog-editor/publish',
                                 'module': 'blog-editor/publish.spec.ts',
+                                'framework': 'puppeteer',
                             },
                             {
                                 'name': 'exploration-player/view-exploration',
                                 'module': 'exploration-player/view-exploration.spec.ts',
+                                'framework': 'playwright',
                             },
                         ],
                     }
@@ -362,14 +365,27 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     {
                         'name': 'blog-admin/assign-roles',
                         'module': 'blog-admin/assign-roles.spec.ts',
+                        'framework': 'puppeteer',
                     },
                     {
                         'name': 'blog-editor/publish',
                         'module': 'blog-editor/publish.spec.ts',
+                        'framework': 'puppeteer',
                     },
                     {
                         'name': 'exploration-player/view-exploration',
                         'module': 'exploration-player/view-exploration.spec.ts',
+                        'framework': 'playwright',
+                    },
+                ],
+            },
+            'acceptance_playwright': {
+                'count': 1,
+                'suites': [
+                    {
+                        'name': 'exploration-player/view-exploration',
+                        'module': 'exploration-player/view-exploration.spec.ts',
+                        'framework': 'playwright',
                     },
                 ],
             },
@@ -745,6 +761,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
                                 'lighthouse_accessibility': {
                                     'count': 0,
                                     'suites': [],
@@ -815,6 +835,17 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         {
                                             'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
                                             'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'playwright',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',
+                                            'module': 'exploration-player/view-exploration.spec.ts',
+                                            'framework': 'playwright',
                                         }
                                     ],
                                 },
@@ -884,6 +915,17 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         {
                                             'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
                                             'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'playwright',
+                                        }
+                                    ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 1,
+                                    'suites': [
+                                        {
+                                            'name': 'exploration-player/view-exploration',
+                                            'module': 'exploration-player/view-exploration.spec.ts',
+                                            'framework': 'playwright',
                                         }
                                     ],
                                 },
@@ -922,6 +964,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
+                                    'count': 0,
+                                    'suites': [],
+                                },
+                                'acceptance_playwright': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -965,6 +1011,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                 {
                     'name': 'blog-admin/create-blog-post',
                     'module': 'blog-admin/create-blog-post.spec.ts',
+                    'framework': 'puppeteer',
                 }
             )
 
@@ -997,8 +1044,13 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         {
                                             'name': 'blog-admin/create-blog-post',  # pylint: disable=line-too-long
                                             'module': 'blog-admin/create-blog-post.spec.ts',  # pylint: disable=line-too-long
+                                            'framework': 'puppeteer',
                                         }
                                     ],
+                                },
+                                'acceptance_playwright': {
+                                    'count': 0,
+                                    'suites': [],
                                 },
                                 'lighthouse_accessibility': {
                                     'count': 0,

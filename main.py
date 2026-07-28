@@ -42,7 +42,6 @@ from core.controllers import (
     custom_landing_pages,
     diagnostic_test_player,
     editor,
-    email_dashboard,
     feature_flag,
     features,
     feedback,
@@ -329,6 +328,24 @@ URLS = [
         access_validators.PracticeSessionAccessValidationPage,
     ),
     get_redirect_route(
+        r'%s/can_access_practice_session_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/practice/<node_id>'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.PracticeSessionAccessValidationPage,
+    ),
+    get_redirect_route(
+        r'%s/can_access_practice_session_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/test/arc/<arc_id>'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.PracticeSessionAccessValidationPage,
+    ),
+    get_redirect_route(
+        r'%s/can_access_practice_session_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/mastery-challenge'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.PracticeSessionAccessValidationPage,
+    ),
+    get_redirect_route(
         r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
         r'/<topic_url_fragment>' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler,
@@ -354,6 +371,11 @@ URLS = [
         r'/<topic_url_fragment>/practice'
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler,
+    ),
+    get_redirect_route(
+        r'%s/can_access_technical_feedback_dashboard'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TechnicalFeedbackDashboardAccessValidationHandler,
     ),
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -530,6 +552,16 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        practice_sessions.PracticeSessionsPageDataHandler,
+    ),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<node_id>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        practice_sessions.PracticeSessionsPageDataHandler,
+    ),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/arc/<arc_id>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler,
     ),
     get_redirect_route(
@@ -1058,21 +1090,25 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.GENERAL_FEEDBACK_SUBMISSION_URL,
-        general_feedback.GeneralFeedbackSubmitHandler,
+        r'%s' % feconf.LESSON_FEEDBACK_URL,
+        general_feedback.LessonFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>/<report_id>'
+        % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackDetailHandler,
+    ),
+    get_redirect_route(
+        r'%s/<dashboard>/<dashboard_id>' % feconf.PLATFORM_FEEDBACK_URL,
+        general_feedback.PlatformFeedbackListHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
         general_feedback.GeneralFeedbackCaptchaConfigHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackListHandler,
-    ),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>'
-        % feconf.CREATOR_FEEDBACK_HANDLER_URL,
-        general_feedback.CreatorFeedbackDetailHandler,
     ),
     get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler
@@ -1221,20 +1257,6 @@ URLS = [
     get_redirect_route(
         r'%s/<story_id>' % feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler,
-    ),
-    get_redirect_route(
-        r'/emaildashboarddatahandler', email_dashboard.EmailDashboardDataHandler
-    ),
-    get_redirect_route(
-        r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler
-    ),
-    get_redirect_route(
-        r'/emaildashboardcancelresult/<query_id>',
-        email_dashboard.EmailDashboardCancelEmailHandler,
-    ),
-    get_redirect_route(
-        r'/emaildashboardtestbulkemailhandler/<query_id>',
-        email_dashboard.EmailDashboardTestBulkEmailHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.EXPLORATION_METADATA_SEARCH_URL,
@@ -1435,6 +1457,10 @@ URLS = [
         feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER,
         certificate_assessment.CertificateAssessmentOfferingByIdHandler,
     ),
+    get_redirect_route(
+        feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+        certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
+    ),
 ]
 
 # Adding redirects for topic landing pages.
@@ -1495,6 +1521,18 @@ URLS.extend(
                 feconf.TOPIC_VIEWER_URL_PREFIX,
                 feconf.PRACTICE_SESSION_URL_PREFIX,
             ),
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'%s/practice/<node_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'%s/test/arc/<arc_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
+            r'%s/mastery-challenge' % feconf.TOPIC_VIEWER_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(

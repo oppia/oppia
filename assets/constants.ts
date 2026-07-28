@@ -94,6 +94,7 @@ export default {
   "ACTIVITY_TYPE_EXPLORATION_VOICEOVERS": "exp_voiceovers",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
+  "ACTIVITY_TYPE_STORY_MIGRATION": "story_migration",
   "ACTIVITY_TYPE_SKILL": "skill",
   "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
   "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION": "subtopic_with_study_guide_migration",
@@ -170,6 +171,9 @@ export default {
 
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
+
+  // The default state name for translation suggestions of non-exploration entities.
+  "DEFAULT_SUGGESTION_STATE_NAME": "Generic Content",
 
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
@@ -6213,6 +6217,13 @@ export default {
     "Hard": 0.9
   },
 
+  // Certificate assessment question difficulty.
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY": "easy",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM": "medium",
+  "CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD": "hard",
+
+  "QUESTIONS_PER_TOPIC": 3,
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
@@ -6563,107 +6574,50 @@ export default {
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
   "MAX_REVIEW_MESSAGE_LENGTH": 2000,
 
-  "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
-    {
-      "backend_id": "user_inactivity",
-      "backend_attr": "inactive_in_last_n_days",
-      "description": "Inactive in last n days",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "user_login_activity",
-      "backend_attr": "has_not_logged_in_for_n_days",
-      "description": "Has not logged in for n days",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "minimum_exp_created",
-      "backend_attr": "created_at_least_n_exps",
-      "description": "Has created at least n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "maximum_exp_created",
-      "backend_attr": "created_fewer_than_n_exps",
-      "description": "Has created fewer than n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "minimum_exp_edited",
-      "backend_attr": "edited_at_least_n_exps",
-      "description": "Has edited at least n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "maximum_exp_edited",
-      "backend_attr": "edited_fewer_than_n_exps",
-      "description": "Has edited fewer than n explorations",
-      "schema": {
-        "type": "int",
-        "validators": [{
-          "id": "is_at_least",
-          "min_value": 0
-        }]
-      },
-      "default_value": null
-    },
-    {
-      "backend_id": "created_collection",
-      "backend_attr": "created_collection",
-      "description": "Has created collection",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
-    }
-  ],
-
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
-    "CERTIFICATE_OFFERING_DASHBOARD": {
-      "ROUTE": "certificate-offering-dashboard",
-      "TITLE": "Certificate Offering Dashboard | Oppia",
+    "TECHNICAL_FEEDBACK_DASHBOARD": {
+      "ROUTE": "technical-feedback-dashboard",
+      "TITLE": "Technical Feedback Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "TECHNICAL_FEEDBACK_DETAIL": {
+      "ROUTE": "technical-feedback-dashboard/:team/:reportId",
+      "TITLE": "Technical Feedback Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "CERTIFICATE_CREATOR_DASHBOARD": {
+      "ROUTE": "certificate-creator-dashboard",
+      "TITLE": "Certificate Creator Dashboard | Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6676,6 +6630,25 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "CERTIFICATE_OFFERING_AVAILABLE": {
+      "ROUTE": "learn/:classroomUrlFragment/certificate-offering-available",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "TITLE": "Certificate Offering Available | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned from your classroom."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned from your classroom."
         }
       ]
     },
@@ -6870,24 +6843,6 @@ export default {
         }
       ]
     },
-    "EMAIL_DASHBOARD": {
-      "ROUTE": "emaildashboard",
-      "TITLE": "Email Dashboard - Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
-    },
     "DIAGNOSTIC_TEST_PLAYER": {
       "ROUTE": "diagnostic-test-player",
       "TITLE": "Diagnostic Test Player - Oppia",
@@ -6903,6 +6858,24 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "CERTIFICATE_ASSESSMENT_PLAYER": {
+      "ROUTE": "certificate-assessment/:certificate_id",
+      "TITLE": "Certificate Assessment Player | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
         }
       ]
     },
@@ -7408,6 +7381,72 @@ export default {
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "NODE_PRACTICE_SESSION": {
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/practice/:node_id",
+      "TITLE": "Practice Session Page",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "END_OF_ARC_TEST": {
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/test/arc/:arc_id",
+      "TITLE": "End-of-Arc Test",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "MASTERY_CHALLENGE": {
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/mastery-challenge",
+      "TITLE": "Mastery Challenge",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",

@@ -17,14 +17,20 @@
  */
 
 import {ViewportSize} from '@playwright/test';
-import {Page, ElementHandle} from '@playwright/test';
+import test, {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import fs from 'fs';
+
+const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+
+const pagesWithDialogHandler = new WeakSet<Page>();
 
 const usernameInputSelector = 'input.e2e-test-username-input';
 const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
@@ -41,7 +47,10 @@ export class BaseUser {
   constructor(page: Page) {
     this.page = page;
     BaseUser.instances.push(this);
-    this.installPageDialogHandler();
+    if (!pagesWithDialogHandler.has(page)) {
+      this.installPageDialogHandler();
+      pagesWithDialogHandler.add(page);
+    }
   }
 
   /**
@@ -75,6 +84,8 @@ export class BaseUser {
     }
   }
 
+  // TODO(#26646): Remove this pre-installed handler in favor of
+  // explicit per-flow dialog handling.
   /**
    * Installs a dialog handler on the page that automatically accepts known
    * browser alerts and throws on unexpected ones.
@@ -119,7 +130,7 @@ export class BaseUser {
   }
 
   /**
-   * * This function types the text in the input field using its CSS selector or ElementHandle.
+   * This function types the text in the input field using its CSS selector or ElementHandle.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the input field.
    * @param {string} text - The text to type.
    */
@@ -199,6 +210,73 @@ export class BaseUser {
   }
 
   /**
+   * Finds and clicks an element matching the given selector whose text content
+   * equals the given text.
+   * @param {string} selector - The CSS selector to query elements.
+   * @param {string} text - The exact text content to match.
+   */
+  async clickOnElementWithSelectorAndText(
+    selector: string,
+    text: string
+  ): Promise<void> {
+    const locator = this.page.locator(selector).filter({hasText: text});
+    await locator.first().waitFor({state: 'visible'});
+    await locator.first().click();
+  }
+
+  /**
+   * Clicks on an anchor element with the given inner text and verifies that the
+   * target page URL contains the given URL.
+   * @param {string} anchorInnerText The inner text of the anchor element.
+   * @param {string} targetPageUrl The URL of the target page.
+   * @param {Page} context The context in which the anchor element is located.
+   */
+  async clickAndVerifyAnchorWithInnerText(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: Page = this.page
+  ): Promise<void> {
+    // Get an anchor element with the given inner text.
+    await context.waitForSelector('a');
+    const anchorElements = await context.$$('a');
+    let element: ElementHandle<Element> | null = null;
+    for (const anchorElement of anchorElements) {
+      const innerText = await anchorElement.evaluate(el =>
+        (el as HTMLAnchorElement).innerText.trim()
+      );
+      if (innerText === anchorInnerText) {
+        element = anchorElement;
+        break;
+      }
+    }
+    if (!element) {
+      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+    }
+
+    // Check if anchor target is the same as the current page.
+    const isTargetSamePage = await element.evaluate(el => {
+      return (el as HTMLAnchorElement).target !== '_blank';
+    });
+    if (!isTargetSamePage) {
+      showMessage('Anchor target is not the same as the current page.');
+      const newTabPromise = context.context().waitForEvent('page');
+      await this.clickOnElement(element);
+      const newTabPage = await newTabPromise;
+      await newTabPage.waitForLoadState();
+      expect(newTabPage).toBeDefined();
+      // Use startsWith instead of exact match because external sites may add
+      // query parameters (e.g., UTM params, Cloudflare challenge tokens, etc.).
+      expect(newTabPage.url().startsWith(targetPageUrl)).toBe(true);
+      await newTabPage.close();
+    } else {
+      showMessage('Anchor target is the same as the current page.');
+      await this.clickOnElement(element);
+      await this.expectPageURLToContain(targetPageUrl, context);
+      await context.goBack();
+    }
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {
@@ -263,20 +341,20 @@ export class BaseUser {
    * Waits for the given element to be attached in the DOM.
    * @param {string} selector - The selector of the element to wait for.
    * @param {Page} context - The page on which the selector should be verified.
-   * @param {number} timeout - The maximum time to wait in milliseconds.
-   * If not provided, Playwright's default timeout is used (30 seconds).
+   * @param {number} timeout - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
+   * @returns {Promise<ElementHandle<Element> | undefined>} The matched element handle, or undefined if it was not found.
    */
   async expectElementToBeAttachedInDOM(
     selector: string,
     context: Page = this.page,
-    timeout?: number
-  ): Promise<void> {
-    const options: {state: 'attached'; timeout?: number} = {
+    timeout: number = 30000
+  ): Promise<ElementHandle<Element> | undefined> {
+    const element = await context.waitForSelector(selector, {
       state: 'attached',
-      ...(timeout !== undefined && {timeout}),
-    };
-    await context.waitForSelector(selector, options);
+      timeout,
+    });
     showMessage(`Element ${selector} is attached in DOM.`);
+    return (element ?? undefined) as ElementHandle<Element> | undefined;
   }
 
   /**
@@ -284,21 +362,58 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to verify.
    * @param {boolean} visibility - Whether the element should be visible or not.
    * @param {Page} context - The page on which the selector should be verified.
-   * @param {number} timeout - The maximum time to wait in milliseconds.
-   * If not provided, Playwright's default timeout is used (30 seconds).
+   * @param {number} timeout - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
+   * @returns {Promise<ElementHandle<Element> | undefined>} The matched element handle, or undefined if it was not found.
    */
   async expectElementToBeVisible(
     selector: string,
     visibility: boolean = true,
     context: Page = this.page,
-    timeout?: number
-  ): Promise<void> {
-    const options: {state: 'visible' | 'hidden'; timeout?: number} = {
+    timeout: number = 30000
+  ): Promise<ElementHandle<Element> | undefined> {
+    const element = await context.waitForSelector(selector, {
       state: visibility ? 'visible' : 'hidden',
-      ...(timeout !== undefined && {timeout}),
-    };
-    await context.waitForSelector(selector, options);
+      timeout,
+    });
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
+    return (element ?? undefined) as ElementHandle<Element> | undefined;
+  }
+
+  /**
+   * Verifies that the element value matches the expected value.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector of the element.
+   * @param {string} value - The expected value.
+   */
+  async expectElementValueToBe(
+    selector: string | ElementHandle,
+    value: string
+  ): Promise<void> {
+    // Change the selector to the actual element.
+    if (typeof selector === 'string') {
+      await this.expectElementToBeVisible(selector);
+      selector = await this.getElementInParent(selector);
+    }
+
+    // Wait until the element value matches the expected value.
+    try {
+      await this.page.waitForFunction(
+        ({element, value}: {element: Node; value: string}) => {
+          const el = element as HTMLInputElement | HTMLTextAreaElement;
+          return el.value.trim() === value;
+        },
+        {element: selector, value},
+        {timeout: 60000}
+      );
+    } catch (error) {
+      const actualValue = await (selector as ElementHandle).evaluate(
+        el => (el as HTMLInputElement).value
+      );
+      throw new Error(
+        `Element does not have the expected value "${value}". ` +
+          `Found "${actualValue}".\n` +
+          `Original Error: ${error instanceof Error ? error.stack : String(error)}`
+      );
+    }
   }
 
   /**
@@ -324,7 +439,7 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    // Clicking three times on a line of text selects all the text.
+    // Using Control+A to select all text, then Backspace to delete it.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
     await element.click();
@@ -332,6 +447,71 @@ export class BaseUser {
     await this.page.keyboard.press('A');
     await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
+  }
+
+  /**
+   * Verify text content inside an element, waiting until it matches expected text.
+   * @param selector - The selector of the element to get text from.
+   * @param expectedText - The expected text content.
+   */
+  async expectElementContentToContain(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        ({selector, text}: {selector: string; text: string}) => {
+          const el = document.querySelector(selector);
+          return el && el.textContent?.includes(text);
+        },
+        {selector, text: expectedText}
+      );
+    } catch (err) {
+      const currentText = await this.getTextContent(selector);
+      throw new Error(
+        `Text did not match within timeout.\nSelector: "${selector}"\nExpected: "${expectedText}"\nActual: "${currentText}"`
+      );
+    }
+  }
+
+  /**
+   * Checks if element is clickable or not.
+   * @param {string | ElementHandle<Element>} selector - The selector or ElementHandle of the element to check.
+   * @param {boolean} clickable - Whether the element should be clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string | ElementHandle<Element>,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    await this.page.waitForFunction(
+      ({element, clickable, clickableFn}) => {
+        const fn = new Function(
+          'element',
+          'clickable',
+          `return (${clickableFn})(element, clickable)`
+        );
+        return fn(element, clickable);
+      },
+      {element, clickable, clickableFn: isElementClickable.toString()},
+      {timeout: 30000}
+    );
+  }
+
+  /**
+   * Function to verify the number of elements matching a selector.
+   * @param {string} selector - The selector to match elements.
+   * @param {number} count - The expected number of elements.
+   */
+  async expectNumberOfElementsToBe(
+    selector: string,
+    count: number
+  ): Promise<void> {
+    const elements = await this.page.$$(selector);
+    expect(elements.length).toBe(count);
   }
 
   /**
@@ -350,11 +530,20 @@ export class BaseUser {
 
     try {
       await this.page.waitForFunction(
-        ({selector, text}: {selector: string; text: string}) => {
-          const element = document.querySelector(selector);
+        ({
+          selector,
+          text,
+          context,
+        }: {
+          selector: string;
+          text: string;
+          context: Element | null;
+        }) => {
+          const root = context ?? document;
+          const element = root.querySelector(selector);
           return element && element.textContent?.trim() === text.trim();
         },
-        {selector, text}
+        {selector, text, context}
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
@@ -423,10 +612,14 @@ export class BaseUser {
     // The toast message disappears after a few seconds, so we need to process
     // the toastMessageElement as soon as we receive it. Otherwise, the text
     // within it may no longer be showing at the time of evaluation.
-    const toastMessageElement = await this.page.waitForSelector(
-      toastMessageSelector,
-      {state: 'visible'}
-    );
+    const toastMessageElement =
+      await this.expectElementToBeVisible(toastMessageSelector);
+    if (!toastMessageElement) {
+      throw new Error(
+        `Toast message element with selector "${toastMessageSelector}" is not available.`
+      );
+    }
+
     const toastMessage = await this.page.evaluate(
       el => el.textContent?.trim() || '',
       toastMessageElement
@@ -438,9 +631,152 @@ export class BaseUser {
       );
     }
     if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
+      await this.clickOnElementWithSelector(toastMessageSelector);
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
+   * Function to expect the page to have no translation ids.
+   */
+  async expectPageHasNoTranslationIds(): Promise<void> {
+    const translationIds = await this.page.$$eval('[translate]', elements =>
+      elements
+        .map(el => el.getAttribute('translate'))
+        .filter(val => val && val.startsWith('I18N'))
+    );
+
+    if (translationIds.length > 0) {
+      throw new Error(
+        `Page has untranslated strings: ${translationIds.join(', ')}`
+      );
+    }
+    showMessage('Success: Page has no translation ids.');
+  }
+
+  /**
+   * This function checks if the page URL contains the given URL.
+   * @param {string} url - The URL to check.
+   * @param {Page} context - The page on which the URL should be checked.
+   */
+  async expectPageURLToContain(
+    url: string,
+    context: Page = this.page
+  ): Promise<void> {
+    await context.waitForFunction((url: string) => {
+      return window.location.href.includes(url);
+    }, url);
+  }
+
+  /**
+   * This function compares the current page screenshot with a reference image.
+   * @param {string} imageName - The name for the image
+   * @param {Page|undefined} newPage - The page to take screenshot from. If not
+   *     specified, uses this.page instead.
+   * @param {Parameters<Page['screenshot']>[0]} options - Additional options for the screenshot comparison.
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    newPage: Page | undefined = undefined,
+    options: Parameters<Page['screenshot']>[0] = {}
+  ): Promise<void> {
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(-1, -1);
+    await currentPage.waitForTimeout(5000);
+
+    const snapshotPath = test
+      .info()
+      .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
+
+    if (
+      !fs.existsSync(snapshotPath) &&
+      process.env.UPDATE_SNAPSHOTS !== 'true'
+    ) {
+      throw new Error(
+        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
+          'Run with --update_snapshots to generate it.'
+      );
+    }
+
+    let failureTrigger = 0;
+
+    if (this.isViewportAtMobileWidth()) {
+      failureTrigger += 0.048;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      failureTrigger += 0.04;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
+
+    await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
+      maxDiffPixelRatio: failureTrigger,
+      ...options,
+    });
+  }
+
+  /**
+   * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} textContent - The expected text content.
+   */
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      ({selector, value}: {selector: string; value: string}) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {selector, value: textContent},
+      {timeout: 60000}
+    );
+  }
+
+  /**
+   * Finds child element in parent by matching text values.
+   * @param {Page | ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {Record<string, string>} selectors - Relevant selectors.
+   * @param {string} criteria - Title value to match.
+   */
+  async findChildElementInParent(
+    parentElement: Page | ElementHandle | undefined,
+    selectors: Record<string, string>,
+    criteria: string
+  ): Promise<ElementHandle | undefined> {
+    let targetElement;
+    let lastHeadingText: string | undefined;
+
+    const allElements = await parentElement?.$$(selectors.content);
+    for (const h of allElements || []) {
+      const targetHeadingElement = await h.$(selectors.heading);
+      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
+        ele.textContent?.trim()
+      );
+      lastHeadingText = targetHeadingText || undefined;
+      showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
+      if (targetHeadingText === criteria) {
+        targetElement = h;
+        break;
+      }
+    }
+
+    if (!targetElement) {
+      throw new Error(
+        `Element with selectors: ${JSON.stringify(
+          selectors
+        )} and criteria: ${criteria} is not found. Last heading seen: ${lastHeadingText}`
+      );
+    }
+    return targetElement;
   }
 
   /**
@@ -462,6 +798,19 @@ export class BaseUser {
   }
 
   /**
+   * Returns text in nested element
+   * @param {string} selector - The selector of the element to get text from.
+   */
+  async getTextContent(selector: string): Promise<string> {
+    const element = await this.page.$(selector);
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent,
+      element as ElementHandle<Element>
+    );
+    return text?.trim() ?? '';
+  }
+
+  /**
    * Close a single user's browser context.
    */
   async closeBrowser(): Promise<void> {
@@ -476,6 +825,15 @@ export class BaseUser {
 
   /**
    * The function clicks an element and waits until the new page is fully loaded.
+   *
+   * @deprecated This function relies on `page.waitForNavigation()`, which can be
+   * flaky — it may hang on SPA route changes that don't trigger a full navigation
+   * event, or race the click if navigation starts before the listener attaches.
+   * Prefer clicking the element and then asserting that an element unique to the
+   * destination page is visible (e.g. via `expectElementToBeVisible`) instead of
+   * using this function, unless a full page navigation is genuinely required and
+   * no other verification is possible.
+   *
    * @param {string} selector - The selector of button to click.
    * @param {boolean} useSelector - Whether to use the selector or the text.
    * @param {number} timeout - The maximum time to wait for navigation in milliseconds. Defaults to 60000.
@@ -645,11 +1003,6 @@ export class BaseUser {
           },
           element
         );
-        await this.page.evaluate(({el, a, b}) => isElementClickable(el, a, b), {
-          el: element,
-          a: true,
-          b: true,
-        });
         const reasonsText =
           clickabilityDiagnostics.reasons.length > 0
             ? clickabilityDiagnostics.reasons
@@ -720,6 +1073,34 @@ export class BaseUser {
   }
 
   /**
+   * Waits for the network to become idle on the given page.
+   *
+   * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
+   * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
+   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
+   * almost all cases and for the page to fully load.
+   *
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   * @param {Page} context - The page on which to wait for network idle. Default is this.page.
+   */
+  async waitForNetworkIdle(
+    timeout: number = 30000,
+    context: Page = this.page
+  ): Promise<void> {
+    try {
+      await context.waitForLoadState('networkidle', {timeout});
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        showMessage(
+          'Network did not become idle within the specified timeout, but we can continue.'
+        );
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
    * Gets a human-readable description of an element for logging purposes.
    * If a string selector is provided, returns it directly.
    * If an ElementHandle is provided, extracts tag name and key attributes.
@@ -755,9 +1136,11 @@ export class BaseUser {
    * @param {string} selector - The CSS selector of the element to click on.
    * @param {ElementHandle<Element>} parentElement - The parent element to search within.
    * @param {number} elementPlace - 1-based index to select nth element with the given selector.
+   * @param {Parameters<ElementHandle['click']>[0]} options - Click options.
    */
   async clickOnElementWithSelector(
     selector: string,
+    options: Parameters<ElementHandle['click']>[0] = {},
     parentElement?: ElementHandle | null,
     elementPlace?: number
   ): Promise<void> {
@@ -782,7 +1165,7 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for selector ${selector}`);
     }
-    await this.clickOnElement(element);
+    await this.clickOnElement(element, options);
     showMessage(`Element (selector: ${selector}) clicked.`);
   }
 
@@ -803,9 +1186,44 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.expectElementToBeVisible(
+      `xpath=//mat-chip[contains(text(), '${textContent}')]`
+    );
+    return matChipElement as ElementHandle<Element>;
+  }
+
+  /**
+   * Selects the mat-option with the given value.
+   * @param value The value of the mat-option to select.
+   */
+  async selectMatOption(value: string): Promise<void> {
+    await this.clickOnElementWithSelectorAndText('mat-option', value);
+    await this.expectElementToBeVisible('mat-option', false);
+  }
+
+  /**
+   * This function uploads a file using the given file path.
+   */
+  async uploadFile(filePath: string): Promise<void> {
+    const inputUploadHandle =
+      await this.expectElementToBeVisible('input[type=file]');
+    if (!inputUploadHandle) {
+      throw new Error('No file input found while attempting to upload a file.');
+    }
+    await inputUploadHandle.setInputFiles(filePath);
+  }
+
+  /**
    * Waits for an element to stabilize.
    * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   * @param {number} timeout - The timeout in milliseconds. Defaults to 5000.
+   * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
     selector: string | ElementHandle<Element>,

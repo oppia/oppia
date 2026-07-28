@@ -26,6 +26,7 @@ import {
   SubtitledUnicodeBackendDict,
   SubtitledUnicode,
 } from 'domain/exploration/subtitled-unicode.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface LabeledRegion {
   region: {
@@ -460,6 +461,6 @@ export type InteractionCustomizationArgs =
   | TextInputCustomizationArgs;
 
 export interface InteractionData {
-  interactionId: string | null;
+  interactionId: InteractionSpecsKey | null;
   customizationArgs: InteractionCustomizationArgs;
 }

@@ -599,24 +599,6 @@ describe('Interaction', () => {
     });
   });
 
-  it(
-    'should throw error when trying to set customization arguments for ' +
-      'interaction id that does not exist',
-    () => {
-      expect(() => {
-        Interaction.createFromBackendDict({
-          answer_groups: answerGroupsDict,
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          default_outcome: defaultOutcomeDict,
-          hints: hintsDict,
-          id: 'InteractionIDThatDNE',
-          solution: solutionDict,
-        });
-      }).toThrowError('Unrecognized interaction id InteractionIDThatDNE');
-    }
-  );
-
   it('should create an object when default outcome is null', () => {
     const copyInteractionDict = {...interactionDict};
     copyInteractionDict.default_outcome = null;
@@ -631,8 +613,8 @@ describe('Interaction', () => {
     const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     expect(testInteraction.id).toEqual('TextInput');
-    testInteraction.setId('new_interaction_id');
-    expect(testInteraction.id).toEqual('new_interaction_id');
+    testInteraction.setId('ImageClickInput');
+    expect(testInteraction.id).toEqual('ImageClickInput');
   });
 
   it('should correctly set the new answer group', () => {
@@ -838,7 +820,7 @@ describe('Interaction', () => {
         html: 'This is the new explanation to the answer',
       },
     };
-    const otherInteractionDict = {
+    const otherInteractionDict: InteractionBackendDict = {
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -909,7 +891,7 @@ describe('Interaction', () => {
     'should correctly convert an Interaction with MultipleChoice to a ' +
       'backend dict',
     () => {
-      const mcInteractionDict = {
+      const mcInteractionDict: InteractionBackendDict = {
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {

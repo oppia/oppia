@@ -40,16 +40,13 @@ import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
-interface OppiaValidator {
-  id: string;
-  min_value: number;
-  max_value: number;
-}
+import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
+import './schema-based-float-editor.component.css';
 
 @Component({
   selector: 'schema-based-float-editor',
   templateUrl: './schema-based-float-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./schema-based-float-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -205,7 +202,7 @@ export class SchemaBasedFloatEditorComponent
   getMinValue(): number | null {
     for (var i = 0; i < this.validators.length; i++) {
       if (this.validators[i].id === 'is_at_least') {
-        return this.validators[i].min_value;
+        return this.validators[i].min_value ?? null;
       }
     }
     return null;
@@ -215,7 +212,7 @@ export class SchemaBasedFloatEditorComponent
   getMaxValue(): number | null {
     for (var i = 0; i < this.validators.length; i++) {
       if (this.validators[i].id === 'is_at_most') {
-        return this.validators[i].max_value;
+        return this.validators[i].max_value ?? null;
       }
     }
     return null;

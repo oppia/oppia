@@ -8,14 +8,17 @@ inputs:
   viewport-type:
     description: "The viewport type to use for running the tests."
     required: true
-    type: choice
-    options:
-      - mobile
-      - desktop
+  prod-env:
+    description: "Whether to run in prod mode (adds --prod_env)."
+    required: false
+    default: 'true'
+  update-snapshots:
+    description: Whether to update the snapshots instead of comparing them.
+    required: false
+    default: 'false'
   enable-screen-recording:
     description: Whether to record the screen during the test.
     required: true
-    type: boolean
   modified-suite-name-for-uploads:
     description: A unique suite name without spaces and forward-slashes to use for the artifacts uploads. If not provided, the test data will not be uploaded.
 
@@ -29,20 +32,46 @@ runs:
           echo "The modified suite name should contain only the following characters: letters, digits, underscore and hyphen."
           exit 1
         fi
+    - name: Clean up stale Oppia server process before rerun
+      shell: bash
+      run: |
+        for i in 1 2 3; do
+          if ! fuser 8181/tcp >/dev/null 2>&1; then
+            echo "Port 8181 is free."
+            break
+          fi
+          echo "Attempt $i: Port 8181 occupied. Killing stale process..."
+          fuser -KILL -k 8181/tcp
+          sleep 5
+        done
+
+        if fuser 8181/tcp >/dev/null 2>&1; then
+          echo "Port 8181 is still occupied after cleanup."
+          exit 1
+        fi
+        echo "Port 8181 successfully freed."
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
       shell: bash
       # We use xvfb-run to create a virtual screen to run tests without headless mode.
       # Numbers in 1920x1080x24 represent screen width, height and color depth respectively.
+      #
+      # NOTE: composite action inputs are always strings, even when declared
+      # `type: boolean` in this file (GitHub Actions does not support typed
+      # inputs for composite actions; `type:` here has no runtime effect).
+      # `inputs.foo && x || y` treats ANY non-empty string as truthy - including
+      # the literal string "false" - so these must be compared with `== 'true'`
+      # explicitly instead of relying on truthiness.
       run: >
         set -o pipefail;
-        VIDEO_RECORDING_IS_ENABLED=${{ inputs.enable-screen-recording && '1' || '0' }}
+        VIDEO_RECORDING_IS_ENABLED=${{ inputs.enable-screen-recording == 'true' && '1' || '0' }}
         xvfb-run -a --server-args="-screen 0, 1920x1080x24"
         python -m scripts.run_acceptance_tests
         --skip_build
         --suite=${{ inputs.test-suite }}
         ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
-        --prod_env
+        ${{ inputs.prod-env != 'false' && '--prod_env' || '' }}
+        ${{ inputs.update-snapshots == 'true' && '--update_snapshots' || '' }}
         --server_log_level=info
         | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
 

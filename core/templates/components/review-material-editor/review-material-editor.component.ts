@@ -26,6 +26,8 @@ import {
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import './review-material-editor.component.css';
 
 interface HtmlSchema {
   type: 'html';
@@ -39,6 +41,7 @@ interface BindableDict {
 @Component({
   selector: 'oppia-review-material-editor',
   templateUrl: './review-material-editor.component.html',
+  styleUrls: ['./review-material-editor.component.css'],
 })
 export class ReviewMaterialEditorComponent implements OnInit {
   @Output() onSaveExplanation: EventEmitter<SubtitledHtml> = new EventEmitter();
@@ -76,9 +79,10 @@ export class ReviewMaterialEditorComponent implements OnInit {
     return this.HTML_SCHEMA;
   }
 
-  updateLocalExp($event: string): void {
-    if (this.editableExplanation !== $event) {
-      this.editableExplanation = $event;
+  updateLocalExp($event: SchemaDefaultValue | string): void {
+    const eventString = String($event);
+    if (this.editableExplanation !== eventString) {
+      this.editableExplanation = eventString;
       this.changeDetectorRef.detectChanges();
     }
   }

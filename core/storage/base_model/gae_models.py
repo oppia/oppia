@@ -2060,3 +2060,248 @@ class BaseMapReduceBatchResultsModel(BaseModel):
 
     _use_cache: bool = False
     _use_memcache: bool = False
+
+
+class BaseFeedbackModel(BaseModel):
+    """Abstract base model shared by LessonFeedbackModel and PlatformFeedbackModel.
+
+    Subclasses MUST implement:
+        get_deletion_policy()
+        get_model_association_to_user()
+        has_reference_to_user_id()
+        export_data()
+
+    Fields:
+        author_id: Optional[str]. User ID of the submitter, or None for
+            reports.
+        feedback_text: str. The main text body submitted by the learner.
+        status: str. Current moderation status of the feedback entry
+            (open | closed | ignored | not_actionable).
+        exploration_id: Optional[str]. ID of the exploration, or None for
+            site-level (non-lesson) submissions.
+        lesson_metadata_schema_version: Optional[int]. Schema version for the
+            lesson_metadata blob. Allows future migrations.
+        lesson_metadata: Optional[Dict]. Lesson Metadata at
+            submission time. Contains:
+                exploration_id (str),
+                exploration_version (int),
+                state_name (str),
+                state_index (int),
+                learner_current_answer (str | None).
+            None for site-level (non-lesson) submissions.
+        created_on: datetime. Timestamp of creation (set by BaseModel).
+        last_updated: datetime. Timestamp of last update (set by BaseModel).
+        deleted: bool. Soft-delete flag (set by BaseModel).
+        ID_PREFIX: str. Prefix used when generating IDs. Subclasses must
+            override this with their own value (e.g. 'feedback.lesson' or
+            'feedback.platform'). Generated IDs have the form
+            '<ID_PREFIX>.<timestamp_b64><random_b64>'.
+    """
+
+    ID_IS_USED_AS_TAKEOUT_KEY: bool = True
+
+    author_id = datastore_services.StringProperty(
+        required=False,
+        indexed=True,
+    )
+    feedback_text = datastore_services.TextProperty(required=True)
+    status = datastore_services.StringProperty(
+        required=True,
+        indexed=True,
+        choices=feconf.STATUS_CHOICES,
+    )
+    exploration_id = datastore_services.StringProperty(
+        required=False,
+        indexed=True,
+    )
+    lesson_metadata_schema_version = datastore_services.IntegerProperty(
+        required=False,
+        indexed=True,
+    )
+    lesson_metadata = datastore_services.JsonProperty(
+        required=False,
+        indexed=False,
+    )
+
+    ID_PREFIX: str = ''
+
+    @staticmethod
+    def get_deletion_policy() -> DELETION_POLICY:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The has_reference_to_user_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+    # Here we use type Any because the return type of all the export_data
+    # methods in BaseModel's subclasses is a subclass of Dict[str, Any].
+    # Otherwise subclass methods will throw [override] error.
+    @staticmethod
+    def export_data(user_id: str) -> Dict[str, Any]:
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The export_data() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+    @staticmethod
+    def get_model_association_to_user() -> MODEL_ASSOCIATION_TO_USER:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_model_association_to_user() method is missing from the '
+            'derived class. It should be implemented in the derived class.'
+        )
+
+    @classmethod
+    def _generate_new_id(cls) -> str:
+        """Generates a unique prefixed model ID.
+
+        The ID has the form:
+            <ID_PREFIX>.<timestamp_base64><random_base64>
+
+        e.g. 'feedback.lesson.MTczNzAwMDAwMDAwMGFi'
+
+        Returns:
+            str. A globally unique ID containing the model's type prefix.
+
+        Raises:
+            Exception. Raised when too many collisions occur while generating
+                a new ID.
+        """
+        if not cls.ID_PREFIX:
+            raise Exception(
+                'Subclasses of BaseFeedbackModel must define a non-empty '
+                'ID_PREFIX. Got empty string for %s.' % cls.__name__
+            )
+        for _ in range(MAX_RETRIES):
+            new_id = '%s.%s%s' % (
+                cls.ID_PREFIX,
+                utils.base64_from_int(
+                    int(utils.get_current_time_in_millisecs())
+                ),
+                utils.base64_from_int(utils.get_random_int(RAND_RANGE)),
+            )
+            if not cls.get_by_id(new_id):
+                return new_id
+        raise Exception(
+            '%s ID generator is producing too many collisions.' % cls.__name__
+        )
+
+    @classmethod
+    def _get_filtered_query(
+        cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+    ) -> datastore_services.Query:
+        """Returns a query object filtered by the given parameters.
+
+        Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime.datetime]. If provided, filters for
+                entries created on or after this date.
+            date_to: Optional[datetime.datetime]. If provided, filters for
+                entries created on or before this date.
+
+        Returns:
+            Query. The filtered query object.
+        """
+        query = cls.query()
+        # Ignoring deleted threads as they are not relevant for operations.
+        query = query.filter(cls.deleted.IN([False]))
+
+        if author_id is not None:
+            query = query.filter(cls.author_id == author_id)
+        if status_filter and status_filter in feconf.STATUS_CHOICES:
+            query = query.filter(cls.status == status_filter)
+        if exploration_id is not None:
+            query = query.filter(cls.exploration_id == exploration_id)
+        if date_from is not None:
+            query = query.filter(cls.created_on >= date_from)
+        if date_to is not None:
+            query = query.filter(cls.created_on <= date_to)
+
+        return query
+
+    @classmethod
+    # Here we use type Any because subclasses can extend the filtered query with
+    # model-specific keyword filters.
+    def fetch_page(
+        cls,
+        page_size: int,
+        cursor: Optional[str] = None,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = None,
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+        **kwargs: Any,
+    ) -> tuple[Sequence['BaseFeedbackModel'], Optional[str], bool]:
+        """Fetches a page of feedback entries sorted by created_on_desc."""
+        query = cls._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+            **kwargs,
+        ).order(-cls.created_on)
+
+        start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
+        results: Sequence[BaseFeedbackModel]
+        results, next_cursor, more = query.fetch_page(
+            page_size, start_cursor=start_cursor
+        )
+
+        next_cursor_str: Optional[str] = None
+        if len(results) < page_size:
+            more = False
+        elif next_cursor and more:
+            more = bool(query.fetch_page(1, start_cursor=next_cursor)[0])
+        if next_cursor and more:
+            raw_next_cursor = next_cursor.urlsafe()
+            next_cursor_str = (
+                raw_next_cursor.decode('utf-8')
+                if isinstance(raw_next_cursor, bytes)
+                else raw_next_cursor
+            )
+        return results, next_cursor_str, more

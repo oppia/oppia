@@ -64,6 +64,7 @@ import {
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface InteractionBackendDict {
   // A null 'default_outcome' indicates that this interaction is
@@ -74,7 +75,7 @@ export interface InteractionBackendDict {
   customization_args: InteractionCustomizationArgsBackendDict;
   hints: readonly HintBackendDict[];
   // Id is null until populated from the backend,
-  id: string | null;
+  id: InteractionSpecsKey | null;
   // A null 'solution' indicates that this Interaction does not have a hint
   // or there is a hint, but no solution. A new interaction is initialised with
   // null 'solution' and stays null until the first hint with solution is added.
@@ -87,7 +88,7 @@ export class Interaction extends BaseTranslatableObject {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string | null;
+  id: InteractionSpecsKey | null;
   solution: Solution | null;
   currentAnswer: InteractionAnswer | null = null;
   submitClicked = false;
@@ -98,7 +99,7 @@ export class Interaction extends BaseTranslatableObject {
     customizationArgs: InteractionCustomizationArgs,
     defaultOutcome: Outcome | null,
     hints: Hint[],
-    id: string | null,
+    id: InteractionSpecsKey | null,
     solution: Solution | null
   ) {
     super();
@@ -196,7 +197,7 @@ export class Interaction extends BaseTranslatableObject {
     return undefined;
   }
 
-  setId(newValue: string | null): void {
+  setId(newValue: InteractionSpecsKey | null): void {
     this.id = newValue;
   }
 
@@ -454,7 +455,7 @@ export class Interaction extends BaseTranslatableObject {
   }
 
   static convertFromCustomizationArgsBackendDict(
-    interactionId: string | null,
+    interactionId: InteractionSpecsKey | null,
     caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
     if (interactionId === null) {
@@ -523,8 +524,6 @@ export class Interaction extends BaseTranslatableObject {
         return this.createFromTextInputCustomizationArgsBackendDict(
           caBackendDict as TextInputCustomizationArgsBackendDict
         );
-      default:
-        throw new Error(`Unrecognized interaction id ${interactionId}`);
     }
   }
 

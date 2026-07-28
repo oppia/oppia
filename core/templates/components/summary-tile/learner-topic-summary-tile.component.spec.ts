@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -31,7 +31,7 @@ describe('Learner Topic Summary Tile Component', () => {
   let fixture: ComponentFixture<LearnerTopicSummaryTileComponent>;
   let urlInterpolationService: UrlInterpolationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [LearnerTopicSummaryTileComponent, MockTranslatePipe],

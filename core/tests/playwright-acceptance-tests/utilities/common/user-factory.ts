@@ -25,19 +25,34 @@ import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
 import {LoggedInUser, LoggedInUserFactory} from '../user/logged-in-user';
+import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
 import {
   ExplorationEditor,
   ExplorationEditorFactory,
 } from '../user/exploration-editor';
+import {
+  CurriculumAdmin,
+  CurriculumAdminFactory,
+} from '../user/curriculum-admin';
+import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
+import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
   'button.e2e-test-oppia-cookie-banner-accept-button';
+const isMobile = process.env.MOBILE === 'true';
+const specName = process.env.SPEC_NAME;
+const VIDEO_RECORDING_DIR = `../oppia_full_stack_test_video_recordings/acceptance/${isMobile ? 'mobile' : 'desktop'}-${specName}/`;
 
 /**
  * Mapping of user roles to their respective factory functions.
  */
-const USER_ROLE_MAPPING = {} as const;
+const USER_ROLE_MAPPING = {
+  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
+  [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
+  [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+} as const;
 
 // Roles that are not reflected on the admin page after assignment.
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
@@ -62,12 +77,16 @@ type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
 type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
   TRoles extends never[] ? [] : TRoles | [];
 
-type BasicRolesUser = LoggedOutUser & LoggedInUser & ExplorationEditor;
+type BasicRolesUser = LoggedOutUser &
+  LoggedInUser &
+  ExplorationEditor &
+  CurriculumAdmin &
+  TopicManager;
 
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: SuperAdmin | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -126,6 +145,16 @@ export class UserFactory {
       }
 
       switch (role) {
+        case ROLES.TOPIC_MANAGER:
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TOPIC_MANAGER,
+            args as string
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -134,6 +163,10 @@ export class UserFactory {
       if (!USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE.includes(role)) {
         await superAdminInstance.expectUserToHaveRole(user.username, role);
       }
+
+      UserFactory.composeUserWithRoles(user, [
+        USER_ROLE_MAPPING[role](user.page),
+      ]);
     }
 
     return user as TUser & MultipleRoleIntersection<typeof roles>;
@@ -160,7 +193,7 @@ export class UserFactory {
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
       recordVideo: {
-        dir: 'core/tests/playwright-acceptance-tests/test-results/videos/',
+        dir: VIDEO_RECORDING_DIR,
       },
     });
     const page = await context.newPage();
@@ -169,6 +202,8 @@ export class UserFactory {
       LoggedOutUserFactory(page),
       LoggedInUserFactory(page),
       ExplorationEditorFactory(page),
+      CurriculumAdminFactory(page),
+      TopicManagerFactory(page),
     ]);
 
     user.username = username;
@@ -186,12 +221,42 @@ export class UserFactory {
   };
 
   /**
+   * This function creates a new browser context for a user who will sign up
+   * manually during the test. Unlike createNewUser, it does NOT call
+   * signUpNewUser — the test drives the signup flow itself.
+   * Use this for CUJs that test the signup UX (e.g. LI.1).
+   */
+  static createUserForSignup = async function (
+    browser: Browser
+  ): Promise<LoggedInUser & LoggedOutUser> {
+    const context = await browser.newContext({
+      recordVideo: {
+        dir: VIDEO_RECORDING_DIR,
+      },
+    });
+    const page = await context.newPage();
+
+    const user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
+      LoggedOutUserFactory(page),
+      LoggedInUserFactory(page),
+    ]);
+
+    await page.goto(testConstants.URLs.Home);
+    await user.waitForPageToFullyLoad();
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
+    user.userHasAcceptedCookies = true;
+
+    activeUsers.push(user);
+    return user;
+  };
+
+  /**
    * The function creates a new super admin user and returns the instance
    * of that user.
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -204,6 +269,7 @@ export class UserFactory {
 
     superAdminInstance = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
+      VoiceoverAdminFactory(user.page),
     ]);
 
     showMessage('Super admin created successfully.');
@@ -218,7 +284,11 @@ export class UserFactory {
   static createLoggedOutUser = async function (
     browser: Browser
   ): Promise<LoggedOutUser> {
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      recordVideo: {
+        dir: VIDEO_RECORDING_DIR,
+      },
+    });
     const page = await context.newPage();
 
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
@@ -226,7 +296,8 @@ export class UserFactory {
     ]);
 
     await page.goto(testConstants.URLs.Home);
-    await page.locator(cookieBannerAcceptButton).click();
+    await user.waitForPageToFullyLoad();
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
 
     activeUsers.push(user);
     return user;

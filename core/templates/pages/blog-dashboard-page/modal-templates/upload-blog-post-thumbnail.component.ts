@@ -31,11 +31,12 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Cropper from 'cropperjs';
-require('cropperjs/dist/cropper.min.css');
+import './upload-blog-post-thumbnail.component.css';
 
 @Component({
   selector: 'oppia-upload-blog-post-thumbnail',
   templateUrl: './upload-blog-post-thumbnail.component.html',
+  styleUrls: ['./upload-blog-post-thumbnail.component.css'],
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

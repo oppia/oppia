@@ -30,13 +30,15 @@ describe('Certificate Assessment Offering Data Model', () => {
       title: 'Math Assessment',
       description: 'An assessment covering basic algebra and geometry.',
       classroom_id: 'classroom_id_1',
+      topic_ids: ['topic_1', 'topic_2'],
       topic_data: {
         topic_1: 5,
         topic_2: 10,
       },
+      demonstrates: ['Learn math'],
       total_questions: 15,
       time_limit_in_minutes: 60,
-      async_status: 'Ready',
+      async_status: 'Available',
       version: 1,
     };
   });
@@ -69,9 +71,18 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(offering.topicData).toEqual({topic_1: 5, topic_2: 10});
     expect(offering.totalQuestions).toEqual(15);
     expect(offering.timeLimitInMinutes).toEqual(60);
-    expect(offering.demonstrates).toEqual([]);
-    expect(offering.asyncStatus).toEqual('Ready');
+    expect(offering.demonstrates).toEqual(['Learn math']);
+    expect(offering.asyncStatus).toEqual('Available');
     expect(offering.version).toEqual(1);
+  });
+
+  it('should preserve backend demonstrates when creating an instance', () => {
+    backendDict.demonstrates = ['Learn math', 'Apply geometry'];
+
+    const offering =
+      CertificateAssessmentOfferingData.createFromBackendDict(backendDict);
+
+    expect(offering.demonstrates).toEqual(['Learn math', 'Apply geometry']);
   });
 
   it('should correctly mutates fields using setters', () => {
