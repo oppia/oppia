@@ -2496,21 +2496,14 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             Returns:
                 dict. The unmodified customization argument value.
             """
-            class_obj: SubtitledUnicode | SubtitledHtml | None = None
-            if (
-                schema_obj_type
-                == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
-            ):
-                class_obj = SubtitledUnicode(
+            return (
+                SubtitledUnicode(
                     ca_value['content_id'], ca_value['unicode_str']
                 )
-
-            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
-                class_obj = SubtitledHtml(
-                    ca_value['content_id'], ca_value['html']
-                )
-            assert class_obj is not None
-            return class_obj
+                if schema_obj_type
+                == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+                else SubtitledHtml(ca_value['content_id'], ca_value['html'])
+            )
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
