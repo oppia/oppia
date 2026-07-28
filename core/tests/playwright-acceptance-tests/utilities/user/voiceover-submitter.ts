@@ -40,6 +40,7 @@ const contentVoiceoverTextSelector = '.e2e-test-content-text';
 const interactionVoiceoverTextSelector = '.e2e-test-interaction-text';
 const solutionVoiceoverTextSelector = '.e2e-test-solution-text';
 const uploadVoiceoverFileInputSelector = '.e2e-test-upload-audio-input';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 
 const voiceoverLanguageAccentSelector =
   '.e2e-test-voiceover-language-accent-selector';
@@ -368,6 +369,20 @@ export class VoiceoverSubmitter extends BaseUser {
       voiceoverPlayPauseBtnSelector,
       'aria-label',
       expectedAccessibleName
+    );
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage - The expected text of the upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
     );
   }
 }

@@ -247,8 +247,7 @@ test.describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.navigateToTranslationsTab();
 
     await voiceoverSubmitter.expectScreenshotToMatch(
-      'voiceoverPageWithOneVoiceoverAddEnIndia',
-      __dirname
+      'voiceoverPageWithOneVoiceoverAddEnIndia'
     );
     await voiceoverSubmitter.expectVoiceoverIsPlayableInTranslationTab();
     await voiceoverSubmitter.saveExplorationDraft();

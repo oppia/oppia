@@ -59,10 +59,6 @@ import {
   PracticeQuestionReviewerFactory,
 } from '../user/practice-question-reviewer';
 import {
-  VoiceoverSubmitter,
-  VoiceoverSubmitterFactory,
-} from '../user/voiceover-submitter';
-import {
   ContributorAdmin,
   ContributorAdminFactory,
 } from '../user/contributor-admin';
@@ -89,12 +85,10 @@ const USER_ROLE_MAPPING = {
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
-  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
   ROLES.TRANSLATION_REVIEWER,
-  ROLES.VOICEOVER_SUBMITTER,
 ];
 
 /**
@@ -123,15 +117,13 @@ type BasicRolesUser = LoggedOutUser &
   TranslationSubmitter &
   Contributor &
   ContributorAdmin &
-  PracticeQuestionReviewer &
-  VoiceoverSubmitter;
+  PracticeQuestionReviewer;
 
 /**
  * Global user instances that are created and can be reused again.
  */
 let superAdminInstance:
-  | (SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin)
-  | null = null;
+  (SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -227,17 +219,6 @@ export class UserFactory {
             );
           }
           break;
-        case ROLES.VOICEOVER_SUBMITTER:
-          if (typeof args !== 'string') {
-            throw new Error(
-              'Exploration ID is required to assign a voiceover submitter.'
-            );
-          }
-          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
-            args as string,
-            user.username
-          );
-          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -301,7 +282,6 @@ export class UserFactory {
       ContributorFactory(),
       ContributorAdminFactory(),
       PracticeQuestionReviewerFactory(),
-      VoiceoverSubmitterFactory(),
     ]);
 
     user.username = username;
