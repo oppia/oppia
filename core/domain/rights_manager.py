@@ -158,29 +158,26 @@ def _save_activity_rights(
         constants.ACTIVITY_TYPE_EXPLORATION,
     )
 
-    model = None
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
         _save_exploration_rights(
             committer_id, activity_rights, commit_message, commit_cmds
         )
-        return
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         model = collection_models.CollectionRightsModel.get(
             activity_rights.id, strict=True
         )
 
-    assert model is not None
-    model.owner_ids = activity_rights.owner_ids
-    model.editor_ids = activity_rights.editor_ids
-    model.viewer_ids = activity_rights.viewer_ids
-    model.voice_artist_ids = activity_rights.voice_artist_ids
-    model.community_owned = activity_rights.community_owned
-    model.status = activity_rights.status
-    model.viewable_if_private = activity_rights.viewable_if_private
-    model.first_published_msec = activity_rights.first_published_msec
+        model.owner_ids = activity_rights.owner_ids
+        model.editor_ids = activity_rights.editor_ids
+        model.viewer_ids = activity_rights.viewer_ids
+        model.voice_artist_ids = activity_rights.voice_artist_ids
+        model.community_owned = activity_rights.community_owned
+        model.status = activity_rights.status
+        model.viewable_if_private = activity_rights.viewable_if_private
+        model.first_published_msec = activity_rights.first_published_msec
 
-    model.commit(committer_id, commit_message, commit_cmds)
+        model.commit(committer_id, commit_message, commit_cmds)
 
 
 def _save_exploration_rights(
