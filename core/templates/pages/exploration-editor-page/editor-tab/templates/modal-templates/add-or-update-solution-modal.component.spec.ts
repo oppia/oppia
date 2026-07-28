@@ -131,6 +131,13 @@ describe('Add Or Update Solution Modal Component', () => {
       expect(component.tempAnsOption).toEqual('The only');
     });
 
+    it('should throw error when interaction id is null on init', () => {
+      stateInteractionIdService.savedMemento = null;
+      expect(() => component.ngOnInit()).toThrowError(
+        'Cannot set solution for a state with no interaction.'
+      );
+    });
+
     it('should update the answerIsExclusive correctly', () => {
       component.tempAnsOption = 'The only';
 
@@ -157,6 +164,15 @@ describe('Add Or Update Solution Modal Component', () => {
       component.onSubmitFromSubmitButton();
 
       expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
+    });
+
+    it('should throw error when interaction id is null in shouldAdditionalSubmitButtonBeShown', () => {
+      stateInteractionIdService.savedMemento = null;
+      expect(() =>
+        component.shouldAdditionalSubmitButtonBeShown()
+      ).toThrowError(
+        'Cannot check submit button for a state with no interaction.'
+      );
     });
 
     it('should check if additional submit button should be shown', () => {

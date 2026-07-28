@@ -1,4 +1,13 @@
 <div class="oppia-opportunities-list">
+  <div class="oppia-search-bar" *ngIf="showSearchBar">
+    <div class="oppia-input-group">
+      <input type="text"
+             class="oppia-search-bar-input"
+             placeholder="Search Skill or Topic ..."
+             [value]="searchQuery"
+             (input)="onSearchQueryChange($any($event.target).value)">
+    </div>
+  </div>
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
     <oppia-opportunities-list-item [opportunity]="opportunity"
                                    (clickActionButton)="clickActionButton.emit($event)"
@@ -42,6 +51,25 @@
 </div>
 
 <style>
+  .oppia-search-bar {
+    margin-bottom: 20px;
+  }
+  .oppia-input-group {
+    align-items: center;
+    display: flex;
+    width: 100%;
+  }
+  .oppia-search-bar-input {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1;
+    height: 40px;
+    padding: 8px 12px;
+  }
+  .oppia-search-bar-input:focus {
+    border-color: #009688;
+    outline: none;
+  }
   .oppia-opportunity-availablity-message {
     color: #555;
     font-style: italic;

@@ -51,7 +51,7 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HTMLSchema {
-  type: string;
+  type: 'html';
   ui_config: object;
 }
 
@@ -60,9 +60,10 @@ interface EditedContentDict {
 }
 
 interface ActiveContributionDetailsDict {
-  chapter_title: string;
-  story_title: string;
+  chapter_title?: string;
+  story_title?: string;
   topic_name: string;
+  entity_description?: string;
 }
 
 export interface SuggestionChangeDict {
@@ -151,6 +152,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   lastSuggestionToReview: boolean = false;
   firstSuggestionToReview: boolean = true;
   resolvingSuggestion: boolean = false;
+  isSubmitting: boolean = false;
   reviewable: boolean = false;
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
@@ -291,10 +293,19 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
     );
-    this.subheading =
-      `${this.activeContribution.details.topic_name} / ` +
-      `${this.activeContribution.details.story_title} / ` +
-      `${this.activeContribution.details.chapter_title}`;
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      this.subheading =
+        `${this.activeContribution.details.topic_name} / ` +
+        `${this.activeContribution.details.entity_description}`;
+    } else {
+      this.subheading =
+        `${this.activeContribution.details.topic_name} / ` +
+        `${this.activeContribution.details.story_title} / ` +
+        `${this.activeContribution.details.chapter_title}`;
+    }
 
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
@@ -327,6 +338,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.errorFound = false;
     this.startedEditing = false;
     this.resolvingSuggestion = false;
+    this.isSubmitting = false;
     this.lastSuggestionToReview =
       Object.keys(this.allContributions).length <= 1;
     this.translationHtml = this.activeSuggestion.change_cmd.translation_html;
@@ -411,6 +423,20 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
+  get contentHtmlAsString(): string {
+    return typeof this.contentHtml === 'string'
+      ? this.contentHtml
+      : this.contentHtml[0] || '';
+  }
+
+  get explorationContentHtmlAsString(): string {
+    return typeof this.explorationContentHtml === 'string'
+      ? this.explorationContentHtml
+      : this.explorationContentHtml !== null
+        ? this.explorationContentHtml[0] || ''
+        : '';
+  }
+
   get updateIsDisabled(): boolean {
     return this.startedEditing && this.areComponentsMismatched();
   }
@@ -427,6 +453,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
+    this.isSubmitting = true;
     this.preEditTranslationHtml = this.translationHtml;
     this.translationHtml = updatedTranslation;
     this.contributionAndReviewService.updateTranslationSuggestionAsync(
@@ -435,9 +462,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       () => {
         this.translationUpdated = true;
         this.startedEditing = false;
+        this.isSubmitting = false;
         this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       },
-      this.showTranslationSuggestionUpdateError
+      error => this.showTranslationSuggestionUpdateError(error)
     );
     this.suggestionImagesString = this.getImageInfoForSuggestion(
       this.translationHtml
@@ -588,6 +616,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.resolveSuggestionAndUpdateModal();
         },
         errorMessage => {
+          this.resolvingSuggestion = false;
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
         }
@@ -642,6 +671,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             this.resolveSuggestionAndUpdateModal();
           },
           errorMessage => {
+            this.resolvingSuggestion = false;
             this.alertsService.clearWarnings();
             this.alertsService.addWarning(
               `Invalid Suggestion: ${errorMessage}`
@@ -719,6 +749,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   showTranslationSuggestionUpdateError(error: Error): void {
+    this.isSubmitting = false;
     this.errorMessage = 'Invalid Suggestion: ' + error.message;
     this.errorFound = true;
     this.startedEditing = true;
@@ -727,6 +758,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   isDeprecatedTranslationSuggestionCommand(): boolean {
     return this.activeSuggestion.change_cmd.cmd === 'add_translation';
+  }
+
+  get chapterTitle(): string {
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled &&
+      this.activeContribution.details
+    ) {
+      return this.activeContribution.details.entity_description || '';
+    }
+    return this.activeContribution.details?.chapter_title || '';
   }
 
   doesTranslationContainTags(): boolean {

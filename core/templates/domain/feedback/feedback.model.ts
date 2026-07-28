@@ -16,25 +16,165 @@
  * @fileoverview Type definitions for web user feedback APIs
  */
 
-export type FeedbackCategory = 'platform' | 'lesson' | 'not_sure';
+export enum FeedbackModalType {
+  LESSON_FEEDBACK = 'lesson_feedback',
+  LESSON_ISSUE = 'lesson_issue',
+  SITE_ISSUE = 'site_issue',
+}
 
-export type FeedbackSubmitCategory = 'platform' | 'lesson';
+export interface LessonFeedbackMetadata {
+  explorationId: string;
+  explorationVersion: number;
+  stateName: string;
+  stateIndex: number;
+  learnerCurrentAnswer: string | null;
+}
 
-export type FeedbackStatus =
-  | 'open'
-  | 'fixed'
-  | 'ignored'
-  | 'compliment'
-  | 'not_actionable';
+export interface LessonFeedbackMetadataBackendDict {
+  exploration_id: string;
+  exploration_version: number;
+  state_name: string;
+  state_index: number;
+  learner_current_answer: string | null;
+}
+
+export interface LessonFeedbackBackendDict {
+  feedback_text: string;
+  lesson_metadata: LessonFeedbackMetadataBackendDict;
+}
+
+export class LessonFeedbackModel {
+  constructor(
+    public readonly feedbackText: string,
+    public readonly explorationContext: LessonFeedbackMetadata
+  ) {}
+
+  static createForSubmission(params: {
+    feedbackText: string;
+    lesson_metadata: LessonFeedbackMetadata;
+  }): LessonFeedbackModel {
+    return new LessonFeedbackModel(params.feedbackText, params.lesson_metadata);
+  }
+
+  toBackendDict(): LessonFeedbackBackendDict {
+    return {
+      feedback_text: this.feedbackText,
+      lesson_metadata: {
+        exploration_id: this.explorationContext.explorationId,
+        exploration_version: this.explorationContext.explorationVersion,
+        state_name: this.explorationContext.stateName,
+        state_index: this.explorationContext.stateIndex,
+        learner_current_answer: this.explorationContext.learnerCurrentAnswer,
+      },
+    };
+  }
+}
+
+export enum ReportAnIssueCategory {
+  TYPO = 'typo',
+  BROKEN_LAYOUT_OR_IMAGE = 'broken_layout_or_image',
+  CONFUSING_OR_INCORRECT_ANSWER = 'confusing_or_incorrect_answer',
+  OTHER_OR_NOT_SURE = 'other_or_not_sure',
+}
+
+export enum ReportType {
+  LESSON = 'lesson',
+  APP = 'app',
+}
+
+export type DashboardType = 'creator' | 'technical';
+
+export enum TechnicalTeamType {
+  TECH_EXTERNAL = 'tech-external',
+  TECH_INTERNAL = 'tech-internal',
+}
+
+export interface PlatformFeedbackBackendDict {
+  source: ReportType;
+  report_message: string;
+  page_url: string;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
+  category: ReportAnIssueCategory | null;
+  include_technical_logs: boolean;
+  session_info: FeedbackSessionInfo | null;
+  screenshot_filename: string | null;
+}
+
+export class PlatformFeedbackModel {
+  constructor(
+    public readonly source: ReportType,
+    public readonly reportMessage: string,
+    public readonly pageUrl: string,
+    public readonly explorationContext: LessonFeedbackMetadata | null,
+    public readonly category: ReportAnIssueCategory | null,
+    public readonly includeTechnicalLogs: boolean,
+    public readonly sessionInfo: FeedbackSessionInfo | null,
+    public readonly screenshotFilename: string | null
+  ) {}
+
+  static createForSubmission(params: {
+    source: ReportType;
+    reportMessage: string;
+    pageUrl: string;
+    explorationContext: LessonFeedbackMetadata | null;
+    category: ReportAnIssueCategory | null;
+    includeTechnicalLogs: boolean;
+    sessionInfo: FeedbackSessionInfo | null;
+    screenshotFilename: string | null;
+  }): PlatformFeedbackModel {
+    return new PlatformFeedbackModel(
+      params.source,
+      params.reportMessage,
+      params.pageUrl,
+      params.explorationContext,
+      params.category,
+      params.includeTechnicalLogs,
+      params.sessionInfo,
+      params.screenshotFilename
+    );
+  }
+
+  toBackendDict(): PlatformFeedbackBackendDict {
+    return {
+      source: this.source,
+      report_message: this.reportMessage,
+      lesson_metadata: this.explorationContext
+        ? {
+            exploration_id: this.explorationContext.explorationId,
+            exploration_version: this.explorationContext.explorationVersion,
+            state_name: this.explorationContext?.stateName,
+            state_index: this.explorationContext.stateIndex,
+            learner_current_answer:
+              this.explorationContext.learnerCurrentAnswer,
+          }
+        : null,
+      category: this.category,
+      include_technical_logs: this.includeTechnicalLogs,
+      // Strip session info if user didn't opt in.
+      session_info:
+        this.includeTechnicalLogs && this.sessionInfo ? this.sessionInfo : null,
+      screenshot_filename: this.screenshotFilename,
+      page_url: this.pageUrl,
+    };
+  }
+}
+
+export enum FeedbackStatus {
+  OPEN = 'open',
+  FIXED = 'fixed',
+  COMPLIMENT = 'compliment',
+  NOT_ACTIONABLE = 'not_actionable',
+  TRANSFERRED_TO_GITHUB = 'transferred_to_github',
+}
 
 export interface FeedbackSessionInfo {
-  console_logs_json: {
+  console_logs: {
     error_message: string;
     log_level: 'error' | 'warn' | 'log' | 'info' | 'debug';
     timestamp_msecs: number;
     stack_trace?: string;
   }[];
-  failed_requests_json: {
+  failed_requests: {
     url: string;
     method: string;
     status_code: number;
@@ -42,11 +182,11 @@ export interface FeedbackSessionInfo {
     status_text?: string;
     error_message?: string;
   }[];
-  navigation_history_json: {
+  navigation_history: {
     path: string;
     timestamp_msecs: number;
   }[];
-  environment_json: {
+  environment: {
     client_time_msecs: number;
     timezone_offset_mins: number;
     user_agent: string;
@@ -65,72 +205,112 @@ export interface FeedbackSessionInfo {
   };
 }
 
-export interface FeedbackMessage {
-  message_index: number;
-  author_id: string | null;
-  author_status: 'learner' | 'editor' | 'feedback_admin';
-  text: string | null;
-  created_on_msecs: number;
-  screenshot_filename?: string | null;
-  screenshot_url?: string | null;
-  updated_status: FeedbackStatus | null;
-}
-
-export interface FeedbackSubmitPayload {
-  category: FeedbackSubmitCategory;
-  target_type: 'exploration' | 'general';
-  target_id: string | null;
-  description: string;
-  page_url: string;
-  language_code: string;
-  rating: number;
-  screenshot_filename: string | null;
-  submit_anonymously: boolean;
-  include_session_info: boolean;
-  session_info: FeedbackSessionInfo | null;
-  captcha_token: string | null;
-  screenshot_file?: Record<string, string> | null;
-}
-
-export interface FeedbackSubmitResponse {
-  thread_id: string;
-}
-
 export interface FeedbackCaptchaConfigResponse {
   site_key: string | null;
 }
 
-export interface FeedbackThreadSummary {
+export interface FeedbackSubmitResponse {
   id: string;
-  category: FeedbackCategory;
-  description_preview: string;
-  page_url: string;
-  status: FeedbackStatus;
-  created_on_msecs: number;
-  rating: number | null;
-  has_screenshot: boolean;
-  has_session_info: boolean;
 }
 
-export interface FeedbackThreadDetail {
+export interface PlatformFeedbackSummary {
   id: string;
-  category: FeedbackCategory;
-  description: string;
-  page_url: string;
-  language_code: string;
+  report_message_preview: string;
   status: FeedbackStatus;
-  created_on_msecs: number;
-  rating: number | null;
-  target_type?: 'exploration' | null;
-  target_id?: string | null;
-  user_id?: string | null;
-  session_info: FeedbackSessionInfo | null;
-  can_edit_exploration?: boolean;
-  messages: FeedbackMessage[];
+  source: string;
+  category: ReportAnIssueCategory | null;
 }
 
-export interface FeedbackListResponse {
-  results: FeedbackThreadSummary[];
-  cursor: string | null;
+export interface PlatformFeedbackBackendResponse {
+  summaries: PlatformFeedbackSummary[];
+  next_cursor: string | null;
   more: boolean;
 }
+
+export interface PlatformFeedbackDetailResponse {
+  id: string;
+  report_message: string;
+  source: ReportType;
+  status: FeedbackStatus;
+  platform: 'web' | 'android';
+  destination_dashboard: 'tech-external' | 'tech-internal' | 'curriculum';
+  page_url: string;
+  category: ReportAnIssueCategory | null;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
+  include_technical_logs: boolean;
+  session_info: FeedbackSessionInfo | null;
+  screenshot_filename: string | null;
+  screenshot_entity_id: string | null;
+  created_on_msecs: number;
+}
+
+export interface SuccessResponse {
+  success: boolean;
+}
+
+export interface FeedbackFilterState {
+  searchText: string | null;
+  status: FeedbackStatus | null;
+  technicalTeam: TechnicalTeamType;
+  dateRange: {
+    start: Date | null;
+    end: Date | null;
+  };
+}
+
+/** Configuration passed to FeedbackFilterBar to hide/show filters. */
+export interface FeedbackFilterConfig {
+  showTeamFilter: boolean;
+  showDateRangeFilter: boolean;
+  showSearchBar: boolean;
+}
+
+/** Configuration passed to FeedbackCard to control visibility. */
+export interface FeedbackCardConfig {
+  showCategory: boolean;
+  showResponse: boolean;
+  showScreenshot: boolean;
+  showLessonMetadata: boolean;
+  showSessionInfo: boolean;
+}
+
+export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: true,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+};
+
+export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
+  showCategory: true,
+  showResponse: false,
+  showLessonMetadata: true,
+  showScreenshot: true,
+  showSessionInfo: true,
+};
+
+// Human readable labels for enums.
+export const FEEDBACK_STATUS_LABELS: Record<FeedbackStatus, string> = {
+  [FeedbackStatus.OPEN]: 'Open',
+  [FeedbackStatus.FIXED]: 'Fixed',
+  [FeedbackStatus.NOT_ACTIONABLE]: 'Not Actionable',
+  [FeedbackStatus.COMPLIMENT]: 'Compliment',
+  [FeedbackStatus.TRANSFERRED_TO_GITHUB]: 'Transferred to GitHub',
+};
+
+export const TECHNICAL_TEAM_LABELS: Record<TechnicalTeamType, string> = {
+  [TechnicalTeamType.TECH_EXTERNAL]: 'LEAP',
+  [TechnicalTeamType.TECH_INTERNAL]: 'CORE',
+};
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  [ReportAnIssueCategory.TYPO]: 'Typo',
+  [ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE]: 'Broken Layout / Image',
+  [ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER]:
+    'Confusing / Incorrect Answer',
+  [ReportAnIssueCategory.OTHER_OR_NOT_SURE]: 'Other / Not Sure',
+};
+
+export const SOURCE_LABELS: Record<string, string> = {
+  [ReportType.LESSON]: 'Lesson',
+  [ReportType.APP]: 'App',
+};

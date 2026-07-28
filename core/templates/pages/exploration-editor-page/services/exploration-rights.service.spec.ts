@@ -131,30 +131,6 @@ describe('Exploration rights service', () => {
     );
   });
 
-  it('should throw error if version of data is null', fakeAsync(() => {
-    explorationDataService.data.version = undefined;
-    expect(() => {
-      ers.makeCommunityOwned();
-      tick();
-    }).toThrowError();
-  }));
-
-  it('should throw error if version of data is null', fakeAsync(() => {
-    explorationDataService.data.version = undefined;
-    expect(() => {
-      ers.saveRoleChanges('name', 'role');
-      tick();
-    }).toThrowError();
-  }));
-
-  it('should throw error if version of data is null', fakeAsync(() => {
-    explorationDataService.data.version = undefined;
-    expect(() => {
-      ers.setViewability(true);
-      tick();
-    }).toThrowError();
-  }));
-
   it('should reports the correct cloning status', () => {
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.isCloned()).toBe(true);
@@ -251,6 +227,30 @@ describe('Exploration rights service', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+  it('should throw error when version is undefined in makeCommunityOwned', () => {
+    explorationDataService.data.version = undefined as unknown as number;
+
+    expect(() => {
+      ers.makeCommunityOwned();
+    }).toThrowError('Exploration version is undefined');
+  });
+
+  it('should throw error when version is undefined in saveRoleChanges', () => {
+    explorationDataService.data.version = undefined as unknown as number;
+
+    expect(() => {
+      ers.saveRoleChanges('user', 'viewer');
+    }).toThrowError('Exploration version is undefined');
+  });
+
+  it('should throw error when version is undefined in setViewability', () => {
+    explorationDataService.data.version = undefined as unknown as number;
+
+    expect(() => {
+      ers.setViewability(true);
+    }).toThrowError('Exploration version is undefined');
+  });
 
   it('should save a new member', fakeAsync(() => {
     serviceData.rights.viewer_names = ['viewerName'];

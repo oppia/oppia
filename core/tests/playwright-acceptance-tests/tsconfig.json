@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./build",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [
+      "node"
+    ],
+    "ignoreDeprecations": "6.0"
+  },
+  "include": [
+    "specs/**/*.ts",
+    "utilities/**/*.ts",
+    "playwright.config.ts"
+  ]
+}

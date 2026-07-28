@@ -17,7 +17,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -159,7 +159,7 @@ describe('Exploration Summary Tile Component', () => {
     true
   );
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
@@ -215,7 +215,7 @@ describe('Exploration Summary Tile Component', () => {
     component.collectionId = '1';
     component.explorationId = '1';
     component.explorationTitle = 'Title';
-    component.numViews = '100';
+    component.numViews = 100;
     component.objective = 'objective';
     component.category = 'category';
     component.contributorsSummary = {

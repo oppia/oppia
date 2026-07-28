@@ -22,6 +22,8 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormControl} from '@angular/forms';
 import {ApplyValidationDirective} from './apply-validation.directive';
 import {Validator} from 'interactions/TextInput/directives/text-input-validation.service';
+import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'mock-comp-a',
@@ -36,8 +38,8 @@ describe('Apply validation directive', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MockCompA, ApplyValidationDirective],
+      providers: [NumberConversionService, I18nLanguageCodeService],
     }).compileComponents();
-
     fixture = TestBed.createComponent(MockCompA);
     fixture.detectChanges();
 

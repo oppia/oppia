@@ -61,7 +61,7 @@ describe('Training Modal Service', () => {
       } as NgbModalRef;
     });
 
-    trainingModalService.openTrainUnresolvedAnswerModal('Test', 'textInput', 2);
+    trainingModalService.openTrainUnresolvedAnswerModal('Test', 'TextInput', 2);
 
     emitter.emit();
     tick();

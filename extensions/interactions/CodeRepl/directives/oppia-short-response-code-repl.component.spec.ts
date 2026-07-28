@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ShortResponseCodeRepl} from './oppia-short-response-code-repl.component';
 import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
@@ -32,7 +32,7 @@ describe('ShortResponseCodeRepl', () => {
     }
   }
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ShortResponseCodeRepl, TruncateAtFirstLinePipe],
       providers: [
