@@ -1073,6 +1073,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
   let fixture: ComponentFixture<RteHelperModalComponent>;
   let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
   let keydownSubject: Subject<KeyboardEvent>;
+  let pageContextService: PageContextService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let imageUploadHelperService: ImageUploadHelperService;
+  let alertsService: AlertsService;
 
   const modalData = {
     componentId: 'Math',
@@ -1130,6 +1134,10 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RteHelperModalComponent);
     component = fixture.componentInstance;
+    pageContextService = TestBed.inject(PageContextService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    alertsService = TestBed.inject(AlertsService);
     fixture.detectChanges();
   });
 
@@ -1187,7 +1195,7 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     expect(bottomSheetRef.dismiss).toHaveBeenCalled();
   }));
 
-  it('should dismiss the bottom sheet on save in math mode', fakeAsync(() => {
+  it('should dismiss the bottom sheet with math customization args on save', fakeAsync(() => {
     component.componentId = 'math';
     component.attrsCustomizationArgsDict = {
       math_content: {raw_latex: '', svg_filename: ''},
@@ -1195,9 +1203,204 @@ describe('RteHelperModalComponent in bottom sheet mode', () => {
     component.customizationArgSpecs = [
       {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
     ];
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
     component.ngOnInit();
     flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(assetsBackendApiService, 'saveMathExpressionImage').and.returnValue(
+      Promise.resolve({filename: 'mathImage.svg'})
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
     component.save();
-    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      math_content: {raw_latex: 'x^2', svg_filename: 'mathImage.svg'},
+    });
+  }));
+
+  it('should dismiss on server error while saving math', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(alertsService, 'addWarning');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    spyOn(assetsBackendApiService, 'saveMathExpressionImage').and.returnValue(
+      Promise.reject({error: 'Error communicating with server.'})
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet when math SVG exceeds 100 KB', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(
+      new Blob([new ArrayBuffer(102 * 1024)], {
+        type: 'application/octet-stream',
+      })
+    );
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet when SVG exceeds 1 MB for blog post', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.BLOG_POST
+    );
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(
+      new Blob([new ArrayBuffer(102 * 1024 * 1024)], {
+        type: 'application/octet-stream',
+      })
+    );
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss the bottom sheet while saving math in local storage', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {name: 'math_content', default_value: {raw_latex: '', svg_filename: ''}},
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'Svg Data',
+      svg_filename: 'mathImage.svg',
+      mathExpressionSvgIsBeingProcessed: false,
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(new Blob());
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      math_content: {raw_latex: 'x^2', svg_filename: 'mathImage.svg'},
+    });
+  }));
+
+  it('should dismiss the bottom sheet with cancel when rawLatex or filename is empty', fakeAsync(() => {
+    component.componentId = 'math';
+    component.attrsCustomizationArgsDict = {
+      math_content: {raw_latex: '', svg_filename: ''},
+    };
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: {raw_latex: '', svg_filename: ''},
+      },
+    ];
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.tmpCustomizationArgs = [];
+    (component as unknown as {data: undefined}).data = undefined;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: '',
+      svgFile: null,
+      svg_filename: '',
+    };
+    component.onCustomizationArgsFormChange(
+      component.customizationArgsForm.value
+    );
+    component.save();
+    flush();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
   }));
 });
