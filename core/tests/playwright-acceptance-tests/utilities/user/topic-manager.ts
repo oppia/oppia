@@ -507,7 +507,7 @@ await this.changeMatSelectOption(currentSort, newSort);
   async expectQuestionToBeVisible(question: string): Promise<void> {
     const questionTextElement = this.page.locator(questionTextSelector, {
       hasText: question,
-    });
+    }).first();
     await questionTextElement.waitFor({state: 'visible'});
     showMessage(`Question ${question} is visible.`);
   }
