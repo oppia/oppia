@@ -44,15 +44,17 @@ import {BlogPostActionConfirmationModalComponent} from 'pages/blog-dashboard-pag
 import {UploadBlogPostThumbnailModalComponent} from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import dayjs from 'dayjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {BlogCardPreviewModalComponent} from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import './blog-post-editor.component.css';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html',
+  styleUrls: ['./blog-post-editor.component.css'],
 })
 export class BlogPostEditorComponent implements OnInit {
   @ViewChild('titleInput') titleInput!: ElementRef;
@@ -106,7 +108,8 @@ export class BlogPostEditorComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private userService: UserService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private dateTimeFormatService: DateTimeFormatService
   ) {}
 
   async getUserInfoAsync(): Promise<void> {
@@ -209,10 +212,19 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   getDateStringInWords(naiveDateTime: string): string {
-    let datestring = naiveDateTime.substring(0, naiveDateTime.length - 7);
-    return dayjs(datestring, 'MM-DD-YYYY, HH:mm:ss').format(
-      'MMMM D, YYYY [at] hh:mm A'
+    // Expected format: 'MM/DD/YYYY, HH:mm:ss:ffffff' (UTC).
+    const dateTimeComponents = naiveDateTime.match(
+      /^(\d{2})\/(\d{2})\/(\d{4}), (\d{2}):(\d{2}):(\d{2}):(\d{3})\d*$/
     );
+    if (!dateTimeComponents) {
+      return naiveDateTime;
+    }
+    const [, month, day, year, hours, minutes, seconds, millis] =
+      dateTimeComponents;
+    const millisSinceEpoch = new Date(
+      `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${millis}Z`
+    ).getTime();
+    return this.dateTimeFormatService.getDateTimeInWords(millisSinceEpoch);
   }
 
   updateLocalTitleValue(): void {
