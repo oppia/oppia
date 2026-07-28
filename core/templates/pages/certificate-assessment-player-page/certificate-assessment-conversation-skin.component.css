@@ -1,0 +1,169 @@
+  .certificate-assessment-conversation-skin {
+    max-width: 60%;
+    margin: 0 auto;
+    padding-top: 6vh;
+  }
+
+  .certificate-assessment-progress-card {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    margin: 0 20px;
+    padding: 20px 20px 16px;
+  }
+
+  .certificate-assessment-progress-meta {
+    color: #334e68;
+    align-items: center;
+    display: flex;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    font-style: italic;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  .certificate-assessment-current-progress {
+    color: rgba(0, 0, 0, .87);
+  }
+
+  .certificate-assessment-question-counter {
+    color: #334e68;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 19px;
+    margin: 20px 25px 12px;
+    left: -20px;
+    top: -70px;
+    position: absolute;
+  }
+
+  .certificate-assessment-question-card {
+    background: white;
+    margin: 80px auto 0;
+    max-width: 40vw;
+    position: relative !important;
+  }
+
+  .certificate-assessment-question-header {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+  }
+
+  .certificate-assessment-avatar {
+    flex: 0 0 auto;
+    left: -87px;
+    position: absolute;
+    top: 10px;
+  }
+
+  .certificate-assessment-avatar img {
+    background: #fff;
+    border: 2px solid #00645c;
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+  }
+
+  .certificate-assessment-prompt-pill {
+    background: #e8f2f1;
+    border-radius: 4px;
+    color: #102a43;
+    flex: 1 1 auto;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    margin: 20px;
+    padding: 10px 20px;
+  }
+
+  .certificate-assessment-options {
+    display: grid;
+    gap: 14px;
+    margin: 20px;
+  }
+
+  .certificate-assessment-option-row {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+  }
+
+  .certificate-assessment-radio,
+  .certificate-assessment-checkbox {
+    accent-color: #0d47a1;
+    border: 2px solid #0d48a1;
+    height: 16px;
+    width: 16px;
+  }
+
+  .certificate-assessment-option-text {
+    color: #0d48a1;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+  }
+
+  .certificate-assessment-free-response {
+    padding: 10px 20px 15px;
+  }
+
+  .certificate-assessment-free-response-input {
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    padding: 10px 14px;
+    width: 100%;
+  }
+
+  .certificate-assessment-actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+    width: 40vw;
+  }
+
+  .certificate-assessment-navigation-link {
+    background: none;
+    border: none;
+    color: #00645c;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 0;
+  }
+
+  .certificate-assessment-navigation-arrow {
+    display: inline-block;
+    font-size: 40px;
+    line-height: 1;
+  }
+
+  .certificate-assessment-primary-button {
+    background-color: #00645c;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 20px;
+  }
+
+  .certificate-assessment-conversation-skin ::ng-deep .oppia-progress-bar {
+    background-color: #fff;
+    border: 2px solid #0d48a1;
+    border-radius: 10px;
+    box-sizing: border-box;
+    height: 20px;
+    width: 100%;
+  }
+
+  .certificate-assessment-conversation-skin ::ng-deep .oppia-current-progress {
+    background: #0d48a1;
+    border-radius: 8px;
+    height: 16px;
+    margin-top: 0;
+  }

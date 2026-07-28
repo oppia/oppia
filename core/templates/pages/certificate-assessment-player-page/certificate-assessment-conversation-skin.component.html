@@ -1,20 +1,102 @@
-<div class="assessment-conversation-skin">
-  <div class="assessment-progress-bar">
-    <div class="assessment-progress-fill" [style.width.%]="progressPercentage"></div>
+<div class="certificate-assessment-conversation-skin">
+
+  <!-- Progress + timer card -->
+  <div class="oppia-question-player-card certificate-assessment-progress-card">
+    <oppia-progress-bar
+      class="certificate-assessment-progress-bar"
+      [progressPercentage]="progressPercentage">
+    </oppia-progress-bar>
+    <div class="certificate-assessment-progress-meta">
+      <span class="certificate-assessment-current-progress">
+        Current Progress: {{ progressPercentage }}%
+      </span>
+    </div>
   </div>
-  <p class="assessment-progress-text">
-    Question {{currentQuestionIndex + 1}} of {{totalQuestions}}
-  </p>
-  <div class="assessment-question-card">
-    <h3>{{currentQuestion.prompt}}</h3>
-    <ul>
-      <li *ngFor="let choice of currentQuestion.choices">{{choice}}</li>
-    </ul>
-    <button *ngIf="!isLastQuestion" class="btn btn-primary" (click)="onNextQuestion()">
-      Next
+
+  
+  <!-- Question card -->
+  <div class="oppia-question-player-card certificate-assessment-question-card">
+    <div class="certificate-assessment-question-counter">
+      Question {{ currentQuestionIndex + 1 }} of {{ totalQuestions }}
+    </div>
+    <div class="certificate-assessment-question-header">
+      <div class="certificate-assessment-avatar">
+        <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+      </div>
+      <div class="certificate-assessment-prompt-pill">
+        {{ currentQuestion.prompt }}
+      </div>
+    </div>
+
+    <!-- Multiple choice: single-select radio list -->
+    <div
+      *ngIf="currentQuestion.type === 'multiple_choice'"
+      class="certificate-assessment-options">
+      <label
+        *ngFor="let option of currentQuestion.options"
+        class="certificate-assessment-option-row">
+        <input
+          type="radio"
+          class="certificate-assessment-radio"
+          [name]="currentQuestion.id"
+          [checked]="isOptionSelected(option.id)"
+          (change)="selectSingleChoice(option.id)">
+        <span class="certificate-assessment-option-text">{{ option.text }}</span>
+      </label>
+    </div>
+
+    <!-- Multiple select: checkbox list -->
+    <div
+      *ngIf="currentQuestion.type === 'multiple_select'"
+      class="certificate-assessment-options">
+      <label
+        *ngFor="let option of currentQuestion.options"
+        class="certificate-assessment-option-row">
+        <input
+          type="checkbox"
+          class="certificate-assessment-checkbox"
+          [checked]="isOptionSelected(option.id)"
+          (change)="toggleMultipleSelect(option.id)">
+        <span class="certificate-assessment-option-text">{{ option.text }}</span>
+      </label>
+    </div>
+
+    <!-- Text / numeric free response -->
+    <div
+      *ngIf="currentQuestion.type === 'text_input' || currentQuestion.type === 'numeric_input'"
+      class="certificate-assessment-free-response">
+      <input
+        [type]="getQuestionInputType()"
+        class="certificate-assessment-free-response-input"
+        [placeholder]="currentQuestion.placeholder || ''"
+        [value]="freeResponse"
+        #freeResponseInput
+        (input)="updateFreeResponse(freeResponseInput.value)">
+    </div>
+  </div>
+
+  <div class="certificate-assessment-actions">
+    <button
+      *ngIf="currentQuestionIndex > 0"
+      class="certificate-assessment-navigation-link"
+      (click)="onPreviousQuestion()">
+      <span class="certificate-assessment-navigation-arrow">&#8592;</span>
+      Back
     </button>
-    <button *ngIf="isLastQuestion" class="btn btn-primary" (click)="onSubmitAssessment()">
-      Submit
+    <span *ngIf="currentQuestionIndex === 0"></span>
+
+    <button
+      *ngIf="!isLastQuestion"
+      class="certificate-assessment-navigation-link"
+      (click)="onNextQuestion()">
+      Next
+      <span class="certificate-assessment-navigation-arrow">&#8594;</span>
+    </button>
+    <button
+      *ngIf="isLastQuestion"
+      class="btn certificate-assessment-primary-button"
+      (click)="onSubmitAssessment()">
+      Submit Assessment
     </button>
   </div>
 </div>
