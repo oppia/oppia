@@ -177,6 +177,7 @@ const solutionFloatTextField =
   'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
+const addQuestionButton = 'button.e2e-test-create-question-button';
 const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
@@ -1005,10 +1006,17 @@ export class CurriculumAdmin extends TopicManager {
       }
       currentUrl.hash = hashParts.join('/');
       await this.goto(currentUrl.toString());
+      // Changing only the URL hash triggers a same-document navigation in
+      // the browser (no reload, no re-run of the app's bootstrap code),
+      // so the app never re-evaluates the hash to switch tabs. A full
+      // reload is required to force the app to re-initialize and pick up
+      // the 'questions' tab from the updated hash.
+      await this.reloadPage();
     } else {
       await this.expectElementToBeVisible(skillQuestionTab);
       await this.clickAndWaitForNavigation(skillQuestionTab, true);
     }
+    await this.expectElementToBeAttachedInDOM(addQuestionButton);
   }
 
   /**
