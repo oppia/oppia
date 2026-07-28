@@ -337,11 +337,8 @@ describe('Translation Submitter V2', function () {
   });
 
   it('should be able to submit the translation', async function () {
-    // With the V2 feature flag enabled, exploration metadata (title,
-    // objective, category) are also returned as translatable content.
-    // This means there are more items after the previous test's skip
-    // sequence, so the button shows "Save and translate another"
-    // instead of "Save and close".
+    // Submitting the translation saves the suggestion for review. On the final
+    // card, clicking "Save and close" saves the translation and closes the modal.
     await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
