@@ -6228,6 +6228,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
         return exploration_dict_deepcopy
 
+    def to_dict_for_android(self) -> ExplorationDict:
+        """Returns a dict representing this Exploration domain object for
+        Android, with allowExponentialNotation reset to False on all
+        NumericInput interactions for backward compatibility.
+
+        Returns:
+            dict. A dict mapping all fields of Exploration instance, with
+            NumericInput customization args adjusted for Android.
+        """
+        exploration_dict = self.to_dict()
+        for state_dict in exploration_dict['states'].values():
+            interaction = state_dict['interaction']
+            if interaction['id'] != 'NumericInput':
+                continue
+            customization_args = interaction['customization_args']
+            if 'allowExponentialNotation' in customization_args:
+                customization_args['allowExponentialNotation']['value'] = True
+        return exploration_dict
+
     def serialize(self) -> str:
         """Returns the object serialized as a JSON string.
 

@@ -3942,6 +3942,41 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exp_from_dict = exp_domain.Exploration.from_dict(demo_dict)
         self.assertEqual(exp_from_dict.to_dict(), demo_dict)
 
+    def test_to_dict_for_android(self) -> None:
+        """Test that to_dict_for_android forces allowExponentialNotation to
+        True for NumericInput interactions, since legacy Android clients
+        always accepted exponential notation.
+        """
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'NumericInput', content_id_generator
+        )
+        self.new_exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index
+        )
+
+        # Explicitly turn the customization arg off to confirm to_dict()
+        # preserves it and to_dict_for_android() overrides it.
+        self.state.interaction.customization_args[
+            'allowExponentialNotation'
+        ].value = False
+
+        exploration_dict = self.new_exploration.to_dict()
+        numeric_input_ca = exploration_dict['states']['Introduction'][
+            'interaction'
+        ]['customization_args']
+        self.assertEqual(
+            numeric_input_ca['allowExponentialNotation']['value'], False
+        )
+
+        android_dict = self.new_exploration.to_dict_for_android()
+        android_numeric_input_ca = android_dict['states']['Introduction'][
+            'interaction'
+        ]['customization_args']
+        self.assertEqual(
+            android_numeric_input_ca['allowExponentialNotation']['value'], True
+        )
+
     def test_interaction_with_none_id_is_not_terminal(self) -> None:
         """Test that an interaction with an id of None leads to is_terminal
         being false.
