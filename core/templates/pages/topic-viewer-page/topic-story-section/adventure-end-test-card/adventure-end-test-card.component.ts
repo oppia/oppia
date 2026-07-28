@@ -32,7 +32,6 @@ const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 export class AdventureEndTestCardComponent implements OnInit {
   @Input() practiceTitle: string = '';
   @Input() practiceDescription: string = '';
-  @Input() relatedLessonNumber: number | null = null;
   @Input() thumbnailUrl: string = '';
   @Input() studyUrl: string = '';
   @Input() practiceUrl: string = '';
@@ -58,14 +57,7 @@ export class AdventureEndTestCardComponent implements OnInit {
   }
 
   getResolvedDescription(): string {
-    if (this.practiceDescription) {
-      return this.practiceDescription;
-    }
-
-    if (this.relatedLessonNumber !== null) {
-      return `Test what you have learned in lesson ${this.relatedLessonNumber}.`;
-    }
-    return 'Test what you have learned.';
+    return this.practiceDescription;
   }
 
   getThumbnailAltText(): string {

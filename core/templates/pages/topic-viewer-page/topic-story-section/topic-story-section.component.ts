@@ -82,7 +82,6 @@ interface AdventureGroupData {
 interface PracticeCardData {
   practiceTitle: string;
   practiceDescription: string;
-  relatedLessonNumber: number | null;
   thumbnailUrl: string;
   studyUrl: string;
   practiceUrl: string;
@@ -127,7 +126,6 @@ export class TopicStorySectionComponent
   practiceCard: PracticeCardData = {
     practiceTitle: '',
     practiceDescription: '',
-    relatedLessonNumber: null,
     thumbnailUrl: '',
     studyUrl: '#',
     practiceUrl: '#',
@@ -477,8 +475,6 @@ export class TopicStorySectionComponent
         this.adventureGroups.length > 1
           ? 'Test what you have learned in Adventure 1 to unlock Adventure 2.'
           : 'Test what you have learned in Adventure 1.',
-      relatedLessonNumber:
-        this.lessonCards.length > 0 ? this.lessonCards[0].lessonNumber : null,
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
       practiceUrl: firstArcId ? this.getEndOfArcUrl(firstArcId) : '#',

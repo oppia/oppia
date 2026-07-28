@@ -137,24 +137,6 @@ describe('AdventureEndTestCardComponent', () => {
     );
   });
 
-  it('should return default description with lesson number when description is not provided', () => {
-    component.practiceDescription = '';
-    component.relatedLessonNumber = 3;
-
-    expect(component.getResolvedDescription()).toBe(
-      'Test what you have learned in lesson 3.'
-    );
-  });
-
-  it('should return default description without lesson number when description is not provided and lesson number is null', () => {
-    component.practiceDescription = '';
-    component.relatedLessonNumber = null;
-
-    expect(component.getResolvedDescription()).toBe(
-      'Test what you have learned.'
-    );
-  });
-
   it('should return thumbnail alt text with practice title', () => {
     component.practiceTitle = 'Fractions Practice';
 

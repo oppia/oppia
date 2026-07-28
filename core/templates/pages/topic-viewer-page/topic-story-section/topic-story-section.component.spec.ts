@@ -1593,19 +1593,6 @@ describe('TopicStorySectionComponent', () => {
     expect(component.adventureGroups[15].accentColor).toBe('#27a844');
   });
 
-  it('should handle practiceCard related lesson number as null when no lessons', () => {
-    component.storySummary = createStorySummarySpy([], []);
-    component.lessonCount = 0;
-    component.practiceCount = 1;
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'topic';
-    component.practiceSubtopicIds = [1];
-
-    component.ngOnInit();
-
-    expect(component.practiceCard.relatedLessonNumber).toBeNull();
-  });
-
   it('should not expand any adventure when no adventure groups exist', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = 'math';
