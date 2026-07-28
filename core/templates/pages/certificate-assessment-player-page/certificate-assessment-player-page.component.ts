@@ -31,6 +31,7 @@ interface AssessmentQuestion {
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
   currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
+  showAssessmentInterruptCard = true;
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
@@ -69,6 +70,17 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   startAssessment(): void {
     this.router.navigate(['session'], {relativeTo: this.activatedRoute});
+  }
+
+  onRetryAssessment(): void {
+    this.showAssessmentInterruptCard = false;
+    this.currentStage = 'intro';
+    this.currentQuestionIndex = 0;
+  }
+
+  onResumeAssessment(): void {
+    this.showAssessmentInterruptCard = false;
+    this.currentStage = 'questions';
   }
 
   nextQuestion(): void {
