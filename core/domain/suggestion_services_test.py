@@ -270,7 +270,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_create_suggestion_with_invalid_suggestion_type(
         self,
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid suggestion type'):
+        with self.assertRaisesRegex(Exception, 'Invalid suggestion'):
             suggestion_services.create_suggestion(
                 'invalid_suggestion_type',
                 feconf.ENTITY_TYPE_EXPLORATION,

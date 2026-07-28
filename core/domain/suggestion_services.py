@@ -218,25 +218,115 @@ def create_suggestion(
 
     status = suggestion_models.STATUS_IN_REVIEW
 
-    exploration = (
-        exp_fetchers.get_exploration_by_id(target_id)
-        if target_type == feconf.ENTITY_TYPE_EXPLORATION
-        else None
-    )
+    match (target_type, suggestion_type):
+        case (
+            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+        ):
+            exploration = exp_fetchers.get_exploration_by_id(target_id)
+            score_category = '%s%s%s' % (
+                suggestion_models.SCORE_TYPE_CONTENT,
+                suggestion_models.SCORE_CATEGORY_DELIMITER,
+                exploration.category,
+            )
+            # Suggestions of this type do not have an associated language code,
+            # since they are not queryable by language.
+            language_code = None
+            suggestion: AllowedSuggestionClasses = (
+                suggestion_registry.SuggestionEditStateContent(
+                    thread_id,
+                    target_id,
+                    target_version_at_submission,
+                    status,
+                    author_id,
+                    None,
+                    change_cmd,
+                    score_category,
+                    language_code,
+                    False,
+                    datetime.datetime.utcnow(),
+                    datetime.datetime.utcnow(),
+                )
+            )
+        case (
+            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        ):
+            exploration = exp_fetchers.get_exploration_by_id(target_id)
+            score_category = '%s%s%s' % (
+                suggestion_models.SCORE_TYPE_TRANSLATION,
+                suggestion_models.SCORE_CATEGORY_DELIMITER,
+                exploration.category,
+            )
+            # The language code of the translation, used for querying purposes.
+            # Ruling out the possibility of any other type to satisfy mypy.
+            assert isinstance(change_cmd['language_code'], str)
+            language_code = change_cmd['language_code']
+            # Ruling out the possibility of any other type to satisfy mypy.
+            assert isinstance(change_cmd['state_name'], str)
+            assert isinstance(change_cmd['content_id'], str)
 
-    if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
-        assert exploration is not None
+            state_name = change_cmd['state_name']
+            content_id = change_cmd['content_id']
 
-        score_category = '%s%s%s' % (
-            suggestion_models.SCORE_TYPE_CONTENT,
-            suggestion_models.SCORE_CATEGORY_DELIMITER,
-            exploration.category,
-        )
-        # Suggestions of this type do not have an associated language code,
-        # since they are not queryable by language.
-        language_code = None
-        suggestion: AllowedSuggestionClasses = (
-            suggestion_registry.SuggestionEditStateContent(
+            # This check and loop act as a backward-compatibility fallback layer
+            # for generic V2 suggestion payloads (which do not specify
+            # exploration-specific state names in change commands directly) or
+            # legacy translation suggestions. It resolves the generic
+            # placeholder state name to the correct exploration state name by
+            # matching content IDs.
+            if (
+                state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+                or state_name not in exploration.states
+            ):
+                for s_name, state in exploration.states.items():
+                    if (
+                        content_id
+                        in state.get_translatable_contents_collection().content_id_to_translatable_content
+                    ):
+                        state_name = s_name
+                        new_change_cmd = dict(change_cmd)
+                        new_change_cmd['state_name'] = state_name
+                        change_cmd = new_change_cmd
+                        break
+
+            content_html = exploration.get_content_html(state_name, content_id)
+            if content_html != change_cmd['content_html']:
+
+                raise Exception(
+                    'The Exploration content has changed since this '
+                    'translation was submitted.'
+                )
+
+            # Do not allow creating a suggestion if there is already a suggestion
+            # in review for the same content_id and language_code.
+            existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
+                target_id, language_code
+            )
+            for existing_suggestion in existing_suggestions:
+                if existing_suggestion.change_cmd['content_id'] == (content_id):
+                    raise Exception(
+                        'A translation suggestion for this content already '
+                        'exists and is currently in review.'
+                    )
+
+            # Do not allow creating a suggestion if the content has already been
+            # translated and is up-to-date.
+            entity_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                target_id,
+                exploration.version,
+                language_code,
+            )
+            if content_id in entity_translation.translations:
+                if not entity_translation.translations[content_id].needs_update:
+                    raise Exception(
+                        'The content with content_id %s has already been '
+                        'translated to %s and is up-to-date.'
+                        % (content_id, language_code)
+                    )
+
+            suggestion = suggestion_registry.SuggestionTranslateContent(
                 thread_id,
                 target_id,
                 target_version_at_submission,
@@ -250,132 +340,43 @@ def create_suggestion(
                 datetime.datetime.utcnow(),
                 datetime.datetime.utcnow(),
             )
-        )
-    elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        assert exploration is not None
-
-        score_category = '%s%s%s' % (
-            suggestion_models.SCORE_TYPE_TRANSLATION,
-            suggestion_models.SCORE_CATEGORY_DELIMITER,
-            exploration.category,
-        )
-        # The language code of the translation, used for querying purposes.
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change_cmd['language_code'], str)
-        language_code = change_cmd['language_code']
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change_cmd['state_name'], str)
-        assert isinstance(change_cmd['content_id'], str)
-
-        state_name = change_cmd['state_name']
-        content_id = change_cmd['content_id']
-
-        # This check and loop act as a backward-compatibility fallback layer for
-        # generic V2 suggestion payloads (which do not specify exploration-specific
-        # state names in change commands directly) or legacy translation suggestions.
-        # It resolves the generic placeholder state name to the correct exploration
-        # state name by matching content IDs.
-        if (
-            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
-            or state_name not in exploration.states
-        ):
-            for s_name, state in exploration.states.items():
-                if (
-                    content_id
-                    in state.get_translatable_contents_collection().content_id_to_translatable_content
-                ):
-                    state_name = s_name
-                    new_change_cmd = dict(change_cmd)
-                    new_change_cmd['state_name'] = state_name
-                    change_cmd = new_change_cmd
-                    break
-
-        content_html = exploration.get_content_html(state_name, content_id)
-        if content_html != change_cmd['content_html']:
-
-            raise Exception(
-                'The Exploration content has changed since this translation '
-                'was submitted.'
+        case (_, feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            score_category = '%s%s%s' % (
+                suggestion_models.SCORE_TYPE_QUESTION,
+                suggestion_models.SCORE_CATEGORY_DELIMITER,
+                target_id,
             )
+            # Ruling out the possibility of any other type to satisfy mypy.
+            assert isinstance(change_cmd['question_dict'], dict)
+            # Here we use cast because we are narrowing down the type from
+            # various Dict types that are present in AcceptableChangeDictTypes
+            # to QuestionDict type.
+            question_dict = cast(
+                question_domain.QuestionDict, change_cmd['question_dict']
+            )
+            question_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
+            question_dict['question_state_data_schema_version'] = (
+                feconf.CURRENT_STATE_SCHEMA_VERSION
+            )
+            # The language code of the question, used for querying purposes.
+            add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
+            suggestion = suggestion_registry.SuggestionAddQuestion(
+                thread_id,
+                target_id,
+                target_version_at_submission,
+                status,
+                author_id,
+                None,
+                change_cmd,
+                score_category,
+                add_question_language_code,
+                False,
+                datetime.datetime.utcnow(),
+                datetime.datetime.utcnow(),
+            )
+        case _:
+            raise Exception(f'Invalid {suggestion_type=!r} for {target_type}')
 
-        # Do not allow creating a suggestion if there is already a suggestion
-        # in review for the same content_id and language_code.
-        existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
-            target_id, language_code
-        )
-        for existing_suggestion in existing_suggestions:
-            if existing_suggestion.change_cmd['content_id'] == (content_id):
-                raise Exception(
-                    'A translation suggestion for this content already exists '
-                    'and is currently in review.'
-                )
-
-        # Do not allow creating a suggestion if the content has already been
-        # translated and is up-to-date.
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            target_id,
-            exploration.version,
-            language_code,
-        )
-        if content_id in entity_translation.translations:
-            if not entity_translation.translations[content_id].needs_update:
-                raise Exception(
-                    'The content with content_id %s has already been '
-                    'translated to %s and is up-to-date.'
-                    % (content_id, language_code)
-                )
-
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            thread_id,
-            target_id,
-            target_version_at_submission,
-            status,
-            author_id,
-            None,
-            change_cmd,
-            score_category,
-            language_code,
-            False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
-        )
-    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        score_category = '%s%s%s' % (
-            suggestion_models.SCORE_TYPE_QUESTION,
-            suggestion_models.SCORE_CATEGORY_DELIMITER,
-            target_id,
-        )
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change_cmd['question_dict'], dict)
-        # Here we use cast because we are narrowing down the type from
-        # various Dict types that are present in AcceptableChangeDictTypes
-        # to QuestionDict type.
-        question_dict = cast(
-            question_domain.QuestionDict, change_cmd['question_dict']
-        )
-        question_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
-        question_dict['question_state_data_schema_version'] = (
-            feconf.CURRENT_STATE_SCHEMA_VERSION
-        )
-        # The language code of the question, used for querying purposes.
-        add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
-        suggestion = suggestion_registry.SuggestionAddQuestion(
-            thread_id,
-            target_id,
-            target_version_at_submission,
-            status,
-            author_id,
-            None,
-            change_cmd,
-            score_category,
-            add_question_language_code,
-            False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
-        )
-    else:
-        raise Exception('Invalid suggestion type %s' % suggestion_type)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
