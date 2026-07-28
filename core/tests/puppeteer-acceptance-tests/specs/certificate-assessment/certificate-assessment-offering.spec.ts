@@ -98,7 +98,7 @@ describe('Certificate Assessment', function () {
           subtopicName: 'Basic Fraction Operations',
           skillName: 'Compare whole numbers using symbols.',
           questionCountsByDifficulty: {
-            Easy: 1,
+            Easy: 2,
             Medium: 1,
             Hard: 0,
           },
@@ -125,16 +125,16 @@ describe('Certificate Assessment', function () {
     await curriculumAdmin.expectElementToBeVisible(certificateDashboardTitle);
     await curriculumAdmin.expectTextContentToBe(
       certificateDashboardTitle,
-      'Certificate Offering Dashboard'
+      'Certificate Creator Dashboard'
     );
   });
 
   it('should create a certificate offering and show it on the dashboard', async function () {
-    await curriculumAdmin.goto('/certificate-offering-dashboard');
+    await curriculumAdmin.goto('/certificate-creator-dashboard');
     await curriculumAdmin.clickAndWaitForNavigation(newCertificateButton, true);
     await curriculumAdmin.expectTextContentToBe(
-      'h1',
-      'Create Certificate Offering'
+      '.oppia-certificate-offering-title',
+      'Create Certificate'
     );
     await curriculumAdmin.expectTextContentToBe(
       'h3.oppia-certificate-section-title',
