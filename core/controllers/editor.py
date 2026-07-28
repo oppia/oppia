@@ -1798,11 +1798,15 @@ class LearnerAnswerInfoHandler(
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
             )
+        # NOTE: URL_PATH_ARGS_SCHEMAS handles entity_type validation via raising
+        # exceptions, so this assertion is purely for satisfying mypy; adding an
+        # else branch here would only introduce unreachable code.
+        assert state_reference is not None
+
         learner_answer_info_id = self.normalized_request[
             'learner_answer_info_id'
         ]
 
-        assert state_reference is not None
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id
         )
