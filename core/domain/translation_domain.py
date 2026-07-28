@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import enum
+import json
 
 from core import feconf, utils
 from core.constants import constants
@@ -26,7 +27,7 @@ from core.domain import (  # pylint: disable=invalid-import-from
     translatable_object_registry,
 )
 
-from typing import Dict, Final, List, Optional, TypedDict, Union
+from typing import Any, Dict, Final, List, Optional, TypedDict, Union
 
 
 class ContentType(enum.Enum):
@@ -41,6 +42,7 @@ class ContentType(enum.Enum):
     HINT = 'hint'
     SOLUTION = 'solution'
     SECTION = 'section'
+    METADATA = 'metadata'
 
 
 class TranslatableContentFormat(enum.Enum):
@@ -259,7 +261,9 @@ class TranslatableContentsCollection:
     def add_fields_from_translatable_object(
         self,
         translatable_object: BaseTranslatableObject,
-        **kwargs: Optional[str],
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        **kwargs: Any,
     ) -> None:
         """Adds translatable fields from a translatable object parameter to
         'content_id_to_translatable_content' dict.
@@ -291,7 +295,10 @@ class BaseTranslatableObject:
     """
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
 
@@ -315,7 +322,9 @@ class BaseTranslatableObject:
         )
 
     def get_all_contents_which_need_translations(
-        self, entity_translation: Union[EntityTranslation, None] = None
+        self,
+        entity_translation: Union[EntityTranslation, None] = None,
+        override_metadata_feature_flag: bool = False,
     ) -> Dict[str, TranslatableContent]:
         """Returns a list of TranslatableContent instances which need new or
         updated translations.
@@ -323,6 +332,8 @@ class BaseTranslatableObject:
         Args:
             entity_translation: EntityTranslation. An object storing the
                 existing translations of an entity.
+            override_metadata_feature_flag: bool. Whether to override the
+                metadata feature flag check.
 
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContent.
@@ -334,9 +345,9 @@ class BaseTranslatableObject:
                 language_code='',
             )
 
-        translatable_content_list = (
-            self.get_translatable_contents_collection().content_id_to_translatable_content.values()
-        )
+        translatable_content_list = self.get_translatable_contents_collection(
+            override_metadata_feature_flag=override_metadata_feature_flag
+        ).content_id_to_translatable_content.values()
 
         content_id_to_translatable_content = {}
 
@@ -363,20 +374,26 @@ class BaseTranslatableObject:
         return content_id_to_translatable_content
 
     def get_translation_count(
-        self, entity_translation: EntityTranslation
+        self,
+        entity_translation: EntityTranslation,
+        override_metadata_feature_flag: bool = False,
     ) -> int:
         """Returs the number of updated translations avialable.
 
         Args:
             entity_translation: EntityTranslation. The translation object
                 containing translations.
+            override_metadata_feature_flag: bool. Whether to override the
+                metadata feature flag check.
 
         Returns:
             int. The number of translatable contnet for which translations are
             available in the given translation object.
         """
         count = 0
-        for content_id in self.get_all_contents_which_need_translations():
+        for content_id in self.get_all_contents_which_need_translations(
+            override_metadata_feature_flag=override_metadata_feature_flag
+        ):
             if not content_id in entity_translation.translations:
                 continue
 
@@ -386,7 +403,9 @@ class BaseTranslatableObject:
         return count
 
     def are_translations_displayable(
-        self, entity_translation: EntityTranslation
+        self,
+        entity_translation: EntityTranslation,
+        override_metadata_feature_flag: bool = False,
     ) -> bool:
         """Whether the given EntityTranslation in the given lanaguage is
         displayable.
@@ -398,12 +417,16 @@ class BaseTranslatableObject:
         Args:
             entity_translation: EntityTranslation. An object storing the
                 existing translations of an entity.
+            override_metadata_feature_flag: bool. Whether to override the
+                metadata feature flag check.
 
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContent.
         """
         content_id_to_translatable_content = (
-            self.get_translatable_contents_collection().content_id_to_translatable_content
+            self.get_translatable_contents_collection(
+                override_metadata_feature_flag=override_metadata_feature_flag
+            ).content_id_to_translatable_content
         )
         for (
             content_id,
@@ -416,9 +439,12 @@ class BaseTranslatableObject:
                 # Rule-related translations cannot be missing.
                 return False
 
-        translatable_content_count = self.get_content_count()
+        translatable_content_count = self.get_content_count(
+            override_metadata_feature_flag=override_metadata_feature_flag
+        )
         translated_content_count = self.get_translation_count(
-            entity_translation
+            entity_translation,
+            override_metadata_feature_flag=override_metadata_feature_flag,
         )
 
         translations_missing_count = (
@@ -428,18 +454,28 @@ class BaseTranslatableObject:
             feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
         )
 
-    def get_content_count(self) -> int:
+    def get_content_count(
+        self, override_metadata_feature_flag: bool = False
+    ) -> int:
         """Returns the total number of distinct content fields available in the
         exploration which are user facing and can be translated into
         different languages.
 
         (The content field includes state content, feedback, hints, solutions.)
 
+        Args:
+            override_metadata_feature_flag: bool. Whether to override the
+                metadata feature flag check.
+
         Returns:
             int. The total number of distinct content fields available inside
             the exploration.
         """
-        return len(self.get_all_contents_which_need_translations())
+        return len(
+            self.get_all_contents_which_need_translations(
+                override_metadata_feature_flag=override_metadata_feature_flag
+            )
+        )
 
     def get_reviewer_only_content_count(self) -> int:
         """Returns the total number of content items in the exploration that
@@ -606,7 +642,12 @@ class EntityTranslation:
         )
 
     def validate(self) -> None:
-        """Validates the EntityTranslation object."""
+        """Validates the EntityTranslation object.
+
+        Raises:
+            utils.ValidationError. One or more attributes of the
+                EntityTranslation are invalid.
+        """
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
                 'entity_type must be a string, recieved %r' % self.entity_type
@@ -1096,3 +1137,55 @@ class ContentIdGenerator:
 
         self.next_content_id_index += 1
         return content_id
+
+
+class MachineTranslationProviderMapping:
+    """Domain object representing the mapping of language codes to their
+    configured translation providers.
+    """
+
+    def __init__(self, language_to_provider_mapping: Dict[str, str]) -> None:
+        """Initializes a MachineTranslationProviderMapping instance.
+
+        Args:
+            language_to_provider_mapping: dict. A dict mapping
+                ISO 639-1 language codes to translation provider identifiers.
+                E.g. {'hi': 'azure', 'es': 'gcp'}.
+        """
+        self.language_to_provider_mapping = language_to_provider_mapping
+
+    def validate(self) -> None:
+        """Validates the language-to-provider mapping.
+
+        Raises:
+            utils.ValidationError. If the mapping is not a dictionary.
+            utils.ValidationError. If any language code is invalid.
+            utils.ValidationError. If any provider does not support the
+                given language.
+        """
+
+        if not isinstance(self.language_to_provider_mapping, dict):
+            raise utils.ValidationError(
+                'language_to_provider_mapping must be a dictionary.'
+            )
+        machine_translation_providers = json.loads(
+            utils.get_file_contents('assets/machine_translation_providers.json')
+        )
+
+        for (
+            language_code,
+            provider,
+        ) in self.language_to_provider_mapping.items():
+            if not utils.is_valid_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code: %s' % language_code
+                )
+            supported_providers = machine_translation_providers.get(
+                language_code, []
+            )
+
+            if provider not in supported_providers:
+                raise utils.ValidationError(
+                    'Provider %s does not support language %s.'
+                    % (provider, language_code)
+                )

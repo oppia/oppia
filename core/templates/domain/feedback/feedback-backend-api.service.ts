@@ -16,7 +16,7 @@
  * @fileoverview Backend API service for web feedback submission and triage.
  */
 
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -26,26 +26,28 @@ import {
 } from 'services/image-local-storage.service';
 import {
   FeedbackCaptchaConfigResponse,
-  FeedbackListResponse,
-  FeedbackSubmitPayload,
+  LessonFeedbackModel,
+  PlatformFeedbackModel,
   FeedbackSubmitResponse,
-  FeedbackThreadDetail,
+  PlatformFeedbackBackendResponse,
+  DashboardType,
+  FeedbackFilterState,
+  PlatformFeedbackDetailResponse,
+  SuccessResponse,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
   screenshotFilename: string | null;
-  screenshotFile: Record<string, string> | null;
+  screenshotFile: string | null;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class FeedbackBackendApiService {
-  private submitFeedbackUrl = '/give_general_feedback';
+  private lessonFeedbackUrl = '/feedback';
+  private reportUrl = '/platform-feedback';
   private captchaConfigUrl = '/feedback_captcha_config_handler';
-  private creatorFeedbackListUrl = '/creator_feedback_handler/<exploration_id>';
-  private creatorFeedbackDetailUrl =
-    '/creator_feedback_handler/<exploration_id>/<thread_id>';
 
   constructor(
     private http: HttpClient,
@@ -85,108 +87,143 @@ export class FeedbackBackendApiService {
     if (imageData === null) {
       throw new Error('No staged feedback screenshot found.');
     }
-
+    const screenshotFile =
+      await this.imageLocalStorageService.getFilenameToBase64MappingAsync([
+        imageData,
+      ]);
     return {
       screenshotFilename,
-      screenshotFile:
-        await this.imageLocalStorageService.getFilenameToBase64MappingAsync([
-          imageData,
-        ]),
+      screenshotFile: screenshotFile[screenshotFilename],
     };
   }
 
-  // Feedback-submission-modal.
-
-  async submitFeedbackAsync(
-    payload: FeedbackSubmitPayload
+  async submitLessonFeedbackAsync(
+    payload: LessonFeedbackModel,
+    captchaToken: string | null
   ): Promise<FeedbackSubmitResponse> {
-    try {
-      return await this.http
-        .post<FeedbackSubmitResponse>(this.submitFeedbackUrl, payload)
-        .toPromise();
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
-    } catch (error: unknown) {
-      if (error instanceof HttpErrorResponse) {
-        return Promise.reject(error);
-      }
-      throw error;
-    }
+    const requestPayload = {
+      ...payload.toBackendDict(),
+      ...(captchaToken ? {captcha_token: captchaToken} : {}),
+    };
+    return await this.http
+      .post<FeedbackSubmitResponse>(this.lessonFeedbackUrl, requestPayload)
+      .toPromise();
   }
 
-  // Creator-feedback-tab.
-
-  async fetchCreatorFeedbackListAsync(
-    explorationId: string,
-    cursor: string | null,
-    status: string | null,
-    dateFromMsecs: number | null,
-    dateToMsecs: number | null
-  ): Promise<FeedbackListResponse> {
-    const params: {[key: string]: string} = {};
-    if (cursor) {
-      params.cursor = cursor;
-    }
-    if (status) {
-      params.status = status;
-    }
-    if (dateFromMsecs !== null) {
-      params.date_from_msecs = String(dateFromMsecs);
-    }
-    if (dateToMsecs !== null) {
-      params.date_to_msecs = String(dateToMsecs);
-    }
-    const url = this.creatorFeedbackListUrl.replace(
-      '<exploration_id>',
-      explorationId
+  async submitSiteAndLessonIssueReportAsync(
+    payload: PlatformFeedbackModel,
+    captchaToken: string | null
+  ): Promise<FeedbackSubmitResponse> {
+    const screenshotData = await this.getStagedScreenshotSubmissionDataAsync(
+      payload.screenshotFilename
     );
-    return this.http.get<FeedbackListResponse>(url, {params}).toPromise();
-  }
-
-  async fetchCreatorFeedbackDetailAsync(
-    explorationId: string,
-    threadId: string
-  ): Promise<FeedbackThreadDetail> {
-    const url = this.creatorFeedbackDetailUrl
-      .replace('<exploration_id>', explorationId)
-      .replace('<thread_id>', threadId);
-    return this.http.get<FeedbackThreadDetail>(url).toPromise();
-  }
-
-  async addCreatorMessageAsync(
-    explorationId: string,
-    threadId: string,
-    message: string | null = null,
-    status: string | null = null,
-    screenshot: {
-      filename: string | null;
-      files?: Record<string, string> | null;
-    } | null = null
-  ): Promise<void> {
-    if (message === null && status === null && screenshot === null) {
-      throw new Error(
-        'At least one of message, status or screenshot must be provided.'
-      );
-    }
-    const url = this.creatorFeedbackDetailUrl
-      .replace('<exploration_id>', explorationId)
-      .replace('<thread_id>', threadId);
-    await this.http
-      .put<void>(url, {
-        action: status,
-        message,
-        screenshotFilename: screenshot?.filename ?? null,
-        files: screenshot?.files ?? null,
+    return await this.http
+      .post<FeedbackSubmitResponse>(this.reportUrl, {
+        ...payload.toBackendDict(),
+        screenshot_file: screenshotData.screenshotFile,
+        ...(captchaToken ? {captcha_token: captchaToken} : {}),
       })
       .toPromise();
   }
 
-  // Feedback-admin dashboard.
-  // Not part of Milestone-1, will be added in Milestone-2.
-  // 1->fetchFeedbackAdminListAsync.
-  // 2->fetchFeedbackAdminDetailAsync.
-  // 3->addFeedbackAdminMessageAsync.
-  // 4->deleteFeedbackAsync.
+  private async fetchPlatformFeedbackListAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    cursor: string | null,
+    statusFilter: string | null,
+    dateFromMsecs: number | null,
+    dateToMsecs: number | null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    let params = new HttpParams();
+    if (cursor) {
+      params = params.set('cursor', cursor);
+    }
+    if (statusFilter) {
+      params = params.set('status', statusFilter);
+    }
+    if (dateFromMsecs) {
+      params = params.set('date_from_msecs', String(dateFromMsecs));
+    }
+    if (dateToMsecs) {
+      params = params.set('date_to_msecs', String(dateToMsecs));
+    }
+
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+    ].join('/');
+    return await this.http
+      .get<PlatformFeedbackBackendResponse>(url, {
+        params,
+      })
+      .toPromise();
+  }
+
+  async fetchTechnicalDashboardFeedbackListAsync(
+    filterState: FeedbackFilterState,
+    cursor: string | null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+    return await this.fetchPlatformFeedbackListAsync(
+      'technical',
+      filterState.technicalTeam,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchCreatorDashboardFeedbackListAsync(
+    explorationId: string,
+    filterState: FeedbackFilterState,
+    cursor: string | null = null
+  ): Promise<PlatformFeedbackBackendResponse> {
+    const dateFromMsecs = filterState.dateRange.start?.getTime() ?? null;
+    const dateToMsecs = filterState.dateRange.end?.getTime() ?? null;
+
+    return await this.fetchPlatformFeedbackListAsync(
+      'creator',
+      explorationId,
+      cursor,
+      filterState.status,
+      dateFromMsecs,
+      dateToMsecs
+    );
+  }
+
+  async fetchPlatformFeedbackDetailAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    reportId: string
+  ): Promise<PlatformFeedbackDetailResponse> {
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+    return await this.http.get<PlatformFeedbackDetailResponse>(url).toPromise();
+  }
+
+  async updatePlatformFeedbackStatusAsync(
+    dashboardType: DashboardType,
+    dashboardId: string,
+    reportId: string,
+    newStatus: string
+  ): Promise<SuccessResponse> {
+    const url = [
+      this.reportUrl,
+      encodeURIComponent(dashboardType),
+      encodeURIComponent(dashboardId),
+      encodeURIComponent(reportId),
+    ].join('/');
+    return await this.http
+      .post<SuccessResponse>(url, {
+        status: newStatus,
+      })
+      .toPromise();
+  }
 }

@@ -53,13 +53,31 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {FeedbackModalComponent} from '../../../base-components/feedback-modal.component';
 
 class MockPlatformFeatureService {
   status = {
     ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false,
     },
+    WebFeedbackModalEnabled: {
+      isEnabled: false,
+    },
+    TechnicalFeedbackDashboardEnabled: {
+      isEnabled: false,
+    },
+    EnableCertificateAssessment: {
+      isEnabled: false,
+    },
   };
+}
+
+class MockNgbModal {
+  open = jasmine.createSpy('open').and.returnValue({
+    componentInstance: {},
+    result: Promise.resolve(),
+  });
 }
 
 class MockWindowRef {
@@ -104,6 +122,7 @@ describe('TopNavigationBarComponent', () => {
   let mockWindowRef: MockWindowRef;
   let searchService: SearchService;
   let wds: WindowDimensionsService;
+  let ngbModal: NgbModal;
   let userService: UserService;
   let alertsService: AlertsService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -173,6 +192,10 @@ describe('TopNavigationBarComponent', () => {
           useClass: MockI18nService,
         },
         {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+        {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
@@ -202,6 +225,7 @@ describe('TopNavigationBarComponent', () => {
     component = fixture.componentInstance;
     searchService = TestBed.inject(SearchService);
     wds = TestBed.inject(WindowDimensionsService);
+    ngbModal = TestBed.inject(NgbModal);
     userService = TestBed.inject(UserService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
@@ -715,6 +739,7 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTechTeamLead: () => false,
       isTranslationAdmin: () => false,
       isTranslationCoordinator: () => false,
       isQuestionCoordinator: () => false,
@@ -939,6 +964,48 @@ describe('TopNavigationBarComponent', () => {
       ).toBe(true);
     }
   );
+
+  it(
+    'should return correct value for show technical feedback dashboard page' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.TechnicalFeedbackDashboardEnabled.isEnabled =
+        true;
+
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(true);
+    }
+  );
+
+  it(
+    'should return correct value for WebFeedbackModalEnabled' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.WebFeedbackModalEnabled.isEnabled =
+        true;
+
+      expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
+    }
+  );
+
+  it('should return correct value for certificate assessment feature flag', () => {
+    expect(component.isCertificateAssessmentEnabled()).toBe(false);
+
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      true;
+
+    expect(component.isCertificateAssessmentEnabled()).toBe(true);
+  });
+
+  it('should open site feedback modal', () => {
+    component.openSiteFeedbackModal();
+    expect(ngbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
+      backdrop: 'static',
+    });
+  });
 
   it('should not check learner groups feature on signup page', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();

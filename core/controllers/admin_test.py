@@ -49,6 +49,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_domain,
     user_services,
     voiceover_services,
     wipeout_service,
@@ -2183,6 +2184,48 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(len(story.story_contents.nodes), 3)
         self.logout()
 
+    def test_generate_dummy_chapters_with_single_chapter(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'topic',
+            'story_id',
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 1,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        chapter_titles = [
+            node.title for node in updated_story.story_contents.nodes
+        ]
+        self.assertEqual(len(chapter_titles), 1)
+        self.assertIn('dummy chapter 1', chapter_titles)
+        self.logout()
+
     def test_chapter_linkage_after_dummy_generation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -2494,6 +2537,66 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         generated_exps = exp_services.get_all_exploration_summaries()
         self.assertEqual(len(generated_exps), 2)
 
+        self.logout()
+
+    def test_arcs_created_when_missing_in_dummy_translation_opportunities(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        skill_id = 'dummySkillId'
+        self.save_new_skill(skill_id, admin_id)
+
+        story_id = 'dummyStoryId'
+        story = story_domain.Story.create_default_story(
+            story_id, 'title', 'description', 'dummyTopicId', 'story-frag'
+        )
+        story_services.save_new_story(admin_id, story)
+
+        topic_id = 'dummyTopicId'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'Topic', 'topic-url', 'description', 'fragm'
+        )
+        topic.add_canonical_story(story_id)
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.add_subtopic(1, 'Title', 'dummy-subtopic')
+        topic.subtopics[0].skill_ids.append(skill_id)
+        topic.update_skill_ids_for_diagnostic_test([skill_id])
+        topic_services.save_new_topic(admin_id, topic)
+        topic_services.publish_topic(topic_id, admin_id)
+
+        for i in range(1, 4):
+            content_id_generator = translation_domain.ContentIdGenerator()
+            question_data = self._create_valid_question_data(
+                'default', content_id_generator
+            )
+            self.save_new_question(
+                'dummyQuestionId%d' % i,
+                admin_id,
+                question_data,
+                [skill_id],
+                content_id_generator.next_content_id_index,
+            )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('dummyStoryId')
+        self.assertEqual(len(updated_story.story_contents.arcs), 1)
+        self.assertIsNotNone(
+            story_fetchers.get_story_by_id('dummyStoryId', strict=False)
+        )
         self.logout()
 
 
