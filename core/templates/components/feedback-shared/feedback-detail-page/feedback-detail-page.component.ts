@@ -195,8 +195,8 @@ export class FeedbackDetailPageComponent {
     if (response.lesson_metadata) {
       issueLines.push(
         `3. Check exploration ${response.lesson_metadata.exploration_id}, ` +
-          `state "${response.lesson_metadata.state_name}",` +
-          `version "${response.lesson_metadata.exploration_version}".`,
+          `state '${response.lesson_metadata.state_name}',` +
+          `version '${response.lesson_metadata.exploration_version}'.`,
         `4. Learner answer at report time: ${response.lesson_metadata.learner_current_answer}`,
         `Quick Links for the exploration reported:`,
         `1. Open reported Lesson version: ${this.windowRef.nativeWindow.location.origin}${this.getReportedLessonUrl()}`,
