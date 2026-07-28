@@ -807,7 +807,7 @@ export class BaseUser {
     if (typeof selector === 'string') {
       const element = await this.page.$(selector);
       if (!element) {
-        return '';
+        throw new Error(`Element not found for selector: ${selector}`);
       }
       const text = await this.page.evaluate(el => el.textContent, element);
       return text?.trim() ?? '';
