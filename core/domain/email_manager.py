@@ -2660,7 +2660,7 @@ def send_email_to_new_cd_user(
         logging.error('This app cannot send emails to users.')
         return
 
-    email_body = None
+    email_body = ''
     email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
     if category in [
@@ -2715,7 +2715,6 @@ def send_email_to_new_cd_user(
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value
             )
         )
-        assert isinstance(email_body, str)
         assert isinstance(noreply_email_address, str)
         _send_email(
             recipient_id,
