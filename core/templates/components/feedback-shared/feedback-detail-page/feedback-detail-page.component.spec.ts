@@ -342,7 +342,7 @@ describe('FeedbackDetailPageComponent', () => {
       ].join('\n')
     );
     expect(queryParams.get('steps-to-reproduce')).toContain(
-      'Check exploration exp1, state "state1",version "1".'
+      "Check exploration exp1, state 'state1',version '1'."
     );
     expect(queryParams.get('steps-to-reproduce')).toContain(
       'Learner answer at report time: answer1'
