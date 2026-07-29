@@ -364,7 +364,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         report = general_feedback_services.create_platform_report(
             feedback_text='There is a typo.',
             source='lesson',
-            category=feconf.CATEGORY_TYPO,
+            category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
             lesson_metadata=self.get_lesson_metadata(),
             session_info=VALID_SESSION_INFO,
             screenshot_filename=None,
