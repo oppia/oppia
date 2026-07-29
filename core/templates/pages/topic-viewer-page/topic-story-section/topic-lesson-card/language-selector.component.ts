@@ -28,6 +28,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {LoggerService} from 'services/contextual/logger.service';
 
+import './language-selector.component.css';
+
 @Component({
   selector: 'topic-lesson-language-selector',
   templateUrl: './language-selector.component.html',

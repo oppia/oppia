@@ -41,6 +41,8 @@ import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.ser
 
 import constants from 'assets/constants';
 
+import './topic-story-section.component.css';
+
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
 const FALLBACK_LESSON_THUMBNAIL_PATH = '/splash/student_desk1x.webp';

@@ -70,13 +70,6 @@
     "core/templates/pages/story-viewer-page/story-viewer-page.component.css",
     "core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css",
     "core/templates/pages/teach-page/teach-page.component.css",
-    "core/templates/pages/topic-viewer-page/topic-viewer-page.component.css",
-    "core/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css",
-    "core/templates/pages/topic-viewer-page/topic-story-section/adventure-circle-badge/adventure-circle-badge.component.css",
-    "core/templates/pages/topic-viewer-page/topic-story-section/adventure-navigation/adventure-navigation.component.css",
-    "core/templates/pages/topic-viewer-page/topic-story-section/topic-lesson-card/language-selector.component.css",
-    "core/templates/pages/topic-viewer-page/topic-story-section/topic-lesson-card/topic-lesson-card.component.css",
-    "core/templates/pages/topic-viewer-page/topic-story-section/topic-story-section.component.css",
     "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],
