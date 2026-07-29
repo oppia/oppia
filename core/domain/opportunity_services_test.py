@@ -2587,44 +2587,45 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_add_new_skill_opportunities(self) -> None:
-        opportunity_services.add_new_skill_opportunities(
-            'topic_id_1', ['skill_id_1']
-        )
-        model_id = 'skill.skill_id_1'
-        model = opportunity_models.TranslationOpportunityModel.get(
-            model_id, strict=False
-        )
-        self.assertIsNotNone(model)
-        assert model is not None
-        self.assertEqual(model.topic_ids, ['topic_id_1'])
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_update_skill_opportunity_on_skill_change(self) -> None:
-        opportunity_services.add_new_skill_opportunities(
-            'topic_id_1', ['skill_id_1']
-        )
-        opportunity_services.update_skill_opportunity_on_skill_change(
-            'skill_id_1'
-        )
-        model_id = 'skill.skill_id_1'
-        model = opportunity_models.TranslationOpportunityModel.get(
-            model_id, strict=False
-        )
-        self.assertIsNotNone(model)
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_update_skill_opportunity_on_skill_change_nonexistent_does_nothing(
+    def test_remove_topic_from_translation_opportunities_updates_multi_topics(
         self,
     ) -> None:
-        opportunity_services.update_skill_opportunity_on_skill_change(
-            'nonexistent_skill'
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']},
+            topic_ids=['topic_id_1', 'topic_id_2'],
         )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_1', 'topic_id_2'])
+
+        opportunity_services.remove_topic_from_translation_opportunities(
+            'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_2'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_remove_topic_from_translation_opportunities_deletes_when_empty(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']},
+            topic_ids=['topic_id_1'],
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+
+        opportunity_services.remove_topic_from_translation_opportunities(
+            'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
+        )
+        deleted_model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNone(deleted_model)

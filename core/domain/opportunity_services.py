@@ -899,54 +899,50 @@ def _create_exploration_opportunities(
         )
 
 
-def add_new_skill_opportunities(topic_id: str, skill_ids: List[str]) -> None:
-    """Creates new skill translation opportunities corresponding to the supplied
-    topic and skill IDs.
+def remove_topic_from_translation_opportunities(
+    topic_id: str,
+    entity_types_and_ids: Dict[str, List[str]],
+) -> None:
+    """Removes a topic ID from topic_ids list of translation opportunities.
+    If topic_ids becomes empty, the opportunity model is deleted.
 
     Args:
-        topic_id: str. ID of the topic.
-        skill_ids: list(str). A list of skill IDs for which new translation
-            opportunities are to be created.
+        topic_id: str. The topic ID to remove.
+        entity_types_and_ids: dict(str, list(str)). A dictionary mapping entity
+            types to lists of entity IDs.
     """
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        create_translation_opportunity(
-            {feconf.ENTITY_TYPE_SKILL: skill_ids}, topic_ids=[topic_id]
+    opportunity_ids = [
+        f'{entity_type}.{entity_id}'
+        for entity_type, entity_ids in entity_types_and_ids.items()
+        for entity_id in entity_ids
+    ]
+
+    opp_models = opportunity_models.TranslationOpportunityModel.get_multi(
+        opportunity_ids
+    )
+    models_to_update = []
+    models_to_delete = []
+
+    for model in opp_models:
+        if model is not None and topic_id in model.topic_ids:
+            model.topic_ids.remove(topic_id)
+            if not model.topic_ids:
+                models_to_delete.append(model)
+            else:
+                models_to_update.append(model)
+
+    if models_to_update:
+        opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
+            models_to_update
+        )
+        opportunity_models.TranslationOpportunityModel.put_multi(
+            models_to_update
         )
 
-
-def update_skill_opportunity_on_skill_change(skill_id: str) -> None:
-    """Updates the skill translation opportunity model when skill contents
-    or misconceptions change.
-
-    Args:
-        skill_id: str. The skill ID.
-    """
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-        None,
-    ):
-        model_id = f'{feconf.ENTITY_TYPE_SKILL}.{skill_id}'
-        model = opportunity_models.TranslationOpportunityModel.get(
-            model_id, strict=False
+    if models_to_delete:
+        opportunity_models.TranslationOpportunityModel.delete_multi(
+            models_to_delete
         )
-        if model is not None:
-            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
-            if skill is not None:
-                content_count = skill.get_content_count()
-                translation_counts = (
-                    translation_services.get_translation_counts(
-                        feconf.TranslatableEntityType.SKILL, skill
-                    )
-                )
-                compute_translation_opportunity_models_with_updated_entity(
-                    feconf.ENTITY_TYPE_SKILL,
-                    skill_id,
-                    content_count,
-                    translation_counts,
-                )
 
 
 def compute_opportunity_models_with_updated_exploration(

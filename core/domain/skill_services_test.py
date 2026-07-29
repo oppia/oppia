@@ -1128,8 +1128,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         ]
     )
     def test_delete_skill_deletes_v2_translation_opportunity(self) -> None:
-        opportunity_services.add_new_skill_opportunities(
-            'topic_id', [self.SKILL_ID]
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]}, topic_ids=['topic_id']
         )
         model_id = f'skill.{self.SKILL_ID}'
         self.assertIsNotNone(
