@@ -829,12 +829,11 @@ class SuggestionTranslateContent(BaseSuggestion):
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
-        if self.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-            version = exp_fetchers.get_exploration_by_id(self.target_id).version
-        elif self.target_type == feconf.ENTITY_TYPE_SKILL:
-            version = skill_fetchers.get_skill_by_id(self.target_id).version
-        else:
-            version = 1
+        from core.domain import opportunity_services
+
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            self.target_type, self.target_id
+        )
 
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
@@ -847,7 +846,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         translation_services.add_new_translation(
             feconf.TranslatableEntityType(self.target_type),
             self.target_id,
-            version,
+            target_entity.version,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,
