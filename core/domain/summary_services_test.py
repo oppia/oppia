@@ -288,7 +288,14 @@ class ExplorationDisplayableSummariesTest(
     ) -> None:
         from core.domain import translation_domain, translation_services
 
-        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID_2)
+        exp_summary_1 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_1
+        )
+        exp_summary_2 = exp_fetchers.get_exploration_summary_by_id(
+            self.EXP_ID_2
+        )
+        exp_summary_2.tags = ['tag', 'math']
+
         translated_title = translation_domain.TranslatedContent(
             'Exploration 2 Hindi Title',
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
@@ -299,10 +306,26 @@ class ExplorationDisplayableSummariesTest(
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             needs_update=False,
         )
+        translated_category = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Category',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_tag_0 = translation_domain.TranslatedContent(
+            'Hindi Tag 1',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_tag_1_outdated = translation_domain.TranslatedContent(
+            'Outdated Tag 2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=True,
+        )
+
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             self.EXP_ID_2,
-            exp_summary.version,
+            exp_summary_2.version,
             'hi',
             feconf.EXPLORATION_TITLE_CONTENT_ID,
             translated_title,
@@ -310,25 +333,62 @@ class ExplorationDisplayableSummariesTest(
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             self.EXP_ID_2,
-            exp_summary.version,
+            exp_summary_2.version,
             'hi',
             feconf.EXPLORATION_OBJECTIVE_CONTENT_ID,
             translated_objective,
         )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            feconf.EXPLORATION_CATEGORY_CONTENT_ID,
+            translated_category,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_0',
+            translated_tag_0,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary_2.version,
+            'hi',
+            f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_1',
+            translated_tag_1_outdated,
+        )
 
+        # Querying with exp_summary_1 (no translations) and exp_summary_2 (has translations).
         displayable_summaries = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_2], display_in_language_code='hi'
+            summary_services.get_displayable_exp_summary_dicts(
+                [exp_summary_1, exp_summary_2], display_in_language_code='hi'
             )
         )
-        self.assertEqual(len(displayable_summaries), 1)
+        self.assertEqual(len(displayable_summaries), 2)
+
+        # exp_summary_1 keeps untranslated default metadata.
+        exp1_summary = next(
+            s for s in displayable_summaries if s['id'] == self.EXP_ID_1
+        )
+        self.assertEqual(exp1_summary['title'], 'Exploration 1 title')
+
+        # exp_summary_2 receives translated title, objective, category, and tag 0.
+        exp2_summary = next(
+            s for s in displayable_summaries if s['id'] == self.EXP_ID_2
+        )
+        self.assertEqual(exp2_summary['title'], 'Exploration 2 Hindi Title')
         self.assertEqual(
-            displayable_summaries[0]['title'], 'Exploration 2 Hindi Title'
+            exp2_summary['objective'], 'Exploration 2 Hindi Objective'
         )
         self.assertEqual(
-            displayable_summaries[0]['objective'],
-            'Exploration 2 Hindi Objective',
+            exp2_summary['category'], 'Exploration 2 Hindi Category'
         )
+        self.assertEqual(exp2_summary['tags'], ['Hindi Tag 1', 'math'])
 
     def test_get_public_and_filtered_private_summary_dicts_for_creator(
         self,
