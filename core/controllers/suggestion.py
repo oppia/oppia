@@ -220,8 +220,10 @@ class SuggestionHandler(
             self.normalized_payload['description'],
         )
 
-        if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        if (
+            suggestion.suggestion_type
+            == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+            and suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
         ):
             (
                 suggestion_services
@@ -681,6 +683,7 @@ class SuggestionToSkillActionHandler(
         elif (
             suggestion.suggestion_type
             == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+            and suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
         ):
             suggestion_services.update_translation_review_stats(suggestion)
 
