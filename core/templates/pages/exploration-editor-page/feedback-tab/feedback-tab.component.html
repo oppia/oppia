@@ -37,7 +37,7 @@
       <oppia-feedback-detail-page class="oppia-feedback-detail-page"
                                   [feedbackDetailResponse]="creatorFeedbackDetailResponse"
                                   [feedbackDetailPageConfig]="getCreatorFeedbackDetailCardConfig()"
-                                  [statusOptions]="getCreatorFeedbackDetailStatusOptions()"
+                                  [statusOptions]="creatorLessonFeedbackStatusOptions"
                                   [screenshotDataUrl]="creatorFeedbackScreenshotDataUrl"
                                   (statusChange)="onCreatorFeedbackStatusChange($event)"
                                   (githubTransfer)="onCreatorFeedbackGithubTransfer($event)"

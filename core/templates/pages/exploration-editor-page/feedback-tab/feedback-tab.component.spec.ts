@@ -571,4 +571,159 @@ describe('Feedback Tab Component', () => {
     isEditableSpy.and.returnValue(false);
     expect(component.isExplorationEditable()).toBe(false);
   });
+
+  it('should select report mode by default for new creator feedback tab', () => {
+    expect(component.isCreatorReportFilterSelected()).toBeTrue();
+  });
+
+  it('should use all statuses for creator report details', () => {
+    component.selectedCreatorFeedbackType = CreatorFeedbackType.REPORT;
+
+    expect(component.getCreatorFeedbackDetailStatusOptions()).toContain(
+      FeedbackStatus.TRANSFERRED_TO_GITHUB
+    );
+    expect(component.getCreatorFeedbackDetailCardConfig()).toBe(
+      component.creatorFeedbackCardConfig
+    );
+  });
+
+  it('should use transferred to GitHub status for lesson feedback details', () => {
+    component.selectedCreatorFeedbackType = CreatorFeedbackType.FEEDBACK;
+
+    expect(component.getCreatorFeedbackDetailStatusOptions()).toContain(
+      FeedbackStatus.TRANSFERRED_TO_GITHUB
+    );
+    expect(component.getCreatorFeedbackDetailCardConfig()).toBe(
+      component.creatorLessonFeedbackCardConfig
+    );
+  });
+
+  it('should switch to lesson feedback mode from creator filter', () => {
+    windowRef.nativeWindow.location.hash = '/feedback/report_id';
+    component.selectedCreatorFeedbackReportId = 'report_id';
+
+    component.onCreatorFeedbackFilterChange({
+      ...component.currentCreatorFeedbackFilterState,
+      creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
+    });
+
+    expect(component.isCreatorReportFilterSelected()).toBeFalse();
+    expect(component.selectedCreatorFeedbackReportId).toBeNull();
+    expect(windowRef.nativeWindow.location.hash).toBe('#/feedback');
+  });
+
+  it('should update URL and fetch details when opening creator report', fakeAsync(() => {
+    const detailResponse: PlatformFeedbackDetailResponse = {
+      id: 'report_id',
+      report_message: 'Report text',
+      source: ReportType.LESSON,
+      status: FeedbackStatus.OPEN,
+      platform: 'web',
+      destination_dashboard: 'curriculum',
+      page_url: '/explore/exp_id',
+      category: null,
+      lesson_metadata: null,
+      include_technical_logs: false,
+      session_info: null,
+      screenshot_filename: null,
+      screenshot_entity_id: null,
+      created_on_msecs: 0,
+    };
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(
+      feedbackBackendApiService,
+      'fetchPlatformFeedbackDetailAsync'
+    ).and.returnValue(Promise.resolve(detailResponse));
+
+    component.onCreatorFeedbackRowClick('report/id');
+    tick();
+
+    expect(component.selectedCreatorFeedbackReportId).toBe('report/id');
+    expect(windowRef.nativeWindow.location.hash).toBe(
+      '#/feedback/report/report%2Fid'
+    );
+    expect(
+      feedbackBackendApiService.fetchPlatformFeedbackDetailAsync
+    ).toHaveBeenCalledWith('curriculum', 'exp_id', 'report/id');
+    expect(component.creatorFeedbackDetailResponse).toEqual(detailResponse);
+  }));
+
+  it('should fetch lesson feedback details when opening lesson feedback', fakeAsync(() => {
+    const detailResponse: LessonFeedbackDetailResponse = {
+      id: 'feedback_id',
+      author_id: 'user_id',
+      feedback_text: 'Feedback text',
+      status: FeedbackStatus.OPEN,
+      lesson_metadata: {
+        exploration_id: 'exp_id',
+        exploration_version: 1,
+        state_name: 'Introduction',
+        state_index: 0,
+        learner_current_answer: null,
+      },
+      parent_feedback_id: null,
+      response_list: [],
+      unread_response_count: 0,
+      created_on_msecs: 0,
+    };
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(
+      feedbackBackendApiService,
+      'fetchLessonFeedbackDetailAsync'
+    ).and.returnValue(Promise.resolve(detailResponse));
+
+    component.onCreatorLessonFeedbackRowClick('feedback_id');
+    tick();
+
+    expect(component.selectedCreatorFeedbackReportId).toBe('feedback_id');
+    expect(component.selectedCreatorFeedbackType).toBe(
+      CreatorFeedbackType.FEEDBACK
+    );
+    expect(windowRef.nativeWindow.location.hash).toBe(
+      '#/feedback/feedback/feedback_id'
+    );
+    expect(
+      feedbackBackendApiService.fetchLessonFeedbackDetailAsync
+    ).toHaveBeenCalledWith('exp_id', 'feedback_id');
+    expect(component.creatorFeedbackDetailResponse).toEqual(detailResponse);
+  }));
+
+  it('should update lesson feedback status when lesson feedback is selected', fakeAsync(() => {
+    const detailResponse: LessonFeedbackDetailResponse = {
+      id: 'feedback_id',
+      author_id: 'user_id',
+      feedback_text: 'Feedback text',
+      status: FeedbackStatus.OPEN,
+      lesson_metadata: {
+        exploration_id: 'exp_id',
+        exploration_version: 1,
+        state_name: 'Introduction',
+        state_index: 0,
+        learner_current_answer: null,
+      },
+      parent_feedback_id: null,
+      response_list: [],
+      unread_response_count: 0,
+      created_on_msecs: 0,
+    };
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(
+      feedbackBackendApiService,
+      'updateLessonFeedbackStatusAsync'
+    ).and.returnValue(Promise.resolve({success: true}));
+
+    component.selectedCreatorFeedbackReportId = 'feedback_id';
+    component.selectedCreatorFeedbackType = CreatorFeedbackType.FEEDBACK;
+    component.creatorFeedbackDetailResponse = detailResponse;
+
+    component.onCreatorFeedbackStatusChange(FeedbackStatus.FIXED);
+    tick();
+
+    expect(
+      feedbackBackendApiService.updateLessonFeedbackStatusAsync
+    ).toHaveBeenCalledWith('exp_id', 'feedback_id', FeedbackStatus.FIXED);
+    expect(component.creatorFeedbackDetailResponse.status).toBe(
+      FeedbackStatus.FIXED
+    );
+  }));
 });

@@ -362,9 +362,9 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
     def test_get_platform_feedback_returns_domain_object(self) -> None:
         report = general_feedback_services.create_platform_report(
-            feedback_text='There is a typo.',
+            feedback_text='There is a bug.',
             source='lesson',
-            category=feconf.CATEGORY_TYPO,
+            category=feconf.CATEGORY_BROKEN_LAYOUT_OR_IMAGE,
             lesson_metadata=self.get_lesson_metadata(),
             session_info=VALID_SESSION_INFO,
             screenshot_filename=None,
@@ -380,7 +380,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertIsNotNone(retrieved_report)
         assert retrieved_report is not None
         self.assertEqual(retrieved_report.id, report.id)
-        self.assertEqual(retrieved_report.report_message, 'There is a typo.')
+        self.assertEqual(retrieved_report.report_message, 'There is a bug.')
         self.assertEqual(
             retrieved_report.session_info,
             VALID_SESSION_INFO,

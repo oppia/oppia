@@ -68,7 +68,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     showCreatorFeedbackTypeFilter: true,
     showDateRangeFilter: true,
     showSearchBar: true,
-    statusOptions: ALL_FEEDBACK_STATUS_OPTIONS,
+    statusOptions: CREATOR_LESSON_FEEDBACK_STATUS_OPTIONS,
   };
   readonly creatorFeedbackCardConfig: FeedbackCardConfig = {
     showCategory: true,
@@ -84,7 +84,6 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     showLessonMetadata: true,
     showSessionInfo: false,
   };
-  readonly creatorReportStatusOptions = ALL_FEEDBACK_STATUS_OPTIONS;
   readonly creatorLessonFeedbackStatusOptions =
     CREATOR_LESSON_FEEDBACK_STATUS_OPTIONS;
   activeThread: SuggestionThread | null = null;
@@ -332,6 +331,32 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       );
   }
 
+  private updateCreatorLessonFeedbackPage(
+    response: LessonFeedbackBackendResponse
+  ): void {
+    this.creatorLessonFeedbackSummaries = response.summaries;
+    this.creatorLessonFeedbackNextCursor = response.next_cursor;
+    this.moreCreatorLessonFeedbackAvailable = response.more;
+    this.applyCreatorLessonFeedbackSearch();
+  }
+
+  private applyCreatorLessonFeedbackSearch(): void {
+    const search = (this.currentCreatorFeedbackFilterState.searchText ?? '')
+      .trim()
+      .toLowerCase();
+    if (!search) {
+      this.displayedCreatorLessonFeedbackSummaries = [
+        ...this.creatorLessonFeedbackSummaries,
+      ];
+      return;
+    }
+
+    this.displayedCreatorLessonFeedbackSummaries =
+      this.creatorLessonFeedbackSummaries.filter(feedback =>
+        feedback.feedback_text_preview.toLowerCase().includes(search)
+      );
+  }
+
   private hasSameCreatorFeedbackServerFilters(
     filterState: FeedbackFilterState
   ): boolean {
@@ -367,11 +392,126 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadCreatorLessonFeedbackDetails(feedbackId: string): void {
+    this.selectedCreatorFeedbackType = CreatorFeedbackType.FEEDBACK;
+    this.creatorFeedbackDetailResponse = null;
+    this.creatorFeedbackScreenshotDataUrl = null;
+    this.feedbackBackendApiService
+      .fetchLessonFeedbackDetailAsync(
+        this.pageContextService.getExplorationId(),
+        feedbackId
+      )
+      .then(response => {
+        this.creatorFeedbackDetailResponse = response;
+      });
+  }
+
+  private getCreatorFeedbackDetailFromUrl(): {
+    feedbackId: string;
+    feedbackType: CreatorFeedbackType;
+  } | null {
+    const feedbackDetailHashPrefix = '#/feedback/';
+    const hash = this.windowRef.nativeWindow.location.hash;
+    if (!hash.startsWith(feedbackDetailHashPrefix)) {
+      return null;
+    }
+
+    const feedbackDetailPath = hash.substring(feedbackDetailHashPrefix.length);
+    const pathParts = feedbackDetailPath.split('/');
+    if (
+      pathParts.length === 2 &&
+      (pathParts[0] === CreatorFeedbackType.REPORT ||
+        pathParts[0] === CreatorFeedbackType.FEEDBACK)
+    ) {
+      return {
+        feedbackId: decodeURIComponent(pathParts[1]),
+        feedbackType: pathParts[0] as CreatorFeedbackType,
+      };
+    }
+
+    return {
+      feedbackId: decodeURIComponent(feedbackDetailPath),
+      feedbackType: CreatorFeedbackType.REPORT,
+    };
+  }
+
+  private syncCreatorFeedbackReportFromUrl(): void {
+    const feedbackDetail = this.getCreatorFeedbackDetailFromUrl();
+    if (feedbackDetail === null) {
+      this.selectedCreatorFeedbackReportId = null;
+      this.selectedCreatorFeedbackType = null;
+      this.creatorFeedbackDetailResponse = null;
+      this.creatorFeedbackScreenshotDataUrl = null;
+      return;
+    }
+
+    this.currentCreatorFeedbackFilterState = {
+      ...this.currentCreatorFeedbackFilterState,
+      creatorFeedbackType: feedbackDetail.feedbackType,
+    };
+    this.selectedCreatorFeedbackReportId = feedbackDetail.feedbackId;
+    this.selectedCreatorFeedbackType = feedbackDetail.feedbackType;
+    if (feedbackDetail.feedbackType === CreatorFeedbackType.FEEDBACK) {
+      this.loadCreatorLessonFeedbackDetails(feedbackDetail.feedbackId);
+      return;
+    }
+
+    this.loadCreatorFeedbackDetails(feedbackDetail.feedbackId);
+  }
+
+  private onHashChange = (): void => {
+    if (this.shouldShowNewCreatorFeedbackTab()) {
+      this.syncCreatorFeedbackReportFromUrl();
+    }
+  };
+
   shouldShowNewCreatorFeedbackTab(): boolean {
     return this.newCreatorFeedbackTabIsEnabled && this.userCanEditExploration;
   }
 
+  isCreatorReportFilterSelected(): boolean {
+    return (
+      this.currentCreatorFeedbackFilterState.creatorFeedbackType ===
+      CreatorFeedbackType.REPORT
+    );
+  }
+
+  getCreatorFeedbackDetailCardConfig(): FeedbackCardConfig {
+    return this.selectedCreatorFeedbackType === CreatorFeedbackType.FEEDBACK
+      ? this.creatorLessonFeedbackCardConfig
+      : this.creatorFeedbackCardConfig;
+  }
+
   onCreatorFeedbackFilterChange(filterState: FeedbackFilterState): void {
+    if (filterState.creatorFeedbackType === CreatorFeedbackType.FEEDBACK) {
+      this.navigateBackToCreatorFeedbackList();
+      if (
+        this.hasSameCreatorFeedbackServerFilters(filterState) &&
+        (this.creatorLessonFeedbackSummaries.length > 0 ||
+          this.creatorLessonFeedbackNextCursor !== null ||
+          this.currentCreatorLessonFeedbackPage > 1)
+      ) {
+        this.currentCreatorFeedbackFilterState = filterState;
+        this.applyCreatorLessonFeedbackSearch();
+        return;
+      }
+
+      this.currentCreatorFeedbackFilterState = filterState;
+      this.currentCreatorLessonFeedbackPage = 1;
+      this.creatorLessonFeedbackCursorHistory = [null];
+      this.creatorLessonFeedbackNextCursor = null;
+      this.feedbackBackendApiService
+        .fetchCreatorLessonFeedbackListAsync(
+          this.pageContextService.getExplorationId(),
+          filterState,
+          this.creatorLessonFeedbackNextCursor
+        )
+        .then(response => {
+          this.updateCreatorLessonFeedbackPage(response);
+        });
+      return;
+    }
+
     if (
       this.hasSameCreatorFeedbackServerFilters(filterState) &&
       (this.creatorFeedbackSummaries.length > 0 ||
@@ -401,6 +541,15 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   onCreatorFeedbackRowClick(feedbackId: string): void {
     this.selectedCreatorFeedbackReportId = feedbackId;
     this.loadCreatorFeedbackDetails(feedbackId);
+    this.windowRef.nativeWindow.location.hash =
+      '/feedback/report/' + encodeURIComponent(feedbackId);
+  }
+
+  onCreatorLessonFeedbackRowClick(feedbackId: string): void {
+    this.selectedCreatorFeedbackReportId = feedbackId;
+    this.loadCreatorLessonFeedbackDetails(feedbackId);
+    this.windowRef.nativeWindow.location.hash =
+      '/feedback/' + encodeURIComponent(feedbackId);
   }
 
   onCreatorFeedbackNextPage(): void {
@@ -443,10 +592,61 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       });
   }
 
+  onCreatorLessonFeedbackNextPage(): void {
+    if (
+      !this.moreCreatorLessonFeedbackAvailable ||
+      !this.creatorLessonFeedbackNextCursor
+    ) {
+      return;
+    }
+
+    const nextPageIndex = this.currentCreatorLessonFeedbackPage;
+    if (this.creatorLessonFeedbackCursorHistory.length === nextPageIndex) {
+      this.creatorLessonFeedbackCursorHistory.push(
+        this.creatorLessonFeedbackNextCursor
+      );
+    }
+    this.feedbackBackendApiService
+      .fetchCreatorLessonFeedbackListAsync(
+        this.pageContextService.getExplorationId(),
+        this.currentCreatorFeedbackFilterState,
+        this.creatorLessonFeedbackNextCursor
+      )
+      .then(response => {
+        this.updateCreatorLessonFeedbackPage(response);
+        this.currentCreatorLessonFeedbackPage++;
+      });
+  }
+
+  onCreatorLessonFeedbackPreviousPage(): void {
+    if (this.currentCreatorLessonFeedbackPage <= 1) {
+      return;
+    }
+
+    const previousPageCursor =
+      this.creatorLessonFeedbackCursorHistory[
+        this.currentCreatorLessonFeedbackPage - 2
+      ];
+    this.feedbackBackendApiService
+      .fetchCreatorLessonFeedbackListAsync(
+        this.pageContextService.getExplorationId(),
+        this.currentCreatorFeedbackFilterState,
+        previousPageCursor
+      )
+      .then(response => {
+        this.updateCreatorLessonFeedbackPage(response);
+        this.currentCreatorLessonFeedbackPage--;
+      });
+  }
+
   navigateBackToCreatorFeedbackList(): void {
     this.selectedCreatorFeedbackReportId = null;
+    this.selectedCreatorFeedbackType = null;
     this.creatorFeedbackDetailResponse = null;
     this.creatorFeedbackScreenshotDataUrl = null;
+    if (this.windowRef.nativeWindow.location.hash !== '#/feedback') {
+      this.windowRef.nativeWindow.location.hash = '/feedback';
+    }
   }
 
   onCreatorFeedbackStatusChange(status: FeedbackStatus): void {
@@ -454,30 +654,33 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.feedbackBackendApiService
-      .updatePlatformFeedbackStatusAsync(
-        'curriculum',
-        this.pageContextService.getExplorationId(),
-        this.selectedCreatorFeedbackReportId,
-        status
-      )
-      .then(() => {
-        if (this.creatorFeedbackDetailResponse) {
-          this.creatorFeedbackDetailResponse = {
-            ...this.creatorFeedbackDetailResponse,
-            status,
-          };
-        }
-        this.alertsService.addSuccessMessage(
-          `Feedback status updated to ${status}.`,
-          7000,
-          true
-        );
-      });
-  }
+    const updateStatusPromise =
+      this.selectedCreatorFeedbackType === CreatorFeedbackType.FEEDBACK
+        ? this.feedbackBackendApiService.updateLessonFeedbackStatusAsync(
+            this.pageContextService.getExplorationId(),
+            this.selectedCreatorFeedbackReportId,
+            status
+          )
+        : this.feedbackBackendApiService.updatePlatformFeedbackStatusAsync(
+            'curriculum',
+            this.pageContextService.getExplorationId(),
+            this.selectedCreatorFeedbackReportId,
+            status
+          );
 
-  onCreatorFeedbackGithubTransfer(_githubIssueUrl: string): void {
-    this.onCreatorFeedbackStatusChange(FeedbackStatus.TRANSFERRED_TO_GITHUB);
+    updateStatusPromise.then(() => {
+      if (this.creatorFeedbackDetailResponse) {
+        this.creatorFeedbackDetailResponse = {
+          ...this.creatorFeedbackDetailResponse,
+          status,
+        };
+      }
+      this.alertsService.addSuccessMessage(
+        `Feedback status updated to ${status}.`,
+        7000,
+        true
+      );
+    });
   }
 
   ngOnInit(): void {
@@ -515,15 +718,26 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
         }),
     ]).then(() => {
       if (this.shouldShowNewCreatorFeedbackTab()) {
-        this.onCreatorFeedbackFilterChange(
-          this.currentCreatorFeedbackFilterState
+        this.windowRef.nativeWindow.addEventListener(
+          'hashchange',
+          this.onHashChange
         );
+        this.syncCreatorFeedbackReportFromUrl();
+        if (this.selectedCreatorFeedbackReportId === null) {
+          this.onCreatorFeedbackFilterChange(
+            this.currentCreatorFeedbackFilterState
+          );
+        }
       }
       this.loaderService.hideLoadingScreen();
     });
   }
 
   ngOnDestroy(): void {
+    this.windowRef.nativeWindow.removeEventListener(
+      'hashchange',
+      this.onHashChange
+    );
     this.directiveSubscriptions.unsubscribe();
   }
 }
