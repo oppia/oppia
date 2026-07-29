@@ -464,6 +464,8 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 # Default content_id for explanation subtitled html.
 DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+# Content ID for skill description.
+SKILL_DESCRIPTION_CONTENT_ID = 'skill_description'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
@@ -542,6 +544,9 @@ MAILCHIMP_USERNAME = None
 VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
+
+# Placeholder for the preferences-page URL in email footers.
+EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
 
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
@@ -749,6 +754,10 @@ MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The maximum number of questions to be fetched at one time.
 MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
+# The minimum number of questions required per skill before a story
+# referencing that skill can be published.
+MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH = 10
 
 # The minimum score required for a user to review suggestions of a particular
 # category.
