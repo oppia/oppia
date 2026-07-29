@@ -61,6 +61,113 @@ PLATFORM_FEEDBACK_RETENTION_DAYS = 90
 CLEARED_FEEDBACK_TEXT = '[Text cleared after 6 months for privacy protection]'
 
 
+class PrepareWebFeedbackRetentionTestJob(base_jobs.JobBase):
+    """Temporary job for release testing only.
+
+    Updates the created_on timestamps of web feedback models so they
+    satisfy the retention policy and can be cleaned up by the retention jobs.
+    """
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    def make_lesson_feedback_expired(
+        self,
+        model: general_feedback_models.LessonFeedbackModel,
+    ) -> general_feedback_models.LessonFeedbackModel:
+        """Makes lesson feedback eligible for cleanup."""
+
+        with datastore_services.get_ndb_context():
+            if model.status == feconf.STATUS_CHOICES_OPEN:
+                model.created_on = (
+                    datetime.datetime.utcnow() - datetime.timedelta(days=366)
+                )
+            else:
+                model.created_on = (
+                    datetime.datetime.utcnow() - datetime.timedelta(days=181)
+                )
+
+        return model
+
+    def make_platform_feedback_expired(
+        self,
+        model: general_feedback_models.PlatformFeedbackModel,
+    ) -> general_feedback_models.PlatformFeedbackModel:
+        """Makes platform feedback eligible for cleanup."""
+
+        with datastore_services.get_ndb_context():
+            model.created_on = datetime.datetime.utcnow() - datetime.timedelta(
+                days=91
+            )
+
+        return model
+
+    def create_lesson_count_job_run_result(
+        self, count: int
+    ) -> job_run_result.JobRunResult:
+        """Creates a JobRunResult for updated LessonFeedbackModel count."""
+        return job_run_result.JobRunResult.as_stdout(
+            'Updated %d LessonFeedbackModels.' % count
+        )
+
+    def create_platform_count_job_run_result(
+        self, count: int
+    ) -> job_run_result.JobRunResult:
+        """Creates a JobRunResult for updated PlatformFeedbackModel count."""
+        return job_run_result.JobRunResult.as_stdout(
+            'Updated %d PlatformFeedbackModels.' % count
+        )
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Runs the PrepareWebFeedbackRetentionTestJob."""
+        lesson_models = (
+            self.pipeline
+            | 'Get LessonFeedbackModels'
+            >> ndb_io.GetModels(
+                general_feedback_models.LessonFeedbackModel.get_all()
+            )
+            | 'Expire LessonFeedbackModels'
+            >> beam.Map(self.make_lesson_feedback_expired)
+        )
+
+        platform_models = (
+            self.pipeline
+            | 'Get PlatformFeedbackModels'
+            >> ndb_io.GetModels(
+                general_feedback_models.PlatformFeedbackModel.get_all()
+            )
+            | 'Expire PlatformFeedbackModels'
+            >> beam.Map(self.make_platform_feedback_expired)
+        )
+
+        _ = lesson_models | 'Write LessonFeedbackModels' >> ndb_io.PutModels()
+
+        _ = (
+            platform_models
+            | 'Write PlatformFeedbackModels' >> ndb_io.PutModels()
+        )
+
+        lesson_count_results = (
+            lesson_models
+            | 'Count updated LessonFeedbackModels'
+            >> beam.combiners.Count.Globally()
+            | 'Format updated LessonFeedbackModels count'
+            >> beam.Map(self.create_lesson_count_job_run_result)
+        )
+
+        platform_count_results = (
+            platform_models
+            | 'Count updated PlatformFeedbackModels'
+            >> beam.combiners.Count.Globally()
+            | 'Format updated PlatformFeedbackModels count'
+            >> beam.Map(self.create_platform_count_job_run_result)
+        )
+
+        return (
+            lesson_count_results,
+            platform_count_results,
+        ) | 'Combine updated web feedback counts' >> beam.Flatten()
+
+
 class LessonFeedbackCleanupJob(base_jobs.JobBase):
     """Clears expired feedback text from LessonFeedbackModel entries."""
 

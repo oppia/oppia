@@ -273,6 +273,83 @@ class PlatformFeedbackCleanupJobTestBase(job_test_utils.JobTestBase):
         PlatformFeedbackCleanupJobTestBase.deleted_filepaths = []
 
 
+class PrepareWebFeedbackRetentionTestJobTests(
+    PlatformFeedbackCleanupJobTestBase,
+    LessonFeedbackCleanupJobTestBase,
+):
+    """Tests for PrepareWebFeedbackRetentionTestJob."""
+
+    JOB_CLASS: Type[
+        web_feedback_cleanup_jobs.PrepareWebFeedbackRetentionTestJob
+    ] = web_feedback_cleanup_jobs.PrepareWebFeedbackRetentionTestJob
+
+    def test_job_makes_web_feedback_models_expired(self) -> None:
+        current_time = datetime.datetime.utcnow()
+        open_lesson_feedback_model = self.create_lesson_feedback_model(
+            'open_lesson_feedback_id',
+            'open lesson feedback',
+            feconf.STATUS_CHOICES_OPEN,
+            current_time,
+        )
+        closed_lesson_feedback_model = self.create_lesson_feedback_model(
+            'closed_lesson_feedback_id',
+            'closed lesson feedback',
+            feconf.STATUS_CHOICES_FIXED,
+            current_time,
+        )
+        platform_feedback_model = self.create_platform_feedback_model(
+            'platform_feedback_id',
+            current_time,
+        )
+        self.put_multi(
+            [
+                open_lesson_feedback_model,
+                closed_lesson_feedback_model,
+                platform_feedback_model,
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Updated 2 LessonFeedbackModels.'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='Updated 1 PlatformFeedbackModels.'
+                ),
+            ]
+        )
+
+        fetched_open_lesson_feedback_model = (
+            general_feedback_models.LessonFeedbackModel.get(
+                'open_lesson_feedback_id'
+            )
+        )
+        fetched_closed_lesson_feedback_model = (
+            general_feedback_models.LessonFeedbackModel.get(
+                'closed_lesson_feedback_id'
+            )
+        )
+        fetched_platform_feedback_model = (
+            general_feedback_models.PlatformFeedbackModel.get(
+                'platform_feedback_id'
+            )
+        )
+
+        self.assertLessEqual(
+            fetched_open_lesson_feedback_model.created_on,
+            current_time - datetime.timedelta(days=365),
+        )
+        self.assertLessEqual(
+            fetched_closed_lesson_feedback_model.created_on,
+            current_time - datetime.timedelta(days=180),
+        )
+        self.assertLessEqual(
+            fetched_platform_feedback_model.created_on,
+            current_time - datetime.timedelta(days=90),
+        )
+
+
 class PlatformFeedbackCleanupJobTests(PlatformFeedbackCleanupJobTestBase):
     """Tests for PlatformFeedbackCleanupJob."""
 
