@@ -33,6 +33,10 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
     Azure Cognitive Services Text Translation API REST endpoint.
     """
 
+    # Unique identifier for this provider. Must match the key used in
+    # auto_translation_provider_mapping.json and feconf.py display names.
+    PROVIDER_ID = 'azure'
+
     MAX_RETRIES = 3
     INITIAL_BACKOFF_SEC = 1.0
     REQUEST_TIMEOUT_SEC = 10.0

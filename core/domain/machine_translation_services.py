@@ -35,11 +35,28 @@ from core.platform.translate import (
     translate_emulator,
 )
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Type
 
 (translation_models,) = models.Registry.import_models(
     [models.Names.TRANSLATION]
 )
+
+
+# Maps every known provider ID to its concrete service class.  The key is
+# taken from the class's own PROVIDER_ID constant so that the string appears
+# in exactly one place.  To onboard a new translation provider:
+#   1. Add its supported languages to auto_translation_provider_mapping.json.
+#   2. Implement a class inheriting BaseTranslationService in
+#      core/platform/translate/ and set its PROVIDER_ID constant.
+#   3. Import the class here and add it to this map.
+# No other changes to this module are needed.
+_PROVIDER_CLASS_MAP: Dict[
+    str, Type[base_translate_services.BaseTranslationService]
+] = {
+    azure_translate_services.AzureTranslationService.PROVIDER_ID: (
+        azure_translate_services.AzureTranslationService
+    ),
+}
 
 
 class TranslationProviderRegistry:
@@ -88,13 +105,25 @@ class TranslationProviderRegistry:
 
         self._providers: Dict[
             str, base_translate_services.BaseTranslationService
-        ] = {
-            'azure': (
+        ] = {}
+        all_provider_ids: Set[str] = set()
+        for providers in self._provider_whitelist.values():
+            all_provider_ids.update(providers)
+
+        for pid in all_provider_ids:
+            if pid not in _PROVIDER_CLASS_MAP:
+                logging.error(
+                    'Provider \'%s\' appears in auto_translation_provider'
+                    '_mapping.json but has no registered implementation in '
+                    '_PROVIDER_CLASS_MAP. Skipping.' % pid
+                )
+                continue
+            cls = _PROVIDER_CLASS_MAP[pid]
+            self._providers[pid] = (
                 translate_emulator.TranslateEmulator()
                 if constants.EMULATOR_MODE
-                else azure_translate_services.AzureTranslationService()
+                else cls()
             )
-        }
 
     def get_provider_id(self, target_language_code: str) -> Optional[str]:
         """Gets the configured translation provider ID for the given language.

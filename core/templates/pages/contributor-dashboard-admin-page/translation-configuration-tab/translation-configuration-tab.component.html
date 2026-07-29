@@ -18,7 +18,7 @@
           <td>
             <button mat-icon-button
                     class="e2e-test-remove-mapping-btn"
-                    [attr.aria-label]="'Remove ' + getLanguageName(entry.key)"
+                    [attr.aria-label]="'Remove ' + entry.key"
                     (click)="removeMapping(entry.key)">
               <mat-icon>close</mat-icon>
             </button>
