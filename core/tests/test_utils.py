@@ -3462,7 +3462,7 @@ version: 1
             params=data,
             headers=headers,
             status=expected_status_int,
-            upload_files=encoded_upload_files,
+            upload_files=encoded_upload_files or None,
             expect_errors=expect_errors,
         )
 
