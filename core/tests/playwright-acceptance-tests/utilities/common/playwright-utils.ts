@@ -233,10 +233,10 @@ export class BaseUser {
   ): Promise<string> {
     if (typeof selector === 'string') {
       const element = await this.page.$(selector);
-      const text = await this.page.evaluate(
-        (el: Element) => el.textContent,
-        element
-      );
+      if (!element) {
+        return '';
+      }
+      const text = await this.page.evaluate(el => el.textContent, element);
       return text?.trim() ?? '';
     }
     const text = await selector.evaluate(el => el.textContent);
