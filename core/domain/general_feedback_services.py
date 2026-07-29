@@ -417,23 +417,8 @@ def get_learner_feedback(
     )
     if model is None or model.author_id != author_id:
         return None
-    return _lesson_feedback_model_to_domain(model)
 
-
-def _update_lesson_feedback_model_status(
-    model: general_feedback_models.LessonFeedbackModel,
-    new_status: str,
-) -> general_feedback_domain.LessonFeedback:
-    """Updates the status of a lesson feedback model.
-
-    Args:
-        model: LessonFeedbackModel. The model to update.
-        new_status: str. The new status value.
-
-    Returns:
-        LessonFeedback. The updated report.
-    """
-    model.status = new_status
+    model.unread_response_count = 0
     model.update_timestamps()
     model.put()
     return _lesson_feedback_model_to_domain(model)
@@ -465,38 +450,6 @@ def _append_lesson_feedback_model_response(
     )
     model.response_list = response_list
     model.unread_response_count += 1
-
-
-def update_lesson_feedback_status(
-    feedback_id: str,
-    new_status: str,
-    exp_id: str,
-) -> Optional[general_feedback_domain.LessonFeedback]:
-    """Updates the status of a lesson feedback.
-
-    Args:
-        feedback_id: str. ID of the LessonFeedbackModel to update.
-        new_status: str. The new status value. Must be a valid status choice.
-        exp_id: str. The exploration from which the feedback is being
-            accessed.
-
-    Returns:
-        Optional[LessonFeedback]. The updated report, or None if not found.
-
-    Raises:
-        ValueError. The new status is invalid or exploration access is invalid.
-    """
-    if new_status not in feconf.STATUS_CHOICES:
-        raise ValueError('Invalid status: %s' % new_status)
-
-    model = general_feedback_models.LessonFeedbackModel.get(
-        feedback_id, strict=False
-    )
-    if model is None:
-        return None
-    if model.lesson_metadata['exploration_id'] != exp_id:
-        raise ValueError('Invalid exploration ID: %s' % exp_id)
-    return _update_lesson_feedback_model_status(model, new_status)
 
 
 def update_lesson_feedback(

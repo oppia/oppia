@@ -57,7 +57,6 @@ class LessonFeedbackDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict: general_feedback_domain.LessonFeedbackDict = {
             'id': 'feedback_id',
-            'author_id': 'author_id',
             'feedback_text': 'Feedback text',
             'status': 'open',
             'lesson_metadata': LESSON_METADATA,

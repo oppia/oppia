@@ -23,6 +23,7 @@ from core import feconf, utils
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     captcha_services,
+    exp_fetchers,
     fs_services,
     general_feedback_domain,
     general_feedback_services,
@@ -139,7 +140,22 @@ class MyFeedbackDetailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             },
         },
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'feedback_text': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': _MAX_FEEDBACK_TEXT_LENGTH,
+                        },
+                    ],
+                }
+            }
+        },
+    }
 
     @acl_decorators.open_access
     def get(self, feedback_id: str) -> None:
@@ -158,6 +174,44 @@ class MyFeedbackDetailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'Feedback with ID %s does not exist.' % feedback_id
             )
         self.render_json(feedback.to_learner_dict())
+
+    @acl_decorators.open_access
+    def post(self, feedback_id: str) -> None:
+        """Creates a learner follow-up with parent_feedback_id set."""
+        if self.user_id is None:
+            raise self.UnauthorizedUserException(
+                'You must be logged in to submit feedback.'
+            )
+
+        assert self.normalized_payload is not None
+        payload = self.normalized_payload
+        parent_feedback = general_feedback_services.get_learner_feedback(
+            feedback_id=feedback_id,
+            author_id=self.user_id,
+        )
+        if parent_feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+
+        lesson_metadata = parent_feedback.lesson_metadata.copy()
+        exploration = exp_fetchers.get_exploration_by_id(
+            lesson_metadata['exploration_id'], strict=False
+        )
+        if exploration is None:
+            raise self.NotFoundException(
+                'Exploration with ID %s does not exist.'
+                % lesson_metadata['exploration_id']
+            )
+        lesson_metadata['exploration_version'] = exploration.version
+
+        general_feedback_services.create_lesson_feedback(
+            parent_feedback_id=feedback_id,
+            author_id=self.user_id,
+            feedback_text=payload['feedback_text'],
+            lesson_metadata=lesson_metadata,
+        )
+        self.render_json({'success': True})
 
 
 class LessonFeedbackSubmitHandler(

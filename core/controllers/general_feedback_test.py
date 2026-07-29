@@ -19,6 +19,7 @@ from __future__ import annotations
 from unittest import mock
 
 from core import feconf
+from core.controllers import general_feedback
 from core.domain import (
     captcha_services,
     fs_services,
@@ -181,6 +182,58 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response, feedback.to_learner_dict())
         self.assertNotIn('author_id', response)
 
+    def test_learner_can_post_follow_up_feedback(self) -> None:
+        parent_feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Helpful lesson.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        current_exploration = mock.Mock(version=7)
+        get_exploration_by_id_mock = mock.Mock(return_value=current_exploration)
+
+        with self.login_context(self.VIEWER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            with self.swap(
+                general_feedback.exp_fetchers,
+                'get_exploration_by_id',
+                get_exploration_by_id_mock,
+            ):
+                response = self.post_json(
+                    '%s/%s' % (feconf.MY_FEEDBACK_URL, parent_feedback.id),
+                    {'feedback_text': 'Follow-up feedback.'},
+                    csrf_token=csrf_token,
+                )
+
+        summaries = general_feedback_services.get_learner_feedback_summaries(
+            self.viewer_id
+        )[0]
+        child_feedback_id = [
+            summary['id']
+            for summary in summaries
+            if summary['feedback_text_preview'] == 'Follow-up feedback.'
+        ][0]
+        child_feedback = general_feedback_services.get_learner_feedback(
+            child_feedback_id, self.viewer_id
+        )
+
+        self.assertEqual(response, {'success': True})
+        self.assertIsNotNone(child_feedback)
+        assert child_feedback is not None
+        self.assertEqual(child_feedback.parent_feedback_id, parent_feedback.id)
+        self.assertEqual(
+            child_feedback.lesson_metadata,
+            {
+                'exploration_id': 'exp_id',
+                'exploration_version': 7,
+                'state_name': 'Introduction',
+                'state_index': 0,
+                'learner_current_answer': 'answer',
+            },
+        )
+        get_exploration_by_id_mock.assert_called_once_with(
+            'exp_id', strict=False
+        )
+
     def test_learner_cannot_get_other_user_feedback_detail(self) -> None:
         feedback = general_feedback_services.create_lesson_feedback(
             author_id=self.other_user_id,
@@ -194,9 +247,73 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=404,
             )
 
+    def test_learner_cannot_post_follow_up_to_other_user_feedback(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.other_user_id,
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+
+        with self.login_context(self.VIEWER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '%s/%s' % (feconf.MY_FEEDBACK_URL, feedback.id),
+                {'feedback_text': 'Follow-up feedback.'},
+                csrf_token=csrf_token,
+                expected_status_int=404,
+            )
+
+    def test_learner_cannot_post_follow_up_when_exploration_is_missing(
+        self,
+    ) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Helpful lesson.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        get_exploration_by_id_mock = mock.Mock(return_value=None)
+
+        with self.login_context(self.VIEWER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            with self.swap(
+                general_feedback.exp_fetchers,
+                'get_exploration_by_id',
+                get_exploration_by_id_mock,
+            ):
+                response = self.post_json(
+                    '%s/%s' % (feconf.MY_FEEDBACK_URL, feedback.id),
+                    {'feedback_text': 'Follow-up feedback.'},
+                    csrf_token=csrf_token,
+                    expected_status_int=404,
+                )
+
+        self.assertIn('Could not find the resource', response['error'])
+        get_exploration_by_id_mock.assert_called_once_with(
+            'exp_id', strict=False
+        )
+
     def test_logged_out_user_cannot_list_feedback(self) -> None:
         response = self.get_json(
             feconf.MY_FEEDBACK_URL, expected_status_int=401
+        )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to submit feedback.'
+        )
+
+    def test_logged_out_user_cannot_post_follow_up_feedback(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.viewer_id,
+            feedback_text='Helpful lesson.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '%s/%s' % (feconf.MY_FEEDBACK_URL, feedback.id),
+            {'feedback_text': 'Follow-up feedback.'},
+            csrf_token=csrf_token,
+            expected_status_int=401,
         )
 
         self.assertEqual(
