@@ -251,9 +251,10 @@ class SuggestionHandler(
             assert isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             )
-            self._copy_images_from_target_exploration_content_to_translation(
-                suggestion
-            )
+            if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+                self._copy_images_from_target_exploration_content_to_translation(
+                    suggestion
+                )
 
             files = self.normalized_payload.get('files')
             new_image_filenames = (
@@ -646,22 +647,26 @@ class SuggestionToSkillActionHandler(
             )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-            target_entity_html_list = (
-                suggestion.get_target_entity_html_strings()
-            )
-            target_image_filenames = (
-                html_cleaner.get_image_filenames_from_html_strings(
-                    target_entity_html_list
+            if (
+                suggestion.suggestion_type
+                == feconf.SUGGESTION_TYPE_ADD_QUESTION
+            ):
+                target_entity_html_list = (
+                    suggestion.get_target_entity_html_strings()
                 )
-            )
+                target_image_filenames = (
+                    html_cleaner.get_image_filenames_from_html_strings(
+                        target_entity_html_list
+                    )
+                )
 
-            fs_services.copy_images(
-                suggestion.target_type,
-                suggestion.target_id,
-                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
-                suggestion.target_id,
-                target_image_filenames,
-            )
+                fs_services.copy_images(
+                    suggestion.target_type,
+                    suggestion.target_id,
+                    feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+                    suggestion.target_id,
+                    target_image_filenames,
+                )
         else:
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
@@ -673,6 +678,11 @@ class SuggestionToSkillActionHandler(
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestion_services.update_question_review_stats(suggestion)
+        elif (
+            suggestion.suggestion_type
+            == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 
