@@ -529,6 +529,9 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+# Placeholder for the preferences-page URL in email footers.
+EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
+
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
 
