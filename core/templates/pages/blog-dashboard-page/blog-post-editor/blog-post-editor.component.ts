@@ -50,9 +50,11 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
+import './blog-post-editor.component.css';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html',
+  styleUrls: ['./blog-post-editor.component.css'],
 })
 export class BlogPostEditorComponent implements OnInit {
   @ViewChild('titleInput') titleInput!: ElementRef;

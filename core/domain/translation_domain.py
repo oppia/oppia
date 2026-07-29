@@ -43,6 +43,9 @@ class ContentType(enum.Enum):
     SOLUTION = 'solution'
     SECTION = 'section'
     METADATA = 'metadata'
+    SKILL_DESCRIPTION = 'skill_description'
+    SKILL_EXPLANATION = 'skill_explanation'
+    MISCONCEPTION_FEEDBACK = 'misconception_feedback'
 
 
 class TranslatableContentFormat(enum.Enum):

@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -110,12 +112,13 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
                 'last_updated': base_models.EXPORT_POLICY.EXPORTED,
                 # author_id is pseudonymized, not exported directly.
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
                 'feedback_text': base_models.EXPORT_POLICY.EXPORTED,
                 'status': base_models.EXPORT_POLICY.EXPORTED,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'lesson_metadata_json': base_models.EXPORT_POLICY.EXPORTED,
+                'lesson_metadata': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -182,7 +185,8 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
             user_data[feedback_model.id] = {
                 'feedback_text': feedback_model.feedback_text,
                 'status': feedback_model.status,
-                'lesson_metadata_json': feedback_model.lesson_metadata_json,
+                'lesson_metadata': feedback_model.lesson_metadata,
+                'exploration_id': feedback_model.exploration_id,
                 'parent_feedback_id': feedback_model.parent_feedback_id,
                 'response_list': sanitized_response_list,
                 'unread_response_count': feedback_model.unread_response_count,
@@ -201,7 +205,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
         cls,
         author_id: str,
         feedback_text: str,
-        lesson_metadata_json: Dict[str, Union[str, int, None]],
+        lesson_metadata: Dict[str, Union[str, int, None]],
         parent_feedback_id: Optional[str] = None,
     ) -> str:
         """Creates a new LessonFeedbackModel and returns its ID.
@@ -209,7 +213,7 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
         Args:
             author_id: str. User ID of the submitter.
             feedback_text: str. The main text body submitted by the learner.
-            lesson_metadata_json: Dict.Lesson metadata at
+            lesson_metadata: Dict.Lesson metadata at
                 submission time. Must include exploration_id,
                 exploration_version, state_name, state_index, and
                 learner_current_answer.
@@ -225,8 +229,9 @@ class LessonFeedbackModel(base_models.BaseFeedbackModel):
             author_id=author_id,
             feedback_text=feedback_text,
             status=feconf.STATUS_CHOICES_OPEN,
+            exploration_id=lesson_metadata['exploration_id'],
             lesson_metadata_schema_version=feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION,
-            lesson_metadata_json=lesson_metadata_json,
+            lesson_metadata=lesson_metadata,
             parent_feedback_id=parent_feedback_id,
             response_list_schema_version=feconf.CURRENT_RESPONSE_LIST_SCHEMA_VERSION,
             response_list=[],
@@ -244,11 +249,11 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     destination_dashboard field is set automatically at creation time
     based on the page_url and category:
 
-        typo                        → creator
-        confusing_or_incorrect_answer → creator
-        broken_layout_or_image      → technical
-        other_or_not_sure           → technical
-        all site (app) reports      → technical
+        typo                        → curriculum
+        confusing_or_incorrect_answer → curriculum
+        broken_layout_or_image      → tech-external or tech-internal
+        other_or_not_sure           → tech-external or tech-internal
+        all site (app) reports      → tech-external or tech-internal
 
     The id of instances of this class has the form
         feedback.platform.<timestamp_base64><random_base64>
@@ -256,7 +261,8 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
     Fields (in addition to BaseFeedbackModel fields):
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Platform of the report ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "technical").
+        destination_dashboard: str. Routing target ("curriculum" |
+            "tech-external" | "tech-internal").
         category: Optional[str]. Report category; required for lesson reports,
             must be None for site reports.
         include_technical_logs: bool. Whether session diagnostics are included.
@@ -327,10 +333,11 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'feedback_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'lesson_metadata_schema_version': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'lesson_metadata_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'lesson_metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 # Fields specific to PlatformFeedbackModel.
                 'source': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -350,24 +357,32 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         cls,
         source: str,
         category: Optional[str],
-        lesson_metadata_json: Optional[Dict[str, Union[str, int, None]]],
+        lesson_metadata: Optional[Dict[str, Union[str, int, None]]],
         screenshot_filename: Optional[str],
         screenshot_entity_id: Optional[str],
     ) -> None:
         """Validates arguments passed to create()."""
 
         if source == feconf.SOURCE_LESSON:
-            if not lesson_metadata_json:
+            if lesson_metadata is None:
                 raise ValueError(
                     'Lesson feedback must include lesson metadata.'
                 )
+
+            if lesson_metadata.get('exploration_id') is None:
+                raise ValueError(
+                    'Lesson feedback must include an exploration ID.'
+                )
+
         elif source == feconf.SOURCE_APP:
-            if category:
+            if category is not None:
                 raise ValueError('App feedback must not include a category.')
-            if lesson_metadata_json:
+
+            if lesson_metadata is not None:
                 raise ValueError(
                     'App feedback must not include lesson metadata.'
                 )
+
         else:
             raise ValueError('Invalid source: %s' % source)
 
@@ -381,6 +396,60 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
                 'provided or both be None.'
             )
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @classmethod
+    def _get_filtered_query(
+        cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+        destination_dashboard: Optional[str] = None,
+        platform: Optional[str] = None,
+        source: Optional[str] = None,
+        **kwargs: Any,
+    ) -> datastore_services.Query:
+        """Returns a filtered query based on the given parameters.
+
+        Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime]. If provided, filters reports created
+                on or after this date.
+            date_to: Optional[datetime]. If provided, filters reports created
+                on or before this date.
+            destination_dashboard: Optional[str]. If provided, filters reports
+                routed to this dashboard.
+            platform: Optional[str]. If provided, filters by platform.
+            source: Optional[str]. If provided, filters by source.
+            **kwargs: *. Filters handled by BaseFeedbackModel.
+
+        Returns:
+            Query. The filtered query object.
+        """
+        query = super()._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+            **kwargs,
+        )
+
+        if destination_dashboard is not None:
+            query = query.filter(
+                cls.destination_dashboard == destination_dashboard
+            )
+        if platform is not None:
+            query = query.filter(cls.platform == platform)
+        if source is not None:
+            query = query.filter(cls.source == source)
+        return query
+
     @classmethod
     def create(
         cls,
@@ -390,7 +459,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         page_url: str,
         destination_dashboard: str,
         category: Optional[str],
-        lesson_metadata_json: Optional[Dict[str, Union[str, int, None]]],
+        lesson_metadata: Optional[Dict[str, Union[str, int, None]]],
         include_technical_logs: bool,
         screenshot_filename: Optional[str],
         screenshot_entity_id: Optional[str],
@@ -403,8 +472,9 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             platform: str. Platform of the report ("web" | "android").
             category: Optional[str]. Report category; can be for lesson
                 reports, must be None for site (app) reports.
-            destination_dashboard: str. Routing target ("creator" | "LEAP" | "CORE).
-            lesson_metadata_json: Optional[Dict]. Lesson metadata at
+            destination_dashboard: str. Routing target ("curriculum" |
+                "tech-external" | "tech-internal").
+            lesson_metadata: Optional[Dict]. Lesson metadata at
                 submission time;
                 required for lesson reports, must be None for site reports.
             include_technical_logs: bool. Whether session diagnostics are included.
@@ -419,10 +489,10 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             str. The ID of the newly created model.
 
         Raises:
-            ValueError. If source is "lesson" and lesson_metadata_json is
+            ValueError. If source is "lesson" and lesson_metadata is
                 missing.
             ValueError. If source is "app" and category is not None.
-            ValueError. If source is "app" and lesson_metadata_json is not
+            ValueError. If source is "app" and lesson_metadata is not
                 None.
             ValueError. If exactly one of screenshot_filename and
                 screenshot_entity_id is provided.
@@ -430,7 +500,7 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
         cls._validate_create_args(
             source=source,
             category=category,
-            lesson_metadata_json=lesson_metadata_json,
+            lesson_metadata=lesson_metadata,
             screenshot_filename=screenshot_filename,
             screenshot_entity_id=screenshot_entity_id,
         )
@@ -442,12 +512,17 @@ class PlatformFeedbackModel(base_models.BaseFeedbackModel):
             author_id=None,
             feedback_text=feedback_text,
             status=feconf.STATUS_CHOICES_OPEN,
-            lesson_metadata_schema_version=(
-                feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
-                if lesson_metadata_json is not None
+            exploration_id=(
+                lesson_metadata.get('exploration_id')
+                if lesson_metadata is not None
                 else None
             ),
-            lesson_metadata_json=lesson_metadata_json,
+            lesson_metadata_schema_version=(
+                feconf.CURRENT_LESSON_METADATA_SCHEMA_VERSION
+                if lesson_metadata is not None
+                else None
+            ),
+            lesson_metadata=lesson_metadata,
             source=source,
             platform=platform,
             category=category,
@@ -475,10 +550,10 @@ class FeedbackSessionLogModel(base_models.BaseModel):
     Fields:
         id: str. PlatformFeedbackModel ID associated with the session log.
         session_info_schema_version: int. Schema version for FeedbackSessionLogModel schema.
-        console_logs_json: List[Dict]. Console errors captured during session.
-        failed_requests_json: List[Dict]. Failed HTTP request logs.
-        navigation_history_json: List[Dict]. Recent navigation history.
-        environment_json: Dict. Browser and device metadata.
+        console_logs: List[Dict]. Console errors captured during session.
+        failed_requests: List[Dict]. Failed HTTP request logs.
+        navigation_history: List[Dict]. Recent navigation history.
+        environment: Dict. Browser and device metadata.
         created_on: datetime. Timestamp of creation.
         last_updated: datetime. Timestamp of last update.
         deleted: bool.
@@ -491,19 +566,19 @@ class FeedbackSessionLogModel(base_models.BaseModel):
         required=True,
         indexed=True,
     )
-    console_logs_json = datastore_services.JsonProperty(
+    console_logs = datastore_services.JsonProperty(
         required=False,
         indexed=False,
     )
-    failed_requests_json = datastore_services.JsonProperty(
+    failed_requests = datastore_services.JsonProperty(
         required=False,
         indexed=False,
     )
-    navigation_history_json = datastore_services.JsonProperty(
+    navigation_history = datastore_services.JsonProperty(
         required=False,
         indexed=False,
     )
-    environment_json = datastore_services.JsonProperty(
+    environment = datastore_services.JsonProperty(
         required=False,
         indexed=False,
     )
@@ -527,12 +602,12 @@ class FeedbackSessionLogModel(base_models.BaseModel):
             super(cls, cls).get_export_policy(),
             **{
                 'session_info_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'console_logs_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'failed_requests_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'navigation_history_json': (
+                'console_logs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'failed_requests': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'navigation_history': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
-                'environment_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'environment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -543,10 +618,10 @@ class FeedbackSessionLogModel(base_models.BaseModel):
     def create(
         cls,
         report_id: str,
-        console_logs_json: Optional[List[Dict[str, str]]],
-        failed_requests_json: Optional[List[Dict[str, str]]],
-        navigation_history_json: Optional[List[Dict[str, str]]],
-        environment_json: Optional[Dict[str, str]],
+        console_logs: Optional[List[Dict[str, str]]],
+        failed_requests: Optional[List[Dict[str, str]]],
+        navigation_history: Optional[List[Dict[str, str]]],
+        environment: Optional[Dict[str, str]],
     ) -> str:
         """Creates a new FeedbackSessionLogModel for a given thread ID."""
         if cls.get_by_id(report_id):
@@ -556,10 +631,10 @@ class FeedbackSessionLogModel(base_models.BaseModel):
         session_log = cls(
             id=report_id,
             session_info_schema_version=feconf.CURRENT_SESSION_INFO_SCHEMA_VERSION,
-            console_logs_json=console_logs_json,
-            failed_requests_json=failed_requests_json,
-            navigation_history_json=navigation_history_json,
-            environment_json=environment_json,
+            console_logs=console_logs,
+            failed_requests=failed_requests,
+            navigation_history=navigation_history,
+            environment=environment,
         )
         session_log.update_timestamps()
         session_log.put()
