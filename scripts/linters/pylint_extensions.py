@@ -1526,7 +1526,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
         Args:
             node: astroid.node_classes.Import|astroid.node_classes.ImportFrom. A
-                Node from some `import *` or `import * from *` in the AST.
+                Node from some `import *` or `from * import *` in the AST.
 
         Yields:
             tuple(str, tuple(str, None)). Yields pair of module name and
