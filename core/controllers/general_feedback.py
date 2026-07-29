@@ -391,7 +391,7 @@ class LessonFeedbackListHandler(
 ):
     """Handles retrieval of Lesson feedback for the Creator.
 
-    GET /lesson-feedback/<exploration_id>
+    GET /feedback/<exploration_id>
 
     URL path args:
         exploration_id: str. The exploration id to retrieve feedback for.

@@ -320,6 +320,21 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
             response['error'], 'You must be logged in to submit feedback.'
         )
 
+    def test_logged_out_user_cannot_get_user_feedback_detail(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.other_user_id,
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self._get_lesson_metadata(),
+        )
+        response = self.get_json(
+            '%s/%s' % (feconf.MY_FEEDBACK_URL, feedback.id),
+            expected_status_int=401,
+        )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to view feedback.'
+        )
+
 
 class PlatformFeedbackSubmitHandlerTests(test_utils.GenericTestBase):
     """Tests for PlatformFeedbackSubmitHandler."""
@@ -812,6 +827,22 @@ class LessonFeedbackDetailHandlerTests(test_utils.GenericTestBase):
             'Thanks, this is fixed.',
         )
 
+    def test_creator_cannot_update_missing_lesson_feedback(self) -> None:
+        with self.login_context(self.OWNER_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            response = self.post_json(
+                '/feedback/exp_id/missing_feedback',
+                {'status': feconf.STATUS_CHOICES_FIXED},
+                csrf_token=csrf_token,
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Could not find the resource '
+            'http://localhost/feedback/exp_id/missing_feedback.',
+        )
+
     def test_creator_cannot_update_lesson_feedback_for_different_exploration(
         self,
     ) -> None:
@@ -1031,4 +1062,116 @@ class PlatformFeedbackDetailHandlerTests(test_utils.GenericTestBase):
             'Could not find the resource '
             'http://localhost/platform-feedback/curriculum/exp_id/%s.'
             % report.id,
+        )
+
+
+class LessonFeedbackHandlerTests(test_utils.GenericTestBase):
+    """Tests for LessonFeedbackListHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_valid_exploration('exp_id', self.owner_id)
+        self.signup('other@example.com', 'otheruser')
+        self.other_user_id = self.get_user_id_from_email('other@example.com')
+        self.save_new_valid_exploration('exp_id_2', self.other_user_id)
+
+    def _get_lesson_metadata(
+        self,
+        exp_id: str,
+    ) -> general_feedback_domain.LessonMetadataDict:
+        """Returns valid lesson metadata."""
+        return {
+            'exploration_id': exp_id,
+            'exploration_version': 1,
+            'state_name': 'Introduction',
+            'state_index': 0,
+            'learner_current_answer': None,
+        }
+
+    def test_creator_can_list_owned_exploration_feedback(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.owner_id,
+            feedback_text='Helpful lesson.',
+            lesson_metadata=self._get_lesson_metadata('exp_id'),
+        )
+        general_feedback_services.create_lesson_feedback(
+            author_id=self.other_user_id,
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self._get_lesson_metadata('exp_id_2'),
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json('/feedback/exp_id')
+
+        self.assertEqual(len(response['summaries']), 1)
+        self.assertEqual(response['summaries'][0]['id'], feedback.id)
+        self.assertIsNone(response['next_cursor'])
+        self.assertFalse(response['more'])
+
+    def test_learner_can_get_own_feedback_detail(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.owner_id,
+            feedback_text='Helpful lesson.',
+            lesson_metadata=self._get_lesson_metadata('exp_id'),
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json('/feedback/exp_id/%s' % feedback.id)
+
+        self.assertEqual(response, feedback.to_dict())
+
+    def test_creator_cannot_get_missing_lesson_feedback_detail(self) -> None:
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json(
+                '/feedback/exp_id/missing_feedback',
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Could not find the resource '
+            'http://localhost/feedback/exp_id/missing_feedback.',
+        )
+
+    def test_learner_cannot_get_other_user_feedback_detail(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.other_user_id,
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self._get_lesson_metadata('exp_id_2'),
+        )
+
+        with self.login_context(self.OWNER_EMAIL):
+            response = self.get_json(
+                '/feedback/exp_id/%s' % feedback.id,
+                expected_status_int=404,
+            )
+
+        self.assertEqual(
+            response['error'],
+            'Could not find the resource '
+            'http://localhost/feedback/exp_id/%s.' % feedback.id,
+        )
+
+    def test_logged_out_user_cannot_list_feedback(self) -> None:
+        response = self.get_json('/feedback/exp_id_2', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
+
+    def test_logged_out_user_cannot_get_lesson_feedback_detail(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id=self.other_user_id,
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self._get_lesson_metadata('exp_id_2'),
+        )
+        response = self.get_json(
+            '/feedback/exp_id_2/%s' % feedback.id,
+            expected_status_int=401,
+        )
+
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
         )
