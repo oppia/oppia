@@ -31,6 +31,12 @@ interface AssessmentQuestion {
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
   currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
+  // TODO(#24717-m2.18-m2.19): The showTimeExpiredModal and
+  // showUnansweredQuestionModal flags are currently initialized with default
+  // values. Update these flags based on the appropriate conditions once the
+  // logic for determining when the modals should be shown or hidden is
+  // implemented.  showTimeExpiredModel = false;
+  showUnansweredQuestionModal = false;
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {

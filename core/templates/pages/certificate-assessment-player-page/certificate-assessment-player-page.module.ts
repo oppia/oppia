@@ -19,6 +19,7 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
+import {CertificateOfferingSharedModule} from 'components/certificate-assessment-offering-helper/certificate-offering-shared.module';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateAssessmentPlayerPageRootComponent} from './certificate-assessment-player-page-root.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
@@ -32,6 +33,7 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
   imports: [
     CommonModule,
     SharedComponentsModule,
+    CertificateOfferingSharedModule,
     RouterModule.forChild([
       {
         path: '',

@@ -1,4 +1,13 @@
 <div class="certificate-assessment-page-container position-relative">
+  <oppia-time-expired-modal
+    *ngIf="showTimeExpiredModel">
+  </oppia-time-expired-modal>
+
+  <oppia-unanswered-question-modal
+    *ngIf="showUnansweredQuestionModal"
+    [unansweredQuestionCount]="3">
+  </oppia-unanswered-question-modal>
+
   <oppia-assessment-introduction-card *ngIf="currentStage === 'intro'"
                                       [certificateId]="certificateId"
                                       (continue)="showInstructions()">
