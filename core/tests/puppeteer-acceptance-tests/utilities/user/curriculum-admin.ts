@@ -2715,7 +2715,10 @@ export class CurriculumAdmin extends TopicManager {
       rubricDifficulties: Array<'Easy' | 'Medium' | 'Hard'>;
     }>,
     classroomName: string,
-    classroomUrlFragment: string
+    classroomUrlFragment: string,
+    classroomIntro: string,
+    classroomObjective: string,
+    classroomConclusion: string
   ): Promise<void> {
     const classroomTopicNames = Array.from(
       new Set(skillConfigs.map(config => config.topicName))
@@ -2758,6 +2761,12 @@ export class CurriculumAdmin extends TopicManager {
     }
 
     await this.createNewClassroom(classroomName, classroomUrlFragment);
+    await this.updateClassroom(
+      classroomName,
+      classroomIntro,
+      classroomObjective,
+      classroomConclusion
+    );
     for (const topicName of classroomTopicNames) {
       await this.addTopicToClassroom(classroomName, topicName);
     }

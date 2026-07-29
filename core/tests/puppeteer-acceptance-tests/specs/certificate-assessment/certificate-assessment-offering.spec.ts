@@ -66,7 +66,6 @@ describe('Certificate Assessment', function () {
     );
 
     await releaseCoordinator.enableFeatureFlag('enable_certificate_assessment');
-
     await curriculumAdmin.createCertificateAssessmentTestSetup(
       [
         {
@@ -106,9 +105,12 @@ describe('Certificate Assessment', function () {
         },
       ],
       'Math',
-      'math'
+      'math',
+      'Welcome to Math classroom!',
+      'This course covers basic operations.',
+      'In this course, you will learn the following topics: Place Values.'
     );
-  }, 2100000);
+  }, 3000000);
 
   it('should let the curriculum admin access the certificate dashboard', async function () {
     await curriculumAdmin.goto(testConstants.URLs.Home);
