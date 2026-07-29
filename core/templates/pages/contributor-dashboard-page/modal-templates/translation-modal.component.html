@@ -112,6 +112,9 @@
         Translation is incomplete. Please use the Copy Tool to include any images or concept cards in the translated
         content.
       </p>
+      <p *ngIf="hasLengthValidationError">
+        {{ lengthValidationErrorMessage }}
+      </p>
     </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">

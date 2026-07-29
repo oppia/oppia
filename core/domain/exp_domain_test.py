@@ -3907,6 +3907,44 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.get_content_html('Invalid state', 'hint_1')
 
+    def test_get_content_html_with_metadata_content_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.title = 'Exploration Title'
+        exploration.objective = 'Exploration Objective'
+        exploration.category = 'Algebra'
+        exploration.tags = ['algebra', 'math']
+
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_title'
+            ),
+            'Exploration Title',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_objective'
+            ),
+            'Exploration Objective',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_category'
+            ),
+            'Algebra',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_tag_0'
+            ),
+            'algebra',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_tag_1'
+            ),
+            'math',
+        )
+
     def test_is_demo_property(self) -> None:
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')

@@ -26,6 +26,7 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
+    feature_flag_services,
     fs_services,
     html_validation_service,
     platform_parameter_list,
@@ -1319,6 +1320,39 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+    def test_validate_suggestion_with_too_long_exploration_title_fails(
+        self,
+    ) -> None:
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        change_cmd = dict(expected_suggestion_dict['change_cmd'])
+        change_cmd['content_id'] = 'exploration_title'
+        change_cmd['translation_html'] = (
+            'This exploration title is way longer than thirty six characters limit'
+        )
+        expected_suggestion_dict['change_cmd'] = change_cmd
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Translation exceeds the allowed character limit. The translation '
+            'for the above content must be 36 characters or fewer.',
+        ):
+            suggestion.validate()
+
     def test_get_score_part_helper_methods(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
@@ -1917,6 +1951,49 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'Expected invalid_state_name to be a valid state name',
         ):
             suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_metadata_content_id(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        expected_suggestion_dict['language_code'] = 'ak'
+        expected_suggestion_dict['change_cmd'] = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'exploration_title',
+            'language_code': 'ak',
+            'content_html': 'original title',
+            'translation_html': 'translated title',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.swap(
+            feature_flag_services, 'is_feature_flag_enabled', lambda *args: True
+        ):
+            suggestion.pre_accept_validate()
+
+        suggestion.change_cmd.content_id = 'invalid_metadata_content_id'
+        with self.swap(
+            feature_flag_services, 'is_feature_flag_enabled', lambda *args: True
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected invalid_metadata_content_id to be a valid metadata content ID',
+            ):
+                suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)
