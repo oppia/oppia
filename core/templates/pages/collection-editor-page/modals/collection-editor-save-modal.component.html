@@ -8,20 +8,19 @@
   <p>
     <span *ngIf="collectionIsPrivate">(Optional)</span>
     Please enter a brief description of what you have changed:
-    <textarea rows="3"
-              cols="50"
-              [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
-              [(ngModel)]="commitMessage"
-              oppiaFocusOn="saveChangesModalOpened"
-              class="e2e-test-commit-message-input"
-              autofocus>
-    </textarea>
   </p>
+  <textarea rows="3"
+            [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
+            [(ngModel)]="commitMessage"
+            oppiaFocusOn="saveChangesModalOpened"
+            class="e2e-test-commit-message-input w-100 form-control"
+            autofocus>
+  </textarea>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-success e2e-test-close-save-modal-button"
-          (disabled)="!collectionIsPrivate && !commitMessage"
+          [disabled]="!collectionIsPrivate && !commitMessage"
           (click)="confirm(commitMessage)">
     <span *ngIf="collectionIsPrivate">Save Draft</span>
     <span *ngIf="!collectionIsPrivate">Publish Changes</span>
