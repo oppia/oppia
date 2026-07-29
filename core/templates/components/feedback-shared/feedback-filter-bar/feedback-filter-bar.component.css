@@ -1,0 +1,110 @@
+.oppia-feedback-filter-bar {
+  margin-bottom: 16px;
+  padding: 12px 0;
+}
+
+.oppia-feedback-filter-bar-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.oppia-feedback-filter-bar-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 115px;
+}
+
+.oppia-feedback-filter-bar-stats-label {
+  color: black;
+  font-size: 13px;
+}
+
+.oppia-feedback-filter-bar-select {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #424242;
+  cursor: pointer;
+  font-size: 13px;
+  outline: none;
+  padding: 6px 28px 6px 10px;
+}
+
+.oppia-feedback-filter-bar-select:focus {
+  border-color: #00645c;
+}
+
+.oppia-feedback-filter-bar-search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.oppia-feedback-filter-bar-search-input {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #212121;
+  font-size: 13px;
+  outline: none;
+  padding: 6px 12px;
+  width: 100%;
+}
+
+.oppia-feedback-filter-bar-search-input:focus {
+  border-color: #00645c;
+}
+
+.oppia-feedback-filter-bar-dates {
+  display: flex;
+  gap: 8px;
+}
+
+.oppia-feedback-filter-bar-date {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #424242;
+  font-size: 13px;
+  outline: none;
+  padding: 6px 10px;
+}
+
+.oppia-feedback-filter-bar-date:focus {
+  border-color: #00645c;
+}
+
+.oppia-feedback-filter-bar-apply {
+  background-color: #00645c;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 10px;
+  transition: background-color 0.15s ease;
+}
+
+.oppia-feedback-filter-bar-apply:hover {
+  background-color: #004d40;
+}
+
+.oppia-feedback-filter-bar-clear {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #616161;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 10px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.oppia-feedback-filter-bar-clear:hover {
+  background-color: #f5f5f5;
+  border-color: #bdbdbd;
+}

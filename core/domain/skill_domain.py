@@ -904,7 +904,7 @@ class Skill(translation_domain.BaseTranslatableObject):
         )
 
         translatable_contents_collection.add_translatable_field(
-            'skill_description',
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
             translation_domain.ContentType.SKILL_DESCRIPTION,
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.description,

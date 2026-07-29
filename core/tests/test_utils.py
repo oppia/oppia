@@ -2324,6 +2324,8 @@ class GenericTestBase(AppEngineTestBase):
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
     RELEASE_COORDINATOR_USERNAME: Final = 'releasecoordinator'
+    TECH_LEAD_EMAIL: Final = 'techlead@example.com'
+    TECH_LEAD_USERNAME: Final = 'techlead'
     OWNER_EMAIL: Final = 'owner@example.com'
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'
@@ -2581,8 +2583,7 @@ class GenericTestBase(AppEngineTestBase):
     # utils.dict_from_yaml can isolate differences quickly.
 
     SAMPLE_YAML_CONTENT: str = (
-        (
-            """author_notes: ''
+        ("""author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -2653,8 +2654,7 @@ states_schema_version: %d
 tags: []
 title: Title
 version: 1
-"""
-        )
+""")
         % (
             feconf.DEFAULT_INIT_STATE_NAME,
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
