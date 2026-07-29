@@ -19,7 +19,6 @@ from __future__ import annotations
 from unittest import mock
 
 from core import feconf
-from core.controllers import general_feedback
 from core.domain import (
     captcha_services,
     exp_fetchers,
