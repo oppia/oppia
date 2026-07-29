@@ -947,11 +947,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_get_translated_exploration_summaries(self) -> None:
-        from core.domain import (
-            exp_fetchers,
-            translation_domain,
-            translation_services,
-        )
+        from core.domain import translation_domain, translation_services
 
         self.login(self.VIEWER_EMAIL)
 

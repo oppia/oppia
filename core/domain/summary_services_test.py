@@ -26,6 +26,7 @@ from core.domain import (
     collection_domain,
     collection_services,
     exp_domain,
+    exp_fetchers,
     exp_services,
     exp_services_test,
     rating_services,
@@ -285,11 +286,7 @@ class ExplorationDisplayableSummariesTest(
     def test_get_displayable_exp_summary_dicts_with_translated_metadata(
         self,
     ) -> None:
-        from core.domain import (
-            exp_fetchers,
-            translation_domain,
-            translation_services,
-        )
+        from core.domain import translation_domain, translation_services
 
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID_2)
         translated_title = translation_domain.TranslatedContent(
