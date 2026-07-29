@@ -138,13 +138,11 @@ APP_YAML_FILEPATH = 'app.yaml'
 
 MAX_OLD_SPACE_SIZE_FOR_NG_BUILD = 8192
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Builds the production version of Oppia. Generates hashes for assets,
 minifies files, and creates the build directory. Angular CLI handles
 CSS bundling including third-party dependencies.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--prod_env', action='store_true', default=False, dest='prod_env'
@@ -808,10 +806,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     )
     if options.prod_env:
         generate_hashes()
-        generate_python_package()
         if not options.skip_ng_build:
             build_using_ng()
             sync_angular_css_hashes()
+        # This must run after build_using_ng(), which uses Angular CLI's
+        # default deleteOutputPath behavior to clear out the 'build/'
+        # directory before writing its own output. Generating the package
+        # first would have it wiped out by the Angular build.
+        generate_python_package()
         rename_assets_with_hashes()
         generate_app_yaml(deploy_mode=options.deploy_mode)
 

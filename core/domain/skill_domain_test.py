@@ -401,7 +401,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         skill_description_content = (
             translatable_contents.content_id_to_translatable_content[
-                'skill_description'
+                feconf.SKILL_DESCRIPTION_CONTENT_ID
             ]
         )
         self.assertEqual(skill_description_content.content_value, 'Description')
@@ -455,7 +455,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             self.skill.get_translatable_content_ids(),
             [
-                'skill_description',
+                feconf.SKILL_DESCRIPTION_CONTENT_ID,
                 explanation_content_id,
                 'misconception_0_feedback',
             ],

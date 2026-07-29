@@ -58,26 +58,15 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component.spec.ts',
     'core/templates/pages/exploration-player-page/services/player-position.service.spec.ts',
     'core/templates/pages/exploration-player-page/services/player-transcript.service.spec.ts',
-    'core/templates/pages/exploration-player-page/services/question-player-engine.service.ts',
     'core/templates/pages/exploration-player-page/services/voiceover-player.service.spec.ts',
-    'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',
     'core/templates/pages/learner-dashboard-page/old-progress-tab.component.spec.ts',
     'core/templates/pages/library-page/classroom-card/classroom-card.component.spec.ts',
     'core/templates/pages/library-page/library-page.component.spec.ts',
-    'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts',
     'core/templates/pages/login-page/login-page.component.spec.ts',
     'core/templates/pages/moderator-page/moderator-page.component.spec.ts',
-    'core/templates/pages/oppia-root/app-error-handler.ts',
-    'core/templates/pages/oppia-root/routing/app.routing.module.ts',
     'core/templates/pages/release-coordinator-page/features-tab/features-tab.component.spec.ts',
     'core/templates/pages/release-coordinator-page/release-coordinator-page.component.spec.ts',
-    'core/templates/pages/skill-editor-page/skill-editor-page.component.ts',
-    'core/templates/pages/splash-page/splash-page.module.ts',
-    'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.spec.ts',
-    'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
-    'core/templates/services/oppia-rte-parser.service.spec.ts',
-    'core/templates/services/oppia-rte-parser.service.ts',
     'core/templates/services/rte-helper-modal.component.spec.ts',
     'core/templates/services/rte-helper-modal.component.ts',
     'core/templates/services/rte-helper.service.spec.ts',
@@ -92,18 +81,15 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/objects/templates/image-editor.component.ts',
     'extensions/objects/templates/svg-editor.component.spec.ts',
     'extensions/objects/templates/svg-editor.component.ts',
-    'extensions/rich_text_components/rte-output-display.component.ts',
     'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Run the script from the oppia root folder:
     python -m scripts.run_typescript_checks
 Note that the root folder MUST be named 'oppia'.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--strict_checks',
