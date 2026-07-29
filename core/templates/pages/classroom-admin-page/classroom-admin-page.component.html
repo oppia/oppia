@@ -83,6 +83,23 @@
 
           <div class="row oppia-classroom-input-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Feedback Recipient Email</strong>
+            </span>
+            <div class="classroom-field">
+              <span *ngIf="classroomViewerMode" class="e2e-test-classroom-feedback-recipient-view">
+                {{tempClassroomData.getFeedbackRecipientEmail()}}
+              </span>
+              <input *ngIf="classroomEditorMode"
+                     class="form-control e2e-update-classroom-feedback-recipient"
+                     [(ngModel)]="tempClassroomData._feedbackRecipientEmail"
+                     (blur)="updateClassroomField()"
+                     (ngModelChange)="validateClassroom(tempClassroomData, classroomData)"
+                    >
+            </div>
+          </div>
+
+          <div class="row oppia-classroom-input-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Teaser Text</strong>
             </span>
             <span *ngIf="classroomViewerMode" class="classroom-field e2e-test-classroom-teaser-view">
