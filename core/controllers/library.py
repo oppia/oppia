@@ -376,8 +376,9 @@ class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    stringified_exp_ids: str
+    stringified_exp_ids: List[str]
     include_private_explorations: Optional[bool]
+    display_in_language_code: Optional[str]
 
 
 class ExplorationSummariesHandler(
@@ -400,6 +401,18 @@ class ExplorationSummariesHandler(
                 'schema': {'type': 'bool'},
                 'default_value': False,
             },
+            'display_in_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': '[a-z]{2,3}(-[a-z]{2,4})?',
+                        }
+                    ],
+                },
+                'default_value': None,
+            },
         }
     }
 
@@ -410,6 +423,9 @@ class ExplorationSummariesHandler(
         exp_ids = self.normalized_request['stringified_exp_ids']
         include_private_exps = self.normalized_request.get(
             'include_private_explorations'
+        )
+        display_in_language_code = self.normalized_request.get(
+            'display_in_language_code'
         )
 
         editor_user_id = self.user_id if include_private_exps else None
@@ -424,13 +440,16 @@ class ExplorationSummariesHandler(
         if include_private_exps:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids, user=self.user
+                    exp_ids,
+                    user=self.user,
+                    display_in_language_code=display_in_language_code,
                 )
             )
         else:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids
+                    exp_ids,
+                    display_in_language_code=display_in_language_code,
                 )
             )
         self.values.update({'summaries': summaries})

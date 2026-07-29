@@ -282,6 +282,57 @@ class ExplorationDisplayableSummariesTest(
         )
         self.assertEqual(displayable_summaries, [])
 
+    def test_get_displayable_exp_summary_dicts_with_translated_metadata(
+        self,
+    ) -> None:
+        from core.domain import (
+            exp_fetchers,
+            translation_domain,
+            translation_services,
+        )
+
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID_2)
+        translated_title = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translated_objective = translation_domain.TranslatedContent(
+            'Exploration 2 Hindi Objective',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID_2,
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_OBJECTIVE_CONTENT_ID,
+            translated_objective,
+        )
+
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_2], display_in_language_code='hi'
+            )
+        )
+        self.assertEqual(len(displayable_summaries), 1)
+        self.assertEqual(
+            displayable_summaries[0]['title'], 'Exploration 2 Hindi Title'
+        )
+        self.assertEqual(
+            displayable_summaries[0]['objective'],
+            'Exploration 2 Hindi Objective',
+        )
+
     def test_get_public_and_filtered_private_summary_dicts_for_creator(
         self,
     ) -> None:

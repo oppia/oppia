@@ -946,6 +946,47 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_can_get_translated_exploration_summaries(self) -> None:
+        from core.domain import (
+            exp_fetchers,
+            translation_domain,
+            translation_services,
+        )
+
+        self.login(self.VIEWER_EMAIL)
+
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(
+            self.PUBLIC_EXP_ID_EDITOR
+        )
+        translated_title = translation_domain.TranslatedContent(
+            'Public Exploration Hindi Title',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            needs_update=False,
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.PUBLIC_EXP_ID_EDITOR,
+            exp_summary.version,
+            'hi',
+            feconf.EXPLORATION_TITLE_CONTENT_ID,
+            translated_title,
+        )
+
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps([self.PUBLIC_EXP_ID_EDITOR]),
+                'display_in_language_code': 'hi',
+            },
+        )
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(
+            summaries[0]['title'], 'Public Exploration Hindi Title'
+        )
+
+        self.logout()
+
     def test_can_get_editable_private_exploration_summaries(self) -> None:
         self.login(self.VIEWER_EMAIL)
 

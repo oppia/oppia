@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     activity_domain,
@@ -32,6 +32,8 @@ from core.domain import (
     rights_manager,
     search_services,
     stats_services,
+    translation_domain,
+    translation_fetchers,
     user_domain,
     user_services,
 )
@@ -47,6 +49,10 @@ from typing import (
     Union,
     cast,
 )
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import translation_models
 
 
 class DisplayableCollectionSummaryDict(TypedDict):
@@ -472,6 +478,7 @@ def get_exploration_metadata_dicts(
 def get_displayable_exp_summary_dicts_matching_ids(
     exploration_ids: List[str],
     user: Optional[user_domain.UserActionsInfo] = None,
+    display_in_language_code: Optional[str] = None,
 ) -> List[DisplayableExplorationSummaryDict]:
     """Gets a summary of explorations in human readable form from
     exploration ids.
@@ -488,6 +495,8 @@ def get_displayable_exp_summary_dicts_matching_ids(
         exploration_ids: list(str). List of exploration ids.
         user: UserActionsInfo or None. Object having user_id, role and actions
             for given user.
+        display_in_language_code: str or None. The language code in which to
+            display translated metadata.
 
     Returns:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -532,11 +541,15 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
             filtered_exploration_summaries.append(exploration_summary)
 
-    return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
+    return get_displayable_exp_summary_dicts(
+        filtered_exploration_summaries,
+        display_in_language_code=display_in_language_code,
+    )
 
 
 def get_displayable_exp_summary_dicts(
     exploration_summaries: List[exp_domain.ExplorationSummary],
+    display_in_language_code: Optional[str] = None,
 ) -> List[DisplayableExplorationSummaryDict]:
     """Gets a summary of explorations in human readable form.
 
@@ -549,6 +562,8 @@ def get_displayable_exp_summary_dicts(
     Args:
         exploration_summaries: list(ExplorationSummary). List of exploration
             summary objects.
+        display_in_language_code: str or None. The language code in which to
+            display translated metadata.
 
     Returns:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -578,19 +593,102 @@ def get_displayable_exp_summary_dicts(
     )
     view_counts = [exp_stats.num_starts for exp_stats in exp_stats_list]
 
+    entity_translations_map: Dict[str, translation_domain.EntityTranslation] = (
+        {}
+    )
+    if (
+        display_in_language_code
+        and display_in_language_code != constants.DEFAULT_LANGUAGE_CODE
+    ):
+        entity_references: List[
+            translation_models.EntityTranslationReferenceDict
+        ] = [
+            {
+                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                'entity_id': exp_summary.id,
+                'entity_version': exp_summary.version,
+                'language_code': display_in_language_code,
+            }
+            for exp_summary in exploration_summaries
+            if exp_summary is not None
+        ]
+        entity_translations_list = (
+            translation_fetchers.get_multiple_entity_translations(
+                entity_references
+            )
+        )
+        for exp_summary, entity_translation in zip(
+            exploration_summaries, entity_translations_list
+        ):
+            if exp_summary is not None and entity_translation is not None:
+                entity_translations_map[exp_summary.id] = entity_translation
+
     displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary:
+            title = exploration_summary.title
+            objective = exploration_summary.objective
+            category = exploration_summary.category
+            tags = list(exploration_summary.tags)
+
+            entity_translation = entity_translations_map.get(
+                exploration_summary.id
+            )
+            if entity_translation is not None:
+                title_translation = entity_translation.translations.get(
+                    feconf.EXPLORATION_TITLE_CONTENT_ID
+                )
+                if (
+                    title_translation is not None
+                    and not title_translation.needs_update
+                    and isinstance(title_translation.content_value, str)
+                ):
+                    title = title_translation.content_value
+
+                objective_translation = entity_translation.translations.get(
+                    feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
+                )
+                if (
+                    objective_translation is not None
+                    and not objective_translation.needs_update
+                    and isinstance(objective_translation.content_value, str)
+                ):
+                    objective = objective_translation.content_value
+
+                category_translation = entity_translation.translations.get(
+                    feconf.EXPLORATION_CATEGORY_CONTENT_ID
+                )
+                if (
+                    category_translation is not None
+                    and not category_translation.needs_update
+                    and isinstance(category_translation.content_value, str)
+                ):
+                    category = category_translation.content_value
+
+                for tag_idx, _ in enumerate(exploration_summary.tags):
+                    tag_content_id = (
+                        f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{tag_idx}'
+                    )
+                    tag_translation = entity_translation.translations.get(
+                        tag_content_id
+                    )
+                    if (
+                        tag_translation is not None
+                        and not tag_translation.needs_update
+                        and isinstance(tag_translation.content_value, str)
+                    ):
+                        tags[tag_idx] = tag_translation.content_value
+
             summary_dict: DisplayableExplorationSummaryDict = {
                 'id': exploration_summary.id,
-                'title': exploration_summary.title,
+                'title': title,
                 'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
-                'category': exploration_summary.category,
+                'category': category,
                 'created_on_msec': utils.get_time_in_millisecs(
                     exploration_summary.exploration_model_created_on
                 ),
-                'objective': exploration_summary.objective,
+                'objective': objective,
                 'language_code': exploration_summary.language_code,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     exploration_summary.exploration_model_last_updated
@@ -603,7 +701,7 @@ def get_displayable_exp_summary_dicts(
                 'status': exploration_summary.status,
                 'ratings': exploration_summary.ratings,
                 'community_owned': exploration_summary.community_owned,
-                'tags': exploration_summary.tags,
+                'tags': tags,
                 'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                     exploration_summary.category
                 ),
