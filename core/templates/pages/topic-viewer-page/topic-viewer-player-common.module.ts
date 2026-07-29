@@ -26,10 +26,10 @@ import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-sto
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
 import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
-import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end-test-card/adventure-end-test-card.component';
-import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge/adventure-circle-badge.component';
-import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation/adventure-navigation.component';
-import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card/mastery-challenge-card.component';
+import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end-test-card.component';
+import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge.component';
+import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
+import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
