@@ -22,6 +22,7 @@ from core import feconf
 from core.controllers import general_feedback
 from core.domain import (
     captcha_services,
+    exp_fetchers,
     fs_services,
     general_feedback_domain,
     general_feedback_services,
@@ -194,7 +195,7 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
         with self.login_context(self.VIEWER_EMAIL):
             csrf_token = self.get_new_csrf_token()
             with self.swap(
-                general_feedback.exp_fetchers,
+                exp_fetchers,
                 'get_exploration_by_id',
                 get_exploration_by_id_mock,
             ):
@@ -276,7 +277,7 @@ class MyFeedbackHandlerTests(test_utils.GenericTestBase):
         with self.login_context(self.VIEWER_EMAIL):
             csrf_token = self.get_new_csrf_token()
             with self.swap(
-                general_feedback.exp_fetchers,
+                exp_fetchers,
                 'get_exploration_by_id',
                 get_exploration_by_id_mock,
             ):
