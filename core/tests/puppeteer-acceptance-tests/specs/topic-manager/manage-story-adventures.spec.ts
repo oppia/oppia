@@ -150,6 +150,9 @@ describe('Topic Manager', function () {
   it(
     'should remove an adventure boundary',
     async function () {
+      await curriculumAdmin.removeAdventureBoundary();
+      await curriculumAdmin.expectAdventureCount(1);
+
       await curriculumAdmin.splitIntoAdventure('Chapter 7');
       await curriculumAdmin.expectAdventureCount(2);
 
