@@ -939,6 +939,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             )
 
     def test_update_skill(self) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]},
+            topic_ids=['topic_id_1'],
+        )
         changelist = [
             skill_domain.SkillChange(
                 {
