@@ -464,6 +464,8 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 # Default content_id for explanation subtitled html.
 DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+# Content ID for skill description.
+SKILL_DESCRIPTION_CONTENT_ID = 'skill_description'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
