@@ -28,7 +28,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let activatedRouteStubValue: {
     snapshot: {
       paramMap: {get: (name: string) => string | null};
-      url: Array<{path: string}>;
+      url: {path: string}[];
     };
   };
 
