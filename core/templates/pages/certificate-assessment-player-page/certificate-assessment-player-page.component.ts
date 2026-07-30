@@ -37,6 +37,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   // logic for determining when the modals should be shown or hidden is
   // implemented.  showTimeExpiredModel = false;
   showUnansweredQuestionModal = false;
+  showTimeExpiredModel = false;
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
