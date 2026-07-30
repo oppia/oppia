@@ -60,6 +60,14 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     validation_message: str
 
 
+class CertificateOfferingClassroomSummary(TypedDict):
+    """Dict representation of a classroom-facing certificate offering."""
+
+    certificate_id: str
+    title: str
+    attempt_status: str
+
+
 def _get_topic_name_to_question_ids_map(
     topic_ids: List[str],
 ) -> tuple[Dict[str, List[str]], List[topic_domain.Topic]]:
@@ -713,3 +721,76 @@ def get_certificate_assessment_offerings() -> (
             certificate_assessment_offering_models
         )
     ]
+
+
+def get_certificate_offerings_for_classroom(
+    classroom_id: str, learner_id: str
+) -> List[CertificateOfferingClassroomSummary]:
+    """Fetches certificate offerings for a classroom, available to a learner."""
+    certificate_assessment_offering_models: List[
+        gae_models.CertificateAssessmentOfferingModel
+    ] = cast(
+        List[gae_models.CertificateAssessmentOfferingModel],
+        gae_models.CertificateAssessmentOfferingModel.query(
+            gae_models.CertificateAssessmentOfferingModel.classroom_id
+            == classroom_id,
+            gae_models.CertificateAssessmentOfferingModel.async_status
+            == 'Available',
+        ).fetch(),
+    )
+    certificate_assessment_offering_models.sort(
+        key=lambda offering_model: offering_model.title.lower()
+    )
+    if not certificate_assessment_offering_models:
+        return []
+
+    attempt_models: List[gae_models.CertificateAssessmentAttemptModel] = cast(
+        List[gae_models.CertificateAssessmentAttemptModel],
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.is_submitted == True,
+        ).fetch(),
+    )
+    latest_attempt_by_certificate_id: Dict[
+        str, gae_models.CertificateAssessmentAttemptModel
+    ] = {}
+    for attempt_model in attempt_models:
+        certificate_id = attempt_model.version_data['certificate_id']
+        existing_attempt_model = latest_attempt_by_certificate_id.get(
+            certificate_id
+        )
+        if existing_attempt_model is None:
+            latest_attempt_by_certificate_id[certificate_id] = attempt_model
+            continue
+        if attempt_model.attempt_index > existing_attempt_model.attempt_index:
+            latest_attempt_by_certificate_id[certificate_id] = attempt_model
+            continue
+        if (
+            attempt_model.attempt_index == existing_attempt_model.attempt_index
+            and attempt_model.finished_at is not None
+            and (
+                existing_attempt_model.finished_at is None
+                or attempt_model.finished_at
+                > existing_attempt_model.finished_at
+            )
+        ):
+            latest_attempt_by_certificate_id[certificate_id] = attempt_model
+
+    certificate_offerings: List[CertificateOfferingClassroomSummary] = []
+    for offering_model in certificate_assessment_offering_models:
+        attempt_model = latest_attempt_by_certificate_id.get(offering_model.id)
+        if attempt_model is None:
+            attempt_status = 'Not Attempted'
+        elif attempt_model.total_score >= 80:
+            attempt_status = 'Passed'
+        else:
+            attempt_status = 'Not Passed'
+        certificate_offerings.append(
+            {
+                'certificate_id': offering_model.id,
+                'title': offering_model.title,
+                'attempt_status': attempt_status,
+            }
+        )
+    return certificate_offerings

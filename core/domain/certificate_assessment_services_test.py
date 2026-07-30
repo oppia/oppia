@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 from unittest import mock
 
 from core import utils
@@ -82,10 +83,27 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.classroom_id = 'math_classroom_01'
+        self.other_classroom_id = 'science_classroom_01'
         self.topic_id = topic_fetchers.get_new_topic_id()
+        self.other_topic_id = topic_fetchers.get_new_topic_id()
+        self.OWNER_EMAIL = f'certificate.assessment.{self.topic_id}@example.com'
+        self.OWNER_USERNAME = f'certificateassessment1'
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_topic(self.topic_id, owner_id)
+        self.save_new_topic(
+            self.topic_id,
+            owner_id,
+            name='math topic',
+            abbreviated_name='math',
+            url_fragment='math-topic',
+        )
+        self.save_new_topic(
+            self.other_topic_id,
+            owner_id,
+            name='science topic',
+            abbreviated_name='science',
+            url_fragment='science-topic',
+        )
         classroom = classroom_config_domain.Classroom(
             self.classroom_id,
             name='Math',
@@ -109,6 +127,29 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             index=0,
         )
         classroom_config_services.create_new_classroom(classroom)
+        other_classroom = classroom_config_domain.Classroom(
+            self.other_classroom_id,
+            name='Science',
+            url_fragment='science',
+            course_details='Course details',
+            teaser_text='Teaser text',
+            topic_list_intro='Topic intro',
+            topic_id_to_prerequisite_topic_ids={self.other_topic_id: []},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg',
+                'red',
+                1,
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.svg',
+                'blue',
+                1,
+            ),
+            index=1,
+        )
+        classroom_config_services.create_new_classroom(other_classroom)
 
     def test_create_certificate_assessment_offering_writes_model(self) -> None:
         certificate_offering = certificate_assessment_services.create_certificate_assessment_offering(
@@ -194,6 +235,202 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 created_offering.certificate_id
             )
 
+    def _create_attempt(
+        self,
+        learner_id: str,
+        certificate_id: str,
+        total_score: float,
+        attempt_index: int,
+        started_at: datetime.datetime,
+        finished_at: datetime.datetime | None,
+        is_submitted: bool,
+    ) -> None:
+        certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=learner_id,
+            total_score=total_score,
+            attempt_index=attempt_index,
+            attempt_data={
+                self.topic_id: {
+                    'total_related_questions': 1,
+                    'total_correct_questions': 1,
+                }
+            },
+            version_data={
+                'certificate_id': certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {self.topic_id: 1},
+                'question_versions': {'question_id_1': 1},
+                'question_topic_links': {'question_id_1': [self.topic_id]},
+            },
+            started_at=started_at,
+            finished_at=finished_at,
+            is_submitted=is_submitted,
+        )
+
+    def test_get_certificate_offerings_for_classroom_filters_and_sorts(
+        self,
+    ) -> None:
+        alpha_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='alpha',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        beta_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Beta',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        certificate_assessment_services.create_certificate_assessment_offering(
+            title='Gamma',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Blocked',
+        )
+        certificate_assessment_services.create_certificate_assessment_offering(
+            title='Delta',
+            description='desc',
+            classroom_id=self.other_classroom_id,
+            topic_ids=[self.other_topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+
+        offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            self.classroom_id, 'learner_id_1'
+        )
+
+        self.assertEqual(
+            [offering['certificate_id'] for offering in offerings],
+            [alpha_offering.certificate_id, beta_offering.certificate_id],
+        )
+
+    def test_get_certificate_offerings_for_classroom_attempt_statuses(
+        self,
+    ) -> None:
+        passed_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Passed',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        not_passed_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Not Passed',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        not_attempted_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Not Attempted',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+
+        started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
+        self._create_attempt(
+            'learner_id_1',
+            passed_offering.certificate_id,
+            90.0,
+            1,
+            started_at,
+            started_at + datetime.timedelta(minutes=5),
+            True,
+        )
+        self._create_attempt(
+            'learner_id_1',
+            not_passed_offering.certificate_id,
+            79.0,
+            1,
+            started_at,
+            started_at + datetime.timedelta(minutes=5),
+            True,
+        )
+
+        offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            self.classroom_id, 'learner_id_1'
+        )
+        status_by_title = {
+            offering['title']: offering['attempt_status']
+            for offering in offerings
+        }
+        self.assertEqual(status_by_title['Passed'], 'Passed')
+        self.assertEqual(status_by_title['Not Passed'], 'Not Passed')
+        self.assertEqual(status_by_title['Not Attempted'], 'Not Attempted')
+
+    def test_get_certificate_offerings_for_classroom_uses_most_recent_attempt(
+        self,
+    ) -> None:
+        offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='History',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
+        self._create_attempt(
+            'learner_id_1',
+            offering.certificate_id,
+            70.0,
+            1,
+            started_at,
+            started_at + datetime.timedelta(minutes=5),
+            True,
+        )
+        self._create_attempt(
+            'learner_id_1',
+            offering.certificate_id,
+            85.0,
+            2,
+            started_at + datetime.timedelta(minutes=10),
+            started_at + datetime.timedelta(minutes=15),
+            True,
+        )
+
+        offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            self.classroom_id, 'learner_id_1'
+        )
+        self.assertEqual(offerings[0]['attempt_status'], 'Passed')
+
+    def test_get_certificate_offerings_for_classroom_empty_classroom(
+        self,
+    ) -> None:
+        offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            'missing_classroom', 'learner_id_1'
+        )
+        self.assertEqual(offerings, [])
+
 
 class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
     """Tests for validate_certificate_assessment_offering."""
@@ -204,6 +441,8 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         super().setUp()
         self.classroom_id = 'math_classroom_01'
         self.topic_id = topic_fetchers.get_new_topic_id()
+        self.OWNER_EMAIL = f'certificate.assessment.{self.topic_id}@example.com'
+        self.OWNER_USERNAME = f'certificateassessment2'
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_topic(self.topic_id, owner_id)

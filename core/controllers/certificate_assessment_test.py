@@ -20,7 +20,12 @@ from unittest import mock
 
 from core import feconf, utils
 from core.controllers import certificate_assessment
-from core.domain import certificate_assessment_services, topic_fetchers
+from core.domain import (
+    certificate_assessment_services,
+    classroom_config_domain,
+    classroom_config_services,
+    topic_fetchers,
+)
 from core.tests import test_utils
 
 
@@ -126,6 +131,92 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(offering['time_limit_in_minutes'], 30)
         self.assertEqual(offering['demonstrates'], ['Basic physics reasoning'])
         self.assertEqual(offering['async_status'], 'Available')
+
+
+class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
+    """Tests class for CertificateAssessmentClassroomHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.classroom_id = 'math_classroom_01'
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_topic(self.topic_id, owner_id)
+        classroom = classroom_config_domain.Classroom(
+            self.classroom_id,
+            name='Math',
+            url_fragment='math',
+            course_details='Course details',
+            teaser_text='Teaser text',
+            topic_list_intro='Topic intro',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg',
+                'red',
+                1,
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.svg',
+                'blue',
+                1,
+            ),
+            index=0,
+        )
+        classroom_config_services.create_new_classroom(classroom)
+
+    def test_get_returns_real_certificate_offerings(self) -> None:
+        certificate_assessment_services.create_certificate_assessment_offering(
+            title='Physics Basics',
+            description='Covers motion and force.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Basic physics reasoning'],
+            async_status='Available',
+        )
+
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
+                '<classroom_id>', self.classroom_id
+            )
+        )
+
+        self.assertEqual(
+            response,
+            {'certificate_offerings': response['certificate_offerings']},
+        )
+        self.assertEqual(len(response['certificate_offerings']), 1)
+        self.assertEqual(
+            response['certificate_offerings'][0]['title'], 'Physics Basics'
+        )
+        self.assertEqual(
+            response['certificate_offerings'][0]['attempt_status'],
+            'Not Attempted',
+        )
+
+    def test_get_returns_empty_certificate_offerings(self) -> None:
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
+                '<classroom_id>', 'missing_classroom'
+            )
+        )
+
+        self.assertEqual(response, {'certificate_offerings': []})
+
+    def test_get_redirects_unauthenticated_user(self) -> None:
+        self.logout()
+        self.testapp.get(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
+                '<classroom_id>', self.classroom_id
+            ),
+            status=302,
+            expect_errors=True,
+        )
 
 
 class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
