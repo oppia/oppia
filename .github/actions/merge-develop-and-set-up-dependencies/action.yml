@@ -53,7 +53,7 @@ runs:
         if ! python -m pip debug; then
           echo "pip is broken. Reinstalling pip via get-pip.py..."
           curl -sS https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-          python /tmp/get-pip.py pip==25.3 --force-reinstall
+          python /tmp/get-pip.py pip==26.1.2 --force-reinstall
           python -m scripts.install_python_dev_dependencies
         else
           echo "pip is working correctly."

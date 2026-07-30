@@ -27,7 +27,7 @@ import sys
 from typing import List, Optional
 
 INSTALLATION_TOOL_VERSIONS = {
-    'pip': '25.3',
+    'pip': '26.1.2',
     'pip-tools': '7.5.2',
     'setuptools': '80.9.0',
 }
