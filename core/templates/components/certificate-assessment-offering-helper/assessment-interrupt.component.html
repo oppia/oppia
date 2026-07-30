@@ -1,28 +1,27 @@
 <div class="assessment-interrupt-card">
-  <h2 class="assessment-interrupt-title">Assessment Interrupted</h2>
+  <h2 class="assessment-interrupt-title">{{ 'I18N_ASSESSMENT_INTERRUPT_TITLE' | translate }}</h2>
 
   <p class="assessment-interrupt-message">
-    Your assessment session ended before it was submitted.
+    {{ 'I18N_ASSESSMENT_INTERRUPT_SESSION_ENDED' | translate }}
   </p>
 
   <p class="assessment-interrupt-message">
-    Don't worry. You can retry or resume this assessment whenever you're ready.
+    {{ 'I18N_ASSESSMENT_INTERRUPT_RETRY_MESSAGE' | translate }}
   </p>
 
   <div class="assessment-interrupt-note">
     <span class="assessment-interrupt-note-icon">i</span>
     <p class="assessment-interrupt-note-text">
-      Because this assessment was not submitted, your answers were not saved.
-      This attempt does not count toward earning a certificate.
+      {{ 'I18N_ASSESSMENT_INTERRUPT_NOTE_TEXT' | translate }}
     </p>
   </div>
 
   <div class="assessment-interrupt-actions">
-    <button type="button" class="btn btn-secondary assessment-interrupt-action-button">
-      Retry assessment
+    <button type="button" class="btn btn-secondary assessment-interrupt-action-button" (click)="onRetryAssessment()">
+      {{ 'I18N_ASSESSMENT_INTERRUPT_RETRY_BUTTON' | translate }}
     </button>
-    <button type="button" class="btn btn-primary assessment-interrupt-action-button">
-      Resume
+    <button type="button" class="btn btn-primary assessment-interrupt-action-button" (click)="onResumeAssessment()">
+      {{ 'I18N_ASSESSMENT_INTERRUPT_RESUME_BUTTON' | translate }}
     </button>
   </div>
 </div>
