@@ -57,6 +57,7 @@ runs:
 
     - name: Show where pip installs its packages, and the contents of that folder.
       run: |
+        pip --version
         pip show certifi
         ls -la /opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages
         ls -la /opt/hostedtoolcache/Python/3.10.16/x64/bin
