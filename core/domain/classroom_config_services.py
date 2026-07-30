@@ -97,6 +97,7 @@ def get_classroom_from_classroom_model(
         classroom_model.id,
         classroom_model.name,
         classroom_model.url_fragment,
+        classroom_model.feedback_recipient_email,
         classroom_model.course_details,
         classroom_model.teaser_text,
         classroom_model.topic_list_intro,
@@ -231,6 +232,9 @@ def update_classroom(
 
     classroom_model.name = classroom.name
     classroom_model.url_fragment = classroom.url_fragment
+    classroom_model.feedback_recipient_email = (
+        classroom.feedback_recipient_email
+    )
     classroom_model.course_details = classroom.course_details
     classroom_model.topic_list_intro = classroom.topic_list_intro
     classroom_model.topic_id_to_prerequisite_topic_ids = (
@@ -268,6 +272,7 @@ def create_new_classroom(classroom: classroom_config_domain.Classroom) -> None:
         classroom.classroom_id,
         classroom.name,
         classroom.url_fragment,
+        classroom.feedback_recipient_email,
         classroom.course_details,
         classroom.teaser_text,
         classroom.topic_list_intro,
@@ -285,7 +290,10 @@ def create_new_classroom(classroom: classroom_config_domain.Classroom) -> None:
 
 
 def create_new_default_classroom(
-    classroom_id: str, name: str, url_fragment: str
+    classroom_id: str,
+    name: str,
+    url_fragment: str,
+    feedback_recipient_email: str,
 ) -> classroom_config_domain.Classroom:
     """Creates a new default classroom model.
 
@@ -293,6 +301,7 @@ def create_new_default_classroom(
         classroom_id: str. The id of new classroom.
         name: str. The name of the classroom.
         url_fragment: str. The url fragment of the classroom.
+        feedback_recipient_email: str. The email of the feedback recipient.
 
     Returns:
         Classroom. The domain object representing a classroom.
@@ -302,6 +311,7 @@ def create_new_default_classroom(
         classroom_id=classroom_id,
         name=name,
         url_fragment=url_fragment,
+        feedback_recipient_email=feedback_recipient_email,
         teaser_text='',
         course_details='',
         topic_list_intro='',
@@ -322,6 +332,7 @@ def create_new_default_classroom(
         classroom.classroom_id,
         classroom.name,
         classroom.url_fragment,
+        classroom.feedback_recipient_email,
         classroom.course_details,
         classroom.teaser_text,
         classroom.topic_list_intro,
