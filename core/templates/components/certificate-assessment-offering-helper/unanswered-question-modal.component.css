@@ -5,9 +5,9 @@
   inset: 0;
   justify-content: center;
   min-height: 100%;
+  padding: 24px;
   position: fixed;
   z-index: 1000;
-  padding: 24px;
 }
 
 .assessment-modal-card {
@@ -22,9 +22,9 @@
 .assessment-modal-header {
   align-items: flex-start;
   display: flex;
+  gap: 16px;
   justify-content: space-between;
   margin-bottom: 14px;
-  gap: 16px;
 }
 
 .assessment-modal-header-content {
@@ -35,25 +35,25 @@
 
 .assessment-modal-icon {
   flex: none;
-  width: 60px;
   height: 60px;
+  width: 60px;
 }
 
 .assessment-modal-title {
   color: #2d2d2d;
+  font-family: 'Capriola', sans-serif;
   font-size: 21px;
   font-weight: 900;
   margin: 0;
-  font-family: 'Capriola';
 }
 
 .assessment-modal-close-button {
   background: transparent;
   border: 0;
   color: #7b8794;
-  padding: 4px;
   cursor: pointer;
   line-height: 1;
+  padding: 4px;
 }
 .assessment-modal-close-button:hover {
   color: #334e68;
@@ -68,17 +68,17 @@
 
 .assessment-modal-inline-key {
   align-items: center;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #cbd2d9;
   border-radius: 6px;
-  display: inline-flex;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  vertical-align: middle;
-  margin: 0 2px;
   cursor: pointer;
+  display: inline-flex;
+  height: 22px;
+  justify-content: center;
+  margin: 0 2px;
   padding: 0;
+  vertical-align: middle;
+  width: 22px;
 }
 .assessment-modal-inline-key:hover {
   background: #f4f6f5;
@@ -87,19 +87,19 @@
 .assessment-modal-actions {
   display: flex;
   justify-content: center;
-  margin-top: 18px;
   margin-left: 62px;
+  margin-top: 18px;
 }
 
 .assessment-modal-action-button {
-  min-width: 220px;
   background: #0d6259;
-  color: #ffffff;
   border: none;
   border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
   font-size: 18px;
   font-weight: 700;
-  cursor: pointer;
+  min-width: 220px;
 }
 .assessment-modal-action-button:hover {
   background: #0a4f48;

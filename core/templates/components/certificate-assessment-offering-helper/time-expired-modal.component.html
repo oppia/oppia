@@ -23,15 +23,13 @@
         </svg>
 
         <div>
-          <h2 class="assessment-modal-title">Time's Up!</h2>
-          <p class="assessment-modal-message">
-            Your assessment time has ended.<br>
-            Your answers have been submitted automatically.
+          <h2 class="assessment-modal-title">{{ 'I18N_TIME_EXPIRED_MODAL_TITLE' | translate }}</h2>
+          <p class="assessment-modal-message" [innerHTML]="'I18N_TIME_EXPIRED_MODAL_MESSAGE' | translate">
           </p>
         </div>
       </div>
 
-      <button type="button" class="assessment-modal-close-button" aria-label="Close" (click)="onClose()">
+      <button type="button" class="assessment-modal-close-button" [attr.aria-label]="'I18N_TIME_EXPIRED_MODAL_CLOSE_BUTTON' | translate" (click)="onClose()">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
@@ -39,11 +37,8 @@
     </div>
 
     <div class="assessment-modal-footer">
-      <button
-        type="button"
-        class="btn btn-primary assessment-modal-action-button"
-        (click)="onViewResult()">
-        View Results
+      <button type="button" class="btn btn-primary assessment-modal-action-button" (click)="onViewResult()">
+        {{ 'I18N_TIME_EXPIRED_MODAL_VIEW_RESULTS_BUTTON' | translate }}
       </button>
     </div>
 
