@@ -762,10 +762,8 @@ def get_certificate_offerings_for_classroom(
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
             == learner_id,
-            # pylint: disable=singleton-comparison
-            # Here we use == True because NDB query filters use __eq__ to
-            # construct filter nodes, not for boolean value comparison.
-            gae_models.CertificateAssessmentAttemptModel.is_submitted == True,
+            gae_models.CertificateAssessmentAttemptModel.is_submitted
+            == True,  # pylint: disable=singleton-comparison
         ).fetch(),
     )
     latest_attempt_by_certificate_id: Dict[
