@@ -40,9 +40,6 @@ describe('Math Formula Detection Service', () => {
         )
       ).toBeTrue();
       expect(
-        mathFormulaDetectionService.isFormulaAsText('<p>x - y = z</p>')
-      ).toBeTrue();
-      expect(
         mathFormulaDetectionService.isFormulaAsText('Addition\n9 = 6 + 3')
       ).toBeTrue();
     });
@@ -53,7 +50,22 @@ describe('Math Formula Detection Service', () => {
       expect(mathFormulaDetectionService.isFormulaAsText(mathHtml)).toBeFalse();
     });
 
+    it('should return true when formula is inside an array of strings', () => {
+      expect(
+        mathFormulaDetectionService.isFormulaAsText([
+          'Normal text',
+          '3 + 6 = 9',
+        ])
+      ).toBeTrue();
+    });
+
     it('should return false for normal text without math formulas', () => {
+      expect(
+        mathFormulaDetectionService.isFormulaAsText('<p>x - y = z</p>')
+      ).toBeFalse();
+      expect(
+        mathFormulaDetectionService.isFormulaAsText('Compare causes - effects')
+      ).toBeFalse();
       expect(
         mathFormulaDetectionService.isFormulaAsText(
           'Just normal sentence without formula.'

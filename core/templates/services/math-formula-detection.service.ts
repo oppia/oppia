@@ -29,6 +29,10 @@ export class MathFormulaDetectionService {
    * @returns boolean True if plain-text math formulas are found.
    */
   isFormulaAsText(htmlString: string | string[]): boolean {
+    if (Array.isArray(htmlString)) {
+      return htmlString.some(s => this.isFormulaAsText(s));
+    }
+
     if (
       !htmlString ||
       typeof htmlString !== 'string' ||
@@ -48,6 +52,6 @@ export class MathFormulaDetectionService {
       .map(line => line.trim())
       .filter(line => line.length > 0);
 
-    return lines.some(line => /[+\-*/=]/.test(line));
+    return lines.some(line => /(\d\s*[+\-*/=])|([+\-*/=]\s*\d)/.test(line));
   }
 }
