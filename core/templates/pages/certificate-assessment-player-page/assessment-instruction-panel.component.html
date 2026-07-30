@@ -1,7 +1,25 @@
-<div class="assessment-card">
-  <h2>Instructions</h2>
-  <p>This is a generic instruction panel for the certificate assessment.</p>
-  <button class="btn btn-primary" (click)="onStartAssessment()">
-    Start Assessment
-  </button>
+<div class="intro-card-container">
+  <div class="intro-card">
+    <h1 class="certificate-title">{{ certificateTitle | titlecase }}</h1>
+
+    <p class="instructions-heading">
+      {{ instructionsHeadingI18nKey | translate }}
+    </p>
+
+    <ul class="instructions-list">
+      <li>
+        {{ timeLimitInstructionI18nKey | translate: { minutes: assessmentDurationMinutes } }}
+      </li>
+      <li *ngFor="let instructionKey of staticInstructionI18nKeys">
+        {{ instructionKey | translate }}
+      </li>
+    </ul>
+
+    <div class="cta-row">
+      <button type="button" class="continue-button"
+              (click)="onStartAssessment()">
+        {{ startAssessmentButtonI18nKey | translate }}
+      </button>
+    </div>
+  </div>
 </div>
