@@ -79,7 +79,7 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'Question Submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
-  TAB_NAME_LANGUAGE_COORDINATOR: string = 'Language Coordinator';
+  TAB_NAME_TRANSLATION_COORDINATOR: string = 'Translation Coordinator';
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
   noDataMessage!: string;
@@ -123,6 +123,10 @@ export class ContributorAdminStatsTable implements OnInit {
         break;
       case this.TAB_NAME_QUESTION_REVIEWER:
         lastContributedType = 'Last Reviewed';
+        break;
+      case this.TAB_NAME_TRANSLATION_COORDINATOR:
+      case this.TAB_NAME_QUESTION_COORDINATOR:
+        lastContributedType = 'Last Active';
         break;
     }
 
@@ -301,10 +305,12 @@ export class ContributorAdminStatsTable implements OnInit {
     switch (activeTab) {
       case this.TAB_NAME_TRANSLATION_SUBMITTER:
       case this.TAB_NAME_TRANSLATION_REVIEWER:
+      case this.TAB_NAME_TRANSLATION_COORDINATOR:
         contributionType = AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION;
         break;
       case this.TAB_NAME_QUESTION_SUBMITTER:
       case this.TAB_NAME_QUESTION_REVIEWER:
+      case this.TAB_NAME_QUESTION_COORDINATOR:
         contributionType = AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION;
         break;
     }
@@ -325,6 +331,11 @@ export class ContributorAdminStatsTable implements OnInit {
       case this.TAB_NAME_QUESTION_REVIEWER:
         contributionSubType = AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
         break;
+      case this.TAB_NAME_TRANSLATION_COORDINATOR:
+      case this.TAB_NAME_QUESTION_COORDINATOR:
+        contributionSubType =
+          AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE;
+        break;
     }
 
     return contributionSubType;
@@ -335,6 +346,15 @@ export class ContributorAdminStatsTable implements OnInit {
       this.columnsToDisplay = ['contributorName'];
     } else {
       this.columnsToDisplay = ['chevron', 'contributorName'];
+    }
+    if (
+      contributionSubType === AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+    ) {
+      this.columnsToDisplay.push('lastContributedInDays');
+      if (this.isMobileView()) {
+        this.columnsToDisplay.push('chevron');
+      }
+      return;
     }
     if (
       contributionSubType === AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION

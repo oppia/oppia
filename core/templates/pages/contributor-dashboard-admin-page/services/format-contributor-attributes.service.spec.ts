@@ -18,8 +18,10 @@
 
 import {FormatContributorAttributesService} from './format-contributor-attributes.service';
 import {
+  QuestionCoordinatorStats,
   QuestionReviewerStats,
   QuestionSubmitterStats,
+  TranslationCoordinatorStats,
   TranslationReviewerStats,
   TranslationSubmitterStats,
 } from '../contributor-dashboard-admin-summary.model';
@@ -199,6 +201,27 @@ describe('Format contribution attributes service', () => {
           displayText: 'topic1, topic2',
         },
       ]);
+    });
+
+    it('should return the translation coordinator stats attributes correctly', () => {
+      const service: FormatContributorAttributesService =
+        new FormatContributorAttributesService();
+      const stats = new TranslationCoordinatorStats('user1', 'en', 5, 3, 10);
+      expect(
+        service.getTranslationCoordinatorContributorAttributes(stats)
+      ).toEqual([
+        {key: 'Translators', displayText: '5'},
+        {key: 'Reviewers', displayText: '3'},
+      ]);
+    });
+
+    it('should return no attributes for question coordinators', () => {
+      const service: FormatContributorAttributesService =
+        new FormatContributorAttributesService();
+      const stats = new QuestionCoordinatorStats('user1', 5);
+      expect(
+        service.getQuestionCoordinatorContributorAttributes(stats)
+      ).toEqual([]);
     });
   });
 });

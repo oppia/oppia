@@ -216,6 +216,14 @@ describe('Translation Coordinator', function () {
     await translationCoordinator.expectNumberOfContributorsToBe(1);
   });
 
+  it('should show the Translation Coordinators tab with stats', async function () {
+    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Coordinators'
+    );
+    await translationCoordinator.expectStatsTableToBeVisible();
+  });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

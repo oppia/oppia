@@ -33,6 +33,7 @@ const lastDatePickerInputSelector = '.e2e-test-last-date-picker-input';
 const mobileLastDatePickerInputSelector =
   '.e2e-test-mobile-last-date-picker-input';
 const statsListItemSelector = '.e2e-test-stats-list-item';
+const statsTableSelector = '.e2e-test-stats-table';
 const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
 const newContributorAdminDashboardPageSelector =
   '.e2e-test-new-contributor-admin-dashboard-page';
@@ -64,6 +65,8 @@ export class ContributorAdmin extends BaseUser {
       | 'Translation Reviewers'
       | 'Question Submitters'
       | 'Question Reviewers'
+      | 'Translation Coordinators'
+      | 'Question Coordinators'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       // Remove last 's' from the tab name.
@@ -164,6 +167,13 @@ export class ContributorAdmin extends BaseUser {
       statsListItemSelector,
       number
     );
+  }
+
+  /**
+   * Checks that the contributor stats table has rendered (i.e. stats loaded).
+   */
+  async expectStatsTableToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(statsTableSelector);
   }
 }
 
