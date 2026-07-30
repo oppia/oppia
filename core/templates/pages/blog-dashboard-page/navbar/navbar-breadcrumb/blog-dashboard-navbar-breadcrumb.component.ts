@@ -57,4 +57,8 @@ export class BlogDashboardNavbarBreadcrumbComponent
   ngOnDestroy(): void {
     return this.directiveSubscriptions.unsubscribe();
   }
+
+  navigateToMainTab(): void {
+    this.blogDashboardPageService.navigateToMainTab();
+  }
 }
