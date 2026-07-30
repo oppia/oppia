@@ -20,6 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {AssessmentInterruptComponent} from './assessment-interrupt.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('AssessmentInterruptComponent', () => {
   let component: AssessmentInterruptComponent;
@@ -27,7 +28,7 @@ describe('AssessmentInterruptComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AssessmentInterruptComponent],
+      declarations: [AssessmentInterruptComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
