@@ -108,6 +108,8 @@
 	"I18N_ANDROID_PAGE_TITLE": "Android | Oppia",
 	"I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT": "Iscriviti per ricevere aggiornamenti sull'app Android di Oppia",
 	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Iscriviti",
+	"I18N_ASSESSMENT_INSTRUCTIONS_HEADING": "Prima di iniziare, ecco cosa aspettarsi:",
+	"I18N_ASSESSMENT_INSTRUCTION_ONE_QUESTION_AT_A_TIME": "Vedrai una domanda alla volta.",
 	"I18N_BACK_TO_CLASSROOM": "Torna a <[classroomName]>",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY": "<[totalNumber]> post",
 	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT": "Aggiungi una breve descrizione su di te. Tieni presente che tutto ciò che scrivi qui verrà mostrato al pubblico.",
