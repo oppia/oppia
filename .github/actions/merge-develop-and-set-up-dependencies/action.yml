@@ -32,27 +32,13 @@ runs:
         echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
       shell: bash
 
-    - name: Cache Python dev dependencies
-      id: restore_python_dev_dependencies_cache
-      uses: actions/cache@v4
-      # We need to include install_python_dev_dependencies.py in the cache key
-      # because it has the version numbers for pip, pip-tools and setuptools.
-      with:
-        key: ${{ runner.os }}-devdeps-python-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
-        path: |
-          /opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages
-          /opt/hostedtoolcache/Python/3.10.16/x64/bin
-
     - name: Install third-party Python dev dependencies
-      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit != 'true'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
         retry_on: error
         shell: bash
         timeout_minutes: 30
-        # Note that the effects of this don't seem to be cached by setup-python,
-        # resulting in the occasional "No module named PIL" errors in CI.
         command: python -m scripts.install_python_dev_dependencies
 
     - name: Show where pip installs its packages, and the contents of that folder.
