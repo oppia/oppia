@@ -317,8 +317,8 @@
     },
     {
       "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
-      "module": "core/tests/playwright-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts",
-      "framework": "playwright"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "exploration-creator/create-an-exploration-with-all-interactions",
