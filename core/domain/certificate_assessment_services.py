@@ -750,7 +750,7 @@ def get_certificate_offerings_for_classroom(
         ).fetch(),
     )
     certificate_assessment_offering_models.sort(
-        key=lambda offering_model: offering_model.title.lower()
+        key=lambda offering_model: str(offering_model.title.lower())
     )
     if not certificate_assessment_offering_models:
         return []
@@ -762,7 +762,10 @@ def get_certificate_offerings_for_classroom(
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
             == learner_id,
-            gae_models.CertificateAssessmentAttemptModel.is_submitted is True,
+            # pylint: disable=singleton-comparison
+            # Here we use == True because NDB query filters use __eq__ to
+            # construct filter nodes, not for boolean value comparison.
+            gae_models.CertificateAssessmentAttemptModel.is_submitted == True,
         ).fetch(),
     )
     latest_attempt_by_certificate_id: Dict[
@@ -792,10 +795,10 @@ def get_certificate_offerings_for_classroom(
 
     certificate_offerings: List[CertificateOfferingClassroomSummary] = []
     for offering_model in certificate_assessment_offering_models:
-        attempt_model = latest_attempt_by_certificate_id.get(offering_model.id)
-        if attempt_model is None:
+        latest_attempt = latest_attempt_by_certificate_id.get(offering_model.id)
+        if latest_attempt is None:
             attempt_status = 'Not Attempted'
-        elif attempt_model.total_score >= 80:
+        elif latest_attempt.total_score >= 80:
             attempt_status = 'Passed'
         else:
             attempt_status = 'Not Passed'

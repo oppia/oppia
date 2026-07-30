@@ -33,6 +33,7 @@ from core.domain import (
     translation_domain,
 )
 from core.platform import models
+from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 from typing import TypedDict
@@ -86,10 +87,10 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         self.other_classroom_id = 'science_classroom_01'
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.other_topic_id = topic_fetchers.get_new_topic_id()
-        self.OWNER_EMAIL = f'certificate.assessment.{self.topic_id}@example.com'
-        self.OWNER_USERNAME = 'certificateassessment1'
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_email = f'certificate.assessment.{self.topic_id}@example.com'
+        self.owner_username = 'certificateassessment1'
+        self.signup(self.owner_email, self.owner_username)
+        owner_id = self.get_user_id_from_email(self.owner_email)
         self.save_new_topic(
             self.topic_id,
             owner_id,
@@ -246,7 +247,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         is_submitted: bool,
     ) -> None:
         """Creates a certificate assessment attempt model for testing."""
-        certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.create(
+        gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             total_score=total_score,
             attempt_index=attempt_index,
@@ -442,10 +443,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         super().setUp()
         self.classroom_id = 'math_classroom_01'
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.OWNER_EMAIL = f'certificate.assessment.{self.topic_id}@example.com'
-        self.OWNER_USERNAME = 'certificateassessment2'
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_email = f'certificate.assessment.{self.topic_id}@example.com'
+        self.owner_username = 'certificateassessment2'
+        self.signup(self.owner_email, self.owner_username)
+        owner_id = self.get_user_id_from_email(self.owner_email)
         self.save_new_topic(self.topic_id, owner_id)
         classroom = classroom_config_domain.Classroom(
             self.classroom_id,
@@ -1088,7 +1089,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
     def test_validation_distributes_remainder_to_earlier_topics(self) -> None:
         topic_2 = topic_fetchers.get_new_topic_id()
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.owner_email)
         self.save_new_topic(
             topic_2,
             owner_id,
@@ -1232,7 +1233,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         topic_id = topic_fetchers.get_new_topic_id()
         question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.owner_email)
 
         self.save_new_skill(skill_id, owner_id, description='Skill 1')
         subtopic = topic_domain.Subtopic.create_default_subtopic(
