@@ -121,9 +121,16 @@ describe('TopicStorySectionComponent', () => {
     urlInterpolationService.getStaticCopyrightedImageUrl.and.callFake(
       (p: string) => `/assets/copyrighted-images${p}`
     );
-    urlInterpolationService.interpolateUrl.and.callFake((template: string) => {
-      return template.replace('<exp_id>', 'exp_1');
-    });
+    urlInterpolationService.interpolateUrl.and.callFake(
+      (template: string, params: Record<string, string>) => {
+        let url = template;
+        for (const [key, value] of Object.entries(params)) {
+          url = url.replace(`<${key}>`, value);
+        }
+        url = url.replace('<exp_id>', 'exp_1');
+        return url;
+      }
+    );
 
     assetsBackendApiService.getThumbnailUrlForPreview.and.returnValue(
       '/thumbnail/story/story_id/thumb.png'
@@ -233,14 +240,14 @@ describe('TopicStorySectionComponent', () => {
     const arcs = [
       {
         id: 'arc_1',
-        title: 'Arc 1',
-        description: 'First arc',
+        title: 'Adventure 1',
+        description: 'First adventure',
         node_ids: ['node_1'],
       },
       {
         id: 'arc_2',
-        title: 'Arc 2',
-        description: 'Second arc',
+        title: 'Adventure 2',
+        description: 'Second adventure',
         node_ids: ['node_2'],
       },
     ];
@@ -256,12 +263,12 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.arcGroups.length).toBe(2);
-    expect(component.arcGroups[0].arcTitle).toBe('Arc 1');
+    expect(component.arcGroups[0].arcTitle).toBe('Adventure 1');
     expect(component.arcGroups[0].lessonCards.length).toBe(1);
     expect(component.arcGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
-    expect(component.arcGroups[1].arcTitle).toBe('Arc 2');
+    expect(component.arcGroups[1].arcTitle).toBe('Adventure 2');
     expect(component.arcGroups[1].lessonCards.length).toBe(1);
     expect(component.arcGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
@@ -746,8 +753,8 @@ describe('TopicStorySectionComponent', () => {
     const arcs = [
       {
         id: 'arc_1',
-        title: 'Arc 1',
-        description: 'First arc',
+        title: 'Adventure 1',
+        description: 'First adventure',
         node_ids: ['missing_node_id'],
       },
     ];
@@ -880,5 +887,37 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.lessonCards.length).toBe(1);
     expect(component.lessonCards[0].totalCheckpointsCount).toBe(0);
+  });
+
+  it('should build lesson practice url with fragments', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'fractions';
+
+    const practiceUrl = component.getLessonPracticeUrl('1');
+    expect(practiceUrl).toContain('fractions/practice/1');
+  });
+
+  it('should fallback lesson practice url when fragments are missing', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+
+    const practiceUrl = component.getLessonPracticeUrl('1');
+    expect(practiceUrl).toBe('#');
+  });
+
+  it('should build end of arc url with fragments', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'fractions';
+
+    const arcUrl = component.getEndOfArcUrl('1');
+    expect(arcUrl).toContain('fractions/test/arc/1');
+  });
+
+  it('should fallback end of arc url when fragments are missing', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+
+    const arcUrl = component.getEndOfArcUrl('1');
+    expect(arcUrl).toBe('#');
   });
 });
