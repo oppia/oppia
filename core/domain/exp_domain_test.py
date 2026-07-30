@@ -4182,7 +4182,8 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         the old version yaml convert to latest Exploration object.
         It verifies whether the these objects are equal.
         """
-        old_version_yaml_content: str = textwrap.dedent("""
+        old_version_yaml_content: str = textwrap.dedent(
+            """
         author_notes: ''
         auto_tts_enabled: false
         blurb: ''
@@ -4236,7 +4237,8 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
                 ca_choices_0: {}
                 ca_choices_1: {}
                 content: {}
-        """)
+        """
+        )
         mock_import_module.return_value = 'mocked_memcache_key'
         exploration_id = 'mocked_memcache_key'
         old_version_exploration = create_old_schema_exploration(
@@ -4998,7 +5000,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
     SAMPLE_YAML_CONTENT: str = (
-        ("""author_notes: ''
+        """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -5069,7 +5071,7 @@ states_schema_version: %d
 tags: []
 title: Title
 version: 0
-""")
+"""
         % (
             feconf.DEFAULT_INIT_STATE_NAME,
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
