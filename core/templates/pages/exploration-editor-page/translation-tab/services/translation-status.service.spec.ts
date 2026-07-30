@@ -356,15 +356,6 @@ describe('Translation status service', () => {
     tss.refresh();
   });
 
-  it('should initialize service properly', () => {
-    tss.ngOnInit();
-
-    expect(tss.explorationVoiceoverContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentRequiredCount).toEqual(0);
-    expect(tss.explorationVoiceoverContentRequiredCount).toEqual(0);
-  });
-
   it(
     'should return a correct list of state names for which audio needs ' +
       'update',
@@ -838,5 +829,50 @@ describe('Translation status service', () => {
     expect(tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()).toBe(
       true
     );
+  });
+});
+
+describe('Translation status service - initialization', () => {
+  let tss: TranslationStatusService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TranslationStatusService,
+        TranslationLanguageService,
+        TranslationTabActiveModeService,
+        ExplorationStatesService,
+        GenerateContentIdService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            },
+          },
+        },
+      ],
+    });
+
+    tss = TestBed.inject(TranslationStatusService);
+  });
+
+  it('should initialize properties correctly on construction', () => {
+    expect(tss.stateNeedsUpdateWarnings).toEqual({});
+    expect(tss.stateWiseStatusColor).toEqual({});
+    expect(tss.explorationTranslationContentRequiredCount).toBe(0);
+    expect(tss.explorationVoiceoverContentRequiredCount).toBe(0);
+    expect(tss.explorationTranslationContentNotAvailableCount).toBe(0);
+    expect(tss.explorationVoiceoverContentNotAvailableCount).toBe(0);
   });
 });

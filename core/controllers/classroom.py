@@ -133,6 +133,9 @@ class ClassroomDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'course_details': classroom.course_details,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
+                'feedback_recipient_email': (
+                    classroom.feedback_recipient_email
+                ),
                 'teaser_text': classroom.teaser_text,
                 'is_published': classroom.is_published,
                 'diagnostic_test_is_enabled': classroom.diagnostic_test_is_enabled,
@@ -452,6 +455,7 @@ class NewClassroomDataHandlerNormalizedPayloadDict(TypedDict):
 
     name: str
     url_fragment: str
+    feedback_recipient_email: str
 
 
 class NewClassroomHandler(
@@ -480,6 +484,17 @@ class NewClassroomHandler(
                 }
             },
             'url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+            'feedback_recipient_email': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.EMAIL_REGEX,
+                        }
+                    ],
+                }
+            },
         }
     }
 
@@ -495,10 +510,13 @@ class NewClassroomHandler(
 
         name = self.normalized_payload['name']
         url_fragment = self.normalized_payload['url_fragment']
+        feedback_recipient_email = self.normalized_payload[
+            'feedback_recipient_email'
+        ]
 
         new_classroom_id = classroom_config_services.get_new_classroom_id()
         classroom_config_services.create_new_default_classroom(
-            new_classroom_id, name, url_fragment
+            new_classroom_id, name, url_fragment, feedback_recipient_email
         )
 
         self.render_json({'new_classroom_id': new_classroom_id})
@@ -530,6 +548,7 @@ class TopicsToClassroomsRelationHandler(
                 'topic_name': topic_dict['name'],
                 'classroom_name': None,
                 'classroom_url_fragment': None,
+                'feedback_recipient_email': None,
             }
 
         for classroom in classrooms:
@@ -538,6 +557,9 @@ class TopicsToClassroomsRelationHandler(
                     {
                         'classroom_name': classroom.name,
                         'classroom_url_fragment': classroom.url_fragment,
+                        'feedback_recipient_email': (
+                            classroom.feedback_recipient_email
+                        ),
                     }
                 )
 
