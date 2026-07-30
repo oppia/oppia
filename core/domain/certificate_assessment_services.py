@@ -726,9 +726,20 @@ def get_certificate_assessment_offerings() -> (
 def get_certificate_offerings_for_classroom(
     classroom_id: str, learner_id: str
 ) -> List[CertificateOfferingClassroomSummary]:
-    """Fetches certificate offerings for a classroom, available to a learner."""
+    """Fetches certificate offerings for a classroom, available to a learner.
+
+    Args:
+        classroom_id: str. The ID of the classroom to fetch offerings for.
+        learner_id: str. The ID of the learner to filter attempts by.
+
+    Returns:
+        list(CertificateOfferingClassroomSummary). A list of certificate
+        offering summaries with attempt status for the given learner.
+    """
     certificate_assessment_offering_models: List[
         gae_models.CertificateAssessmentOfferingModel
+        # Here we use cast because .fetch() returns a generic list,
+        # but we need a typed list for the type checker.
     ] = cast(
         List[gae_models.CertificateAssessmentOfferingModel],
         gae_models.CertificateAssessmentOfferingModel.query(
@@ -744,12 +755,14 @@ def get_certificate_offerings_for_classroom(
     if not certificate_assessment_offering_models:
         return []
 
+    # Here we use cast because .fetch() returns a generic list,
+    # but we need a typed list for the type checker.
     attempt_models: List[gae_models.CertificateAssessmentAttemptModel] = cast(
         List[gae_models.CertificateAssessmentAttemptModel],
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
             == learner_id,
-            gae_models.CertificateAssessmentAttemptModel.is_submitted == True,
+            gae_models.CertificateAssessmentAttemptModel.is_submitted is True,
         ).fetch(),
     )
     latest_attempt_by_certificate_id: Dict[

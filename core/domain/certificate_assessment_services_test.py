@@ -87,7 +87,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.other_topic_id = topic_fetchers.get_new_topic_id()
         self.OWNER_EMAIL = f'certificate.assessment.{self.topic_id}@example.com'
-        self.OWNER_USERNAME = f'certificateassessment1'
+        self.OWNER_USERNAME = 'certificateassessment1'
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_topic(
@@ -245,6 +245,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         finished_at: datetime.datetime | None,
         is_submitted: bool,
     ) -> None:
+        """Creates a certificate assessment attempt model for testing."""
         certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             total_score=total_score,
@@ -343,7 +344,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             demonstrates=['Skill'],
             async_status='Available',
         )
-        not_attempted_offering = certificate_assessment_services.create_certificate_assessment_offering(
+        _ = certificate_assessment_services.create_certificate_assessment_offering(
             title='Not Attempted',
             description='desc',
             classroom_id=self.classroom_id,
@@ -442,7 +443,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.classroom_id = 'math_classroom_01'
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.OWNER_EMAIL = f'certificate.assessment.{self.topic_id}@example.com'
-        self.OWNER_USERNAME = f'certificateassessment2'
+        self.OWNER_USERNAME = 'certificateassessment2'
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_topic(self.topic_id, owner_id)
