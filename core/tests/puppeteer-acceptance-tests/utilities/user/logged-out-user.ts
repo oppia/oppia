@@ -588,7 +588,7 @@ const revisionTabSelector = 'subtopics-list';
 
 const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const startPracticeButtonSelector = '.e2e-test-practice-start-button';
-const practiceSessionContainerSelector = 'practice-session-page';
+const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
 
 const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
@@ -7140,6 +7140,10 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOnElementWithSelector(startPracticeButtonSelector);
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
+    });
+    await this.page.waitForSelector(practiceSessionContainerSelector, {
+      visible: true,
+      timeout: 30000,
     });
   }
 
