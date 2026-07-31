@@ -26,7 +26,6 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CollectionEditor} from '../../utilities/user/collection-editor';
 
 const ROLES = testConstants.Roles;
-const COLLECTION_NAME = 'Numbers';
 const FIRST_EXPLORATION_TITLE = 'Positive Numbers';
 const SECOND_EXPLORATION_TITLE = 'Negative Numbers';
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
@@ -46,14 +45,6 @@ describe('Logged-Out Learner', function () {
       'lessoncreator@example.com',
       [ROLES.COLLECTION_EDITOR]
     )) as unknown as ExplorationEditor & CollectionEditor;
-    await lessonCreator.page.setViewport({
-      width: 1920,
-      height: 1080,
-      deviceScaleFactor: 1,
-      isMobile: false,
-      hasTouch: false,
-      isLandscape: true,
-    });
 
     const expId1 = await lessonCreator.createAndPublishExplorationWithCards(
       FIRST_EXPLORATION_TITLE
@@ -63,7 +54,7 @@ describe('Logged-Out Learner', function () {
     );
 
     await lessonCreator.createAndPublishCollection(
-      COLLECTION_NAME,
+      'Numbers',
       'Learn about numbers.',
       'Algebra',
       [expId1, expId2]
@@ -72,18 +63,14 @@ describe('Logged-Out Learner', function () {
 
   it('should find the collection in the community library', async function () {
     await loggedOutLearner.navigateToCommunityLibraryPage();
-    await loggedOutLearner.expectCollectionToBeVisibleInLibrary(
-      COLLECTION_NAME
-    );
+    await loggedOutLearner.expectCollectionToBeVisibleInLibrary('Numbers');
   });
 
   it('should display both explorations on the collection page', async function () {
-    await loggedOutLearner.navigateToCollectionFromLibrary(COLLECTION_NAME);
+    await loggedOutLearner.navigateToCollectionFromLibrary('Numbers');
 
     // Verify the collection begin button and both explorations are visible.
-    await loggedOutLearner.expectBeginCollectionButtonToBePresent(
-      COLLECTION_NAME
-    );
+    await loggedOutLearner.expectBeginCollectionButtonToBePresent('Numbers');
     await loggedOutLearner.expectExplorationToBeListedInCollection(
       FIRST_EXPLORATION_TITLE
     );
