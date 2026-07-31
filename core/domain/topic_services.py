@@ -1563,15 +1563,6 @@ def delete_uncategorized_skill(
         opportunity_services.remove_topic_from_translation_opportunities(
             topic_id, {feconf.ENTITY_TYPE_SKILL: [uncategorized_skill_id]}
         )
-        all_topics = topic_fetchers.get_all_topics()
-        skill_in_other_topic = any(
-            t.id != topic_id and uncategorized_skill_id in t.get_all_skill_ids()
-            for t in all_topics
-        )
-        if not skill_in_other_topic:
-            suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
-                [uncategorized_skill_id]
-            )
 
 
 def add_uncategorized_skill(
@@ -2021,23 +2012,6 @@ def delete_topic(
                 opportunity_services.remove_topic_from_translation_opportunities(
                     topic_id, {feconf.ENTITY_TYPE_SKILL: topic_skills}
                 )
-                all_other_topics = [
-                    t
-                    for t in topic_fetchers.get_all_topics()
-                    if t.id != topic_id
-                ]
-                skills_to_clean_up = [
-                    skill_id
-                    for skill_id in topic_skills
-                    if not any(
-                        skill_id in t.get_all_skill_ids()
-                        for t in all_other_topics
-                    )
-                ]
-                if skills_to_clean_up:
-                    suggestion_services.auto_reject_translation_suggestions_for_skill_ids(
-                        skills_to_clean_up
-                    )
 
 
 def delete_topic_summary(topic_id: str) -> None:

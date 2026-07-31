@@ -1181,6 +1181,58 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'Topic 1', 'abbrev', 'description', 'fragment'
+        )
+        topic.add_uncategorized_skill_id(self.SKILL_ID)
+        topic_services.save_new_topic(self.USER_ID, topic)
+
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]}, topic_ids=['topic_id']
+        )
+        model_id = f'skill.{self.SKILL_ID}'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.content_count, 3)
+
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
+                    ),
+                    'old_value': {
+                        'content_id': '1',
+                        'html': '<p>Explanation</p>',
+                    },
+                    'new_value': {
+                        'content_id': '1',
+                        'html': '<p>New Explanation</p>',
+                    },
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.USER_ID,
+            self.SKILL_ID,
+            changelist,
+            'Updated explanation.',
+        )
+        updated_model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        self.assertIsNotNone(updated_model)
+
     def test_delete_skill_marked_deleted(self) -> None:
         skill_models.SkillModel.delete_multi(
             [self.SKILL_ID], self.USER_ID, '', force_deletion=False

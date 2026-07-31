@@ -904,7 +904,6 @@ def remove_topic_from_translation_opportunities(
     entity_types_and_ids: Dict[str, List[str]],
 ) -> None:
     """Removes a topic ID from topic_ids list of translation opportunities.
-    If topic_ids becomes empty, the opportunity model is deleted.
 
     Args:
         topic_id: str. The topic ID to remove.
@@ -921,15 +920,11 @@ def remove_topic_from_translation_opportunities(
         opportunity_ids
     )
     models_to_update = []
-    models_to_delete = []
 
     for model in opp_models:
         if model is not None and topic_id in model.topic_ids:
             model.topic_ids.remove(topic_id)
-            if not model.topic_ids:
-                models_to_delete.append(model)
-            else:
-                models_to_update.append(model)
+            models_to_update.append(model)
 
     if models_to_update:
         opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
@@ -937,11 +932,6 @@ def remove_topic_from_translation_opportunities(
         )
         opportunity_models.TranslationOpportunityModel.put_multi(
             models_to_update
-        )
-
-    if models_to_delete:
-        opportunity_models.TranslationOpportunityModel.delete_multi(
-            models_to_delete
         )
 
 

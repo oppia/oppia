@@ -2722,7 +2722,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         model = opportunity_models.TranslationOpportunityModel.get(
             'skill.skill_id_3', strict=False
         )
-        self.assertIsNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, [])
 
     @test_utils.enable_feature_flags(
         [
@@ -2938,16 +2939,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
 
-        self.assertIsNone(
-            opportunity_models.TranslationOpportunityModel.get(
-                'skill.skill_id_5', strict=False
-            )
+        model_5 = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_5', strict=False
         )
-        self.assertIsNotNone(
-            opportunity_models.TranslationOpportunityModel.get(
-                'skill.skill_id_6', strict=False
-            )
+        assert model_5 is not None
+        self.assertEqual(model_5.topic_ids, [])
+
+        model_6 = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_6', strict=False
         )
+        assert model_6 is not None
+        self.assertEqual(model_6.topic_ids, [topic_id_2])
 
     def test_delete_subtopic_with_skill_ids(self) -> None:
         changelist = [

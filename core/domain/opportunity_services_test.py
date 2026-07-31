@@ -2611,7 +2611,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_remove_topic_from_translation_opportunities_deletes_when_empty(
+    def test_remove_topic_from_translation_opportunities_retains_model_when_empty(
         self,
     ) -> None:
         opportunity_services.create_translation_opportunity(
@@ -2625,7 +2625,8 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         opportunity_services.remove_topic_from_translation_opportunities(
             'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
         )
-        deleted_model = opportunity_models.TranslationOpportunityModel.get(
-            model_id, strict=False
+        updated_model = opportunity_models.TranslationOpportunityModel.get(
+            model_id
         )
-        self.assertIsNone(deleted_model)
+        assert updated_model is not None
+        self.assertEqual(updated_model.topic_ids, [])
