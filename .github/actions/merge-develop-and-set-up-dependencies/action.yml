@@ -50,6 +50,23 @@ runs:
         ls -la /opt/hostedtoolcache/Python/3.10.16/x64/bin
       shell: bash
 
+    - name: Check Yarn Cache
+      run: |
+        # Move outside repository root to ignore the configs in
+        # oppia/.yarnrc. These configs specify that yarn should use the
+        # Oppia-managed yarn executable, which hasn't been downloaded
+        # yet.
+        cd ..
+        # Create a new .yarnrc file to check what is already in the
+        # Oppia-managed yarn cache.
+        echo 'cache-folder "yarn_cache"' > .yarnrc
+        yarn cache list
+        # Delete the .yarnrc file that we just created.
+        rm .yarnrc
+        # Move back to the repository root.
+        cd -
+      shell: bash
+
     # Production pip dependencies are installed in a custom folder rather than
     # the pip cache (see "Caching Python dependencies" in the README at
     # https://github.com/actions/setup-python?tab=readme-ov-file).
@@ -81,23 +98,6 @@ runs:
           /home/runner/work/oppia/oppia/node_modules
           /home/runner/work/oppia/oppia/third_party/python_libs
           /home/runner/work/oppia/oppia/third_party/static
-
-    - name: Check Yarn Cache
-      run: |
-        # Move outside repository root to ignore the configs in
-        # oppia/.yarnrc. These configs specify that yarn should use the
-        # Oppia-managed yarn executable, which hasn't been downloaded
-        # yet.
-        cd ..
-        # Create a new .yarnrc file to check what is already in the
-        # Oppia-managed yarn cache.
-        echo 'cache-folder "yarn_cache"' > .yarnrc
-        yarn cache list
-        # Delete the .yarnrc file that we just created.
-        rm .yarnrc
-        # Move back to the repository root.
-        cd -
-      shell: bash
 
     - name: Print requirements files (before)
       run: |
