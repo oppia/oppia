@@ -45,7 +45,6 @@ runs:
 
     - name: Show where pip installs its packages, and the contents of that folder.
       run: |
-        pip --version
         pip show certifi
         ls -la /opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages
         ls -la /opt/hostedtoolcache/Python/3.10.16/x64/bin
@@ -82,6 +81,23 @@ runs:
           /home/runner/work/oppia/oppia/node_modules
           /home/runner/work/oppia/oppia/third_party/python_libs
           /home/runner/work/oppia/oppia/third_party/static
+
+    - name: Check Yarn Cache
+      run: |
+        # Move outside repository root to ignore the configs in
+        # oppia/.yarnrc. These configs specify that yarn should use the
+        # Oppia-managed yarn executable, which hasn't been downloaded
+        # yet.
+        cd ..
+        # Create a new .yarnrc file to check what is already in the
+        # Oppia-managed yarn cache.
+        echo 'cache-folder "yarn_cache"' > .yarnrc
+        yarn cache list
+        # Delete the .yarnrc file that we just created.
+        rm .yarnrc
+        # Move back to the repository root.
+        cd -
+      shell: bash
 
     - name: Print requirements files (before)
       run: |
