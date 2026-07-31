@@ -4202,7 +4202,7 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 @media (max-width: 991px) {
   .navbar-options-display {
     position: absolute !important;
-    right: 70px !important;
+    right: 48px !important;
     top: 0 !important;
     height: 56px !important;
     align-items: center !important;
