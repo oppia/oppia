@@ -4193,3 +4193,40 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 .hidden-element {
   outline: 0;
 }
+
+/* Custom responsive overrides for Collection Editor header options */
+.navbar-options-display {
+  display: flex !important;
+}
+
+@media (max-width: 991px) {
+  .navbar-options-display {
+    position: absolute !important;
+    right: 70px !important;
+    top: 0 !important;
+    height: 56px !important;
+    align-items: center !important;
+    z-index: 1000 !important;
+  }
+  .oppia-collection-editor-navbar {
+    margin-bottom: 0 !important;
+    padding-left: 0 !important;
+  }
+  .oppia-button-container {
+    margin-top: 3px !important;
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  navbar-breadcrumb {
+    display: none !important;
+  }
+  .oppia-save-publish-button-label {
+    display: none !important;
+  }
+  .oppia-save-draft-button,
+  .oppia-editor-publish-button {
+    padding: 6px 12px !important;
+  }
+}

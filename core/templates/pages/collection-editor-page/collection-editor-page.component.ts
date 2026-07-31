@@ -22,7 +22,6 @@ import {Subscription} from 'rxjs';
 
 import {UrlService} from 'services/contextual/url.service';
 import {PageTitleService} from 'services/page-title.service';
-import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {CollectionEditorRoutingService} from './services/collection-editor-routing.service';
 import {CollectionEditorStateService} from './services/collection-editor-state.service';
 
@@ -38,12 +37,10 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     private collectionEditorStateService: CollectionEditorStateService,
     private pageTitleService: PageTitleService,
     private urlService: UrlService,
-    private translateService: TranslateService,
-    private bottomNavbarStatusService: BottomNavbarStatusService
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
-    this.bottomNavbarStatusService.markBottomNavbarStatus(true);
     this.directiveSubscriptions.add(
       this.collectionEditorStateService.onCollectionInitialized.subscribe(
         () => {
