@@ -459,9 +459,9 @@
         </li>
         <li class="nav-item" *ngIf="isCertificateAssessmentEnabled()">
           <a (click)="closeSubmenuIfNotMobile($event)"
-             href="/certificate-offering-dashboard"
+             href="/certificate-creator-dashboard"
              class="dropdown-item nav-link">
-            <span>Certificate creator dashboard</span>
+            <span>Certificate Creator Dashboard</span>
           </a>
         </li>
         <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
@@ -517,6 +517,15 @@
              href="/moderator"
              rel="noopener">
             <span [innerHTML]="'I18N_TOPNAV_MODERATOR_PAGE' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item"
+            *ngIf="isTechnicalFeedbackDashboardEnabled() && isTechTeamLead">
+          <a class="dropdown-item nav-link"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/technical-feedback-dashboard"
+             rel="noopener">
+            <span [innerHTML]="'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item"

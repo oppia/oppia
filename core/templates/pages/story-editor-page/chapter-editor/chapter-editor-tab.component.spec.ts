@@ -28,8 +28,8 @@ import {ChapterEditorTabComponent} from './chapter-editor-tab.component';
 describe('Chapter Editor Tab Component', () => {
   let component: ChapterEditorTabComponent;
   let fixture: ComponentFixture<ChapterEditorTabComponent>;
-  let storyInitializedEventEmitter;
-  let storyReinitializedEventEmitter;
+  let storyInitializedEventEmitter: EventEmitter<void>;
+  let storyReinitializedEventEmitter: EventEmitter<void>;
   let storyEditorStateService: StoryEditorStateService;
 
   class MockStoryEditorNavigationService {
@@ -73,26 +73,38 @@ describe('Chapter Editor Tab Component', () => {
       title: 'Story title',
       description: 'Story Description',
       notes: '<p>Notes/p>',
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      url_fragment: '',
+      meta_tag_content: '',
       story_contents: {
         initial_node_id: 'node_1',
         next_node_id: 'node_2',
         nodes: [
           {
             id: 'node_1',
+            title: 'Chapter 1',
+            description: 'Description 1',
             prerequisite_skill_ids: [],
             acquired_skill_ids: [],
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
+            thumbnail_bg_color: null,
+            thumbnail_filename: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
         ],
       },
       language_code: 'en',
-      story_contents_schema_version: 1,
       version: 1,
       corresponding_topic_id: 'topic_id',
-    } as unknown as StoryBackendDict);
+    } as StoryBackendDict);
 
     storyInitializedEventEmitter = new EventEmitter();
     storyReinitializedEventEmitter = new EventEmitter();
