@@ -393,6 +393,76 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.skill.superseding_skill_id, '1')
         self.assertEqual(self.skill.all_questions_merged, True)
 
+    def test_get_translatable_contents_collection(self) -> None:
+        translatable_contents = (
+            self.skill.get_translatable_contents_collection()
+        )
+        self.assertEqual(
+            len(translatable_contents.content_id_to_translatable_content), 3
+        )
+
+        skill_description_content = (
+            translatable_contents.content_id_to_translatable_content[
+                feconf.SKILL_DESCRIPTION_CONTENT_ID
+            ]
+        )
+        self.assertEqual(skill_description_content.content_value, 'Description')
+        self.assertEqual(
+            skill_description_content.content_type,
+            translation_domain.ContentType.SKILL_DESCRIPTION,
+        )
+        self.assertEqual(
+            skill_description_content.content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+        )
+
+        explanation_content_id = (
+            self.skill.skill_contents.explanation.content_id
+        )
+        explanation_content = (
+            translatable_contents.content_id_to_translatable_content[
+                explanation_content_id
+            ]
+        )
+        self.assertEqual(
+            explanation_content.content_value, '<p>Explanation</p>'
+        )
+        self.assertEqual(
+            explanation_content.content_type,
+            translation_domain.ContentType.SKILL_EXPLANATION,
+        )
+        self.assertEqual(
+            explanation_content.content_format,
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+
+        feedback_content = (
+            translatable_contents.content_id_to_translatable_content[
+                'misconception_0_feedback'
+            ]
+        )
+        self.assertEqual(
+            feedback_content.content_value, '<p>default_feedback</p>'
+        )
+        self.assertEqual(
+            feedback_content.content_type,
+            translation_domain.ContentType.MISCONCEPTION_FEEDBACK,
+        )
+        self.assertEqual(
+            feedback_content.content_format,
+            translation_domain.TranslatableContentFormat.HTML,
+        )
+
+        self.assertEqual(self.skill.get_content_count(), 3)
+        self.assertItemsEqual(
+            self.skill.get_translatable_content_ids(),
+            [
+                feconf.SKILL_DESCRIPTION_CONTENT_ID,
+                explanation_content_id,
+                'misconception_0_feedback',
+            ],
+        )
+
     def test_valid_misconception_must_be_addressed(self) -> None:
         self.skill.validate()
         must_be_addressed = 'False'

@@ -4590,6 +4590,7 @@ version: 1
         classroom_id: str = 'math_classroom_id',
         name: str = 'math',
         url_fragment: str = 'math',
+        feedback_recipient_email: str = 'user@email.com',
         course_details: str = 'Course Details',
         teaser_text: str = 'Teaser Text',
         topic_list_intro: str = 'Topic list intro',
@@ -4607,6 +4608,7 @@ version: 1
             classroom_id: str. Classroom ID of the newly-created classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            feedback_recipient_email: str. The email of the feedback recipient.
             course_details: str. A text to provide course details present in
                 the classroom.
             teaser_text: str. A text to provide a summary of the classroom.
@@ -4634,6 +4636,7 @@ version: 1
             classroom_id=classroom_id,
             name=name,
             url_fragment=url_fragment,
+            feedback_recipient_email=feedback_recipient_email,
             teaser_text=teaser_text,
             course_details=course_details,
             topic_list_intro=topic_list_intro,
