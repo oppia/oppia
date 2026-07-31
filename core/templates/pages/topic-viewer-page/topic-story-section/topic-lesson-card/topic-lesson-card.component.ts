@@ -36,6 +36,7 @@ const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   'initialVoiceoverLanguageCode';
+const LESSON_PROGRESS_STATUS_COMING_SOON = 'coming_soon';
 
 @Component({
   selector: 'topic-lesson-card',
@@ -112,13 +113,13 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
 
   get showCheckpointBar(): boolean {
     return (
-      this.lessonProgressStatus !== 'coming_soon' &&
+      this.lessonProgressStatus !== LESSON_PROGRESS_STATUS_COMING_SOON &&
       this.totalCheckpointsCount > 0
     );
   }
 
   get isComingSoonLesson(): boolean {
-    return this.lessonProgressStatus === 'coming_soon';
+    return this.lessonProgressStatus === LESSON_PROGRESS_STATUS_COMING_SOON;
   }
 
   navigateTo(url: string): void {

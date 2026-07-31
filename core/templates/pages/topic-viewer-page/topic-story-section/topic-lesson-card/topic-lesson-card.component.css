@@ -6,20 +6,15 @@
   border-radius: 8px;
   box-shadow: none;
   display: flex;
-  height: auto;
   max-width: 912px;
   min-height: 248px;
-  overflow: visible;
   width: 100%;
 }
 
 .topic-lesson-card.collapsed {
   border: 1px solid #d1d5db;
   border-radius: 0;
-  box-shadow: none;
-  height: auto;
   min-height: 0;
-  overflow: visible;
 }
 
 .topic-lesson-card.coming-soon-section-card {
@@ -59,11 +54,8 @@
 
 .topic-lesson-card-content.collapsed {
   align-items: center;
-  border: none;
-  box-shadow: none;
   flex-direction: row;
   gap: 12px;
-  height: auto;
   padding: 14px 18px;
 }
 
