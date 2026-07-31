@@ -6655,6 +6655,24 @@ export default {
         }
       ]
     },
+    "TECHNICAL_FEEDBACK_DETAIL": {
+      "ROUTE": "technical-feedback-dashboard/:team/:reportId",
+      "TITLE": "Technical Feedback Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "CERTIFICATE_CREATOR_DASHBOARD": {
       "ROUTE": "certificate-creator-dashboard",
       "TITLE": "Certificate Creator Dashboard | Oppia",

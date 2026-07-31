@@ -78,7 +78,7 @@ describe('Blog Admin Page component ', () => {
       max_number_of_tags_assigned_to_blog_post: {
         description: 'Max number of tags.',
         value: 10,
-        schema: {type: 'number'},
+        schema: {type: 'float'},
       },
     },
     updatableRoles: {
