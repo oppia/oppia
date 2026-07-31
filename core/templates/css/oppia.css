@@ -4216,12 +4216,12 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
     margin-top: 3px !important;
     margin-right: 0 !important;
   }
-}
-
-@media (max-width: 768px) {
   navbar-breadcrumb {
     display: none !important;
   }
+}
+
+@media (max-width: 768px) {
   .oppia-save-publish-button-label {
     display: none !important;
   }
