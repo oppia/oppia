@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for AssessmentIntroductionCardComponent.
  */
 
+import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 
@@ -36,6 +37,7 @@ describe('AssessmentIntroductionCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [CommonModule],
       declarations: [AssessmentIntroductionCardComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

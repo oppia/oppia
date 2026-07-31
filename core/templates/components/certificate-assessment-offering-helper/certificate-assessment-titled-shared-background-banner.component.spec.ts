@@ -17,6 +17,7 @@
  * CertificateAssessmentTitledBackgroundBannerComponent.
  */
 
+import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 
@@ -40,6 +41,7 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [CommonModule],
       declarations: [
         CertificateAssessmentTitledBackgroundBannerComponent,
         MockTranslatePipe,
@@ -100,9 +102,9 @@ describe('CertificateAssessmentTitledBackgroundBannerComponent', () => {
 
     const button = fixture.nativeElement.querySelector('button');
 
-    expect(button.textContent.trim()).toBe(`translated:${BACK_BUTTON_KEY}`);
+    expect(button.textContent.trim()).toBe(`TRANSLATED:${BACK_BUTTON_KEY}`);
     expect(button.getAttribute('aria-label')).toBe(
-      `translated:${BACK_BUTTON_KEY}`
+      `TRANSLATED:${BACK_BUTTON_KEY}`
     );
   });
 });

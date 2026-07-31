@@ -1,15 +1,15 @@
-<oppia-titled-background-banner [title]="'I18N_CERTIFICATE_ASSESSMENT'"
+  <oppia-titled-background-banner [title]="'I18N_CERTIFICATE_ASSESSMENT'"
                                 [buttonText]="'I18N_CERTIFICATE_ASSESSMENT_BACK_BUTTON'"
                                 [buttonRoute]="['/learn', 'math', 'certificate-offering-available']">
 </oppia-titled-background-banner>
 <div class="intro-card-container">
   <div class="intro-card">
-    <h1 class="certificate-title">{{ certificateTitle }}</h1>
+    <h1 class="certificate-title">{{ certificateTitle | titlecase }}</h1>
     <p class="certificate-description">{{ certificateDescription }}</p>
     <div class="demonstrates-box">
       <p class="demonstrates-heading">{{ demonstratesHeadingI18nKey | translate }}</p>
       <ul class="demonstrates-list">
-        <li *ngFor="let item of demonstratesList">{{ item }}</li>
+        <li *ngFor="let item of demonstratesList">{{ item | titlecase }}</li>
       </ul>
     </div>
 
@@ -22,7 +22,7 @@
       <div class="topic-tile" *ngFor="let topic of recommendedTopics"
            [ngClass]="topic.colorClass">
         <div class="topic-tile-info">
-          <p class="topic-name">{{ topic.name }}</p>
+          <p class="topic-name">{{ topic.name | titlecase }}</p>
           <p class="topic-lessons">{{ topic.lessonCount }} Lessons</p>
         </div>
       </div>
