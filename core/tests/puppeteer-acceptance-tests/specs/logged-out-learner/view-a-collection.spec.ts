@@ -17,11 +17,6 @@
  *
  * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FU1ADL4QO-eLZIuTowIA/edit?gid=888982708#gid=888982708
  * Test LO.13 (View collection)
- * Setup: create & publish 2 explorations + 1 collection
- * Navigate to library → find collection
- * Verify explorations visible → play one → verify completion
- * Click "Back to Collection"
- * Change language to Spanish → verify "COMPARTIR ESTA COLECCIÓN"
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
