@@ -26,8 +26,17 @@
     <h3 class="oppia-certificate-review-section-heading">
       Topic Readiness
     </h3>
+    <button type="button" class="btn btn-sm btn-outline-secondary mb-3"
+            [disabled]="isLoadingValidation" (click)="refreshValidationState()">
+      Refresh
+    </button>
 
-    <table class="oppia-certificate-review-table">
+    <div *ngIf="isLoadingValidation" class="text-center py-3 text-muted">
+      <mat-spinner class="mx-auto mb-2" diameter="24"></mat-spinner>
+      Loading readiness data...
+    </div>
+
+    <table *ngIf="!isLoadingValidation" class="oppia-certificate-review-table">
       <caption class="oppia-visually-hidden">
         Topic readiness breakdown for certificate assessment
       </caption>
@@ -37,7 +46,7 @@
           <th scope="col">Easy Available / Required</th>
           <th scope="col">Medium Available / Required</th>
           <th scope="col">Hard Available / Required</th>
-          <th scope="col">Total Questions</th>
+          <th scope="col">Total Questions / Total Required</th>
           <th scope="col">Status</th>
         </tr>
       </thead>
@@ -59,7 +68,7 @@
             {{ row.hardAvailable }} / {{ row.hardRequired }}
           </td>
 
-          <td>{{ row.totalQuestions }}</td>
+          <td>{{ row.totalQuestions }} / {{ row.totalRequiredQuestions }}</td>
 
           <td>
             <span *ngIf="row.isReady" class="oppia-certificate-review-badge--pass"
@@ -135,7 +144,7 @@
         </button>
         <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
                 (click)="onSaveClicked()">
-          {{ getSaveButtonText() }}
+          Save Certificate
         </button>
       </div>
     </ng-container>
@@ -159,7 +168,7 @@
         </button>
         <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
                 (click)="onSaveClicked()">
-          {{ getSaveButtonText() }}
+          Save Certificate
         </button>
       </div>
     </ng-container>
