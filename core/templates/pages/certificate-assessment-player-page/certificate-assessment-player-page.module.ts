@@ -25,7 +25,6 @@ import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment
 import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
-import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
 
 @NgModule({
@@ -43,11 +42,6 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
         component: CertificateAssessmentPlayerPageRootComponent,
         canActivate: [CertificateAssessmentPlayerPageAuthGuard],
       },
-      {
-        path: 'result/:attempt_id',
-        component: CertificateAssessmentPlayerPageRootComponent,
-        canActivate: [CertificateAssessmentPlayerPageAuthGuard],
-      },
     ]),
   ],
   declarations: [
@@ -56,7 +50,6 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
   ],
   entryComponents: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -64,7 +57,6 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
   ],
 })
 export class CertificateAssessmentPlayerPageModule {}

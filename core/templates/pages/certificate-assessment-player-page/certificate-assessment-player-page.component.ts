@@ -30,7 +30,7 @@ interface AssessmentQuestion {
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
-  currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
+  currentStage: 'intro' | 'instructions' | 'questions' = 'intro';
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
@@ -58,8 +58,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     if (currentRoute === 'session') {
       this.currentStage = 'questions';
-    } else if (currentRoute === 'result') {
-      this.currentStage = 'result';
     }
   }
 
@@ -80,10 +78,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   submitAssessment(): void {
     const attemptId = `attempt-${Date.now()}`;
-    this.router.navigate([
-      `/certificate-assessment/${this.certificateId}/result`,
-      attemptId,
-    ]);
+    this.router.navigate(['/certificate-assessment-result', attemptId]);
   }
 
   getProgressPercentage(): number {

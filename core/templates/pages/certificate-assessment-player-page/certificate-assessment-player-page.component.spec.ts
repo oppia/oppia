@@ -83,12 +83,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentStage).toBe('questions');
   });
 
-  it('should set current stage to result when route is result', async () => {
-    await configureComponent('result');
-    fixture.detectChanges();
-    expect(component.currentStage).toBe('result');
-  });
-
   it('should navigate to the session route on startAssessment', () => {
     fixture.detectChanges();
 
@@ -106,7 +100,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.submitAssessment();
 
     expect(router.navigate).toHaveBeenCalledWith([
-      '/certificate-assessment/cert-123/result',
+      '/certificate-assessment-result',
       'attempt-1234',
     ]);
   });

@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -17,7 +17,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {ActivatedRoute} from '@angular/router';
+import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 
 describe('CertificateAssessmentResultCardComponent', () => {
@@ -26,23 +26,9 @@ describe('CertificateAssessmentResultCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CertificateAssessmentResultCardComponent],
-      providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: (name: string) => {
-                  if (name === 'attempt_id') {
-                    return 'attempt-1';
-                  }
-                  return null;
-                },
-              },
-            },
-          },
-        },
+      declarations: [
+        CertificateAssessmentResultCardComponent,
+        AssessmentResultTopicWiseBreakdownComponent,
       ],
     }).compileComponents();
 
@@ -50,9 +36,40 @@ describe('CertificateAssessmentResultCardComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should read attempt id from the route', () => {
+  it('should render the provided attempt id', () => {
+    component.attemptId = 'attempt-1';
     fixture.detectChanges();
 
     expect(component.attemptId).toBe('attempt-1');
+  });
+
+  it('should return false when no result is available', () => {
+    expect(component.passed).toBeFalse();
+  });
+
+  it('should return false when the score is below the passing threshold', () => {
+    component.result = {
+      certificateName: 'Test Certificate',
+      scorePercentage: 69,
+      topicBreakdown: [],
+      timeTakenMinutes: 10,
+    };
+
+    expect(component.passed).toBeFalse();
+  });
+
+  it('should render the failed certificate image from the mock result', () => {
+    fixture.detectChanges();
+
+    const mascotImage = fixture.nativeElement.querySelector(
+      '.result-card-mascot-icon'
+    ) as HTMLImageElement;
+    expect(mascotImage.getAttribute('src')).toBe(
+      '/assets/images/certificate-assessment/certificate-assessment-failed.webp'
+    );
+  });
+
+  it('should allow retry handling without throwing', () => {
+    expect(() => component.onRetryAssessment()).not.toThrow();
   });
 });
