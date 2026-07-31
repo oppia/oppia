@@ -28,28 +28,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AssessmentQuestion} from './certificate-assessment-player-page.component';
 import './certificate-assessment-conversation-skin.component.css';
-
-type AssessmentQuestionType =
-  | 'multiple_choice'
-  | 'multiple_select'
-  | 'text_input'
-  | 'numeric_input';
-
-interface AssessmentQuestionOption {
-  id: string;
-  text: string;
-}
-
-interface AssessmentQuestion {
-  id: string;
-  type: AssessmentQuestionType;
-  prompt: string;
-  hint: string;
-  options: AssessmentQuestionOption[];
-  placeholder?: string;
-  correctAnswerText: string;
-}
 
 @Component({
   selector: 'oppia-certificate-assessment-conversation-skin',

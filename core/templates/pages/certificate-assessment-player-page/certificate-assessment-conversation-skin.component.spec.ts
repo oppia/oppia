@@ -124,6 +124,47 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     expect(component.selectedOptionIds).toEqual([]);
   });
 
+  it('should hydrate multiple-select responses on init', () => {
+    component.currentQuestion = {
+      id: 'q3',
+      type: 'multiple_select',
+      prompt: 'Select all prime numbers.',
+      hint: 'Choose all that apply.',
+      options: [
+        {id: 'a', text: '2'},
+        {id: 'b', text: '3'},
+        {id: 'c', text: '4'},
+      ],
+      correctAnswerText: '2,3',
+    };
+    component.savedResponse = 'a,b';
+
+    component.ngOnInit();
+
+    expect(component.isOptionSelected('a')).toBeTrue();
+    expect(component.isOptionSelected('b')).toBeTrue();
+    expect(component.isOptionSelected('c')).toBeFalse();
+  });
+
+  it('should bind the free-response label to a stable input id', () => {
+    component.currentQuestion = numericQuestion;
+    fixture.detectChanges();
+
+    const label = fixture.nativeElement.querySelector(
+      '.certificate-assessment-free-response-label'
+    ) as HTMLLabelElement;
+    const input = fixture.nativeElement.querySelector(
+      '.certificate-assessment-free-response-input'
+    ) as HTMLInputElement;
+
+    expect(label.getAttribute('for')).toBe(
+      'certificate-assessment-free-response-input-q2'
+    );
+    expect(input.getAttribute('id')).toBe(
+      'certificate-assessment-free-response-input-q2'
+    );
+  });
+
   it('should return the expected input type for each question type', () => {
     component.currentQuestion = numericQuestion;
     expect(component.getQuestionInputType()).toBe('number');

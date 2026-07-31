@@ -19,18 +19,18 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
-type AssessmentQuestionType =
+export type AssessmentQuestionType =
   | 'multiple_choice'
   | 'multiple_select'
   | 'text_input'
   | 'numeric_input';
 
-interface AssessmentQuestionOption {
+export interface AssessmentQuestionOption {
   id: string;
   text: string;
 }
 
-interface AssessmentQuestion {
+export interface AssessmentQuestion {
   id: string;
   type: AssessmentQuestionType;
   prompt: string;
@@ -43,6 +43,7 @@ interface AssessmentQuestion {
 @Component({
   selector: 'certificate-assessment-player-page',
   templateUrl: './certificate-assessment-player-page.component.html',
+  styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';

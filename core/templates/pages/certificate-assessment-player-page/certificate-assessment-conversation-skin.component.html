@@ -47,7 +47,14 @@
 
     <div *ngIf="currentQuestion.type === 'text_input' || currentQuestion.type === 'numeric_input'"
          class="certificate-assessment-free-response">
-      <input [type]="getQuestionInputType()" class="certificate-assessment-free-response-input"
+      <label class="certificate-assessment-free-response-label"
+             [for]="'certificate-assessment-free-response-input-' + currentQuestion.id"
+      >
+        Your answer
+      </label>
+      <input
+             [id]="'certificate-assessment-free-response-input-' + currentQuestion.id"
+             [type]="getQuestionInputType()" class="certificate-assessment-free-response-input"
              [placeholder]="currentQuestion.placeholder || ''"  [value]="freeResponse"
              #freeResponseInput
              (input)="updateFreeResponse(freeResponseInput.value)">
@@ -55,7 +62,9 @@
   </div>
 
   <div class="certificate-assessment-actions">
-    <button *ngIf="currentQuestionIndex > 0" class="certificate-assessment-navigation-link"
+    <button *ngIf="currentQuestionIndex > 0"
+            type="button"
+            class="certificate-assessment-navigation-link"
             (click)="onPreviousQuestion()">
       <span class="certificate-assessment-navigation-arrow">&#8592;</span>
       {{
@@ -65,7 +74,8 @@
     </button>
     <span *ngIf="currentQuestionIndex === 0"></span>
 
-    <button *ngIf="!isLastQuestion" class="certificate-assessment-navigation-link"
+    <button *ngIf="!isLastQuestion" type="button"
+            class="certificate-assessment-navigation-link"
             (click)="onNextQuestion()">
       {{
         'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_NEXT_BUTTON'
@@ -73,7 +83,8 @@
       }}
       <span class="certificate-assessment-navigation-arrow">&#8594;</span>
     </button>
-    <button *ngIf="isLastQuestion" class="btn certificate-assessment-primary-button"
+    <button *ngIf="isLastQuestion" type="submit"
+            class="btn certificate-assessment-primary-button"
             (click)="onSubmitAssessment()">
       {{
         'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_SUBMIT_ASSESSMENT_BUTTON'
