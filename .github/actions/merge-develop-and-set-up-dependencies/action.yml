@@ -39,6 +39,8 @@ runs:
         retry_on: error
         shell: bash
         timeout_minutes: 30
+        # Note that the effects of this don't seem to be cached by setup-python,
+        # resulting in the occasional "No module named PIL" errors in CI.
         command: python -m scripts.install_python_dev_dependencies
 
     - name: Show where pip installs its packages, and the contents of that folder.
