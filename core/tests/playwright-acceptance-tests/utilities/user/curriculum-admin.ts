@@ -79,6 +79,8 @@ const addDiagnosticTestSkillButton =
   'button.e2e-test-add-diagnostic-test-skill';
 const diagnosticTestSkillSelector =
   'select.e2e-test-diagnostic-test-skill-selector';
+const desktopSkillQuestionTab = '.e2e-test-questions-tab';
+const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
@@ -127,6 +129,8 @@ const addTopicFormFieldInput =
   '.mat-select-search-input:not(.mat-select-search-hidden)';
 const createNewTopicButton = '.e2e-test-create-topic-button';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
@@ -177,6 +181,7 @@ const solutionFloatTextField =
   'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
+const addQuestionButton = 'button.e2e-test-create-question-button';
 const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
@@ -886,6 +891,20 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOnElementWithSelector(enableDiagnosticTestButton);
+    await this.clickOnElementWithSelector(saveClassroomButton);
+    await this.expectElementToBeVisible(saveClassroomButton, false);
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
+  }
+
+  /**
    * Checks if the classroom contains a topic with the given name.
    * @param {string} topicName The name of the topic to check for.
    * @returns {Promise<ElementHandle<Element>>} A promise that resolves to the ElementHandle
@@ -978,6 +997,42 @@ export class CurriculumAdmin extends TopicManager {
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.goto(editorUrl);
     showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
+   * Navigate to the question editor tab present in the skills tab.
+   */
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
+      } else {
+        hashParts.push('questions');
+      }
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      // Changing only the URL hash triggers a same-document navigation in
+      // the browser (no reload, no re-run of the app's bootstrap code),
+      // so the app never re-evaluates the hash to switch tabs. A full
+      // reload is required to force the app to re-initialize and pick up
+      // the 'questions' tab from the updated hash.
+      await this.reloadPage();
+    } else {
+      await this.expectElementToBeVisible(skillQuestionTab);
+      await this.clickAndWaitForNavigation(skillQuestionTab, true);
+    }
+    await this.expectElementToBeVisible(addQuestionButton);
   }
 
   /**

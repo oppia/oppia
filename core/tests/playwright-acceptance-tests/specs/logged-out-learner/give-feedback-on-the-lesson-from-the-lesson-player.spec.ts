@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,10 @@
  * EL.FB. Learner can give feedback on the lesson from the lesson player
  */
 
-import {showMessage} from '../../utilities/common/show-message';
-import testConstants from '../../utilities/common/test-constants';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
@@ -34,28 +32,32 @@ enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   FINAL_CARD = 'Final Card',
 }
-describe('Logged-Out Learner', function () {
+
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
+  // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+  // in mobile viewport which is required for testing the feedback messages tab),
+  // remove this part of skipping the test and make the test to run in mobile viewport as well.
+  // see: https://github.com/oppia/oppia/issues/19443
+  test.skip(
+    () => process.env.MOBILE === 'true',
+    'Test skipped in mobile viewport'
+  );
+
   let loggedOutLearner: LoggedOutUser;
   let explorationEditor: ExplorationEditor;
 
   let explorationId: string | null;
 
-  beforeAll(async function () {
-    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
-    // in mobile viewport which is required for testing the feedback messages tab),
-    // remove this part of skipping the test and make the test to run in mobile viewport as well.
-    // see: https://github.com/oppia/oppia/issues/19443
-    if (process.env.MOBILE === 'true') {
-      showMessage('Test skipped in mobile viewport');
-      process.exit(0);
-    }
-
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
@@ -87,33 +89,26 @@ describe('Logged-Out Learner', function () {
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
     }
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should be able to give feedback from the navbar',
-    async function () {
-      await loggedOutLearner.playExploration(explorationId);
+  test('should be able to give feedback from the navbar', async function () {
+    await loggedOutLearner.playExploration(explorationId);
 
-      // Open Feedback popup and check "Stay Anonymous" text isn't visible.
-      await loggedOutLearner.openFeedbackPopup();
-      await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);
-      await loggedOutLearner.expectScreenshotToMatch(
-        'feedbackPopup',
-        __dirname
-      );
+    // Open Feedback popup and check "Stay Anonymous" text isn't visible.
+    await loggedOutLearner.openFeedbackPopup();
+    await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);
+    await loggedOutLearner.expectScreenshotToMatch('feedbackPopup');
 
-      // Give feedback and verify submission success.
-      await loggedOutLearner.writeAndSubmitFeedback(
-        'This is a great lesson!',
-        false,
-        false
-      );
-      await loggedOutLearner.verifyFeedbackSubmissionSuccess();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Give feedback and verify submission success.
+    await loggedOutLearner.writeAndSubmitFeedback(
+      'This is a great lesson!',
+      false,
+      false
+    );
+    await loggedOutLearner.expectFeedbackSubmissionPopupToAppear();
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
