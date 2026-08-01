@@ -20,7 +20,7 @@ import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {RTEEditor} from '../common/rte-editor';
-import {Page} from '@playwright/test';
+import {expect, Frame, Page} from '@playwright/test';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -45,6 +45,9 @@ const updateBioIconSelector = '.e2e-test-update-blog-editor-bio';
 
 const usernameInBlogDashboardSelector = '.e2e-test-username-visible';
 const bioInBlogDashboardSelector = '.e2e-test-bio-visible';
+
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
 
 const firstPostButtonSelector = '.e2e-test-first-post-button';
 const newPostButtonSelector = '.e2e-test-new-post-button';
@@ -102,6 +105,54 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementToBeVisible(closePreivewModalButtonSelector);
     await this.clickOnElementWithSelector(closePreivewModalButtonSelector);
     await this.expectElementToBeVisible(closePreivewModalButtonSelector, false);
+  }
+
+  /**
+   * Verifies that the modal title is as expected.
+   * @param {string} expectedTitle - The expected title.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToContain(
+      commonModalTitleSelector,
+      expectedTitle
+    );
+  }
+
+  /**
+   * Verifies that the modal body contains the expected text.
+   * @param {string} expectedText - The expected text.
+   */
+  async expectModalBodyToContain(expectedText: string): Promise<void> {
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Performs actions within an open modal.
+   * @param {Object} options - Options containing the modal selector and the
+   *   callback to run when the modal is open.
+   * @param {string} options.selector - The selector for the modal container.
+   * @param {Function} options.whenOpened - The callback to run with the user
+   *   instance and the modal selector once the modal is visible.
+   */
+  async doWithinModal(options: {
+    selector: string;
+    whenOpened: (context: BaseUser, selector: string) => Promise<void>;
+  }): Promise<void> {
+    await this.expectElementToBeVisible(options.selector);
+    await options.whenOpened(this, options.selector);
+  }
+
+  /**
+   * Pastes the clipboard content into the element matching the selector.
+   * @param {string} selector - The selector for the element to paste into.
+   */
+  async pasteTextTo(selector: string): Promise<void> {
+    await this.clickOnElementWithSelector(selector);
+    await this.page.keyboard.press('Control+V');
   }
 
   /**
@@ -280,12 +331,11 @@ export class BlogPostEditor extends BaseUser {
    * blog post content rich text editor.
    */
   async pasteContentInBlogPostContentRte(): Promise<void> {
-    // OverridePermissions is used to allow clipboard access.
+    // Grant permissions is used to allow clipboard access.
     const context = this.page.context();
-    await context.overridePermissions('http://localhost:8181', [
-      'clipboard-read',
-      'clipboard-write',
-    ]);
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+      origin: 'http://localhost:8181',
+    });
     if (this.isViewportAtMobileWidth()) {
       await this.pasteTextTo(mobileBlogBodyInputWithText);
     } else {
@@ -323,7 +373,7 @@ export class BlogPostEditor extends BaseUser {
       }
     } catch (error) {
       const newError = new Error(`Failed to verify pasted content: ${error}`);
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -393,10 +443,12 @@ export class BlogPostEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
-        await this.clickOnElementWithSelector(
-          '.e2e-test-blog-post-edit-box',
-          allDraftBlogPosts[i]
+        const editBox = await allDraftBlogPosts[i].$(
+          '.e2e-test-blog-post-edit-box'
         );
+        if (editBox) {
+          await editBox.click();
+        }
         await this.expectElementToBeClickable(deleteBlogPostBtnSelector);
         await this.clickOnElementWithSelector(deleteBlogPostBtnSelector);
         await this.expectElementToBeVisible('div.modal-dialog');
@@ -407,7 +459,7 @@ export class BlogPostEditor extends BaseUser {
         await this.doWithinModal({
           selector: 'div.modal-dialog',
           whenOpened: async (_this: BaseUser, container: string) => {
-            _this.clickOnElementWithSelector(confirmButtonSelector);
+            await _this.clickOnElementWithSelector(confirmButtonSelector);
           },
         });
 
@@ -589,8 +641,8 @@ export class BlogPostEditor extends BaseUser {
         await tagElement.click();
 
         await this.page.waitForFunction(
-          ({el, state}: {el: Element; state: string}) => {
-            return (el as HTMLElement).getAttribute('aria-pressed') === state;
+          ({el, state}: {el: HTMLButtonElement | null; state: string}) => {
+            return el?.getAttribute('aria-pressed') === state;
           },
           {
             el: await tagElement.$('button'),
@@ -652,7 +704,7 @@ export class BlogPostEditor extends BaseUser {
     const editBlogBodyElement = await this.page.waitForSelector(
       editBlogBodySelector,
       {
-        visible: true,
+        state: 'visible',
       }
     );
     if (!editBlogBodyElement) {
@@ -663,7 +715,7 @@ export class BlogPostEditor extends BaseUser {
     // Click on the text area of the RTE editor (adapted from rteEditor.clickOnTextArea()).
     const textAreaElement = await this.page.waitForSelector(
       rteTextAreaSelector,
-      {visible: true}
+      {state: 'visible'}
     );
     if (!textAreaElement) {
       throw new Error('Text area element not found.');
@@ -685,7 +737,7 @@ export class BlogPostEditor extends BaseUser {
 
     const iframes = this.page.frames();
 
-    let iframe: typeof this.page | null = null;
+    let iframe: Frame | null = null;
     for (const frame of iframes) {
       if (frame.name().includes('cke')) {
         iframe = frame;
@@ -725,7 +777,7 @@ export class BlogPostEditor extends BaseUser {
     await formatOptionElement2.click();
 
     const iframes2 = this.page.frames();
-    let iframe2: typeof this.page | null = null;
+    let iframe2: Frame | null = null;
     for (const frame of iframes2) {
       if (frame.name().includes('cke')) {
         iframe2 = frame;
@@ -805,10 +857,12 @@ export class BlogPostEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       if (publishedBlogPostTitle === blogPostTitle) {
-        await this.clickOnElementWithSelector(
-          '.e2e-test-blog-post-edit-box',
-          allPublishedBlogPosts[i]
+        const editBox = await allPublishedBlogPosts[i].$(
+          '.e2e-test-blog-post-edit-box'
         );
+        if (editBox) {
+          await editBox.click();
+        }
         await this.expectElementToBeClickable(deleteBlogPostBtnSelector);
         await this.clickOnElementWithSelector(deleteBlogPostBtnSelector);
         await this.page.waitForSelector(confirmButtonSelector);
@@ -829,10 +883,9 @@ export class BlogPostEditor extends BaseUser {
     expectedWarningMessage: string
   ): Promise<void> {
     const toastMessageBox = await this.page.$(toastMessage);
-    const toastMessageWarning = await this.page.evaluate(
-      (element: HTMLDivElement) => element.textContent,
-      toastMessageBox
-    );
+    const toastMessageWarning = toastMessageBox
+      ? await toastMessageBox.evaluate(element => element.textContent)
+      : null;
     const isPublishButtonDisabled = await this.page.$eval(
       publishBlogPostButton,
       button => (button as HTMLButtonElement).disabled
