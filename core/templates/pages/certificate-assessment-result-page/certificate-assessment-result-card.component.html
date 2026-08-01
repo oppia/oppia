@@ -1,43 +1,45 @@
 <div class="certificate-assessment-page-container position-relative">
-  <div
-    class="result-card"
-    [ngClass]="{ 'result-card--failed': !passed }"
-    *ngIf="!isLoading && result"
-  >
+  <div class="result-card" [ngClass]="{ 'result-card--failed': !passed }"
+       *ngIf="!isLoading && result">
     <h1 class="result-card-heading">
-      {{ passed ? "Congratulations, you passed!" : "Don't give up! You can try again" }}
+      {{
+        passed
+          ? ('I18N_CERTIFICATE_ASSESSMENT_RESULT_PASSED_HEADING' | translate)
+          : ('I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_HEADING' | translate)
+      }}
     </h1>
 
     <div class="result-card-earned-banner">
       <ng-container *ngIf="passed; else failedBanner">
         <p>
-          You've earned your
+          {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_PASSED_EARNED_PREFIX' | translate }}
           <strong>{{ result.certificateName }} certificate</strong>.
         </p>
-        <p>Great job mastering these skills!</p>
+        <p>{{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_PASSED_EARNED_SUFFIX' | translate }}</p>
       </ng-container>
       <ng-template #failedBanner>
         <p>
-          You didn't pass the
+          {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_PREFIX' | translate }}
           <strong>{{ result.certificateName }} certificate</strong>.
         </p>
-        <p>Review and practice the lessons, then try taking the assessment again.</p>
+        <p>{{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_FAILED_SUFFIX' | translate }}</p>
       </ng-template>
     </div>
 
     <div class="result-card-summary">
       <div class="result-card-mascot" aria-hidden="true">
-        <img
-          class="result-card-mascot-icon"
-          [src]="passed
-            ? '/assets/images/certificate-assessment/certificate-assessment-passed.webp'
-            : '/assets/images/certificate-assessment/certificate-assessment-failed.webp'"
-          alt=""
+        <img class="result-card-mascot-icon" [src]="passed
+             ? '/assets/images/certificate-assessment/certificate-assessment-passed.webp'
+             : '/assets/images/certificate-assessment/certificate-assessment-failed.webp'"
+             alt=""
         />
       </div>
 
       <div class="result-card-score-block">
-        <h2 class="result-card-score">Score: {{ result.scorePercentage }}%</h2>
+        <h2 class="result-card-score">
+          {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_SCORE_LABEL' | translate }}:
+          {{ result.scorePercentage }}%
+        </h2>
 
         <oppia-assessment-result-topic-wise-breakdown
           [topicBreakdown]="result.topicBreakdown">
@@ -45,17 +47,15 @@
 
         <p class="result-card-time-taken">
           <i class="fas fa-history" aria-hidden="true"></i>
-          <strong>Time Taken</strong>: {{ result.timeTakenMinutes }} minutes
+          <strong>{{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_TIME_TAKEN_LABEL' | translate }}</strong>:
+          {{ result.timeTakenMinutes }} minutes
         </p>
       </div>
     </div>
 
-    <button
-      type="button"
-      class="btn result-card-retry-btn"
-      (click)="onRetryAssessment()"
-    >
-      Retry Assessment
+    <button type="button" class="btn result-card-retry-btn"
+            (click)="onRetryAssessment()">
+      {{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_RETRY_BUTTON' | translate }}
     </button>
   </div>
 </div>

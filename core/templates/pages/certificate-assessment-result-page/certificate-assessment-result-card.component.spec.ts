@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 
@@ -29,6 +30,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
       declarations: [
         CertificateAssessmentResultCardComponent,
         AssessmentResultTopicWiseBreakdownComponent,
+        MockTranslatePipe,
       ],
     }).compileComponents();
 
