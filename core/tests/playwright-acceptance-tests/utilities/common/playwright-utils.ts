@@ -225,25 +225,6 @@ export class BaseUser {
   }
 
   /**
-   * Gets the trimmed text content of an element.
-   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
-   */
-  async getTextContent(
-    selector: string | ElementHandle<Element>
-  ): Promise<string> {
-    if (typeof selector === 'string') {
-      const element = await this.page.$(selector);
-      if (!element) {
-        return '';
-      }
-      const text = await this.page.evaluate(el => el.textContent, element);
-      return text?.trim() ?? '';
-    }
-    const text = await selector.evaluate(el => el.textContent);
-    return (text ?? '').trim();
-  }
-
-  /**
    * Clicks on an anchor element with the given inner text and verifies that the
    * target page URL contains the given URL.
    * @param {string} anchorInnerText The inner text of the anchor element.
