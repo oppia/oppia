@@ -230,7 +230,7 @@
 /core/templates/components/checkpoint-celebration-modal/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
-/core/templates/components/on-screen-keyboard/ @oppia/lace-backend-reviewers
+/core/templates/components/on-screen-keyboard/ @oppia/lace-frontend-reviewers
 /core/templates/components/recommendations/ @oppia/lace-frontend-reviewers
 /core/templates/components/save-pending-changes/ @oppia/lace-frontend-reviewers
 /core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
@@ -271,6 +271,7 @@
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-undefined-last-element.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/url-fragment-editor/url-fragment-editor.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/url-fragment-editor/url-fragment-editor.component.css @oppia/lace-frontend-reviewers
 /core/templates/components/url-fragment-editor/url-fragment-editor.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/url-fragment-editor/url-fragment-editor.component.spec.ts @oppia/lace-frontend-reviewers
 
@@ -352,6 +353,7 @@
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
 /core/templates/css/oppia-material.css @oppia/lace-frontend-reviewers
+/core/templates/css/shepherd-overrides.css @oppia/lace-frontend-reviewers
 
 
 # Interaction project.
@@ -361,9 +363,9 @@
 /core/domain/object_registry*.py @oppia/lace-frontend-reviewers
 /core/domain/rules_registry*.py @oppia/lace-backend-reviewers
 /core/domain/translatable_object_registry*.py @oppia/lace-frontend-reviewers
-/core/templates/components/keyboard-shortcut-help/ @oppia/lace-backend-reviewers
-/core/templates/domain/objects/ @oppia/lace-backend-reviewers
-/core/templates/expressions/ @oppia/lace-backend-reviewers
+/core/templates/components/keyboard-shortcut-help/ @oppia/lace-frontend-reviewers
+/core/templates/domain/objects/ @oppia/lace-frontend-reviewers
+/core/templates/expressions/ @oppia/lace-frontend-reviewers
 /core/templates/services/code-normalizer.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/guppy-configuration.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/guppy-initialization.service.ts @oppia/lace-frontend-reviewers
@@ -568,7 +570,6 @@
 /extensions/extensions.module.ts @oppia/lace-frontend-reviewers
 /core/schema_utils*.py @oppia/lace-backend-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
-/.rtlcssrc @oppia/lace-frontend-reviewers
 
 
 # Python typing
@@ -625,8 +626,9 @@
 /core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
 /core/domain/rte_component_registry*.py @oppia/lace-frontend-reviewers
 /extensions/ckeditor_plugins/ @oppia/lace-backend-reviewers
-/extensions/rich_text_components/rte-output-display.component* @oppia/lace-frontend-reviewers
-/extensions/rich_text_components/ @oppia/lace-backend-reviewers
+/extensions/rich_text_components/ @oppia/lace-frontend-reviewers
+/extensions/rich_text_components/__init__.py @oppia/lace-backend-reviewers
+/extensions/rich_text_components/components*.py @oppia/lace-backend-reviewers
 /assets/rich_text_components_definitions.ts @oppia/lace-frontend-reviewers
 
 # Web User Feedback project.
@@ -634,6 +636,8 @@
 /core/controllers/general_feedback*.py @oppia/lace-backend-reviewers
 /core/templates/services/feedback-session-info.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/session-info-http-interceptor.service.ts  @oppia/lace-frontend-reviewers
+/core/templates/pages/technical-feedback-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/components/feedback-shared @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
@@ -698,13 +702,14 @@
 # Certificate Offering Pages.
 /core/domain/certificate_assessment*.py @oppia/contributor-experience-team
 /core/storage/certificate_assessment @oppia/contributor-experience-team
-/core/templates/pages/certificate-assessment-dashboard-page/ @oppia/contributor-experience-team
+/core/templates/pages/certificate-assessment-creator-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/create-certificate-offering-page/ @oppia/contributor-experience-team
 /core/templates/pages/edit-certificate-offering-page/ @oppia/contributor-experience-team
 /core/templates/components/certificate-assessment-offering-helper/ @oppia/contributor-experience-team
 /core/templates/domain/certificate-assessment/ @oppia/contributor-experience-team
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
 /core/templates/pages/certificate-offering-available-page @oppia/lace-frontend-reviewers
+/core/templates/pages/certificate-assessment-player-page @oppia/lace-frontend-reviewers
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
@@ -717,7 +722,6 @@
 /.lighthouserc*.js @oppia/dev-workflow-reviewers
 /puppeteer-login-script.js @oppia/dev-workflow-reviewers
 /scripts/run_lighthouse_tests.py @oppia/dev-workflow-reviewers
-/webpack.*.ts @oppia/dev-workflow-reviewers
 
 
 # User’s profile page.

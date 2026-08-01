@@ -434,6 +434,7 @@
         "core.storage.certificate_assessment.gae_models_test",
         "core.controllers.certificate_assessment_test",
         "core.domain.certificate_assessment_services_test",
-        "core.jobs.batch_jobs.certificate_assessment_validation_jobs_test"
+        "core.jobs.batch_jobs.certificate_assessment_validation_jobs_test",
+        "core.jobs.batch_jobs.classroom_migration_jobs_test"
     ]
 }
