@@ -468,6 +468,19 @@ describe('Translation Modal Component', () => {
     expect(handler(event)).toBeUndefined();
   });
 
+  it('should reset the image save destination when the modal is destroyed', () => {
+    pageContextService.setImageSaveDestinationToLocalStorage();
+    expect(pageContextService.getImageSaveDestination()).toBe(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
+
+    component.ngOnDestroy();
+
+    expect(pageContextService.getImageSaveDestination()).toBe(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
+  });
+
   describe('when initialized', () => {
     describe('with an rtl language', () => {
       beforeEach(fakeAsync(() => {
@@ -1373,6 +1386,7 @@ describe('Translation Modal Component', () => {
               useValue: {
                 setImageSaveDestinationToLocalStorage: () => {},
                 setCustomEntityContext: () => {},
+                resetImageSaveDestination: () => {},
                 getEntityType: () => 'exploration',
                 getEntityId: () => '1',
                 getImageSaveDestination: () => 'localStorage',
@@ -1484,6 +1498,67 @@ describe('Translation Modal Component', () => {
         expect(ngbModal.open).not.toHaveBeenCalled();
         expect(component.activeModal.close).toHaveBeenCalled();
       }));
+    });
+  });
+
+  describe('when validating exploration title length', () => {
+    it('should set hasLengthValidationError if title length exceeds 36 characters', () => {
+      translateTextService.activeContentId = 'exploration_title';
+      component.textToTranslate = 'Original title';
+
+      component.updateHtml(
+        'This translation of the exploration title is way too long and should be rejected'
+      );
+      expect(component.hasLengthValidationError).toBe(true);
+      expect(component.lengthValidationErrorMessage).toBe(
+        'Translation exceeds the allowed character limit. The translation for the above content must be 36 characters or fewer.'
+      );
+      expect(component.hasSubmitValidationErrors()).toBe(true);
+    });
+
+    it('should not set hasLengthValidationError if title length is 36 characters or fewer', () => {
+      translateTextService.activeContentId = 'exploration_title';
+      component.textToTranslate = 'Original title';
+
+      component.updateHtml('Short title');
+      expect(component.hasLengthValidationError).toBe(false);
+      expect(component.lengthValidationErrorMessage).toBe('');
+      expect(component.hasSubmitValidationErrors()).toBe(false);
+    });
+  });
+
+  describe('when getting formatted content type', () => {
+    it('should correctly format content type and content ID', () => {
+      expect(component.getFormattedContentType()).toBe('');
+      expect(
+        component.getFormattedContentType('metadata', null, 'exploration_title')
+      ).toBe('title');
+      expect(
+        component.getFormattedContentType(
+          'metadata',
+          null,
+          'exploration_objective'
+        )
+      ).toBe('objective');
+      expect(
+        component.getFormattedContentType(
+          'metadata',
+          null,
+          'exploration_category'
+        )
+      ).toBe('category');
+      expect(
+        component.getFormattedContentType('metadata', null, 'exploration_tag_0')
+      ).toBe('tag');
+      expect(component.getFormattedContentType('metadata', null, 'other')).toBe(
+        'metadata'
+      );
+      expect(
+        component.getFormattedContentType('interaction', 'TextInput')
+      ).toBe('TextInput interaction');
+      expect(component.getFormattedContentType('ca')).toBe('label');
+      expect(component.getFormattedContentType('rule')).toBe('input rule');
+      expect(component.getFormattedContentType('content')).toBe('content');
     });
   });
 });

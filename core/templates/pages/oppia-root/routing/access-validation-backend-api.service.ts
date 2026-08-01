@@ -24,6 +24,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   providedIn: 'root',
 })
 export class AccessValidationBackendApiService {
+  TECHNICAL_FEEDBACK_DASHBOARD_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_technical_feedback_dashboard';
   STORY_EDITOR_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_story_editor_page/<story_id>';
 
@@ -70,6 +72,18 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/can_access_practice_session_page/' +
     '<classroom_url_fragment>/<topic_url_fragment>/practice/session';
 
+  LESSON_PRACTICE_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_practice_session_page/' +
+    '<classroom_url_fragment>/<topic_url_fragment>/practice/<node_id>';
+
+  END_OF_ARC_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_practice_session_page/' +
+    '<classroom_url_fragment>/<topic_url_fragment>/test/arc/<arc_id>';
+
+  MASTERY_CHALLENGE_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_practice_session_page/' +
+    '<classroom_url_fragment>/<topic_url_fragment>/mastery-challenge';
+
   BLOG_HOME_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_blog_home_page';
 
@@ -109,8 +123,14 @@ export class AccessValidationBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
+  validateAccessToTechnicalFeedbackDashboardPage(): Promise<void> {
+    return this.http
+      .get<void>(this.TECHNICAL_FEEDBACK_DASHBOARD_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
+
   validateAccessToExplorationEditorPage(explorationId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.EXPLORATION_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         exploration_id: explorationId,
@@ -120,7 +140,7 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessToStoryEditorPage(storyId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.STORY_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         story_id: storyId,
@@ -150,7 +170,7 @@ export class AccessValidationBackendApiService {
     topicUrlFragment: string,
     storyUrlFragment: string
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEW_TESTS_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
@@ -166,7 +186,7 @@ export class AccessValidationBackendApiService {
     topicUrlFragment: string,
     subtopicUrlFragment: string
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.SUBTOPIC_VIEWER_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
@@ -182,7 +202,7 @@ export class AccessValidationBackendApiService {
     classroomUrlFragment: string,
     topicUrlFragment: string
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
@@ -197,7 +217,7 @@ export class AccessValidationBackendApiService {
     topicUrlFragment: string,
     storyUrlFragment: string
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.STORY_VIEWER_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
@@ -214,7 +234,7 @@ export class AccessValidationBackendApiService {
     topicUrlFragment: string,
     selectedSubtopicIds: string
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.PRACTICE_SESSION_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
@@ -226,6 +246,52 @@ export class AccessValidationBackendApiService {
       selectedSubtopicIds
     );
     return this.http.get<void>(url, {params}).toPromise();
+  }
+
+  validateAccessToLessonPracticePage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    nodeId: string
+  ): Promise<void> {
+    const url = this.urlInterpolationService.interpolateUrl(
+      this.LESSON_PRACTICE_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        node_id: nodeId,
+      }
+    );
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToEndOfArcPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    arcId: string
+  ): Promise<void> {
+    const url = this.urlInterpolationService.interpolateUrl(
+      this.END_OF_ARC_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        arc_id: arcId,
+      }
+    );
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToMasteryChallengePage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string
+  ): Promise<void> {
+    const url = this.urlInterpolationService.interpolateUrl(
+      this.MASTERY_CHALLENGE_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+      }
+    );
+    return this.http.get<void>(url).toPromise();
   }
 
   validateAccessToClassroomPage(classroomUrlFragment: string): Promise<void> {
@@ -261,7 +327,7 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessToBlogAuthorProfilePage(authorUsername: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR,
       {
         author_username: authorUsername,
@@ -277,7 +343,7 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessToCollectionPlayerPage(collectionId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE,
       {
         collection_id: collectionId,
@@ -288,7 +354,7 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessToTopicEditorPage(topicId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.TOPIC_EDITOR_ACCESS_VALIDATOR_URL,
       {
         topic_id: topicId,
@@ -299,7 +365,7 @@ export class AccessValidationBackendApiService {
   }
 
   doesProfileExist(username: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.DOES_PROFILE_EXIST,
       {
         username: username,
@@ -318,7 +384,7 @@ export class AccessValidationBackendApiService {
   validateAccessToLearnerGroupEditorPage(
     learnerGroupId: string
   ): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.LEARNER_GROUP_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         learner_group_id: learnerGroupId,
@@ -335,7 +401,7 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessToSkillEditorPage(skillId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.SKILL_EDITOR_ACCESS_VALIDATION_URL,
       {
         skill_id: skillId,
@@ -358,7 +424,7 @@ export class AccessValidationBackendApiService {
   }
 
   doesLearnerGroupExist(learnerGroupId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.DOES_LEARNER_GROUP_EXIST,
       {
         learner_group_id: learnerGroupId,
@@ -369,7 +435,7 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessCollectionEditorPage(collectionId: string): Promise<void> {
-    let url = this.urlInterpolationService.interpolateUrl(
+    const url = this.urlInterpolationService.interpolateUrl(
       this.COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         collection_id: collectionId,

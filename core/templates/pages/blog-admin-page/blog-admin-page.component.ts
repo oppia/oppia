@@ -28,6 +28,7 @@ import {Schema} from 'services/schema-default-value.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {RoleToActionsBackendResponse} from 'domain/admin/admin-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import './blog-admin-page.component.css';
 
 interface UpdateRoleAction {
   // 'newRole' is 'null' when the form is refreshed.
@@ -54,6 +55,7 @@ type PlatformParameterValuesRecord = Record<
 @Component({
   selector: 'oppia-blog-admin-page',
   templateUrl: './blog-admin-page.component.html',
+  styleUrls: ['./blog-admin-page.component.css'],
 })
 export class BlogAdminPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
