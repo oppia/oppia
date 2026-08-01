@@ -27,6 +27,8 @@ from core.domain import (
     suggestion_registry,
     suggestion_services,
     topic_fetchers,
+    translation_domain,
+    translation_services,
     user_domain,
     user_services,
 )
@@ -844,3 +846,101 @@ def get_question_coordinator_frontend_dict(
         )
 
     return stats
+
+
+class FeaturedTranslationLanguagesAdminHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of FeaturedTranslationLanguagesAdminHandler's
+    normalized_payload dictionary.
+    """
+
+    featured_translation_languages: List[
+        translation_domain.FeaturedTranslationLanguageDict
+    ]
+
+
+class FeaturedTranslationLanguagesAdminHandler(
+    base.BaseHandler[
+        FeaturedTranslationLanguagesAdminHandlerNormalizedPayloadDict,
+        Dict[str, str],
+    ]
+):
+    """Handler to get and update the featured ('Most needed') translation
+    languages shown on the Contributor Dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'featured_translation_languages': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'language_code',
+                                'schema': {
+                                    'type': 'basestring',
+                                    'validators': [
+                                        {
+                                            'id': (
+                                                'is_supported_audio_language_code'
+                                            )
+                                        }
+                                    ],
+                                },
+                            },
+                            {
+                                'name': 'explanation',
+                                'schema': {'type': 'basestring'},
+                            },
+                        ],
+                        'required': ['language_code', 'explanation'],
+                    },
+                }
+            },
+        },
+    }
+
+    @acl_decorators.can_manage_featured_translation_languages
+    def get(self) -> None:
+        """Retrieves the featured translation languages configuration."""
+        self.render_json(
+            {
+                'featured_translation_languages': (
+                    translation_services.get_featured_translation_languages()
+                )
+            }
+        )
+
+    @acl_decorators.can_manage_featured_translation_languages
+    def put(self) -> None:
+        """Updates the featured translation languages configuration.
+
+        Raises:
+            InvalidInputException. The submitted configuration is invalid
+                (e.g. duplicate language, empty explanation).
+        """
+        assert self.normalized_payload is not None
+        featured_translation_languages = self.normalized_payload[
+            'featured_translation_languages'
+        ]
+        try:
+            translation_services.save_featured_translation_languages(
+                featured_translation_languages
+            )
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e) from e
+        # Return the saved config so the frontend can refresh its table
+        # without a follow-up GET. Returning data from PUT is idiomatic here
+        # (cf. CertificateAssessmentOfferingByIdHandler.put, which returns the
+        # updated entity's id).
+        self.render_json(
+            {
+                'featured_translation_languages': (
+                    translation_services.get_featured_translation_languages()
+                )
+            }
+        )

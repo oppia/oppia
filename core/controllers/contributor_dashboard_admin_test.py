@@ -1654,3 +1654,159 @@ class CommunityStatsHandlerTest(test_utils.GenericTestBase):
         self.assertDictEqual(
             stats['translation_reviewers_count'], {'en': 1, 'fr': 1}
         )
+
+
+class FeaturedTranslationLanguagesAdminHandlerTest(test_utils.GenericTestBase):
+    """Tests for the FeaturedTranslationLanguagesAdminHandler."""
+
+    URL = '/contributordashboardadminfeaturedtranslationlanguages'
+
+    TRANSLATION_ADMIN_EMAIL = 'translationadmin@example.com'
+    TRANSLATION_ADMIN_USERNAME = 'translationlead'
+    QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
+    QUESTION_ADMIN_USERNAME = 'questionlead'
+    TRANSLATION_COORDINATOR_EMAIL = 'translationcoordinator@example.com'
+    TRANSLATION_COORDINATOR_USERNAME = 'translationcoord'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.TRANSLATION_ADMIN_EMAIL, self.TRANSLATION_ADMIN_USERNAME
+        )
+        self.add_user_role(
+            self.TRANSLATION_ADMIN_USERNAME,
+            feconf.ROLE_ID_TRANSLATION_ADMIN,
+        )
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN
+        )
+        self.signup(
+            self.TRANSLATION_COORDINATOR_EMAIL,
+            self.TRANSLATION_COORDINATOR_USERNAME,
+        )
+        self.add_user_role(
+            self.TRANSLATION_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_TRANSLATION_COORDINATOR,
+        )
+
+    def test_translation_admin_can_get_and_update(self) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        expected = {
+            'featured_translation_languages': [
+                {'language_code': 'hi', 'explanation': 'For India.'}
+            ]
+        }
+
+        # PUT echoes back the saved config.
+        put_response = self.put_json(self.URL, expected, csrf_token=csrf_token)
+        self.assertEqual(put_response, expected)
+
+        # A subsequent admin GET returns the same.
+        self.assertEqual(self.get_json(self.URL), expected)
+        self.logout()
+
+    def test_admin_get_returns_seed_default_when_no_configuration(self) -> None:
+        # Admin GET has its own route + ACL, so verify the seed-default path
+        # here too (Commit 2 only covers the public endpoint's default path).
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        response = self.get_json(self.URL)
+        expected_default = [
+            {
+                'language_code': language['language_code'],
+                'explanation': language['explanation'],
+            }
+            for language in constants.FEATURED_TRANSLATION_LANGUAGES
+        ]
+        self.assertEqual(
+            response,
+            {'featured_translation_languages': expected_default},
+        )
+        self.logout()
+
+    def test_translation_coordinator_cannot_manage(self) -> None:
+        self.login(self.TRANSLATION_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            self.URL,
+            {'featured_translation_languages': []},
+            csrf_token=csrf_token,
+            expected_status_int=401,
+        )
+        self.get_json(self.URL, expected_status_int=401)
+        self.logout()
+
+    def test_question_admin_cannot_manage(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            self.URL,
+            {'featured_translation_languages': []},
+            csrf_token=csrf_token,
+            expected_status_int=401,
+        )
+        self.get_json(self.URL, expected_status_int=401)
+        self.logout()
+
+    def test_guest_cannot_manage(self) -> None:
+        self.get_json(self.URL, expected_status_int=401)
+
+    def test_update_with_duplicate_language_returns_400(self) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            self.URL,
+            {
+                'featured_translation_languages': [
+                    {'language_code': 'hi', 'explanation': 'a'},
+                    {'language_code': 'hi', 'explanation': 'b'},
+                ]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.logout()
+
+    def test_update_with_unsupported_language_returns_400(self) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            self.URL,
+            {
+                'featured_translation_languages': [
+                    {'language_code': 'zz', 'explanation': 'x'}
+                ]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.logout()
+
+    def test_saved_languages_are_visible_to_public_endpoint(self) -> None:
+        # Full-feature integration: Commit 3 write -> Commit 1 storage ->
+        # Commit 2 public read. A translation admin saves a config, and an
+        # unauthenticated visitor sees it on the learner-facing endpoint.
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            self.URL,
+            {
+                'featured_translation_languages': [
+                    {'language_code': 'sw', 'explanation': 'For East Africa.'}
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        public_response = self.get_json('/retrievefeaturedtranslationlanguages')
+        self.assertEqual(
+            public_response,
+            {
+                'featured_translation_languages': [
+                    {'language_code': 'sw', 'explanation': 'For East Africa.'}
+                ]
+            },
+        )

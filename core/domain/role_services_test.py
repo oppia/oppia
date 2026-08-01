@@ -86,3 +86,17 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             ),
             True,
         )
+
+    def test_manage_featured_translation_languages_permission_boundary(
+        self,
+    ) -> None:
+        self.assertIn(
+            role_services.ACTION_MANAGE_FEATURED_TRANSLATION_LANGUAGES,
+            role_services.get_all_actions([feconf.ROLE_ID_TRANSLATION_ADMIN]),
+        )
+        self.assertNotIn(
+            role_services.ACTION_MANAGE_FEATURED_TRANSLATION_LANGUAGES,
+            role_services.get_all_actions(
+                [feconf.ROLE_ID_TRANSLATION_COORDINATOR]
+            ),
+        )

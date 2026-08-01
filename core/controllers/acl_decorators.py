@@ -1314,6 +1314,56 @@ def can_manage_contributors_role(
     return test_can_manage_contributors_role
 
 
+def can_manage_featured_translation_languages(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator that checks if the current user can manage the featured
+    translation languages configuration shown on the Contributor Dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can manage featured translation languages.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_manage_featured_translation_languages(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user can manage featured translation languages.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannot manage featured
+                translation languages.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if (
+            role_services.ACTION_MANAGE_FEATURED_TRANSLATION_LANGUAGES
+            in self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage featured translation '
+            'languages.'
+        )
+
+    return test_can_manage_featured_translation_languages
+
+
 def can_delete_any_user(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:

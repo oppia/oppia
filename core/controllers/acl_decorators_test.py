@@ -2617,6 +2617,76 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanManageFeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
+    """Tests for the can_manage_featured_translation_languages decorator."""
+
+    TRANSLATION_ADMIN_EMAIL = 'translationadmin@example.com'
+    TRANSLATION_ADMIN_USERNAME = 'translationlead'
+    QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
+    QUESTION_ADMIN_USERNAME = 'questionlead'
+    TRANSLATION_COORDINATOR_EMAIL = 'translationcoordinator@example.com'
+    TRANSLATION_COORDINATOR_USERNAME = 'translationcoord'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_manage_featured_translation_languages
+        def get(self) -> None:
+            self.render_json({'success': True})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.TRANSLATION_ADMIN_EMAIL, self.TRANSLATION_ADMIN_USERNAME
+        )
+        self.add_user_role(
+            self.TRANSLATION_ADMIN_USERNAME, feconf.ROLE_ID_TRANSLATION_ADMIN
+        )
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN
+        )
+        self.signup(
+            self.TRANSLATION_COORDINATOR_EMAIL,
+            self.TRANSLATION_COORDINATOR_USERNAME,
+        )
+        self.add_user_role(
+            self.TRANSLATION_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_TRANSLATION_COORDINATOR,
+        )
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler)],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_translation_admin_can_access(self) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_translation_coordinator_cannot_access(self) -> None:
+        self.login(self.TRANSLATION_COORDINATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=401)
+        self.logout()
+
+    def test_question_admin_cannot_access(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=401)
+        self.logout()
+
+    def test_guest_cannot_access(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=401)
+
+
 class DeleteAnyUserTests(test_utils.GenericTestBase):
     """Tests for can_delete_any_user decorator."""
 
