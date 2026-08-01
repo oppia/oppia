@@ -44,6 +44,10 @@ class ClassroomModel(base_models.BaseModel):
     url_fragment = datastore_services.StringProperty(
         required=True, indexed=True
     )
+    # The email address of the classroom's feedback recipient.
+    feedback_recipient_email = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # A text to provide course details present in the classroom.
     course_details = datastore_services.StringProperty(
         indexed=True, required=True
@@ -107,6 +111,7 @@ class ClassroomModel(base_models.BaseModel):
             **{
                 'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'feedback_recipient_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'course_details': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'teaser_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'topic_list_intro': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -157,6 +162,7 @@ class ClassroomModel(base_models.BaseModel):
         classroom_id: str,
         name: str,
         url_fragment: str,
+        feedback_recipient_email: str,
         course_details: str,
         teaser_text: str,
         topic_list_intro: str,
@@ -177,6 +183,7 @@ class ClassroomModel(base_models.BaseModel):
             classroom_id: str. Classroom ID of the newly-created classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            feedback_recipient_email: str. The email of the feedback recipient.
             course_details: str. A text to provide course details present in
                 the classroom.
             teaser_text: str. A text to provide a summary of the classroom.
@@ -210,6 +217,7 @@ class ClassroomModel(base_models.BaseModel):
             id=classroom_id,
             name=name,
             url_fragment=url_fragment,
+            feedback_recipient_email=feedback_recipient_email,
             course_details=course_details,
             teaser_text=teaser_text,
             topic_list_intro=topic_list_intro,

@@ -110,7 +110,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         classroom = classroom_config_domain.Classroom(
             self.classroom_id,
             name='Math',
-            url_fragment=self.classroom_url_fragment,
+            url_fragment='math',
+            feedback_recipient_email='user@email.com',
             course_details='Course details',
             teaser_text='Teaser text',
             topic_list_intro='Topic intro',
@@ -492,6 +493,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             self.classroom_id,
             name='Math',
             url_fragment='math',
+            feedback_recipient_email='user@email.com',
             course_details='Course details',
             teaser_text='Teaser text',
             topic_list_intro='Topic intro',
