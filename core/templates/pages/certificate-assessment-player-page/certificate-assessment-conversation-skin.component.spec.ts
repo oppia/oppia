@@ -19,6 +19,7 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
 
@@ -59,7 +60,10 @@ describe('CertificateAssessmentConversationSkinComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [CertificateAssessmentConversationSkinComponent],
+      declarations: [
+        CertificateAssessmentConversationSkinComponent,
+        MockTranslatePipe,
+      ],
       providers: [
         {
           provide: UrlInterpolationService,
