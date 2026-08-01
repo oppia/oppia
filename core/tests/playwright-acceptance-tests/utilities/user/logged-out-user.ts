@@ -27,6 +27,10 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const blogUrl = testConstants.URLs.Blog;
+const partnershipsUrl = testConstants.URLs.Partnerships;
+const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const splashPageUrl = testConstants.URLs.splash;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -37,6 +41,10 @@ const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const languageDropdown = '.e2e-test-language-dropdown';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const navbarGetInvolvedTabSchoolAndOrganizationsButton =
+  'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
+const navbarAboutTabBlogButton = '.e2e-test-navbar-about-menu-blog-button';
 
 const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
@@ -74,7 +82,10 @@ const mobileSidebarOpenSelector = '.e2e-test-sidebar-menu-open';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
-
+const mobileSidebarExpandGetInvolvedMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileSidebarGetInvolvedMenuPartnershipsButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 
@@ -180,6 +191,51 @@ const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const revisionTabSelector = 'subtopics-list';
+
+const blogSearchInputSelector = '.e2e-test-search-input';
+const blogSubmitButtonSelector = '.e2e-test-search-submit-btn';
+const blogTagFilterSelector = '.e2e-test-tag-filter-component';
+const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+const blogPaginationSelector = '.e2e-test-pagination';
+const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
+const blogPostTitleContainerSelector =
+  '.e2e-test-blog-post-page-title-container';
+const blogPostContentSelector = '.e2e-test-blog-post-content';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
+const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
+const blogPostListSelector = '.e2e-test-blog-post-list';
+const blogPostTileItemSelector = '.e2e-test-blog-post-tile-item';
+const blogPostPageCardSelector = '.e2e-test-oppia-blog-post-page-card';
+const blogAuthorNameSelector = '.e2e-test-author-name';
+const blogPostAuthorSelector = '.e2e-test-username-visible';
+const blogPostPublishDateSelector = '.mobile-published-date';
+const blogPostTagContainerSelector = '.e2e-test-blog-tag-container';
+const blogShareButtonSelector = '.share-blog-post-button';
+const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
+const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
+const blogCardTagContainerSelector = '.blog-card-tag-container';
+const blogPostTagSelector = '.e2e-test-blog-post-tag';
+const noBlogPostsFoundSelector = '.e2e-no-blog-posts-found';
+
+const partnershipsHeadingSelector = '.e2e-test-partnership-heading';
+const partnershipPageSubheadingsSelector =
+  '.e2e-test-partnerships-page .oppia-partnerships-h3';
+const partneringWithUsImageSelector = '.e2e-test-partnering-with-oppia-image';
+const partnershipYoutubeVideoIFrameSelector =
+  '.e2e-test-partnership-youtube-video-iframe';
+const learnerStoriesCarouselContainerSelector =
+  '.e2e-test-learner-stories-carousel';
+const learnerStoriesHeadingSelector = '.e2e-test-learner-stories-heading';
+
+const partnerWithUsButtonAtTheTopOfPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
+const brochureButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-brochure-button';
+const readMoreStoriesButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-stories-button';
+
+const postsDisplayHeadingSelector = '.e2e-test-blog-posts-display-heading';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -2359,6 +2415,477 @@ export class LoggedOutUser extends BaseUser {
 
     // While mouse is over pause button, the pause button doesn't change its state.
     await this.page.mouse.move(10, 10);
+  }
+
+  /**
+   * Function to navigate to the Partnerships page.
+   */
+  async navigateToPartnershipsPage(): Promise<void> {
+    await this.goto(partnershipsUrl);
+  }
+
+  /**
+   * Function to click the School and Organizations button in the
+   * Get Involved Menu on navbar and check if it opens the Partnerships page.
+   */
+  async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarButtonSelector);
+      await this.openMobileSidebar();
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuPartnershipsButton,
+        partnershipsUrl
+      );
+    } else {
+      await this.expectElementToBeVisible(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabSchoolAndOrganizationsButton,
+        partnershipsUrl
+      );
+    }
+  }
+
+  /**
+   * Function to click the Partner With Us button in the Partnerships page
+   * and check if it opens the Partnerships Google form.
+   * The button is in the first section of the page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    await this.waitForElementToStabilize(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
+    const pageContext = this.page.context();
+    const newTabPromise = pageContext.waitForEvent('page');
+    await this.clickOnElementWithSelector(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
+    const newTab = await newTabPromise;
+    await newTab.waitForLoadState();
+    expect(newTab.url()).toContain(partnershipsFormUrl);
+    await newTab.close();
+  }
+
+  /**
+   * Function to click the Download Brochure button in the Partnerships page
+   * and check if it opens the Partnerships Brochure.
+   */
+  async verifyDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    await this.expectElementToBeVisible(brochureButtonInPartnershipsPage);
+    const href = await this.page.$eval(
+      brochureButtonInPartnershipsPage,
+      element => element.getAttribute('href')
+    );
+    if (href !== partnershipsBrochureUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    }
+  }
+
+  /**
+   * Function to click the Read more stories button in the Partnerships page
+   * and check if it opens the blog page.
+   */
+  async clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      readMoreStoriesButtonInPartnershipsPage,
+      blogUrl
+    );
+  }
+
+  /**
+   * Checks if heading in partnership matches the expected heading.
+   */
+  async expectPartnershipHeadingToBe(heading: string): Promise<void> {
+    await this.expectTextContentInElementWithSelectorToBe(
+      partnershipsHeadingSelector,
+      heading,
+      true
+    );
+  }
+
+  /**
+   * Checks if the partner with us button is visible at the top of the partnerships page.
+   */
+  async expectPartnerWithUsButtonIsVisible(): Promise<void> {
+    await this.expectElementToBeVisible(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
+  }
+
+  /**
+   * Checks if the subheadings in the partnerships page contain the expected subheading.
+   */
+  async expectSubheadingsInPartnershipPageToContain(
+    subheading: string
+  ): Promise<void> {
+    const subheadings = await this.page.$$eval(
+      partnershipPageSubheadingsSelector,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+
+    if (subheadings.includes(subheading)) {
+      showMessage(`Subheading ${subheading} is present.`);
+    } else {
+      throw new Error(
+        `Subheading "${subheading}" is not present. Subheading present: ${subheadings.join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Checks if the partnerships page contains the expected image.
+   */
+  async expectPartneringWithUsImageToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(partneringWithUsImageSelector);
+  }
+
+  /**
+   * Checks if YouTube video IFrame has Youtube URL and Video ID.
+   */
+  async expectYouTubeVideoInPartnershipWithVideoID(
+    videoID: string
+  ): Promise<void> {
+    const videoBaseURI = await this.page.$eval(
+      partnershipYoutubeVideoIFrameSelector,
+      el => (el as HTMLIFrameElement).src
+    );
+
+    expect(videoBaseURI).toContain('https://www.youtube.com/embed');
+    expect(videoBaseURI).toContain(videoID);
+  }
+
+  /**
+   * Checks if Carousel of Learner Stories in Partnership Page works properly.
+   */
+  async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
+    const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
+    await this.expectElementToBeVisible(learnerStoriesHeadingSelector);
+
+    // Verify Carousel Heading.
+    const subHeading = await this.page.$eval(
+      learnerStoriesHeadingSelector,
+      element => (element as HTMLElement).textContent
+    );
+    expect(subHeading).toBe('Learner Stories');
+
+    // Check if carousel works properly.
+    const carouselItems = await this.page.$$eval(
+      `${learnerStoriesCarouselContainerSelector} .carousel-item`,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+    expect(carouselItems.length).toBe(3);
+
+    const activeCarouselItems = await this.page.$$eval(
+      activeItemSelector,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+    expect(activeCarouselItems.length).toBe(1);
+
+    // Check if carousel items are moving.
+    const initialSlideId = await this.page.$eval(
+      activeItemSelector,
+      el => el.id
+    );
+
+    // Wait for the active class to move to a different slide.
+    await this.page.waitForFunction(
+      ({initialId, selector}: {initialId: string; selector: string}) => {
+        const active = document.querySelector(selector);
+        return active && active.id !== initialId;
+      },
+      {initialId: initialSlideId, selector: activeItemSelector},
+      {timeout: 10000}
+    );
+
+    // Confirm new slide ID is different.
+    const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
+    expect(newSlideId).not.toBe(initialSlideId);
+  }
+
+  /**
+   * Function to navigate to the blog page.
+   */
+  async navigateToBlogPage(): Promise<void> {
+    await this.goto(blogUrl);
+  }
+
+  /**
+   * Navigates to the blog page via the navbar (About > Blog).
+   */
+  async navigateToBlogPageViaNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.navigateToBlogPage();
+    } else {
+      await this.expectElementToBeVisible(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        blogUrl
+      );
+    }
+  }
+
+  /**
+   * Function to check whether any blog posts are found.
+   */
+  private async checkIfBlogPostsAreFound(): Promise<boolean> {
+    const noPostsElement = await this.page.$(noBlogPostsFoundSelector);
+    return !noPostsElement;
+  }
+
+  /**
+   * Function to filter blog posts by a keyword.
+   */
+  async filterBlogPostsByKeyword(keyword: string): Promise<void> {
+    await this.expectElementToBeVisible(blogSearchInputSelector);
+    await this.typeInInputField(blogSearchInputSelector, keyword);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
+
+    const url = new URL(this.page.url());
+    const queryParam = url.searchParams.get('q');
+
+    if (queryParam !== keyword) {
+      throw new Error(
+        `Query Parameter doesn't match. Expected ${keyword}, but found ${queryParam}`
+      );
+    }
+  }
+
+  /**
+   * Function to verify that the filtered blog posts contain the keyword.
+   */
+  async expectBlogSearchResultsToContain(text: string): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
+    await this.expectElementToBeVisible(blogPostContentSelector);
+    const contentFound = await this.page.$$eval(
+      `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
+      (elements, searchText) =>
+        elements.some(el =>
+          el.textContent
+            ?.toLowerCase()
+            .includes((searchText as string).toLowerCase())
+        ),
+      text
+    );
+
+    if (!contentFound) {
+      throw new Error(`No results found containing "${text}"`);
+    }
+  }
+
+  /**
+   * Function to filter blog posts by a tag.
+   */
+  async filterBlogPostsByTag(tagName: string): Promise<void> {
+    await this.expectElementToBeVisible(blogTagFilterSelector);
+    await this.typeInInputField(
+      '.e2e-test-tag-filter-selection-input',
+      tagName
+    );
+    await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
+    await this.expectElementToBeVisible(blogTagFilterDropdownSelector, false);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
+
+    const url = new URL(this.page.url());
+    const queryParam = url.searchParams.get('tags');
+
+    if (queryParam !== `("${tagName}")`) {
+      throw new Error(
+        `Query Parameter doesn't match. Expected ${tagName}, but found ${queryParam}`
+      );
+    }
+  }
+
+  /**
+   * Function to verify that the filtered blog posts contain the tag.
+   */
+  async expectBlogSearchResultsToHaveTag(tagName: string): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
+    await this.expectElementToBeVisible(blogPostTagSelector);
+    const tagFound = await this.page.$$eval(
+      blogPostTagSelector,
+      (elements, expectedTag) =>
+        elements.some(el => el.textContent?.trim() === expectedTag),
+      tagName
+    );
+
+    if (!tagFound) {
+      throw new Error(`No results found with tag "${tagName}"`);
+    }
+  }
+
+  /**
+   * Function to click the next button in the pagination controls.
+   */
+  async clickNextBlogPage(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const firstPostTitle = await this.page.$eval(
+      blogPostTitleSelector,
+      el => el.textContent
+    );
+    const nextButton = await this.page.$(blogPaginationNextSelector);
+    if (!nextButton) {
+      return;
+    }
+    await this.clickOnElementWithSelector(blogPaginationNextSelector);
+    await this.waitForNetworkIdle();
+
+    const newFirstPostTitle = await this.page.$eval(
+      blogPostTitleSelector,
+      el => el.textContent
+    );
+    if (newFirstPostTitle === firstPostTitle) {
+      throw new Error('Next button did not navigate to the next page');
+    }
+  }
+
+  /**
+   * Expects the number of blog posts on the current page to be equal to the given number.
+   */
+  async expectNumberOfBlogPostsOnPageToBe(number: number): Promise<void> {
+    await this.page.waitForFunction(
+      ({selector, expected}: {selector: string; expected: number}) =>
+        document.querySelectorAll(selector).length === expected,
+      {selector: blogPostTileItemSelector, expected: number},
+      {timeout: 10000}
+    );
+
+    showMessage(`Found ${number} blog post(s) on the page as expected.`);
+  }
+
+  /**
+   * Expects a blog post with the given title to be present on the page.
+   */
+  async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
+    await this.expectTextContentToContain(blogPostListSelector, title);
+    showMessage(`Blog post with title "${title}" is present.`);
+  }
+
+  /**
+   * Expects the blog welcome message to be visible.
+   */
+  async expectBlogWelcomeMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(blogWelcomeHeadingSelector, expectedText);
+  }
+
+  /**
+   * Expects the "no blog posts" message to be visible.
+   */
+  async expectNoBlogPostsMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectTextContentToBe(blogNoResultsFoundSelector, expectedText);
+  }
+
+  /**
+   * Expects the blog page layout to be correct with all required elements.
+   */
+  async expectBlogPageLayoutToBeCorrect(): Promise<void> {
+    await this.expectElementToBeVisible(postsDisplayHeadingSelector);
+
+    const blogPosts = await this.page.$$(blogPostListSelector);
+    if (blogPosts.length === 0) {
+      showMessage('No blog posts found, but layout elements are present.');
+    }
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    await this.expectElementToBeVisible(blogPostAuthorSelector);
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+    await this.expectElementToBeVisible(blogPostTagContainerSelector);
+
+    const paginationExists = await this.page.$(blogPaginationSelector);
+    if (paginationExists) {
+      await this.expectElementToBeVisible(blogPaginationSelector);
+    }
+
+    showMessage('Blog page layout is correct with all required elements.');
+  }
+
+  /**
+   * Clicks on the first blog post in the list.
+   */
+  async clickOnFirstBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+
+    const firstBlogPost = await this.page.$(blogPostTitleSelector);
+
+    if (!firstBlogPost) {
+      throw new Error('No blog posts found to click on.');
+    }
+
+    await firstBlogPost.click();
+    await this.waitForNetworkIdle();
+
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelector(selector) !== null,
+      blogPostPageCardSelector,
+      {timeout: 10000}
+    );
+  }
+
+  /**
+   * Expects blog post title to be visible.
+   */
+  async expectBlogPostTitleToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleContainerSelector);
+  }
+
+  /**
+   * Expects blog post author name to be visible.
+   */
+  async expectBlogPostAuthorToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogAuthorNameSelector);
+  }
+
+  /**
+   * Expects blog post publish date to be visible.
+   */
+  async expectBlogPostPublishDateToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+  }
+
+  /**
+   * Expects blog post content to be visible.
+   */
+  async expectBlogPostContentToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostContentSelector);
+  }
+
+  /**
+   * Expects blog post tags to be visible.
+   */
+  async expectBlogPostTagsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogCardTagContainerSelector);
+  }
+
+  /**
+   * Expects blog share button to be visible.
+   */
+  async expectBlogShareButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogShareButtonSelector);
+  }
+
+  /**
+   * Expects suggested posts section to be visible (if present).
+   */
+  async expectSuggestedBlogPostsSectionToBeVisible(): Promise<void> {
+    const suggestedSection = await this.page.$(
+      blogSuggestedForYouSectionSelector
+    );
+
+    if (suggestedSection) {
+      await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
+    }
   }
 
   /**

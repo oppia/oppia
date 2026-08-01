@@ -22,13 +22,13 @@
     },
     {
       "name": "interested-partner-organization/submit-a-partnership-application",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-partner-organization/view-the-blog",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
