@@ -57,56 +57,59 @@ describe('Exploration Editor', function () {
     await explorationEditor.clickOnHelpButton();
     await explorationEditor.clickOnTakeATourButton();
 
-    await explorationEditor.expectJoyrideTitleToBe('Creating in Oppia');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.expectShepherdTitleToBe('Creating in Oppia');
+    await explorationEditor.expectShepherdContentToContain(
       'Explorations are learning experiences that you create using Oppia'
     );
-    await explorationEditor.expectJoyridePreviousButtonToBeVisible(false);
+    await explorationEditor.expectShepherdPreviousButtonToBeVisible(false);
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Content');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Content');
+    await explorationEditor.expectShepherdContentToContain(
       "An Oppia exploration is divided into several 'cards'."
     );
 
     // Check previous button.
-    await explorationEditor.continueToPreviousJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Creating in Oppia');
-    await explorationEditor.continueToNextJoyrideStep();
+    await explorationEditor.continueToPreviousShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Creating in Oppia');
+    await explorationEditor.continueToNextShepherdStep();
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Interaction');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Interaction');
+    await explorationEditor.expectShepherdContentToContain(
       "After you've written the content of your conversation, choose an interaction type"
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Responses');
-    await explorationEditor.expectJoyrideContentToContain(
-      "After the learner uses the interaction you created, it's your turn again to choose how your exploration will respond to their input."
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Responses');
+    await explorationEditor.expectShepherdContentToContain(
+      'After the learner uses the interaction you created, it is your turn again ' +
+        'to choose how your exploration will respond to their input. You can send ' +
+        'a learner to a new card or have them repeat the same card, depending on ' +
+        'how they answer.'
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Preview');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Preview');
+    await explorationEditor.expectShepherdContentToContain(
       'At any time, you can click the preview button to play through your exploration.'
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Save');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Save');
+    await explorationEditor.expectShepherdContentToContain(
       "When you're done making changes, be sure to save your work."
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Tutorial Complete');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Tutorial Complete');
+    await explorationEditor.expectShepherdContentToContain(
       'Now for the fun part...'
     );
 
-    await explorationEditor.expectJoyrideNextButtonToBeVisible(false);
-    await explorationEditor.expectJoyrideDoneButtonToBeVisible(true);
-    await explorationEditor.finishJoyride();
+    await explorationEditor.expectShepherdNextButtonToBeVisible(false);
+    await explorationEditor.expectShepherdDoneButtonToBeVisible(true);
+    await explorationEditor.finishShepherd();
   });
 
   it('should be able to take a tour of translations tab', async function () {
@@ -120,60 +123,62 @@ describe('Exploration Editor', function () {
     await explorationEditor.clickOnTakeATranslationsTourButton();
     await explorationEditor.dismissTranslationTabWelcomeModal();
 
-    await explorationEditor.expectJoyrideTitleToBe('Translations In Oppia');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.expectShepherdTitleToBe('Translations In Oppia');
+    await explorationEditor.expectShepherdContentToContain(
       'Hello, welcome to the Translation Tab!'
     );
-    await explorationEditor.expectJoyridePreviousButtonToBeVisible(false);
+    await explorationEditor.expectShepherdPreviousButtonToBeVisible(false);
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Choose Language');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Choose Language');
+    await explorationEditor.expectShepherdContentToContain(
       'Start your translation by choosing the language that you want to translate to.'
     );
 
-    await explorationEditor.continueToPreviousJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Translations In Oppia');
-    await explorationEditor.continueToNextJoyrideStep();
+    await explorationEditor.continueToPreviousShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Translations In Oppia');
+    await explorationEditor.continueToNextShepherdStep();
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe(
       'Choose a Card to Translate'
     );
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.expectShepherdContentToContain(
       'Then, choose a card from the exploration overview by clicking on the card.'
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe(
       'Choose a Part of the Card to Translate'
     );
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.expectShepherdContentToContain(
       'Next, choose a part of the lesson card to translate.'
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Recording Audio');
-    await explorationEditor.expectJoyrideContentToContain(
-      'To create audio translations in Oppia, we recommend using the  button to upload audio files from your computer.'
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Recording Audio');
+    await explorationEditor.expectShepherdContentToContain(
+      'To create audio translations in Oppia, we recommend using the'
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Re-record/Re-upload audio');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe(
+      'Re-record/Re-upload audio'
+    );
+    await explorationEditor.expectShepherdContentToContain(
       'The audio recording also has options related to updating and deleting translations'
     );
 
-    await explorationEditor.continueToNextJoyrideStep();
-    await explorationEditor.expectJoyrideTitleToBe('Tutorial Complete');
-    await explorationEditor.expectJoyrideContentToContain(
+    await explorationEditor.continueToNextShepherdStep();
+    await explorationEditor.expectShepherdTitleToBe('Tutorial Complete');
+    await explorationEditor.expectShepherdContentToContain(
       'Now, you are ready to begin adding translations to your explorations!'
     );
 
-    await explorationEditor.expectJoyrideNextButtonToBeVisible(false);
-    await explorationEditor.expectJoyrideDoneButtonToBeVisible(true);
+    await explorationEditor.expectShepherdNextButtonToBeVisible(false);
+    await explorationEditor.expectShepherdDoneButtonToBeVisible(true);
 
-    await explorationEditor.finishJoyride();
+    await explorationEditor.finishShepherd();
   });
 
   afterAll(async function () {

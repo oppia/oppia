@@ -30,6 +30,7 @@ import {
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {
+  CERTIFICATE_OFFERING_ASYNC_STATUSES,
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
@@ -42,6 +43,7 @@ import './create-certificate-offering-page.component.css';
 @Component({
   selector: 'oppia-create-certificate-offering-page',
   templateUrl: './create-certificate-offering-page.component.html',
+  styleUrls: ['./create-certificate-offering-page.component.css'],
 })
 export class CreateCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
@@ -108,6 +110,8 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
       );
       modalRef.componentInstance.action =
         CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
+      modalRef.componentInstance.currentAsyncStatus =
+        this.certificateAssessmentOffering.asyncStatus;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
@@ -118,9 +122,28 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         return;
       }
 
+      const certificateAssessmentOfferingForSave =
+        CertificateAssessmentOfferingData.createFromBackendDict({
+          certificate_id: this.certificateAssessmentOffering.certificateId,
+          title: this.certificateAssessmentOffering.title,
+          description: this.certificateAssessmentOffering.description,
+          classroom_id: this.certificateAssessmentOffering.classroomId,
+          topic_ids: Object.keys(this.certificateAssessmentOffering.topicData),
+          topic_data: this.certificateAssessmentOffering.topicData,
+          demonstrates: this.certificateAssessmentOffering.demonstrates,
+          total_questions: this.certificateAssessmentOffering.totalQuestions,
+          time_limit_in_minutes:
+            this.certificateAssessmentOffering.timeLimitInMinutes,
+          async_status:
+            action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
+              ? CERTIFICATE_OFFERING_ASYNC_STATUSES.NOT_READY
+              : CERTIFICATE_OFFERING_ASYNC_STATUSES.AVAILABLE,
+          version: this.certificateAssessmentOffering.version,
+        });
+
       const certificateId =
         await this.certificateAssessmentOfferingBackendApiService.createCertificateAssessmentOfferingAsync(
-          this.certificateAssessmentOffering
+          certificateAssessmentOfferingForSave
         );
 
       if (!certificateId) {
@@ -159,6 +182,6 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
   }
 
   private navigateToCertificateOfferingDashboard(): void {
-    this.router.navigate(['/certificate-offering-dashboard']);
+    this.router.navigate(['/certificate-creator-dashboard']);
   }
 }

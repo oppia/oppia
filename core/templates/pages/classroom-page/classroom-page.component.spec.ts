@@ -20,11 +20,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {
   ComponentFixture,
-  fakeAsync,
   TestBed,
+  fakeAsync,
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {RouterTestingModule} from '@angular/router/testing';
 import {TranslateService} from '@ngx-translate/core';
 
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
@@ -62,6 +63,9 @@ class MockPlatformFeatureService {
     DiagnosticTest: {
       isEnabled: false,
     },
+    EnableCertificateAssessment: {
+      isEnabled: true,
+    },
   };
 }
 
@@ -83,7 +87,7 @@ describe('Classroom Page Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, RouterTestingModule],
       declarations: [ClassroomPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
@@ -130,6 +134,12 @@ describe('Classroom Page Component', () => {
     );
     translateService = TestBed.inject(TranslateService);
     userService = TestBed.inject(UserService);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      } as UserInfo)
+    );
   });
 
   it('should create', () => {
@@ -144,7 +154,7 @@ describe('Classroom Page Component', () => {
     expect(component.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
-  it('should initialize', fakeAsync(() => {
+  it('should initialize', async () => {
     let classroomUrlFragment = 'math';
     let bannerImageUrl = 'banner_image_url';
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
@@ -192,6 +202,7 @@ describe('Classroom Page Component', () => {
       'mathid',
       'Math',
       'math',
+      'user@email.com',
       topicSummaryDicts,
       'Course details',
       'Topics covered',
@@ -226,9 +237,7 @@ describe('Classroom Page Component', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
       false
     );
-    component.ngOnInit();
-    tick();
-    tick();
+    await component.ngOnInit();
     expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
     expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
@@ -245,9 +254,9 @@ describe('Classroom Page Component', () => {
       classroomBackendApiService.onInitializeTranslation.emit
     ).toHaveBeenCalled();
     expect(siteAnalyticsService.registerClassroomPageViewed).toHaveBeenCalled();
-  }));
+  });
 
-  it('should display alert when unable to fetch classroom data', fakeAsync(() => {
+  it('should display alert when unable to fetch classroom data', async () => {
     let classroomUrlFragment = 'test_fragment';
     let bannerImageUrl = 'banner_image_url';
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
@@ -266,8 +275,7 @@ describe('Classroom Page Component', () => {
       'fetchClassroomDataAsync'
     ).and.returnValue(Promise.reject({status: 500}));
     spyOn(alertsService, 'addWarning');
-    component.ngOnInit();
-    tick();
+    await component.ngOnInit();
     expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
     expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
@@ -277,7 +285,67 @@ describe('Classroom Page Component', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Failed to get classroom data'
     );
-  }));
+  });
+
+  it('should link to the classroom certificate assessment page', () => {
+    component.classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      'user@email.com',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      true,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    spyOn(component, 'ngOnInit').and.stub();
+    fixture.detectChanges();
+
+    let certificateAssessmentLink = fixture.nativeElement.querySelector(
+      '.e2e-test-take-certificate-assessment'
+    );
+    expect(certificateAssessmentLink.getAttribute('href')).toBe(
+      '/learn/math/certificate-offering-available'
+    );
+  });
+
+  it('should hide the classroom certificate assessment entry when disabled', () => {
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      false;
+    component.classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      'user@email.com',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      true,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    spyOn(component, 'ngOnInit').and.stub();
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector(
+        '.e2e-test-take-certificate-assessment'
+      )
+    ).toBeNull();
+
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      true;
+  });
 
   it(
     'should obtain translated page title whenever the selected' +
@@ -356,6 +424,7 @@ describe('Classroom Page Component', () => {
       'mathid',
       'Math',
       'math',
+      'user@email.com',
       [],
       'Course details',
       'Topics covered',
@@ -367,7 +436,7 @@ describe('Classroom Page Component', () => {
       1
     );
     component.classroomData = classroomData;
-    expect(component.diagnosticTestIsEnabled()).toBeFalse();
+    expect(component.diagnosticTestIsEnabled()).toBe(false);
   });
 
   it('should show private classroom banner to curriculum admins', fakeAsync(() => {
@@ -375,10 +444,10 @@ describe('Classroom Page Component', () => {
       isCurriculumAdmin: () => true,
       isModerator: () => false,
     } as UserInfo;
-    expect(component.showPrivateClassroomBanner).toBeFalse();
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
       Promise.resolve(userInfo)
     );
+    expect(component.showPrivateClassroomBanner).toBe(false);
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
       'classroomUrlFragment'
     );
@@ -386,6 +455,7 @@ describe('Classroom Page Component', () => {
       'mathid',
       'Math',
       'math',
+      'user@email.com',
       [],
       'Course details',
       'Topics covered',
@@ -409,7 +479,45 @@ describe('Classroom Page Component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.showPrivateClassroomBanner).toBeTrue();
+    expect(component.showPrivateClassroomBanner).toBe(true);
+  }));
+
+  it('should hide private classroom banner when user info fetch fails', fakeAsync(() => {
+    (userService.getUserInfoAsync as jasmine.Spy).and.returnValue(
+      Promise.reject(new Error('User info error'))
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroomUrlFragment'
+    );
+    let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      'user@email.com',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      false,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(classroomData));
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.showPrivateClassroomBanner).toBe(false);
   }));
 
   it(
@@ -422,9 +530,9 @@ describe('Classroom Page Component', () => {
         teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
         topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
       };
-      expect(
-        component.isHackyClassroomTranslationDisplayed('tags')
-      ).toBeFalse();
+      expect(component.isHackyClassroomTranslationDisplayed('tags')).toBe(
+        false
+      );
     }
   );
 
@@ -432,6 +540,6 @@ describe('Classroom Page Component', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 });

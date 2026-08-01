@@ -29,6 +29,7 @@ export interface Message {
   type: string;
   content: string;
   timeout: number;
+  closeButton?: boolean;
 }
 
 @Injectable({
@@ -112,7 +113,12 @@ export class AlertsService {
    * @param {string} message - Message content
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addMessage(type: string, message: string, timeoutMilliseconds: number): void {
+  addMessage(
+    type: string,
+    message: string,
+    timeoutMilliseconds: number,
+    closeButton: boolean = false
+  ): void {
     if (this._messages.length >= this.MAX_TOTAL_MESSAGES) {
       return;
     }
@@ -120,6 +126,7 @@ export class AlertsService {
       type: type,
       content: message,
       timeout: timeoutMilliseconds,
+      closeButton: closeButton,
     });
   }
   /**
@@ -150,11 +157,15 @@ export class AlertsService {
    * @param {string} message - Success message to display
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
+  addSuccessMessage(
+    message: string,
+    timeoutMilliseconds?: number,
+    closeButton: boolean = false
+  ): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 3000;
     }
-    this.addMessage('success', message, timeoutMilliseconds);
+    this.addMessage('success', message, timeoutMilliseconds, closeButton);
   }
 
   /**

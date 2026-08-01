@@ -17,7 +17,13 @@
  */
 
 import {AppConstants} from 'app.constants';
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewEncapsulation,
+} from '@angular/core';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -30,12 +36,11 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
 
-import './home-tab.component.css';
-
 @Component({
   selector: 'oppia-home-tab',
   templateUrl: './home-tab.component.html',
   styleUrls: ['./home-tab.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();

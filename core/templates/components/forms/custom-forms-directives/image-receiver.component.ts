@@ -28,6 +28,7 @@ import {AppConstants} from 'app.constants';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
+import './image-receiver.component.css';
 
 interface ImageTypeMapping {
   [key: string]: {
@@ -39,6 +40,7 @@ interface ImageTypeMapping {
 @Component({
   selector: 'oppia-image-receiver',
   templateUrl: './image-receiver.component.html',
+  styleUrls: ['./image-receiver.component.css'],
 })
 export class ImageReceiverComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();

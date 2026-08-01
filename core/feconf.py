@@ -106,15 +106,15 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles')
+    os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('build', 'webpack_bundles')
+    else os.path.join('build')
 )
 # To know more about AOT visit https://angular.io/guide/glossary#aot
 FRONTEND_AOT_DIR = (
     os.path.join('dist', 'oppia-angular')
     if constants.DEV_MODE
-    else os.path.join('dist', 'oppia-angular-prod')
+    else os.path.join('build')
 )
 DEPENDENCIES_TEMPLATES_DIR = os.path.join(
     EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
@@ -228,10 +228,10 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_logs_json',
-    'failed_requests_json',
-    'navigation_history_json',
-    'environment_json',
+    'console_logs',
+    'failed_requests',
+    'navigation_history',
+    'environment',
 )
 
 # Allowed formats of how HTML is present in rule specs.
@@ -429,6 +429,16 @@ INVALID_CONTENT_ID = 'invalid_content_id'
 # The default content text for the initial state of an exploration.
 DEFAULT_STATE_CONTENT_STR = ''
 
+# Content IDs and prefixes for exploration metadata.
+EXPLORATION_METADATA_CONTENT_ID_PREFIX = 'exploration_'
+EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
+EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
+EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
+EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
+
+# Character limit for exploration title translation.
+EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT = 36
+
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
 DEFAULT_AUTO_TTS_ENABLED = False
@@ -458,6 +468,8 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 # Default content_id for explanation subtitled html.
 DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+# Content ID for skill description.
+SKILL_DESCRIPTION_CONTENT_ID = 'skill_description'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
@@ -537,6 +549,9 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+# Placeholder for the preferences-page URL in email footers.
+EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
+
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
 
@@ -594,7 +609,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.5.1'
+OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -743,6 +758,10 @@ MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The maximum number of questions to be fetched at one time.
 MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
+# The minimum number of questions required per skill before a story
+# referencing that skill can be published.
+MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH = 10
 
 # The minimum score required for a user to review suggestions of a particular
 # category.
@@ -1081,6 +1100,7 @@ USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 STUDY_GUIDE_EDITOR_DATA_URL_PREFIX = '/study_guide_editor_handler/data'
+TECHNICAL_FEEDBACK_DASHBOARD_URL = '/technical-feedback-dashboard'
 TOPIC_VIEWER_URL_PREFIX = '/learn/<classroom_url_fragment>/<topic_url_fragment>'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
@@ -1140,6 +1160,9 @@ CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
 )
 CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
     '/certificate_assessment_offering_handler/<certificate_id>'
+)
+VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/validate_certificate_assessment_offering_handler'
 )
 
 # Event types.
@@ -1272,6 +1295,7 @@ ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
 ROLE_ID_TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR'
+ROLE_ID_TECH_TEAM_LEAD = 'TECH_TEAM_LEAD'
 
 ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER,
@@ -1294,6 +1318,7 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_VOICEOVER_ADMIN,
     ROLE_ID_QUESTION_COORDINATOR,
     ROLE_ID_TRANSLATION_COORDINATOR,
+    ROLE_ID_TECH_TEAM_LEAD,
 ]
 
 # Intent of the User making query to role structure via admin interface. Used
@@ -1914,16 +1939,26 @@ PLATFORM_ANDROID: Final = 'android'
 PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
 
 # Destination choices.
-DESTINATION_CREATOR: Final = 'creator'
-DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
-DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
+DESTINATION_CURRICULUM: Final = 'curriculum'
+DESTINATION_TECHNICAL: Final = 'technical'
+DESTINATION_TECHNICAL_EXTERNAL_TEAM: Final = 'tech-external'
+DESTINATION_TECHNICAL_INTERNAL_TEAM: Final = 'tech-internal'
 DESTINATION_CHOICES: Final = [
-    DESTINATION_CREATOR,
-    DESTINATION_TECHNICAL_LEAP_TEAM,
-    DESTINATION_TECHNICAL_CORE_TEAM,
+    DESTINATION_CURRICULUM,
+    DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+    DESTINATION_TECHNICAL_INTERNAL_TEAM,
+]
+PLATFORM_FEEDBACK_DASHBOARD_CHOICES: Final = [
+    DESTINATION_CURRICULUM,
+    DESTINATION_TECHNICAL,
+]
+TECHNICAL_FEEDBACK_TEAM_CHOICES: Final = [
+    DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+    DESTINATION_TECHNICAL_INTERNAL_TEAM,
 ]
 
-LEAP_DASHBOARD_PATHS = frozenset(
+
+TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
     [
         'about',
         'community-library',
@@ -1941,3 +1976,5 @@ LEAP_DASHBOARD_PATHS = frozenset(
         'donate',
     ]
 )
+
+DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'

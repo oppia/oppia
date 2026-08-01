@@ -41,7 +41,7 @@ export class CollectionEditorPrePublishModalComponent extends ConfirmOrCancelMod
   requireTitleToBeSpecified: boolean = false;
   requireObjectiveToBeSpecified: boolean = false;
   requireCategoryToBeSpecified: boolean = false;
-  CATEGORY_LIST = AppConstants.ALL_CATEGORIES;
+  CATEGORY_LIST = [...AppConstants.ALL_CATEGORIES];
 
   constructor(
     private alertsService: AlertsService,
