@@ -143,6 +143,14 @@ describe('Warnings and Alert Component', () => {
     expect(modalService.open).toHaveBeenCalled();
   });
 
+  it('should not open error modal if another error modal is already open', () => {
+    componentInstance.isErrorModalOpen = true;
+
+    componentInstance.openErrorModal('Incoming Warning');
+
+    expect(modalService.open).not.toHaveBeenCalled();
+  });
+
   it('should process sequential warnings queue when modal settles', fakeAsync(() => {
     let mockNgbModalRef = {
       componentInstance: {

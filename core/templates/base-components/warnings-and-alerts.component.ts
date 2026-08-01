@@ -31,6 +31,7 @@ import './warnings-and-alerts.component.css';
 })
 export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
   private directiveSubscriptions = new Subscription();
+  isErrorModalOpen = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -50,6 +51,10 @@ export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
   }
 
   openErrorModal(warningMessage: string): void {
+    if (this.isErrorModalOpen) {
+      return;
+    }
+    this.isErrorModalOpen = true;
     const modalRef = this.modalService.open(ErrorModalComponent, {
       backdropClass: 'oppia-error-modal-backdrop',
       windowClass: 'oppia-error-modal-window',
@@ -58,6 +63,7 @@ export class WarningsAndAlertsComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.errorMessage = warningMessage;
 
     modalRef.result.finally(() => {
+      this.isErrorModalOpen = false;
       if (this.alertsService.warnings.length > 0) {
         this.alertsService.deleteWarning(this.alertsService.warnings[0]);
       }
