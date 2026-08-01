@@ -52,6 +52,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'classroom_id': 'math_classroom_id',
             'name': 'math',
             'url_fragment': 'math',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated math foundations course.',
             'teaser_text': 'Teaser test for math classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -73,6 +74,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.classroom_id,
             self.math_classroom.name,
             self.math_classroom.url_fragment,
+            self.math_classroom.feedback_recipient_email,
             self.math_classroom.course_details,
             self.math_classroom.teaser_text,
             self.math_classroom.topic_list_intro,
@@ -92,6 +94,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'classroom_id': 'physics_classroom_id',
             'name': 'physics',
             'url_fragment': 'physics',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated physics foundations course.',
             'teaser_text': 'Teaser test for physics classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -113,6 +116,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.classroom_id,
             self.physics_classroom.name,
             self.physics_classroom.url_fragment,
+            self.physics_classroom.feedback_recipient_email,
             self.physics_classroom.course_details,
             self.physics_classroom.teaser_text,
             self.physics_classroom.topic_list_intro,
@@ -161,6 +165,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'classroom_id': 'chem_classroom_id',
             'name': 'chem',
             'url_fragment': 'chem',
+            'feedback_recipient_email': 'user@email.com',
             'course_details': 'Curated Chemistry foundations course.',
             'teaser_text': 'Teaser test for chemistry classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
@@ -178,6 +183,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.classroom_id,
             chemistry_classroom.name,
             chemistry_classroom.url_fragment,
+            chemistry_classroom.feedback_recipient_email,
             chemistry_classroom.course_details,
             chemistry_classroom.teaser_text,
             chemistry_classroom.topic_list_intro,
@@ -258,6 +264,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             new_classroom_id,
             'chemistry',
             'chemistry',
+            'user@email.com',
             'Curated chemistry foundations course.',
             'Teaser test for chemistry classroom',
             'Start from the basics with our first topic.',
@@ -374,7 +381,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         classroom_id = classroom_config_services.get_new_classroom_id()
         history_classroom = (
             classroom_config_services.create_new_default_classroom(
-                classroom_id, 'history', 'history'
+                classroom_id, 'history', 'history', 'user@email.com'
             )
         )
         history_classroom_data = classroom_config_services.get_classroom_by_id(
