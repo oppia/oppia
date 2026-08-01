@@ -98,7 +98,7 @@
     width: 34px;
   }
 
-.answer-wrapper .right-side-curve {
+  .answer-wrapper .right-side-curve {
     height: 29px;
     position: absolute;
     right: -17px;
@@ -107,7 +107,7 @@
     width: 19px;
   }
 
-.conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
     border: 2px solid #094142;
     height: 34px;
     right: -39px;
@@ -115,7 +115,7 @@
     width: 34px;
   }
 
-.feedback-wrapper .left-side-curve {
+  .feedback-wrapper .left-side-curve {
     height: 29px;
     left: -18px;
     position: absolute;
@@ -132,7 +132,7 @@
     width: 64px;
   }
 
-.feedback-wrapper .left-side-curve {
+  .feedback-wrapper .left-side-curve {
     height: 39px;
     left: -27px;
     position: absolute;
@@ -140,7 +140,7 @@
     width: 29px;
   }
 
-.answer-wrapper .right-side-curve {
+  .answer-wrapper .right-side-curve {
     height: 39px;
     position: absolute;
     right: -28px;
@@ -149,7 +149,7 @@
     width: 29px;
   }
 
-.conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
     height: 64px;
     right: -69px;
     top: 3px;
@@ -165,7 +165,7 @@
     width: 64px;
   }
 
-.feedback-wrapper .left-side-curve {
+  .feedback-wrapper .left-side-curve {
     height: 39px;
     left: -27px;
     position: absolute;
@@ -173,7 +173,7 @@
     width: 29px;
   }
 
-.answer-wrapper .right-side-curve {
+  .answer-wrapper .right-side-curve {
     height: 39px;
     position: absolute;
     right: -28px;
@@ -182,7 +182,7 @@
     width: 29px;
   }
 
-.conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
     height: 64px;
     right: -69px;
     top: 3px;
