@@ -27,7 +27,12 @@ describe('Classroom admin model', () => {
       providers: [],
     });
 
-    classroomData = new NewClassroomData('classroomId', 'math', 'math');
+    classroomData = new NewClassroomData(
+      'classroomId',
+      'math',
+      'math',
+      'user@email.com'
+    );
   });
 
   it('should return error messgage when classroom name exceeds max len', () => {
@@ -50,6 +55,8 @@ describe('Classroom admin model', () => {
 
   it('should not present any error when classroom name is valid', () => {
     classroomData.setClassroomName('Discrete maths');
+    expect(classroomData.getClassroomName()).toEqual('Discrete maths');
+    expect(classroomData.getClassroomId()).toEqual('classroomId');
 
     expect(classroomData.getClassroomNameValidationErrors()).toEqual('');
   });
@@ -81,8 +88,36 @@ describe('Classroom admin model', () => {
 
   it('should not present error for valid classroom url fragment', () => {
     classroomData.setUrlFragment('physics-url-fragment');
+    expect(classroomData.getClassroomUrlFragment()).toEqual(
+      'physics-url-fragment'
+    );
 
     expect(classroomData.getClassroomUrlValidationErrors()).toEqual('');
+  });
+
+  it('should present error when feedback email is empty', () => {
+    classroomData.setFeedbackEmail('');
+
+    expect(classroomData.getFeedbackRecipientEmailValidationErrors()).toEqual(
+      'The feedback recipient email should not be empty.'
+    );
+  });
+
+  it('should present error for valid classroom feedback email when email is invalid', () => {
+    classroomData.setFeedbackEmail('abc123');
+
+    expect(classroomData.getFeedbackRecipientEmailValidationErrors()).toEqual(
+      'Please enter a valid email address.'
+    );
+  });
+
+  it('should not present error for valid classroom feedback email', () => {
+    classroomData.setFeedbackEmail('user@email.com');
+    expect(classroomData.getFeedbackRecipientEmail()).toEqual('user@email.com');
+
+    expect(classroomData.getFeedbackRecipientEmailValidationErrors()).toEqual(
+      ''
+    );
   });
 
   it('should be able to set and get classroom validity flag', () => {
