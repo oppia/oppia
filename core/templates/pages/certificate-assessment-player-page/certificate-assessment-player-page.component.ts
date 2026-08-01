@@ -31,7 +31,8 @@ interface AssessmentQuestion {
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
   currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
-  showAssessmentInterruptCard = true;
+  //TODO(#24717-M2.20): This flag value is by default set as false so interrupt card does not render. In the future, this flag will change its value based on conditions.
+  showAssessmentInterruptCard = false;
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
