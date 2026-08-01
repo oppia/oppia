@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 
 from core import feconf, utils
+from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -31,7 +32,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
+from typing import List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -970,3 +971,79 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
                 translation_services.save_machine_translation_provider_mapping(
                     invalid_mapping
                 )
+
+
+class FeaturedTranslationLanguagesServicesTests(test_utils.GenericTestBase):
+    """Tests for the featured translation languages services."""
+
+    def test_get_returns_saved_datastore_value(self) -> None:
+        # Create the model directly to test the read path independently of
+        # save_featured_translation_languages().
+        model = translation_models.FeaturedTranslationLanguagesModel(
+            id=translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+            featured_translation_languages=[
+                {'language_code': 'hi', 'explanation': 'High demand'}
+            ],
+        )
+        model.update_timestamps()
+        model.put()
+
+        self.assertEqual(
+            translation_services.get_featured_translation_languages(),
+            [{'language_code': 'hi', 'explanation': 'High demand'}],
+        )
+
+    def test_get_returns_seed_default_when_no_model_exists(self) -> None:
+        # No setup/cleanup needed: GenericTestBase isolates the datastore per
+        # test, so no model exists here. Mirrors
+        # test_get_machine_translation_provider_mapping_returns_empty_by_default.
+        expected_default = [
+            {
+                'language_code': language['language_code'],
+                'explanation': language['explanation'],
+            }
+            for language in constants.FEATURED_TRANSLATION_LANGUAGES
+        ]
+        self.assertEqual(
+            translation_services.get_featured_translation_languages(),
+            expected_default,
+        )
+
+    def test_save_creates_model_and_get_returns_saved_value(self) -> None:
+        new_config: List[translation_domain.FeaturedTranslationLanguageDict] = [
+            {
+                'language_code': 'hi',
+                'explanation': 'High demand',
+            }
+        ]
+        translation_services.save_featured_translation_languages(new_config)
+        self.assertEqual(
+            translation_services.get_featured_translation_languages(),
+            new_config,
+        )
+
+    def test_save_overwrites_existing_configuration(self) -> None:
+        translation_services.save_featured_translation_languages(
+            [{'language_code': 'hi', 'explanation': 'a'}]
+        )
+        translation_services.save_featured_translation_languages(
+            [{'language_code': 'es', 'explanation': 'b'}]
+        )
+        self.assertEqual(
+            translation_services.get_featured_translation_languages(),
+            [{'language_code': 'es', 'explanation': 'b'}],
+        )
+
+    def test_save_with_invalid_language_raises_and_does_not_persist(
+        self,
+    ) -> None:
+        state_before = translation_services.get_featured_translation_languages()
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language code: xx'
+        ):
+            translation_services.save_featured_translation_languages(
+                [{'language_code': 'xx', 'explanation': 'a'}]
+            )
+        # Assert nothing at all was written (validate() runs before put()).
+        state_after = translation_services.get_featured_translation_languages()
+        self.assertEqual(state_after, state_before)

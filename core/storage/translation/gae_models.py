@@ -239,6 +239,7 @@ class EntityTranslationsModel(base_models.BaseModel):
 
 
 MACHINE_TRANSLATION_POLICY_ID = 'machine_translation_policy'
+FEATURED_TRANSLATION_LANGUAGES_MODEL_ID = 'featured_translation_languages'
 
 
 class MachineTranslationModel(base_models.BaseModel):
@@ -445,6 +446,47 @@ class MachineTranslationPolicyModel(base_models.BaseModel):
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
                 'language_to_provider_mapping': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+            },
+        )
+
+
+class FeaturedTranslationLanguagesModel(base_models.BaseModel):
+    """Singleton model storing the featured ('Most needed') translation
+    languages shown on the Contributor Dashboard translation tab.
+
+    There should be exactly one instance of this model, identified by
+    FEATURED_TRANSLATION_LANGUAGES_MODEL_ID.
+    """
+
+    # A list of dicts, each of the form:
+    #   {'language_code': str, 'explanation': str}.
+    # List order is significant: it is the display order of the featured
+    # ('Most needed') languages on the Contributor Dashboard.
+    featured_translation_languages = datastore_services.JsonProperty(
+        required=True, default=[]
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'featured_translation_languages': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
             },

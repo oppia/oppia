@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.domain import exp_domain, translation_domain, translation_fetchers
 from core.platform import models
 
@@ -483,5 +484,80 @@ def save_machine_translation_provider_mapping(
         )
     else:
         model.language_to_provider_mapping = language_to_provider_mapping
+    model.update_timestamps()
+    model.put()
+
+
+def get_featured_translation_languages() -> (
+    List[translation_domain.FeaturedTranslationLanguageDict]
+):
+    """Returns the configured featured ('Most needed') translation languages.
+
+    Falls back to the initial default configuration defined in
+    constants.FEATURED_TRANSLATION_LANGUAGES when no configuration row exists
+    yet (e.g. fresh installations, or environments where an admin has not yet
+    saved a configuration). Once an admin saves, the datastore row is the
+    source of truth and this default is no longer consulted.
+
+    Returns:
+        list(FeaturedTranslationLanguageDict). The ordered list of featured
+        translation languages.
+    """
+    model = translation_models.FeaturedTranslationLanguagesModel.get(
+        translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+        strict=False,
+    )
+    if model is None:
+        return [
+            {
+                'language_code': language['language_code'],
+                'explanation': language['explanation'],
+            }
+            for language in constants.FEATURED_TRANSLATION_LANGUAGES
+        ]
+    # Here we use cast because JsonProperty returns Any at the type-checking
+    # level, but we know the stored value is always a list of
+    # FeaturedTranslationLanguageDict. Returned as-is (no defensive copy) to
+    # match get_machine_translation_provider_mapping.
+    return cast(
+        List[translation_domain.FeaturedTranslationLanguageDict],
+        model.featured_translation_languages,
+    )
+
+
+def save_featured_translation_languages(
+    featured_translation_languages: List[
+        translation_domain.FeaturedTranslationLanguageDict
+    ],
+) -> None:
+    """Validates and saves the featured translation languages configuration.
+
+    Args:
+        featured_translation_languages: list(FeaturedTranslationLanguageDict).
+            The new ordered list of featured translation languages.
+
+    Raises:
+        utils.ValidationError. The provided configuration is invalid (e.g.
+            unsupported language code, duplicate language, or empty
+            explanation).
+    """
+    featured_languages_domain_object = (
+        translation_domain.FeaturedTranslationLanguages(
+            featured_translation_languages
+        )
+    )
+    featured_languages_domain_object.validate()
+
+    model = translation_models.FeaturedTranslationLanguagesModel.get(
+        translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+        strict=False,
+    )
+    if model is None:
+        model = translation_models.FeaturedTranslationLanguagesModel(
+            id=translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+            featured_translation_languages=featured_translation_languages,
+        )
+    else:
+        model.featured_translation_languages = featured_translation_languages
     model.update_timestamps()
     model.put()

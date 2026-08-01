@@ -579,6 +579,56 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         )
 
 
+class FeaturedTranslationLanguagesModelTests(test_utils.GenericTestBase):
+    """Tests for the FeaturedTranslationLanguagesModel class."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            translation_models.FeaturedTranslationLanguagesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            translation_models.FeaturedTranslationLanguagesModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'featured_translation_languages': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
+        }
+        self.assertEqual(
+            translation_models.FeaturedTranslationLanguagesModel.get_export_policy(),
+            expected_export_policy_dict,
+        )
+
+    def test_create_and_retrieve_singleton(self) -> None:
+        model = translation_models.FeaturedTranslationLanguagesModel(
+            id=translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+            featured_translation_languages=[
+                {'language_code': 'hi', 'explanation': 'High demand'}
+            ],
+        )
+        model.update_timestamps()
+        model.put()
+
+        retrieved_model = (
+            translation_models.FeaturedTranslationLanguagesModel.get(
+                translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID
+            )
+        )
+        self.assertEqual(
+            retrieved_model.featured_translation_languages,
+            [{'language_code': 'hi', 'explanation': 'High demand'}],
+        )
+
+
 class MachineTranslationPolicyModelTests(test_utils.GenericTestBase):
     """Tests for the MachineTranslationPolicyModel."""
 

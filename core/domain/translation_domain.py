@@ -818,6 +818,95 @@ class MachineTranslation:
         }
 
 
+class FeaturedTranslationLanguageDict(TypedDict):
+    """Dictionary representing a single featured translation language."""
+
+    language_code: str
+    explanation: str
+
+
+class FeaturedTranslationLanguages:
+    """Domain object representing the ordered list of featured ('Most needed')
+    translation languages shown on the Contributor Dashboard.
+    """
+
+    def __init__(
+        self,
+        featured_translation_languages: List[FeaturedTranslationLanguageDict],
+    ) -> None:
+        """Initializes a FeaturedTranslationLanguages instance.
+
+        Args:
+            featured_translation_languages: list(FeaturedTranslationLanguageDict).
+                The ordered list of featured translation languages, each a dict
+                with keys 'language_code' and 'explanation'.
+        """
+        self.featured_translation_languages = featured_translation_languages
+
+    def validate(self) -> None:
+        """Validates the FeaturedTranslationLanguages domain object.
+
+        Raises:
+            utils.ValidationError. The value is not a list.
+            utils.ValidationError. An entry is not a dict.
+            utils.ValidationError. An entry is missing 'language_code' or
+                'explanation'.
+            utils.ValidationError. A language code is not a supported
+                audio/voiceover language code.
+            utils.ValidationError. A language code appears more than once.
+            utils.ValidationError. An explanation is missing, empty, or
+                whitespace-only.
+        """
+        if not isinstance(self.featured_translation_languages, list):
+            raise utils.ValidationError(
+                'Expected featured_translation_languages to be a list, '
+                'received: %s' % self.featured_translation_languages
+            )
+
+        # Featured translation languages are drawn from the same set as
+        # voiceover/audio languages (mirrors WrittenTranslations.validate()).
+        allowed_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+
+        seen_language_codes: List[str] = []
+        for featured_language in self.featured_translation_languages:
+            if not isinstance(featured_language, dict):
+                raise utils.ValidationError(
+                    'Expected each featured language to be a dict, '
+                    'received: %s' % featured_language
+                )
+
+            if (
+                'language_code' not in featured_language
+                or 'explanation' not in featured_language
+            ):
+                raise utils.ValidationError(
+                    'Each featured language must contain \'language_code\' '
+                    'and \'explanation\'.'
+                )
+
+            language_code = featured_language['language_code']
+            explanation = featured_language['explanation']
+
+            if language_code not in allowed_language_codes:
+                raise utils.ValidationError(
+                    'Invalid language code: %s' % language_code
+                )
+
+            if language_code in seen_language_codes:
+                raise utils.ValidationError(
+                    'Duplicate language code: %s' % language_code
+                )
+            seen_language_codes.append(language_code)
+
+            if not isinstance(explanation, str) or not explanation.strip():
+                raise utils.ValidationError(
+                    'Expected a non-empty explanation for language %s.'
+                    % language_code
+                )
+
+
 # WrittenTrasnlation and WrittenTranslations class is still used in topic and
 # subtopic entity and will be removed from here as well once Topic and subtopic
 # will also support translation feature.
