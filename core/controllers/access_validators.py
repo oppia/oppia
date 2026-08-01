@@ -441,17 +441,26 @@ class PracticeSessionAccessValidationPage(
     def _validate_arc_id(self, topic: topic_domain.Topic, arc_id: str) -> None:
         """Validates that the given arc ID exists in the first story.
 
-        The arc_id parameter is a 1-based index that maps to the nth arc
-        in the first published story of the topic.
+        The arc_id parameter maps to an arc by its 1-based position among the
+        arcs of the first published story (e.g., '1' maps to the first arc)
+        or by its full ID (e.g., 'default_arc' maps to the arc whose id is
+        'default_arc').
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The arc index (e.g., '1') to validate.
+            arc_id: str. The 1-based arc position or full arc ID to validate.
 
         Raises:
             NotFoundException. The arc ID was not found.
         """
         all_arcs = self._get_all_arcs_for_topic(topic)
+        if arc_id.isdigit():
+            arc_index = int(arc_id)
+            if 1 <= arc_index <= len(all_arcs):
+                return
+            raise self.NotFoundException(
+                'Arc with id %s is not part of this topic.' % arc_id
+            )
         valid_indices = {arc.id.replace('arc_', '') for arc in all_arcs}
         if arc_id not in valid_indices:
             raise self.NotFoundException(
