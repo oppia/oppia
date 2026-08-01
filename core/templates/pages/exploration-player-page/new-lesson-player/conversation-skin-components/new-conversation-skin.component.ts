@@ -71,7 +71,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
   selector: 'oppia-new-conversation-skin',
   templateUrl: './new-conversation-skin.component.html',
   styleUrls: ['./new-conversation-skin.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  // encapsulation: ViewEncapsulation.None,
 })
 export class NewConversationSkinComponent {
   // This throws "Type 'QuestionPlayerConfig' is not assignable to type 'QuestionPlayerConfigDict'".

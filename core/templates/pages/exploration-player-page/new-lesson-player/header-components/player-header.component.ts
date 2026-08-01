@@ -42,7 +42,7 @@ enum PageContextConstants {
   selector: 'oppia-player-header',
   templateUrl: './player-header.component.html',
   styleUrls: ['./player-header.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  // encapsulation: ViewEncapsulation.None,
 })
 export class PlayerHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks

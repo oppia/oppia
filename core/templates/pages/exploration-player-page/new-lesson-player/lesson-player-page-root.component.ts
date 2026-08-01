@@ -21,6 +21,6 @@ import {Component, ViewEncapsulation} from '@angular/core';
 @Component({
   selector: 'oppia-new-lesson-player-page-root',
   templateUrl: './lesson-player-page-root.component.html',
-  encapsulation: ViewEncapsulation.None,
+  // encapsulation: ViewEncapsulation.None,
 })
 export class NewLessonPlayerPageRootComponent {}

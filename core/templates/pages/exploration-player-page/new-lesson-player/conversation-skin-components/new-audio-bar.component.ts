@@ -42,7 +42,7 @@ import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-m
   selector: 'oppia-new-audio-bar',
   templateUrl: './new-audio-bar.component.html',
   styleUrls: ['./new-audio-bar.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  // encapsulation: ViewEncapsulation.None,
 })
 export class NewAudioBarComponent {
   @ViewChild('audioControls', {static: false}) audioControlsRef!: ElementRef;

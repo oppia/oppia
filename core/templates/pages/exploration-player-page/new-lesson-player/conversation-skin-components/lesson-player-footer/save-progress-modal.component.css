@@ -4,11 +4,11 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-oppia-save-progress-modal .new-save-progress-menu {
+.new-save-progress-menu {
   padding: 16px;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .checkpoint-status {
+.new-save-progress-menu .checkpoint-status {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -17,7 +17,7 @@ oppia-save-progress-modal .new-save-progress-menu .checkpoint-status {
   width: 100%;
 }
 
-oppia-save-progress-modal .new-save-progress-menu h3 {
+.new-save-progress-menu h3 {
   color: #00645c;
   font-family: capriola, sans-serif;
   font-size: 20px;
@@ -25,7 +25,7 @@ oppia-save-progress-modal .new-save-progress-menu h3 {
   text-align: center;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .sign-in-box {
+.new-save-progress-menu .sign-in-box {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -34,16 +34,16 @@ oppia-save-progress-modal .new-save-progress-menu .sign-in-box {
   width: 100%;
 }
 
-oppia-save-progress-modal.new-save-progress-menu .sign-in-box p {
+.new-save-progress-menu .sign-in-box p {
   margin: 10px 20px;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .sign-in-box .sign-in-text a {
+.new-save-progress-menu .sign-in-box .sign-in-text a {
   color: #00645c;
   text-decoration: underline;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .sign-in-box .create-account-btn {
+.new-save-progress-menu .sign-in-box .create-account-btn {
   background-color: #00645c;
   color: #fff;
   cursor: pointer;
@@ -55,7 +55,7 @@ oppia-save-progress-modal .new-save-progress-menu .sign-in-box .create-account-b
   width: 169px;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .uid-box {
+.new-save-progress-menu .uid-box {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -63,11 +63,11 @@ oppia-save-progress-modal .new-save-progress-menu .uid-box {
   width: 100%;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .uid-box .oppia-tooltip-container {
+.new-save-progress-menu .uid-box .oppia-tooltip-container {
   width: 100%;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .uid-box .guide-text {
+.new-save-progress-menu .uid-box .guide-text {
   margin-top: 32px;
   text-align: center;
 }
@@ -80,7 +80,7 @@ oppia-save-progress-modal .new-save-progress-menu .uid-box .copy-text {
   width: 100%;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .save-progress-close-button {
+.new-save-progress-menu .save-progress-close-button {
   background: transparent;
   border: none;
   outline: none;

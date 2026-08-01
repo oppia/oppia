@@ -44,7 +44,7 @@ import {ConversationFlowService} from 'pages/exploration-player-page/services/co
   selector: 'oppia-supplemental-card',
   templateUrl: './supplemental-card.component.html',
   styleUrls: ['./supplemental-card.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  // encapsulation: ViewEncapsulation.None,
 })
 export class SupplementalCardComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

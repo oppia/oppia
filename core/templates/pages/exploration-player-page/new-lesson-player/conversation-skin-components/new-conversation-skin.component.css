@@ -18,7 +18,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   z-index: 16;
 }
 
-oppia-new-conversation-skin .new-supplemental-card-parent-container {
+.new-supplemental-card-parent-container {
   min-width: 50%;
 }
 
@@ -97,7 +97,7 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   width: 40vw;
 }
 
-oppia-new-conversation-skin .oppia-new-button-raised.mat-raised-raised {
+.oppia-new-button-raised.mat-raised-raised {
   align-items: center;
   background-color: #0d48a1;
   display: flex;
@@ -106,7 +106,7 @@ oppia-new-conversation-skin .oppia-new-button-raised.mat-raised-raised {
   width: 32px;
 }
 
-oppia-new-conversation-skin .oppia-button-icon {
+.oppia-button-icon {
   color: #fff;
 }
 

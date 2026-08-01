@@ -7,12 +7,12 @@ oppia-new-ratings-and-recommendations .oppia-sign-up-button {
   width: 154px;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-final-summary {
+.conversation-skin-final-summary {
   margin-bottom: 25px;
   margin-top: 20px;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-header {
+.conversation-skin-final-ratings-header {
   color: #333;
   font-family: 'Capriola', Arial, sans-serif;
   font-size: 20px;
@@ -21,28 +21,28 @@ oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-header {
   text-align: center;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-final-ratings {
+.conversation-skin-final-ratings {
   margin: 0 auto 60px;
   text-align: center;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-display {
+.conversation-skin-final-ratings-display {
   color: #064b46;
   letter-spacing: 10px;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-final-recommendations-header {
+.conversation-skin-final-recommendations-header {
   color: #333;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
   font-weight: 400;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-final-recommendations-header-container {
+.conversation-skin-final-recommendations-header-container {
   text-align: center;
 }
 
-oppia-new-ratings-and-recommendations .conversation-skin-recommended-activities-container {
+.conversation-skin-recommended-activities-container {
   padding-top: 10px;
 }
 
@@ -104,7 +104,7 @@ oppia-new-ratings-and-recommendations .conversation-skin-login-secondary-options
   font-size: 0.8em;
 }
 
-oppia-new-ratings-and-recommendations .ratings-and-recommendations-exp-summary-tiles-container {
+.ratings-and-recommendations-exp-summary-tiles-container {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -114,7 +114,7 @@ oppia-new-ratings-and-recommendations .ratings-and-recommendations-exp-summary-t
   padding-top: 24px;
 }
 
-oppia-new-ratings-and-recommendations .community-library-btn {
+.community-library-btn {
   align-items: center;
   background-color: #e8f1f0;
   border: 1px solid #00645c;
@@ -132,17 +132,17 @@ oppia-new-ratings-and-recommendations .community-library-btn {
   width: 325px;
 }
 
-oppia-new-ratings-and-recommendations a:hover {
+a:hover {
   text-decoration: none;
 }
 
-oppia-new-ratings-and-recommendations .community-library-btn i {
+.community-library-btn i {
   font-size: 24px;
   margin-right: 10px;
 }
 
 @media screen and (max-width: 959px) {
-  oppia-new-ratings-and-recommendations .conversation-skin-final-summary {
+  .conversation-skin-final-summary {
     margin: 0 auto;
     max-width: 650px;
     width: 100%;
@@ -150,12 +150,12 @@ oppia-new-ratings-and-recommendations .community-library-btn i {
 }
 
 @media (max-width: 480px) {
-  oppia-new-ratings-and-recommendations .community-library-btn {
+  .community-library-btn {
     font-size: 13px;
     width: 240px;
   }
 
-  oppia-new-ratings-and-recommendations .community-library-btn i {
+  .community-library-btn i {
     font-size: 18px;
   }
 }

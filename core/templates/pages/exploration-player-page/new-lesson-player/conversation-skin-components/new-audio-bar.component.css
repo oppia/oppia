@@ -77,7 +77,7 @@ oppia-new-audio-bar .mat-slider-wrapper {
   position: static;
 }
 
-oppia-new-audio-bar .mobile-mode {
+.mobile-mode {
   display: none;
 }
 
