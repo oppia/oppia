@@ -25,6 +25,7 @@ import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
 import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
 import {LoggedInUser, LoggedInUserFactory} from '../user/logged-in-user';
+import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
 import {
   ExplorationEditor,
   ExplorationEditorFactory,
@@ -50,6 +51,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
@@ -84,7 +86,7 @@ type BasicRolesUser = LoggedOutUser &
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: SuperAdmin | null = null;
+let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -254,7 +256,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin> {
+  ): Promise<SuperAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -267,6 +269,7 @@ export class UserFactory {
 
     superAdminInstance = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
+      VoiceoverAdminFactory(user.page),
     ]);
 
     showMessage('Super admin created successfully.');
@@ -288,9 +291,7 @@ export class UserFactory {
     });
     const page = await context.newPage();
 
-    let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
-      LoggedOutUserFactory(page),
-    ]);
+    let user = new LoggedOutUser(page);
 
     await page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();

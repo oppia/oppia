@@ -2548,6 +2548,78 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT
         )
 
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                param_list.ParamName.EMAIL_FOOTER,
+                'You can change your email preferences via the '
+                '<a href="LINK_TO_PREFERENCES_PAGE">'
+                'Preferences</a> page.',
+            ),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
+            (
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com',
+            ),
+            (
+                param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'https://www.oppia.org',
+            ),
+        ]
+    )
+    def test_flag_exploration_email_replaces_preferences_link(self) -> None:
+        """Tests that the email footer preferences link is rendered."""
+        email_manager.send_flag_exploration_email(
+            self.exploration.title,
+            self.exploration.id,
+            self.new_user_id,
+            self.report_text,
+        )
+
+        messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertIn(
+            'href="https://www.oppia.org/preferences"',
+            messages[0].html,
+        )
+        self.assertNotIn(
+            'LINK_TO_PREFERENCES_PAGE',
+            messages[0].html,
+        )
+
+
+class RenderedEmailFooterTest(test_utils.GenericTestBase):
+    """Tests the email-footer rendering helper."""
+
+    @test_utils.set_platform_parameters(
+        [
+            (
+                param_list.ParamName.EMAIL_FOOTER,
+                'You can change your email preferences via the '
+                '<a href="https://custom.example/account/preferences">'
+                'Preferences</a> page.',
+            ),
+        ]
+    )
+    def test_preserves_custom_footer_without_placeholder(self) -> None:
+        """Tests that a custom footer is returned unchanged."""
+        footer = email_manager.get_rendered_email_footer()
+        self.assertEqual(
+            footer,
+            'You can change your email preferences via the '
+            '<a href="https://custom.example/account/preferences">'
+            'Preferences</a> page.',
+        )
+
 
 class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent while onboarding reviewers."""

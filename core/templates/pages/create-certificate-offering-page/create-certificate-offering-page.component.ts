@@ -43,6 +43,7 @@ import './create-certificate-offering-page.component.css';
 @Component({
   selector: 'oppia-create-certificate-offering-page',
   templateUrl: './create-certificate-offering-page.component.html',
+  styleUrls: ['./create-certificate-offering-page.component.css'],
 })
 export class CreateCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
@@ -109,6 +110,8 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
       );
       modalRef.componentInstance.action =
         CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
+      modalRef.componentInstance.currentAsyncStatus =
+        this.certificateAssessmentOffering.asyncStatus;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
@@ -179,6 +182,6 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
   }
 
   private navigateToCertificateOfferingDashboard(): void {
-    this.router.navigate(['/certificate-offering-dashboard']);
+    this.router.navigate(['/certificate-creator-dashboard']);
   }
 }
