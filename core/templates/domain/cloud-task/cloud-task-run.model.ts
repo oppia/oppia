@@ -120,6 +120,13 @@ export class CloudTaskRun {
     return this.matIcon.color;
   }
 
+  getLanguageAccents(): string {
+    return (
+      this.additionalContextualInformation?.language_accents ||
+      'No language accents available'
+    );
+  }
+
   getEventName(): string {
     const additionalContextualInformation =
       this.additionalContextualInformation || {};
@@ -135,7 +142,7 @@ export class CloudTaskRun {
       this.functionId === 'regenerate_voiceovers_on_exploration_update' &&
       isAdditionalContextProvided
     ) {
-      return `Content updated for Exploration ("${additionalContextualInformation.exploration_title}")`;
+      return `Voiceovers regenerated for "${additionalContextualInformation.exploration_title}" due to content being updated`;
     }
 
     if (
@@ -149,7 +156,7 @@ export class CloudTaskRun {
         'regenerate_voiceovers_on_exploration_added_to_topic' &&
       isAdditionalContextProvided
     ) {
-      return `Exploration ("${additionalContextualInformation.exploration_title}") added to topic ("${additionalContextualInformation.topic_name}")`;
+      return `All voiceovers generated for "${additionalContextualInformation.exploration_title}" because it was added to topic "${additionalContextualInformation.topic_name}"`;
     }
 
     if (
@@ -163,7 +170,7 @@ export class CloudTaskRun {
         'regenerate_voiceovers_of_exploration_for_given_language_accent' &&
       isAdditionalContextProvided
     ) {
-      return `Voiceover admin regenerated voiceovers for Exploration ("${additionalContextualInformation.exploration_title}") in ${additionalContextualInformation.language_accent} accent`;
+      return `All voiceovers regenerated for "${additionalContextualInformation.exploration_title}" by voiceover admin`;
     }
 
     if (
@@ -175,7 +182,7 @@ export class CloudTaskRun {
       this.functionId === 'regenerate_voiceovers_after_accepting_suggestion' &&
       isAdditionalContextProvided
     ) {
-      return `Translation suggestion accepted for Exploration ("${additionalContextualInformation.exploration_title}") for language ${additionalContextualInformation.language}`;
+      return `Voiceover generated for "${additionalContextualInformation.exploration_title}" because translation suggestion was accepted`;
     }
     return '';
   }

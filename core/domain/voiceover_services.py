@@ -1004,6 +1004,8 @@ def regenerate_voiceovers_for_given_contents(
     # support autogeneration.
     language_code_to_autogeneratable_accent_codes = {}
 
+    language_accent_codes_for_voiceover_regenerations = []
+
     # Retrieve all Oppia-supported language accents, grouped by language code,
     # for which voiceovers need to be regenerated for the given contents.
     for language_code in language_codes:
@@ -1029,6 +1031,23 @@ def regenerate_voiceovers_for_given_contents(
         task_run_id,
         language_code_to_contents_mapping,
         language_code_to_autogeneratable_accent_codes,
+    )
+
+    language_accent_codes_to_descriptions = (
+        get_language_accent_codes_to_descriptions()
+    )
+
+    for (
+        language_code,
+        accent_codes,
+    ) in language_code_to_autogeneratable_accent_codes.items():
+        for accent_code in accent_codes:
+            language_accent_codes_for_voiceover_regenerations.append(
+                language_accent_codes_to_descriptions[accent_code]
+            )
+
+    additional_contextual_information['language_accents'] = ', '.join(
+        language_accent_codes_for_voiceover_regenerations
     )
 
     # Ruling out the possibility of None for mypy type checking.

@@ -244,7 +244,17 @@
 
       <ng-container matColumnDef="functionID">
         <th mat-header-cell *matHeaderCellDef> Event </th>
-        <td mat-cell *matCellDef="let element" class="task-run-data"> {{element.getEventName()}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.getEventName()}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="languageAccents">
+        <th mat-header-cell *matHeaderCellDef>Language Accents</th>
+
+        <td mat-cell *matCellDef="let element" class="task-run-data metadata-alignment language-accent-cell">
+          <div *ngFor="let accent of element.getLanguageAccents().split(',')">
+            {{ accent.trim() }}
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="numberOfRetries">
@@ -282,6 +292,12 @@
 </div>
 
 <style>
+  .language-accent-cell {
+    min-width: 170px;
+  }
+  .task-run-data {
+    white-space: pre-line;
+  }
   .metadata-alignment {
     text-align: center;
   }
