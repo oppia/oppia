@@ -120,7 +120,6 @@ core/templates/pages/topics-and-skills-dashboard-page/topic-selector/select-topi
 core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.component.ts
 core/templates/pages/topics-and-skills-dashboard-page/topics-list/topics-list.component.ts
 core/templates/pages/volunteer-page/volunteer-page.component.ts
-core/templates/services/rte-helper-modal.component.ts
 extensions/interactions/CodeRepl/directives/oppia-short-response-code-repl.component.ts
 extensions/interactions/GraphInput/directives/graph-viz.component.ts
 extensions/interactions/GraphInput/directives/oppia-response-graph-input.component.ts
