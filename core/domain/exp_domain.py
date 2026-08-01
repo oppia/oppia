@@ -3694,14 +3694,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             choice_translations = state_dict['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'
-            ][content_id]
+            ][
+                content_id
+            ]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
             choice_voiceovers = state_dict['recorded_voiceovers'][  # type: ignore[typeddict-item]
                 'voiceovers_mapping'
-            ][content_id]
+            ][
+                content_id
+            ]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
 
@@ -3982,14 +3986,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             continue_button_translations = state_dict['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'
-            ][content_id]
+            ][
+                content_id
+            ]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
             choice_voiceovers = state_dict['recorded_voiceovers'][  # type: ignore[typeddict-item]
                 'voiceovers_mapping'
-            ][content_id]
+            ][
+                content_id
+            ]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
 
