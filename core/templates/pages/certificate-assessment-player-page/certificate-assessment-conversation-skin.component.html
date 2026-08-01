@@ -1,9 +1,11 @@
 <div class="certificate-assessment-conversation-skin">
 
   <div class="oppia-question-player-card certificate-assessment-progress-card">
-    <oppia-progress-bar class="certificate-assessment-progress-bar"
-                        [progressPercentage]="progressPercentage">
-    </oppia-progress-bar>
+    <div class="certificate-assessment-question-player-progress">
+      <div class="certificate-assessment-progress-fill"
+           [ngStyle]="{'width': progressPercentage + '%'}">
+      </div>
+    </div>
     <div class="certificate-assessment-progress-meta">
       <span class="certificate-assessment-current-progress">
         {{
@@ -50,7 +52,7 @@
       <label class="certificate-assessment-free-response-label"
              [for]="'certificate-assessment-free-response-input-' + currentQuestion.id"
       >
-        Your answer
+        {{ 'I18N_CERTIFICATE_ASSESSMENT_CONVERSATION_SKIN_YOUR_ANSWER' | translate }}
       </label>
       <input
              [id]="'certificate-assessment-free-response-input-' + currentQuestion.id"
