@@ -50,10 +50,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'math',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 0,
                 },
                 {
                   classroom_id: 'science',
@@ -61,10 +59,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'science',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 1,
                 },
               ]),
           },
@@ -89,6 +85,28 @@ describe('Certificate Offering Details Component', () => {
       ['Math', 'Science']
     );
     expect(component.classroomLoadErrorMessage).toEqual('');
+  });
+
+  it('should capitalize classroom names in the dropdown', async () => {
+    component.classroomOptions = [
+      {
+        classroom_id: 'math',
+        name: 'math classroom',
+        url_fragment: 'math',
+        teaser_text: '',
+        is_published: true,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+      },
+    ];
+
+    fixture.detectChanges();
+
+    const optionText = fixture.nativeElement
+      .querySelectorAll('select option')[1]
+      .textContent.trim();
+
+    expect(optionText).toEqual('Math Classroom');
   });
 
   it('should show an error message when loading classrooms fails', fakeAsync(() => {
@@ -159,6 +177,7 @@ describe('Certificate Offering Details Component', () => {
         title: 'Loaded title',
         description: 'Loaded description',
         classroom_id: 'science',
+        topic_ids: [],
         topic_data: {},
         demonstrates: ['Loaded outcome'],
         total_questions: 6,
@@ -244,7 +263,7 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should validate the form only when required fields are present', () => {
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
 
     component.title = 'Certificate title';
     component.description = 'Certificate description';
@@ -253,20 +272,20 @@ describe('Certificate Offering Details Component', () => {
     component.totalQuestions = 5;
     component.demonstratesList = ['Learn math'];
 
-    expect(component.isFormValid()).toBeTrue();
+    expect(component.isFormValid()).toBe(true);
   });
 
   it('should disable the next button when numeric values exceed limits', () => {
     component.title = 'Certificate title';
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.timeLimitInMinutes = 4;
+    component.totalQuestions = 2;
     component.demonstratesList = ['Learn math'];
 
-    expect(component.isTimeLimitInvalid()).toBeTrue();
-    expect(component.isTotalQuestionsInvalid()).toBeTrue();
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isTimeLimitInvalid()).toBe(true);
+    expect(component.isTotalQuestionsInvalid()).toBe(true);
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should return an empty classroom name when the classroom is not found', () => {
@@ -276,16 +295,16 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should mark time limit and question count as invalid when out of range', () => {
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.timeLimitInMinutes = 4;
+    component.totalQuestions = 2;
 
     expect(component.getTimeLimitValidationError()).toContain(
-      'at most 60 minutes'
+      'at least 5 minutes'
     );
     expect(component.getTotalQuestionsValidationError()).toContain(
-      'at most 50'
+      'at least 3'
     );
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should not show threshold errors for empty numeric fields', () => {
@@ -299,7 +318,7 @@ describe('Certificate Offering Details Component', () => {
 
     expect(component.getTimeLimitValidationError()).toEqual('');
     expect(component.getTotalQuestionsValidationError()).toEqual('');
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should not emit events when the form is invalid', () => {
@@ -423,6 +442,25 @@ describe('Certificate Offering Details Component', () => {
 
     expect(component.getClassroomValidationError()).toEqual('');
   });
+
+  it('should set loading state while classrooms are fetched', fakeAsync(() => {
+    let resolveClassrooms: (value: never[]) => void = () => {};
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveClassrooms = resolve;
+      })
+    );
+
+    void component.loadClassrooms();
+    expect(component.isLoadingClassrooms).toBe(true);
+    resolveClassrooms([]);
+    flushMicrotasks();
+
+    expect(component.isLoadingClassrooms).toBe(false);
+  }));
 
   it('should return a demonstrates validation error when outcomes exceed the limit', () => {
     component.demonstratesList = ['a'.repeat(201)];

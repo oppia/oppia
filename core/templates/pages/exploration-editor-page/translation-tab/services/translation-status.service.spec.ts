@@ -34,6 +34,7 @@ import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 
 class MockNgbModal {
   open() {
@@ -70,7 +71,7 @@ describe('Translation status service', () => {
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
-  let statesWithAudioDict = null;
+  let statesWithAudioDict: StateObjectsBackendDict = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -353,15 +354,6 @@ describe('Translation status service', () => {
     entityVoiceoversService.setActiveLanguageAccentCode('en-US');
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
     tss.refresh();
-  });
-
-  it('should initialize service properly', () => {
-    tss.ngOnInit();
-
-    expect(tss.explorationVoiceoverContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentNotAvailableCount).toEqual(0);
-    expect(tss.explorationTranslationContentRequiredCount).toEqual(0);
-    expect(tss.explorationVoiceoverContentRequiredCount).toEqual(0);
   });
 
   it(
@@ -837,5 +829,50 @@ describe('Translation status service', () => {
     expect(tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()).toBe(
       true
     );
+  });
+});
+
+describe('Translation status service - initialization', () => {
+  let tss: TranslationStatusService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TranslationStatusService,
+        TranslationLanguageService,
+        TranslationTabActiveModeService,
+        ExplorationStatesService,
+        GenerateContentIdService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            },
+          },
+        },
+      ],
+    });
+
+    tss = TestBed.inject(TranslationStatusService);
+  });
+
+  it('should initialize properties correctly on construction', () => {
+    expect(tss.stateNeedsUpdateWarnings).toEqual({});
+    expect(tss.stateWiseStatusColor).toEqual({});
+    expect(tss.explorationTranslationContentRequiredCount).toBe(0);
+    expect(tss.explorationVoiceoverContentRequiredCount).toBe(0);
+    expect(tss.explorationTranslationContentNotAvailableCount).toBe(0);
+    expect(tss.explorationVoiceoverContentNotAvailableCount).toBe(0);
   });
 });

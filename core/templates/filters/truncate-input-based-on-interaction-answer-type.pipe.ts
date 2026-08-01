@@ -37,7 +37,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
 
   transform(
     input: InteractionAnswer,
-    interactionId: string,
+    interactionId: InteractionSpecsKey,
     length: number
   ): string {
     let answerType =
