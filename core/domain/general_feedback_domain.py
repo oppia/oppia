@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, TypedDict
 
+from core import feconf
+
 
 class LessonMetadataDict(TypedDict):
     """Lesson metadata captured when lesson feedback is submitted.
@@ -254,7 +256,9 @@ class PlatformFeedback:
         self.lesson_metadata = lesson_metadata
         self.include_technical_logs = include_technical_logs
         self.session_info = (
-            session_info if destination_dashboard != 'curriculum' else None
+            session_info
+            if destination_dashboard != feconf.DESTINATION_CURRICULUM
+            else None
         )
         self.screenshot_filename = screenshot_filename
         self.screenshot_entity_id = screenshot_entity_id
@@ -279,7 +283,7 @@ class PlatformFeedback:
             'include_technical_logs': self.include_technical_logs,
             'session_info': (
                 self.session_info
-                if self.destination_dashboard != 'curriculum'
+                if self.destination_dashboard != feconf.DESTINATION_CURRICULUM
                 else None
             ),
             'screenshot_filename': self.screenshot_filename,
