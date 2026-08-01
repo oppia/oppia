@@ -583,22 +583,29 @@ def _check_if_usernames_are_valid(
             + f'duplicates: {duplicates}.'
         )
 
-    filters = [
-        user_models.UserSettingsModel.username == username
+    normalized_member_usernames = [
+        user_domain.UserSettings.normalize_username(username)
         for username in member_usernames
+    ]
+    filters = [
+        user_models.UserSettingsModel.normalized_username == normalized_username
+        for normalized_username in normalized_member_usernames
     ]
     existing_users_settings: Sequence[user_models.UserSettingsModel] = (
         user_models.UserSettingsModel.query(
             datastore_services.any_of(*filters)
         ).fetch()
     )
-    existing_members_usernames = [
-        user_settings.username for user_settings in existing_users_settings
+    existing_normalized_usernames = [
+        user_settings.normalized_username
+        for user_settings in existing_users_settings
     ]
     invalid_usernames = [
         username
-        for username in member_usernames
-        if username not in existing_members_usernames
+        for username, normalized_username in zip(
+            member_usernames, normalized_member_usernames
+        )
+        if normalized_username not in existing_normalized_usernames
     ]
 
     if len(invalid_usernames) > 0:
