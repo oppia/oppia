@@ -83,6 +83,6 @@ describe('CertificateAssessmentResultCardComponent', () => {
   });
 
   it('should allow retry handling without throwing', () => {
-    expect(() => component.onRetryAssessment()).not.toThrow();
+    expect(() => component.onRetryAssessment()).not.toThrowError();
   });
 });
