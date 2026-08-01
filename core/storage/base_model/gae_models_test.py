@@ -1253,6 +1253,23 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         self.assertIsNotNone(next_cursor)
         self.assertTrue(more)
 
+    def test_fetch_page_returns_no_cursor_when_final_page_is_full(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_2', 'feedback_1'],
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
     def test_fetch_page_accepts_cursor_for_later_page(
         self,
     ) -> None:
