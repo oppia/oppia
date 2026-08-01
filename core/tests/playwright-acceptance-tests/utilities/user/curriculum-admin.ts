@@ -79,6 +79,8 @@ const addDiagnosticTestSkillButton =
   'button.e2e-test-add-diagnostic-test-skill';
 const diagnosticTestSkillSelector =
   'select.e2e-test-diagnostic-test-skill-selector';
+const desktopSkillQuestionTab = '.e2e-test-questions-tab';
+const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
@@ -95,6 +97,8 @@ const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
 const newClassroomNameInputField = '.e2e-test-new-classroom-name';
 const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
+const newClassroomFeedbackRecipientInputField =
+  '.e2e-test-new-classroom-feedback-recipient';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
 
@@ -105,6 +109,8 @@ const editClassroomCourseDetailsInputField =
 const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
 const editClassroomUrlFragmentInputField = '.e2e-update-classroom-url-fragment';
+const editClassroomFeedbackRecipientInputField =
+  '.e2e-update-classroom-feedback-recipient';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer =
@@ -123,6 +129,8 @@ const addTopicFormFieldInput =
   '.mat-select-search-input:not(.mat-select-search-hidden)';
 const createNewTopicButton = '.e2e-test-create-topic-button';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
@@ -173,6 +181,7 @@ const solutionFloatTextField =
   'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
+const addQuestionButton = 'button.e2e-test-create-question-button';
 const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
@@ -566,14 +575,20 @@ export class CurriculumAdmin extends TopicManager {
    * Creates, updates, and publishes a new classroom with a topic.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
    */
   async createAndPublishClassroom(
     classroomName: string,
     urlFragment: string,
-    topicToBeAssigned: string
+    topicToBeAssigned: string,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
-    await this.createNewClassroom(classroomName, urlFragment);
+    await this.createNewClassroom(
+      classroomName,
+      urlFragment,
+      feedbackRecipientEmail
+    );
     await this.updateClassroom(
       classroomName,
       'Welcome to Math classroom!',
@@ -681,16 +696,22 @@ export class CurriculumAdmin extends TopicManager {
    * Function for creating a new classroom.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback recipient email of the classroom.
    */
   async createNewClassroom(
     classroomName: string,
-    urlFragment: string
+    urlFragment: string,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.clickOnElementWithSelector(createNewClassroomButton);
     await this.expectElementToBeVisible(createNewClassroomModal);
     await this.typeInInputField(newClassroomNameInputField, classroomName);
     await this.typeInInputField(newClassroomUrlFragmentInputField, urlFragment);
+    await this.typeInInputField(
+      newClassroomFeedbackRecipientInputField,
+      feedbackRecipientEmail
+    );
     await this.clickOnElementWithSelector(saveNewClassroomButton);
     await this.expectElementToBeVisible(createNewClassroomModal, false);
     showMessage(`Created ${classroomName} classroom.`);
@@ -870,6 +891,20 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOnElementWithSelector(enableDiagnosticTestButton);
+    await this.clickOnElementWithSelector(saveClassroomButton);
+    await this.expectElementToBeVisible(saveClassroomButton, false);
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
+  }
+
+  /**
    * Checks if the classroom contains a topic with the given name.
    * @param {string} topicName The name of the topic to check for.
    * @returns {Promise<ElementHandle<Element>>} A promise that resolves to the ElementHandle
@@ -962,6 +997,42 @@ export class CurriculumAdmin extends TopicManager {
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.goto(editorUrl);
     showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
+   * Navigate to the question editor tab present in the skills tab.
+   */
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
+      } else {
+        hashParts.push('questions');
+      }
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      // Changing only the URL hash triggers a same-document navigation in
+      // the browser (no reload, no re-run of the app's bootstrap code),
+      // so the app never re-evaluates the hash to switch tabs. A full
+      // reload is required to force the app to re-initialize and pick up
+      // the 'questions' tab from the updated hash.
+      await this.reloadPage();
+    } else {
+      await this.expectElementToBeVisible(skillQuestionTab);
+      await this.clickAndWaitForNavigation(skillQuestionTab, true);
+    }
+    await this.expectElementToBeVisible(addQuestionButton);
   }
 
   /**
@@ -1178,6 +1249,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} topicListIntro - The topic list intro of the classroom.
    * @param {string} courseDetails - The course details of the classroom.
    * @param {string} url - The URL of the classroom.
+   * @param {string} feedbackRecipientEmail - The feedback recipient email of the classroom.
    * @param {string} thumbnailImage - The thumbnail image of the classroom.
    * @param {string} bannerImage - The banner image of the classroom.
    */
@@ -1188,7 +1260,8 @@ export class CurriculumAdmin extends TopicManager {
     courseDetails: string,
     url?: string,
     thumbnailImage: string = curriculumAdminThumbnailImage,
-    bannerImage: string = classroomBannerImage
+    bannerImage: string = classroomBannerImage,
+    feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
@@ -1207,6 +1280,12 @@ export class CurriculumAdmin extends TopicManager {
       await this.clearAllTextFrom(editClassroomUrlFragmentInputField);
       await this.typeInInputField(editClassroomUrlFragmentInputField, url);
     }
+
+    await this.clearAllTextFrom(editClassroomFeedbackRecipientInputField);
+    await this.page.type(
+      editClassroomFeedbackRecipientInputField,
+      feedbackRecipientEmail
+    );
 
     await this.clearAllTextFrom(editClassroomTeaserTextInputField);
     await this.typeInInputField(editClassroomTeaserTextInputField, teaserText);
