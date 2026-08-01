@@ -46,6 +46,7 @@ import {
   QuestionCoordinatorStats,
   QuestionReviewerStats,
   QuestionSubmitterStats,
+  TranslationCoordinatorStats,
   TranslationReviewerStats,
   TranslationSubmitterStats,
 } from '../contributor-dashboard-admin-summary.model';
@@ -910,12 +911,47 @@ describe('Contributor stats component', () => {
       component.onItemsPerPageChange('05');
       expect(component.itemsPerPage).toEqual(5);
     }));
+
+    it('should return the translation coordinator stats attributes correctly', fakeAsync(() => {
+      const translationCoordinatorStats = new TranslationCoordinatorStats(
+        'user1',
+        'en',
+        5,
+        3,
+        10
+      );
+      expect(
+        component.getFormattedContributorAttributes(translationCoordinatorStats)
+      ).toEqual([
+        {key: 'Translators', displayText: '5'},
+        {key: 'Reviewers', displayText: '3'},
+      ]);
+    }));
+
+    it('should return no attributes for question coordinators', fakeAsync(() => {
+      const questionCoordinatorStats = new QuestionCoordinatorStats('user1', 5);
+      expect(
+        component.getFormattedContributorAttributes(questionCoordinatorStats)
+      ).toEqual([]);
+    }));
   });
 
   describe('when user navigates to coordinator tabs', () => {
     beforeEach(waitForAsync(() => {
       spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(900);
     }));
+
+    it('should append the chevron column on mobile', () => {
+      spyOn(component, 'isMobileView').and.returnValue(true);
+      component.updateColumns(
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      );
+      expect(component.columnsToDisplay).toEqual([
+        'contributorName',
+        'lastContributedInDays',
+        'chevron',
+      ]);
+    });
 
     it('should map coordinator tabs to the coordinate subtype', () => {
       expect(

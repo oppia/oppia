@@ -357,6 +357,58 @@ describe('Contribution Admin dashboard stats service', () => {
     })
   );
 
+  it('should reject when translation coordinator stats request fails', fakeAsync(() => {
+    const url =
+      '/contributor-dashboard-admin-stats/translation/coordinate' +
+      '?page_size=20&offset=0&language_code=en';
+
+    cdasbas
+      .fetchContributorAdminStats(
+        ContributorAdminDashboardFilter.createDefault(),
+        20,
+        0,
+        AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      )
+      .then(successHandler, failHandler);
+    const req = http.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {error: 'error'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should reject when question coordinator stats request fails', fakeAsync(() => {
+    const url =
+      '/contributor-dashboard-admin-stats/question/coordinate' +
+      '?page_size=20&offset=0&language_code=en';
+
+    cdasbas
+      .fetchContributorAdminStats(
+        ContributorAdminDashboardFilter.createDefault(),
+        20,
+        0,
+        AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_COORDINATE
+      )
+      .then(successHandler, failHandler);
+    const req = http.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {error: 'error'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
   it('should return available question submitter stats', fakeAsync(() => {
     spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
     const url =
