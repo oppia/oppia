@@ -35,9 +35,9 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   // showUnansweredQuestionModal flags are currently initialized with default
   // values. Update these flags based on the appropriate conditions once the
   // logic for determining when the modals should be shown or hidden is
-  // implemented.  showTimeExpiredModel = false;
+  // implemented.
   showUnansweredQuestionModal = false;
-  showTimeExpiredModel = false;
+  showTimeExpiredModal = false;
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {

@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for CertificateAssessmentPlayerPageComponent.
  */
 
+import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 
@@ -46,6 +48,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [CertificateAssessmentPlayerPageComponent],
+      imports: [CommonModule],
       providers: [
         {
           provide: ActivatedRoute,
@@ -156,5 +159,36 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.currentQuestionIndex = 1;
 
     expect(component.getCurrentQuestion()).toEqual(component.mockQuestions[1]);
+  });
+
+  it('should hide the modals by default', () => {
+    fixture.detectChanges();
+
+    expect(
+      fixture.debugElement.query(By.css('oppia-time-expired-modal'))
+    ).toBeNull();
+    expect(
+      fixture.debugElement.query(By.css('oppia-unanswered-question-modal'))
+    ).toBeNull();
+  });
+
+  it('should show the time-expired modal when showTimeExpiredModal is true', () => {
+    fixture.detectChanges();
+    component.showTimeExpiredModal = true;
+    fixture.detectChanges();
+
+    expect(
+      fixture.debugElement.query(By.css('oppia-time-expired-modal'))
+    ).toBeTruthy();
+  });
+
+  it('should show the unanswered-question modal when showUnansweredQuestionModal is true', () => {
+    fixture.detectChanges();
+    component.showUnansweredQuestionModal = true;
+    fixture.detectChanges();
+
+    expect(
+      fixture.debugElement.query(By.css('oppia-unanswered-question-modal'))
+    ).toBeTruthy();
   });
 });
