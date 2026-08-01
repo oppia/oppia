@@ -23,9 +23,10 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {ContributorDashboardAdminBackendApiService} from './contributor-dashboard-admin-backend-api.service';
+import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
-describe('Contributor dashboard admin backend api service', () => {
+describe('Contributor dashboard admin backend api cdabas', () => {
   let cdabas: ContributorDashboardAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
@@ -506,6 +507,102 @@ describe('Contributor dashboard admin backend api service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should fetch featured translation languages', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    cdabas
+      .getFeaturedTranslationLanguagesAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/contributor-dashboard-admin-featured-translation-languages'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      featured_translation_languages: [
+        {language_code: 'hi', explanation: 'For India.'},
+      ],
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith([
+      FeaturedTranslationLanguage.createFromBackendDict({
+        language_code: 'hi',
+        explanation: 'For India.',
+      }),
+    ]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should update featured translation languages', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const payload = [{language_code: 'hi', explanation: 'For India.'}];
+
+    cdabas
+      .updateFeaturedTranslationLanguagesAsync(payload)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/contributor-dashboard-admin-featured-translation-languages'
+    );
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({
+      featured_translation_languages: payload,
+    });
+    req.flush({featured_translation_languages: payload});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should reject on error when fetching featured languages', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    cdabas
+      .getFeaturedTranslationLanguagesAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/contributor-dashboard-admin-featured-translation-languages'
+    );
+    req.flush(
+      {error: 'Backend error.'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Backend error.');
+  }));
+
+  it('should reject on error when updating featured languages', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    cdabas
+      .updateFeaturedTranslationLanguagesAsync([
+        {language_code: 'hi', explanation: 'For India.'},
+      ])
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/contributor-dashboard-admin-featured-translation-languages'
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {error: 'Duplicate language code: hi'},
+      {status: 400, statusText: 'Bad Request'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Duplicate language code: hi');
+  }));
 
   it(
     'should add question submitter and reviewer rights given the username ' +

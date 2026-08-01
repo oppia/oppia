@@ -1,0 +1,75 @@
+<div class="card e2e-test-featured-translation-languages-editor">
+  <div class="card-header">
+    Featured Translation Languages
+  </div>
+  <div class="card-body">
+    <p>
+      These languages appear under "Most needed" on the Contributor Dashboard
+      translation tab.
+    </p>
+
+    <div *ngIf="loadingMessage" class="oppia-align-center">
+      <span>{{ loadingMessage }}</span>
+      <loading-dots></loading-dots>
+    </div>
+
+    <div *ngIf="!loadingMessage">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Explanation</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="featuredLanguages.length === 0">
+            <td colspan="3">No featured languages configured.</td>
+          </tr>
+          <tr *ngFor="let language of featuredLanguages; index as i">
+            <td>{{ language.languageCode }}</td>
+            <td>{{ language.explanation }}</td>
+            <td>
+              <button type="button"
+                      class="btn btn-secondary e2e-test-remove-featured-language"
+                      (click)="removeFeaturedLanguage(i)">
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="e2e-test-add-featured-language-row">
+        <label for="featured-language-select">Language</label>
+        <select id="featured-language-select" [(ngModel)]="newLanguageCode">
+          <option value="">Select language</option>
+          <option *ngFor="let option of availableLanguageOptions"
+                  [value]="option.id">
+            {{ option.description }}
+          </option>
+        </select>
+
+        <label for="featured-language-explanation">Explanation</label>
+        <input id="featured-language-explanation"
+               type="text"
+               [(ngModel)]="newExplanation"
+               placeholder="Explanation">
+
+        <button type="button"
+                class="btn btn-secondary e2e-test-add-featured-language"
+                [disabled]="!newLanguageCode || !newExplanation.trim()"
+                (click)="addFeaturedLanguage()">
+          Add language
+        </button>
+      </div>
+
+      <button type="button"
+              class="btn btn-success e2e-test-save-featured-languages"
+              [disabled]="saveInProgress"
+              (click)="saveFeaturedTranslationLanguages()">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

@@ -28,4 +28,6 @@ export const ContributorDashboardAdminPageConstants = {
   COMMUNITY_CONTRIBUTION_STATS_URL: '/community-contribution-stats',
   ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
   DEFAULT_LANGUAGE_FILTER: 'en',
+  FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL:
+    '/contributor-dashboard-admin-featured-translation-languages',
 } as const;

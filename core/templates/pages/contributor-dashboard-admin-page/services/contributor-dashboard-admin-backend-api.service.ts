@@ -23,6 +23,14 @@ import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
 import {AppConstants} from 'app.constants';
+import {
+  FeaturedTranslationLanguage,
+  FeaturedTranslationLanguageBackendDict,
+} from 'domain/opportunity/featured-translation-language.model';
+
+export interface FeaturedTranslationLanguagesBackendResponse {
+  featured_translation_languages: FeaturedTranslationLanguageBackendDict[];
+}
 
 export interface ViewContributionBackendResponse {
   usernames: string[];
@@ -82,6 +90,55 @@ export class ContributorDashboardAdminBackendApiService {
         .then(
           response => {
             resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async getFeaturedTranslationLanguagesAsync(): Promise<
+    FeaturedTranslationLanguage[]
+  > {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<FeaturedTranslationLanguagesBackendResponse>(
+          PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              response.featured_translation_languages.map(backendDict =>
+                FeaturedTranslationLanguage.createFromBackendDict(backendDict)
+              )
+            );
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async updateFeaturedTranslationLanguagesAsync(
+    featuredLanguages: FeaturedTranslationLanguageBackendDict[]
+  ): Promise<FeaturedTranslationLanguage[]> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .put<FeaturedTranslationLanguagesBackendResponse>(
+          PageConstants.FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL,
+          {featured_translation_languages: featuredLanguages}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              response.featured_translation_languages.map(backendDict =>
+                FeaturedTranslationLanguage.createFromBackendDict(backendDict)
+              )
+            );
           },
           errorResponse => {
             reject(errorResponse.error.error);
