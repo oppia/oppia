@@ -165,7 +165,7 @@
                                        multiple="true"
                                        class="mx-2 my-2 tag">
                 <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
-                                   (change)="onTagChange($event.value)"
+                                   (change)="onTagChange(tag)"
                                    [value]="tag"
                                    [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
                 {{ tag }}
@@ -255,7 +255,7 @@
                                    multiple="true"
                                    class="mx-2 my-2 tag">
             <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
-                               (change)="onTagChange($event.value)"
+                               (change)="onTagChange(tag)"
                                [value]="tag"
                                [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
               {{ tag }}

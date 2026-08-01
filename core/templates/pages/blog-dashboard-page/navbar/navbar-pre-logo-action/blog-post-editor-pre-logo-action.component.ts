@@ -47,4 +47,8 @@ export class BlogPostEditorNavbarPreLogoActionComponent
   ngOnDestroy(): void {
     return this.directiveSubscriptions.unsubscribe();
   }
+
+  navigateToMainTab(): void {
+    this.blogDashboardPageService.navigateToMainTab();
+  }
 }
