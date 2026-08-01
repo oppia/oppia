@@ -798,22 +798,16 @@ export class BaseUser {
   }
 
   /**
-   * Gets the trimmed text content of an element.
-   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
+   * Returns text in nested element
+   * @param {string} selector - The selector of the element to get text from.
    */
-  async getTextContent(
-    selector: string | ElementHandle<Element>
-  ): Promise<string> {
-    if (typeof selector === 'string') {
-      const element = await this.page.$(selector);
-      if (!element) {
-        return '';
-      }
-      const text = await this.page.evaluate(el => el.textContent, element);
-      return text?.trim() ?? '';
-    }
-    const text = await selector.evaluate(el => el.textContent);
-    return (text ?? '').trim();
+  async getTextContent(selector: string): Promise<string> {
+    const element = await this.page.$(selector);
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent,
+      element as ElementHandle<Element>
+    );
+    return text?.trim() ?? '';
   }
 
   /**
