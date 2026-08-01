@@ -53,4 +53,20 @@ describe('CertificateAssessmentResultPageRootComponent', () => {
   it('should set the attempt id from the route', () => {
     expect(component.attemptId).toBe('attempt-1');
   });
+
+  it('should fall back to an empty attempt id when the route param is missing', () => {
+    component = new CertificateAssessmentResultPageRootComponent(
+      {} as PageHeadService,
+      {} as TranslateService,
+      {
+        snapshot: {
+          paramMap: {
+            get: () => null,
+          },
+        },
+      } as never
+    );
+
+    expect(component.attemptId).toBe('');
+  });
 });

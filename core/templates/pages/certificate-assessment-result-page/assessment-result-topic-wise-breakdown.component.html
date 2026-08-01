@@ -6,6 +6,7 @@
     <div
       class="topic-row-bar"
       role="progressbar"
+      [attr.aria-label]="topic.topicName"
       [attr.aria-valuenow]="topic.scorePercentage"
       aria-valuemin="0"
       aria-valuemax="100"

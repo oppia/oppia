@@ -58,6 +58,17 @@ describe('CertificateAssessmentResultCardComponent', () => {
     expect(component.passed).toBeFalse();
   });
 
+  it('should return true when the score meets the passing threshold', () => {
+    component.result = {
+      certificateName: 'Test Certificate',
+      scorePercentage: 70,
+      topicBreakdown: [],
+      timeTakenMinutes: 10,
+    };
+
+    expect(component.passed).toBeTrue();
+  });
+
   it('should render the failed certificate image from the mock result', () => {
     fixture.detectChanges();
 

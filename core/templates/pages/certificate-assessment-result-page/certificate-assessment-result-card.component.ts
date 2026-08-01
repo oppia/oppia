@@ -43,8 +43,8 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
   isLoading = true;
 
   ngOnInit(): void {
-    // TODO(#24717-M1.17): Replace with a real call to the assessment result
-    // backend service, keyed on this.attemptId.
+    // TODO(#24717-M1.17): Replace this mock with the real assessment result
+    // backend response keyed on this.attemptId after the API is wired up.
     this.result = this.getMockResult();
     this.isLoading = false;
   }
@@ -57,25 +57,12 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
   }
 
   onRetryAssessment(): void {
-    // TODO(##24717-M1.17): Navigate back into the assessment player.
+    // TODO(#24717-M1.17): Navigate back into the assessment retry flow.
   }
 
-  // Returns mock data for local development.
-  // Swap MOCK_PASSED_RESULT / MOCK_FAILED_RESULT below to preview either
-  // state until the backend endpoint is wired in.
   private getMockResult(): AssessmentResult {
-    const MOCK_PASSED_RESULT: AssessmentResult = {
-      certificateName: 'Everyday Arithmetic & Number Confidence',
-      scorePercentage: 90,
-      topicBreakdown: [
-        {topicName: 'Place Values', scorePercentage: 88},
-        {topicName: 'Addition & Subtraction', scorePercentage: 95},
-        {topicName: 'Multiplication', scorePercentage: 92},
-        {topicName: 'Division', scorePercentage: 85},
-      ],
-      timeTakenMinutes: 58,
-    };
-
+    // Keep a single stub result until the backend endpoint returns persisted
+    // attempt data for this page.
     const MOCK_FAILED_RESULT: AssessmentResult = {
       certificateName: 'Everyday Arithmetic & Number Confidence',
       scorePercentage: 50,
