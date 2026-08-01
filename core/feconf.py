@@ -1152,9 +1152,7 @@ CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
 CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
     '/certificate_assessment_offering_handler/<certificate_id>'
 )
-CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = (
-    '/certificate_assessment_offerings_for_classroom_handler/<classroom_id>'
-)
+CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = '/certificate_assessment_offerings_for_classroom_handler/<classroom_url_fragment>'
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
 )

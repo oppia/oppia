@@ -330,6 +330,10 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
     # The ID of the learner who made this attempt.
     learner_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The ID of the certificate this attempt belongs to.
+    certificate_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The total score achieved by the learner in this attempt.
     total_score = datastore_services.FloatProperty(required=True, indexed=True)
     # The index of this attempt for the given learner (1-based, increasing
@@ -503,6 +507,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         attempt_instance = cls(
             id=instance_id,
             learner_id=learner_id,
+            certificate_id=version_data['certificate_id'],
             total_score=total_score,
             attempt_index=attempt_index,
             attempt_data=attempt_data,

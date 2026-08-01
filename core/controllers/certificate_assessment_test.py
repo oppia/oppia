@@ -139,6 +139,7 @@ class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.classroom_id = 'math_classroom_01'
+        self.classroom_url_fragment = 'math'
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.login(self.OWNER_EMAIL)
@@ -147,7 +148,7 @@ class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
         classroom = classroom_config_domain.Classroom(
             self.classroom_id,
             name='Math',
-            url_fragment='math',
+            url_fragment=self.classroom_url_fragment,
             course_details='Course details',
             teaser_text='Teaser text',
             topic_list_intro='Topic intro',
@@ -182,7 +183,7 @@ class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
-                '<classroom_id>', self.classroom_id
+                '<classroom_url_fragment>', self.classroom_url_fragment
             )
         )
 
@@ -199,7 +200,7 @@ class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
     def test_get_returns_empty_certificate_offerings(self) -> None:
         response = self.get_json(
             feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
-                '<classroom_id>', 'missing_classroom'
+                '<classroom_url_fragment>', 'missing_classroom'
             )
         )
 
@@ -209,7 +210,7 @@ class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.testapp.get(
             feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
-                '<classroom_id>', self.classroom_id
+                '<classroom_url_fragment>', self.classroom_url_fragment
             ),
             status=302,
             expect_errors=True,

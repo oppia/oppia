@@ -84,7 +84,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.classroom_id = 'math_classroom_01'
+        self.classroom_url_fragment = 'math'
         self.other_classroom_id = 'science_classroom_01'
+        self.other_classroom_url_fragment = 'science'
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.other_topic_id = topic_fetchers.get_new_topic_id()
         self.owner_email = f'certificate.assessment.{self.topic_id}@example.com'
@@ -108,7 +110,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         classroom = classroom_config_domain.Classroom(
             self.classroom_id,
             name='Math',
-            url_fragment='math',
+            url_fragment=self.classroom_url_fragment,
             course_details='Course details',
             teaser_text='Teaser text',
             topic_list_intro='Topic intro',
@@ -131,7 +133,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         other_classroom = classroom_config_domain.Classroom(
             self.other_classroom_id,
             name='Science',
-            url_fragment='science',
+            url_fragment=self.other_classroom_url_fragment,
             course_details='Course details',
             teaser_text='Teaser text',
             topic_list_intro='Topic intro',
@@ -314,7 +316,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
-            self.classroom_id, 'learner_id_1'
+            self.classroom_url_fragment, 'learner_id_1'
         )
 
         self.assertEqual(
@@ -377,7 +379,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
-            self.classroom_id, 'learner_id_1'
+            self.classroom_url_fragment, 'learner_id_1'
         )
         status_by_title = {
             offering['title']: offering['attempt_status']
@@ -421,7 +423,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
-            self.classroom_id, 'learner_id_1'
+            self.classroom_url_fragment, 'learner_id_1'
         )
         self.assertEqual(offerings[0]['attempt_status'], 'Passed')
 
@@ -459,7 +461,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
-            self.classroom_id, 'learner_id_1'
+            self.classroom_url_fragment, 'learner_id_1'
         )
         self.assertEqual(offerings[0]['attempt_status'], 'Passed')
 

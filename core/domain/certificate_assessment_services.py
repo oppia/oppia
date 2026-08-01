@@ -25,6 +25,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
+    classroom_config_services,
     question_services,
     skill_fetchers,
     topic_domain,
@@ -725,18 +726,25 @@ def get_certificate_assessment_offerings() -> (
 
 
 def get_certificate_offerings_for_classroom(
-    classroom_id: str, learner_id: str
+    classroom_url_fragment: str, learner_id: str
 ) -> List[CertificateOfferingClassroomSummary]:
     """Fetches certificate offerings for a classroom, available to a learner.
 
     Args:
-        classroom_id: str. The ID of the classroom to fetch offerings for.
+        classroom_url_fragment: str. The URL fragment of the classroom to
+            fetch offerings for.
         learner_id: str. The ID of the learner to filter attempts by.
 
     Returns:
         list(CertificateOfferingClassroomSummary). A list of certificate
         offering summaries with attempt status for the given learner.
     """
+    classroom = classroom_config_services.get_classroom_by_url_fragment(
+        classroom_url_fragment
+    )
+    if classroom is None:
+        return []
+
     certificate_assessment_offering_models: List[
         gae_models.CertificateAssessmentOfferingModel
         # Here we use cast because .fetch() returns a generic list,
@@ -745,7 +753,7 @@ def get_certificate_offerings_for_classroom(
         List[gae_models.CertificateAssessmentOfferingModel],
         gae_models.CertificateAssessmentOfferingModel.query(
             gae_models.CertificateAssessmentOfferingModel.classroom_id
-            == classroom_id,
+            == classroom.classroom_id,
             gae_models.CertificateAssessmentOfferingModel.async_status
             == 'Available',
         ).fetch(),
@@ -756,6 +764,10 @@ def get_certificate_offerings_for_classroom(
     if not certificate_assessment_offering_models:
         return []
 
+    certificate_ids = [
+        offering_model.id
+        for offering_model in certificate_assessment_offering_models
+    ]
     # Here we use cast because .fetch() returns a generic list,
     # but we need a typed list for the type checker.
     attempt_models: List[gae_models.CertificateAssessmentAttemptModel] = cast(
@@ -763,15 +775,23 @@ def get_certificate_offerings_for_classroom(
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
             == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.certificate_id.IN(
+                certificate_ids
+            ),
             gae_models.CertificateAssessmentAttemptModel.is_submitted
             == True,  # pylint: disable=singleton-comparison
         ).fetch(),
     )
+
     latest_attempt_by_certificate_id: Dict[
         str, gae_models.CertificateAssessmentAttemptModel
     ] = {}
     for attempt_model in attempt_models:
-        certificate_id = attempt_model.version_data['certificate_id']
+        certificate_id = getattr(attempt_model, 'certificate_id', None)
+        if certificate_id is None:
+            certificate_id = attempt_model.version_data['certificate_id']
+        if certificate_id not in certificate_ids:
+            continue
         existing_attempt_model = latest_attempt_by_certificate_id.get(
             certificate_id
         )

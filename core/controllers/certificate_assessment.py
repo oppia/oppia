@@ -216,16 +216,18 @@ class CertificateAssessmentClassroomHandler(
     """Handler for learner-facing certificate offerings in a classroom."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {'classroom_id': {'schema': {'type': 'basestring'}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {'schema': {'type': 'basestring'}}
+    }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def get(self, classroom_id: str) -> None:
+    def get(self, classroom_url_fragment: str) -> None:
         """Returns certificate offerings for the classroom."""
         if self.user_id is None:
             raise self.NotLoggedInException
         certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
-            classroom_id, self.user_id
+            classroom_url_fragment, self.user_id
         )
         self.render_json({'certificate_offerings': certificate_offerings})
 
