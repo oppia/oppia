@@ -31,7 +31,6 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {TranslateService} from '@ngx-translate/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FeedbackModalComponent} from './feedback-modal.component';
@@ -52,7 +51,10 @@ import {
 import {
   FeedbackSessionInfo,
   FeedbackModalType,
+  ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
+import {AlertsService} from 'services/alerts.service';
+import {TranslateService} from '@ngx-translate/core';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {UserInfo} from 'domain/user/user-info.model';
 
@@ -142,7 +144,7 @@ class MockActiveModal {
 }
 
 const feedbackSessionInfo: FeedbackSessionInfo = {
-  console_logs_json: [
+  console_logs: [
     {
       error_message: 'TypeError: Something went wrong',
       log_level: 'error',
@@ -150,7 +152,7 @@ const feedbackSessionInfo: FeedbackSessionInfo = {
       stack_trace: 'Error stack trace',
     },
   ],
-  failed_requests_json: [
+  failed_requests: [
     {
       url: '/createhandler/web_feedback',
       method: 'POST',
@@ -160,13 +162,13 @@ const feedbackSessionInfo: FeedbackSessionInfo = {
       error_message: 'Request failed',
     },
   ],
-  navigation_history_json: [
+  navigation_history: [
     {
       path: '/learn/math',
       timestamp_msecs: 1234567892,
     },
   ],
-  environment_json: {
+  environment: {
     client_time_msecs: 1234567893,
     timezone_offset_mins: -330,
     user_agent: 'Mozilla/5.0 Chrome/136.0',
@@ -192,7 +194,6 @@ describe('FeedbackModalComponent', () => {
   let fixture: ComponentFixture<FeedbackModalComponent>;
   let component: FeedbackModalComponent;
   let activeModal: MockActiveModal;
-  let translateService: jasmine.SpyObj<TranslateService>;
   let feedbackScreenshotStagingService: jasmine.SpyObj<FeedbackScreenshotStagingService>;
   let windowRef: MockWindowRef;
   let userService: MockUserService;
@@ -202,6 +203,8 @@ describe('FeedbackModalComponent', () => {
   let feedbackBackendApiService: FeedbackBackendApiService;
   let feedbackSessionInfoService: jasmine.SpyObj<FeedbackSessionInfoService>;
   let insertScriptService: jasmine.SpyObj<InsertScriptService>;
+  let translateService: jasmine.SpyObj<TranslateService>;
+  let alertService: jasmine.SpyObj<AlertsService>;
 
   const createComponent = (
     modalType: FeedbackModalType = FeedbackModalType.LESSON_FEEDBACK
@@ -228,13 +231,19 @@ describe('FeedbackModalComponent', () => {
     translateService = jasmine.createSpyObj('TranslateService', ['instant']);
 
     translateService.instant.and.callFake(
-      (key: string, params?: {maxLength: number}) => {
+      (key: string, params?: {maxLength: number; characterCount: number}) => {
         if (key === 'I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED') {
           return 'Please add a description before submitting.';
         }
 
         if (key === 'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG') {
-          return `Please keep your feedback under ${params?.maxLength} characters.`;
+          return `Your description is a bit too long (${params?.characterCount} characters). Please shorten it slightly so our team can review it quickly!.`;
+        }
+        if (key === 'I18N_FEEDBACK_CAPTCHA_UNAVAILABLE') {
+          return 'Captcha is currently unavailable. Please log in to submit feedback.';
+        }
+        if (key === 'I18N_FEEDBACK_CAPTCHA_LOAD_FAILED') {
+          return 'Captcha failed to load.';
         }
 
         return key;
@@ -244,6 +253,10 @@ describe('FeedbackModalComponent', () => {
       'FeedbackSessionInfoService',
       ['getSessionInfo']
     );
+    alertService = jasmine.createSpyObj('AlertsService', [
+      'addSuccessMessage',
+      'addWarning',
+    ]);
 
     feedbackSessionInfoService.getSessionInfo.and.returnValue(
       feedbackSessionInfo
@@ -281,6 +294,10 @@ describe('FeedbackModalComponent', () => {
           useValue: translateService,
         },
         {
+          provide: AlertsService,
+          useValue: alertService,
+        },
+        {
           provide: FeedbackSessionInfoService,
           useValue: feedbackSessionInfoService,
         },
@@ -308,6 +325,10 @@ describe('FeedbackModalComponent', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
+
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
 
   it('should create the component', () => {
     createComponent();
@@ -413,7 +434,7 @@ describe('FeedbackModalComponent', () => {
   it('should show technical logs in lesson issue mode when category enables it', () => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
-    component.selectCategory('broken_layout_or_image');
+    component.selectCategory(ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE);
 
     expect(component.shouldShowTechnicalLogs).toBe(true);
   });
@@ -421,7 +442,7 @@ describe('FeedbackModalComponent', () => {
   it('should not show technical logs in lesson issue mode when category disables it', () => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
-    component.selectCategory('typo');
+    component.selectCategory(ReportAnIssueCategory.TYPO);
 
     expect(component.shouldShowTechnicalLogs).toBe(false);
   });
@@ -582,43 +603,49 @@ describe('FeedbackModalComponent', () => {
 
   it('should select typo category and disable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('typo');
+    component.selectCategory(ReportAnIssueCategory.TYPO);
 
-    expect(component.category).toBe('typo');
+    expect(component.category).toBe(ReportAnIssueCategory.TYPO);
     expect(component.showTechnicalLogsCheckbox).toBe(false);
   });
 
   it('should select broken_layout_or_image category and enable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('broken_layout_or_image');
+    component.selectCategory(ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE);
 
-    expect(component.category).toBe('broken_layout_or_image');
+    expect(component.category).toBe(
+      ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE
+    );
     expect(component.showTechnicalLogsCheckbox).toBe(true);
   });
 
   it('should select confusing_or_incorrect_answer category and disable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('confusing_or_incorrect_answer');
+    component.selectCategory(
+      ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER
+    );
 
-    expect(component.category).toBe('confusing_or_incorrect_answer');
+    expect(component.category).toBe(
+      ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER
+    );
     expect(component.showTechnicalLogsCheckbox).toBe(false);
   });
 
   it('should select other_or_not_sure category and enable technical logs checkbox', () => {
     createComponent();
-    component.selectCategory('other_or_not_sure');
+    component.selectCategory(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
 
-    expect(component.category).toBe('other_or_not_sure');
+    expect(component.category).toBe(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
     expect(component.showTechnicalLogsCheckbox).toBe(true);
   });
 
   it('should update category when a different chip is selected', () => {
     createComponent();
-    component.selectCategory('typo');
-    expect(component.category).toBe('typo');
+    component.selectCategory(ReportAnIssueCategory.TYPO);
+    expect(component.category).toBe(ReportAnIssueCategory.TYPO);
 
-    component.selectCategory('other_or_not_sure');
-    expect(component.category).toBe('other_or_not_sure');
+    component.selectCategory(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
+    expect(component.category).toBe(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
   });
 
   it('should fail validation for empty feedback text', () => {
@@ -648,7 +675,9 @@ describe('FeedbackModalComponent', () => {
     );
 
     expect(component.isFormValid()).toBe(false);
-    expect(component.formError).toContain('Please keep your feedback under');
+    expect(component.formError).toBe(
+      'Your description is a bit too long (2501/2500 characters). Please shorten it slightly so our team can review it quickly!.'
+    );
   });
 
   it('should pass validation for valid feedback text', () => {
@@ -825,6 +854,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_FEEDBACK_SUBMITTED_SUCCESS'
+    );
+    expect(alertService.addSuccessMessage).toHaveBeenCalled();
 
     expect(submitSpy).toHaveBeenCalled();
   }));
@@ -852,7 +885,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
-
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_FEEDBACK_SUBMITTED_SUCCESS'
+    );
+    expect(alertService.addSuccessMessage).toHaveBeenCalled();
     expect(closeSpy).toHaveBeenCalled();
   }));
 
@@ -880,7 +916,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
-
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_FEEDBACK_SUBMITTED_ERROR'
+    );
+    expect(alertService.addWarning).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();
   }));
@@ -888,7 +927,9 @@ describe('FeedbackModalComponent', () => {
   it('should call submitSiteAndLessonIssueReportAsync with session info when includeTechnicalLogs is true', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Lesson issue report';
+    component.category = ReportAnIssueCategory.TYPO;
     component.includeTechnicalLogs = true;
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -909,6 +950,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_LESSON_FEEDBACK_SUBMITTED_SUCCESS'
+    );
+    expect(alertService.addSuccessMessage).toHaveBeenCalled();
 
     expect(feedbackSessionInfoService.getSessionInfo).toHaveBeenCalled();
     expect(submitSpy).toHaveBeenCalled();
@@ -919,6 +964,7 @@ describe('FeedbackModalComponent', () => {
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
     component.feedbackText = 'Lesson issue';
     component.includeTechnicalLogs = false;
+    component.isUserLoggedIn = true;
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
@@ -946,6 +992,7 @@ describe('FeedbackModalComponent', () => {
   it('should close modal after successful lesson issue submission', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Issue';
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -966,7 +1013,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
-
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
+    );
+    expect(alertService.addSuccessMessage).toHaveBeenCalled();
     expect(closeSpy).toHaveBeenCalled();
   }));
 
@@ -974,6 +1024,7 @@ describe('FeedbackModalComponent', () => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.LESSON_ISSUE;
     component.feedbackText = 'Issue';
+    component.isUserLoggedIn = true;
     component.includeTechnicalLogs = false;
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -995,7 +1046,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
-
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_FEEDBACK_SUBMITTED_ERROR'
+    );
+    expect(alertService.addWarning).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();
   }));
@@ -1029,6 +1083,7 @@ describe('FeedbackModalComponent', () => {
   it('should call submitSiteAndLessonIssueReportAsync for site issue', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue report';
 
     const submitSpy = spyOn(
@@ -1038,6 +1093,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
+    );
+    expect(alertService.addSuccessMessage).toHaveBeenCalled();
 
     expect(submitSpy).toHaveBeenCalled();
   }));
@@ -1045,6 +1104,7 @@ describe('FeedbackModalComponent', () => {
   it('should include session info when includeTechnicalLogs is true for site issue', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = true;
     feedbackSessionInfoService.getSessionInfo.calls.reset();
@@ -1077,7 +1137,7 @@ describe('FeedbackModalComponent', () => {
     expect(feedbackSessionInfoService.getSessionInfo).not.toHaveBeenCalled();
   }));
 
-  it('should close modal after successful site issue submission', fakeAsync(() => {
+  it('should not close modal after un-successful site issue submission', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
     component.feedbackText = 'Site issue';
@@ -1091,13 +1151,39 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_FEEDBACK_CAPTCHA_REQUIRED'
+    );
+    expect(alertService.addSuccessMessage).not.toHaveBeenCalled();
+    expect(closeSpy).not.toHaveBeenCalled();
+  }));
 
+  it('should close modal after successful site issue submission', fakeAsync(() => {
+    createComponent();
+    component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
+    component.feedbackText = 'Site issue';
+
+    spyOn(
+      feedbackBackendApiService,
+      'submitSiteAndLessonIssueReportAsync'
+    ).and.returnValue(Promise.resolve());
+
+    const closeSpy = spyOn(component, 'closeModal').and.callThrough();
+
+    component.submit();
+    tick();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REPORT_WEBSITE_ISSUE_SUBMITTED_SUCCESS'
+    );
+    expect(alertService.addSuccessMessage).toHaveBeenCalled();
     expect(closeSpy).toHaveBeenCalled();
   }));
 
   it('should log error and not close modal when site issue submission fails', fakeAsync(() => {
     createComponent();
     component.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+    component.isUserLoggedIn = true;
     component.feedbackText = 'Site issue';
     component.includeTechnicalLogs = false;
 
@@ -1111,7 +1197,10 @@ describe('FeedbackModalComponent', () => {
 
     component.submit();
     tick();
-
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_FEEDBACK_SUBMITTED_ERROR'
+    );
+    expect(alertService.addWarning).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();
   }));
@@ -1123,7 +1212,7 @@ describe('FeedbackModalComponent', () => {
     component.screenshotFilename = 'screenshot.png';
     component.screenshotPreviewDataUrl = 'data:image/png;base64,image';
     component.feedbackText = 'Some text';
-    component.category = 'typo';
+    component.category = ReportAnIssueCategory.TYPO;
     component.formError = 'Some error';
     component.includeTechnicalLogs = false;
 
@@ -1230,7 +1319,7 @@ describe('FeedbackModalComponent', () => {
     flushMicrotasks();
 
     expect(component.captchaLoadError).toEqual(
-      'Captcha is currently unavailable. Please Login to submit feedback.'
+      'Captcha is currently unavailable. Please log in to submit feedback.'
     );
 
     expect(insertScriptService.loadScript).not.toHaveBeenCalled();
@@ -1247,7 +1336,7 @@ describe('FeedbackModalComponent', () => {
     flushMicrotasks();
 
     expect(component.captchaLoadError).toEqual(
-      'Captcha is currently unavailable, Please Login to submit feedback.'
+      'Captcha is currently unavailable. Please log in to submit feedback.'
     );
 
     expect(insertScriptService.loadScript).not.toHaveBeenCalled();

@@ -32,6 +32,7 @@ import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Exploration} from 'domain/exploration/exploration.model';
 import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
+import {StateBackendDict} from 'domain/state/state.model';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ParamSpecs} from '../../../domain/exploration/param-specs.model';
@@ -957,7 +958,7 @@ describe('Contribution and review service', () => {
   });
 
   describe('updateQuestionSuggestionAsync', () => {
-    const questionStateData = {
+    const questionStateData: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -1430,6 +1431,41 @@ describe('Contribution and review service', () => {
       );
 
       expect(sortedTranslationCards).toEqual(translationSuggestions);
+    });
+
+    it('should prepend generic (metadata) translation suggestions at the beginning', () => {
+      const states = States.createFromBackendDict(statesBackendDict);
+      const suggestionsWithGeneric = [
+        ...translationSuggestions,
+        {
+          suggestion_type: 'suggestion',
+          suggestion_id: 'id_generic',
+          target_type: 'exploration',
+          target_id: '1',
+          status: 'review',
+          author_name: 'author',
+          change_cmd: {
+            state_name: AppConstants.DEFAULT_SUGGESTION_STATE_NAME,
+            content_id: 'exploration_title',
+            new_value: {
+              html: 'translated title',
+            },
+            old_value: {
+              html: 'original title',
+            },
+          },
+          last_updated_msecs: 0,
+        },
+      ] as unknown as SuggestionBackendDict[];
+
+      const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
+        suggestionsWithGeneric,
+        states,
+        'First State'
+      );
+
+      expect(sortedTranslationCards.length).toBe(7);
+      expect(sortedTranslationCards[0].suggestion_id).toBe('id_generic');
     });
   });
 });

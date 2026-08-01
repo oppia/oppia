@@ -30,11 +30,12 @@ import json
 import re
 import string
 
-from core import feconf, schema_utils, utils
+from core import feature_flag_list, feconf, schema_utils, utils
 from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
+    feature_flag_services,
     html_validation_service,
     interaction_registry,
     param_domain,
@@ -1561,9 +1562,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.edits_allowed = edits_allowed
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self,
+        override_metadata_feature_flag: bool = False,
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the exploration.
+
+        Args:
+            override_metadata_feature_flag: bool. Whether to override the
+                metadata feature flag check.
+            **kwargs: Dict[str, Any]. Additional keyword arguments.
 
         Returns:
             TranslatableContentsCollection. An instance of
@@ -1579,6 +1589,43 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state
                 )
             )
+
+        if (
+            override_metadata_feature_flag
+            or feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+                None,
+            )
+        ):
+            if self.title:
+                translatable_contents_collection.add_translatable_field(
+                    feconf.EXPLORATION_TITLE_CONTENT_ID,
+                    translation_domain.ContentType.METADATA,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    self.title,
+                )
+            if self.objective:
+                translatable_contents_collection.add_translatable_field(
+                    feconf.EXPLORATION_OBJECTIVE_CONTENT_ID,
+                    translation_domain.ContentType.METADATA,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    self.objective,
+                )
+            if self.category:
+                translatable_contents_collection.add_translatable_field(
+                    feconf.EXPLORATION_CATEGORY_CONTENT_ID,
+                    translation_domain.ContentType.METADATA,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    self.category,
+                )
+            for idx, tag in enumerate(self.tags):
+                translatable_contents_collection.add_translatable_field(
+                    f'{feconf.EXPLORATION_TAG_CONTENT_ID_PREFIX}_{idx}',
+                    translation_domain.ContentType.METADATA,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    tag,
+                )
+
         return translatable_contents_collection
 
     @classmethod
@@ -2381,19 +2428,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def get_content_html(
         self, state_name: str, content_id: str
     ) -> Union[str, List[str]]:
-        """Return the content for a given content id of a state.
+        """Return the content for a given content id of a state or metadata.
 
         Args:
             state_name: str. The name of the state.
             content_id: str. The id of the content.
 
         Returns:
-            str. The html content corresponding to the given content id of a
-            state.
+            str. The html content corresponding to the given content id.
 
         Raises:
             ValueError. The given state_name does not exist.
         """
+        # Content IDs for exploration metadata fields (such as title, objective,
+        # category, and tags) start with the prefix 'exploration_'. Since these
+        # metadata fields do not belong to any specific state, we retrieve them
+        # directly from the exploration's translatable contents collection.
+        if content_id.startswith(feconf.EXPLORATION_METADATA_CONTENT_ID_PREFIX):
+            translatable_contents = self.get_translatable_contents_collection(
+                override_metadata_feature_flag=True
+            )
+            if (
+                content_id
+                in translatable_contents.content_id_to_translatable_content
+            ):
+                return translatable_contents.content_id_to_translatable_content[
+                    content_id
+                ].content_value
+
         if state_name not in self.states:
             raise ValueError('State %s does not exist' % state_name)
 

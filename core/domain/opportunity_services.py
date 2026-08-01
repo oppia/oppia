@@ -560,10 +560,14 @@ def _build_opportunity_for_non_exploration_entity(
     Returns:
         TranslationOpportunity. The constructed opportunity domain object.
     """
-    # Story, Skill, and Topic do not extend BaseTranslatableObject, so
-    # get_content_count() is not available. Content count defaults to 0
-    # until these entities implement the translatable interface.
-    content_count = 0
+    # Story and Topic do not extend BaseTranslatableObject, so
+    # get_content_count() is not available for them. Content count defaults
+    # to 0 for non-translatable entities.
+    content_count = (
+        entity.get_content_count()
+        if isinstance(entity, translation_domain.BaseTranslatableObject)
+        else 0
+    )
     translation_counts = translation_services.get_translation_counts(
         translatable_entity_type, entity
     )

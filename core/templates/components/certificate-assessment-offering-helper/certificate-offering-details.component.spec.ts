@@ -17,7 +17,13 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  waitForAsync,
+} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
@@ -44,10 +50,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'math',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 0,
                 },
                 {
                   classroom_id: 'science',
@@ -55,10 +59,8 @@ describe('Certificate Offering Details Component', () => {
                   url_fragment: 'science',
                   teaser_text: '',
                   is_published: true,
-                  diagnostic_test_is_enabled: false,
                   thumbnail_filename: '',
                   thumbnail_bg_color: '',
-                  index: 1,
                 },
               ]),
           },
@@ -75,6 +77,53 @@ describe('Certificate Offering Details Component', () => {
       CertificateAssessmentOfferingData.createEmpty();
     fixture.detectChanges();
   });
+
+  it('should load classroom options on init', async () => {
+    await component.loadClassrooms();
+
+    expect(component.classroomOptions.map(classroom => classroom.name)).toEqual(
+      ['Math', 'Science']
+    );
+    expect(component.classroomLoadErrorMessage).toEqual('');
+  });
+
+  it('should capitalize classroom names in the dropdown', async () => {
+    component.classroomOptions = [
+      {
+        classroom_id: 'math',
+        name: 'math classroom',
+        url_fragment: 'math',
+        teaser_text: '',
+        is_published: true,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+      },
+    ];
+
+    fixture.detectChanges();
+
+    const optionText = fixture.nativeElement
+      .querySelectorAll('select option')[1]
+      .textContent.trim();
+
+    expect(optionText).toEqual('Math Classroom');
+  });
+
+  it('should show an error message when loading classrooms fails', fakeAsync(() => {
+    spyOn(console, 'error');
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(Promise.reject(new Error('boom')));
+
+    component.loadClassrooms();
+    flushMicrotasks();
+
+    expect(component.classroomOptions).toEqual([]);
+    expect(component.classroomLoadErrorMessage).toEqual(
+      'Unable to load classrooms. Please try again.'
+    );
+  }));
 
   it('should emit events correctly when clicking next button', () => {
     const offeringChangeSpy = spyOn(
@@ -112,6 +161,46 @@ describe('Certificate Offering Details Component', () => {
     component.setFormValues();
 
     expect(component.demonstratesList).toEqual(['Learn math', 'Learn science']);
+  });
+
+  it('should sync form fields when the offering input changes after init', () => {
+    component.title = 'Stale title';
+    component.description = 'Stale description';
+    component.classroomId = 'stale_classroom';
+    component.timeLimitInMinutes = 12;
+    component.totalQuestions = 2;
+    component.demonstratesList = ['Stale outcome'];
+
+    component.certificateAssessmentOffering =
+      CertificateAssessmentOfferingData.createFromBackendDict({
+        certificate_id: 'certificate_1',
+        title: 'Loaded title',
+        description: 'Loaded description',
+        classroom_id: 'science',
+        topic_ids: [],
+        topic_data: {},
+        demonstrates: ['Loaded outcome'],
+        total_questions: 6,
+        time_limit_in_minutes: 25,
+        async_status: 'Available',
+        version: 1,
+      });
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: CertificateAssessmentOfferingData.createEmpty(),
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.title).toEqual('Loaded title');
+    expect(component.description).toEqual('Loaded description');
+    expect(component.classroomId).toEqual('science');
+    expect(component.timeLimitInMinutes).toEqual(25);
+    expect(component.totalQuestions).toEqual(6);
+    expect(component.demonstratesList).toEqual(['Loaded outcome']);
   });
 
   it('should restore values from initial values when provided', () => {
@@ -174,7 +263,7 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should validate the form only when required fields are present', () => {
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
 
     component.title = 'Certificate title';
     component.description = 'Certificate description';
@@ -183,20 +272,20 @@ describe('Certificate Offering Details Component', () => {
     component.totalQuestions = 5;
     component.demonstratesList = ['Learn math'];
 
-    expect(component.isFormValid()).toBeTrue();
+    expect(component.isFormValid()).toBe(true);
   });
 
   it('should disable the next button when numeric values exceed limits', () => {
     component.title = 'Certificate title';
     component.description = 'Certificate description';
     component.classroomId = 'classroom_id';
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.timeLimitInMinutes = 4;
+    component.totalQuestions = 2;
     component.demonstratesList = ['Learn math'];
 
-    expect(component.isTimeLimitInvalid()).toBeTrue();
-    expect(component.isTotalQuestionsInvalid()).toBeTrue();
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isTimeLimitInvalid()).toBe(true);
+    expect(component.isTotalQuestionsInvalid()).toBe(true);
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should return an empty classroom name when the classroom is not found', () => {
@@ -206,16 +295,16 @@ describe('Certificate Offering Details Component', () => {
   });
 
   it('should mark time limit and question count as invalid when out of range', () => {
-    component.timeLimitInMinutes = 61;
-    component.totalQuestions = 51;
+    component.timeLimitInMinutes = 4;
+    component.totalQuestions = 2;
 
     expect(component.getTimeLimitValidationError()).toContain(
-      'at most 60 minutes'
+      'at least 5 minutes'
     );
     expect(component.getTotalQuestionsValidationError()).toContain(
-      'at most 50'
+      'at least 3'
     );
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should not show threshold errors for empty numeric fields', () => {
@@ -229,7 +318,7 @@ describe('Certificate Offering Details Component', () => {
 
     expect(component.getTimeLimitValidationError()).toEqual('');
     expect(component.getTotalQuestionsValidationError()).toEqual('');
-    expect(component.isFormValid()).toBeFalse();
+    expect(component.isFormValid()).toBe(false);
   });
 
   it('should not emit events when the form is invalid', () => {
@@ -354,11 +443,50 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getClassroomValidationError()).toEqual('');
   });
 
+  it('should set loading state while classrooms are fetched', fakeAsync(() => {
+    let resolveClassrooms: (value: never[]) => void = () => {};
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(
+      new Promise(resolve => {
+        resolveClassrooms = resolve;
+      })
+    );
+
+    void component.loadClassrooms();
+    expect(component.isLoadingClassrooms).toBe(true);
+    resolveClassrooms([]);
+    flushMicrotasks();
+
+    expect(component.isLoadingClassrooms).toBe(false);
+  }));
+
   it('should return a demonstrates validation error when outcomes exceed the limit', () => {
     component.demonstratesList = ['a'.repeat(201)];
 
     expect(component.getDemonstratesValidationError()).toContain(
       'at most 200 characters'
     );
+  });
+
+  it('should return normalized demonstrates and classroom name in form data', async () => {
+    await component.loadClassrooms();
+    component.title = '  Certificate title  ';
+    component.description = '  Certificate description  ';
+    component.classroomId = 'science';
+    component.timeLimitInMinutes = 30;
+    component.totalQuestions = 5;
+    component.demonstratesList = [' Learn math ', ''];
+
+    expect(component.getFormData()).toEqual({
+      title: 'Certificate title',
+      description: 'Certificate description',
+      classroomId: 'science',
+      classroomName: 'Science',
+      timeLimitInMinutes: 30,
+      totalQuestions: 5,
+      demonstrates: ['Learn math'],
+    });
   });
 });

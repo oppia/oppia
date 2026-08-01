@@ -3907,6 +3907,44 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.get_content_html('Invalid state', 'hint_1')
 
+    def test_get_content_html_with_metadata_content_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.title = 'Exploration Title'
+        exploration.objective = 'Exploration Objective'
+        exploration.category = 'Algebra'
+        exploration.tags = ['algebra', 'math']
+
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_title'
+            ),
+            'Exploration Title',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_objective'
+            ),
+            'Exploration Objective',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_category'
+            ),
+            'Algebra',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_tag_0'
+            ),
+            'algebra',
+        )
+        self.assertEqual(
+            exploration.get_content_html(
+                'Generic Content', 'exploration_tag_1'
+            ),
+            'math',
+        )
+
     def test_is_demo_property(self) -> None:
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -4956,6 +4994,142 @@ title: Title
         )
         found_content = exploration.find_content_by_content_id('nonexistent_id')
         self.assertIsNone(found_content)
+
+    def test_get_translatable_contents_collection_with_new_opp_models_flag_disabled(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id',
+            title='Exploration Title',
+            category='Category',
+            objective='Exploration Objective',
+        )
+        exploration.tags = ['tag1', 'tag2']
+        translatable_contents = (
+            exploration.get_translatable_contents_collection().content_id_to_translatable_content
+        )
+        self.assertNotIn(
+            feconf.EXPLORATION_TITLE_CONTENT_ID, translatable_contents
+        )
+        self.assertNotIn(
+            feconf.EXPLORATION_OBJECTIVE_CONTENT_ID, translatable_contents
+        )
+        self.assertNotIn(
+            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
+        )
+        self.assertNotIn('exploration_tag_0', translatable_contents)
+        self.assertNotIn('exploration_tag_1', translatable_contents)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_get_translatable_contents_collection_with_new_opp_models_flag_enabled(
+        self,
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id',
+            title='Exploration Title',
+            category='Category',
+            objective='Exploration Objective',
+        )
+        exploration.tags = ['tag1', 'tag2']
+        translatable_contents = (
+            exploration.get_translatable_contents_collection().content_id_to_translatable_content
+        )
+
+        self.assertIn(
+            feconf.EXPLORATION_TITLE_CONTENT_ID, translatable_contents
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_TITLE_CONTENT_ID
+            ].content_value,
+            'Exploration Title',
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_TITLE_CONTENT_ID
+            ].content_type,
+            translation_domain.ContentType.METADATA,
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_TITLE_CONTENT_ID
+            ].content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+        )
+
+        self.assertIn(
+            feconf.EXPLORATION_OBJECTIVE_CONTENT_ID, translatable_contents
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
+            ].content_value,
+            'Exploration Objective',
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
+            ].content_type,
+            translation_domain.ContentType.METADATA,
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_OBJECTIVE_CONTENT_ID
+            ].content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+        )
+
+        self.assertIn(
+            feconf.EXPLORATION_CATEGORY_CONTENT_ID, translatable_contents
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_CATEGORY_CONTENT_ID
+            ].content_value,
+            'Category',
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_CATEGORY_CONTENT_ID
+            ].content_type,
+            translation_domain.ContentType.METADATA,
+        )
+        self.assertEqual(
+            translatable_contents[
+                feconf.EXPLORATION_CATEGORY_CONTENT_ID
+            ].content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+        )
+
+        self.assertIn('exploration_tag_0', translatable_contents)
+        self.assertEqual(
+            translatable_contents['exploration_tag_0'].content_value, 'tag1'
+        )
+        self.assertEqual(
+            translatable_contents['exploration_tag_0'].content_type,
+            translation_domain.ContentType.METADATA,
+        )
+        self.assertEqual(
+            translatable_contents['exploration_tag_0'].content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+        )
+
+        self.assertIn('exploration_tag_1', translatable_contents)
+        self.assertEqual(
+            translatable_contents['exploration_tag_1'].content_value, 'tag2'
+        )
+        self.assertEqual(
+            translatable_contents['exploration_tag_1'].content_type,
+            translation_domain.ContentType.METADATA,
+        )
+        self.assertEqual(
+            translatable_contents['exploration_tag_1'].content_format,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+        )
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):

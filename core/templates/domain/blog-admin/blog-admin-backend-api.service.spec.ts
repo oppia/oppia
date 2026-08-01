@@ -23,6 +23,7 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   BlogAdminPageData,
+  BlogAdminPageDataBackendDict,
   BlogAdminBackendApiService,
 } from './blog-admin-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
@@ -33,7 +34,7 @@ describe('Blog Admin backend api service', () => {
   let csrfService: CsrfTokenService;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
-  let blogAdminBackendResponse = {
+  let blogAdminBackendResponse: BlogAdminPageDataBackendDict = {
     role_to_actions: {
       blog_post_editor: ['action for editor'],
     },
@@ -41,7 +42,7 @@ describe('Blog Admin backend api service', () => {
       max_number_of_tags_assigned_to_blog_post: {
         description: 'Max number of tags.',
         value: 10,
-        schema: {type: 'number'},
+        schema: {type: 'float'},
       },
     },
     updatable_roles: {

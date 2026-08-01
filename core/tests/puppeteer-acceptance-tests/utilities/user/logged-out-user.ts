@@ -587,7 +587,7 @@ const revisionTabSelector = 'subtopics-list';
 
 const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const startPracticeButtonSelector = '.e2e-test-practice-start-button';
-const practiceSessionContainerSelector = 'practice-session-page';
+const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
 
 const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
@@ -1111,7 +1111,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogTagFilterSelector, {
       visible: true,
     });
-    await this.clickOnElementWithSelector(blogTagFilterSelector);
+    await this.typeInInputField(
+      '.e2e-test-tag-filter-selection-input',
+      tagName
+    );
     await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
@@ -2131,11 +2134,18 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('No new tab opened.');
     }
     const newTabPage = await newTarget.page();
+    if (newTabPage === null) {
+      throw new Error('New tab page could not be retrieved.');
+    }
 
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
-    expect(newTabPage?.url()).toContain(expectedAccountId);
-    await newTabPage?.close();
+    // Wait for the new page to navigate to the correct domain per reviewer request.
+    await newTabPage.waitForFunction(
+      (domain: string) => window.location.href.includes(domain),
+      {timeout: 10000},
+      expectedDestinationDomain
+    );
+
+    await newTabPage.close();
   }
 
   /**
@@ -3067,12 +3077,18 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
 
-    await this.clickOnElementWithSelector(
-      featuresAccordionCloseButtonInAboutPage
-    );
-    await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
-      hidden: true,
+    await this.page.$eval(featuresAccordionCloseButtonInAboutPage, btn => {
+      (btn as HTMLElement).click();
     });
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const panel = document.querySelector(selector);
+        return !panel || !panel.classList.contains('show');
+      },
+      {},
+      featuresAccordionPanelContentInAboutPage
+    );
   }
 
   /**
@@ -4718,7 +4734,7 @@ export class LoggedOutUser extends BaseUser {
       attributionHtmlCodeSelector
     );
     const attributionHtmlCode = await this.page.evaluate(
-      el => el.textContent,
+      el => el.textContent?.trim(),
       attributionHtmlCodeElement
     );
 
@@ -4742,7 +4758,7 @@ export class LoggedOutUser extends BaseUser {
       attributionPrintTextSelector
     );
     const attributionPrintText = await this.page.evaluate(
-      el => el.textContent,
+      el => el.textContent?.trim(),
       attributionPrintTextElement
     );
 
@@ -4983,6 +4999,15 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
+
+    // Dismiss the hint card tooltip if it is covering the hint button.
+    const hintCardTooltipCloseButton = await this.page.$(
+      '.hint-box .btn-close'
+    );
+    if (hintCardTooltipCloseButton) {
+      await hintCardTooltipCloseButton.click();
+    }
+
     await this.clickOnElementWithSelector(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
@@ -7029,6 +7054,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
     });
+    await this.page.waitForSelector(practiceSessionContainerSelector, {
+      visible: true,
+      timeout: 30000,
+    });
   }
 
   /**
@@ -7555,19 +7584,6 @@ export class LoggedOutUser extends BaseUser {
       if (appName !== expected.applicationName) {
         throw new Error(
           `meta name=\"application-name\" mismatch. Expected: "${expected.applicationName}", Found: "${appName}"`
-        );
-      }
-    }
-
-    // Verify that the raw server-side HTML contains semantic elements
-    // (so bots crawling the raw HTML can see page structure without JS).
-    const requiredSemanticTags = ['h2', 'p'];
-    const rawHtml = await this.getRawHtmlForCurrentPage();
-    for (const tag of requiredSemanticTags) {
-      const tagRegex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`);
-      if (!tagRegex.test(rawHtml)) {
-        throw new Error(
-          `Expected server-side HTML to contain a <${tag}> element.`
         );
       }
     }

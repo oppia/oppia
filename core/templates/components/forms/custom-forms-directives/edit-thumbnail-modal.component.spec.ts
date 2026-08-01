@@ -20,11 +20,11 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {EditThumbnailModalComponent} from './edit-thumbnail-modal.component';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 @Pipe({name: 'translate'})
-class MockTranslatePipe {
+class MockTranslatePipe implements PipeTransform {
   transform(value: string): string {
     return value;
   }
@@ -256,6 +256,19 @@ describe('Edit Thumbnail Modal Component', () => {
   it('should close the modal on clicking cancel button', () => {
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should get issue URL from svg sanitizer service', () => {
+    const invalidTagsAndAttrs = {
+      tags: ['script'],
+      attrs: ['onclick'],
+    };
+    spyOn(svgSanitizerService, 'getIssueURL').and.returnValue('issue-url');
+
+    expect(component.getIssueURL(invalidTagsAndAttrs)).toBe('issue-url');
+    expect(svgSanitizerService.getIssueURL).toHaveBeenCalledWith(
+      invalidTagsAndAttrs
+    );
   });
 
   it(

@@ -61,4 +61,23 @@ describe('QuestionDifficultySelectorComponent', () => {
     expect(component.skillWithDifficulty.getDifficulty()).toBe(0.9);
     expect(component.skillWithDifficultyChange.emit).toHaveBeenCalled();
   });
+
+  it('should get rubrics for the current skill', () => {
+    component.skillWithDifficulty = new SkillDifficulty('skill_1', '', 0.6);
+    component.skillIdToRubricsObject = {
+      skill_1: [
+        {
+          difficulty: 'easy',
+          explanations: ['Explanation'],
+        } as never,
+      ],
+    };
+
+    expect(component.getRubricsForSkill()).toEqual([
+      {
+        difficulty: 'easy',
+        explanations: ['Explanation'],
+      },
+    ]);
+  });
 });
