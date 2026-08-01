@@ -2066,6 +2066,27 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
                 'list' % (language['language_code']),
             )
 
+    def test_get_returns_datastore_configured_featured_translation_languages(
+        self,
+    ) -> None:
+        translation_services.save_featured_translation_languages(
+            [{'language_code': 'hi', 'explanation': 'For learners in India.'}]
+        )
+
+        response = self.get_json('/retrievefeaturedtranslationlanguages')
+
+        self.assertEqual(
+            response,
+            {
+                'featured_translation_languages': [
+                    {
+                        'language_code': 'hi',
+                        'explanation': 'For learners in India.',
+                    }
+                ]
+            },
+        )
+
 
 class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslatableTopicNamesHandler."""

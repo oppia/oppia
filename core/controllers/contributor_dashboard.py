@@ -1208,7 +1208,9 @@ class FeaturedTranslationLanguagesHandler(
         """Handles GET requests."""
         self.render_json(
             {
-                'featured_translation_languages': constants.FEATURED_TRANSLATION_LANGUAGES
+                'featured_translation_languages': (
+                    translation_services.get_featured_translation_languages()
+                )
             }
         )
 
