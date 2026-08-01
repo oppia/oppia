@@ -26,6 +26,7 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
+import {AppConstants} from 'app.constants';
 
 export interface EntityTypeOption {
   id: string;
@@ -47,18 +48,18 @@ export class EntityTypeSelectorComponent implements OnInit {
   dropdownShown = false;
   entityTypeOptions: EntityTypeOption[] = [
     {
-      id: 'exploration',
+      id: AppConstants.ENTITY_TYPE.EXPLORATION,
       label: 'Lessons',
     },
     {
-      id: 'skill',
+      id: AppConstants.ENTITY_TYPE.SKILL,
       label: 'Skills',
     },
   ];
 
   ngOnInit(): void {
     if (!this.activeEntityType) {
-      this.activeEntityType = 'exploration';
+      this.activeEntityType = AppConstants.ENTITY_TYPE.EXPLORATION;
     }
     this.setActiveEntityType.emit(this.activeEntityType);
   }
