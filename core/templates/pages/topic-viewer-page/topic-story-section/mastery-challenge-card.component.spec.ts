@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for MasteryChallengeCardComponent.
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {MasteryChallengeCardComponent} from './mastery-challenge-card.component';
@@ -59,8 +65,9 @@ describe('MasteryChallengeCardComponent', () => {
   it('should navigate when action URL is provided', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.actionUrl = '/practice/session/1';
+    component.isUnlocked = true;
 
-    component.navigateToAction();
+    component.onChallengeButtonClick();
 
     expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
       '/practice/session/1'
@@ -70,9 +77,41 @@ describe('MasteryChallengeCardComponent', () => {
   it('should not navigate when action URL is empty', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.actionUrl = '';
+    component.isUnlocked = true;
 
-    component.navigateToAction();
+    component.onChallengeButtonClick();
 
     expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
   });
+
+  it('should show helper tooltip for 5 seconds for a locked challenge', fakeAsync(() => {
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.actionUrl = '/practice/session/1';
+    component.isUnlocked = false;
+
+    component.onChallengeButtonClick();
+
+    expect(component.showLockedTooltip).toBeTrue();
+    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+
+    tick(4999);
+    expect(component.showLockedTooltip).toBeTrue();
+
+    tick(1);
+    expect(component.showLockedTooltip).toBeFalse();
+  }));
+
+  it('should reset helper tooltip timer when clicked again while locked', fakeAsync(() => {
+    component.isUnlocked = false;
+
+    component.onChallengeButtonClick();
+    tick(3000);
+
+    component.onChallengeButtonClick();
+    tick(3000);
+    expect(component.showLockedTooltip).toBeTrue();
+
+    tick(2000);
+    expect(component.showLockedTooltip).toBeFalse();
+  }));
 });

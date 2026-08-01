@@ -42,8 +42,41 @@
       </topic-adventure-navigation>
 
       <ng-container *ngIf="adventureGroups.length > 0; else flatLessonList">
-        <div class="adventure-group" *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx"
-             [ngStyle]="{'border-color': adventureGroup.headerBorderColor}">
+        <ng-container *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx">
+          <div *ngIf="isSkippedAdventureCollapsed(adventureIdx)"
+               class="skipped-adventure-bar"
+               [id]="'adventure-group-' + adventureIdx">
+            <button type="button"
+                    class="skipped-adventure-bar-button"
+                    (click)="onSkippedAdventureBarSelected(adventureIdx)"
+                    [attr.aria-label]="'Open adventure ' + (adventureIdx + 1)">
+              <div class="skipped-adventure-bar-header-row">
+                <div class="skipped-adventure-bar-header-left">
+                  <span class="skipped-adventure-bar-icon" aria-hidden="true">
+                    <i class="material-icons">fast_forward</i>
+                  </span>
+                  <span class="skipped-adventure-bar-label">Adventure {{ adventureIdx + 1 }}</span>
+                  <span class="skipped-adventure-badge">
+                    {{ 'I18N_TOPIC_VIEWER_SKIP_AHEAD_SKIPPED_BADGE' | translate }}
+                  </span>
+                </div>
+              </div>
+              <div class="skipped-adventure-bar-footer-row">
+                <p class="skipped-adventure-bar-description">
+                  {{ 'I18N_TOPIC_VIEWER_SKIP_AHEAD_SKIPPED_DESCRIPTION' | translate }}
+                </p>
+                <span class="skipped-adventure-bar-action">
+                  <i class="material-icons" aria-hidden="true">visibility</i>
+                  {{ 'I18N_TOPIC_VIEWER_SKIP_AHEAD_REVIEW_ADVENTURE_BUTTON' | translate }}
+                </span>
+              </div>
+            </button>
+          </div>
+
+          <div *ngIf="!isSkippedAdventureCollapsed(adventureIdx)"
+               class="adventure-group"
+               [id]="'adventure-group-' + adventureIdx"
+               [ngStyle]="{'border-color': adventureGroup.headerBorderColor}">
           <div class="adventure-header" (click)="toggleAdventure(adventureIdx)" role="button" tabindex="0"
                [attr.aria-expanded]="isAdventureExpanded(adventureIdx)"
                [ngStyle]="{'background-color': adventureGroup.headerBackgroundColor}"
@@ -104,7 +137,8 @@
               </topic-adventure-end-test-card>
             </div>
           </div>
-        </div>
+          </div>
+        </ng-container>
       </ng-container>
 
       <ng-template #flatLessonList>
@@ -190,7 +224,8 @@
       </section>
 
       <topic-mastery-challenge-card
-        [actionUrl]="masteryChallengeUrl">
+        [actionUrl]="masteryChallengeUrl"
+        [isUnlocked]="isMasteryChallengeUnlocked">
       </topic-mastery-challenge-card>
     </div>
   </div>

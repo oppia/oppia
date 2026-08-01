@@ -24,6 +24,7 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
@@ -40,6 +41,8 @@ import {UrlService} from 'services/contextual/url.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 import constants from 'assets/constants';
+import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
+import {SkipAheadConfirmationModalComponent} from './skip-ahead-confirmation-modal.component';
 
 import './topic-story-section.component.css';
 
@@ -133,9 +136,12 @@ export class TopicStorySectionComponent
     practiceUrl: '#',
   };
   masteryChallengeUrl: string = '#';
+  isMasteryChallengeUnlocked: boolean = false;
   isPracticeCardVisible: boolean = false;
   _expandedAdventureIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
+  skippedAdventureEndIndex: number | null = null;
+  revealedSkippedAdventureIndices: Set<number> = new Set();
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -151,14 +157,74 @@ export class TopicStorySectionComponent
     }
   }
 
-  onNavigationLessonSelected(lessonNumber: number): void {
+  onNavigationLessonSelected(
+    lessonSelection: AdventureNavigationLessonSelection | number
+  ): void {
+    const lessonNumber =
+      typeof lessonSelection === 'number'
+        ? lessonSelection
+        : lessonSelection.lessonNumber;
+    const targetAdventureIndex =
+      typeof lessonSelection === 'number'
+        ? this.getAdventureIndexByLessonNumber(lessonNumber)
+        : lessonSelection.adventureIndex;
+
+    if (this.shouldPromptSkipAhead(targetAdventureIndex)) {
+      this.openSkipAheadModal(targetAdventureIndex);
+      return;
+    }
+
+    this.navigateToLesson(lessonNumber);
+  }
+
+  hasSkippedAdventureSummary(): boolean {
+    return (
+      this.skippedAdventureEndIndex !== null &&
+      this.skippedAdventureEndIndex >= 0
+    );
+  }
+
+  getSkippedAdventureSummaryText(): string {
+    if (
+      this.skippedAdventureEndIndex === null ||
+      this.skippedAdventureEndIndex < 0
+    ) {
+      return '';
+    }
+
+    return `Adventure 1-${this.skippedAdventureEndIndex + 1}: ⏭️`;
+  }
+
+  isSkippedAdventureCollapsed(adventureIndex: number): boolean {
+    return (
+      this.skippedAdventureEndIndex !== null &&
+      adventureIndex <= this.skippedAdventureEndIndex &&
+      !this.revealedSkippedAdventureIndices.has(adventureIndex)
+    );
+  }
+
+  onSkippedAdventureBarSelected(adventureIndex: number): void {
+    this.revealedSkippedAdventureIndices.add(adventureIndex);
+    this._expandedAdventureIndices.add(adventureIndex);
+    this.scrollToAdventure(adventureIndex);
+  }
+
+  onNavigationPracticeSelected(adventureIndex: number): void {
+    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
+    setTimeout(() => {
+      const el = document.getElementById('practice-card-' + adventureIndex);
+      if (el) {
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+    }, 300);
+  }
+
+  private navigateToLesson(lessonNumber: number): void {
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
 
     // Expand the adventure that contains this lesson.
-    const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
-      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
-    );
+    const adventureIndex = this.getAdventureIndexByLessonNumber(lessonNumber);
     if (adventureIndex !== -1) {
       this._expandedAdventureIndices.add(adventureIndex);
     }
@@ -174,10 +240,66 @@ export class TopicStorySectionComponent
     }, 300);
   }
 
-  onNavigationPracticeSelected(adventureIndex: number): void {
-    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
+  private shouldPromptSkipAhead(targetAdventureIndex: number): boolean {
+    if (targetAdventureIndex <= 0) {
+      return false;
+    }
+
+    return targetAdventureIndex > this.getCurrentAdventureIndex();
+  }
+
+  private getCurrentAdventureIndex(): number {
+    if (this.activeLessonNumber === null) {
+      return 0;
+    }
+
+    const activeAdventureIndex = this.getAdventureIndexByLessonNumber(
+      this.activeLessonNumber
+    );
+    return activeAdventureIndex === -1 ? 0 : activeAdventureIndex;
+  }
+
+  private getAdventureIndexByLessonNumber(lessonNumber: number): number {
+    return this.visibleAdventureGroups.findIndex(group =>
+      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
+    );
+  }
+
+  private openSkipAheadModal(targetAdventureIndex: number): void {
+    const modalRef = this.ngbModal.open(SkipAheadConfirmationModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-progress-reminder-modal',
+    });
+
+    modalRef.componentInstance.targetArcNumber = targetAdventureIndex + 1;
+    modalRef.result.then(
+      () => {
+        this.confirmSkipAheadToAdventure(targetAdventureIndex);
+      },
+      () => undefined
+    );
+  }
+
+  private confirmSkipAheadToAdventure(targetAdventureIndex: number): void {
+    const targetAdventure = this.visibleAdventureGroups[targetAdventureIndex];
+    if (!targetAdventure || targetAdventure.lessonCards.length === 0) {
+      return;
+    }
+
+    const firstLessonNumber = targetAdventure.lessonCards[0].lessonNumber;
+    this.skippedAdventureEndIndex = targetAdventureIndex - 1;
+    this.revealedSkippedAdventureIndices.clear();
+    this._expandedAdventureIndices = new Set([targetAdventureIndex]);
+    this.activeLessonNumber = firstLessonNumber;
+    this.navigatedLessonNumber = firstLessonNumber;
+
+    this.scrollToAdventure(targetAdventureIndex);
+  }
+
+  private scrollToAdventure(adventureIndex: number): void {
     setTimeout(() => {
-      const el = document.getElementById('practice-card-' + adventureIndex);
+      const el = document.getElementById('adventure-group-' + adventureIndex);
       if (el) {
         el.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
@@ -188,6 +310,7 @@ export class TopicStorySectionComponent
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
+    private ngbModal: NgbModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
@@ -362,6 +485,7 @@ export class TopicStorySectionComponent
 
     const allNodes = this.storySummary.getAllNodes();
     this.adventureGroups = this.buildAdventureGroups(allNodes);
+    this.updateMasteryChallengeState();
     this.updateVisibleSections();
   }
 
@@ -400,6 +524,9 @@ export class TopicStorySectionComponent
   }
 
   private populateFromInputs(): void {
+    this.skippedAdventureEndIndex = null;
+    this.revealedSkippedAdventureIndices.clear();
+
     if (!this.classroomUrlFragment) {
       this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
@@ -459,12 +586,24 @@ export class TopicStorySectionComponent
     });
 
     this.adventureGroups = this.buildAdventureGroups(allNodes);
+    this.updateMasteryChallengeState();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
     this.masteryChallengeUrl = this.getMasteryChallengeUrl();
+  }
+
+  private updateMasteryChallengeState(): void {
+    const availableLessons = this.lessonCards.filter(
+      lesson => !lesson.isComingSoon
+    );
+    this.isMasteryChallengeUnlocked =
+      availableLessons.length > 0 &&
+      availableLessons.every(
+        lesson => lesson.lessonProgressStatus === 'completed'
+      );
   }
 
   private getPracticeCardData(): PracticeCardData {

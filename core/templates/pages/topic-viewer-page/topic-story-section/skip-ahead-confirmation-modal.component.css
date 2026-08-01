@@ -1,0 +1,212 @@
+.oppia-skip-ahead-modal {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.oppia-skip-ahead-close {
+  align-items: center;
+  align-self: flex-end;
+  background: #fff;
+  border: 2px solid #dfe3ea;
+  border-radius: 50%;
+  color: #6b7486;
+  display: inline-flex !important;
+  height: 56px;
+  justify-content: center;
+  margin-left: 0;
+  max-width: 56px;
+  min-height: 56px;
+  min-width: 56px;
+  padding: 0;
+  width: 56px !important;
+}
+
+.oppia-skip-ahead-close-mark {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.oppia-skip-ahead-icon {
+  align-items: center;
+  background: #f0eeff;
+  border-radius: 50%;
+  color: #5b3ac4;
+  display: flex;
+  height: 168px;
+  justify-content: center;
+  margin: 20px 0 22px;
+  position: relative;
+  width: 168px;
+}
+
+.oppia-skip-ahead-fast-forward {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.oppia-skip-ahead-fast-forward .triangle {
+  border-bottom: 20px solid transparent;
+  border-left: 28px solid #5b3ac4;
+  border-top: 20px solid transparent;
+  height: 0;
+  width: 0;
+}
+
+.oppia-skip-ahead-icon-spark {
+  background: #7f6ad8;
+  border-radius: 999px;
+  display: block;
+  height: 6px;
+  position: absolute;
+  width: 26px;
+}
+
+.oppia-skip-ahead-icon-spark.spark-one {
+  right: -6px;
+  top: 14px;
+  transform: rotate(24deg);
+}
+
+.oppia-skip-ahead-icon-spark.spark-two {
+  right: -18px;
+  top: 38px;
+  transform: rotate(-6deg);
+}
+
+.oppia-skip-ahead-icon-spark.spark-three {
+  right: -9px;
+  top: 62px;
+  transform: rotate(-34deg);
+}
+
+.oppia-skip-ahead-title {
+  color: #273247;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.16;
+  margin: 0 0 18px;
+}
+
+.oppia-skip-ahead-description {
+  color: #3f4c63;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.38;
+  margin: 0;
+  max-width: 740px;
+}
+
+.oppia-skip-ahead-divider {
+  border: none;
+  border-top: 1px solid #e5e9ef;
+  margin: 34px 0 30px;
+  width: 100%;
+}
+
+.oppia-skip-ahead-actions {
+  display: flex;
+  gap: 36px;
+  justify-content: center;
+  width: 100%;
+}
+
+.oppia-skip-ahead-cancel,
+.oppia-skip-ahead-continue {
+  border-radius: 24px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  min-height: 76px;
+  padding: 0 28px;
+  width: 42%;
+}
+
+.oppia-skip-ahead-cancel {
+  background: #fff;
+  border: 2px solid #8f9aaf;
+  color: #2f3a4f;
+}
+
+.oppia-skip-ahead-continue {
+  background: #00645c;
+  border: 2px solid #00645c;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .oppia-skip-ahead-modal {
+    min-height: 0;
+    padding: 20px 16px 24px;
+  }
+
+  .oppia-skip-ahead-close {
+    height: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    width: 44px;
+  }
+
+  .oppia-skip-ahead-close-mark {
+    font-size: 28px;
+  }
+
+  .oppia-skip-ahead-icon {
+    height: 98px;
+    margin: 10px 0 14px;
+    width: 98px;
+  }
+
+  .oppia-skip-ahead-fast-forward {
+    gap: 4px;
+  }
+
+  .oppia-skip-ahead-fast-forward .triangle {
+    border-bottom-width: 12px;
+    border-left-width: 16px;
+    border-top-width: 12px;
+  }
+
+  .oppia-skip-ahead-icon-spark {
+    height: 4px;
+    width: 16px;
+  }
+
+  .oppia-skip-ahead-title {
+    font-size: 34px;
+    margin-bottom: 10px;
+  }
+
+  .oppia-skip-ahead-description {
+    font-size: 16px;
+  }
+
+  .oppia-skip-ahead-divider {
+    margin: 20px 0;
+  }
+
+  .oppia-skip-ahead-actions {
+    gap: 12px;
+  }
+
+  .oppia-skip-ahead-cancel,
+  .oppia-skip-ahead-continue {
+    border-radius: 14px;
+    font-size: 16px;
+    min-height: 58px;
+    width: 50%;
+  }
+
+}

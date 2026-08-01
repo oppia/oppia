@@ -30,6 +30,7 @@ import {AdventureEndTestCardComponent} from './topic-story-section/adventure-end
 import {AdventureCircleBadgeComponent} from './topic-story-section/adventure-circle-badge.component';
 import {AdventureNavigationComponent} from './topic-story-section/adventure-navigation.component';
 import {MasteryChallengeCardComponent} from './topic-story-section/mastery-challenge-card.component';
+import {SkipAheadConfirmationModalComponent} from './topic-story-section/skip-ahead-confirmation-modal.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
@@ -45,6 +46,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureCircleBadgeComponent,
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
+    SkipAheadConfirmationModalComponent,
   ],
   entryComponents: [
     StoriesListComponent,
@@ -56,6 +58,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AdventureCircleBadgeComponent,
     AdventureNavigationComponent,
     MasteryChallengeCardComponent,
+    SkipAheadConfirmationModalComponent,
   ],
   exports: [
     StoriesListComponent,

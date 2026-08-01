@@ -64,9 +64,12 @@ describe('AdventureNavigationComponent', () => {
   it('should emit lessonSelected event when onLessonClick is called', () => {
     spyOn(component.lessonSelected, 'emit');
 
-    component.onLessonClick(5);
+    component.onLessonClick(5, 2);
 
-    expect(component.lessonSelected.emit).toHaveBeenCalledWith(5);
+    expect(component.lessonSelected.emit).toHaveBeenCalledWith({
+      lessonNumber: 5,
+      adventureIndex: 2,
+    });
   });
 
   it('should emit practiceSelected event when onPracticeClick is called', () => {

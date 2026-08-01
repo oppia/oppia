@@ -21,12 +21,12 @@
                                       [borderColor]="adventureGroup.accentColor"
                             [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
-                                      (click)="onLessonClick(lesson.lessonNumber)"
+                                      (click)="onLessonClick(lesson.lessonNumber, adventureIdx)"
                                       [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
                                       role="button"
                                       tabindex="0"
-                                      (keydown.enter)="onLessonClick(lesson.lessonNumber)"
-                                      (keydown.space)="onLessonClick(lesson.lessonNumber); $event.preventDefault()">
+                                      (keydown.enter)="onLessonClick(lesson.lessonNumber, adventureIdx)"
+                                      (keydown.space)="onLessonClick(lesson.lessonNumber, adventureIdx); $event.preventDefault()">
         </topic-adventure-circle-badge>
 
         <topic-adventure-circle-badge *ngIf="adventureGroup.showPractice"

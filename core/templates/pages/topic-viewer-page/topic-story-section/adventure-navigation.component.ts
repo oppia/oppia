@@ -40,6 +40,11 @@ interface AdventureNavigationGroup {
   showPractice: boolean;
 }
 
+export interface AdventureNavigationLessonSelection {
+  lessonNumber: number;
+  adventureIndex: number;
+}
+
 @Component({
   selector: 'topic-adventure-navigation',
   templateUrl: './adventure-navigation.component.html',
@@ -50,7 +55,8 @@ export class AdventureNavigationComponent
 {
   @Input() adventureGroups: AdventureNavigationGroup[] = [];
   @Input() activeLessonNumber: number | null = null;
-  @Output() lessonSelected = new EventEmitter<number>();
+  @Output() lessonSelected =
+    new EventEmitter<AdventureNavigationLessonSelection>();
   @Output() practiceSelected = new EventEmitter<number>();
 
   @ViewChild('scrollWrapper') scrollWrapper!: ElementRef<HTMLElement>;
@@ -138,8 +144,11 @@ export class AdventureNavigationComponent
     return lessonNumber === this.activeLessonNumber;
   }
 
-  onLessonClick(lessonNumber: number): void {
-    this.lessonSelected.emit(lessonNumber);
+  onLessonClick(lessonNumber: number, adventureIndex: number): void {
+    this.lessonSelected.emit({
+      lessonNumber,
+      adventureIndex,
+    });
   }
 
   onPracticeClick(adventureIndex: number): void {

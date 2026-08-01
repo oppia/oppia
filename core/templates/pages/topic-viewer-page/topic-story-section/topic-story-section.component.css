@@ -152,6 +152,112 @@
   overflow: hidden;
 }
 
+.skipped-adventure-bar {
+  margin-top: 12px;
+}
+
+.skipped-adventure-bar-button {
+  background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
+  border: 1px solid #d9e3f2;
+  border-radius: 14px;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  color: #243047;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 18px 22px;
+  text-align: left;
+  width: 100%;
+}
+
+.skipped-adventure-bar-header-row {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.skipped-adventure-bar-header-left {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+}
+
+.skipped-adventure-bar-icon {
+  align-items: center;
+  background: #ece8ff;
+  border-radius: 50%;
+  color: #4f2ab5;
+  display: inline-flex;
+  flex: 0 0 52px;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.skipped-adventure-bar-icon .material-icons {
+  font-size: 30px;
+}
+
+.skipped-adventure-bar-label {
+  color: #243047;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.skipped-adventure-badge {
+  background: #ece8ff;
+  border-radius: 999px;
+  color: #4f2ab5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  padding: 8px 14px;
+}
+
+.skipped-adventure-bar-footer-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.skipped-adventure-bar-action {
+  align-items: center;
+  border: 2px solid #5a3aba;
+  border-radius: 14px;
+  color: #4f2ab5;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  gap: 8px;
+  justify-content: center;
+  line-height: 1.2;
+  min-width: 246px;
+  padding: 12px 18px;
+  white-space: nowrap;
+}
+
+.skipped-adventure-bar-action .material-icons {
+  font-size: 20px;
+}
+
+.skipped-adventure-bar-description {
+  color: #2d3a50;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+  margin: 0;
+  flex: 1;
+}
+
 .adventure-header {
   align-items: center;
   background: #f5fafa;
@@ -415,6 +521,50 @@ topic-mastery-challenge-card {
 
   .adventure-group {
     margin-top: 12px;
+  }
+
+  .skipped-adventure-bar-button {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .skipped-adventure-bar-header-row {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .skipped-adventure-bar-icon {
+    flex: 0 0 44px;
+    height: 44px;
+    width: 44px;
+  }
+
+  .skipped-adventure-bar-icon .material-icons {
+    font-size: 24px;
+  }
+
+  .skipped-adventure-bar-label {
+    font-size: 20px;
+  }
+
+  .skipped-adventure-badge {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .skipped-adventure-bar-footer-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .skipped-adventure-bar-description {
+    font-size: 15px;
+  }
+
+  .skipped-adventure-bar-action {
+    font-size: 14px;
+    padding: 10px 14px;
   }
 
   .coming-soon-chapters-title {
