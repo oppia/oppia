@@ -827,16 +827,6 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the application is in production mode.
-   * @returns {Promise<boolean>} Returns true if the application is in development mode,
-   * false otherwise.
-   */
-  async isInProdMode(): Promise<boolean> {
-    const prodMode = process.env.PROD_ENV === 'true';
-    return prodMode;
-  }
-
-  /**
    * Close a single user's browser context.
    */
   async closeBrowser(): Promise<void> {
