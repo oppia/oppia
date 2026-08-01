@@ -18,11 +18,14 @@
 
 import {
   Component,
+  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  QueryList,
   SimpleChanges,
+  ViewChildren,
 } from '@angular/core';
 import {Subscription} from 'rxjs';
 
@@ -137,6 +140,11 @@ export class TopicStorySectionComponent
   _expandedAdventureIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
 
+  @ViewChildren('lessonCardWrapper')
+  lessonCardWrappers!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('practiceCardWrapper')
+  practiceCardWrappers!: QueryList<ElementRef<HTMLElement>>;
+
   private directiveSubscriptions: Subscription = new Subscription();
 
   isAdventureExpanded(index: number): boolean {
@@ -165,11 +173,9 @@ export class TopicStorySectionComponent
 
     // Scroll to the lesson card after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el =
-        document.getElementById('lesson-' + lessonNumber) ||
-        document.getElementById('coming-soon-lesson-' + lessonNumber);
-      if (el) {
-        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      const lessonCardElement = this.getLessonCardElement(lessonNumber);
+      if (lessonCardElement) {
+        lessonCardElement.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
     }, 300);
   }
@@ -177,11 +183,34 @@ export class TopicStorySectionComponent
   onNavigationPracticeSelected(adventureIndex: number): void {
     // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el = document.getElementById('practice-card-' + adventureIndex);
-      if (el) {
-        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      const practiceCardElement = this.getPracticeCardElement(adventureIndex);
+      if (practiceCardElement) {
+        practiceCardElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     }, 300);
+  }
+
+  private getLessonCardElement(lessonNumber: number): HTMLElement | null {
+    const wrappers = this.lessonCardWrappers?.toArray() ?? [];
+    const match = wrappers.find(wrapper => {
+      const id = wrapper.nativeElement.id;
+      return (
+        id === 'lesson-' + lessonNumber ||
+        id === 'coming-soon-lesson-' + lessonNumber
+      );
+    });
+    return match ? match.nativeElement : null;
+  }
+
+  private getPracticeCardElement(adventureIndex: number): HTMLElement | null {
+    const wrappers = this.practiceCardWrappers?.toArray() ?? [];
+    const match = wrappers.find(wrapper => {
+      return wrapper.nativeElement.id === 'practice-card-' + adventureIndex;
+    });
+    return match ? match.nativeElement : null;
   }
 
   constructor(

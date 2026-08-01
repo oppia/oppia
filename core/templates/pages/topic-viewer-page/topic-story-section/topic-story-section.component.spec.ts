@@ -1450,8 +1450,6 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     fixture.detectChanges();
 
-    spyOn(document, 'getElementById').and.returnValue(null);
-
     component.onNavigationLessonSelected(2);
 
     expect(component.activeLessonNumber).toBe(2);
@@ -1461,16 +1459,12 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
-  it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
-    const getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(
-      null
-    );
-
+  it('should handle adventure navigation practice selected when practice card is not rendered', fakeAsync(() => {
     component.onNavigationPracticeSelected(0);
 
     tick(300);
 
-    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-0');
+    expect(component.practiceCardWrappers.length).toBe(0);
   }));
 
   it('should select first not_started lesson as active when no in_progress', () => {
@@ -1611,31 +1605,105 @@ describe('TopicStorySectionComponent', () => {
     expect(component.shouldShowAdventureEndTestCard(0)).toBe(false);
   });
 
-  it('should scroll to lesson element when found by getElementById', fakeAsync(() => {
-    const mockElement = document.createElement('div');
-    spyOn(document, 'getElementById').and.returnValue(mockElement);
-    spyOn(mockElement, 'scrollIntoView');
+  it('should scroll to the lesson card when navigating to a lesson', fakeAsync(() => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    const lessonWrapper = component.lessonCardWrappers
+      .toArray()
+      .find(wrapper => wrapper.nativeElement.id === 'lesson-1');
+    expect(lessonWrapper).toBeDefined();
+    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
 
     component.onNavigationLessonSelected(1);
 
     tick(300);
 
-    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });
   }));
 
-  it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
-    const mockElement = document.createElement('div');
-    spyOn(document, 'getElementById').and.returnValue(mockElement);
-    spyOn(mockElement, 'scrollIntoView');
+  it('should scroll to the practice card when navigating to a practice session', fakeAsync(() => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceCount = 1;
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    const practiceCardWrapper = component.practiceCardWrappers
+      .toArray()
+      .find(wrapper => wrapper.nativeElement.id === 'practice-card-0');
+    expect(practiceCardWrapper).toBeDefined();
+    spyOn(practiceCardWrapper.nativeElement, 'scrollIntoView');
 
     component.onNavigationPracticeSelected(0);
 
     tick(300);
 
-    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(
+      practiceCardWrapper.nativeElement.scrollIntoView
+    ).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });
@@ -1977,8 +2045,6 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
     fixture.detectChanges();
-
-    spyOn(document, 'getElementById').and.returnValue(null);
 
     component.onNavigationLessonSelected(999);
 
@@ -2348,7 +2414,7 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should fall back to coming-soon-lesson prefix when lesson element is not found', fakeAsync(() => {
+  it('should scroll to the coming-soon lesson card when navigating to it', fakeAsync(() => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
       'getDescription',
@@ -2377,19 +2443,17 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     fixture.detectChanges();
 
-    const mockElement = document.createElement('div');
-    const getElementByIdSpy = spyOn(document, 'getElementById');
-    getElementByIdSpy.withArgs('lesson-1').and.returnValue(null);
-    getElementByIdSpy
-      .withArgs('coming-soon-lesson-1')
-      .and.returnValue(mockElement);
-    spyOn(mockElement, 'scrollIntoView');
+    const lessonWrapper = component.lessonCardWrappers
+      .toArray()
+      .find(wrapper => wrapper.nativeElement.id === 'coming-soon-lesson-1');
+    expect(lessonWrapper).toBeDefined();
+    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
 
     component.onNavigationLessonSelected(1);
 
     tick(300);
 
-    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });

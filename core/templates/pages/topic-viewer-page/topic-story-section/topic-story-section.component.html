@@ -68,6 +68,7 @@
           <div *ngIf="isAdventureExpanded(adventureIdx)" class="adventure-lessons">
             <div class="story-lesson-card-wrapper"
                  [id]="'lesson-' + lessonCard.lessonNumber"
+                 #lessonCardWrapper
                  *ngFor="let lessonCard of adventureGroup.lessonCards">
               <topic-lesson-card
                 [lessonTitle]="lessonCard.lessonTitle"
@@ -92,6 +93,7 @@
 
             <div class="story-practice-card-wrapper"
                  [id]="'practice-card-' + adventureIdx"
+                 #practiceCardWrapper
                  *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
               <topic-adventure-end-test-card
                 [practiceTitle]="practiceCard.practiceTitle"
@@ -110,6 +112,7 @@
       <ng-template #flatLessonList>
         <div class="story-lesson-card-wrapper"
              [id]="'lesson-' + lessonCard.lessonNumber"
+             #lessonCardWrapper
              *ngFor="let lessonCard of availableLessonCards">
           <topic-lesson-card
             [lessonTitle]="lessonCard.lessonTitle"
@@ -134,6 +137,7 @@
 
         <div class="story-practice-card-wrapper"
              id="practice-card-flat"
+             #practiceCardWrapper
              *ngIf="isPracticeCardVisible">
           <topic-adventure-end-test-card
             [practiceTitle]="practiceCard.practiceTitle"
@@ -150,21 +154,24 @@
       <section
                class="coming-soon-chapters-section e2e-test-coming-soon-chapters"
                *ngIf="comingSoonLessonCards.length > 0"
-               [attr.aria-label]="'Coming soon chapters'">
+               [attr.aria-label]="'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS' | translate">
         <div class="coming-soon-chapters-header">
           <div class="coming-soon-chapters-icon" aria-hidden="true">
             <i class="material-icons">schedule</i>
           </div>
           <div class="coming-soon-chapters-heading-text">
-            <h4 class="coming-soon-chapters-title">COMING SOON CHAPTERS</h4>
+            <h4 class="coming-soon-chapters-title">
+              {{ 'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS' | translate }}
+            </h4>
             <p class="coming-soon-chapters-count">
-              {{ comingSoonLessonCards.length }} chapter{{ comingSoonLessonCards.length === 1 ? '' : 's' }}
+              <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate: {count: comingSoonLessonCards.length, messageFormat: true}"></span>
             </p>
           </div>
         </div>
         <div
              class="story-lesson-card-wrapper coming-soon-lesson-card-wrapper"
              [id]="'coming-soon-lesson-' + lessonCard.lessonNumber"
+             #lessonCardWrapper
              *ngFor="let lessonCard of comingSoonLessonCards">
           <topic-lesson-card
             [lessonTitle]="lessonCard.lessonTitle"
