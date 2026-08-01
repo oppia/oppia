@@ -26,6 +26,7 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ContributorDashboardPageComponent} from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
+import {EntityTypeSelectorComponent} from './entity-type-selector/entity-type-selector.component';
 import {ContributionAndReviewService} from './services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
@@ -60,7 +61,10 @@ describe('Contributor dashboard page', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [ContributorDashboardPageComponent],
+      declarations: [
+        ContributorDashboardPageComponent,
+        EntityTypeSelectorComponent,
+      ],
       providers: [
         LocalStorageService,
         UserService,
@@ -335,6 +339,27 @@ describe('Contributor dashboard page', () => {
       component.onTabClick(changedTab);
       expect(component.activeTabName).toBe(changedTab);
       expect(component.showTopicSelector()).toBe(true);
+    });
+
+    it('should change active entity type when clicking on entity type selector', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+
+      component.onChangeEntityType('skill');
+      expect(component.activeEntityType).toBe('skill');
+    });
+
+    it('should show entity type selector based on active tab', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+
+      expect(component.activeTabName).toBe('myContributionTab');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      component.onTabClick('translateTextTab');
+      expect(component.showEntityTypeSelector()).toBe(true);
     });
 
     it('should show topic selector for questions reviews', () => {

@@ -90,6 +90,7 @@ export interface TranslationOpportunity {
   totalCount: number;
   translationsCount: number;
   reviewerOnlyContentCount: number;
+  entityType?: string;
 }
 export interface ModifyTranslationOpportunity {
   id: string;
@@ -230,10 +231,12 @@ export class TranslationModalComponent {
       this.translationLanguageService.getActiveLanguageDescription();
 
     if (!this.modifyTranslationOpportunity) {
+      const entityType =
+        this.opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION;
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
       this.pageContextService.setCustomEntityContext(
-        AppConstants.ENTITY_TYPE.EXPLORATION,
+        entityType,
         this.opportunity.id
       );
 
@@ -248,7 +251,8 @@ export class TranslationModalComponent {
           this.hasDataFormatListContent =
             this.opportunity.reviewerOnlyContentCount > 0;
           this.loadingData = false;
-        }
+        },
+        entityType
       );
     } else {
       // Initialize the translation modal with the "modify translation" opportunity

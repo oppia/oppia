@@ -180,7 +180,8 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
     languageCode: string,
     topicName: string,
-    cursor: string
+    cursor: string,
+    entityType?: string
   ): Promise<TranslationContributionOpportunities> {
     if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
@@ -191,7 +192,7 @@ export class ContributionOpportunitiesBackendApiService {
         topic_name:
           topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
         cursor: cursor,
-        entity_type: AppConstants.ENTITY_TYPE.EXPLORATION,
+        entity_type: entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
       };
 
       return this.http
