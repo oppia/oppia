@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from core import feconf, utils
 from core.domain import (
@@ -85,11 +86,30 @@ class TranslationProviderRegistryTests(test_utils.GenericTestBase):
     def test_get_provider_instance_returns_instance_for_valid_id(
         self,
     ) -> None:
-        instance = self.registry.get_provider_instance('azure')
+        instance = self.registry.get_provider_instance('gcp')
         self.assertIsNotNone(instance)
 
     def test_get_provider_instance_returns_none_for_invalid_id(self) -> None:
         self.assertIsNone(self.registry.get_provider_instance('nonexistent'))
+
+    def test_init_logs_error_for_unregistered_provider_class(self) -> None:
+        # Since the registry reads the file via utils.get_file_contents in its
+        # __init__, we need to mock utils.get_file_contents to return JSON with
+        # the unknown provider to trigger the initialization path correctly.
+        mock_get_file_contents = self.swap(
+            utils, 'get_file_contents', lambda _: '{"hi": ["unknown_provider"]}'
+        )
+
+        with mock_get_file_contents:
+            with self.capture_logging(min_level=logging.ERROR) as logs:
+                _ = machine_translation_services.TranslationProviderRegistry()
+
+        self.assertIn(
+            'Provider \'unknown_provider\' appears in auto_translation_provider'
+            '_mapping.json but has no registered implementation in '
+            '_PROVIDER_CLASS_MAP. Skipping.',
+            logs,
+        )
 
 
 class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):

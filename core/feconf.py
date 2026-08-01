@@ -588,6 +588,7 @@ OPPIA_CONTENT_TAG_DELIMITER = '; '
 # Azure Translator API configuration for automatic translation suggestions.
 AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
 AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
+GCP_TRANSLATOR_API_KEY = os.environ.get('GCP_TRANSLATOR_API_KEY')
 
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 

@@ -30,8 +30,8 @@ from core.domain import (
 )
 from core.platform import models
 from core.platform.translate import (
-    azure_translate_services,
     base_translate_services,
+    gcp_translate_services,
     translate_emulator,
 )
 
@@ -53,8 +53,8 @@ from typing import Dict, List, Optional, Set, Tuple, Type
 _PROVIDER_CLASS_MAP: Dict[
     str, Type[base_translate_services.BaseTranslationService]
 ] = {
-    azure_translate_services.AzureTranslationService.PROVIDER_ID: (
-        azure_translate_services.AzureTranslationService
+    gcp_translate_services.GcpTranslationService.PROVIDER_ID: (
+        gcp_translate_services.GcpTranslationService
     ),
 }
 
