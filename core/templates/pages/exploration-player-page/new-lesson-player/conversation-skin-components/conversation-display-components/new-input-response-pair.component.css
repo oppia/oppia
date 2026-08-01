@@ -28,8 +28,7 @@
   border-bottom-right-radius: 0;
 }
 
-oppia-new-input-response-pair .conversation-skin-oppia-feedback-content,
-oppia-new-input-response-pair .conversation-skin-learner-answer-content {
+.conversation-skin-oppia-feedback-content {
   padding: 12px;
   word-wrap: break-word;
 }
@@ -75,7 +74,9 @@ oppia-new-input-response-pair .conversation-skin-learner-answer-content {
 .oppia-popover {
   cursor: pointer;
   display: inline-block;
-}.oppia-answer-popup-container .oppia-answer-popup {
+}
+
+.oppia-answer-popup-container .oppia-answer-popup {
   max-height: 300px;
   max-width: 300px;
 }

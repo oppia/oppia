@@ -97,10 +97,10 @@ oppia-new-audio-bar .mat-slider-wrapper {
     width: 120px;
   }
 
-  oppia-new-audio-bar .desktop-mode {
+  .desktop-mode {
     display: none;
   }
-  oppia-new-audio-bar .mobile-mode {
+  .mobile-mode {
     display: block;
     margin-left: 30px;
   }

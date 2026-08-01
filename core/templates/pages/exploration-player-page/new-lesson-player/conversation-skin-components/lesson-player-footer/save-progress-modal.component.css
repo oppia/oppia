@@ -72,7 +72,7 @@
   text-align: center;
 }
 
-oppia-save-progress-modal .new-save-progress-menu .uid-box .copy-text {
+.new-save-progress-menu .uid-box .copy-text {
   font-size: 14px;
   margin-bottom: 10px;
   padding-left: 20px;

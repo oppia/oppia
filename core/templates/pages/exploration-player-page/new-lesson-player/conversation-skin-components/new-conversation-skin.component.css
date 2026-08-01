@@ -57,10 +57,6 @@ otherwise they will interfere with the iframed conversation skin directive. */
   width: 100%;
 }
 
-.conversation-skin-help-card-content {
-  padding: 12px;
-}
-
 .new-conversation-skin-tutor-card-container {
   margin: auto;
   max-width: 660px;
