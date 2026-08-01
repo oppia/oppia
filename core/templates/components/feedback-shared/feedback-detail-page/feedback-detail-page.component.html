@@ -1,0 +1,19 @@
+<ng-container *ngIf="feedbackDetailResponse as feedback; else loadingState">
+  <div class="oppia-feedback-detail-card">
+    <div class="oppia-feedback-detail-header">
+      <div class="oppia-feedback-detail-header-left">
+        <button type="button" class="btn btn-secondary btn-sm oppia-feedback-detail-back" (click)="goBack.emit()">
+          <i class="fas fa-angle-left" aria-hidden="true"></i>
+        </button>
+        <span class="oppia-feedback-detail-thread-title">
+          Feedback Detail
+        </span>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+
+<ng-template #loadingState>
+  <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
+</ng-template>
