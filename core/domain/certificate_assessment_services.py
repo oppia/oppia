@@ -50,6 +50,7 @@ CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: str = (
 CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: str = (
     constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
 )
+CERTIFICATE_ASSESSMENT_PASSING_SCORE_THRESHOLD: float = 80.0
 
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
@@ -796,7 +797,10 @@ def get_certificate_offerings_for_classroom(
         latest_attempt = latest_attempt_by_certificate_id.get(offering_model.id)
         if latest_attempt is None:
             attempt_status = 'Not Attempted'
-        elif latest_attempt.total_score >= 80:
+        elif (
+            latest_attempt.total_score
+            >= CERTIFICATE_ASSESSMENT_PASSING_SCORE_THRESHOLD
+        ):
             attempt_status = 'Passed'
         else:
             attempt_status = 'Not Passed'

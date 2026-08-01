@@ -425,6 +425,44 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
         self.assertEqual(offerings[0]['attempt_status'], 'Passed')
 
+    def test_get_certificate_offerings_for_classroom_uses_later_finished_attempt(
+        self,
+    ) -> None:
+        offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Geography',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
+        self._create_attempt(
+            'learner_id_1',
+            offering.certificate_id,
+            70.0,
+            1,
+            started_at,
+            started_at + datetime.timedelta(minutes=5),
+            True,
+        )
+        self._create_attempt(
+            'learner_id_1',
+            offering.certificate_id,
+            85.0,
+            1,
+            started_at + datetime.timedelta(minutes=10),
+            started_at + datetime.timedelta(minutes=20),
+            True,
+        )
+
+        offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            self.classroom_id, 'learner_id_1'
+        )
+        self.assertEqual(offerings[0]['attempt_status'], 'Passed')
+
     def test_get_certificate_offerings_for_classroom_empty_classroom(
         self,
     ) -> None:

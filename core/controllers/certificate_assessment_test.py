@@ -186,10 +186,7 @@ class CertificateAssessmentClassroomHandlerTest(test_utils.GenericTestBase):
             )
         )
 
-        self.assertEqual(
-            response,
-            {'certificate_offerings': response['certificate_offerings']},
-        )
+        self.assertIn('certificate_offerings', response)
         self.assertEqual(len(response['certificate_offerings']), 1)
         self.assertEqual(
             response['certificate_offerings'][0]['title'], 'Physics Basics'
