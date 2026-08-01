@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, TypedDict
-
 from core import feconf
+
+from typing import Dict, List, Optional, TypedDict
 
 
 class LessonMetadataDict(TypedDict):
