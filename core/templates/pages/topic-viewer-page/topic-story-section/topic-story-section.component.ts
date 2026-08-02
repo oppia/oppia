@@ -24,7 +24,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
@@ -41,10 +40,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 import constants from 'assets/constants';
-import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
-import {SkipAheadConfirmationModalComponent} from './skip-ahead-confirmation-modal.component';
-
-import './topic-story-section.component.css';
 
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
@@ -95,6 +90,7 @@ interface PracticeCardData {
 interface AdventureNavigationGroupData {
   lessons: {
     lessonNumber: number;
+    isCompleted: boolean;
   }[];
   accentColor: string;
   showPractice: boolean;
@@ -136,12 +132,14 @@ export class TopicStorySectionComponent
     practiceUrl: '#',
   };
   masteryChallengeUrl: string = '#';
-  isMasteryChallengeUnlocked: boolean = false;
   isPracticeCardVisible: boolean = false;
   _expandedAdventureIndices: Set<number> = new Set();
+  skippedAdventureIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
-  skippedAdventureEndIndex: number | null = null;
-  revealedSkippedAdventureIndices: Set<number> = new Set();
+  showArcSkipConfirmationModal: boolean = false;
+  pendingArcSkipTargetLabel: string = '';
+  private pendingNavigationLessonNumber: number | null = null;
+  private pendingNavigationAdventureIndex: number | null = null;
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -154,78 +152,77 @@ export class TopicStorySectionComponent
       this._expandedAdventureIndices.delete(index);
     } else {
       this._expandedAdventureIndices.add(index);
+      this.skippedAdventureIndices.delete(index);
     }
   }
 
-  onNavigationLessonSelected(
-    lessonSelection: AdventureNavigationLessonSelection | number
-  ): void {
-    const lessonNumber =
-      typeof lessonSelection === 'number'
-        ? lessonSelection
-        : lessonSelection.lessonNumber;
-    const targetAdventureIndex =
-      typeof lessonSelection === 'number'
-        ? this.getAdventureIndexByLessonNumber(lessonNumber)
-        : lessonSelection.adventureIndex;
+  onNavigationLessonSelected(lessonNumber: number): void {
+    const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
+      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
+    );
 
-    if (this.shouldPromptSkipAhead(targetAdventureIndex)) {
-      this.openSkipAheadModal(targetAdventureIndex);
+    if (adventureIndex !== -1 && this.shouldConfirmArcSkip(adventureIndex)) {
+      this.pendingNavigationLessonNumber = lessonNumber;
+      this.pendingNavigationAdventureIndex = adventureIndex;
+      this.pendingArcSkipTargetLabel = `Adventure ${adventureIndex + 1}`;
+      this.showArcSkipConfirmationModal = true;
       return;
     }
 
-    this.navigateToLesson(lessonNumber);
+    this.selectLessonFromNavigation(lessonNumber, adventureIndex);
   }
 
-  hasSkippedAdventureSummary(): boolean {
-    return (
-      this.skippedAdventureEndIndex !== null &&
-      this.skippedAdventureEndIndex >= 0
-    );
+  onArcSkipConfirmationCancel(): void {
+    this.showArcSkipConfirmationModal = false;
+    this.pendingNavigationLessonNumber = null;
+    this.pendingNavigationAdventureIndex = null;
+    this.pendingArcSkipTargetLabel = '';
   }
 
-  getSkippedAdventureSummaryText(): string {
+  onArcSkipConfirmationProceed(): void {
     if (
-      this.skippedAdventureEndIndex === null ||
-      this.skippedAdventureEndIndex < 0
+      this.pendingNavigationLessonNumber === null ||
+      this.pendingNavigationAdventureIndex === null
     ) {
-      return '';
+      this.onArcSkipConfirmationCancel();
+      return;
     }
 
-    return `Adventure 1-${this.skippedAdventureEndIndex + 1}: ⏭️`;
+    this.showArcSkipConfirmationModal = false;
+    this.selectLessonFromNavigation(
+      this.pendingNavigationLessonNumber,
+      this.pendingNavigationAdventureIndex
+    );
+
+    this.pendingNavigationLessonNumber = null;
+    this.pendingNavigationAdventureIndex = null;
+    this.pendingArcSkipTargetLabel = '';
   }
 
-  isSkippedAdventureCollapsed(adventureIndex: number): boolean {
-    return (
-      this.skippedAdventureEndIndex !== null &&
-      adventureIndex <= this.skippedAdventureEndIndex &&
-      !this.revealedSkippedAdventureIndices.has(adventureIndex)
+  isAdventureSkipped(adventureIndex: number): boolean {
+    return this.skippedAdventureIndices.has(adventureIndex);
+  }
+
+  isAdventureCompleted(adventureIndex: number): boolean {
+    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
+    if (!adventureGroup || adventureGroup.lessonCards.length === 0) {
+      return false;
+    }
+
+    return adventureGroup.lessonCards.every(
+      card => card.lessonProgressStatus === 'completed'
     );
   }
 
-  onSkippedAdventureBarSelected(adventureIndex: number): void {
-    this.revealedSkippedAdventureIndices.add(adventureIndex);
-    this._expandedAdventureIndices.add(adventureIndex);
-    this.scrollToAdventure(adventureIndex);
-  }
-
-  onNavigationPracticeSelected(adventureIndex: number): void {
-    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
-    setTimeout(() => {
-      const el = document.getElementById('practice-card-' + adventureIndex);
-      if (el) {
-        el.scrollIntoView({behavior: 'smooth', block: 'start'});
-      }
-    }, 300);
-  }
-
-  private navigateToLesson(lessonNumber: number): void {
+  private selectLessonFromNavigation(
+    lessonNumber: number,
+    adventureIndex: number
+  ): void {
     this.activeLessonNumber = lessonNumber;
     this.navigatedLessonNumber = lessonNumber;
 
-    // Expand the adventure that contains this lesson.
-    const adventureIndex = this.getAdventureIndexByLessonNumber(lessonNumber);
     if (adventureIndex !== -1) {
+      this.markSkippedAdventuresBefore(adventureIndex);
       this._expandedAdventureIndices.add(adventureIndex);
     }
 
@@ -240,66 +237,36 @@ export class TopicStorySectionComponent
     }, 300);
   }
 
-  private shouldPromptSkipAhead(targetAdventureIndex: number): boolean {
+  private shouldConfirmArcSkip(targetAdventureIndex: number): boolean {
     if (targetAdventureIndex <= 0) {
       return false;
     }
 
-    return targetAdventureIndex > this.getCurrentAdventureIndex();
-  }
-
-  private getCurrentAdventureIndex(): number {
-    if (this.activeLessonNumber === null) {
-      return 0;
+    for (let index = 0; index < targetAdventureIndex; index++) {
+      if (!this.isAdventureCompleted(index)) {
+        return true;
+      }
     }
-
-    const activeAdventureIndex = this.getAdventureIndexByLessonNumber(
-      this.activeLessonNumber
-    );
-    return activeAdventureIndex === -1 ? 0 : activeAdventureIndex;
+    return false;
   }
 
-  private getAdventureIndexByLessonNumber(lessonNumber: number): number {
-    return this.visibleAdventureGroups.findIndex(group =>
-      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
-    );
-  }
-
-  private openSkipAheadModal(targetAdventureIndex: number): void {
-    const modalRef = this.ngbModal.open(SkipAheadConfirmationModalComponent, {
-      backdrop: 'static',
-      centered: true,
-      windowClass: 'oppia-progress-reminder-modal',
-    });
-
-    modalRef.componentInstance.targetArcNumber = targetAdventureIndex + 1;
-    modalRef.result.then(
-      () => {
-        this.confirmSkipAheadToAdventure(targetAdventureIndex);
-      },
-      () => undefined
-    );
-  }
-
-  private confirmSkipAheadToAdventure(targetAdventureIndex: number): void {
-    const targetAdventure = this.visibleAdventureGroups[targetAdventureIndex];
-    if (!targetAdventure || targetAdventure.lessonCards.length === 0) {
+  private markSkippedAdventuresBefore(targetAdventureIndex: number): void {
+    if (targetAdventureIndex <= 0) {
       return;
     }
 
-    const firstLessonNumber = targetAdventure.lessonCards[0].lessonNumber;
-    this.skippedAdventureEndIndex = targetAdventureIndex - 1;
-    this.revealedSkippedAdventureIndices.clear();
-    this._expandedAdventureIndices = new Set([targetAdventureIndex]);
-    this.activeLessonNumber = firstLessonNumber;
-    this.navigatedLessonNumber = firstLessonNumber;
-
-    this.scrollToAdventure(targetAdventureIndex);
+    for (let index = 0; index < targetAdventureIndex; index++) {
+      if (!this.isAdventureCompleted(index)) {
+        this.skippedAdventureIndices.add(index);
+        this._expandedAdventureIndices.delete(index);
+      }
+    }
   }
 
-  private scrollToAdventure(adventureIndex: number): void {
+  onNavigationPracticeSelected(adventureIndex: number): void {
+    // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el = document.getElementById('adventure-group-' + adventureIndex);
+      const el = document.getElementById('practice-card-' + adventureIndex);
       if (el) {
         el.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
@@ -310,7 +277,6 @@ export class TopicStorySectionComponent
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private ngbModal: NgbModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
@@ -485,7 +451,6 @@ export class TopicStorySectionComponent
 
     const allNodes = this.storySummary.getAllNodes();
     this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.updateMasteryChallengeState();
     this.updateVisibleSections();
   }
 
@@ -524,9 +489,6 @@ export class TopicStorySectionComponent
   }
 
   private populateFromInputs(): void {
-    this.skippedAdventureEndIndex = null;
-    this.revealedSkippedAdventureIndices.clear();
-
     if (!this.classroomUrlFragment) {
       this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
@@ -586,24 +548,12 @@ export class TopicStorySectionComponent
     });
 
     this.adventureGroups = this.buildAdventureGroups(allNodes);
-    this.updateMasteryChallengeState();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
     this.masteryChallengeUrl = this.getMasteryChallengeUrl();
-  }
-
-  private updateMasteryChallengeState(): void {
-    const availableLessons = this.lessonCards.filter(
-      lesson => !lesson.isComingSoon
-    );
-    this.isMasteryChallengeUnlocked =
-      availableLessons.length > 0 &&
-      availableLessons.every(
-        lesson => lesson.lessonProgressStatus === 'completed'
-      );
   }
 
   private getPracticeCardData(): PracticeCardData {
@@ -745,6 +695,7 @@ export class TopicStorySectionComponent
           lessons: visibleLessons.map(card => {
             return {
               lessonNumber: card.lessonNumber,
+              isCompleted: card.lessonProgressStatus === 'completed',
             };
           }),
           accentColor: group.accentColor,

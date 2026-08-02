@@ -42,41 +42,36 @@
       </topic-adventure-navigation>
 
       <ng-container *ngIf="adventureGroups.length > 0; else flatLessonList">
-        <ng-container *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx">
-          <div *ngIf="isSkippedAdventureCollapsed(adventureIdx)"
-               class="skipped-adventure-bar"
-               [id]="'adventure-group-' + adventureIdx">
-            <button type="button"
-                    class="skipped-adventure-bar-button"
-                    (click)="onSkippedAdventureBarSelected(adventureIdx)"
-                    [attr.aria-label]="'Open adventure ' + (adventureIdx + 1)">
-              <div class="skipped-adventure-bar-header-row">
-                <div class="skipped-adventure-bar-header-left">
-                  <span class="skipped-adventure-bar-icon" aria-hidden="true">
-                    <i class="material-icons">fast_forward</i>
-                  </span>
-                  <span class="skipped-adventure-bar-label">Adventure {{ adventureIdx + 1 }}</span>
-                  <span class="skipped-adventure-badge">
-                    {{ 'I18N_TOPIC_VIEWER_SKIP_AHEAD_SKIPPED_BADGE' | translate }}
-                  </span>
+        <div *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx">
+          <div *ngIf="isAdventureSkipped(adventureIdx) && !isAdventureExpanded(adventureIdx)"
+               class="skipped-adventure-card"
+               [attr.aria-label]="adventureGroup.adventureTitle + ' was skipped. Expand to review.'">
+            <div class="skipped-adventure-header-row">
+              <div class="skipped-adventure-left-cluster">
+                <div class="skipped-adventure-icon" aria-hidden="true">
+                  <i class="material-icons">fast_forward</i>
                 </div>
+                <h4 class="skipped-adventure-name">{{ adventureGroup.adventureTitle }}</h4>
+                <span class="skipped-adventure-badge">SKIPPED</span>
               </div>
-              <div class="skipped-adventure-bar-footer-row">
-                <p class="skipped-adventure-bar-description">
-                  {{ 'I18N_TOPIC_VIEWER_SKIP_AHEAD_SKIPPED_DESCRIPTION' | translate }}
-                </p>
-                <span class="skipped-adventure-bar-action">
-                  <i class="material-icons" aria-hidden="true">visibility</i>
-                  {{ 'I18N_TOPIC_VIEWER_SKIP_AHEAD_REVIEW_ADVENTURE_BUTTON' | translate }}
-                </span>
-              </div>
-            </button>
+            </div>
+
+            <div class="skipped-adventure-body-row">
+              <p class="skipped-adventure-message">
+                This adventure was skipped. You can revisit it anytime.
+              </p>
+              <button type="button"
+                      class="skipped-adventure-review-cta"
+                      (click)="toggleAdventure(adventureIdx)">
+                <i class="material-icons" aria-hidden="true">visibility</i>
+                Review Adventure
+              </button>
+            </div>
           </div>
 
-          <div *ngIf="!isSkippedAdventureCollapsed(adventureIdx)"
-               class="adventure-group"
-               [id]="'adventure-group-' + adventureIdx"
-               [ngStyle]="{'border-color': adventureGroup.headerBorderColor}">
+        <div class="adventure-group"
+             *ngIf="!isAdventureSkipped(adventureIdx) || isAdventureExpanded(adventureIdx)"
+             [ngStyle]="{'border-color': adventureGroup.headerBorderColor}">
           <div class="adventure-header" (click)="toggleAdventure(adventureIdx)" role="button" tabindex="0"
                [attr.aria-expanded]="isAdventureExpanded(adventureIdx)"
                [ngStyle]="{'background-color': adventureGroup.headerBackgroundColor}"
@@ -137,8 +132,8 @@
               </topic-adventure-end-test-card>
             </div>
           </div>
-          </div>
-        </ng-container>
+        </div>
+        </div>
       </ng-container>
 
       <ng-template #flatLessonList>
@@ -224,9 +219,57 @@
       </section>
 
       <topic-mastery-challenge-card
-        [actionUrl]="masteryChallengeUrl"
-        [isUnlocked]="isMasteryChallengeUnlocked">
+        [actionUrl]="masteryChallengeUrl">
       </topic-mastery-challenge-card>
     </div>
   </div>
 </section>
+
+<div *ngIf="showArcSkipConfirmationModal"
+     class="arc-skip-confirmation-modal-backdrop"
+     role="presentation"
+     (click)="onArcSkipConfirmationCancel()">
+  <section class="arc-skip-confirmation-modal"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="arc-skip-confirmation-title"
+           (click)="$event.stopPropagation()">
+    <button type="button"
+            class="arc-skip-confirmation-close"
+            aria-label="Close"
+            (click)="onArcSkipConfirmationCancel()">
+      <i class="material-icons" aria-hidden="true">close</i>
+    </button>
+
+    <div class="arc-skip-confirmation-icon-wrap" aria-hidden="true">
+      <div class="arc-skip-confirmation-icon-circle">
+        <i class="material-icons">fast_forward</i>
+      </div>
+      <span class="arc-skip-confirmation-icon-ray arc-skip-confirmation-icon-ray-one"></span>
+      <span class="arc-skip-confirmation-icon-ray arc-skip-confirmation-icon-ray-two"></span>
+      <span class="arc-skip-confirmation-icon-ray arc-skip-confirmation-icon-ray-three"></span>
+    </div>
+
+    <h3 id="arc-skip-confirmation-title" class="arc-skip-confirmation-title">
+      Skip ahead to {{ pendingArcSkipTargetLabel }}?
+    </h3>
+    <p class="arc-skip-confirmation-message">
+      Previous Arcs will be marked as skipped, but remain accessible.
+    </p>
+
+    <div class="arc-skip-confirmation-divider" aria-hidden="true"></div>
+
+    <div class="arc-skip-confirmation-actions">
+      <button type="button"
+              class="arc-skip-confirmation-cancel"
+              (click)="onArcSkipConfirmationCancel()">
+        Cancel
+      </button>
+      <button type="button"
+              class="arc-skip-confirmation-proceed"
+              (click)="onArcSkipConfirmationProceed()">
+        Continue
+      </button>
+    </div>
+  </section>
+</div>

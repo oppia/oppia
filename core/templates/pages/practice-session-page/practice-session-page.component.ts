@@ -29,13 +29,6 @@ import {PageTitleService} from 'services/page-title.service';
 import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
-enum PracticeSessionType {
-  Lesson = 'lesson',
-  Arc = 'arc',
-  Mastery = 'mastery',
-  Legacy = 'legacy',
-}
-
 @Component({
   selector: 'practice-session-page',
   templateUrl: './practice-session-page.component.html',
@@ -49,9 +42,6 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   stringifiedSubtopicIds!: string;
   questionPlayerConfig!: QuestionPlayerConfig;
   loadingMessage: string = 'Loading';
-  private sessionType: PracticeSessionType = PracticeSessionType.Mastery;
-  private nodeId: string = '';
-  private arcId: string = '';
 
   constructor(
     private urlService: UrlService,
@@ -81,101 +71,27 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _getDataUrl(): string {
-    const classroomUrlFragment =
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    const topicUrlFragment =
-      this.urlService.getTopicUrlFragmentFromLearnerUrl();
-
-    switch (this.sessionType) {
-      case PracticeSessionType.Lesson:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.LESSON_PRACTICE_DATA_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-            node_id: this.nodeId,
-          }
-        );
-      case PracticeSessionType.Arc:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.ARC_PRACTICE_DATA_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-            arc_id: this.arcId,
-          }
-        );
-      case PracticeSessionType.Legacy:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-            stringified_subtopic_ids: this.stringifiedSubtopicIds,
-          }
-        );
-      default:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.MASTERY_CHALLENGE_DATA_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-          }
-        );
-    }
-  }
-
-  private _getRetryUrl(): string {
-    const classroomUrlFragment =
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    const topicUrlFragment =
-      this.urlService.getTopicUrlFragmentFromLearnerUrl();
-
-    switch (this.sessionType) {
-      case PracticeSessionType.Lesson:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.LESSON_PRACTICE_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-            node_id: this.nodeId,
-          }
-        );
-      case PracticeSessionType.Arc:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.END_OF_ARC_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-            arc_id: this.arcId,
-          }
-        );
-      case PracticeSessionType.Legacy:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-            stringified_subtopic_ids: this.stringifiedSubtopicIds,
-          }
-        );
-      default:
-        return this.urlInterpolationService.interpolateUrl(
-          PracticeSessionPageConstants.MASTERY_CHALLENGE_URL,
-          {
-            classroom_url_fragment: classroomUrlFragment,
-            topic_url_fragment: topicUrlFragment,
-          }
-        );
-    }
-  }
-
   _fetchSkillDetails(): void {
     const topicUrlFragment =
       this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    const practiceSessionsDataUrl = this._getDataUrl();
-    const practiceSessionsUrl = this._getRetryUrl();
+    const practiceSessionsDataUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL,
+      {
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment:
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
+        stringified_subtopic_ids: this.stringifiedSubtopicIds,
+      }
+    );
+    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
+      {
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment:
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
+        stringified_subtopic_ids: this.stringifiedSubtopicIds,
+      }
+    );
     const topicViewerUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.TOPIC_VIEWER_PAGE,
       {
@@ -232,32 +148,8 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     );
 
     this.topicName = this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    if (!this.platformFeatureService.status.StoryEditorArcs.isEnabled) {
-      this.stringifiedSubtopicIds =
-        this.urlService.getSelectedSubtopicsFromUrl();
-    }
-    this._determineSessionType();
+    this.stringifiedSubtopicIds = this.urlService.getSelectedSubtopicsFromUrl();
     this._fetchSkillDetails();
-  }
-
-  private _determineSessionType(): void {
-    const nodeId = this.urlService.getNodeIdFromPracticeUrl();
-    const arcId = this.urlService.getArcIdFromUrl();
-
-    if (nodeId) {
-      this.sessionType = PracticeSessionType.Lesson;
-      this.nodeId = nodeId;
-    } else if (
-      arcId &&
-      this.platformFeatureService.status.StoryEditorArcs.isEnabled
-    ) {
-      this.sessionType = PracticeSessionType.Arc;
-      this.arcId = arcId;
-    } else if (this.urlService.getPathname().match(/\/mastery-challenge/)) {
-      this.sessionType = PracticeSessionType.Mastery;
-    } else if (this.stringifiedSubtopicIds) {
-      this.sessionType = PracticeSessionType.Legacy;
-    }
   }
 
   ngOnDestroy(): void {

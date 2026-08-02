@@ -30,13 +30,10 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
 
-import './topic-lesson-card.component.css';
-
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
 const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   'initialVoiceoverLanguageCode';
-const LESSON_PROGRESS_STATUS_COMING_SOON = 'coming_soon';
 
 @Component({
   selector: 'topic-lesson-card',
@@ -73,6 +70,11 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   selectedTextLanguageCode: string | null = null;
   selectedVoiceoverLanguageCode: string | null = null;
   isExpanded: boolean = false;
+  private previousLessonProgressStatus:
+    | 'not_started'
+    | 'in_progress'
+    | 'completed'
+    | 'coming_soon' = 'not_started';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -89,8 +91,9 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     // Expand the first lesson by default, or the navigated lesson.
     this.isExpanded =
       !this.isComingSoonSectionCard &&
-      (this.lessonNumber === 1 ||
-        this.navigatedLessonNumber === this.lessonNumber);
+      (this.navigatedLessonNumber === this.lessonNumber ||
+        (this.lessonNumber === 1 && this.lessonProgressStatus !== 'completed'));
+    this.previousLessonProgressStatus = this.lessonProgressStatus;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -109,17 +112,37 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
         this.isExpanded = true;
       }
     }
+
+    if (changes.lessonProgressStatus) {
+      const currentStatus = changes.lessonProgressStatus.currentValue as
+        | 'not_started'
+        | 'in_progress'
+        | 'completed'
+        | 'coming_soon';
+      if (
+        currentStatus === 'completed' &&
+        this.previousLessonProgressStatus !== 'completed' &&
+        !this.isComingSoonSectionCard
+      ) {
+        this.isExpanded = false;
+      }
+      this.previousLessonProgressStatus = currentStatus;
+    }
   }
 
   get showCheckpointBar(): boolean {
     return (
-      this.lessonProgressStatus !== LESSON_PROGRESS_STATUS_COMING_SOON &&
+      this.lessonProgressStatus !== 'coming_soon' &&
       this.totalCheckpointsCount > 0
     );
   }
 
   get isComingSoonLesson(): boolean {
-    return this.lessonProgressStatus === LESSON_PROGRESS_STATUS_COMING_SOON;
+    return this.lessonProgressStatus === 'coming_soon';
+  }
+
+  get isCompletedLesson(): boolean {
+    return this.lessonProgressStatus === 'completed';
   }
 
   navigateTo(url: string): void {
@@ -165,6 +188,12 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
       return;
     }
     this.isExpanded = !this.isExpanded;
+  }
+
+  onPlayAgainClick(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.onStartButtonClick();
   }
 
   onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {

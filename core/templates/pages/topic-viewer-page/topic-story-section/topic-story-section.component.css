@@ -145,50 +145,33 @@
   padding: 0 24px 24px;
 }
 
-.adventure-group {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  margin-top: 16px;
-  overflow: hidden;
-}
-
-.skipped-adventure-bar {
-  margin-top: 12px;
-}
-
-.skipped-adventure-bar-button {
-  background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
-  border: 1px solid #d9e3f2;
+.skipped-adventure-card {
+  background: linear-gradient(180deg, #fff 0%, #fcfdff 100%);
+  border: 1px solid #dce4f2;
   border-radius: 14px;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  color: #243047;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 18px 22px;
-  text-align: left;
-  width: 100%;
+  margin-top: 16px;
+  padding: 16px 22px 18px;
 }
 
-.skipped-adventure-bar-header-row {
+.skipped-adventure-header-row {
   align-items: center;
   display: flex;
+  gap: 12px;
   justify-content: flex-start;
-  width: 100%;
 }
 
-.skipped-adventure-bar-header-left {
+.skipped-adventure-left-cluster {
   align-items: center;
-  display: flex;
-  gap: 16px;
+  display: inline-flex;
+  gap: 14px;
   min-width: 0;
 }
 
-.skipped-adventure-bar-icon {
+.skipped-adventure-icon {
   align-items: center;
-  background: #ece8ff;
+  background: #ece9ff;
   border-radius: 50%;
-  color: #4f2ab5;
+  color: #4e39c3;
   display: inline-flex;
   flex: 0 0 52px;
   height: 52px;
@@ -196,66 +179,88 @@
   width: 52px;
 }
 
-.skipped-adventure-bar-icon .material-icons {
-  font-size: 30px;
+.skipped-adventure-icon .material-icons {
+  font-size: 27px;
 }
 
-.skipped-adventure-bar-label {
-  color: #243047;
+.skipped-adventure-name {
+  color: #1f2937;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.15;
+  margin: 0;
 }
 
 .skipped-adventure-badge {
-  background: #ece8ff;
+  background: #eae7ff;
   border-radius: 999px;
-  color: #4f2ab5;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  line-height: 1;
-  padding: 8px 14px;
-}
-
-.skipped-adventure-bar-footer-row {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-}
-
-.skipped-adventure-bar-action {
-  align-items: center;
-  border: 2px solid #5a3aba;
-  border-radius: 14px;
-  color: #4f2ab5;
-  display: inline-flex;
+  color: #4c38be;
   font-family: Roboto, Arial, sans-serif;
   font-size: 17px;
-  font-weight: 600;
-  gap: 8px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+  padding: 9px 20px;
+}
+
+.skipped-adventure-body-row {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.skipped-adventure-message {
+  color: #374151;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.28;
+  margin: 0;
+}
+
+.skipped-adventure-review-cta {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #5641c7;
+  border-radius: 14px;
+  color: #4830b4;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 11px;
   justify-content: center;
-  line-height: 1.2;
-  min-width: 246px;
-  padding: 12px 18px;
+  line-height: 1.15;
+  margin-left: auto;
+  min-height: 54px;
+  min-width: 244px;
+  padding: 10px 24px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
 }
 
-.skipped-adventure-bar-action .material-icons {
-  font-size: 20px;
+.skipped-adventure-review-cta .material-icons {
+  font-size: 22px;
 }
 
-.skipped-adventure-bar-description {
-  color: #2d3a50;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 17px;
-  line-height: 1.4;
-  margin: 0;
-  flex: 1;
+.skipped-adventure-review-cta:hover {
+  background: #f8f6ff;
+  border-color: #4d39bc;
+}
+
+.skipped-adventure-review-cta:focus-visible {
+  box-shadow: 0 0 0 3px rgba(75, 53, 182, 0.2);
+  outline: none;
+}
+
+.adventure-group {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-top: 16px;
+  overflow: hidden;
 }
 
 .adventure-header {
@@ -450,6 +455,168 @@ topic-mastery-challenge-card {
   display: block;
 }
 
+.arc-skip-confirmation-modal-backdrop {
+  align-items: center;
+  background: rgba(16, 24, 40, 0.52);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 16px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1200;
+}
+
+.arc-skip-confirmation-modal {
+  background: #fff;
+  border-radius: 10px;
+  max-width: 560px;
+  min-height: 0;
+  padding: 24px 24px 20px;
+  position: relative;
+  width: min(560px, calc(100vw - 32px));
+}
+
+.arc-skip-confirmation-close {
+  align-items: center;
+  background: #fff;
+  border: 2px solid #e1e6ef;
+  border-radius: 50%;
+  color: #7f8a9b;
+  cursor: pointer;
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  width: 48px;
+}
+
+.arc-skip-confirmation-close .material-icons {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.arc-skip-confirmation-close:focus-visible {
+  outline: 2px solid #00645c;
+  outline-offset: 2px;
+}
+
+.arc-skip-confirmation-icon-wrap {
+  margin: 0 auto 14px;
+  position: relative;
+  width: fit-content;
+}
+
+.arc-skip-confirmation-icon-circle {
+  align-items: center;
+  background: #f0efff;
+  border-radius: 50%;
+  color: #4b3bc6;
+  display: inline-flex;
+  height: 96px;
+  justify-content: center;
+  width: 96px;
+}
+
+.arc-skip-confirmation-icon-circle .material-icons {
+  font-size: 50px;
+}
+
+.arc-skip-confirmation-icon-ray {
+  background: #7a6cd8;
+  border-radius: 8px;
+  display: block;
+  height: 5px;
+  position: absolute;
+  right: -8px;
+  width: 20px;
+}
+
+.arc-skip-confirmation-icon-ray-one {
+  top: 11px;
+  transform: rotate(-18deg);
+}
+
+.arc-skip-confirmation-icon-ray-two {
+  right: -11px;
+  top: 25px;
+  transform: rotate(6deg);
+}
+
+.arc-skip-confirmation-icon-ray-three {
+  right: -8px;
+  top: 40px;
+  transform: rotate(30deg);
+}
+
+.arc-skip-confirmation-title {
+  color: #222f42;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.arc-skip-confirmation-message {
+  color: #4e596b;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  margin: 0 auto;
+  max-width: 420px;
+  text-align: center;
+}
+
+.arc-skip-confirmation-divider {
+  background: #e6e9ef;
+  height: 1px;
+  margin: 20px auto 16px;
+  max-width: 100%;
+  width: 100%;
+}
+
+.arc-skip-confirmation-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.arc-skip-confirmation-cancel,
+.arc-skip-confirmation-proceed {
+  border-radius: 5px;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  min-height: 52px;
+  min-width: 240px;
+  padding: 10px 16px;
+}
+
+.arc-skip-confirmation-cancel {
+  background: #fff;
+  border: 2px solid #727d90;
+  color: #2f3d4d;
+}
+
+.arc-skip-confirmation-proceed {
+  background: #00645c;
+  border: 2px solid #00645c;
+  color: #fff;
+}
+
+.arc-skip-confirmation-cancel:focus-visible,
+.arc-skip-confirmation-proceed:focus-visible {
+  outline: 2px solid #00645c;
+  outline-offset: 2px;
+}
+
 @media (max-width: 768px) {
   .story-callout-row {
     align-items: flex-start;
@@ -523,48 +690,60 @@ topic-mastery-challenge-card {
     margin-top: 12px;
   }
 
-  .skipped-adventure-bar-button {
-    gap: 12px;
-    padding: 14px;
+  .skipped-adventure-card {
+    margin-top: 12px;
+    padding: 12px 12px 14px;
   }
 
-  .skipped-adventure-bar-header-row {
+  .skipped-adventure-header-row {
     align-items: flex-start;
-    gap: 8px;
+    flex-direction: column;
   }
 
-  .skipped-adventure-bar-icon {
-    flex: 0 0 44px;
-    height: 44px;
-    width: 44px;
+  .skipped-adventure-left-cluster {
+    gap: 10px;
   }
 
-  .skipped-adventure-bar-icon .material-icons {
-    font-size: 24px;
+  .skipped-adventure-icon {
+    flex: 0 0 36px;
+    height: 36px;
+    width: 36px;
   }
 
-  .skipped-adventure-bar-label {
+  .skipped-adventure-icon .material-icons {
     font-size: 20px;
   }
 
+  .skipped-adventure-name {
+    font-size: 18px;
+  }
+
   .skipped-adventure-badge {
-    font-size: 12px;
-    padding: 8px 12px;
+    font-size: 13px;
+    padding: 6px 12px;
   }
 
-  .skipped-adventure-bar-footer-row {
-    align-items: flex-start;
+  .skipped-adventure-body-row {
+    align-items: stretch;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    margin-top: 12px;
   }
 
-  .skipped-adventure-bar-description {
-    font-size: 15px;
-  }
-
-  .skipped-adventure-bar-action {
+  .skipped-adventure-message {
     font-size: 14px;
+  }
+
+  .skipped-adventure-review-cta {
+    font-size: 14px;
+    min-width: 0;
+    min-height: 44px;
     padding: 10px 14px;
+    width: 100%;
+  }
+
+  .skipped-adventure-review-cta .material-icons {
+    font-size: 22px;
   }
 
   .coming-soon-chapters-title {
@@ -788,4 +967,87 @@ topic-mastery-challenge-card {
   .story-practice-card-wrapper {
     margin-top: 8px;
   }
+
+
+  .arc-skip-confirmation-modal {
+    border-radius: 10px;
+    min-height: 0;
+    padding: 18px 14px 14px;
+    width: min(560px, calc(100vw - 24px));
+  }
+
+  .arc-skip-confirmation-close {
+    border-width: 1.5px;
+    height: 42px;
+    right: 8px;
+    top: 8px;
+    width: 42px;
+  }
+
+  .arc-skip-confirmation-close .material-icons {
+    font-size: 30px;
+  }
+
+  .arc-skip-confirmation-icon-wrap {
+    margin-bottom: 12px;
+  }
+
+  .arc-skip-confirmation-icon-circle {
+    height: 84px;
+    width: 84px;
+  }
+
+  .arc-skip-confirmation-icon-circle .material-icons {
+    font-size: 44px;
+  }
+
+  .arc-skip-confirmation-icon-ray {
+    height: 4px;
+    width: 16px;
+  }
+
+  .arc-skip-confirmation-icon-ray-one {
+    right: -4px;
+    top: 10px;
+  }
+
+  .arc-skip-confirmation-icon-ray-two {
+    right: -8px;
+    top: 20px;
+  }
+
+  .arc-skip-confirmation-icon-ray-three {
+    right: -5px;
+    top: 31px;
+  }
+
+  .arc-skip-confirmation-title {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .arc-skip-confirmation-message {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  .arc-skip-confirmation-divider {
+    margin: 18px 0 14px;
+  }
+
+  .arc-skip-confirmation-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .arc-skip-confirmation-cancel,
+  .arc-skip-confirmation-proceed {
+    border-radius: 5px;
+    font-size: 14px;
+    min-width: 0;
+    padding: 10px 12px;
+    width: 100%;
+  }
+
 }
+
