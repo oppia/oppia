@@ -140,6 +140,30 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
   });
 
+  it('should reset the assessment state on retry', () => {
+    fixture.detectChanges();
+    component.showAssessmentInterruptCard = true;
+    component.currentStage = 'questions';
+    component.currentQuestionIndex = 2;
+
+    component.onRetryAssessment();
+
+    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.currentStage).toBe('intro');
+    expect(component.currentQuestionIndex).toBe(0);
+  });
+
+  it('should resume the assessment on resume', () => {
+    fixture.detectChanges();
+    component.showAssessmentInterruptCard = true;
+    component.currentStage = 'intro';
+
+    component.onResumeAssessment();
+
+    expect(component.showAssessmentInterruptCard).toBeFalse();
+    expect(component.currentStage).toBe('questions');
+  });
+
   it('should compute the progress percentage based on the current question index', () => {
     fixture.detectChanges();
     component.currentQuestionIndex = 0;

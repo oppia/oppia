@@ -45,18 +45,24 @@ describe('AssessmentInterruptComponent', () => {
     expect(component.isVisible).toBeFalse();
   });
 
-  it('should emit retryAssessment when retry is triggered', () => {
+  it('should emit retryAssessment when the retry button is clicked', () => {
     spyOn(component.retryAssessment, 'emit');
+    fixture.detectChanges();
 
-    component.onRetryAssessment();
+    const retryButton: HTMLButtonElement =
+      fixture.nativeElement.querySelectorAll('button')[0];
+    retryButton.click();
 
     expect(component.retryAssessment.emit).toHaveBeenCalled();
   });
 
-  it('should emit resumeAssessment when resume is triggered', () => {
+  it('should emit resumeAssessment when the resume button is clicked', () => {
     spyOn(component.resumeAssessment, 'emit');
+    fixture.detectChanges();
 
-    component.onResumeAssessment();
+    const resumeButton: HTMLButtonElement =
+      fixture.nativeElement.querySelectorAll('button')[1];
+    resumeButton.click();
 
     expect(component.resumeAssessment.emit).toHaveBeenCalled();
   });
