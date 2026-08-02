@@ -73,14 +73,15 @@ describe('Featured Translation Languages Editor Component', () => {
     component = fixture.componentInstance;
   });
 
-  it('should load featured languages on init', fakeAsync(() => {
+  it('should load featured languages when the editor is opened', fakeAsync(() => {
     backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
       Promise.resolve([HINDI_LANGUAGE])
     );
 
-    component.ngOnInit();
+    component.toggleEditor();
     flushMicrotasks();
 
+    expect(component.isEditorOpen).toBeTrue();
     expect(
       backendApiSpy.getFeaturedTranslationLanguagesAsync
     ).toHaveBeenCalled();
@@ -88,16 +89,32 @@ describe('Featured Translation Languages Editor Component', () => {
     expect(component.loadingMessage).toBe('');
   }));
 
-  it('should warn when loading fails', fakeAsync(() => {
+  it('should warn when loading fails on open', fakeAsync(() => {
     backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
       Promise.reject('Load error.')
     );
 
-    component.ngOnInit();
+    component.toggleEditor();
     flushMicrotasks();
 
     expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith('Load error.');
     expect(component.loadingMessage).toBe('');
+  }));
+
+  it('should close without reloading when toggled off', fakeAsync(() => {
+    backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
+      Promise.resolve([])
+    );
+    component.toggleEditor(); // open → loads
+    flushMicrotasks();
+    backendApiSpy.getFeaturedTranslationLanguagesAsync.calls.reset();
+
+    component.toggleEditor(); // close
+
+    expect(component.isEditorOpen).toBeFalse();
+    expect(
+      backendApiSpy.getFeaturedTranslationLanguagesAsync
+    ).not.toHaveBeenCalled();
   }));
 
   it('should add a language, clear inputs, and exclude it from options', () => {

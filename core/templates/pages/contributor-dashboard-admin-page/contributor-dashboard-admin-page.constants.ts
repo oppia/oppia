@@ -29,5 +29,5 @@ export const ContributorDashboardAdminPageConstants = {
   ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
   DEFAULT_LANGUAGE_FILTER: 'en',
   FEATURED_TRANSLATION_LANGUAGES_HANDLER_URL:
-    '/contributor-dashboard-admin-featured-translation-languages',
+    '/contributordashboardadminfeaturedtranslationlanguages',
 } as const;

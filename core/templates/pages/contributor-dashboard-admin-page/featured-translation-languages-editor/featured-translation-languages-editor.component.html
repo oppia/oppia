@@ -1,8 +1,12 @@
 <div class="card e2e-test-featured-translation-languages-editor">
   <div class="card-header">
-    Featured Translation Languages
+    <button type="button"
+            class="btn btn-secondary e2e-test-toggle-featured-languages-editor"
+            (click)="toggleEditor()">
+      {{ isEditorOpen ? 'Hide' : 'Manage' }} featured translation languages
+    </button>
   </div>
-  <div class="card-body">
+  <div class="card-body" *ngIf="isEditorOpen">
     <p>
       These languages appear under "Most needed" on the Contributor Dashboard
       translation tab.

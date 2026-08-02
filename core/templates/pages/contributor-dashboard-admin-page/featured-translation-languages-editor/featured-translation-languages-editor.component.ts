@@ -40,6 +40,7 @@ export class FeaturedTranslationLanguagesEditorComponent implements OnInit {
   newExplanation: string = '';
   loadingMessage: string = '';
   saveInProgress: boolean = false;
+  isEditorOpen: boolean = false;
 
   constructor(
     private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
@@ -51,8 +52,18 @@ export class FeaturedTranslationLanguagesEditorComponent implements OnInit {
       id: lang.id,
       description: lang.description,
     }));
-    // loadFeaturedTranslationLanguages() refreshes the options on success.
-    this.loadFeaturedTranslationLanguages();
+    // Populate the dropdown immediately so it works even before (or without)
+    // a successful load of the currently-configured languages.
+    this.refreshAvailableLanguageOptions();
+  }
+
+  toggleEditor(): void {
+    this.isEditorOpen = !this.isEditorOpen;
+    // Lazy-load: fetch only when the admin opens the panel (avoids a failed
+    // GET on every dashboard load, and allows a retry on re-open).
+    if (this.isEditorOpen) {
+      this.loadFeaturedTranslationLanguages();
+    }
   }
 
   private loadFeaturedTranslationLanguages(): void {
