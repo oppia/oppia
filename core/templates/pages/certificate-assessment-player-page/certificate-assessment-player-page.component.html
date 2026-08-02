@@ -1,4 +1,10 @@
 <div class="certificate-assessment-page-container position-relative">
+  <!-- TODO(#24717-m2.19): Wire the modals' inputs and outputs to the page state
+       once the backend is integrated and the conditional rendering logic for
+       the modals is implemented. Until then, the unanswered-question count is
+       mocked with a literal value and the viewResult, submitAnyway, and
+       goBackToAssessment outputs are intentionally left unbound so that no
+       nonfunctional controls are exposed. -->
   <oppia-time-expired-modal
     *ngIf="showTimeExpiredModal">
   </oppia-time-expired-modal>

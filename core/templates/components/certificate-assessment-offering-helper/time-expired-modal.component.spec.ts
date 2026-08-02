@@ -45,13 +45,13 @@ describe('TimeExpiredModalComponent', () => {
       By.css('#time-expired-modal-message')
     );
 
-    expect(card.attributes['role']).toBe('dialog');
+    expect(card.attributes.role).toBe('dialog');
     expect(card.attributes['aria-modal']).toBe('true');
     expect(card.attributes['aria-labelledby']).toBe('time-expired-modal-title');
     expect(card.attributes['aria-describedby']).toBe(
       'time-expired-modal-message'
     );
-    expect(card.attributes['tabindex']).toBe('-1');
+    expect(card.attributes.tabindex).toBe('-1');
     expect(title).toBeTruthy();
     expect(message).toBeTruthy();
   });
@@ -65,6 +65,9 @@ describe('TimeExpiredModalComponent', () => {
   it('should restore focus to the previously focused element on destroy', () => {
     const triggerElement = document.createElement('button');
     document.body.appendChild(triggerElement);
+    // Disabled dot-notation as previouslyFocusedElement is a private property
+    // and hence cannot be accessed without this syntax.
+    // eslint-disable-next-line dot-notation
     component['previouslyFocusedElement'] = triggerElement;
 
     component.ngOnDestroy();
@@ -74,9 +77,12 @@ describe('TimeExpiredModalComponent', () => {
   });
 
   it('should not restore focus when no element was focused before', () => {
+    // Disabled dot-notation as previouslyFocusedElement is a private property
+    // and hence cannot be accessed without this syntax.
+    // eslint-disable-next-line dot-notation
     component['previouslyFocusedElement'] = null;
 
-    expect(() => component.ngOnDestroy()).not.toThrow();
+    expect(() => component.ngOnDestroy()).not.toThrowError();
   });
 
   it('should wrap focus forward to the first element from the last', () => {

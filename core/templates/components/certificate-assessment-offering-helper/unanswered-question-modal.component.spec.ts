@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for UnansweredQuestionModalComponent.
  */
 
-import {Pipe} from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 
 @Pipe({name: 'translate'})
-class MockTranslatePipe {
+class MockTranslatePipe implements PipeTransform {
   transform(
     value: string,
     params?: {unansweredQuestionCount?: number}
@@ -58,7 +58,7 @@ describe('UnansweredQuestionModalComponent', () => {
       By.css('#unanswered-question-modal-message')
     );
 
-    expect(card.attributes['role']).toBe('dialog');
+    expect(card.attributes.role).toBe('dialog');
     expect(card.attributes['aria-modal']).toBe('true');
     expect(card.attributes['aria-labelledby']).toBe(
       'unanswered-question-modal-title'
@@ -66,7 +66,7 @@ describe('UnansweredQuestionModalComponent', () => {
     expect(card.attributes['aria-describedby']).toBe(
       'unanswered-question-modal-message'
     );
-    expect(card.attributes['tabindex']).toBe('-1');
+    expect(card.attributes.tabindex).toBe('-1');
     expect(title).toBeTruthy();
     expect(message).toBeTruthy();
   });
@@ -80,6 +80,9 @@ describe('UnansweredQuestionModalComponent', () => {
   it('should restore focus to the previously focused element on destroy', () => {
     const triggerElement = document.createElement('button');
     document.body.appendChild(triggerElement);
+    // Disabled dot-notation as previouslyFocusedElement is a private property
+    // and hence cannot be accessed without this syntax.
+    // eslint-disable-next-line dot-notation
     component['previouslyFocusedElement'] = triggerElement;
 
     component.ngOnDestroy();
@@ -89,9 +92,12 @@ describe('UnansweredQuestionModalComponent', () => {
   });
 
   it('should not restore focus when no element was focused before', () => {
+    // Disabled dot-notation as previouslyFocusedElement is a private property
+    // and hence cannot be accessed without this syntax.
+    // eslint-disable-next-line dot-notation
     component['previouslyFocusedElement'] = null;
 
-    expect(() => component.ngOnDestroy()).not.toThrow();
+    expect(() => component.ngOnDestroy()).not.toThrowError();
   });
 
   it('should wrap focus forward to the first element from the last', () => {
