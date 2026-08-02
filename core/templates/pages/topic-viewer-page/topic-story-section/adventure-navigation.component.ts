@@ -35,6 +35,7 @@ import './adventure-navigation.component.css';
 interface AdventureNavigationGroup {
   lessons: {
     lessonNumber: number;
+    isCompleted: boolean;
   }[];
   accentColor: string;
   showPractice: boolean;

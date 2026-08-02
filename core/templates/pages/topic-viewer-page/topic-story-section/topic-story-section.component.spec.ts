@@ -818,6 +818,56 @@ describe('TopicStorySectionComponent', () => {
     expect(component.practiceCard.practiceUrl).toContain('test/arc/1');
   });
 
+  it('should use positional arc id in practice card url for non-numeric arc ids', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'default_arc',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'add';
+    component.practiceCount = 1;
+    component.practiceSubtopicIds = [3];
+
+    component.ngOnInit();
+
+    expect(component.isPracticeCardVisible).toBe(true);
+    expect(component.practiceCard.practiceUrl).toContain('add/test/arc/1');
+    expect(component.practiceCard.practiceUrl).not.toContain(
+      'add/test/arc/arc'
+    );
+  });
+
   it('should not create practice card when practice count is zero', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.lessonCount = 0;
@@ -1886,19 +1936,6 @@ describe('TopicStorySectionComponent', () => {
     expect(component.adventureGroups[15].accentColor).toBe('#27a844');
   });
 
-  it('should handle practiceCard related lesson number as null when no lessons', () => {
-    component.storySummary = createStorySummarySpy([], []);
-    component.lessonCount = 0;
-    component.practiceCount = 1;
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'topic';
-    component.practiceSubtopicIds = [1];
-
-    component.ngOnInit();
-
-    expect(component.practiceCard.relatedLessonNumber).toBeNull();
-  });
-
   it('should not expand any adventure when no adventure groups exist', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.classroomUrlFragment = 'math';
@@ -1931,6 +1968,50 @@ describe('TopicStorySectionComponent', () => {
       block: 'start',
     });
   }));
+
+  it('should report story as completed only when all available lessons are completed', () => {
+    const baseLesson = {
+      lessonTitle: 'Lesson',
+      lessonDescription: '',
+      thumbnailUrl: '',
+      startUrl: '/explore/1',
+      practiceUrl: '',
+      nodeId: 'node_1',
+      lessonProgressStatus: 'completed',
+      totalCheckpointsCount: 0,
+      visitedCheckpointsCount: 0,
+      isComingSoon: false,
+      isPublished: true,
+      isNewLabelVisible: false,
+      availableTextLanguageCodes: [],
+      availableVoiceoverLanguageCodes: [],
+      availableVoiceoverLanguageAccentDescriptions: {},
+    };
+
+    component.availableLessonCards = [
+      {...baseLesson, lessonNumber: 1},
+      {...baseLesson, lessonNumber: 2},
+    ];
+
+    expect(component.isStoryCompleted()).toBeTrue();
+
+    component.availableLessonCards = [
+      {...baseLesson, lessonNumber: 1},
+      {
+        ...baseLesson,
+        lessonNumber: 2,
+        lessonProgressStatus: 'not_started',
+      },
+    ];
+
+    expect(component.isStoryCompleted()).toBeFalse();
+  });
+
+  it('should report story as not completed when no available lessons exist', () => {
+    component.availableLessonCards = [];
+
+    expect(component.isStoryCompleted()).toBeFalse();
+  });
 
   it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
     const mockElement = document.createElement('div');
@@ -2191,10 +2272,64 @@ describe('TopicStorySectionComponent', () => {
     expect(component.adventureNavigationGroups[0].lessons).toEqual([
       {
         lessonNumber: 1,
+        isCompleted: false,
       },
     ]);
     expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
     expect(component.adventureNavigationGroups[0].showPractice).toBeTrue();
+  });
+
+  it('should mark completed lessons in adventureNavigationGroups', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Completed Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getStatus.and.returnValue('Published');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Completed Node'],
+      [storyNodeSpy],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.adventureNavigationGroups[0].lessons).toEqual([
+      {
+        lessonNumber: 1,
+        isCompleted: true,
+      },
+    ]);
   });
 
   it('should exclude non-published lessons from adventure navigation groups', () => {
@@ -2269,7 +2404,7 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.adventureNavigationGroups).toEqual([
       {
-        lessons: [{lessonNumber: 1}],
+        lessons: [{lessonNumber: 1, isCompleted: false}],
         accentColor: '#27a844',
         showPractice: true,
       },

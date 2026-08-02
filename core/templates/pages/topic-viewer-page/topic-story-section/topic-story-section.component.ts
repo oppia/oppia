@@ -222,6 +222,16 @@ export class TopicStorySectionComponent
     );
   }
 
+  isStoryCompleted(): boolean {
+    if (this.availableLessonCards.length === 0) {
+      return false;
+    }
+
+    return this.availableLessonCards.every(
+      card => card.lessonProgressStatus === 'completed'
+    );
+  }
+
   private selectLessonFromNavigation(
     lessonNumber: number,
     adventureIndex: number
@@ -506,7 +516,9 @@ export class TopicStorySectionComponent
           adventureLessonCards.push(this.lessonCards[nodeIndex]);
         }
       });
-      const arcNumber = arc.id.split('_').pop() || '';
+      // The backend maps an arc to its 1-based position among the topic's
+      // story arcs, so pass the position rather than a parsed arc id.
+      const arcId = String(adventureIndex + 1);
       return {
         adventureTitle: arc.title,
         adventureDescription: arc.description,
@@ -515,7 +527,7 @@ export class TopicStorySectionComponent
         iconBg: paletteColor.iconBg,
         headerBackgroundColor: paletteColor.headerBg,
         headerBorderColor: paletteColor.headerBorder,
-        arcId: arcNumber,
+        arcId,
       };
     });
   }

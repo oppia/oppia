@@ -13,9 +13,14 @@
   <div class="topic-lesson-card-content" [class.collapsed]="!isExpanded">
     <div class="topic-lesson-card-copy">
       <div class="topic-lesson-card-title-row" [class.collapsed]="!isExpanded">
-        <div *ngIf="!isExpanded && isCompletedLesson" class="topic-lesson-card-completed-leading-icon" aria-hidden="true">
-          <i class="material-icons">check</i>
-        </div>
+        <topic-adventure-circle-badge *ngIf="!isExpanded && isCompletedLesson"
+                                      [label]="lessonNumber.toString()"
+                                      [iconName]="'check'"
+                                      [size]="'sm'"
+                                      [backgroundColor]="'#fff'"
+                                      [borderColor]="'#40a84f'"
+                                      [textColor]="'#40a84f'">
+        </topic-adventure-circle-badge>
         <topic-adventure-circle-badge *ngIf="isExpanded || !isCompletedLesson"
                                       [label]="lessonNumber.toString()"
                                       [iconName]="''"

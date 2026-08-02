@@ -61,6 +61,27 @@ describe('AdventureNavigationComponent', () => {
     expect(component.isActiveLesson(2)).toBe(false);
   });
 
+  it('should show a check icon for completed lessons in the navigation', () => {
+    component.adventureGroups = [
+      {
+        lessons: [
+          {lessonNumber: 1, isCompleted: false},
+          {lessonNumber: 2, isCompleted: true},
+        ],
+        accentColor: '#27a844',
+        showPractice: false,
+      },
+    ];
+
+    fixture.detectChanges();
+
+    const badges = fixture.nativeElement.querySelectorAll(
+      'topic-adventure-circle-badge'
+    );
+    expect(badges[0].iconName).toBe('');
+    expect(badges[1].iconName).toBe('check');
+  });
+
   it('should emit lessonSelected event when onLessonClick is called', () => {
     spyOn(component.lessonSelected, 'emit');
 
@@ -205,7 +226,7 @@ describe('AdventureNavigationComponent', () => {
         [],
         [
           {
-            lessons: [{lessonNumber: 1}],
+            lessons: [{lessonNumber: 1, isCompleted: false}],
             accentColor: '#000',
             showPractice: true,
           },
