@@ -98,19 +98,19 @@ describe('Translation Submitter V2', function () {
       'Cutting the Pies',
       'Exploration - Fractions'
     );
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
       'Save and translate another'
     );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOnElementWithText(
-      'Save and translate another'
-    );
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    await translationSubmitter.closeTranslateTextModal();
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
