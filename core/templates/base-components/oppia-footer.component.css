@@ -34,8 +34,12 @@
   text-decoration: none;
 }
 
-.oppia-footer-container a:focus {
+.oppia-footer a:focus,
+.oppia-footer button:focus,
+.oppia-footer-container a:focus,
+.oppia-footer-terms-privacy a:focus {
   outline: 2px solid #fff;
+  outline-offset: 2px;
   text-decoration: underline;
 }
 
