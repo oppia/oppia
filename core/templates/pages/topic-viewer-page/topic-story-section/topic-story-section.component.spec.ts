@@ -1638,13 +1638,17 @@ describe('TopicStorySectionComponent', () => {
       .toArray()
       .find(wrapper => wrapper.nativeElement.id === 'lesson-1');
     expect(lessonWrapper).toBeDefined();
-    spyOn(lessonWrapper!.nativeElement, 'scrollIntoView');
+    if (!lessonWrapper) {
+      fail('Expected lesson wrapper to be defined');
+      return;
+    }
+    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
 
     component.onNavigationLessonSelected(1);
 
     tick(300);
 
-    expect(lessonWrapper!.nativeElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });
@@ -1695,14 +1699,18 @@ describe('TopicStorySectionComponent', () => {
       .toArray()
       .find(wrapper => wrapper.nativeElement.id === 'practice-card-0');
     expect(practiceCardWrapper).toBeDefined();
-    spyOn(practiceCardWrapper!.nativeElement, 'scrollIntoView');
+    if (!practiceCardWrapper) {
+      fail('Expected practice card wrapper to be defined');
+      return;
+    }
+    spyOn(practiceCardWrapper.nativeElement, 'scrollIntoView');
 
     component.onNavigationPracticeSelected(0);
 
     tick(300);
 
     expect(
-      practiceCardWrapper!.nativeElement.scrollIntoView
+      practiceCardWrapper.nativeElement.scrollIntoView
     ).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
@@ -2447,13 +2455,17 @@ describe('TopicStorySectionComponent', () => {
       .toArray()
       .find(wrapper => wrapper.nativeElement.id === 'coming-soon-lesson-1');
     expect(lessonWrapper).toBeDefined();
-    spyOn(lessonWrapper!.nativeElement, 'scrollIntoView');
+    if (!lessonWrapper) {
+      fail('Expected coming-soon lesson wrapper to be defined');
+      return;
+    }
+    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
 
     component.onNavigationLessonSelected(1);
 
     tick(300);
 
-    expect(lessonWrapper!.nativeElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });
