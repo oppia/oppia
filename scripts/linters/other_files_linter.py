@@ -47,11 +47,6 @@ STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(
     os.getcwd(), STRICT_TS_CONFIG_FILE_NAME
 )
 
-WEBPACK_CONFIG_FILE_NAME: Final = 'webpack.common.config.ts'
-WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
-    os.getcwd(), WEBPACK_CONFIG_FILE_NAME
-)
-
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
@@ -247,64 +242,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages
         )
 
-    def check_webpack_config_file(self) -> concurrent_task_utils.TaskResult:
-        """Check to ensure that the instances of HtmlWebpackPlugin in
-        webpack.common.config.ts contains all needed keys.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Webpack config file'
-
-        failed = False
-        error_messages = []
-        plugins_section_found = False
-        htmlwebpackplugin_section_found = False
-        for line_num, line in enumerate(
-            self.file_cache.readlines(WEBPACK_CONFIG_FILEPATH)
-        ):
-            stripped_line = line.strip()
-            if stripped_line.startswith('plugins:'):
-                plugins_section_found = True
-            if not plugins_section_found:
-                continue
-            if stripped_line.startswith('new HtmlWebpackPlugin('):
-                error_line_num = line_num
-                htmlwebpackplugin_section_found = True
-                keys = [
-                    'chunks',
-                    'filename',
-                    'meta',
-                    'template',
-                    'minify',
-                    'inject',
-                ]
-            elif htmlwebpackplugin_section_found and stripped_line.startswith(
-                '}),'
-            ):
-                htmlwebpackplugin_section_found = False
-                if keys:
-                    error_message = (
-                        'Line %s: The following keys: %s are missing in '
-                        'HtmlWebpackPlugin block in %s'
-                        % (
-                            error_line_num + 1,
-                            ', '.join(keys),
-                            WEBPACK_CONFIG_FILE_NAME,
-                        )
-                    )
-                    error_messages.append(error_message)
-                    failed = True
-            if htmlwebpackplugin_section_found:
-                key = stripped_line.split(':')[0]
-                if key in keys:
-                    keys.remove(key)
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
-
     def check_github_workflows_have_name(
         self,
     ) -> concurrent_task_utils.TaskResult:
@@ -372,7 +309,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
-        linter_stdout.append(self.check_webpack_config_file())
         linter_stdout.append(self.check_github_workflows_have_name())
 
         return linter_stdout

@@ -37,7 +37,7 @@
           <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
                class="oppia-logo"
                alt="Oppia Home"
-               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-left': !menuIconIsShown ? '25px' : '0px'}">
+               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-inline-start': !menuIconIsShown ? '25px' : '0px'}">
         </picture>
       </a>
     </ng-template>
@@ -457,6 +457,13 @@
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
+        <li class="nav-item" *ngIf="isCertificateAssessmentEnabled()">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/certificate-creator-dashboard"
+             class="dropdown-item nav-link">
+            <span>Certificate Creator Dashboard</span>
+          </a>
+        </li>
         <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/facilitator-dashboard"
@@ -510,6 +517,15 @@
              href="/moderator"
              rel="noopener">
             <span [innerHTML]="'I18N_TOPNAV_MODERATOR_PAGE' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item"
+            *ngIf="isTechnicalFeedbackDashboardEnabled() && isTechTeamLead">
+          <a class="dropdown-item nav-link"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/technical-feedback-dashboard"
+             rel="noopener">
+            <span [innerHTML]="'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item"

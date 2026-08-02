@@ -2533,8 +2533,11 @@ div#ng-curtain {
   float: right;
   height: 56px;
   line-height: 20px;
-  margin-left: -10px;
+  margin-inline-start: -10px;
   padding: 0;
+}
+[dir="rtl"] .oppia-navbar-brand-name {
+  float: left;
 }
 
 .oppia-logo {
@@ -2591,7 +2594,6 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  background-color: #fff;
   color: #00645c;
 }
 .oppia-navbar-profile-picture {

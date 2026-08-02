@@ -1,9 +1,8 @@
-<ng-template #EditorTabTourSaveDraft>
-  <h3 class="e2e-test-joyride-title" tabindex="0">Save</h3>
+<div id="editorTabTourSaveDraftContent" [hidden]="true">
   <p tabindex="0">When you're done making changes, be sure to save your work.</p>
-</ng-template>
+</div>
 
-<ul class="nav navbar-nav oppia-navbar-nav float-end">
+<ul class="nav navbar-nav oppia-navbar-nav float-end" dir="ltr">
   <!-- Start of html for large screens. -->
   <li class="nav-item d-sm-block" *ngIf="explorationCanBePublished">
     <div class="btn-group oppia-publish-button-container"
@@ -46,7 +45,7 @@
             <i class="fas fa-save oppia-save-publish-button-icon"
                alt="Save Draft">
             </i>
-            <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message" joyrideStep="editorTabTourSaveDraft" [stepContent]="EditorTabTourSaveDraft">Save Draft</span>
+            <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message" id="editorTabTourSaveDraft">Save Draft</span>
             <span class="d-none d-md-block oppia-num-changes-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
           </span>
           <span class="oppia-publish-label-container" *ngIf="!isPrivate()" title="Publish Changes">

@@ -1,0 +1,65 @@
+<div class="oppia-feedback-filter-bar">
+  <div class="oppia-feedback-filter-bar-row">
+
+    <div class="oppia-feedback-filter-bar-stats">
+      <span class="oppia-feedback-filter-bar-stats-label">Status:</span>
+      <select class="oppia-feedback-filter-bar-select"
+              [(ngModel)]="selectedStatus">
+        <option *ngFor="let s of statusOptions" [value]="s">
+          {{ statusLabels[s] }}
+        </option>
+      </select>
+    </div>
+
+    <div class="oppia-feedback-filter-bar-stats" *ngIf="config.showTeamFilter">
+      <span class="oppia-feedback-filter-bar-stats-label">Technical Team:</span>
+      <select class="oppia-feedback-filter-bar-select"
+              [(ngModel)]="selectedTechnicalTeam">
+        <option *ngFor="let t of teamOptions" [value]="t">
+          {{ teamLabels[t] }}
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="config.showSearchBar" class="oppia-feedback-filter-bar-search">
+      <div class="oppia-feedback-filter-bar-stats">
+        <span class="oppia-feedback-filter-bar-stats-label">Description Filter:</span>
+        <input type="text"
+               class="oppia-feedback-filter-bar-search-input"
+               placeholder="Filter current page by description"
+               [(ngModel)]="searchText">
+      </div>
+    </div>
+
+    <div *ngIf="config.showDateRangeFilter" class="oppia-feedback-filter-bar-dates">
+      <div class="oppia-feedback-filter-bar-stats">
+        <span class="oppia-feedback-filter-bar-stats-label">From Date:</span>
+        <input type="date"
+               [max]="today"
+               class="oppia-feedback-filter-bar-date"
+               placeholder="From Date"
+               [(ngModel)]="fromDate">
+      </div>
+
+      <div class="oppia-feedback-filter-bar-stats">
+        <span class="oppia-feedback-filter-bar-stats-label">To Date:</span>
+        <input type="date"
+               class="oppia-feedback-filter-bar-date"
+               [max]="today"
+               [min]="fromDate || null"
+               placeholder="To Date"
+               [(ngModel)]="toDate">
+      </div>
+    </div>
+
+    <div class="oppia-feedback-filter-bar-stats">
+      <button class="oppia-feedback-filter-bar-apply" (click)="applyFilters()">
+        Apply
+      </button>
+      <button class="oppia-feedback-filter-bar-clear" (click)="clearAllFilters()">
+        Clear
+      </button>
+    </div>
+
+  </div>
+</div>

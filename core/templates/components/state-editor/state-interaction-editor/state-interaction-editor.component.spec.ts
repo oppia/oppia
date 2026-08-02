@@ -189,7 +189,7 @@ describe('State Interaction component', () => {
           {} as unknown as InteractionCustomizationArgs,
           null,
           [],
-          'id',
+          'TextInput',
           null
         ),
         [],
@@ -485,7 +485,7 @@ describe('State Interaction component', () => {
 
     expect(
       stateEditorService.onHandleCustomArgsUpdate.emit
-    ).toHaveBeenCalledWith(undefined);
+    ).toHaveBeenCalledWith(null);
   }));
   it('should handle update answer choices without choices', fakeAsync(() => {
     const stateData = {
@@ -506,7 +506,7 @@ describe('State Interaction component', () => {
     tick();
 
     expect(stateEditorService.onUpdateAnswerChoices.emit).toHaveBeenCalledWith(
-      undefined
+      null
     );
   }));
 });

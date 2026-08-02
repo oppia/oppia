@@ -64,6 +64,12 @@ class MockPlatformFeatureService {
     WebFeedbackModalEnabled: {
       isEnabled: false,
     },
+    TechnicalFeedbackDashboardEnabled: {
+      isEnabled: false,
+    },
+    EnableCertificateAssessment: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -733,6 +739,7 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTechTeamLead: () => false,
       isTranslationAdmin: () => false,
       isTranslationCoordinator: () => false,
       isQuestionCoordinator: () => false,
@@ -959,6 +966,19 @@ describe('TopNavigationBarComponent', () => {
   );
 
   it(
+    'should return correct value for show technical feedback dashboard page' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.TechnicalFeedbackDashboardEnabled.isEnabled =
+        true;
+
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(true);
+    }
+  );
+
+  it(
     'should return correct value for WebFeedbackModalEnabled' +
       'in profile pic drop down menu feature flag',
     () => {
@@ -970,6 +990,15 @@ describe('TopNavigationBarComponent', () => {
       expect(component.isWebFeedbackModalFeatureFlagEnabled()).toBe(true);
     }
   );
+
+  it('should return correct value for certificate assessment feature flag', () => {
+    expect(component.isCertificateAssessmentEnabled()).toBe(false);
+
+    mockPlatformFeatureService.status.EnableCertificateAssessment.isEnabled =
+      true;
+
+    expect(component.isCertificateAssessmentEnabled()).toBe(true);
+  });
 
   it('should open site feedback modal', () => {
     component.openSiteFeedbackModal();
