@@ -397,3 +397,111 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
             csrf_token=csrf_token,
         )
         self.assertFalse(response['is_valid'])
+
+
+class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
+    """Tests class for StartCertificateAssessmentHandler."""
+
+    def test_post_returns_hardcoded_attempt_and_questions(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
+            {'certificate_id': 'dummy_certificate_id'},
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(
+            response,
+            {
+                'attempt_id': 'dummy_attempt_id',
+                'questions': [
+                    {
+                        'question_id': 'dummy_question_id_1',
+                        'question_version': 1,
+                    },
+                    {
+                        'question_id': 'dummy_question_id_2',
+                        'question_version': 1,
+                    },
+                ],
+            },
+        )
+
+
+class SubmitCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
+    """Tests class for SubmitCertificateAssessmentHandler."""
+
+    def test_post_returns_hardcoded_submission_confirmation(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
+                '<attempt_id>', 'dummy_attempt_id'
+            ),
+            {
+                'answers': [
+                    {
+                        'question_id': 'dummy_question_id_1',
+                        'selected_answer': 'A',
+                    },
+                    {
+                        'question_id': 'dummy_question_id_2',
+                        'selected_answer': 'B',
+                    },
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(
+            response,
+            {
+                'attempt_id': 'dummy_attempt_id',
+                'is_submitted': True,
+            },
+        )
+
+
+class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
+    """Tests class for CertificateAssessmentResultHandler."""
+
+    def test_get_returns_hardcoded_result_payload(self) -> None:
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', 'dummy_attempt_id'
+            )
+        )
+        self.assertEqual(
+            response,
+            {
+                'title': 'Everyday Arithmetic & Number Confidence',
+                'total_score': 80,
+                'attempt_data': {
+                    'dummy_topic_id': {
+                        'total_related_questions': 5,
+                        'total_correct_questions': 4,
+                    },
+                },
+                'is_submitted': True,
+            },
+        )
+
+
+class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
+    """Tests class for CertificateAssessmentAttemptsHandler."""
+
+    def test_get_returns_hardcoded_attempts_list(self) -> None:
+        response = self.get_json(feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER)
+        self.assertEqual(
+            response,
+            {
+                'attempts': [
+                    {
+                        'attempt_id': 'dummy_attempt_id',
+                        'classroom_id': 'dummy_classroom_id',
+                        'title': ('Everyday Arithmetic & Number Confidence'),
+                        'total_score': 80,
+                        'attempt_index': 1,
+                        'started_at': '2026-07-18T00:00:00Z',
+                        'is_submitted': True,
+                    }
+                ]
+            },
+        )
