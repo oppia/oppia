@@ -1195,7 +1195,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isNewLabelVisible).toBeTrue();
+    expect(component.lessonCards[0].isNewLabelVisible).toBe(true);
   });
 
   it('should not call loadChapterProgress on first change of storySummary', () => {
@@ -1454,7 +1454,7 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.isAdventureExpanded(0)).toBeTrue();
+    expect(component.isAdventureExpanded(0)).toBe(true);
 
     tick(300);
   }));
@@ -1638,13 +1638,13 @@ describe('TopicStorySectionComponent', () => {
       .toArray()
       .find(wrapper => wrapper.nativeElement.id === 'lesson-1');
     expect(lessonWrapper).toBeDefined();
-    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
+    spyOn(lessonWrapper!.nativeElement, 'scrollIntoView');
 
     component.onNavigationLessonSelected(1);
 
     tick(300);
 
-    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(lessonWrapper!.nativeElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });
@@ -1695,14 +1695,14 @@ describe('TopicStorySectionComponent', () => {
       .toArray()
       .find(wrapper => wrapper.nativeElement.id === 'practice-card-0');
     expect(practiceCardWrapper).toBeDefined();
-    spyOn(practiceCardWrapper.nativeElement, 'scrollIntoView');
+    spyOn(practiceCardWrapper!.nativeElement, 'scrollIntoView');
 
     component.onNavigationPracticeSelected(0);
 
     tick(300);
 
     expect(
-      practiceCardWrapper.nativeElement.scrollIntoView
+      practiceCardWrapper!.nativeElement.scrollIntoView
     ).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
@@ -1956,7 +1956,7 @@ describe('TopicStorySectionComponent', () => {
       },
     ]);
     expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
-    expect(component.adventureNavigationGroups[0].showPractice).toBeTrue();
+    expect(component.adventureNavigationGroups[0].showPractice).toBe(true);
   });
 
   it('should exclude non-published lessons from adventure navigation groups', () => {
@@ -2237,7 +2237,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isNewLabelVisible).toBeFalse();
+    expect(component.lessonCards[0].isNewLabelVisible).toBe(false);
   });
 
   it('should return false from isChapterPublished when getStatus throws', () => {
@@ -2270,7 +2270,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isPublished).toBeFalse();
+    expect(component.lessonCards[0].isPublished).toBe(false);
   });
 
   it('should return false from isChapterPublished when getStatus returns null', () => {
@@ -2303,7 +2303,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isPublished).toBeFalse();
+    expect(component.lessonCards[0].isPublished).toBe(false);
   });
 
   it('should return false from isChapterReadyToPublish when getStatus returns null', () => {
@@ -2447,13 +2447,13 @@ describe('TopicStorySectionComponent', () => {
       .toArray()
       .find(wrapper => wrapper.nativeElement.id === 'coming-soon-lesson-1');
     expect(lessonWrapper).toBeDefined();
-    spyOn(lessonWrapper.nativeElement, 'scrollIntoView');
+    spyOn(lessonWrapper!.nativeElement, 'scrollIntoView');
 
     component.onNavigationLessonSelected(1);
 
     tick(300);
 
-    expect(lessonWrapper.nativeElement.scrollIntoView).toHaveBeenCalledWith({
+    expect(lessonWrapper!.nativeElement.scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'start',
     });
