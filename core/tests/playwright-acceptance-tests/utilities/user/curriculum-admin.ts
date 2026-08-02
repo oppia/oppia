@@ -839,6 +839,17 @@ export class CurriculumAdmin extends TopicManager {
     return topicId;
   }
 
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
+  }
+
   /**
    * Add any number of questions to a particular skill.
    * @param {string} skillName The name of the skill to which the questions will be added.

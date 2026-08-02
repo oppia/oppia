@@ -119,6 +119,11 @@ const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
+
+const previewTabButton = '.e2e-test-preview-tab';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const previewTabContainer = '.e2e-test-preview-tab-container';
+
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -144,6 +149,12 @@ const voiceoverLanguageAccentOptionSelector =
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const skillNameInput = '.e2e-test-skill-name-input';
+
+const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
+
+const skillReviewComponent = 'oppia-noninteractive-skillreview';
+const skillReviewComponentModal =
+  'oppia-noninteractive-skillreview-concept-card-modal';
 
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
@@ -987,6 +998,47 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to the exploration preview tab.
+   */
+  async navigateToExplorationEditorPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobilePreviewTabButton);
+    } else {
+      await this.expectElementToBeVisible(previewTabButton);
+      await this.clickOnElementWithSelector(previewTabButton);
+    }
+
+    await this.expectElementToBeVisible(previewTabContainer);
+  }
+
+  /**
+   * Function to open the skill review component.
+   */
+  async clickOnSkillReviewComponent(): Promise<void> {
+    await this.expectElementToBeVisible(skillReviewComponent);
+    await this.clickOnElementWithSelector(
+      `${skillReviewComponent} .e2e-test-concept-card-link`
+    );
+    await this.expectElementToBeVisible(skillReviewComponentModal);
+  }
+
+  /**
+   * Function to verify that the concept card with worked example is displayed.
+   * @param {string} question - Expected worked example question.
+   * @param {string} answer - Expected worked example answer.
+   */
+  async checkConceptCardWithWorkedExampleIsInserted(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    await this.expectTextContentToContain('body', question);
+    await this.expectTextContentToContain('body', answer);
+  }
+
+  /**
    * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
@@ -1051,6 +1103,28 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateContentInputField, false);
     await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
+  }
+
+  /**
+   * Function to update a card with content and insert a concept card.
+   * @param {string} content - The content to be added to the card.
+   */
+  async updateCardContentWithConceptCard(content: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
+
+    await this.typeInInputField(stateContentInputField, `${content}`);
+
+    // Add the concept card.
+    await this.clickOnElementWithSelector(addSkillReviewComponentButton);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.expectElementToBeVisible(stateContentInputField, false);
+
+    showMessage('Card content is updated successfully with concept card.');
   }
 
   /**
