@@ -407,6 +407,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         return {
             **super(cls, cls).get_export_policy(),
             'learner_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'certificate_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_score': base_models.EXPORT_POLICY.EXPORTED,
             'attempt_index': base_models.EXPORT_POLICY.EXPORTED,
             'attempt_data': base_models.EXPORT_POLICY.EXPORTED,

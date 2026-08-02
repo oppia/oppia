@@ -135,6 +135,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             self.other_classroom_id,
             name='Science',
             url_fragment=self.other_classroom_url_fragment,
+            feedback_recipient_email='user@email.com',
             course_details='Course details',
             teaser_text='Teaser text',
             topic_list_intro='Topic intro',

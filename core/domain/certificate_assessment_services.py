@@ -778,8 +778,8 @@ def get_certificate_offerings_for_classroom(
             gae_models.CertificateAssessmentAttemptModel.certificate_id.IN(
                 certificate_ids
             ),
-            gae_models.CertificateAssessmentAttemptModel.is_submitted
-            == True,  # pylint: disable=singleton-comparison
+            gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
+            == True,
         ).fetch(),
     )
 
