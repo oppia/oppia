@@ -1,0 +1,61 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-topic-preview-tab .oppia-redesigned-topic-viewer-container {
+  background-color: #fff;
+  min-height: 100vh;
+  text-align: start;
+}
+
+oppia-topic-preview-tab .redesigned-topic-viewer-content {
+  padding: 24px 36px 0;
+}
+
+oppia-topic-preview-tab .redesigned-topic-viewer-content topic-header {
+  display: block;
+  margin: 0 auto;
+  max-width: 960px;
+  width: 100%;
+}
+
+oppia-topic-preview-tab .redesigned-stories-section {
+  background-color: #dceaf4;
+  background-image: url('/assets/images/background/bannerE.svg');
+  background-position: top center;
+  background-repeat: repeat;
+  background-size: 1480px auto;
+  margin-top: 24px;
+  padding: 28px 36px 56px;
+}
+
+oppia-topic-preview-tab .redesigned-stories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  margin: 0 auto;
+  max-width: 1160px;
+  width: 100%;
+}
+
+oppia-topic-preview-tab .redesigned-stories-section .oppia-page-card {
+  border-radius: 0.25em;
+  margin: 0 auto;
+  max-width: 1160px;
+  width: 100%;
+}
+
+oppia-topic-preview-tab .coming-soon-title {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 1.5em;
+  margin: 1em;
+  padding-top: 1em;
+}
+
+oppia-topic-preview-tab .coming-soon-text {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 1.1em;
+  margin-left: 1.4em;
+}

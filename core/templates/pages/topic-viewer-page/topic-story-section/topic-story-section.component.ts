@@ -27,6 +27,7 @@ import {
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -861,7 +862,16 @@ export class TopicStorySectionComponent
   }
 
   private getStudyGuideUrl(): string {
-    return this.urlService.getLearnerTopicStudyGuideUrl();
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return '#';
+    }
+    return ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE.replace(
+      '<classroom_url_fragment>',
+      encodeURIComponent(this.classroomUrlFragment)
+    ).replace(
+      '<topic_url_fragment>',
+      encodeURIComponent(this.topicUrlFragment)
+    );
   }
 
   private getPrimaryAvatarImageUrl(): string {

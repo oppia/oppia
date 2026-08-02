@@ -73,7 +73,6 @@ describe('TopicStorySectionComponent', () => {
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
-      'getLearnerTopicStudyGuideUrl',
       'getClassroomUrlFragmentFromLearnerUrl',
       'getTopicUrlFragmentFromLearnerUrl',
       'getQueryFieldValuesAsList',
@@ -170,9 +169,6 @@ describe('TopicStorySectionComponent', () => {
     fixture = TestBed.createComponent(TopicStorySectionComponent);
     component = fixture.componentInstance;
 
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue(
-      '/learn/math/place-values/studyguide'
-    );
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
     urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('topic');
     urlService.getQueryFieldValuesAsList.and.returnValue([]);
@@ -256,7 +252,7 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should set study guide url on init', () => {
-    expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
+    expect(component.studyGuideUrl).toBe('/learn/math/topic/studyguide');
   });
 
   it('should fallback avatar image on error', () => {
@@ -609,7 +605,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards.length).toBe(0);
     expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.studyUrl).toBe(
-      '/learn/math/place-values/studyguide'
+      '/learn/math/topic/studyguide'
     );
   });
 
@@ -898,20 +894,17 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should sync on relevant ngOnChanges input updates', () => {
-    const initialStudyGuideUrl = component.studyGuideUrl;
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+    component.classroomUrlFragment = 'science';
 
     component.ngOnChanges({
       storySummary: new SimpleChange(null, null, false),
     });
 
-    expect(component.studyGuideUrl).not.toBe(initialStudyGuideUrl);
-    expect(component.studyGuideUrl).toBe('/learn/new/study');
+    expect(component.studyGuideUrl).toBe('/learn/science/topic/studyguide');
   });
 
   it('should not sync on unrelated ngOnChanges input updates', () => {
     component.studyGuideUrl = 'unchanged-value';
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
 
     component.ngOnChanges({
       practiceSubtopicIds: new SimpleChange([], [1], false),
@@ -2221,53 +2214,47 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should sync on storyTitle ngOnChanges input update', () => {
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
-
     component.ngOnChanges({
       storyTitle: new SimpleChange('Old Title', 'New Title', false),
     });
 
-    expect(component.studyGuideUrl).toBe('/learn/new/study');
+    expect(component.studyGuideUrl).toBe('/learn/math/topic/studyguide');
   });
 
   it('should sync on storyDescription ngOnChanges input update', () => {
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
-
     component.ngOnChanges({
       storyDescription: new SimpleChange('Old', 'New', false),
     });
 
-    expect(component.studyGuideUrl).toBe('/learn/new/study');
+    expect(component.studyGuideUrl).toBe('/learn/math/topic/studyguide');
   });
 
   it('should sync on classroomUrlFragment ngOnChanges input update', () => {
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+    component.classroomUrlFragment = 'science';
 
     component.ngOnChanges({
       classroomUrlFragment: new SimpleChange('', 'science', false),
     });
 
-    expect(component.studyGuideUrl).toBe('/learn/new/study');
+    expect(component.studyGuideUrl).toBe('/learn/science/topic/studyguide');
   });
 
   it('should sync on topicUrlFragment ngOnChanges input update', () => {
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+    component.topicUrlFragment = 'biology';
 
     component.ngOnChanges({
       topicUrlFragment: new SimpleChange('', 'biology', false),
     });
 
-    expect(component.studyGuideUrl).toBe('/learn/new/study');
+    expect(component.studyGuideUrl).toBe('/learn/math/biology/studyguide');
   });
 
   it('should sync on lessonCount ngOnChanges input update', () => {
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
-
     component.ngOnChanges({
       lessonCount: new SimpleChange(0, 5, false),
     });
 
-    expect(component.studyGuideUrl).toBe('/learn/new/study');
+    expect(component.studyGuideUrl).toBe('/learn/math/topic/studyguide');
   });
 
   it('should return # as lesson start url when only topic fragment is missing', () => {

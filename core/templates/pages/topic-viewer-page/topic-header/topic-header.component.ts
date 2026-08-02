@@ -17,6 +17,7 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlService} from 'services/contextual/url.service';
 import {
   I18nLanguageCodeService,
@@ -35,8 +36,8 @@ export class TopicHeaderComponent implements OnInit {
   @Input() topicId!: string;
   @Input() classroomName!: string | null;
   @Input() showStudySkillsBreadcrumb: boolean = false;
-  classroomUrlFragment!: string;
-  topicUrlFragment!: string;
+  @Input() classroomUrlFragment: string = '';
+  @Input() topicUrlFragment: string = '';
 
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
@@ -59,9 +60,23 @@ export class TopicHeaderComponent implements OnInit {
         TranslationKeyType.DESCRIPTION
       );
 
-    this.classroomUrlFragment =
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    // The fragments may be passed in directly (e.g. in the topic editor
+    // preview, where the current URL is not a learner URL). Only derive them
+    // from the URL when they were not provided.
+    const pathname = this.urlService.getPathname();
+    if (!this.classroomUrlFragment && pathname.startsWith('/learn')) {
+      this.classroomUrlFragment =
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    }
+    if (
+      !this.topicUrlFragment &&
+      (pathname.startsWith('/learn') ||
+        pathname.startsWith('/explore') ||
+        pathname.startsWith('/lesson'))
+    ) {
+      this.topicUrlFragment =
+        this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    }
 
     if (this.classroomName) {
       this.classroomNameTranslationKey =
@@ -101,10 +116,20 @@ export class TopicHeaderComponent implements OnInit {
   }
 
   getClassroomUrl(): string {
-    return this.urlService.getLearnerClassroomUrl();
+    return this.classroomUrlFragment
+      ? `/learn/${this.classroomUrlFragment}`
+      : '/learn';
   }
 
   getTopicStoryUrl(): string {
-    return this.urlService.getLearnerTopicStoryUrl();
+    return this.classroomUrlFragment && this.topicUrlFragment
+      ? ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE.replace(
+          '<classroom_url_fragment>',
+          encodeURIComponent(this.classroomUrlFragment)
+        ).replace(
+          '<topic_url_fragment>',
+          encodeURIComponent(this.topicUrlFragment)
+        )
+      : '/learn';
   }
 }
