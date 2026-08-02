@@ -1018,7 +1018,14 @@ export class ExplorationEditor extends BaseUser {
    * Function to open the skill review component.
    */
   async clickOnSkillReviewComponent(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(skillReviewComponent);
+    
+    // Wait for the specific link element to stabilize and ensure its layout is complete.
+    await this.waitForElementToStabilize(
+      `${skillReviewComponent} .e2e-test-concept-card-link`
+    );
+
     await this.clickOnElementWithSelector(
       `${skillReviewComponent} .e2e-test-concept-card-link`
     );
