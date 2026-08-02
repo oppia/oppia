@@ -7,17 +7,17 @@
 
   --oppia-result-accent: var(--oppia-teal-dark);
 
-  min-height: calc(100vh - 56px);
   background: #ece9e3;
+  min-height: calc(100vh - 56px);
 }
 
 .result-card {
-  max-width: 650px;
-  margin: 70px auto 48px;
-  padding: 40px 44px 36px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 6px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  margin: 70px auto 48px;
+  max-width: 650px;
+  padding: 40px 44px 36px;
   position: relative;
   z-index: 1;
 }
@@ -28,7 +28,7 @@
 
 .result-card-heading {
   color: var(--oppia-result-accent);
-  font-family: 'Capriola';
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 3.5rem;
   font-weight: 800;
   margin-bottom: 20px;
@@ -37,21 +37,21 @@
 
 .result-card-earned-banner {
   border-radius: 6px;
-  padding: 12px 16px;
   margin-bottom: 24px;
+  padding: 12px 16px;
 }
 
 .result-card-earned-banner p {
-  margin: 0;
   color: #333;
-  text-align: center;
   font-size: 15px;
+  margin: 0;
+  text-align: center;
 }
 
 .result-card-summary {
+  align-items: flex-start;
   display: flex;
   gap: 24px;
-  align-items: flex-start;
   margin-bottom: 28px;
 }
 
@@ -60,9 +60,9 @@
 }
 
 .result-card-mascot-icon {
-  width: 200px;
   height: 200px;
   object-fit: contain;
+  width: 200px;
 }
 
 .result-card-score-block {
@@ -72,29 +72,29 @@
 
 .result-card-score {
   color: var(--oppia-result-accent);
-  font-weight: 800;
   font-size: 4rem;
+  font-weight: 800;
   margin: 4px 0 18px;
 }
 
 .result-card-time-taken {
-  margin-top: 16px;
   color: #333;
+  margin-top: 16px;
 }
 
 .result-card-time-taken i {
-  margin-right: 6px;
   color: var(--oppia-teal-dark);
+  margin-right: 6px;
 }
 
 .result-card-retry-btn {
-  width: 100%;
-  background: #ffffff;
-  color: var(--oppia-teal-dark);
+  background: #fff;
   border: 2px solid var(--oppia-teal-pale);
+  border-radius: 4px;
+  color: var(--oppia-teal-dark);
   font-weight: 700;
   padding: 10px 0;
-  border-radius: 4px;
+  width: 100%;
 }
 
 .result-card-retry-btn:hover {
@@ -108,8 +108,8 @@
   }
 
   .result-card-summary {
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
     text-align: center;
   }
 }
