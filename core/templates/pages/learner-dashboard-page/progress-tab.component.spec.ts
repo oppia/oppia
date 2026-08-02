@@ -31,7 +31,12 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProgressTabComponent} from './progress-tab.component';
-import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
@@ -46,7 +51,7 @@ class MockRemoveActivityNgbModalRef {
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

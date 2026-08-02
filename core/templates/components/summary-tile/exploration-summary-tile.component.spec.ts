@@ -23,7 +23,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -43,21 +43,21 @@ import {UserInfo} from 'domain/user/user-info.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'truncate'})
-class MockTruncatePipe {
+class MockTruncatePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
 @Pipe({name: 'summarizeNonnegativeNumber'})
-class MockSummarizeNonnegativeNumberPipe {
+class MockSummarizeNonnegativeNumberPipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -168,7 +168,7 @@ describe('Exploration Summary Tile Component', () => {
       declarations: [
         ExplorationSummaryTileComponent,
         MockTruncatePipe,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
         MockTranslatePipe,
       ],

@@ -23,7 +23,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -41,7 +41,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 @Pipe({name: 'truncateAndCapitalize'})
-class MockTruncteAndCapitalizePipe {
+class MockTruncateAndCapitalizePipe implements PipeTransform {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -95,7 +95,7 @@ describe('Collection Summary Tile Component', () => {
       ],
       declarations: [
         CollectionSummaryTileComponent,
-        MockTruncteAndCapitalizePipe,
+        MockTruncateAndCapitalizePipe,
         MockTranslatePipe,
       ],
       providers: [

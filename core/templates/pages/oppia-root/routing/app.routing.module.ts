@@ -24,6 +24,7 @@ import {IsLoggedInGuard} from './guards/is-logged-in.guard';
 import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
+import {PracticeSessionAccessGuard} from 'pages/practice-session-page/practice-session-page-auth.guard';
 import {TechnicalFeedbackDashboardPageComponentAuthGuard} from 'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.component-auth.guard';
 
 // All paths must be defined in constants.ts file.
@@ -144,6 +145,31 @@ const routes: Route[] = [
       import('pages/practice-session-page/practice-session-page.module').then(
         m => m.PracticeSessionPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NODE_PRACTICE_SESSION
+      .ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.END_OF_ARC_TEST.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MASTERY_CHALLENGE.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+    canActivate: [PracticeSessionAccessGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
@@ -553,12 +579,12 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CERTIFICATE_OFFERING_DASHBOARD.ROUTE,
+      .CERTIFICATE_CREATOR_DASHBOARD.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-assessment-dashboard-page/certificate-offering-dashboard-page.module'
-      ).then(m => m.CertificateOfferingDashboardPageModule),
+        'pages/certificate-assessment-creator-dashboard-page/certificate-creator-dashboard-page.module'
+      ).then(m => m.CertificateCreatorDashboardPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
@@ -581,6 +607,16 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .TECHNICAL_FEEDBACK_DASHBOARD.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/technical-feedback-dashboard-page/technical-feedback-dashboard-page.module'
+      ).then(m => m.TechnicalFeedbackDashboardPageModule),
+    canActivate: [TechnicalFeedbackDashboardPageComponentAuthGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TECHNICAL_FEEDBACK_DETAIL
+      .ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
       import(
