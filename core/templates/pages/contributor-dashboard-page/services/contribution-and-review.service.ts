@@ -480,7 +480,11 @@ export class ContributionAndReviewService {
     onSuccess: (suggestionId: string) => void,
     onFailure: () => void
   ): Promise<void> {
-    const requestBody: Record<string, string | number> = {
+    const requestBody: {
+      action: string;
+      review_message: string;
+      skill_difficulty?: number;
+    } = {
       action: action,
       review_message: reviewMessage,
     };
