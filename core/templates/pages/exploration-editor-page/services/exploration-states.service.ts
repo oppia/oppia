@@ -631,8 +631,8 @@ export class ExplorationStatesService {
       .filter(contentId => contentId !== undefined);
     return allContentIds.filter(contentId => {
       // Content ids present in this map (card content, customization args
-      // like choices, feedback, hints, solution) are dropped when their)
-      // HTML is emty, since empty fields don't need a translation. Content
+      // like choices, feedback, hints, solution) are dropped when their
+      // HTML is empty, since empty fields don't need a translation. Content
       // ids not in the map (e.g. rule inputs) are left untouched.
       if (contentId in contentIdToHtml) {
         return contentIdToHtml[contentId] !== '';
