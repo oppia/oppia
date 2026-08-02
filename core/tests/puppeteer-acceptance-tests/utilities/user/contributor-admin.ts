@@ -38,6 +38,14 @@ const newContributorAdminDashboardPageSelector =
   '.e2e-test-new-contributor-admin-dashboard-page';
 const oldContributorAdminDashboardPageSelector =
   '.oppia-contributor-dashboard-admin-page-tabs-container';
+const featuredLanguagesEditorSelector =
+  '.e2e-test-featured-translation-languages';
+const toggleFeaturedLanguagesEditorSelector =
+  '.e2e-test-toggle-featured-languages-editor';
+const featuredLanguageSelectSelector = '#featured-language-select';
+const featuredLanguageExplanationSelector = '#featured-language-explanation';
+const addFeaturedLanguageButtonSelector = '.e2e-test-add-featured-language';
+const saveFeaturedLanguagesButtonSelector = '.e2e-test-save-featured-languages';
 
 export class ContributorAdmin extends BaseUser {
   /**
@@ -164,6 +172,91 @@ export class ContributorAdmin extends BaseUser {
       statsListItemSelector,
       number
     );
+  }
+
+  /**
+   * Opens the featured translation languages editor panel.
+   */
+  async openFeaturedTranslationLanguagesEditor(): Promise<void> {
+    await this.expectElementToBeVisible(toggleFeaturedLanguagesEditorSelector);
+    await this.clickOnElementWithSelector(
+      toggleFeaturedLanguagesEditorSelector
+    );
+    await this.expectElementToBeVisible(addFeaturedLanguageButtonSelector);
+  }
+
+  /**
+   * Adds a featured translation language row in the editor.
+   * @param languageCode - The language option value (e.g. 'zh').
+   * @param explanation - The explanation shown under "Most needed".
+   */
+  async addFeaturedTranslationLanguage(
+    languageCode: string,
+    explanation: string
+  ): Promise<void> {
+    // this.select() is the BaseUser wrapper (waits for the element, then
+    // selects) — the convention used across the utilities.
+    await this.select(featuredLanguageSelectSelector, languageCode);
+    await this.typeInInputField(
+      featuredLanguageExplanationSelector,
+      explanation
+    );
+    await this.clickOnElementWithSelector(addFeaturedLanguageButtonSelector);
+    // Wait for the new row to render (one Angular change-detection cycle).
+    await this.expectFeaturedTranslationLanguageToBeListed(languageCode);
+  }
+
+  /**
+   * Saves the featured translation languages configuration.
+   */
+  async saveFeaturedTranslationLanguages(): Promise<void> {
+    await this.clickOnElementWithSelector(saveFeaturedLanguagesButtonSelector);
+    await this.expectToastMessage('Featured translation languages saved.');
+  }
+
+  /**
+   * Checks the editor lists the given language code.
+   * @param languageCode - The language code, e.g. 'zh'.
+   */
+  async expectFeaturedTranslationLanguageToBeListed(
+    languageCode: string
+  ): Promise<void> {
+    // Once added, the code appears in the editor table (and is removed from
+    // the dropdown options), so a containment check on the editor suffices.
+    await this.expectTextContentToContain(
+      featuredLanguagesEditorSelector,
+      languageCode
+    );
+  }
+
+  /**
+   * Checks whether the featured translation languages editor is present.
+   * (It is gated on the Translation Admin role.)
+   * @param present - Whether the editor should be present.
+   */
+  async expectFeaturedTranslationLanguagesEditorToBePresent(
+    present: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      featuredLanguagesEditorSelector,
+      present
+    );
+  }
+
+  /**
+   * Navigates directly to the public Contributor Dashboard by URL.
+   *
+   * We do NOT reuse `navigateToContributorDashboardUsingProfileDropdown()`
+   * here: after saving, the account is on the *new* Contributor Admin
+   * Dashboard, whose minimal navbar has no `.e2e-test-profile-dropdown`, so
+   * the dropdown-based navigation times out. A direct `goto` is robust
+   * regardless of the current page's navbar.
+   */
+  async navigateToContributorDashboard(): Promise<void> {
+    await this.goto(testConstants.URLs.ContributorDashboard);
+    // '.e2e-test-oppia-contributor-home' is the contributor dashboard
+    // container (see logged-in-user.ts).
+    await this.expectElementToBeVisible('.e2e-test-oppia-contributor-home');
   }
 }
 

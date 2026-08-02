@@ -521,6 +521,11 @@
       "framework": "puppeteer"
     },
     {
+      "name": "translation-submitter/manage-featured-translation-languages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/manage-featured-translation-languages.spec.ts",
+      "framework": "puppeteer"
+    },
+    {
       "name": "translation-submitter/check-their-accomplishment",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts",
       "framework": "puppeteer"
