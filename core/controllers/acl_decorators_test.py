@@ -2622,8 +2622,6 @@ class CanManageFeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
 
     TRANSLATION_ADMIN_EMAIL = 'translationadmin@example.com'
     TRANSLATION_ADMIN_USERNAME = 'translationlead'
-    QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
-    QUESTION_ADMIN_USERNAME = 'questionlead'
     TRANSLATION_COORDINATOR_EMAIL = 'translationcoordinator@example.com'
     TRANSLATION_COORDINATOR_USERNAME = 'translationcoord'
 

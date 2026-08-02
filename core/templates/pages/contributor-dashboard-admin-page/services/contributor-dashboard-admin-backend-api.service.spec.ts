@@ -517,7 +517,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/contributor-dashboard-admin-featured-translation-languages'
+      '/contributordashboardadminfeaturedtranslationlanguages'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({
@@ -546,7 +546,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/contributor-dashboard-admin-featured-translation-languages'
+      '/contributordashboardadminfeaturedtranslationlanguages'
     );
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual({
@@ -568,7 +568,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/contributor-dashboard-admin-featured-translation-languages'
+      '/contributordashboardadminfeaturedtranslationlanguages'
     );
     req.flush(
       {error: 'Backend error.'},
@@ -591,7 +591,7 @@ describe('Contributor dashboard admin backend api cdabas', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/contributor-dashboard-admin-featured-translation-languages'
+      '/contributordashboardadminfeaturedtranslationlanguages'
     );
     expect(req.request.method).toEqual('PUT');
     req.flush(
