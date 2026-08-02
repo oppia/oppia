@@ -19,7 +19,7 @@
  */
 
 import {Browser} from '@playwright/test';
-import testConstants from './test-constants';
+import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
 import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
@@ -37,6 +37,7 @@ import {
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
+import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -88,7 +89,7 @@ type BasicRolesUser = LoggedOutUser &
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & BlogAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -147,6 +148,15 @@ export class UserFactory {
       }
 
       switch (role) {
+        case ROLES.BLOG_POST_EDITOR: {
+          const blogAdmin = new BlogAdmin(superAdminInstance.page);
+          await blogAdmin.navigateToBlogAdminPage();
+          await blogAdmin.assignUserToRoleFromBlogAdminPage(
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
+        }
         case ROLES.TOPIC_MANAGER:
           if (typeof args !== 'string') {
             throw new Error('Expected additional argument to be string.');
@@ -258,7 +268,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     browser: Browser
-  ): Promise<SuperAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -269,8 +279,14 @@ export class UserFactory {
       browser
     );
 
-    superAdminInstance = UserFactory.composeUserWithRoles(user, [
+    const superAdmin = UserFactory.composeUserWithRoles(user, [
       SuperAdminFactory(user.page),
+    ]);
+    await superAdmin.assignRoleToUser('superAdm', ROLES.BLOG_ADMIN);
+    await superAdmin.expectUserToHaveRole('superAdm', ROLES.BLOG_ADMIN);
+
+    superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
+      BlogAdminFactory(user.page),
       VoiceoverAdminFactory(user.page),
     ]);
 
