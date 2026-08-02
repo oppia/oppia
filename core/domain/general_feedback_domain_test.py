@@ -97,6 +97,7 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
             'category': 'category',
             'lesson_metadata': LESSON_METADATA,
             'include_technical_logs': True,
+            'session_info': None,
             'screenshot_filename': 'screenshot_filename',
             'screenshot_entity_id': 'screenshot_entity_id',
             'created_on_msecs': 1700000000000.0,

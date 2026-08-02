@@ -86,11 +86,16 @@ def _lesson_feedback_model_to_domain(
 
 def _platform_feedback_model_to_domain(
     model: general_feedback_models.PlatformFeedbackModel,
+    session_info_model: Optional[
+        general_feedback_models.FeedbackSessionLogModel
+    ] = None,
 ) -> general_feedback_domain.PlatformFeedback:
     """Converts a PlatformFeedbackModel to a PlatformFeedback domain object.
 
     Args:
         model: PlatformFeedbackModel. The model to convert.
+        session_info_model: Optional[FeedbackSessionLogModel]. The session info
+            model for the feedback.
 
     Returns:
         PlatformFeedback. The corresponding domain object.
@@ -106,6 +111,17 @@ def _platform_feedback_model_to_domain(
             'learner_current_answer': raw.get('learner_current_answer'),
         }
 
+    # Here we use object because session-info diagnostics are heterogeneous
+    # JSON-like payloads (nested dict/list values) from client logs.
+    session_info: Optional[Dict[str, object]] = None
+    if session_info_model is not None:
+        session_info = {
+            'console_logs': session_info_model.console_logs or [],
+            'failed_requests': (session_info_model.failed_requests or []),
+            'navigation_history': (session_info_model.navigation_history or []),
+            'environment': session_info_model.environment or {},
+        }
+
     return general_feedback_domain.PlatformFeedback(
         report_id=model.id,
         report_message=model.feedback_text,
@@ -117,6 +133,7 @@ def _platform_feedback_model_to_domain(
         category=model.category,
         lesson_metadata=lesson_metadata,
         include_technical_logs=model.include_technical_logs,
+        session_info=session_info,
         screenshot_filename=model.screenshot_filename,
         screenshot_entity_id=model.screenshot_entity_id,
         created_on_msecs=utils.get_time_in_millisecs(model.created_on),
@@ -351,7 +368,10 @@ def get_platform_feedback(
     )
     if model is None:
         return None
-    return _platform_feedback_model_to_domain(model)
+    session_info_model = general_feedback_models.FeedbackSessionLogModel.get(
+        report_id, strict=False
+    )
+    return _platform_feedback_model_to_domain(model, session_info_model)
 
 
 def get_platform_feedback_summaries(
