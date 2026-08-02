@@ -225,7 +225,7 @@ const partneringWithUsImageSelector = '.e2e-test-partnering-with-oppia-image';
 const partnershipYoutubeVideoIFrameSelector =
   '.e2e-test-partnership-youtube-video-iframe';
 const learnerStoriesCarouselContainerSelector =
-  '.e2e-test-learner-stories-carousel';
+  '.e2e-test-learner-stories-coursal-container';
 const learnerStoriesHeadingSelector = '.e2e-test-learner-stories-heading';
 
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
@@ -235,7 +235,7 @@ const brochureButtonInPartnershipsPage =
 const readMoreStoriesButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-partner-stories-button';
 
-const postsDisplayHeadingSelector = '.e2e-test-blog-posts-display-heading';
+const postsDisplayHeadingSelector = '.posts-display-heading';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -2464,7 +2464,10 @@ export class LoggedOutUser extends BaseUser {
       partnerWithUsButtonAtTheTopOfPartnershipsPage
     );
     const newTab = await newTabPromise;
-    await newTab.waitForLoadState();
+    await newTab.waitForURL(
+      url => url.toString().includes(partnershipsFormUrl),
+      {timeout: 30000}
+    );
     expect(newTab.url()).toContain(partnershipsFormUrl);
     await newTab.close();
   }
@@ -2738,6 +2741,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.clickOnElementWithSelector(blogPaginationNextSelector);
     await this.waitForNetworkIdle();
+    await this.page.waitForSelector(blogPostTitleSelector, {state: 'visible'});
 
     const newFirstPostTitle = await this.page.$eval(
       blogPostTitleSelector,
