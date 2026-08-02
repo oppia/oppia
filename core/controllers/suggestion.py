@@ -867,7 +867,7 @@ class ReviewableSuggestionsHandler(
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')
-        exp_ids = [exploration_id] if exploration_id else []
+        exp_ids = [exploration_id] if exploration_id else None
         user_settings = user_services.get_user_settings(self.user_id)
         # User_settings.preferred_translation_language_code is the language
         # selected by user in language filter of contributor dashboard.
@@ -893,7 +893,12 @@ class ReviewableSuggestionsHandler(
                 # unlimited number of exp_ids.
                 reviewable_suggestions, next_offset = (
                     suggestion_services.get_reviewable_translation_suggestions_by_offset(
-                        self.user_id, exp_ids, limit, offset, sort_key
+                        self.user_id,
+                        exp_ids,
+                        limit,
+                        offset,
+                        sort_key,
+                        target_type=target_type,
                     )
                 )
             suggestions = (
@@ -989,7 +994,12 @@ class UserSubmittedSuggestionsHandler(
         sort_key = self.normalized_request['sort_key']
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
-                self.user_id, suggestion_type, limit, offset, sort_key
+                self.user_id,
+                suggestion_type,
+                limit,
+                offset,
+                sort_key,
+                target_type=target_type,
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -1022,13 +1032,12 @@ class UserSubmittedSuggestionsHandler(
                         limit,
                         next_offset,
                         sort_key,
+                        target_type=target_type,
                     )
                 )
                 suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
                     translatable_suggestions
                 )
-            suggestions = suggestions_with_translatable_exps
-
         self._render_suggestions(target_type, suggestions, next_offset)
 
 

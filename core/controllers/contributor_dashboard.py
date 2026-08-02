@@ -605,7 +605,7 @@ class ReviewableOpportunitiesHandlerV2(
                 )
 
         in_review_suggestion_target_ids = suggestion_services.get_reviewable_translation_suggestion_target_ids(
-            user_id, language
+            user_id, language, target_type=entity_type
         )
 
         if not in_review_suggestion_target_ids:

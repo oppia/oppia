@@ -20,6 +20,8 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   ViewChild,
   HostListener,
   Input,
@@ -67,6 +69,7 @@ export interface Suggestion {
   };
   status: string;
   suggestion_type: string;
+  target_type?: string;
   target_id: string;
   suggestion_id: string;
   author_name: string;
@@ -130,10 +133,22 @@ const COMMIT_TIMEOUT_DURATION = 30000;
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
 })
-export class ContributionsAndReview implements OnInit, OnDestroy {
+export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
   @Input() activeTopicName: string;
+  @Input() activeEntityType: string = AppConstants.ENTITY_TYPE.EXPLORATION;
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.activeEntityType) {
+      this.activeExplorationId = null;
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+    }
+  }
+
+  get ENTITY_TYPE_SKILL(): string {
+    return AppConstants.ENTITY_TYPE.SKILL;
+  }
 
   directiveSubscriptions = new Subscription();
 
@@ -255,7 +270,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         subheading =
           ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
       } else {
-        if (
+        if (suggestion.target_type === AppConstants.ENTITY_TYPE.SKILL) {
+          subheading = details.skill_description || '';
+        } else if (
           this.featureService.status.EnableTranslationOppsWithNewOppModels
             .isEnabled
         ) {
@@ -505,38 +522,73 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     const currentSuggestionSummary = this.queuedSuggestionSummary;
     this.queuedSuggestionSummary = null;
 
-    this.contributionAndReviewService.reviewExplorationSuggestion(
-      currentSuggestionSummary.target_id,
-      currentSuggestionSummary.suggestion_id,
-      currentSuggestionSummary.action_status,
-      currentSuggestionSummary.reviewer_message,
-      currentSuggestionSummary.action_status === 'accept' &&
-        currentSuggestionSummary.commit_message
-        ? currentSuggestionSummary.commit_message
-        : null,
-      // Only include commit_message for accepted suggestions.
-      () => {
-        this.alertsService.clearMessages();
-        this.alertsService.addSuccessMessage(
-          `Suggestion ${
-            currentSuggestionSummary?.action_status === 'accept'
-              ? 'accepted'
-              : 'rejected'
-          }.`
-        );
-        clearTimeout(this.commitTimeout);
-        this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-          [currentSuggestionSummary.suggestion_id]
-        );
-        delete this.contributions[currentSuggestionSummary.suggestion_id];
-        this.isCommitting = false;
-      },
-      errorMessage => {
-        this.alertsService.clearWarnings();
-        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-        this.isCommitting = false;
-      }
-    );
+    if (
+      currentSuggestionSummary.target_type === AppConstants.ENTITY_TYPE.SKILL
+    ) {
+      this.contributionAndReviewService.reviewSkillSuggestion(
+        currentSuggestionSummary.target_id,
+        currentSuggestionSummary.suggestion_id,
+        currentSuggestionSummary.action_status,
+        currentSuggestionSummary.reviewer_message,
+        null,
+        () => {
+          this.alertsService.clearMessages();
+          this.alertsService.addSuccessMessage(
+            `Suggestion ${
+              currentSuggestionSummary?.action_status === 'accept'
+                ? 'accepted'
+                : 'rejected'
+            }.`
+          );
+          clearTimeout(this.commitTimeout);
+          this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+            [currentSuggestionSummary.suggestion_id]
+          );
+          delete this.contributions[currentSuggestionSummary.suggestion_id];
+          this.isCommitting = false;
+        },
+        () => {
+          this.alertsService.clearWarnings();
+          this.alertsService.addWarning(
+            'Invalid Suggestion: Error updating skill suggestion'
+          );
+          this.isCommitting = false;
+        }
+      );
+    } else {
+      this.contributionAndReviewService.reviewExplorationSuggestion(
+        currentSuggestionSummary.target_id,
+        currentSuggestionSummary.suggestion_id,
+        currentSuggestionSummary.action_status,
+        currentSuggestionSummary.reviewer_message,
+        currentSuggestionSummary.action_status === 'accept' &&
+          currentSuggestionSummary.commit_message
+          ? currentSuggestionSummary.commit_message
+          : null,
+        // Only include commit_message for accepted suggestions.
+        () => {
+          this.alertsService.clearMessages();
+          this.alertsService.addSuccessMessage(
+            `Suggestion ${
+              currentSuggestionSummary?.action_status === 'accept'
+                ? 'accepted'
+                : 'rejected'
+            }.`
+          );
+          clearTimeout(this.commitTimeout);
+          this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+            [currentSuggestionSummary.suggestion_id]
+          );
+          delete this.contributions[currentSuggestionSummary.suggestion_id];
+          this.isCommitting = false;
+        },
+        errorMessage => {
+          this.alertsService.clearWarnings();
+          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+          this.isCommitting = false;
+        }
+      );
+    }
   }
 
   showUndoSnackbar(): void {
@@ -695,7 +747,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     return this.contributionOpportunitiesService
       .getReviewableTranslationOpportunitiesAsync(
         this.translationTopicService.getActiveTopicName(),
-        this.languageCode
+        this.languageCode,
+        this.activeEntityType
       )
       .then(response => {
         const opportunitiesDicts = [];
@@ -985,14 +1038,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
           return this.contributionAndReviewService.getUserCreatedTranslationSuggestionsAsync(
             shouldResetOffset,
-            this.userCreatedTranslationsSortKey
+            this.userCreatedTranslationsSortKey,
+            this.activeEntityType
           );
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService.getReviewableTranslationSuggestionsAsync(
             shouldResetOffset,
             this.reviewableTranslationsSortKey,
-            this.activeExplorationId
+            this.activeExplorationId,
+            this.activeEntityType
           );
         },
       },
