@@ -61,6 +61,8 @@ export class LocalStorageService {
 
   HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
+  SKIPPED_ADVENTURES_KEY = 'skipped_adventures';
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -453,5 +455,54 @@ export class LocalStorageService {
       return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
     }
     return null;
+  }
+
+  /**
+   * Save the given skipped adventure indices for a story to localStorage.
+   * @param storyId The id of the story the skipped adventures belong to.
+   * @param skippedAdventureIndices The indices of the skipped adventures.
+   */
+  updateSkippedAdventures(
+    storyId: string,
+    skippedAdventureIndices: number[]
+  ): void {
+    if (this.isStorageAvailable()) {
+      let skippedAdventuresDict: {[storyId: string]: number[]} = {};
+
+      const stringifiedSkippedAdventures = (this.storage as Storage).getItem(
+        this.SKIPPED_ADVENTURES_KEY
+      );
+      if (stringifiedSkippedAdventures) {
+        skippedAdventuresDict = JSON.parse(stringifiedSkippedAdventures);
+      }
+
+      skippedAdventuresDict[storyId] = skippedAdventureIndices;
+      (this.storage as Storage).setItem(
+        this.SKIPPED_ADVENTURES_KEY,
+        JSON.stringify(skippedAdventuresDict)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the skipped adventure indices for a story from localStorage.
+   * @param storyId The id of the story the skipped adventures belong to.
+   * @returns The indices of the skipped adventures, or an empty array if none
+   *   are stored.
+   */
+  getSkippedAdventures(storyId: string): number[] {
+    if (this.isStorageAvailable()) {
+      const stringifiedSkippedAdventures = (this.storage as Storage).getItem(
+        this.SKIPPED_ADVENTURES_KEY
+      );
+      if (stringifiedSkippedAdventures) {
+        const skippedAdventuresDict = JSON.parse(stringifiedSkippedAdventures);
+        const skippedAdventures = skippedAdventuresDict[storyId];
+        if (Array.isArray(skippedAdventures)) {
+          return skippedAdventures;
+        }
+      }
+    }
+    return [];
   }
 }

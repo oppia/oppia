@@ -38,8 +38,11 @@ import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.s
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
+import {LocalStorageService} from 'services/local-storage.service';
 
 import constants from 'assets/constants';
+
+import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
 
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
@@ -152,11 +155,16 @@ export class TopicStorySectionComponent
       this._expandedAdventureIndices.delete(index);
     } else {
       this._expandedAdventureIndices.add(index);
-      this.skippedAdventureIndices.delete(index);
+      if (this.skippedAdventureIndices.delete(index)) {
+        this.persistSkippedAdventures();
+      }
     }
   }
 
-  onNavigationLessonSelected(lessonNumber: number): void {
+  onNavigationLessonSelected(
+    selection: AdventureNavigationLessonSelection
+  ): void {
+    const lessonNumber = selection.lessonNumber;
     const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
       group.lessonCards.some(card => card.lessonNumber === lessonNumber)
     );
@@ -261,6 +269,28 @@ export class TopicStorySectionComponent
         this._expandedAdventureIndices.delete(index);
       }
     }
+    this.persistSkippedAdventures();
+  }
+
+  private restoreSkippedAdventures(): void {
+    const storyId = this.storySummary.getId();
+    if (!storyId) {
+      return;
+    }
+    this.skippedAdventureIndices = new Set(
+      this.localStorageService.getSkippedAdventures(storyId)
+    );
+  }
+
+  private persistSkippedAdventures(): void {
+    const storyId = this.storySummary.getId();
+    if (!storyId) {
+      return;
+    }
+    this.localStorageService.updateSkippedAdventures(
+      storyId,
+      Array.from(this.skippedAdventureIndices)
+    );
   }
 
   onNavigationPracticeSelected(adventureIndex: number): void {
@@ -280,7 +310,8 @@ export class TopicStorySectionComponent
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
-    private chapterLabelVisibilityService: ChapterLabelVisibilityService
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
+    private localStorageService: LocalStorageService
   ) {}
 
   ngOnInit(): void {
@@ -451,6 +482,7 @@ export class TopicStorySectionComponent
 
     const allNodes = this.storySummary.getAllNodes();
     this.adventureGroups = this.buildAdventureGroups(allNodes);
+    this.restoreSkippedAdventures();
     this.updateVisibleSections();
   }
 
@@ -548,6 +580,7 @@ export class TopicStorySectionComponent
     });
 
     this.adventureGroups = this.buildAdventureGroups(allNodes);
+    this.restoreSkippedAdventures();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
 
@@ -708,7 +741,14 @@ export class TopicStorySectionComponent
       this.visibleAdventureGroups.length &&
       this._expandedAdventureIndices.size === 0
     ) {
-      this._expandedAdventureIndices = new Set([0]);
+      // Do not auto-expand an adventure that was previously skipped; expand
+      // the first adventure that was not skipped instead.
+      const firstNonSkippedIndex = this.visibleAdventureGroups.findIndex(
+        (_group, index) => !this.skippedAdventureIndices.has(index)
+      );
+      this._expandedAdventureIndices = new Set([
+        firstNonSkippedIndex === -1 ? 0 : firstNonSkippedIndex,
+      ]);
     }
   }
 

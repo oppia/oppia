@@ -39,6 +39,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
+import {LocalStorageService} from 'services/local-storage.service';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
@@ -56,6 +57,7 @@ describe('TopicStorySectionComponent', () => {
   let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
   let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
   let chapterLabelVisibilityService: jasmine.SpyObj<ChapterLabelVisibilityService>;
+  let localStorageService: jasmine.SpyObj<LocalStorageService>;
   let platformFeatureService: {
     status: {
       SerialChapterLaunchLearnerView: {
@@ -110,6 +112,11 @@ describe('TopicStorySectionComponent', () => {
     chapterLabelVisibilityService.isNewChapterLabelVisible.and.returnValue(
       false
     );
+    localStorageService = jasmine.createSpyObj('LocalStorageService', [
+      'getSkippedAdventures',
+      'updateSkippedAdventures',
+    ]);
+    localStorageService.getSkippedAdventures.and.returnValue([]);
     platformFeatureService = {
       status: {
         SerialChapterLaunchLearnerView: {
@@ -141,6 +148,10 @@ describe('TopicStorySectionComponent', () => {
         {
           provide: ChapterLabelVisibilityService,
           useValue: chapterLabelVisibilityService,
+        },
+        {
+          provide: LocalStorageService,
+          useValue: localStorageService,
         },
         {
           provide: PlatformFeatureService,
@@ -1469,7 +1480,7 @@ describe('TopicStorySectionComponent', () => {
 
     spyOn(document, 'getElementById').and.returnValue(null);
 
-    component.onNavigationLessonSelected(2);
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 0});
 
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
@@ -1477,6 +1488,271 @@ describe('TopicStorySectionComponent', () => {
 
     tick(300);
   }));
+
+  it('should restore skipped adventures from localStorage on init', () => {
+    localStorageService.getSkippedAdventures.and.returnValue([0]);
+
+    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy1.getTitle.and.returnValue('Node 1');
+    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
+    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy1.getId.and.returnValue('node_1');
+    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy2.getTitle.and.returnValue('Node 2');
+    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
+    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
+    storyNodeSpy2.getId.and.returnValue('node_2');
+    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(localStorageService.getSkippedAdventures).toHaveBeenCalledWith(
+      'story_id_1'
+    );
+    expect(component.isAdventureSkipped(0)).toBeTrue();
+    expect(component.isAdventureSkipped(1)).toBeFalse();
+    expect(component.isAdventureExpanded(0)).toBeFalse();
+    expect(component.isAdventureExpanded(1)).toBeTrue();
+  });
+
+  it('should auto-expand first adventure when all adventures are skipped', () => {
+    localStorageService.getSkippedAdventures.and.returnValue([0, 1]);
+
+    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy1.getTitle.and.returnValue('Node 1');
+    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
+    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy1.getId.and.returnValue('node_1');
+    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy2.getTitle.and.returnValue('Node 2');
+    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
+    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
+    storyNodeSpy2.getId.and.returnValue('node_2');
+    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(component.isAdventureSkipped(0)).toBeTrue();
+    expect(component.isAdventureSkipped(1)).toBeTrue();
+    expect(component.isAdventureExpanded(0)).toBeTrue();
+  });
+
+  it('should persist skipped adventures when proceeding with skip confirmation', fakeAsync(() => {
+    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy1.getTitle.and.returnValue('Node 1');
+    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
+    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy1.getId.and.returnValue('node_1');
+    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy2.getTitle.and.returnValue('Node 2');
+    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
+    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
+    storyNodeSpy2.getId.and.returnValue('node_2');
+    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    spyOn(document, 'getElementById').and.returnValue(null);
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(component.showArcSkipConfirmationModal).toBeTrue();
+    expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
+
+    component.onArcSkipConfirmationProceed();
+
+    expect(component.isAdventureSkipped(0)).toBeTrue();
+    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
+      'story_id_1',
+      [0]
+    );
+
+    tick(300);
+  }));
+
+  it('should persist un-skipping when a skipped adventure is expanded', () => {
+    component.skippedAdventureIndices = new Set([0]);
+
+    component.toggleAdventure(0);
+
+    expect(component.isAdventureSkipped(0)).toBeFalse();
+    expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
+      'story_id_1',
+      []
+    );
+  });
+
+  it('should not persist or restore skipped adventures when story id is missing', () => {
+    (component.storySummary.getId as jasmine.Spy).and.returnValue('');
+    localStorageService.getSkippedAdventures.calls.reset();
+    localStorageService.updateSkippedAdventures.calls.reset();
+
+    component.skippedAdventureIndices = new Set([0]);
+    component.toggleAdventure(0);
+
+    expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(localStorageService.getSkippedAdventures).not.toHaveBeenCalled();
+  });
 
   it('should handle adventure navigation practice selected when element not found', fakeAsync(() => {
     const getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(
@@ -1646,7 +1922,7 @@ describe('TopicStorySectionComponent', () => {
     spyOn(document, 'getElementById').and.returnValue(mockElement);
     spyOn(mockElement, 'scrollIntoView');
 
-    component.onNavigationLessonSelected(1);
+    component.onNavigationLessonSelected({lessonNumber: 1, adventureIndex: 0});
 
     tick(300);
 
@@ -2010,7 +2286,10 @@ describe('TopicStorySectionComponent', () => {
 
     spyOn(document, 'getElementById').and.returnValue(null);
 
-    component.onNavigationLessonSelected(999);
+    component.onNavigationLessonSelected({
+      lessonNumber: 999,
+      adventureIndex: 0,
+    });
 
     expect(component.activeLessonNumber).toBe(999);
     expect(component.navigatedLessonNumber).toBe(999);

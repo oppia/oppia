@@ -1643,7 +1643,7 @@
   "I18N_TOPIC_VIEWER_PRACTICE": "Title shown in a tab header in the topic's viewer page. - Clicking on this tab header shows a list of the practice questions that can be used to test the learner's understanding of the topic.",
   "I18N_TOPIC_VIEWER_PRACTICE_BUTTON": "Label for the practice button in the topic lesson card.",
   "I18N_TOPIC_VIEWER_SKIP_AHEAD_CLOSE": "ARIA label for the close button in the skip-ahead confirmation modal.",
-  "I18N_TOPIC_VIEWER_SKIP_AHEAD_MODAL_DESCRIPTION": "Description text in the skip-ahead confirmation modal that explains previous arcs will be marked as skipped but remain accessible.",
+  "I18N_TOPIC_VIEWER_SKIP_AHEAD_MODAL_DESCRIPTION": "Description text in the skip-ahead confirmation modal that explains previous adventures will be marked as skipped but remain accessible.",
   "I18N_TOPIC_VIEWER_SKIP_AHEAD_MODAL_TITLE": "Heading in the skip-ahead confirmation modal. The <[arcNumber]> placeholder is replaced by the target arc number.",
   "I18N_TOPIC_VIEWER_SKIP_AHEAD_REVIEW_ADVENTURE_BUTTON": "Label for the CTA button shown on a skipped adventure card that lets learners open the skipped adventure again.",
   "I18N_TOPIC_VIEWER_SKIP_AHEAD_REVIEW_BUTTON": "Label for the action on compact skipped-arc bars that allows learners to reopen and review a skipped arc.",

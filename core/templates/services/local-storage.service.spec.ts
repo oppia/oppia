@@ -365,5 +365,24 @@ describe('LocalStorageService', () => {
         localStorageService.getLastPageViewTime('lastPageViewTime')
       ).toBeNull();
     });
+
+    it('should correctly save and retrieve skipped adventures', () => {
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+
+      localStorageService.updateSkippedAdventures('story_1', [0, 1]);
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([
+        0, 1,
+      ]);
+      expect(localStorageService.getSkippedAdventures('story_2')).toEqual([]);
+    });
+
+    it('should not save skipped adventures when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.updateSkippedAdventures('story_1', [0, 1]);
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+    });
   });
 });
