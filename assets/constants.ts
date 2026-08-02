@@ -6605,13 +6605,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "View detailed technical feedback reports and manage submissions to improve the Oppia platform."
         },
         {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "View detailed technical feedback reports and manage submissions to improve the Oppia platform."
         }
       ]
     },
