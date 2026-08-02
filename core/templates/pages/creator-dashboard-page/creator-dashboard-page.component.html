@@ -603,8 +603,9 @@
     height: 260px;
     margin-left: 7.5px;
     margin-right: 7.5px;
+    overflow: hidden;
     padding: 0;
-    position: static;
+    position: relative;
     width: 184px;
   }
 
@@ -619,10 +620,15 @@
   }
 
   .oppia-dashboard-card-view-item .exp-private-text {
+    display: -webkit-box;
     font-size: 13px;
+    overflow: hidden;
     padding-left: 0.5em;
     padding-right: 0.5em;
     padding-top: 0.8em;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
   }
 
   .oppia-dashboard-card-view-item .metrics {
@@ -637,7 +643,9 @@
 
   .oppia-dashboard-card-view-item .oppia-sharing-links {
     font-size: 24px;
-    margin: 10px;
+    margin: 5px;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .oppia-dashboard-card-view-item .oppia-sharing-links .share-option-img,
