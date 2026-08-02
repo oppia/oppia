@@ -187,6 +187,7 @@
   .certificate-assessment-question-header {
     align-items: flex-start;
     flex-direction: column;
+    padding-top: 20px;
   }
 
   .certificate-assessment-avatar {
@@ -199,10 +200,6 @@
   .certificate-assessment-avatar img {
     height: 40px;
     width: 40px;
-  }
-
-  .certificate-assessment-question-header {
-    padding-top: 20px;
   }
 
   .certificate-assessment-prompt-pill {
