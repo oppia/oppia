@@ -52,7 +52,6 @@ const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 const usernameSelector = 'input.e2e-test-username-input';
 const termsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
-const registerButtonSelector = 'button.e2e-test-register-user';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
