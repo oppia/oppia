@@ -2582,7 +2582,8 @@ class GenericTestBase(AppEngineTestBase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT: str = """author_notes: ''
+    SAMPLE_YAML_CONTENT: str = (
+        """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Category
@@ -2653,12 +2654,14 @@ states_schema_version: %d
 tags: []
 title: Title
 version: 1
-""" % (
-        feconf.DEFAULT_INIT_STATE_NAME,
-        exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-        feconf.DEFAULT_INIT_STATE_NAME,
-        feconf.DEFAULT_INIT_STATE_NAME,
-        feconf.CURRENT_STATE_SCHEMA_VERSION,
+"""
+        % (
+            feconf.DEFAULT_INIT_STATE_NAME,
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+        )
     )
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
