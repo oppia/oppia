@@ -29,6 +29,14 @@ const baseUrl = testConstants.URLs.BaseURL;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
+const splashPageUrl = testConstants.URLs.splash;
+const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const preferencesPageUrl = testConstants.URLs.Preferences;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+
+const playLaterButton = '.e2e-test-add-to-playlist-btn';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
@@ -3032,7 +3040,60 @@ export class LoggedOutUser extends BaseUser {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
   }
+
+  /**
+   * Function to navigate to the Creator Dashboard.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async navigateToCreatorDashboard(verifyURL: boolean = true): Promise<void> {
+    await this.goto(creatorDashboardUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the Learner Dashboard.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async navigateToLearnerDashboard(verifyURL: boolean = true): Promise<void> {
+    await this.goto(learnerDashboardUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the Moderator Page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async navigateToModeratorPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(moderatorPageUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the Preferences Page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async navigateToPreferencesPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(preferencesPageUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the Topics and Skills Dashboard Page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl, verifyURL);
+  }
+
+  /**
+   * Function to verify that the user cannot add an exploration to the Play Later list.
+   * The "Add to Play Later" button should not be visible for logged-out users.
+   */
+  async expectCannotAddExplorationToPlayLater(): Promise<void> {
+    const isButtonVisible =
+      (await this.page.$(playLaterButton)) !== null;
+    expect(isButtonVisible).toBe(false);
+  }
 }
+
 
 export const LoggedOutUserFactory = (page: Page): LoggedOutUser => {
   return new LoggedOutUser(page);
