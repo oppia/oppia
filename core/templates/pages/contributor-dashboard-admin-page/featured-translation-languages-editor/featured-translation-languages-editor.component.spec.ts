@@ -25,6 +25,7 @@ import {
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
+import {AppConstants} from 'app.constants';
 import {FeaturedTranslationLanguagesEditorComponent} from './featured-translation-languages-editor.component';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -73,6 +74,21 @@ describe('Featured Translation Languages Editor Component', () => {
     component = fixture.componentInstance;
   });
 
+  it('should initialize language options from supported audio languages on init', () => {
+    const expectedOptions = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
+      lang => ({
+        id: lang.id,
+        description: lang.description,
+      })
+    );
+
+    component.ngOnInit();
+
+    expect(component.languageOptions).toEqual(expectedOptions);
+    // With no featured languages selected, every option is available.
+    expect(component.availableLanguageOptions).toEqual(expectedOptions);
+  });
+
   it('should load featured languages when the editor is opened', fakeAsync(() => {
     backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
       Promise.resolve([HINDI_LANGUAGE])
@@ -101,15 +117,34 @@ describe('Featured Translation Languages Editor Component', () => {
     expect(component.loadingMessage).toBe('');
   }));
 
+  it('should show a default warning when load fails without a message', fakeAsync(() => {
+    backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
+      Promise.reject('')
+    );
+
+    component.toggleEditor();
+    flushMicrotasks();
+
+    expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
+      'Failed to load featured translation languages.'
+    );
+    expect(component.loadingMessage).toBe('');
+  }));
+
   it('should close without reloading when toggled off', fakeAsync(() => {
     backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
       Promise.resolve([])
     );
-    // Create translation admin user.
+
+    // Open the editor first (this triggers a load).
+    component.toggleEditor();
     flushMicrotasks();
+    expect(component.isEditorOpen).toBeTrue();
     backendApiSpy.getFeaturedTranslationLanguagesAsync.calls.reset();
 
-    // Verify featured language editor is visible.
+    // Close the editor: it should NOT trigger another load.
+    component.toggleEditor();
+    flushMicrotasks();
 
     expect(component.isEditorOpen).toBeFalse();
     expect(
@@ -192,6 +227,21 @@ describe('Featured Translation Languages Editor Component', () => {
     flushMicrotasks();
 
     expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith('Save error.');
+    expect(component.saveInProgress).toBeFalse();
+  }));
+
+  it('should show a default warning when save fails without a message', fakeAsync(() => {
+    component.featuredLanguages = [HINDI_LANGUAGE];
+    backendApiSpy.updateFeaturedTranslationLanguagesAsync.and.returnValue(
+      Promise.reject('')
+    );
+
+    component.saveFeaturedTranslationLanguages();
+    flushMicrotasks();
+
+    expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
+      'Failed to save featured translation languages.'
+    );
     expect(component.saveInProgress).toBeFalse();
   }));
 
