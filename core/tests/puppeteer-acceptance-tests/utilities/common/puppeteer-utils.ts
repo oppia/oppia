@@ -400,9 +400,8 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    let selectedUsername = username;
 
-    await this.typeInInputField(usernameSelector, selectedUsername);
+    await this.typeInInputField(usernameSelector, username);
 
     await this.page.waitForFunction(
       (selector: string, expectedUsername: string) => {
@@ -413,7 +412,7 @@ export class BaseUser {
       },
       {},
       usernameSelector,
-      selectedUsername
+      username
     );
 
     await this.clickOnElementWithSelector(termsCheckboxSelector);
@@ -427,70 +426,10 @@ export class BaseUser {
       termsCheckboxSelector
     );
 
-    let isRegisterButtonEnabled = false;
-    for (let attempt = 0; attempt < 5 && !isRegisterButtonEnabled; attempt++) {
-      if (attempt > 0) {
-        selectedUsername = `${username}${Date.now().toString().slice(-4)}${attempt}`;
-        await this.page.evaluate(
-          (
-            nextUsername: string,
-            usernameSelector: string,
-            checkboxSelector: string
-          ) => {
-            const usernameInput = document.querySelector(
-              usernameSelector
-            ) as HTMLInputElement | null;
-            if (usernameInput) {
-              usernameInput.focus();
-              usernameInput.value = nextUsername;
-              usernameInput.dispatchEvent(new Event('input', {bubbles: true}));
-              usernameInput.dispatchEvent(new Event('change', {bubbles: true}));
-              usernameInput.blur();
-            }
-
-            const checkbox = document.querySelector(
-              checkboxSelector
-            ) as HTMLInputElement | null;
-            if (checkbox && !checkbox.checked) {
-              checkbox.click();
-            }
-          },
-          selectedUsername,
-          usernameSelector,
-          termsCheckboxSelector
-        );
-      }
-
-      isRegisterButtonEnabled = await this.page
-        .waitForFunction(
-          (selector: string) => {
-            const button = document.querySelector(
-              selector
-            ) as HTMLButtonElement | null;
-            if (!button) {
-              return false;
-            }
-
-            const isDisabled =
-              button.disabled ||
-              button.hasAttribute('disabled') ||
-              button.classList.contains('disabled');
-
-            return !isDisabled;
-          },
-          {timeout: 8000},
-          registerButtonSelector
-        )
-        .then(() => true)
-        .catch(() => false);
-    }
-
-    if (!isRegisterButtonEnabled) {
-      throw new Error('Sign-up submit button did not become enabled.');
-    }
+    await this.clickOnElementWithSelector(registerButtonSelector);
 
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
-    this.username = selectedUsername;
+    this.username = username;
     this.email = email;
   }
 
