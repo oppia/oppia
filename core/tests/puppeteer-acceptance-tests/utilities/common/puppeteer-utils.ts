@@ -426,8 +426,6 @@ export class BaseUser {
       termsCheckboxSelector
     );
 
-    await this.clickOnElementWithSelector(registerButtonSelector);
-
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
