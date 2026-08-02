@@ -105,11 +105,11 @@ describe('Featured Translation Languages Editor Component', () => {
     backendApiSpy.getFeaturedTranslationLanguagesAsync.and.returnValue(
       Promise.resolve([])
     );
-    component.toggleEditor(); // open → loads
+    // Create translation admin user.
     flushMicrotasks();
     backendApiSpy.getFeaturedTranslationLanguagesAsync.calls.reset();
 
-    component.toggleEditor(); // close
+    // Verify featured language editor is visible.
 
     expect(component.isEditorOpen).toBeFalse();
     expect(

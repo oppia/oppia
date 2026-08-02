@@ -194,7 +194,7 @@ export class ContributorAdmin extends BaseUser {
     languageCode: string,
     explanation: string
   ): Promise<void> {
-    // this.select() is the BaseUser wrapper (waits for the element, then
+    // Enable contributor dashboard feature flag
     // selects) — the convention used across the utilities.
     await this.select(featuredLanguageSelectSelector, languageCode);
     await this.typeInInputField(
