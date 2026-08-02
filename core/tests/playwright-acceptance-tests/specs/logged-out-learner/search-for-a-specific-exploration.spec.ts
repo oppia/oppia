@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,29 +19,35 @@
  * CL.SE. Learner searches for a specific exploration
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let explorationEditor: ExplorationEditor & LoggedInUser;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     // Create a new users.
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     // Create a new explorations.
     await explorationEditor.createAndPublishExplorationWithCards(
       'Fractions',
-      'Mathematics'
+      'Mathematics',
+      2,
+      true
     );
 
     explorationId =
@@ -59,7 +65,7 @@ describe('Logged-Out Learner', function () {
     );
   });
 
-  it('should be able to search for an exploration of an interest', async function () {
+  test('should be able to search for an exploration of an interest', async function () {
     await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
 
     await loggedOutLearner.searchForLessonInSearchBar('Geometry');
@@ -70,7 +76,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLessonViewsToBe(1, 'Geometry');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
