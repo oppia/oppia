@@ -109,7 +109,11 @@ export class ContributorDashboardPageComponent implements OnInit {
   }
 
   showEntityTypeSelector(): boolean {
-    return this.activeTabName === 'translateTextTab';
+    return (
+      this.activeTabName === 'translateTextTab' ||
+      this.activeTabName === 'myContributionTab' ||
+      !this.activeTabName
+    );
   }
 
   onChangeTopic(topicName: string): void {

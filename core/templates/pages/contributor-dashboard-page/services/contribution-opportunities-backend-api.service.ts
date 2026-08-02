@@ -257,16 +257,14 @@ export class ContributionOpportunitiesBackendApiService {
 
   async fetchReviewableTranslationOpportunitiesAsync(
     topicName: string,
-    languageCode?: string
+    languageCode?: string,
+    entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
-    const params: {
-      topic_name?: string;
-      language_code?: string;
-      entity_type?: string;
-    } = {};
-    if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
-      params.topic_name = topicName;
-    }
+    const params: Record<string, string> = {
+      topic_name:
+        topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
+    };
+
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }
@@ -275,7 +273,7 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      params.entity_type = AppConstants.ENTITY_TYPE.EXPLORATION;
+      params.entity_type = entityType;
       return this.http
         .get<ReviewableTranslationOpportunitiesBackendDictV2>(
           '/getreviewableopportunitieshandlerv2',

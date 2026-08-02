@@ -102,6 +102,7 @@ interface PendingSuggestionDict {
   action_status: string;
   reviewer_message: string;
   commit_message?: string;
+  target_type?: string;
 }
 
 enum ExpansionTabType {
@@ -430,11 +431,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   get explorationContentHtmlAsString(): string {
-    return typeof this.explorationContentHtml === 'string'
-      ? this.explorationContentHtml
-      : this.explorationContentHtml !== null
-        ? this.explorationContentHtml[0] || ''
-        : '';
+    if (typeof this.explorationContentHtml === 'string') {
+      return this.explorationContentHtml;
+    }
+    if (Array.isArray(this.explorationContentHtml)) {
+      return this.explorationContentHtml[0] || '';
+    }
+    return '';
   }
 
   get updateIsDisabled(): boolean {
@@ -587,6 +590,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         action_status: AppConstants.ACTION_ACCEPT_SUGGESTION,
         reviewer_message: reviewMessageForSubmitter,
         commit_message: this.finalCommitMessage,
+        target_type: this.activeSuggestion.target_type,
       };
       this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
 
@@ -604,23 +608,49 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         'Translation'
       );
 
-      this.contributionAndReviewService.reviewExplorationSuggestion(
-        this.activeSuggestion.target_id,
-        this.activeSuggestionId,
-        AppConstants.ACTION_ACCEPT_SUGGESTION,
-        reviewMessageForSubmitter,
-        this.finalCommitMessage,
-        () => {
-          this.alertsService.clearMessages();
-          this.alertsService.addSuccessMessage('Suggestion accepted.');
-          this.resolveSuggestionAndUpdateModal();
-        },
-        errorMessage => {
-          this.resolvingSuggestion = false;
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-        }
-      );
+      if (
+        this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
+      ) {
+        this.contributionAndReviewService.reviewSkillSuggestion(
+          this.activeSuggestion.target_id,
+          this.activeSuggestionId,
+          AppConstants.ACTION_ACCEPT_SUGGESTION,
+          reviewMessageForSubmitter,
+          null,
+          () => {
+            this.alertsService.clearMessages();
+            this.alertsService.addSuccessMessage('Suggestion accepted.');
+            this.resolveSuggestionAndUpdateModal();
+          },
+          () => {
+            this.resolvingSuggestion = false;
+            this.alertsService.clearWarnings();
+            this.alertsService.addWarning(
+              'Invalid Suggestion: Error updating skill suggestion'
+            );
+          }
+        );
+      } else {
+        this.contributionAndReviewService.reviewExplorationSuggestion(
+          this.activeSuggestion.target_id,
+          this.activeSuggestionId,
+          AppConstants.ACTION_ACCEPT_SUGGESTION,
+          reviewMessageForSubmitter,
+          this.finalCommitMessage,
+          () => {
+            this.alertsService.clearMessages();
+            this.alertsService.addSuccessMessage('Suggestion accepted.');
+            this.resolveSuggestionAndUpdateModal();
+          },
+          errorMessage => {
+            this.resolvingSuggestion = false;
+            this.alertsService.clearWarnings();
+            this.alertsService.addWarning(
+              `Invalid Suggestion: ${errorMessage}`
+            );
+          }
+        );
+      }
     }
   }
 
@@ -641,6 +671,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           suggestion_id: this.activeSuggestionId,
           action_status: AppConstants.ACTION_REJECT_SUGGESTION,
           reviewer_message: reviewMessage || this.reviewMessage,
+          target_type: this.activeSuggestion.target_type,
         };
         this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
         this.resolveSuggestionAndUpdateModal();
@@ -659,25 +690,49 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
         // In case of rejection, the suggestion is not applied, so there is no
         // commit message. Because there is no commit to make.
-        this.contributionAndReviewService.reviewExplorationSuggestion(
-          this.activeSuggestion.target_id,
-          this.activeSuggestionId,
-          AppConstants.ACTION_REJECT_SUGGESTION,
-          reviewMessage || this.reviewMessage,
-          null,
-          () => {
-            this.alertsService.clearMessages();
-            this.alertsService.addSuccessMessage('Suggestion rejected.');
-            this.resolveSuggestionAndUpdateModal();
-          },
-          errorMessage => {
-            this.resolvingSuggestion = false;
-            this.alertsService.clearWarnings();
-            this.alertsService.addWarning(
-              `Invalid Suggestion: ${errorMessage}`
-            );
-          }
-        );
+        if (
+          this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
+        ) {
+          this.contributionAndReviewService.reviewSkillSuggestion(
+            this.activeSuggestion.target_id,
+            this.activeSuggestionId,
+            AppConstants.ACTION_REJECT_SUGGESTION,
+            reviewMessage || this.reviewMessage,
+            null,
+            () => {
+              this.alertsService.clearMessages();
+              this.alertsService.addSuccessMessage('Suggestion rejected.');
+              this.resolveSuggestionAndUpdateModal();
+            },
+            () => {
+              this.resolvingSuggestion = false;
+              this.alertsService.clearWarnings();
+              this.alertsService.addWarning(
+                'Invalid Suggestion: Error rejecting skill suggestion'
+              );
+            }
+          );
+        } else {
+          this.contributionAndReviewService.reviewExplorationSuggestion(
+            this.activeSuggestion.target_id,
+            this.activeSuggestionId,
+            AppConstants.ACTION_REJECT_SUGGESTION,
+            reviewMessage || this.reviewMessage,
+            null,
+            () => {
+              this.alertsService.clearMessages();
+              this.alertsService.addSuccessMessage('Suggestion rejected.');
+              this.resolveSuggestionAndUpdateModal();
+            },
+            errorMessage => {
+              this.resolvingSuggestion = false;
+              this.alertsService.clearWarnings();
+              this.alertsService.addWarning(
+                `Invalid Suggestion: ${errorMessage}`
+              );
+            }
+          );
+        }
       }
     }
   }

@@ -1650,6 +1650,19 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
         )
     )
 
+    missing_ids = [
+        entity_id
+        for entity_id, model in zip(entity_ids, opportunity_models_from_db)
+        if model is None
+    ]
+    if missing_ids:
+        create_translation_opportunity({entity_type: missing_ids})
+        opportunity_models_from_db = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+                entity_type, entity_ids
+            )
+        )
+
     opportunity_models_list = [
         model for model in opportunity_models_from_db if model is not None
     ]
