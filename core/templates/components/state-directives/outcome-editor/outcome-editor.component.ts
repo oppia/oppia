@@ -36,6 +36,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './outcome-editor.component.css';
 
 interface AddOutcomeModalResponse {
   outcome: Outcome;
@@ -44,6 +45,7 @@ interface AddOutcomeModalResponse {
 @Component({
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html',
+  styleUrls: ['./outcome-editor.component.css'],
 })
 export class OutcomeEditorComponent implements OnInit {
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();

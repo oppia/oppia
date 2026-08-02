@@ -88,10 +88,10 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict: general_feedback_domain.PlatformFeedbackDict = {
             'id': 'feedback_id',
-            'feedback_text': 'Feedback text',
+            'report_message': 'Report text',
             'source': 'lesson',
             'platform': 'platform',
-            'destination_dashboard': 'creator_dashboard',
+            'destination_dashboard': 'curriculum',
             'status': 'open',
             'page_url': 'page_url',
             'category': 'category',
@@ -104,10 +104,10 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
 
         feedback = general_feedback_domain.PlatformFeedback(
             report_id='feedback_id',
-            feedback_text='Feedback text',
+            report_message='Report text',
             source='lesson',
             platform='platform',
-            destination_dashboard='creator_dashboard',
+            destination_dashboard='curriculum',
             status='open',
             page_url='page_url',
             category='category',
@@ -119,3 +119,30 @@ class PlatformFeedbackDomainTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(feedback.to_dict(), expected_dict)
+
+    def test_to_summary_dict(self) -> None:
+        expected_dict: general_feedback_domain.PlatformFeedbackSummaryDict = {
+            'id': 'feedback_id',
+            'report_message_preview': f'{"N" * 97}...',
+            'status': 'open',
+            'source': 'lesson',
+            'category': 'category',
+        }
+
+        feedback = general_feedback_domain.PlatformFeedback(
+            report_id='feedback_id',
+            report_message='N' * 110,
+            source='lesson',
+            platform='platform',
+            destination_dashboard='curriculum',
+            status='open',
+            page_url='page_url',
+            category='category',
+            lesson_metadata=LESSON_METADATA,
+            include_technical_logs=True,
+            screenshot_filename='screenshot_filename',
+            screenshot_entity_id='screenshot_entity_id',
+            created_on_msecs=1700000000000.0,
+        )
+
+        self.assertEqual(feedback.to_summary_dict(), expected_dict)

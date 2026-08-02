@@ -729,3 +729,42 @@
     position: relative;
   }
 }
+
+@media screen and (min-width: 769px) and (max-width: 1500px) {
+  .oppia-top-navigation-bar .oppia-language-dropdown-button {
+    max-width: 45px;
+    overflow: hidden;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .oppia-top-navigation-bar .oppia-language-dropdown-button .desktop-view-language-code {
+    display: none;
+  }
+}
+
+.oppia-top-navigation-bar .oppia-navbar-tab-content {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+@media screen and (min-width: 769px) and (max-width: 950px) {
+  .oppia-top-navigation-bar .oppia-navbar-tab-content {
+    max-width: 60px;
+  }
+}
+
+@media screen and (min-width: 951px) and (max-width: 1150px) {
+  .oppia-top-navigation-bar .oppia-navbar-tab-content {
+    max-width: 100px;
+  }
+}
+
+@media screen and (min-width: 1151px) and (max-width: 1500px) {
+  .oppia-top-navigation-bar .oppia-navbar-tab-content {
+    max-width: 120px;
+  }
+}

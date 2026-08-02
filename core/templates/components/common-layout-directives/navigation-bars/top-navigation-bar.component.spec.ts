@@ -64,6 +64,9 @@ class MockPlatformFeatureService {
     WebFeedbackModalEnabled: {
       isEnabled: false,
     },
+    TechnicalFeedbackDashboardEnabled: {
+      isEnabled: false,
+    },
     EnableCertificateAssessment: {
       isEnabled: false,
     },
@@ -736,6 +739,7 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTechTeamLead: () => false,
       isTranslationAdmin: () => false,
       isTranslationCoordinator: () => false,
       isQuestionCoordinator: () => false,
@@ -958,6 +962,19 @@ describe('TopNavigationBarComponent', () => {
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
       ).toBe(true);
+    }
+  );
+
+  it(
+    'should return correct value for show technical feedback dashboard page' +
+      'in profile pic drop down menu feature flag',
+    () => {
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(false);
+
+      mockPlatformFeatureService.status.TechnicalFeedbackDashboardEnabled.isEnabled =
+        true;
+
+      expect(component.isTechnicalFeedbackDashboardEnabled()).toBe(true);
     }
   );
 
