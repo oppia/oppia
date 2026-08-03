@@ -64,15 +64,20 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-suggestion_models, feedback_models, opportunity_models, user_models = (
-    models.Registry.import_models(
-        [
-            models.Names.SUGGESTION,
-            models.Names.FEEDBACK,
-            models.Names.OPPORTUNITY,
-            models.Names.USER,
-        ]
-    )
+(
+    suggestion_models,
+    feedback_models,
+    opportunity_models,
+    user_models,
+    translation_models,
+) = models.Registry.import_models(
+    [
+        models.Names.SUGGESTION,
+        models.Names.FEEDBACK,
+        models.Names.OPPORTUNITY,
+        models.Names.USER,
+        models.Names.TRANSLATION,
+    ]
 )
 
 
@@ -347,6 +352,58 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.author_id,
                 change_dict,
                 'Skill translation suggestion',
+            )
+
+    def test_create_skill_translation_suggestion_fails_if_content_already_translated(
+        self,
+    ) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        skill = self.save_new_skill(
+            skill_id, self.author_id, description='description'
+        )
+        explanation_content_id = skill.skill_contents.explanation.content_id
+        explanation_html = skill.skill_contents.explanation.html
+
+        translation = translation_domain.EntityTranslation.create_empty(
+            feconf.TranslatableEntityType.SKILL, skill_id, 'hi'
+        )
+        translation.add_translation(
+            explanation_content_id,
+            '<p>हिंदी स्पष्टीकरण</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.SKILL.value,
+            skill_id,
+            skill.version,
+            'hi',
+            translation.to_dict()['translations'],
+        ).put()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': explanation_content_id,
+            'language_code': 'hi',
+            'content_html': explanation_html,
+            'translation_html': '<p>हिंदी स्पष्टीकरण 2</p>',
+            'data_format': 'html',
+        }
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The content with content_id %s has already been '
+            'translated to hi and is up-to-date.' % explanation_content_id,
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_SKILL,
+                skill_id,
+                skill.version,
+                self.author_id,
+                change_dict,
+                'test description',
             )
 
     def test_create_translation_suggestion_fails_if_duplicate_exists(

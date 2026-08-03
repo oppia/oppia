@@ -331,23 +331,31 @@ def create_suggestion(
 
         # Do not allow creating a suggestion if the content has already been
         # translated and is up-to-date.
-        if (
-            target_type == feconf.ENTITY_TYPE_EXPLORATION
-            and exploration is not None
-        ):
-            entity_translation = translation_fetchers.get_entity_translation(
-                feconf.TranslatableEntityType.EXPLORATION,
-                target_id,
-                exploration.version,
-                language_code,
+        translatable_entity_types = [
+            e.value for e in feconf.TranslatableEntityType
+        ]
+        if target_type in translatable_entity_types:
+            target_entity = opportunity_services.get_entity_by_type_and_id(
+                target_type, target_id
             )
-            if content_id in entity_translation.translations:
-                if not entity_translation.translations[content_id].needs_update:
-                    raise Exception(
-                        'The content with content_id %s has already been '
-                        'translated to %s and is up-to-date.'
-                        % (content_id, language_code)
+            if target_entity is not None:
+                entity_translation = (
+                    translation_fetchers.get_entity_translation(
+                        feconf.TranslatableEntityType(target_type),
+                        target_id,
+                        target_entity.version,
+                        language_code,
                     )
+                )
+                if content_id in entity_translation.translations:
+                    if not entity_translation.translations[
+                        content_id
+                    ].needs_update:
+                        raise Exception(
+                            'The content with content_id %s has already been '
+                            'translated to %s and is up-to-date.'
+                            % (content_id, language_code)
+                        )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
