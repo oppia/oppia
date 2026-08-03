@@ -634,10 +634,9 @@ export class ExplorationStatesService {
       // like choices, feedback, hints, solution) are dropped when their
       // HTML is empty, since empty fields don't need a translation. Content
       // ids not in the map (e.g. rule inputs) are left untouched.
-      if (contentId in contentIdToHtml) {
-        return contentIdToHtml[contentId] !== '';
-      }
-      return true;
+      return (
+        !(contentId in contentIdToHtml) || contentIdToHtml[contentId] !== ''
+      );
     });
   }
 
