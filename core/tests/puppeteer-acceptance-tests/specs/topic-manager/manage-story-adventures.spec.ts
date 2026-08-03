@@ -97,8 +97,6 @@ describe('Topic Manager', function () {
       await curriculumAdmin.expectAdventureCount(2);
       await curriculumAdmin.expectAdventureHeaderToBeVisible('Adventure 2');
 
-      // Pin the scroll position so the screenshot is deterministic: the split
-      // re-render can otherwise leave the page at an arbitrary scroll offset.
       await curriculumAdmin.scrollToTopOfPage();
 
       await curriculumAdmin.expectScreenshotToMatch(
@@ -131,9 +129,6 @@ describe('Topic Manager', function () {
         'The second part of the story'
       );
 
-      // Pin the scroll position so the screenshot is deterministic: closing
-      // the edit-adventure modal can otherwise leave the page scrolled up to
-      // the story card form.
       await curriculumAdmin.scrollToTopOfPage();
 
       await curriculumAdmin.expectScreenshotToMatch(
@@ -168,9 +163,6 @@ describe('Topic Manager', function () {
       await curriculumAdmin.removeAdventureBoundary();
       await curriculumAdmin.expectAdventureCount(1);
 
-      // Collapse the mobile navbar options panel if a previous test in this
-      // suite failed before re-navigating to the story editor, so that the
-      // screenshot shows the story editor with the collapsed bottom bar.
       await curriculumAdmin.closeStoryEditorMobileNavbarOptions();
 
       await curriculumAdmin.expectScreenshotToMatch(
