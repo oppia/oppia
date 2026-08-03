@@ -328,6 +328,9 @@ describe('RteHelperModalComponent', () => {
 
     it('should handle missing entity context when saving math SVG', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
       spyOn(pageContextService, 'getEntityType').and.returnValue(
         undefined as unknown as string
       );
@@ -370,6 +373,9 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when math SVG exceeds 100 KB', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
       spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
@@ -397,6 +403,9 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when SVG exceeds 1 MB for blog post', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
       spyOn(pageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.BLOG_POST
       );
