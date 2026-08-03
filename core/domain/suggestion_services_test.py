@@ -5869,7 +5869,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Explanation',
-            'content_id': 'explanation',
+            'content_id': '1',
             'language_code': 'hi',
             'content_html': '<p>Explanation</p>',
             'translation_html': '<p>Hindi Explanation</p>',

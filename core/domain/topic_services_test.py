@@ -2715,6 +2715,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'skill.skill_id_3', strict=False
         )
         self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, [self.TOPIC_ID])
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
 
         topic_services.delete_uncategorized_skill(
             self.user_id_admin, self.TOPIC_ID, 'skill_id_3'
@@ -2724,6 +2728,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         assert model is not None
         self.assertEqual(model.topic_ids, [])
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
 
     @test_utils.enable_feature_flags(
         [
@@ -2754,6 +2760,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'skill.skill_id_4', strict=False
         )
         self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(
+            sorted(model.topic_ids), sorted([self.TOPIC_ID, topic_id_2])
+        )
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
 
         topic_services.delete_uncategorized_skill(
             self.user_id_admin, self.TOPIC_ID, 'skill_id_4'
@@ -2762,6 +2774,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'skill.skill_id_4', strict=False
         )
         self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.topic_ids, [topic_id_2])
+        self.assertEqual(model.content_count, 1)
+        self.assertEqual(model.translation_counts, {})
 
     def test_delete_canonical_story(self) -> None:
         topic_services.delete_canonical_story(
@@ -2926,16 +2942,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.add_uncategorized_skill(
             self.user_id_admin, topic_id_2, 'skill_id_6'
         )
-        self.assertIsNotNone(
-            opportunity_models.TranslationOpportunityModel.get(
-                'skill.skill_id_5', strict=False
-            )
+        model_5_before = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_5', strict=False
         )
-        self.assertIsNotNone(
-            opportunity_models.TranslationOpportunityModel.get(
-                'skill.skill_id_6', strict=False
-            )
+        self.assertIsNotNone(model_5_before)
+        assert model_5_before is not None
+        self.assertEqual(model_5_before.topic_ids, [self.TOPIC_ID])
+        self.assertEqual(model_5_before.content_count, 1)
+
+        model_6_before = opportunity_models.TranslationOpportunityModel.get(
+            'skill.skill_id_6', strict=False
         )
+        self.assertIsNotNone(model_6_before)
+        assert model_6_before is not None
+        self.assertEqual(
+            sorted(model_6_before.topic_ids),
+            sorted([self.TOPIC_ID, topic_id_2]),
+        )
+        self.assertEqual(model_6_before.content_count, 1)
 
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
 
@@ -2944,12 +2968,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         assert model_5 is not None
         self.assertEqual(model_5.topic_ids, [])
+        self.assertEqual(model_5.content_count, 1)
 
         model_6 = opportunity_models.TranslationOpportunityModel.get(
             'skill.skill_id_6', strict=False
         )
         assert model_6 is not None
         self.assertEqual(model_6.topic_ids, [topic_id_2])
+        self.assertEqual(model_6.content_count, 1)
 
     def test_delete_subtopic_with_skill_ids(self) -> None:
         changelist = [
