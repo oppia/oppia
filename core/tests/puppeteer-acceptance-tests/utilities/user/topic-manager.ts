@@ -5830,6 +5830,22 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Closes the mobile navbar options panel if it is open. This is needed
+   * before story editor screenshots so that the capture is deterministic even
+   * when a previous test in the same suite failed before re-navigating to the
+   * story editor (which is what would normally have collapsed the panel).
+   */
+  async closeStoryEditorMobileNavbarOptions(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+    if (await this.isElementVisible(navigationContainerSelector, true, 1000)) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.expectElementToBeVisible(navigationContainerSelector, false);
+    }
+  }
+
+  /**
    * Removes the last adventure boundary by clicking the Remove Arc Boundary
    * button on the last non-default adventure header. The chapters from the
    * removed adventure are merged into the previous adventure.
