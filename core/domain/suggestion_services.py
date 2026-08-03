@@ -331,14 +331,17 @@ def create_suggestion(
 
         # Do not allow creating a suggestion if the content has already been
         # translated and is up-to-date.
-        if (
-            target_type == feconf.ENTITY_TYPE_EXPLORATION
-            and exploration is not None
-        ):
+        translatable_entity_types = [
+            e.value for e in feconf.TranslatableEntityType
+        ]
+        if target_type in translatable_entity_types:
+            target_entity = opportunity_services.get_entity_by_type_and_id(
+                target_type, target_id
+            )
             entity_translation = translation_fetchers.get_entity_translation(
-                feconf.TranslatableEntityType.EXPLORATION,
+                feconf.TranslatableEntityType(target_type),
                 target_id,
-                exploration.version,
+                target_entity.version,
                 language_code,
             )
             if content_id in entity_translation.translations:
@@ -362,6 +365,7 @@ def create_suggestion(
             False,
             datetime.datetime.utcnow(),
             datetime.datetime.utcnow(),
+            target_type=target_type,
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = '%s%s%s' % (
@@ -439,6 +443,25 @@ def get_suggestion_from_model(
             suggestion_model.suggestion_type
         ]
     )
+    if (
+        suggestion_model.suggestion_type
+        == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+    ):
+        return suggestion_registry.SuggestionTranslateContent(
+            suggestion_model.id,
+            suggestion_model.target_id,
+            suggestion_model.target_version_at_submission,
+            suggestion_model.status,
+            suggestion_model.author_id,
+            suggestion_model.final_reviewer_id,
+            suggestion_model.change_cmd,
+            suggestion_model.score_category,
+            suggestion_model.language_code,
+            suggestion_model.edited_by_reviewer,
+            suggestion_model.last_updated,
+            suggestion_model.created_on,
+            target_type=suggestion_model.target_type,
+        )
     return suggestion_domain_class(
         suggestion_model.id,
         suggestion_model.target_id,
@@ -919,15 +942,17 @@ def accept_suggestion(
         )
 
     # Do not allow accepting a suggestion if the content has already been
-    # translated and is up-to-date. We use the current exploration version
+    # translated and is up-to-date. We use the current entity version
     # (not the version at submission) to match the version used when saving
     # the translation in suggestion_registry.py.
     if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            suggestion.target_type, suggestion.target_id
+        )
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(suggestion.target_type),
             suggestion.target_id,
-            exploration.version,
+            target_entity.version,
             suggestion.language_code,
         )
         if suggestion.change_cmd.content_id in entity_translation.translations:
