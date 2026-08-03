@@ -85,7 +85,7 @@ class DiagnosticTestQuestionsHandler(
     }
 
     @acl_decorators.open_access
-    def get(self, topic_id: str) -> None:
+    def get(self, topic_id: str) -> None:  # pylint: disable=arguments-differ
         """Retrieves diagnostic test questions for a specific topic.
 
         Args:

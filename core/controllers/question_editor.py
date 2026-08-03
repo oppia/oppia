@@ -47,7 +47,7 @@ class QuestionCreationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         skill_ids = self.payload.get('skill_ids')
@@ -253,7 +253,7 @@ class QuestionSkillLinkHandler(
     }
 
     @acl_decorators.can_manage_question_skill_status
-    def put(self, question_id: str) -> None:
+    def put(self, question_id: str) -> None:  # pylint: disable=arguments-differ
         """Updates the QuestionSkillLink models with respect to the given
         question.
         """
@@ -338,7 +338,7 @@ class EditableQuestionDataHandler(
     }
 
     @acl_decorators.can_view_question_editor
-    def get(self, question_id: str) -> None:
+    def get(self, question_id: str) -> None:  # pylint: disable=arguments-differ
         """Gets the data for the question overview page."""
         assert self.user_id is not None
         question = question_services.get_question_by_id(
@@ -361,7 +361,7 @@ class EditableQuestionDataHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_edit_question
-    def put(self, question_id: str) -> None:
+    def put(self, question_id: str) -> None:  # pylint: disable=arguments-differ
         """Updates properties of the given question."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -392,7 +392,9 @@ class EditableQuestionDataHandler(
         self.render_json({'question_dict': question_dict})
 
     @acl_decorators.can_delete_question
-    def delete(self, question_id: str) -> None:
+    def delete(  # pylint: disable=arguments-differ
+        self, question_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles Delete requests."""
         assert self.user_id is not None
         question = question_services.get_question_by_id(

@@ -99,7 +99,7 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
     timestamps are valid for both blog post models and blog post summary models.
     """
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         input_model: Union[
             blog_models.BlogPostModel, blog_models.BlogPostSummaryModel

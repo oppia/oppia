@@ -68,7 +68,9 @@ class PracticeSessionsPageDataHandler(
     }
 
     @acl_decorators.can_access_topic_viewer_page
+    def get(self, topic_name: str) -> None:  # pylint: disable=arguments-differ
     def get(self, topic_name: str, **kwargs: str) -> None:
+
         """Retrieves information about a topic.
 
         Args:

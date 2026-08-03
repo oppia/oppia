@@ -100,7 +100,7 @@ class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
 class CheckDisconnectedNodeIds(beam.DoFn):  # type: ignore[misc]
     """DoFn to check for disconnected node_ids in stories."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, element: Tuple[str, StoryContentsDict]
     ) -> Iterable[job_run_result.JobRunResult]:
         story_id, story_contents = element

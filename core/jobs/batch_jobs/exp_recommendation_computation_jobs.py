@@ -151,7 +151,7 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
 class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
     """DoFn to compute similarities between exploration."""
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self,
         ref_exp_summary: exp_domain.ExplorationSummary,
         compared_exp_summaries: Iterable[exp_domain.ExplorationSummary],

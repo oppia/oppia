@@ -81,7 +81,9 @@ class SubtopicPageDataHandler(
     }
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, topic_name: str, subtopic_id: int) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, topic_name: str, subtopic_id: int
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests.
 
         Args:

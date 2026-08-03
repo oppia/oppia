@@ -376,7 +376,7 @@ class AdminHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the admin page."""
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
@@ -431,7 +431,7 @@ class AdminHandler(
         )
 
     @acl_decorators.can_access_admin_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Performs a series of actions based on the action parameter on the
         admin page.
 
@@ -1142,6 +1142,7 @@ class AdminHandler(
             for i, story_node_dict in enumerate(story_node_dicts):
                 generate_dummy_story_nodes(i + 1, **story_node_dict)
 
+
             # Create a default arc covering all nodes.
             node_ids = [
                 '%s%d' % (story_domain.NODE_ID_PREFIX, i + 1)
@@ -1567,14 +1568,6 @@ class AdminHandler(
                                 ),
                                 'old_value': None,
                                 'new_value': exp_id,
-                            }
-                        ),
-                        story_domain.StoryChange(
-                            {
-                                'cmd': 'move_node_to_arc',
-                                'node_id': '%s%d'
-                                % (story_domain.NODE_ID_PREFIX, node_id),
-                                'to_arc_id': target_arc_id,
                             }
                         ),
                     ]
@@ -2364,13 +2357,6 @@ class AdminHandler(
                             'old_value': 'thumbnail_bg_color',
                         }
                     ),
-                    story_domain.StoryChange(
-                        {
-                            'cmd': 'move_node_to_arc',
-                            'node_id': node_id,
-                            'to_arc_id': target_arc_id,
-                        }
-                    ),
                 ]
                 topic_services.update_story_and_topic_summary(
                     self.user_id,
@@ -2525,7 +2511,7 @@ class AdminRoleHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves information about users based on different filter
         criteria to populate the roles tab.
 
@@ -2616,7 +2602,7 @@ class AdminRoleHandler(
             self.render_json(user_roles_dict)
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Adds a role to a user.
 
         Raises:
@@ -2645,7 +2631,7 @@ class AdminRoleHandler(
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Removes a role from a user.
 
         Raises:
@@ -2711,7 +2697,7 @@ class TopicManagerRoleHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Adds or removes the topic-manager role for a user in the context
         of a specific topic.
 
@@ -2797,7 +2783,7 @@ class BannedUsersHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Marks a user as banned.
 
         Raises:
@@ -2817,7 +2803,7 @@ class BannedUsersHandler(
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Removes the banned status of the user.
 
         Raises:
@@ -2869,7 +2855,7 @@ class AdminSuperAdminPrivilegesHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Grants super admin privileges to a user.
 
         Raises:
@@ -2894,7 +2880,7 @@ class AdminSuperAdminPrivilegesHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Revokes super admin privileges from a user.
 
         Raises:
@@ -2937,7 +2923,7 @@ class AdminTopicsCsvFileDownloader(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Generates a CSV file containing topic similarities."""
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
@@ -2979,7 +2965,7 @@ class AutomaticVoiceoverAdminControlHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves the admin config data for automatic voiceovers."""
         self.render_json(
             {
@@ -2990,7 +2976,7 @@ class AutomaticVoiceoverAdminControlHandler(
         )
 
     @acl_decorators.can_access_admin_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Updates the admin config data for automatic voiceovers."""
         assert self.normalized_payload is not None
         autogenerated_voiceovers_are_enabled: bool = self.normalized_payload[
@@ -3034,7 +3020,7 @@ class DataExtractionQueryHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves a specified number of submitted answers for a particular
         state within an exploration.
 
@@ -3092,7 +3078,7 @@ class SendDummyMailToAdminHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Sends a dummy email to the admin if the application is
         configured to send emails.
 
@@ -3138,7 +3124,7 @@ class UpdateUsernameHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates the username for a user.
 
         Raises:
@@ -3208,7 +3194,7 @@ class NumberOfDeletionRequestsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Retrieves the number of pending deletion requests for models."""
         self.render_json(
             {
@@ -3241,7 +3227,7 @@ class VerifyUserModelsDeletedHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Checks if a user with a specific user_id has been deleted and
         if there are related models or not.
         """
@@ -3277,7 +3263,7 @@ class DeleteUserHandler(
     }
 
     @acl_decorators.can_delete_any_user
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Initiates the pre-deletion process for a user.
 
         Raises:
@@ -3342,7 +3328,7 @@ class UpdateBlogPostHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Updates the author and published date of a blog post.
 
         Raises:
@@ -3392,7 +3378,7 @@ class RegenerateTopicSummariesHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'PUT': {}}
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Regenerates all topic summary models."""
 
         # Fetched topics are sorted only to make the backend tests pass.
@@ -3415,7 +3401,7 @@ class GenerateStudyGuideModelsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Generates study guide models for all subtopic pages."""
 
         # Fetched topics are sorted only to make the backend tests pass.
@@ -3441,7 +3427,7 @@ class DeleteStudyGuideModelsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
 
     @acl_decorators.can_access_admin_page
-    def delete(self) -> None:
+    def delete(self) -> None:  # pylint: disable=arguments-differ
         """Deletes all study guide models."""
 
         # Fetched topics are sorted only to make the backend tests pass.
@@ -3469,7 +3455,7 @@ class VerifyStudyGuideModelsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Verifies all study guide models have the correct snapshot and
         commitlog models.
         """
@@ -3526,7 +3512,7 @@ class TranslationCoordinatorRoleHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Adds or removes the translation-coordinator role for a user in the
         context of a specific language.
 
@@ -3601,7 +3587,7 @@ class InteractionsByExplorationIdHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_request is not None
         exploration_id = self.normalized_request['exp_id']
 

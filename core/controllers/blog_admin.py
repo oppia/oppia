@@ -75,7 +75,7 @@ class BlogAdminHandler(
     }
 
     @acl_decorators.can_access_blog_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         max_no_of_tags_parameter = platform_parameter_registry.Registry.get_platform_parameter(
             platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
@@ -113,7 +113,7 @@ class BlogAdminHandler(
         )
 
     @acl_decorators.can_access_blog_admin_page
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -193,7 +193,7 @@ class BlogAdminRolesHandler(
     }
 
     @acl_decorators.can_manage_blog_post_editors
-    def post(self) -> None:
+    def post(self) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -211,7 +211,7 @@ class BlogAdminRolesHandler(
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors
-    def put(self) -> None:
+    def put(self) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']

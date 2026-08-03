@@ -184,7 +184,7 @@ class ApplyAllValidations(beam.DoFn):  # type: ignore[misc]
         super().__init__()
         self._validation_functions = validation_functions
 
-    def process(
+    def process(  # pylint: disable=arguments-differ
         self, model: base_models.BaseModel
     ) -> Iterator[job_run_result.JobRunResult]:
         for validation_fn in self._validation_functions:

@@ -110,7 +110,7 @@ class ContributionRightsHandler(
     }
 
     @acl_decorators.can_manage_contributors_role
-    def post(self, category: str) -> None:
+    def post(self, category: str) -> None:  # pylint: disable=arguments-differ
         """Manages contributors' roles.
 
         Args:
@@ -183,7 +183,7 @@ class ContributionRightsHandler(
         self.render_json({})
 
     @acl_decorators.can_manage_contributors_role
-    def delete(self, category: str) -> None:
+    def delete(self, category: str) -> None:  # pylint: disable=arguments-differ
         """Removes contributors' roles.
 
         Args:
@@ -293,7 +293,7 @@ class ContributorUsersListHandler(
     }
 
     @acl_decorators.can_manage_contributors_role
-    def get(self, category: str) -> None:
+    def get(self, category: str) -> None:  # pylint: disable=arguments-differ
         """Retrieves the usernames of contributors.
 
         Args:
@@ -329,7 +329,7 @@ class ContributionRightsDataHandler(
     }
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Fetches contributor dashboard admin page data.
 
         Raises:
@@ -386,7 +386,7 @@ class TranslationContributionStatsHandler(
     }
 
     @acl_decorators.can_access_translation_stats
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Fetches translation contribution statistics.
 
         Raises:
@@ -585,7 +585,9 @@ class ContributorDashboardAdminStatsHandler(
     }
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
-    def get(self, contribution_type: str, contribution_subtype: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, contribution_type: str, contribution_subtype: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
 
         assert self.normalized_request is not None
@@ -730,7 +732,7 @@ class CommunityContributionStatsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Fetches community contribution stats data.
 
         Raises:

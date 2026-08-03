@@ -147,7 +147,9 @@ class ExplorationHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Populates the data on the individual exploration page.
 
         Args:
@@ -368,7 +370,7 @@ class EntityTranslationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(
+    def get(  # pylint: disable=arguments-differ
         self,
         entity_type: str,
         entity_id: str,
@@ -420,7 +422,9 @@ class PretestHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET request."""
         assert self.normalized_request is not None
         story_url_fragment = self.normalized_request['story_url_fragment']
@@ -497,7 +501,9 @@ class StorePlaythroughHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests. Appends to existing list of playthroughs or
         deletes it if already full.
 
@@ -575,7 +581,9 @@ class StatsEventsHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         assert self.normalized_payload is not None
         aggregated_stats = self.normalized_payload['aggregated_stats']
         exp_version = self.normalized_payload['exp_version']
@@ -695,7 +703,9 @@ class AnswerSubmittedEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -835,7 +845,9 @@ class StateHitEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -924,7 +936,9 @@ class StateCompleteEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         state_name = self.normalized_payload['state_name']
@@ -1005,7 +1019,9 @@ class LeaveForRefresherExpEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         refresher_exp_id = self.normalized_payload['refresher_exp_id']
@@ -1092,7 +1108,9 @@ class ReaderFeedbackHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -1172,7 +1190,9 @@ class ExplorationStartEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -1238,7 +1258,9 @@ class ExplorationActualStartEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         event_services.ExplorationActualStartEventHandler.record(
@@ -1298,7 +1320,9 @@ class SolutionHitEventHandler(
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         event_services.SolutionHitEventHandler.record(
@@ -1394,7 +1418,9 @@ class ExplorationCompleteEventHandler(
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -1524,7 +1550,9 @@ class ExplorationMaybeLeaveHandler(
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -1613,7 +1641,9 @@ class LearnerIncompleteActivityHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
 
     @acl_decorators.can_access_learner_dashboard
-    def delete(self, activity_type: str, activity_id: str) -> None:
+    def delete(  # pylint: disable=arguments-differ
+        self, activity_type: str, activity_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Removes exploration, collection, story or topic from incomplete
             list.
 
@@ -1689,7 +1719,9 @@ class RatingHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         self.values.update(
             {
@@ -1708,7 +1740,9 @@ class RatingHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_rate_exploration
-    def put(self, exploration_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests for submitting ratings at the end of an
         exploration.
         """
@@ -1809,7 +1843,9 @@ class RecommendationsHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         assert self.normalized_request is not None
         collection_id = self.normalized_request.get('collection_id')
@@ -1900,7 +1936,9 @@ class FlagExplorationHandler(
     }
 
     @acl_decorators.can_flag_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests.
 
         Args:
@@ -1956,7 +1994,7 @@ class QuestionPlayerHandler(
     }
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self) -> None:  # pylint: disable=arguments-differ
         """Handles GET request."""
         # Skill ids are given as a comma separated list because this is
         # a GET request.
@@ -2006,7 +2044,9 @@ class TransientCheckpointUrlPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, unique_progress_url_id: str) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, unique_progress_url_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests. Fetches the logged-out learner's progress."""
 
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
@@ -2087,7 +2127,9 @@ class SaveTransientCheckpointProgressHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests. Creates a new unique progress
         url ID and a new corresponding TransientCheckpointUrl model.
 
@@ -2118,7 +2160,9 @@ class SaveTransientCheckpointProgressHandler(
         self.render_json({'unique_progress_url_id': new_unique_progress_url_id})
 
     @acl_decorators.can_play_exploration
-    def put(self, exploration_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles the PUT requests. Saves the logged-out user's progress."""
         assert self.normalized_payload is not None
         unique_progress_url_id = self.normalized_payload[
@@ -2201,7 +2245,9 @@ class LearnerAnswerDetailsSubmissionHandler(
     }
 
     @acl_decorators.can_play_entity
-    def put(self, entity_type: str, entity_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, entity_type: str, entity_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
@@ -2292,7 +2338,9 @@ class CheckpointReachedEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def put(self, exploration_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Args:
@@ -2353,7 +2401,9 @@ class ExplorationRestartEventHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def put(self, exploration_id: str) -> None:
+    def put(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles PUT requests.
 
         Args:
@@ -2414,7 +2464,9 @@ class SyncLoggedOutLearnerProgressHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id: str) -> None:
+    def post(  # pylint: disable=arguments-differ
+        self, exploration_id: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles POST requests."""
         assert self.normalized_payload is not None
         unique_progress_url_id = self.normalized_payload[
@@ -2469,7 +2521,9 @@ class StateVersionHistoryHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str, state_name: str, version: int) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str, state_name: str, version: int
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         version_history = exp_fetchers.get_exploration_version_history(
             exploration_id, version
@@ -2549,7 +2603,9 @@ class MetadataVersionHistoryHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id: str, version: int) -> None:
+    def get(  # pylint: disable=arguments-differ
+        self, exploration_id: str, version: int
+    ) -> None:  # pylint: disable=arguments-differ
         """Handles GET requests."""
         version_history = exp_fetchers.get_exploration_version_history(
             exploration_id, version
