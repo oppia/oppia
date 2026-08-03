@@ -969,7 +969,9 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         user_data = user_models.LearnerPlaylistModel.export_data(
             self.NONEXISTENT_USER_ID
         )
-        self.assertEqual({}, user_data)
+        self.assertEqual(
+            {'exploration_ids': [], 'collection_ids': []}, user_data
+        )
 
     def test_export_data_on_existent_user(self) -> None:
         """Test if export_data works as intended on a user in datastore."""

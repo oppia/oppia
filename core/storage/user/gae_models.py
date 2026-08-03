@@ -950,7 +950,10 @@ class LearnerPlaylistModel(base_models.BaseModel):
         """
         user_model = LearnerPlaylistModel.get(user_id, strict=False)
         if user_model is None:
-            return {}
+            return {
+                'exploration_ids': [],
+                'collection_ids': [],
+            }
 
         return {
             'exploration_ids': user_model.exploration_ids,

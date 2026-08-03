@@ -163,7 +163,6 @@
     "core/templates/pages/learner-dashboard-page/learner-dashboard-icons.component.ts",
     "core/templates/pages/learner-dashboard-page/learner-groups-tab.component.ts",
     "core/templates/pages/learner-dashboard-page/modal-templates/decline-invitaiton-modal.component.ts",
-    "core/templates/pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component.ts",
     "core/templates/pages/learner-dashboard-page/modal-templates/remove-activity-modal.component.ts",
     "core/templates/pages/learner-dashboard-page/modal-templates/view-learner-group-details-modal.component.ts",
     "core/templates/pages/learner-dashboard-page/modal-templates/view-learner-group-invitation-modal.component.ts",

@@ -441,11 +441,6 @@
       "framework": "playwright"
     },
     {
-      "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
-      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts",
-      "framework": "playwright"
-    },
-    {
       "name": "logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
       "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts",
       "framework": "playwright"

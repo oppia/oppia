@@ -33,8 +33,6 @@ describe('Learner dashboard activity ids model', () => {
       completed_collection_ids: ['8', '9'],
       completed_story_ids: ['10', '11'],
       learnt_topic_ids: ['12', '13'],
-      exploration_playlist_ids: ['14', '15'],
-      collection_playlist_ids: ['16', '17'],
       topic_ids_to_learn: ['18', '19'],
       all_topic_ids: ['20', '21'],
       untracked_topic_ids: ['22', '23'],
@@ -59,76 +57,6 @@ describe('Learner dashboard activity ids model', () => {
       expect(learnerDashboardActivityIds.includesActivity('26')).toEqual(false);
     }
   );
-
-  it('should add exploration to learner playlist', () => {
-    var learnerDashboardActivityIds =
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict
-      );
-
-    learnerDashboardActivityIds.addToExplorationLearnerPlaylist('12');
-    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([
-      '14',
-      '15',
-      '12',
-    ]);
-
-    learnerDashboardActivityIds.addToExplorationLearnerPlaylist('13');
-    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([
-      '14',
-      '15',
-      '12',
-      '13',
-    ]);
-  });
-
-  it('should add collection to learner playlist', () => {
-    var learnerDashboardActivityIds =
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict
-      );
-
-    learnerDashboardActivityIds.addToCollectionLearnerPlaylist('12');
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([
-      '16',
-      '17',
-      '12',
-    ]);
-
-    learnerDashboardActivityIds.addToCollectionLearnerPlaylist('13');
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([
-      '16',
-      '17',
-      '12',
-      '13',
-    ]);
-  });
-
-  it('should remove exploration from learner playlist', () => {
-    var learnerDashboardActivityIds =
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict
-      );
-
-    learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('14');
-    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(['15']);
-
-    learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('15');
-    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([]);
-  });
-
-  it('should remove collection from learner playlist', () => {
-    var learnerDashboardActivityIds =
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict
-      );
-
-    learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('16');
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(['17']);
-
-    learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('17');
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([]);
-  });
 
   it('should remove topic from learn', () => {
     var learnerDashboardActivityIds =
@@ -177,76 +105,8 @@ describe('Learner dashboard activity ids model', () => {
         '11',
       ]);
       expect(learnerDashboardActivityIds.learntTopicIds).toEqual(['12', '13']);
-      expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([
-        '14',
-        '15',
-      ]);
-      expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([
-        '16',
-        '17',
-      ]);
     }
   );
-
-  it('should check if explorationId belongs to exploration playlist', () => {
-    var learnerDashboardActivityIds =
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict
-      );
-
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('14')).toBe(
-      true
-    );
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('15')).toBe(
-      true
-    );
-
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('0')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('2')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('4')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('6')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('10')).toBe(
-      false
-    );
-  });
-
-  it('should check if collectionId belongs to collection playlist', () => {
-    var learnerDashboardActivityIds =
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict
-      );
-
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('16')).toBe(
-      true
-    );
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('17')).toBe(
-      true
-    );
-
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('0')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('2')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('4')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('6')).toBe(
-      false
-    );
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('8')).toBe(
-      false
-    );
-  });
 
   it('should check if topicId belongs to learn', () => {
     var learnerDashboardActivityIds =
