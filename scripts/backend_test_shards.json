@@ -64,6 +64,7 @@
         "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
         "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test",
         "core.platform.translate.azure_translate_services_test",
+        "core.platform.translate.gcp_translate_services_test",
         "core.platform.translate.base_translate_services_test",
         "core.platform.translate.translate_emulator_test",
         "core.domain.machine_translation_services_test",

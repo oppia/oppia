@@ -1380,14 +1380,19 @@ export class SuperAdmin extends BaseUser {
   }
 
   async enableAutoTranslation(): Promise<void> {
-    const toggleSelector = '.e2e-test-auto-translation-toggle input';
-    await this.page.waitForSelector(toggleSelector);
+    // The Material slide toggle renders its actual checkbox input as
+    // cdk-visually-hidden (off-screen), overlapped by the thumb div.
+    // Puppeteer's clickability check blocks clicks on the hidden input, so
+    // we read the checked state from the input but click the visible label.
+    const inputSelector = '.e2e-test-auto-translation-toggle input';
+    const labelSelector = '.e2e-test-auto-translation-toggle label';
+    await this.page.waitForSelector(inputSelector);
     const isChecked = await this.page.$eval(
-      toggleSelector,
+      inputSelector,
       el => (el as HTMLInputElement).checked
     );
     if (!isChecked) {
-      await this.clickOnElementWithSelector(toggleSelector);
+      await this.clickOnElementWithSelector(labelSelector);
     }
   }
 
