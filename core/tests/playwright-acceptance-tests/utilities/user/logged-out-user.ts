@@ -76,7 +76,11 @@ const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
 const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+const progressBarSelector = '.oppia-progress-bar';
+const rateOptionsSelector = '.conversation-skin-final-ratings';
+const suggestionSection = '.suggested-for-you-section';
 
+const errorPageHeading = '.e2e-test-error-page-heading';
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
 
 const conceptCardLinkSelector = '.e2e-test-concept-card-link';
@@ -189,6 +193,11 @@ const returnToStoryFromLastStateSelector =
   '.e2e-test-end-chapter-return-to-story';
 const tagsContainerSelector = '.exploration-tags span';
 const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
+
+// Community Library.
+const communityLibraryHeading = '.e2e-test-library-main-header';
+const communityLibraryGroupHeader = '.e2e-test-library-group-header';
+const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
 
 // Home Page Selectors.
 const homePageHeadingSelector =
@@ -311,6 +320,32 @@ export class LoggedOutUser extends BaseUser {
       },
       {selector: languageOption, textContent: initialLanguage}
     );
+  }
+
+  /**
+   * Changes the site language for an embedded exploration without reloading
+   * the page, since reloading resets the language in the embedded player.
+   * @param {string} langCode - The language code to change to. Example: 'es', 'pt-br'
+   */
+  async changeSiteLanguageForEmbeddedExploration(
+    langCode: string
+  ): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+    const languageDropdownElement =
+      await this.expectElementToBeVisible(languageDropdown);
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
+    }
+    await this.clickOnElement(languageDropdownElement);
+    await this.clickOnElementWithSelector(languageOption);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -782,6 +817,58 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to verify the community library group header is present.
+   * @param {string[]} groupHeaders - The group headers to verify.
+   */
+  async expectCommunityLibraryGroupHeaderToContain(
+    groupHeaders: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityLibraryGroupHeader);
+
+    const communityLibraryGroupHeaderText = await this.page.$$eval(
+      communityLibraryGroupHeader,
+      el => el.map(el => el.textContent)
+    );
+
+    for (const groupHeader of groupHeaders) {
+      if (
+        communityLibraryGroupHeaderText?.some(el =>
+          el?.trim().includes(groupHeader)
+        ) === false
+      ) {
+        throw new Error(
+          `Failed: Community library group header does not contain ${groupHeader}.\nActual: ${communityLibraryGroupHeaderText}`
+        );
+      }
+      showMessage(
+        `Success: Community library group header contains ${groupHeader}.`
+      );
+    }
+  }
+
+  /**
+   * Function to verify the community library heading is present.
+   * @param {string} heading - The heading to verify.
+   */
+  async expectCommunityLibraryHeadingToBePresent(
+    heading: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityLibraryHeading);
+
+    const communityLibraryHeadingText = await this.getTextContent(
+      communityLibraryHeading
+    );
+
+    if (communityLibraryHeadingText?.trim() !== heading) {
+      throw new Error(
+        `Expected community library heading to be ${heading}, but found ${communityLibraryHeadingText}`
+      );
+    }
+
+    showMessage(`Success: Community library heading is ${heading}.`);
+  }
+
+  /**
    * Checks if the concept card link in the lesson works properly.
    * @param {string} content - The expected content of the concept card.
    */
@@ -1063,6 +1150,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if the the language dropdown is available or not.
+   * @param {boolean} status - Status of language dropdown.
+   */
+  async expectLanguageDropdownToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (status && !languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be present on the page, but it is not.'
+      );
+    } else if (!status && languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be absent on the page, but it is present.'
+      );
+    } else {
+      showMessage(
+        `The language dropdown is ${status ? 'present' : 'not present'} on the page.`
+      );
+    }
+  }
+
+  /**
    * Checks if the lesson info modal header matches the expected header.
    * @param {string} header - The expected header.
    */
@@ -1084,6 +1194,29 @@ export class LoggedOutUser extends BaseUser {
       lessonInfoTextSelector,
       lessonText
     );
+  }
+
+  /**
+   * Checks if lesson info text is visible or not.
+   * @param {boolean} status - Boolean value representing that info text should be visible or not.
+   */
+  async expectLessonInfoTextToBePresent(status: boolean = true): Promise<void> {
+    if (status) {
+      await this.expectElementToBeVisible(lessonInfoButton);
+      showMessage('Lesson info text is present.');
+      return;
+    } else {
+      try {
+        await this.expectElementToBeVisible(lessonInfoButton);
+        throw new Error('Lesson info text is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Timeout')) {
+          showMessage('Lesson info text is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
   }
 
   /**
@@ -1243,6 +1376,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Check if the number input placeholder matches the expected text.
+   * @param {string} expectedPlaceholder - Expected placeholder text of the input field.
+   */
+  async expectNumberInputPlaceholderToMatch(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    // Wait until the placeholder attribute updates to the expected value.
+    await this.page.waitForFunction(
+      ({selector, expected}: {selector: string; expected: string}) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {selector: floatFormInput, expected: expectedPlaceholder},
+      {timeout: 30000}
+    );
+
+    showMessage(`Input placeholder is "${expectedPlaceholder}" as expected.`);
+  }
+
+  /**
    * Function to verify if the latest Oppia feedback matches the expected feedback.
    * @param {string} expectedFeedback - The expected feedback.
    */
@@ -1257,6 +1410,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if the page's language matches the expected language.
+   * @param {string} expectedLanguage - The expected language of the page.
+   */
+  async expectPageLanguageToMatch(expectedLanguage: string): Promise<void> {
+    // Get the 'lang' attribute from the <html> tag.
+    await this.waitForStaticAssetsToLoad();
+
+    const actualLanguage = await this.page.evaluate(
+      () => document.documentElement.lang
+    );
+
+    if (actualLanguage !== expectedLanguage) {
+      throw new Error(
+        `Expected page language to be ${expectedLanguage}, but it was ${actualLanguage}`
+      );
+    }
+    showMessage('Page language matches the expected one.');
+  }
+
+  /**
    * Checks if the progress reminder modal text matches the expected text.
    * @param {string} expectedText - The expected text.
    */
@@ -1268,6 +1441,17 @@ export class LoggedOutUser extends BaseUser {
       progressReminderModalHeaderSelector,
       expectedText
     );
+  }
+
+  /**
+   * Checks if the rate options are not available.
+   */
+  async expectRateOptionsNotAvailable(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const rateOptions = await this.page.$(rateOptionsSelector);
+    if (rateOptions !== null) {
+      throw new Error('Rate options found.');
+    }
   }
 
   /**
@@ -1354,6 +1538,16 @@ export class LoggedOutUser extends BaseUser {
     for (const subtopicName of subtopicNames) {
       expect(subtopicsInList).toContain(subtopicName);
     }
+  }
+
+  /**
+   * Checks if suggestion section is visible or not.
+   * @param {boolean} visible - Expected visibility.
+   */
+  async expectSuggestionSectionToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(suggestionSection, visible);
   }
 
   /**
@@ -1461,6 +1655,30 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * This function verifies that the user is on the correct classroom page.
+   * @param {number} statusCode The status code of the error page.
+   */
+  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
+    await this.expectElementToBeVisible(errorPageHeading);
+
+    const errorText = await this.getTextContent(errorPageHeading);
+
+    if (!errorText) {
+      throw new Error(`Error text is not visible. URL: ${this.page.url()}`);
+    }
+
+    const currentStatusCode = Number(errorText.split(' ')[1]);
+
+    if (currentStatusCode !== statusCode) {
+      throw new Error(
+        `Expected status code to be ${statusCode}, found: ${currentStatusCode}`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
    * Function to verify that the user is on the login page.
    */
   async expectToBeOnLoginPage(): Promise<void> {
@@ -1554,6 +1772,14 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectProfilePictureToBePresent(): Promise<void> {
     await this.expectElementToBeVisible(profilePictureSelector);
+  }
+
+  /**
+   * Checks if progress bar is visible or not.
+   * @param {boolean} visible - Expected visibility.
+   */
+  async expectProgressBarToBePresent(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(progressBarSelector, visible);
   }
 
   /**
@@ -1773,6 +1999,70 @@ export class LoggedOutUser extends BaseUser {
         return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
       },
       {selector: audioSliderSelector, value: currentSliderValue + 12}
+    );
+  }
+
+  /**
+   * Checks if Audio bar is visible or not.
+   * @param {boolean} visible - Expected visibility.
+   */
+  async expectVoiceoverBarToBePresent(visible: boolean = true): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.expectElementToBeVisible(voiceoverDropdown);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected voiceover bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
+      );
+    }
+  }
+
+  /**
+   * Filters lessons by multiple categories.
+   * @param {string[]} categoryNames - The names of the categories to filter by.
+   */
+  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
+    await this.clickOnElementWithSelector(categoryFilterDropdownToggler);
+    await this.waitForStaticAssetsToLoad();
+
+    await this.expectElementToBeVisible(unselectedFilterOptionsSelector);
+    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
+    let foundMatch = false;
+
+    for (const option of filterOptions) {
+      const optionText = await this.getTextContent(option);
+
+      if (categoryNames.includes(optionText.trim())) {
+        foundMatch = true;
+        await this.clickOnElement(option);
+      }
+    }
+
+    if (!foundMatch) {
+      throw new Error(
+        `No match found for categories: ${categoryNames.join(', ')}`
+      );
+    }
+
+    await this.clickOnElementWithSelector(searchInputSelector);
+    await this.page.keyboard.press('Enter');
+
+    await this.page.waitForFunction(
+      (categoryNames: string[]) => {
+        // Check if URL contains all the categories. Added %22 to remove false positives.
+        return categoryNames.every(category =>
+          window.location.href.includes(`%22${category}%22`)
+        );
+      },
+      categoryNames,
+      {timeout: 60000}
     );
   }
 
