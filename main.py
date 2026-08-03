@@ -53,7 +53,6 @@ from core.controllers import (
     learner_dashboard,
     learner_goals,
     learner_group,
-    learner_playlist,
     library,
     moderator,
     oppia_root,
@@ -761,10 +760,6 @@ URLS = [
     get_redirect_route(
         r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
         learner_goals.LearnerGoalsHandler,
-    ),
-    get_redirect_route(
-        r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
-        learner_playlist.LearnerPlaylistHandler,
     ),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
