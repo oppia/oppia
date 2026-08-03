@@ -694,14 +694,18 @@ def _save_multi_translation_opportunities(
             if existing_model is None:
                 models_to_save.append(model)
             else:
+                merged_topic_ids = sorted(
+                    list(set(existing_model.topic_ids + model.topic_ids))
+                )
                 if (
                     existing_model.content_count != model.content_count
                     or existing_model.translation_counts
                     != model.translation_counts
                     or set(existing_model.incomplete_translation_language_codes)
                     != set(model.incomplete_translation_language_codes)
-                    or existing_model.topic_ids != model.topic_ids
+                    or existing_model.topic_ids != merged_topic_ids
                 ):
+                    model.topic_ids = merged_topic_ids
                     models_to_save.append(model)
 
         if models_to_save:
