@@ -5420,10 +5420,10 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNotNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
+            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
         )
         self.assertIsNotNone(
-            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
+            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
         )
 
         wipeout_service.delete_user(
@@ -5439,10 +5439,10 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNone(
-            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
+            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
         )
         self.assertIsNone(
-            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id)
+            user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id)
         )
 
     def test_delete_user_for_full_user_and_its_profiles_is_successful(
