@@ -38,6 +38,14 @@
 .oppia-top-navigation-bar .get-involved-dropdown a {
   text-decoration: none;
 }
+
+.oppia-top-navigation-bar .learn-dropdown-menu a:focus,
+.oppia-top-navigation-bar .about-dropdown-menu a:focus,
+.oppia-top-navigation-bar .get-involved-dropdown a:focus {
+  outline: 2px solid #00645c;
+  outline-offset: 2px;
+  text-decoration: underline;
+}
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-top-link a {
   color: #333;
   font-family: 'Roboto', sans-serif;
