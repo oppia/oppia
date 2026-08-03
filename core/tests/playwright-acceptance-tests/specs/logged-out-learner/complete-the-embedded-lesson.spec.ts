@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,26 +19,27 @@
  * LO.11. Play an embedded exploration
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import testConstants from '../../utilities/common/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-Out Learner in Embedded Lesson', function () {
+test.describe('Logged-Out Learner in Embedded Lesson', function () {
   let loggedOutUser: LoggedOutUser;
   let explorationEditor: ExplorationEditor;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     // Create a new exploration editor user to set up the exploration.
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -83,73 +84,62 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
     );
 
     // Create a logged-out user to simulate anonymous learner behavior.
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    loggedOutUser = await UserFactory.createLoggedOutUser(browser);
+  });
 
-  it(
-    'should be able to play and complete an embedded lesson',
-    async function () {
-      // Open the embedded exploration player.
-      await loggedOutUser.goto(
-        `http://localhost:8181/embed/exploration/${explorationId}`
-      );
+  test('should be able to play and complete an embedded lesson', async function () {
+    // Open the embedded exploration player.
+    await loggedOutUser.goto(
+      `http://localhost:8181/embed/exploration/${explorationId}`
+    );
 
-      // Verify UI elements expected in embedded player mode.
-      await loggedOutUser.expectCardContentToMatch('Exploración de pruebas');
-      await loggedOutUser.expectLanguageDropdownToBePresent();
-      await loggedOutUser.expectPageLanguageToMatch('en');
+    // Verify UI elements expected in embedded player mode.
+    await loggedOutUser.expectCardContentToMatch('Exploración de pruebas');
+    await loggedOutUser.expectLanguageDropdownToBePresent();
+    await loggedOutUser.expectPageLanguageToMatch('en');
 
-      await loggedOutUser.expectLessonInfoTextToBePresent(false);
-      await loggedOutUser.expectVoiceoverBarToBePresent(false);
-      await loggedOutUser.expectSignInButtonToBePresent(false);
-      await loggedOutUser.expectProgressBarToBePresent(false);
-      await loggedOutUser.expectRateOptionsNotAvailable();
+    await loggedOutUser.expectLessonInfoTextToBePresent(false);
+    await loggedOutUser.expectVoiceoverBarToBePresent(false);
+    await loggedOutUser.expectSignInButtonToBePresent(false);
+    await loggedOutUser.expectProgressBarToBePresent(false);
+    await loggedOutUser.expectRateOptionsNotAvailable();
 
-      // Screenshot verification.
-      await loggedOutUser.expectScreenshotToMatch(
-        'lessonPlayerEmbedded',
-        __dirname
-      );
+    // Screenshot verification.
+    await loggedOutUser.expectScreenshotToMatch('lessonPlayerEmbedded');
 
-      // Play until checkpoint.
-      await loggedOutUser.submitAnswer('0');
-      await loggedOutUser.expectContinueToNextCardButtonToBePresent();
-      await loggedOutUser.continueToNextCard();
+    // Play until checkpoint.
+    await loggedOutUser.submitAnswer('0');
+    await loggedOutUser.expectContinueToNextCardButtonToBePresent();
+    await loggedOutUser.continueToNextCard();
 
-      // TODO(#24066): Verify checkpoint behavior. Currently, the expected behavior is not observed.
+    // TODO(#24066): Verify checkpoint behavior. Currently, the expected behavior is not observed.
 
-      // Complete lesson.
-      // Confetti poppup behavior. Currently, the expected behavior is not observed.
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+    // Complete lesson.
+    // Confetti poppup behavior. Currently, the expected behavior is not observed.
+    await loggedOutUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
 
-      // Post-completion checks.
-      await loggedOutUser.expectRateOptionsNotAvailable();
-      await loggedOutUser.expectSuggestionSectionToBePresent(false);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Post-completion checks.
+    await loggedOutUser.expectRateOptionsNotAvailable();
+    await loggedOutUser.expectSuggestionSectionToBePresent(false);
+  });
 
-  it(
-    'should use URL language as site language',
-    async function () {
-      await loggedOutUser.goto(
-        `http://localhost:8181/embed/exploration/${explorationId}`
-      );
+  test('should use URL language as site language', async function () {
+    await loggedOutUser.goto(
+      `http://localhost:8181/embed/exploration/${explorationId}`
+    );
 
-      // Change the site language using the embedded exploration.
-      await loggedOutUser.changeSiteLanguageForEmbeddedExploration('es');
+    // Change the site language using the embedded exploration.
+    await loggedOutUser.changeSiteLanguageForEmbeddedExploration('es');
 
-      // Verify Spanish placeholder.
-      await loggedOutUser.expectNumberInputPlaceholderToMatch(
-        'Ingresa un número'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Verify Spanish placeholder.
+    await loggedOutUser.expectNumberInputPlaceholderToMatch(
+      'Ingresa un número'
+    );
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

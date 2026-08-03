@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,26 +19,30 @@
  * EL.LP.  Learner can access the lesson player
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
   let explorationId: string | null;
-  beforeAll(async function () {
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+
+  test.beforeAll(async function ({browser}) {
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdm@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -50,9 +54,9 @@ describe('Logged-Out Learner', function () {
     if (!explorationId) {
       throw new Error('Exploration ID is null or undefined.');
     }
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it('should not be able to access non-existent lesson', async function () {
+  test('should not be able to access non-existent lesson', async function () {
     // Try navigating to a non-existent lesson player.
     const wrongExplorationId =
       explorationId?.slice(5) ?? '' + explorationId?.slice(0, 5);
@@ -61,7 +65,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectToBeOnErrorPage(404);
   });
 
-  it('should be able to access existent lesson', async function () {
+  test('should be able to access existent lesson', async function () {
     // Navigate to exploration, verify URL, and match screenshot.
     await loggedOutLearner.playExploration(explorationId);
     await loggedOutLearner.expectToBeOnPage('/explore/');
@@ -69,13 +73,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
-    await loggedOutLearner.expectScreenshotToMatch(
-      'explorationPlayerPage',
-      __dirname
-    );
+    await loggedOutLearner.expectScreenshotToMatch('explorationPlayerPage');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
