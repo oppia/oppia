@@ -328,11 +328,13 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.adventureGroups.length).toBe(2);
     expect(component.adventureGroups[0].adventureTitle).toBe('Adventure 1');
+    expect(component.adventureGroups[0].arcId).toBe('1');
     expect(component.adventureGroups[0].lessonCards.length).toBe(1);
     expect(component.adventureGroups[0].lessonCards[0].lessonTitle).toContain(
       'Node title 1'
     );
     expect(component.adventureGroups[1].adventureTitle).toBe('Adventure 2');
+    expect(component.adventureGroups[1].arcId).toBe('2');
     expect(component.adventureGroups[1].lessonCards.length).toBe(1);
     expect(component.adventureGroups[1].lessonCards[0].lessonTitle).toContain(
       'Node title 2'
@@ -1776,6 +1778,93 @@ describe('TopicStorySectionComponent', () => {
     tick(300);
   }));
 
+  it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
+    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy1.getTitle.and.returnValue('Node 1');
+    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
+    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy1.getId.and.returnValue('node_1');
+    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy2.getTitle.and.returnValue('Node 2');
+    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
+    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
+    storyNodeSpy2.getId.and.returnValue('node_2');
+    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    const storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2'],
+      [storyNodeSpy1, storyNodeSpy2],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_2'],
+        },
+      ]
+    );
+    storySummary.isNodeCompleted.and.callFake(
+      (title: string) => title === 'Node 1'
+    );
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(component.isAdventureCompleted(0)).toBeTrue();
+    expect(component.isAdventureCompleted(1)).toBeFalse();
+
+    spyOn(document, 'getElementById').and.returnValue(null);
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(component.showArcSkipConfirmationModal).toBeFalse();
+    expect(component.activeLessonNumber).toBe(2);
+    expect(component.navigatedLessonNumber).toBe(2);
+    expect(component.isAdventureExpanded(1)).toBeTrue();
+
+    tick(300);
+  }));
+
   it('should persist un-skipping when a skipped adventure is expanded', () => {
     component.skippedAdventureIndices = new Set([0]);
 
@@ -2011,6 +2100,74 @@ describe('TopicStorySectionComponent', () => {
     component.availableLessonCards = [];
 
     expect(component.isStoryCompleted()).toBeFalse();
+  });
+
+  it('should report adventure as completed only when all its lessons are completed', () => {
+    const baseLesson = {
+      lessonTitle: 'Lesson',
+      lessonDescription: '',
+      thumbnailUrl: '',
+      startUrl: '/explore/1',
+      practiceUrl: '',
+      nodeId: 'node_1',
+      lessonProgressStatus: 'completed',
+      totalCheckpointsCount: 0,
+      visitedCheckpointsCount: 0,
+      isComingSoon: false,
+      isPublished: true,
+      isNewLabelVisible: false,
+      availableTextLanguageCodes: [],
+      availableVoiceoverLanguageCodes: [],
+      availableVoiceoverLanguageAccentDescriptions: {},
+    };
+
+    component.visibleAdventureGroups = [
+      {
+        adventureTitle: 'Adventure 1',
+        adventureDescription: '',
+        lessonCards: [],
+        accentColor: '#27a844',
+        iconBg: '',
+        headerBackgroundColor: '',
+        headerBorderColor: '',
+        arcId: '1',
+      },
+      {
+        adventureTitle: 'Adventure 2',
+        adventureDescription: '',
+        lessonCards: [
+          {...baseLesson, lessonNumber: 1},
+          {...baseLesson, lessonNumber: 2},
+        ],
+        accentColor: '#27a844',
+        iconBg: '',
+        headerBackgroundColor: '',
+        headerBorderColor: '',
+        arcId: '2',
+      },
+      {
+        adventureTitle: 'Adventure 3',
+        adventureDescription: '',
+        lessonCards: [
+          {...baseLesson, lessonNumber: 3},
+          {
+            ...baseLesson,
+            lessonNumber: 4,
+            lessonProgressStatus: 'not_started',
+          },
+        ],
+        accentColor: '#27a844',
+        iconBg: '',
+        headerBackgroundColor: '',
+        headerBorderColor: '',
+        arcId: '3',
+      },
+    ];
+
+    expect(component.isAdventureCompleted(0)).toBeFalse();
+    expect(component.isAdventureCompleted(1)).toBeTrue();
+    expect(component.isAdventureCompleted(2)).toBeFalse();
+    expect(component.isAdventureCompleted(99)).toBeFalse();
   });
 
   it('should scroll to practice card element when found by getElementById', fakeAsync(() => {

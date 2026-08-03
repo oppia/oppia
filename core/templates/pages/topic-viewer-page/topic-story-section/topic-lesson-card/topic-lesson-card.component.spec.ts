@@ -228,6 +228,14 @@ describe('TopicLessonCardComponent', () => {
     expect(component.isComingSoonLesson).toBeFalse();
   });
 
+  it('should expose isCompletedLesson based on lesson progress status', () => {
+    component.lessonProgressStatus = 'completed';
+    expect(component.isCompletedLesson).toBeTrue();
+
+    component.lessonProgressStatus = 'in_progress';
+    expect(component.isCompletedLesson).toBeFalse();
+  });
+
   it('should navigate to startUrl directly when no fallback is needed', () => {
     spyOn(component, 'navigateTo');
     component.startUrl = '/explore/123';
@@ -781,6 +789,23 @@ describe('TopicLessonCardComponent', () => {
     expect(component.navigateTo).not.toHaveBeenCalled();
   });
 
+  it('should start the lesson again without toggling expansion on play again click', () => {
+    spyOn(component, 'onStartButtonClick');
+    component.startUrl = '/explore/123';
+    component.isExpanded = true;
+    const event = {
+      preventDefault: jasmine.createSpy('preventDefault'),
+      stopPropagation: jasmine.createSpy('stopPropagation'),
+    } as unknown as Event;
+
+    component.onPlayAgainClick(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(component.onStartButtonClick).toHaveBeenCalled();
+    expect(component.isExpanded).toBeTrue();
+  });
+
   it('should auto-expand when navigatedLessonNumber matches lessonNumber', () => {
     component.lessonNumber = 3;
     component.navigatedLessonNumber = 3;
@@ -816,6 +841,62 @@ describe('TopicLessonCardComponent', () => {
     });
 
     expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should collapse expanded lesson when progress becomes completed', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('in_progress', 'completed', false),
+    });
+
+    expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should not collapse when lesson is already completed', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('not_started', 'completed', false),
+    });
+    expect(component.isExpanded).toBeFalse();
+
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('completed', 'completed', false),
+    });
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not collapse completed lesson when isComingSoonSectionCard is true', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+    component.isComingSoonSectionCard = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange('not_started', 'completed', false),
+    });
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not collapse when progress changes to a non-completed status', () => {
+    component.lessonNumber = 2;
+    component.isExpanded = true;
+
+    component.ngOnChanges({
+      lessonProgressStatus: new SimpleChange(
+        'not_started',
+        'in_progress',
+        false
+      ),
+    });
+
+    expect(component.isExpanded).toBeTrue();
   });
 
   it('should use DEFAULT_LANGUAGE_CODE when selectedTextLanguageCode is null', () => {
@@ -923,6 +1004,24 @@ describe('TopicLessonCardComponent', () => {
   it('should expand navigated non-first lesson', () => {
     component.lessonNumber = 3;
     component.navigatedLessonNumber = 3;
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeTrue();
+  });
+
+  it('should not expand first lesson by default when it is completed', () => {
+    component.lessonNumber = 1;
+    component.lessonProgressStatus = 'completed';
+
+    component.ngOnInit();
+
+    expect(component.isExpanded).toBeFalse();
+  });
+
+  it('should expand first lesson when it is not completed', () => {
+    component.lessonNumber = 1;
+    component.lessonProgressStatus = 'in_progress';
 
     component.ngOnInit();
 

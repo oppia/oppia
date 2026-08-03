@@ -114,4 +114,16 @@ describe('MasteryChallengeCardComponent', () => {
     tick(2000);
     expect(component.showLockedTooltip).toBeFalse();
   }));
+
+  it('should keep tooltip visible after destroy clears the timer', fakeAsync(() => {
+    component.isUnlocked = false;
+
+    component.onChallengeButtonClick();
+    expect(component.showLockedTooltip).toBeTrue();
+
+    component.ngOnDestroy();
+    tick(5000);
+
+    expect(component.showLockedTooltip).toBeTrue();
+  }));
 });
