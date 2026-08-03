@@ -26,6 +26,7 @@ export class ClassroomData {
   _classroom_id: string;
   _name: string;
   _urlFragment: string;
+  _feedbackRecipientEmail: string;
   _topicSummaries: CreatorTopicSummary[];
   _courseDetails: string;
   _topicListIntro: string;
@@ -40,6 +41,7 @@ export class ClassroomData {
     classroomId: string,
     name: string,
     urlFragment: string,
+    feedbackRecipientEmail: string,
     topicSummaries: CreatorTopicSummary[],
     courseDetails: string,
     topicListIntro: string,
@@ -53,6 +55,7 @@ export class ClassroomData {
     this._classroom_id = classroomId;
     this._name = name;
     this._urlFragment = urlFragment;
+    this._feedbackRecipientEmail = feedbackRecipientEmail;
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
@@ -68,6 +71,7 @@ export class ClassroomData {
     classroomId: string,
     name: string,
     urlFragment: string,
+    feedbackRecipientEmail: string,
     topicSummaryDicts: CreatorTopicSummaryBackendDict[],
     courseDetails: string,
     topicListIntro: string,
@@ -85,6 +89,7 @@ export class ClassroomData {
       classroomId,
       name,
       urlFragment,
+      feedbackRecipientEmail,
       topicSummaries,
       courseDetails,
       topicListIntro,
@@ -103,6 +108,10 @@ export class ClassroomData {
 
   getUrlFragment(): string {
     return this._urlFragment;
+  }
+
+  getFeedbackRecipientEmail(): string {
+    return this._feedbackRecipientEmail;
   }
 
   getTopicSummaries(): CreatorTopicSummary[] {
