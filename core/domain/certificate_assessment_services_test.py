@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 from unittest import mock
 
 from core import utils
@@ -193,6 +194,353 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         ):
             certificate_assessment_services.get_certificate_assessment_offering(
                 created_offering.certificate_id
+            )
+
+    def _create_assessment_question(
+        self, question_id: str, skill_id: str, answer_text: str
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_skill(skill_id, owner_id, description='Skill 1')
+        self.save_new_question(
+            question_id,
+            owner_id,
+            self._create_valid_question_data(answer_text, content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            owner_id, question_id, skill_id, 0.3
+        )
+
+    def test_start_certificate_assessment_attempt_creates_attempt_and_selects_questions(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(question_id_1, 'skill_1', 'Answer 1')
+        self._create_assessment_question(question_id_2, 'skill_2', 'Answer 2')
+        self._create_assessment_question(question_id_3, 'skill_3', 'Answer 3')
+
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        with mock.patch.object(
+            certificate_assessment_services,
+            '_pick_questions',
+            return_value=[question_id_1, question_id_2, question_id_3],
+        ), mock.patch.object(
+            certificate_assessment_services,
+            '_build_version_data',
+            return_value={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_ids': [self.topic_id],
+                'question_versions': {
+                    question_id_1: 1,
+                    question_id_2: 1,
+                    question_id_3: 1,
+                },
+                'question_topic_links': {
+                    question_id_1: [self.topic_id],
+                    question_id_2: [self.topic_id],
+                    question_id_3: [self.topic_id],
+                },
+            },
+        ), mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value={'is_valid': True},
+        ), mock.patch.object(
+            certificate_assessment_services,
+            '_get_current_time',
+            return_value=datetime.datetime(2026, 8, 2, 0, 0),
+        ), mock.patch.object(
+            certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel,
+            'create',
+            return_value=mock.Mock(
+                to_dict=mock.Mock(
+                    return_value={
+                        'attempt_id': 'attempt_1',
+                        'learner_id': owner_id,
+                        'total_score': 0.0,
+                        'attempt_index': 1,
+                        'attempt_data': {},
+                        'version_data': {
+                            'certificate_id': created_offering.certificate_id,
+                            'certificate_version': 1,
+                            'topic_ids': [self.topic_id],
+                            'question_versions': {
+                                question_id_1: 1,
+                                question_id_2: 1,
+                                question_id_3: 1,
+                            },
+                            'question_topic_links': {
+                                question_id_1: [self.topic_id],
+                                question_id_2: [self.topic_id],
+                                question_id_3: [self.topic_id],
+                            },
+                        },
+                        'started_at': datetime.datetime(2026, 8, 2, 0, 0),
+                        'finished_at': None,
+                        'is_submitted': False,
+                    }
+                )
+            ),
+        ):
+            attempt, questions = (
+                certificate_assessment_services.start_certificate_assessment_attempt(
+                    created_offering.certificate_id,
+                    owner_id,
+                )
+            )
+
+        self.assertEqual(attempt.attempt_index, 1)
+        self.assertFalse(attempt.is_submitted)
+        self.assertEqual(
+            attempt.started_at, datetime.datetime(2026, 8, 2, 0, 0)
+        )
+        self.assertEqual(
+            questions,
+            [
+                {'question_id': question_id_1, 'question_version': 1},
+                {'question_id': question_id_2, 'question_version': 1},
+                {'question_id': question_id_3, 'question_version': 1},
+            ],
+        )
+
+    def test_start_certificate_assessment_attempt_rejects_in_progress_attempt(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(question_id_1, 'skill_1', 'Answer')
+        self._create_assessment_question(question_id_2, 'skill_2', 'Answer 2')
+        self._create_assessment_question(question_id_3, 'skill_3', 'Answer 3')
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+
+        in_progress_attempt = certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_ids': [self.topic_id],
+                'question_versions': {},
+                'question_topic_links': {},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+
+        with mock.patch.object(
+            certificate_assessment_services,
+            'validate_certificate_assessment_offering',
+            return_value={'is_valid': True},
+        ), self.assertRaisesRegex(
+            utils.ValidationError,
+            'You already have an in-progress certificate assessment attempt.',
+        ):
+            certificate_assessment_services.start_certificate_assessment_attempt(
+                created_offering.certificate_id,
+                owner_id,
+            )
+
+        self.assertIsNotNone(
+            certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.get_by_id(
+                in_progress_attempt.id
+            )
+        )
+
+    def test_submit_certificate_assessment_attempt_scores_and_persists_responses(
+        self,
+    ) -> None:
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
+        question_id_3 = question_services.get_new_question_id()
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Correct answer'
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Second answer'
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Third answer'
+        )
+
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Arithmetic Check',
+            description='Checks arithmetic basics.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=3,
+            time_limit_in_minutes=30,
+            demonstrates=['Arithmetic reasoning'],
+            async_status='Available',
+        )
+        attempt_model = certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': created_offering.certificate_id,
+                'certificate_version': 1,
+                'topic_ids': [self.topic_id],
+                'question_versions': {
+                    question_id_1: 1,
+                    question_id_2: 1,
+                    question_id_3: 1,
+                },
+                'question_topic_links': {
+                    question_id_1: [self.topic_id],
+                    question_id_2: [self.topic_id],
+                    question_id_3: [self.topic_id],
+                },
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+
+        with mock.patch.object(
+            certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel,
+            'put',
+            autospec=True,
+        ), mock.patch.object(
+            certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel,
+            'to_dict',
+            return_value={
+                'attempt_id': attempt_model.id,
+                'learner_id': owner_id,
+                'total_score': 50.0,
+                'attempt_index': 1,
+                'attempt_data': {
+                    self.topic_id: {
+                        'total_related_questions': 3,
+                        'total_correct_questions': 1,
+                    }
+                },
+                'version_data': attempt_model.version_data,
+                'started_at': attempt_model.started_at,
+                'finished_at': attempt_model.started_at,
+                'is_submitted': True,
+            },
+        ):
+            submitted_attempt = certificate_assessment_services.submit_certificate_assessment_attempt(
+                attempt_model.id,
+                [
+                    {
+                        'question_id': question_id_1,
+                        'selected_answer': '  Solution  ',
+                    },
+                    {
+                        'question_id': question_id_2,
+                        'selected_answer': 'Wrong answer',
+                    },
+                    {
+                        'question_id': question_id_3,
+                        'selected_answer': 'Wrong answer',
+                    },
+                ],
+            )
+
+        self.assertTrue(submitted_attempt.is_submitted)
+        self.assertEqual(submitted_attempt.total_score, 50.0)
+        self.assertEqual(
+            submitted_attempt.attempt_data,
+            {
+                self.topic_id: {
+                    'total_related_questions': 3,
+                    'total_correct_questions': 1,
+                }
+            },
+        )
+
+        response_models = certificate_assessment_services.gae_models.CertificateAssessmentResponseModel.query(
+            certificate_assessment_services.gae_models.CertificateAssessmentResponseModel.attempt_id
+            == attempt_model.id
+        ).fetch()
+        self.assertEqual(len(response_models), 3)
+        response_by_question_id = {
+            response.question_id: response for response in response_models
+        }
+        self.assertEqual(
+            response_by_question_id[question_id_1].selected_answer,
+            'Solution',
+        )
+        self.assertTrue(response_by_question_id[question_id_1].is_correct)
+        self.assertEqual(
+            response_by_question_id[question_id_2].selected_answer,
+            'Wrong answer',
+        )
+        self.assertFalse(response_by_question_id[question_id_2].is_correct)
+        self.assertEqual(
+            response_by_question_id[question_id_3].selected_answer,
+            'Wrong answer',
+        )
+        self.assertFalse(response_by_question_id[question_id_3].is_correct)
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'This assessment has already been submitted.',
+        ):
+            certificate_assessment_services.submit_certificate_assessment_attempt(
+                attempt_model.id,
+                [
+                    {
+                        'question_id': question_id_1,
+                        'selected_answer': 'Correct answer',
+                    }
+                ],
+            )
+
+    def test_submit_certificate_assessment_attempt_rejects_missing_attempt(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Attempt does not exist.',
+        ):
+            certificate_assessment_services.submit_certificate_assessment_attempt(
+                'missing_attempt_id',
+                [],
             )
 
 
@@ -500,6 +848,66 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
                 required_questions_by_topic,
                 CERTIFICATE_DIFFICULTY_EASY,
             )
+        )
+
+    def test_pick_questions_uses_validator_distribution(self) -> None:
+        pick_questions = getattr(
+            certificate_assessment_services, '_pick_questions'
+        )
+
+        topic_id_to_question_ids_by_difficulty = {
+            'topic_1': {
+                CERTIFICATE_DIFFICULTY_MEDIUM: ['q1', 'q2'],
+                CERTIFICATE_DIFFICULTY_EASY: ['q3'],
+                CERTIFICATE_DIFFICULTY_HARD: ['q4'],
+            },
+            'topic_2': {
+                CERTIFICATE_DIFFICULTY_MEDIUM: ['q5'],
+                CERTIFICATE_DIFFICULTY_EASY: ['q6', 'q7'],
+                CERTIFICATE_DIFFICULTY_HARD: ['q8'],
+            },
+        }
+
+        with mock.patch.object(
+            certificate_assessment_services,
+            '_get_topic_question_ids_by_difficulty',
+            return_value=topic_id_to_question_ids_by_difficulty,
+        ), mock.patch.object(
+            certificate_assessment_services.random,
+            'sample',
+            side_effect=lambda items, count: items[:count],
+        ), mock.patch.object(
+            certificate_assessment_services.random,
+            'shuffle',
+            side_effect=lambda items: None,
+        ):
+            selected_question_ids = pick_questions(['topic_1', 'topic_2'], 5)
+
+        self.assertEqual(
+            selected_question_ids,
+            ['q1', 'q3', 'q4', 'q5', 'q6'],
+        )
+
+    def test_get_required_questions_for_topic_share_matches_cycle(self) -> None:
+        self.assertEqual(
+            certificate_assessment_services.get_required_questions_for_topic_share(
+                3
+            ),
+            {
+                CERTIFICATE_DIFFICULTY_EASY: 1,
+                CERTIFICATE_DIFFICULTY_MEDIUM: 1,
+                CERTIFICATE_DIFFICULTY_HARD: 1,
+            },
+        )
+        self.assertEqual(
+            certificate_assessment_services.get_required_questions_for_topic_share(
+                4
+            ),
+            {
+                CERTIFICATE_DIFFICULTY_EASY: 1,
+                CERTIFICATE_DIFFICULTY_MEDIUM: 2,
+                CERTIFICATE_DIFFICULTY_HARD: 1,
+            },
         )
 
     def test_validation_distribution_sampling_cases(self) -> None:

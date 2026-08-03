@@ -19,7 +19,9 @@
 from __future__ import annotations
 
 import collections
+import datetime
 import sys
+import random
 
 from core import feconf, utils
 from core.constants import constants
@@ -58,6 +60,14 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     is_valid: bool
     validation_errors: Dict[str, Dict[str, Dict[str, int]]]
     validation_message: str
+
+
+class CertificateAssessmentAttemptNotReadyException(Exception):
+    """Raised when the certificate question pool is no longer valid."""
+
+
+def _get_current_time() -> datetime.datetime:
+    return datetime.datetime.utcnow()
 
 
 def _get_topic_name_to_question_ids_map(
@@ -122,6 +132,13 @@ def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     for index in range(total_questions):
         counts[cycle[index % len(cycle)]] += 1
     return counts
+
+
+def get_required_questions_for_topic_share(
+    total_questions_for_topic: int,
+) -> Dict[str, int]:
+    """Returns the validator-approved difficulty split for one topic share."""
+    return _get_difficulty_counts(total_questions_for_topic)
 
 
 def _get_difficulty_label(skill_difficulty: float) -> str | None:
@@ -277,6 +294,337 @@ def _has_valid_distinct_assignment(
             return True
 
     return False
+
+
+def _get_topic_question_ids_by_difficulty(
+    topic_ids: List[str],
+) -> Dict[str, Dict[str, List[str]]]:
+    """Returns available question ids grouped by topic and difficulty."""
+    topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, List[str]]] = {}
+    for topic_id in topic_ids:
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
+        question_ids_by_difficulty: Dict[str, List[str]] = (
+            collections.defaultdict(list)
+        )
+        seen_question_ids: set[str] = set()
+        skill_ids = list(topic.get_all_skill_ids())
+        skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
+        for skill_id, skill_model in zip(skill_ids, skill_models_list):
+            if skill_model is None:
+                continue
+            skill = skill_fetchers.get_skill_from_model(skill_model)
+            for (
+                question_skill_link
+            ) in question_services.get_question_skill_links_of_skill(
+                skill_id, skill.description
+            ):
+                if question_skill_link.question_id in seen_question_ids:
+                    continue
+                seen_question_ids.add(question_skill_link.question_id)
+                if (
+                    question_skill_link.skill_difficulty
+                    == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                        constants.SKILL_DIFFICULTY_EASY
+                    ]
+                ):
+                    question_ids_by_difficulty[
+                        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
+                    ].append(question_skill_link.question_id)
+                elif (
+                    question_skill_link.skill_difficulty
+                    == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                        constants.SKILL_DIFFICULTY_MEDIUM
+                    ]
+                ):
+                    question_ids_by_difficulty[
+                        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
+                    ].append(question_skill_link.question_id)
+                elif (
+                    question_skill_link.skill_difficulty
+                    == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                        constants.SKILL_DIFFICULTY_HARD
+                    ]
+                ):
+                    question_ids_by_difficulty[
+                        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
+                    ].append(question_skill_link.question_id)
+        topic_id_to_question_ids_by_difficulty[topic_id] = (
+            question_ids_by_difficulty
+        )
+    return topic_id_to_question_ids_by_difficulty
+
+
+def _pick_questions(topic_ids: List[str], total_questions: int) -> List[str]:
+    """Selects questions using the validator's topic and difficulty split."""
+    topic_id_to_question_ids_by_difficulty = (
+        _get_topic_question_ids_by_difficulty(topic_ids)
+    )
+    per_topic = total_questions // len(topic_ids)
+    remainder = total_questions % len(topic_ids)
+    selected_question_ids: List[str] = []
+    used_question_ids: set[str] = set()
+    for index, topic_id in enumerate(topic_ids):
+        topic_share = per_topic + (1 if index < remainder else 0)
+        difficulty_counts = get_required_questions_for_topic_share(topic_share)
+        for difficulty in (
+            CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM,
+            CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY,
+            CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD,
+        ):
+            available_question_ids = [
+                question_id
+                for question_id in topic_id_to_question_ids_by_difficulty[
+                    topic_id
+                ].get(difficulty, [])
+                if question_id not in used_question_ids
+            ]
+            required_count = difficulty_counts[difficulty]
+            if len(available_question_ids) < required_count:
+                raise CertificateAssessmentAttemptNotReadyException()
+            selected_question_ids.extend(
+                random.sample(available_question_ids, required_count)
+            )
+            used_question_ids.update(selected_question_ids[-required_count:])
+    random.shuffle(selected_question_ids)
+    return selected_question_ids
+
+
+def _build_version_data(
+    certificate_id: str,
+    certificate_version: int,
+    topic_ids: List[str],
+    selected_question_ids: List[str],
+) -> Dict[str, object]:
+    """Builds the version snapshot for a started attempt."""
+    topic_versions = {
+        topic_id: topic_fetchers.get_topic_by_id(topic_id, strict=True).version
+        for topic_id in topic_ids
+    }
+    question_versions = {
+        question_id: question_services.get_question_by_id(question_id).version
+        for question_id in selected_question_ids
+    }
+    return {
+        'certificate_id': certificate_id,
+        'certificate_version': certificate_version,
+        'topic_versions': topic_versions,
+        'question_versions': question_versions,
+        'question_topic_links': {
+            question_id: list(topic_ids)
+            for question_id in selected_question_ids
+        },
+    }
+
+
+def _get_in_progress_attempt_for_learner(
+    learner_id: str,
+) -> Optional[gae_models.CertificateAssessmentAttemptModel]:
+    return gae_models.CertificateAssessmentAttemptModel.query(
+        gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id,
+        gae_models.CertificateAssessmentAttemptModel.is_submitted
+        == False,  # pylint: disable=singleton-comparison
+    ).get()
+
+
+def _get_active_attempt_for_learner(
+    learner_id: str,
+) -> gae_models.CertificateAssessmentAttemptModel:
+    """Returns the learner's active assessment attempt or raises."""
+    attempt_model = _get_in_progress_attempt_for_learner(learner_id)
+    if attempt_model is None:
+        raise utils.ValidationError(
+            'No active certificate assessment attempt was found.'
+        )
+    return attempt_model
+
+
+def _get_submission_count_for_certificate(
+    learner_id: str, certificate_id: str
+) -> int:
+    count = 0
+    for attempt in gae_models.CertificateAssessmentAttemptModel.query(
+        gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id
+    ).fetch():
+        if (
+            attempt.version_data.get('certificate_id') == certificate_id
+            and attempt.is_submitted
+        ):
+            count += 1
+    return count
+
+
+def start_certificate_assessment_attempt(
+    certificate_id: str, learner_id: str
+) -> Tuple[
+    certificate_assessment_domain.CertificateAssessmentAttempt,
+    List[Dict[str, int]],
+]:
+    """Starts a new DB-backed certificate assessment attempt."""
+    offering = get_certificate_assessment_offering(certificate_id)
+    validation_result = validate_certificate_assessment_offering(
+        offering.topic_ids, offering.total_questions
+    )
+    if not validation_result['is_valid']:
+        offering_model = (
+            gae_models.CertificateAssessmentOfferingModel.get_by_id(
+                certificate_id
+            )
+        )
+        assert offering_model is not None
+        offering_model.async_status = 'Blocked'
+        offering_model.put()
+        raise CertificateAssessmentAttemptNotReadyException(
+            'Sorry, this assessment isn\'t ready anymore! We\'ve alerted the creator, and in the meantime you can try a different assessment.'
+        )
+
+    if _get_in_progress_attempt_for_learner(learner_id) is not None:
+        raise utils.ValidationError(
+            'You already have an in-progress certificate assessment attempt.'
+        )
+
+    selected_question_ids = _pick_questions(
+        offering.topic_ids, offering.total_questions
+    )
+    version_data = _build_version_data(
+        certificate_id,
+        offering.version,
+        offering.topic_ids,
+        selected_question_ids,
+    )
+    attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
+        learner_id=learner_id,
+        total_score=0.0,
+        attempt_index=_get_submission_count_for_certificate(
+            learner_id, certificate_id
+        )
+        + 1,
+        attempt_data={},
+        version_data=version_data,
+        started_at=_get_current_time(),
+        finished_at=None,
+        is_submitted=False,
+    )
+    return (
+        certificate_assessment_domain.CertificateAssessmentAttempt.from_dict(
+            attempt_model.to_dict()
+        ),
+        [
+            {
+                'question_id': question_id,
+                'question_version': version_data['question_versions'][
+                    question_id
+                ],
+            }
+            for question_id in selected_question_ids
+        ],
+    )
+
+
+def _normalize_answer(answer: Optional[str]) -> Optional[str]:
+    return None if answer is None else answer.strip()
+
+
+def submit_certificate_assessment_attempt(
+    attempt_id: str, answers: List[Dict[str, Optional[str]]]
+) -> certificate_assessment_domain.CertificateAssessmentAttempt:
+    """Scores a submitted attempt against the pinned question versions."""
+    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
+        attempt_id
+    )
+    if attempt_model is None:
+        raise utils.ValidationError('Attempt does not exist.')
+    if attempt_model.is_submitted:
+        raise utils.ValidationError(
+            'This assessment has already been submitted.'
+        )
+
+    answers_by_question_id = {
+        answer['question_id']: _normalize_answer(answer.get('selected_answer'))
+        for answer in answers
+    }
+    question_versions = attempt_model.version_data['question_versions']
+    question_topic_links = attempt_model.version_data['question_topic_links']
+    responses: List[gae_models.CertificateAssessmentResponseModel] = []
+    attempt_data: Dict[str, Dict[str, int]] = collections.defaultdict(
+        lambda: {
+            'total_related_questions': 0,
+            'total_correct_questions': 0,
+        }
+    )
+    correct_count = 0
+    for question_id, question_version in question_versions.items():
+        question = question_services.get_question_by_id_and_version(
+            question_id, question_version
+        )
+        selected_answer = answers_by_question_id.get(question_id)
+        solution = question.question_state_data.interaction.solution
+        correct_answer = None if solution is None else solution.correct_answer
+        is_correct = (
+            selected_answer is not None
+            and correct_answer is not None
+            and selected_answer == correct_answer
+        )
+        if is_correct:
+            correct_count += 1
+        responses.append(
+            gae_models.CertificateAssessmentResponseModel(
+                id=gae_models.CertificateAssessmentResponseModel._get_new_id(),
+                attempt_id=attempt_id,
+                question_id=question_id,
+                question_version=question_version,
+                selected_answer=(
+                    '' if selected_answer is None else selected_answer
+                ),
+                is_correct=is_correct,
+            )
+        )
+        for topic_id in question_topic_links[question_id]:
+            attempt_data[topic_id]['total_related_questions'] += 1
+            if is_correct:
+                attempt_data[topic_id]['total_correct_questions'] += 1
+
+    gae_models.CertificateAssessmentResponseModel.put_multi(responses)
+    attempt_model.attempt_data = dict(attempt_data)
+    attempt_model.total_score = (
+        float(correct_count) / float(len(question_versions)) * 100.0
+        if question_versions
+        else 0.0
+    )
+    attempt_model.finished_at = _get_current_time()
+    attempt_model.is_submitted = True
+    attempt_model.put()
+    return certificate_assessment_domain.CertificateAssessmentAttempt.from_dict(
+        attempt_model.to_dict()
+    )
+
+
+def get_question_state_data_for_assessment_attempt(
+    learner_id: str, attempt_id: str, question_id: str
+) -> Dict[str, object]:
+    """Returns pinned question state data for an in-progress attempt."""
+    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
+        attempt_id
+    )
+    if attempt_model is None:
+        raise utils.ValidationError('Attempt does not exist.')
+    if attempt_model.learner_id != learner_id:
+        raise utils.ValidationError(
+            'This attempt does not belong to the current learner.'
+        )
+    if attempt_model.is_submitted:
+        raise utils.ValidationError(
+            'This assessment has already been submitted.'
+        )
+
+    question_version = attempt_model.version_data['question_versions'].get(
+        question_id
+    )
+    if question_version is None:
+        raise utils.ValidationError('Question is not part of this attempt.')
+    question = question_services.get_question_by_id_and_version(
+        question_id, question_version
+    )
+    return question.question_state_data.to_dict()
 
 
 def validate_certificate_assessment_offering(

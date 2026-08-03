@@ -165,6 +165,66 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
+class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
+    """Tests for certificate assessment ACL decorators."""
+
+    class SubmitMockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'attempt_id': {'schema': {'type': 'basestring'}}
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+        @acl_decorators.can_submit_assessment_response
+        def post(self, attempt_id: str) -> None:
+            self.render_json({'attempt_id': attempt_id})
+
+    class QuestionMockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {'schema': {'type': 'basestring'}}
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_certificate_assessment_attempt
+        def get(self, question_id: str, attempt_id: str) -> None:
+            self.render_json(
+                {'question_id': question_id, 'attempt_id': attempt_id}
+            )
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/submit/<attempt_id>', self.SubmitMockHandler
+                    ),
+                    webapp2.Route(
+                        '/question/<question_id>', self.QuestionMockHandler
+                    ),
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+
+    def test_submit_decorator_rejects_logged_out_user(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/submit/attempt_1',
+                {},
+                csrf_token=csrf_token,
+                expected_status_int=401,
+            )
+        self.assertIn(
+            'You must be logged in to access this resource.',
+            response['error'],
+        )
+
+
 class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for download exploration decorator."""
 

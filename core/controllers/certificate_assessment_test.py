@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import datetime
 from unittest import mock
 
 from core import feconf, utils
@@ -403,14 +404,36 @@ class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
     """Tests class for StartCertificateAssessmentHandler."""
 
     def test_post_returns_hardcoded_attempt_and_questions(self) -> None:
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
-            {'certificate_id': 'dummy_certificate_id'},
-            csrf_token=csrf_token,
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
         )
-        self.assertEqual(
-            response,
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'dummy_certificate_id'}
+        with mock.patch.object(
+            certificate_assessment.certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            return_value=(
+                mock.Mock(attempt_id='dummy_attempt_id'),
+                [
+                    {
+                        'question_id': 'dummy_question_id_1',
+                        'question_version': 1,
+                    },
+                    {
+                        'question_id': 'dummy_question_id_2',
+                        'question_version': 1,
+                    },
+                ],
+            ),
+        ), mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        render_json_mock.assert_called_once_with(
             {
                 'attempt_id': 'dummy_attempt_id',
                 'questions': [
@@ -423,7 +446,7 @@ class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
                         'question_version': 1,
                     },
                 ],
-            },
+            }
         )
 
 
@@ -431,31 +454,46 @@ class SubmitCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
     """Tests class for SubmitCertificateAssessmentHandler."""
 
     def test_post_returns_hardcoded_submission_confirmation(self) -> None:
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
-                '<attempt_id>', 'dummy_attempt_id'
-            ),
-            {
-                'answers': [
-                    {
-                        'question_id': 'dummy_question_id_1',
-                        'selected_answer': 'A',
-                    },
-                    {
-                        'question_id': 'dummy_question_id_2',
-                        'selected_answer': 'B',
-                    },
-                ]
-            },
-            csrf_token=csrf_token,
+        handler = (
+            certificate_assessment.SubmitCertificateAssessmentHandler.__new__(
+                certificate_assessment.SubmitCertificateAssessmentHandler
+            )
         )
-        self.assertEqual(
-            response,
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {
+            'answers': [
+                {
+                    'question_id': 'dummy_question_id_1',
+                    'selected_answer': 'A',
+                },
+                {
+                    'question_id': 'dummy_question_id_2',
+                    'selected_answer': 'B',
+                },
+            ]
+        }
+        with mock.patch.object(
+            certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel,
+            'get_by_id',
+            return_value=mock.Mock(
+                learner_id='user_id_1',
+                is_submitted=False,
+            ),
+        ), mock.patch.object(
+            certificate_assessment.certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            return_value=mock.Mock(attempt_id='dummy_attempt_id'),
+        ), mock.patch.object(
+            certificate_assessment.SubmitCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post('dummy_attempt_id')
+
+        render_json_mock.assert_called_once_with(
             {
                 'attempt_id': 'dummy_attempt_id',
                 'is_submitted': True,
-            },
+            }
         )
 
 
@@ -504,4 +542,109 @@ class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
                     }
                 ]
             },
+        )
+
+
+class StartCertificateAssessmentHandlerUnitTest(test_utils.GenericTestBase):
+    """Tests for the start certificate assessment handler."""
+
+    def test_post_returns_real_attempt_payload(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment.certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            return_value=(
+                mock.Mock(attempt_id='attempt_1'),
+                [{'question_id': 'q1', 'question_version': 1}],
+            ),
+        ), mock.patch.object(
+            certificate_assessment.StartCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post()
+
+        render_json_mock.assert_called_once_with(
+            {
+                'attempt_id': 'attempt_1',
+                'questions': [{'question_id': 'q1', 'question_version': 1}],
+            }
+        )
+
+
+class SubmitCertificateAssessmentHandlerUnitTest(test_utils.GenericTestBase):
+    """Tests for the submit certificate assessment handler."""
+
+    def test_post_returns_submission_confirmation(self) -> None:
+        handler = (
+            certificate_assessment.SubmitCertificateAssessmentHandler.__new__(
+                certificate_assessment.SubmitCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {
+            'answers': [{'question_id': 'q1', 'selected_answer': 'A'}]
+        }
+        with mock.patch.object(
+            certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel,
+            'get_by_id',
+            return_value=mock.Mock(
+                learner_id='user_id_1',
+                is_submitted=False,
+            ),
+        ), mock.patch.object(
+            certificate_assessment.certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            return_value=mock.Mock(attempt_id='attempt_1'),
+        ), mock.patch.object(
+            certificate_assessment.SubmitCertificateAssessmentHandler,
+            'render_json',
+        ) as render_json_mock:
+            handler.post('attempt_1')
+
+        render_json_mock.assert_called_once_with(
+            {'attempt_id': 'attempt_1', 'is_submitted': True}
+        )
+
+
+class CertificateQuestionHandlerUnitTest(test_utils.GenericTestBase):
+    """Tests for the certificate question handler."""
+
+    def test_get_returns_question_state_data(self) -> None:
+        handler = certificate_assessment.CertificateQuestionHandler.__new__(
+            certificate_assessment.CertificateQuestionHandler
+        )
+        handler.user_id = 'user_id_1'
+        attempt = certificate_assessment_services.gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='user_id_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'question_versions': {'q1': 1},
+                'question_topic_links': {'q1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        with mock.patch.object(
+            certificate_assessment.certificate_assessment_services,
+            'get_question_state_data_for_assessment_attempt',
+            return_value={'content': 'state'},
+        ), mock.patch.object(
+            certificate_assessment.CertificateQuestionHandler, 'render_json'
+        ) as render_json_mock:
+            handler.get('q1')
+
+        render_json_mock.assert_called_once_with(
+            {
+                'question_id': 'q1',
+                'question_state_data': {'content': 'state'},
+            }
         )
