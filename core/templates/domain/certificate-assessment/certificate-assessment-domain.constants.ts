@@ -26,6 +26,10 @@ export const CertificateAssessmentDomainConstants = {
     '/validate_certificate_assessment_offering_handler',
   AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL:
     '/certificate_assessment_offerings_for_classroom_handler/<classroom_id>',
+  CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL:
+    '/certificate_assessment_result_handler/<attempt_id>',
+  CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER_URL:
+    '/certificate_assessment_attempts_handler',
 } as const;
 
 // Confirmation actions are used by the pre-save modal to represent the user's

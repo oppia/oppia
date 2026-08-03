@@ -23,6 +23,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('AvailableCertificateOfferingPageComponent', () => {
   let component: AvailableCertificateOfferingPageComponent;
@@ -39,7 +40,10 @@ describe('AvailableCertificateOfferingPageComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [AvailableCertificateOfferingPageComponent],
+      declarations: [
+        AvailableCertificateOfferingPageComponent,
+        MockTranslatePipe,
+      ],
       providers: [
         {
           provide: CertificateAssessmentOfferingBackendApiService,
@@ -152,15 +156,82 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
-
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
     ) as HTMLButtonElement[];
-
-    const assessmentButtons = buttons.filter(
-      b => b.textContent?.trim() === 'Continue to assessment'
+    const assessmentButtons = buttons.filter(b =>
+      [
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT',
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_RETRY_ASSESSMENT_BUTTON_TEXT',
+      ].includes(b.textContent?.trim() || '')
     );
 
-    expect(assessmentButtons.length).toBe(1);
+    expect(assessmentButtons.length).toBe(
+      component.availableCertificates.length
+    );
+    assessmentButtons.forEach(button => {
+      expect(button.getAttribute('ng-reflect-router-link')).toContain(
+        '/certificate-assessment'
+      );
+    });
+  });
+
+  it('should show a Check Score button for passed and failed certificates', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        {
+          certificateId: 'certificate-1',
+          title: 'Arithmetic',
+          attemptStatus: 'Passed',
+        },
+        {
+          certificateId: 'certificate-2',
+          title: 'Zoology',
+          attemptStatus: 'Failed',
+        },
+        {
+          certificateId: 'certificate-3',
+          title: 'History',
+          attemptStatus: 'Not Attempted',
+        },
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('button')
+    ) as HTMLButtonElement[];
+    const checkScoreButtons = buttons.filter(
+      b =>
+        b.textContent?.trim() ===
+        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CHECK_SCORE_BUTTON_TEXT'
+    );
+    const passedOrFailedCount = component.availableCertificates.filter(
+      c => c.status === 'passed' || c.status === 'failed'
+    ).length;
+
+    expect(checkScoreButtons.length).toBe(passedOrFailedCount);
+    expect(checkScoreButtons.length).toBe(2);
+  });
+
+  it('should route the Exit button to the classroom page', () => {
+    fixture.detectChanges();
+    const exitButton = fixture.nativeElement.querySelector(
+      '.oppia-certificate-offering-available-page-exit-button'
+    ) as HTMLButtonElement;
+
+    expect(exitButton.textContent?.trim()).toBe(
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_EXIT_BUTTON_TEXT'
+    );
+    expect(exitButton.getAttribute('ng-reflect-router-link')).toContain('math');
+  });
+
+  it('should build the certificate assessment route with the certificate id', () => {
+    expect(component.getCertificateAssessmentRoute('some_cert_id')).toEqual([
+      '/certificate-assessment',
+      'some_cert_id',
+    ]);
   });
 });

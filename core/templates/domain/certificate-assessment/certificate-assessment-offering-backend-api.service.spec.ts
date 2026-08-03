@@ -875,4 +875,139 @@ describe('Certificate Assessment Offering backend api service', () => {
       )
     );
   }));
+  it('should successfully fetch a certificate assessment result', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentResultAsync('mock_attempt_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL.replace(
+        '<attempt_id>',
+        'mock_attempt_id'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 80,
+      attempt_data: {
+        dummy_topic_id: {
+          total_related_questions: 5,
+          total_correct_questions: 4,
+        },
+      },
+      is_submitted: true,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 80,
+      attempt_data: {
+        dummy_topic_id: {
+          total_related_questions: 5,
+          total_correct_questions: 4,
+        },
+      },
+      is_submitted: true,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if fetching certificate assessment result fails', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentResultAsync('mock_attempt_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL.replace(
+        '<attempt_id>',
+        'mock_attempt_id'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error occurred while fetching result.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error occurred while fetching result.'
+    );
+  }));
+
+  it('should successfully fetch certificate assessment attempts', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentAttemptsAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      attempts: [
+        {
+          attempt_id: 'dummy_attempt_id',
+          classroom_id: 'dummy_classroom_id',
+          title: 'Everyday Arithmetic & Number Confidence',
+          total_score: 80,
+          attempt_index: 1,
+          started_at: '2026-07-18T00:00:00Z',
+          is_submitted: true,
+        },
+      ],
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith([
+      {
+        attempt_id: 'dummy_attempt_id',
+        classroom_id: 'dummy_classroom_id',
+        title: 'Everyday Arithmetic & Number Confidence',
+        total_score: 80,
+        attempt_index: 1,
+        started_at: '2026-07-18T00:00:00Z',
+        is_submitted: true,
+      },
+    ]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if fetching certificate assessment attempts fails', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentAttemptsAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error occurred while fetching attempts.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error occurred while fetching attempts.'
+    );
+  }));
 });
