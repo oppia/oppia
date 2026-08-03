@@ -42,6 +42,7 @@ import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.ser
 import {LocalStorageService} from 'services/local-storage.service';
 
 import constants from 'assets/constants';
+import './topic-story-section.component.css';
 
 import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
 

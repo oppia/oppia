@@ -377,6 +377,15 @@ describe('LocalStorageService', () => {
       expect(localStorageService.getSkippedAdventures('story_2')).toEqual([]);
     });
 
+    it('should overwrite existing skipped adventures for a story', () => {
+      localStorageService.updateSkippedAdventures('story_3', [0, 1]);
+      localStorageService.updateSkippedAdventures('story_3', [2, 3]);
+
+      expect(localStorageService.getSkippedAdventures('story_3')).toEqual([
+        2, 3,
+      ]);
+    });
+
     it('should not save skipped adventures when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
 

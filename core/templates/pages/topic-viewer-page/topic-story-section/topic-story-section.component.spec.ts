@@ -1268,7 +1268,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isNewLabelVisible).toBeTrue();
+    expect(component.lessonCards[0].isNewLabelVisible).toBe(true);
   });
 
   it('should not call loadChapterProgress on first change of storySummary', () => {
@@ -1529,7 +1529,7 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.isAdventureExpanded(0)).toBeTrue();
+    expect(component.isAdventureExpanded(0)).toBe(true);
 
     tick(300);
   }));
@@ -1606,10 +1606,10 @@ describe('TopicStorySectionComponent', () => {
     expect(localStorageService.getSkippedAdventures).toHaveBeenCalledWith(
       'story_id_1'
     );
-    expect(component.isAdventureSkipped(0)).toBeTrue();
-    expect(component.isAdventureSkipped(1)).toBeFalse();
-    expect(component.isAdventureExpanded(0)).toBeFalse();
-    expect(component.isAdventureExpanded(1)).toBeTrue();
+    expect(component.isAdventureSkipped(0)).toBe(true);
+    expect(component.isAdventureSkipped(1)).toBe(false);
+    expect(component.isAdventureExpanded(0)).toBe(false);
+    expect(component.isAdventureExpanded(1)).toBe(true);
   });
 
   it('should auto-expand first adventure when all adventures are skipped', () => {
@@ -1681,9 +1681,9 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     fixture.detectChanges();
 
-    expect(component.isAdventureSkipped(0)).toBeTrue();
-    expect(component.isAdventureSkipped(1)).toBeTrue();
-    expect(component.isAdventureExpanded(0)).toBeTrue();
+    expect(component.isAdventureSkipped(0)).toBe(true);
+    expect(component.isAdventureSkipped(1)).toBe(true);
+    expect(component.isAdventureExpanded(0)).toBe(true);
   });
 
   it('should persist skipped adventures when proceeding with skip confirmation', fakeAsync(() => {
@@ -1757,12 +1757,12 @@ describe('TopicStorySectionComponent', () => {
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.showArcSkipConfirmationModal).toBeTrue();
+    expect(component.showArcSkipConfirmationModal).toBe(true);
     expect(localStorageService.updateSkippedAdventures).not.toHaveBeenCalled();
 
     component.onArcSkipConfirmationProceed();
 
-    expect(component.isAdventureSkipped(0)).toBeTrue();
+    expect(component.isAdventureSkipped(0)).toBe(true);
     expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
       'story_id_1',
       [0]
@@ -1770,6 +1770,22 @@ describe('TopicStorySectionComponent', () => {
 
     tick(300);
   }));
+
+  it('should clear skip confirmation state on cancel', () => {
+    component.showArcSkipConfirmationModal = true;
+
+    component.onArcSkipConfirmationCancel();
+
+    expect(component.showArcSkipConfirmationModal).toBe(false);
+  });
+
+  it('should cancel skip confirmation on proceed when there is no pending navigation', () => {
+    component.showArcSkipConfirmationModal = true;
+
+    component.onArcSkipConfirmationProceed();
+
+    expect(component.showArcSkipConfirmationModal).toBe(false);
+  });
 
   it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
     const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
@@ -1843,17 +1859,17 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
     fixture.detectChanges();
 
-    expect(component.isAdventureCompleted(0)).toBeTrue();
-    expect(component.isAdventureCompleted(1)).toBeFalse();
+    expect(component.isAdventureCompleted(0)).toBe(true);
+    expect(component.isAdventureCompleted(1)).toBe(false);
 
     spyOn(document, 'getElementById').and.returnValue(null);
 
     component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
 
-    expect(component.showArcSkipConfirmationModal).toBeFalse();
+    expect(component.showArcSkipConfirmationModal).toBe(false);
     expect(component.activeLessonNumber).toBe(2);
     expect(component.navigatedLessonNumber).toBe(2);
-    expect(component.isAdventureExpanded(1)).toBeTrue();
+    expect(component.isAdventureExpanded(1)).toBe(true);
 
     tick(300);
   }));
@@ -1863,7 +1879,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.toggleAdventure(0);
 
-    expect(component.isAdventureSkipped(0)).toBeFalse();
+    expect(component.isAdventureSkipped(0)).toBe(false);
     expect(localStorageService.updateSkippedAdventures).toHaveBeenCalledWith(
       'story_id_1',
       []
@@ -2059,7 +2075,7 @@ describe('TopicStorySectionComponent', () => {
       startUrl: '/explore/1',
       practiceUrl: '',
       nodeId: 'node_1',
-      lessonProgressStatus: 'completed',
+      lessonProgressStatus: 'completed' as const,
       totalCheckpointsCount: 0,
       visitedCheckpointsCount: 0,
       isComingSoon: false,
@@ -2075,7 +2091,7 @@ describe('TopicStorySectionComponent', () => {
       {...baseLesson, lessonNumber: 2},
     ];
 
-    expect(component.isStoryCompleted()).toBeTrue();
+    expect(component.isStoryCompleted()).toBe(true);
 
     component.availableLessonCards = [
       {...baseLesson, lessonNumber: 1},
@@ -2086,13 +2102,13 @@ describe('TopicStorySectionComponent', () => {
       },
     ];
 
-    expect(component.isStoryCompleted()).toBeFalse();
+    expect(component.isStoryCompleted()).toBe(false);
   });
 
   it('should report story as not completed when no available lessons exist', () => {
     component.availableLessonCards = [];
 
-    expect(component.isStoryCompleted()).toBeFalse();
+    expect(component.isStoryCompleted()).toBe(false);
   });
 
   it('should report adventure as completed only when all its lessons are completed', () => {
@@ -2103,7 +2119,7 @@ describe('TopicStorySectionComponent', () => {
       startUrl: '/explore/1',
       practiceUrl: '',
       nodeId: 'node_1',
-      lessonProgressStatus: 'completed',
+      lessonProgressStatus: 'completed' as const,
       totalCheckpointsCount: 0,
       visitedCheckpointsCount: 0,
       isComingSoon: false,
@@ -2157,10 +2173,10 @@ describe('TopicStorySectionComponent', () => {
       },
     ];
 
-    expect(component.isAdventureCompleted(0)).toBeFalse();
-    expect(component.isAdventureCompleted(1)).toBeTrue();
-    expect(component.isAdventureCompleted(2)).toBeFalse();
-    expect(component.isAdventureCompleted(99)).toBeFalse();
+    expect(component.isAdventureCompleted(0)).toBe(false);
+    expect(component.isAdventureCompleted(1)).toBe(true);
+    expect(component.isAdventureCompleted(2)).toBe(false);
+    expect(component.isAdventureCompleted(99)).toBe(false);
   });
 
   it('should scroll to practice card element when found by getElementById', fakeAsync(() => {
@@ -2420,7 +2436,7 @@ describe('TopicStorySectionComponent', () => {
       },
     ]);
     expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
-    expect(component.adventureNavigationGroups[0].showPractice).toBeTrue();
+    expect(component.adventureNavigationGroups[0].showPractice).toBe(true);
   });
 
   it('should mark completed lessons in adventureNavigationGroups', async () => {
@@ -2759,7 +2775,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isNewLabelVisible).toBeFalse();
+    expect(component.lessonCards[0].isNewLabelVisible).toBe(false);
   });
 
   it('should return false from isChapterPublished when getStatus throws', () => {
@@ -2792,7 +2808,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.lessonCards[0].isPublished).toBeFalse();
+    expect(component.lessonCards[0].isPublished).toBe(false);
   });
 
   it('should return false from isChapterReadyToPublish when getStatus throws and serial flag enabled', () => {
@@ -2830,5 +2846,38 @@ describe('TopicStorySectionComponent', () => {
     // When getStatus throws and serial flag is enabled, isComingSoon falls back to false
     // (getExplorationId is set so it won't be coming_soon via the null check)
     expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
+  });
+
+  it('should return false from isChapterPublished when getStatus returns null', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node');
+    storyNodeSpy.getDescription.and.returnValue('Desc');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getStatus.and.returnValue(null);
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards[0].isPublished).toBe(false);
   });
 });

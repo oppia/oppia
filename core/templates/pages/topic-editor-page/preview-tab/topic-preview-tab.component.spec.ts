@@ -217,6 +217,15 @@ describe('Topic Preview Tab Component', () => {
     ).toEqual(1);
   });
 
+  it('should track story section data by story id', () => {
+    expect(
+      componentInstance.trackStoryDataById(
+        0,
+        componentInstance.canonicalStorySectionData[0]
+      )
+    ).toEqual('id');
+  });
+
   it('should update page title on language change', () => {
     spyOn(componentInstance, 'setPageTitle');
     componentInstance.subscribeToOnLangChange();
