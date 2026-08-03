@@ -70,6 +70,7 @@ export class FeedbackDetailPageComponent {
   readonly statusLabels = FEEDBACK_STATUS_LABELS;
   readonly sourceLabels = SOURCE_LABELS;
   readonly teamLabels = TECHNICAL_TEAM_LABELS;
+  readonly statusOptions = Object.values(FeedbackStatus);
   readonly transferredToGithubStatus = FeedbackStatus.TRANSFERRED_TO_GITHUB;
 
   replyText: string = '';
@@ -154,6 +155,7 @@ export class FeedbackDetailPageComponent {
     }
 
     return null;
+    return this.feedbackDetailResponse?.session_info ?? null;
   }
 
   getCategoryLabel(category: string | null): string {

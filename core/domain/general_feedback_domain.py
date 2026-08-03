@@ -247,7 +247,7 @@ class PlatformFeedback:
             present for lesson reports, None for site reports.
         include_technical_logs: bool. Whether session diagnostics are attached.
         session_info: Optional[Dict[str, object]]. Session diagnostics; present
-            if include_technical_logs is True and destination_dashboard is not "creator".
+            if include_technical_logs is True and destination_dashboard is not "curriculum".
         screenshot_filename: Optional[str]. GCS filename of the screenshot.
         screenshot_entity_id: Optional[str]. GCS entity ID for the screenshot.
         created_on_msecs: float. Creation timestamp in milliseconds.
@@ -284,7 +284,9 @@ class PlatformFeedback:
         self.lesson_metadata = lesson_metadata
         self.include_technical_logs = include_technical_logs
         self.session_info = (
-            session_info if destination_dashboard != 'curriculum' else None
+            session_info
+            if destination_dashboard != feconf.DESTINATION_CURRICULUM
+            else None
         )
         self.screenshot_filename = screenshot_filename
         self.screenshot_entity_id = screenshot_entity_id
@@ -309,7 +311,7 @@ class PlatformFeedback:
             'include_technical_logs': self.include_technical_logs,
             'session_info': (
                 self.session_info
-                if self.destination_dashboard != 'curriculum'
+                if self.destination_dashboard != feconf.DESTINATION_CURRICULUM
                 else None
             ),
             'screenshot_filename': self.screenshot_filename,

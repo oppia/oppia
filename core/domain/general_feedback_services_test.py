@@ -380,7 +380,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         self.assertIsNotNone(retrieved_report)
         assert retrieved_report is not None
         self.assertEqual(retrieved_report.id, report.id)
-        self.assertEqual(retrieved_report.report_message, 'There is a bug.')
+        self.assertEqual(retrieved_report.report_message, 'There is a typo.')
         self.assertEqual(
             retrieved_report.session_info,
             VALID_SESSION_INFO,
