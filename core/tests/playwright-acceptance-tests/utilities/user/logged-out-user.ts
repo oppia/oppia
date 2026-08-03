@@ -29,6 +29,13 @@ const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const homeUrl = testConstants.URLs.Home;
 const splashPageUrl = testConstants.URLs.splash;
 
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
+const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
+const googleAnalyticsPartnerPoliciesLegacyUrl =
+  'https://www.google.com/policies/privacy/partners/';
+const privacyPolicyPageSelector = '.e2e-test-privacy-page';
+
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const signUpUsernameInputField = 'input.e2e-test-username-input';
 
@@ -2775,6 +2782,106 @@ export class LoggedOutUser extends BaseUser {
     if (verifyFeedbackPopup) {
       await this.expectFeedbackSubmissionPopupToAppear();
     }
+  }
+
+  /**
+   * Verifies that an external Privacy Policy link is uniquely rendered,
+   * visible, correctly configured, and actionable without navigating to the
+   * third-party destination.
+   *
+   * @param linkText - Exact accessible name displayed for the link.
+   * @param expectedHref - Exact raw href authored in the page template.
+   */
+  private async verifyExternalPrivacyPolicyLink(
+    linkText: string,
+    expectedHref: string
+  ): Promise<void> {
+    const privacyPolicyPage = this.page.locator(privacyPolicyPageSelector);
+
+    const link = privacyPolicyPage.getByRole('link', {
+      name: linkText,
+      exact: true,
+    });
+
+    await expect(
+      link,
+      `Expected exactly one visible Privacy Policy link named "${linkText}".`
+    ).toHaveCount(1);
+
+    await expect(
+      link,
+      `Expected Privacy Policy link "${linkText}" to be visible.`
+    ).toBeVisible();
+
+    await expect(
+      link,
+      `Expected Privacy Policy link "${linkText}" to have href "${expectedHref}".`
+    ).toHaveAttribute('href', expectedHref);
+
+    await link.click({trial: true});
+  }
+
+  /**
+   * Navigates to the Privacy Policy page and verifies that its primary
+   * container has rendered.
+   */
+  async navigateToPrivacyPolicyPage(): Promise<void> {
+    await this.goto(privacyPolicyUrl);
+
+    await expect(this.page.locator(privacyPolicyPageSelector)).toBeVisible();
+  }
+
+  /**
+   * Clicks the Oppia homepage link on the Privacy Policy page and verifies
+   * successful first-party navigation.
+   */
+  async clickLinkToHomePageOnPrivacyPolicyPage(): Promise<void> {
+    const privacyPolicyPage = this.page.locator(privacyPolicyPageSelector);
+
+    const homeLink = privacyPolicyPage.getByRole('link', {
+      name: 'https://www.oppia.org',
+      exact: true,
+    });
+
+    await expect(homeLink).toHaveCount(1);
+    await expect(homeLink).toBeVisible();
+    await expect(homeLink).toHaveAttribute('href', '/');
+
+    await homeLink.click();
+
+    await expect(this.page).toHaveURL(homeUrl);
+    await expect(this.page.locator(homePageHeadingSelector)).toBeVisible();
+  }
+
+  /**
+   * Verifies the cookie-management link on the Privacy Policy page.
+   */
+  async verifyLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
+    await this.verifyExternalPrivacyPolicyLink(
+      allAboutCookiesUrl,
+      allAboutCookiesUrl
+    );
+  }
+
+  /**
+   * Verifies the Google Analytics partner-policy link on the Privacy Policy
+   * page.
+   */
+  async verifyLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
+    await this.verifyExternalPrivacyPolicyLink(
+      googleAnalyticsPartnerPoliciesLegacyUrl,
+      googleAnalyticsPartnerPoliciesLegacyUrl
+    );
+  }
+
+  /**
+   * Verifies the Google Analytics opt-out link on the Privacy Policy page.
+   */
+  async verifyLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
+    await this.verifyExternalPrivacyPolicyLink(
+      googleAnalyticsOptOutUrl,
+      googleAnalyticsOptOutUrl
+    );
   }
 }
 

@@ -252,8 +252,8 @@
     },
     {
       "name": "logged-out-user/click-all-links-on-privacy-policy-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-privacy-policy-page.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-user/click-all-links-on-privacy-policy-page.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-user/click-all-links-on-terms-page",
