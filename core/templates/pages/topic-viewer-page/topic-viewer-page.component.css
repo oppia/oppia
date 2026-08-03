@@ -327,39 +327,39 @@ topic-viewer-page-root .topic-viewer-page-content .coming-soon-text {
 
 @media(max-width: 768px) {
   topic-viewer-page .redesigned-topic-viewer-content {
-    padding: 20px 20px 0;
+    padding: 16px 16px 0;
   }
 
   topic-viewer-page .redesigned-studyguide-section {
-    padding: 18px 20px 42px;
+    padding: 16px 16px 36px;
   }
 
   topic-viewer-page .redesigned-studyguide-section subtopics-list .tab-title {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopic-subheading {
-    font-size: 17px;
-    margin-bottom: 20px;
+    font-size: 16px;
+    margin-bottom: 18px;
   }
 
   topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopics-container {
-    gap: 22px;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 170px));
+    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   topic-viewer-page .redesigned-stories-section {
-    margin-top: 20px;
-    padding: 24px 20px 44px;
+    margin-top: 16px;
+    padding: 20px 16px 36px;
   }
 
   topic-viewer-page .redesigned-stories-list {
-    gap: 26px;
+    gap: 22px;
     max-width: 100%;
   }
 
   topic-viewer-page .redesigned-secondary-section {
-    padding-top: 16px;
+    padding-top: 14px;
   }
 }
 
