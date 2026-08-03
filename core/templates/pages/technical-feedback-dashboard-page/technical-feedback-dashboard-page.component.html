@@ -1,0 +1,36 @@
+<ng-container *ngIf="selectedReportId === null; else detailView">
+  <background-banner></background-banner>
+
+  <div class="oppia-technical-feedback-dashboard-page">
+    <div class="oppia-technical-feedback-dashboard-page-header">
+      <h2>
+        {{ 'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate }}
+      </h2>
+    </div>
+
+    <oppia-feedback-filter-bar [config]="filterConfig"
+                               (filterChange)="onFilterChange($event)">
+    </oppia-feedback-filter-bar>
+
+    <oppia-feedback-table class="oppia-feedback-table"
+                          [feedbackCardConfig]="cardConfig"
+                          [feedbackSummaries]="displayedFeedbackSummaries"
+                          [currentPage]="currentPage"
+                          [moreFeedbackAvailable]="moreFeedbackAvailable"
+                          (rowClick)="onRowClick($event)"
+                          (nextPage)="onNextPage()"
+                          (previousPage)="onPreviousPage()">
+    </oppia-feedback-table>
+
+  </div>
+</ng-container>
+
+<ng-template #detailView>
+  <oppia-feedback-detail-page [feedbackDetailResponse]="feedbackDetailResponse"
+                              [feedbackDetailPageConfig]="cardConfig"
+                              [screenshotDataUrl]="screenshotDataUrl"
+                              (statusChange)="onStatusChange($event)"
+                              (githubTransfer)="onGithubTransfer($event)"
+                              (goBack)="navigateBackToDashboard()">
+  </oppia-feedback-detail-page>
+</ng-template>

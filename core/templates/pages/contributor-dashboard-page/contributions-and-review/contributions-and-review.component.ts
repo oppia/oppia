@@ -569,6 +569,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     return this.activeTabType === tabType && this.activeTabSubtype === subType;
   }
 
+  get activeReviewTab(): boolean {
+    return this.activeTabType === this.TAB_TYPE_REVIEWS;
+  }
+
   isReviewTranslationsTab(): boolean {
     return (
       this.activeTabType === this.TAB_TYPE_REVIEWS &&

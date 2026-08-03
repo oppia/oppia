@@ -1,0 +1,59 @@
+.oppia-feedback-chip {
+  align-items: center;
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 11px;
+  font-weight: 600;
+  justify-content: center;
+  letter-spacing: 0.3px;
+  line-height: 18px;
+  padding: 1px 8px;
+  text-transform: uppercase;
+}
+
+.oppia-feedback-chip-open {
+  background: #ffc107;
+  color: #212529;
+}
+
+.oppia-feedback-chip-fixed,
+.oppia-feedback-chip-transferred_to_github {
+  background: #198754;
+  color: #fff;
+}
+
+.oppia-feedback-chip-compliment {
+  background: #0dcaf0;
+  color: #000;
+}
+
+.oppia-feedback-chip-not_actionable {
+  background: #212529;
+  color: #fff;
+}
+
+.oppia-feedback-chip-typo {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.oppia-feedback-chip-broken_layout_or_image {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.oppia-feedback-chip-confusing_or_incorrect_answer {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.oppia-feedback-chip-other_or_not_sure {
+  background: #eceff1;
+  color: #546e7a;
+}
+
+.oppia-feedback-chip-none {
+  background: #f8f9fa;
+  color: #6c757d;
+}

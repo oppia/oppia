@@ -40,7 +40,7 @@ export interface LessonFeedbackMetadataBackendDict {
 
 export interface LessonFeedbackBackendDict {
   feedback_text: string;
-  lesson_metadata_json: LessonFeedbackMetadataBackendDict;
+  lesson_metadata: LessonFeedbackMetadataBackendDict;
 }
 
 export class LessonFeedbackModel {
@@ -51,18 +51,15 @@ export class LessonFeedbackModel {
 
   static createForSubmission(params: {
     feedbackText: string;
-    lesson_metadata_json: LessonFeedbackMetadata;
+    lesson_metadata: LessonFeedbackMetadata;
   }): LessonFeedbackModel {
-    return new LessonFeedbackModel(
-      params.feedbackText,
-      params.lesson_metadata_json
-    );
+    return new LessonFeedbackModel(params.feedbackText, params.lesson_metadata);
   }
 
   toBackendDict(): LessonFeedbackBackendDict {
     return {
       feedback_text: this.feedbackText,
-      lesson_metadata_json: {
+      lesson_metadata: {
         exploration_id: this.explorationContext.explorationId,
         exploration_version: this.explorationContext.explorationVersion,
         state_name: this.explorationContext.stateName,
@@ -73,19 +70,30 @@ export class LessonFeedbackModel {
   }
 }
 
-export type ReportAnIssueCategory =
-  | 'typo'
-  | 'broken_layout_or_image'
-  | 'confusing_or_incorrect_answer'
-  | 'other_or_not_sure';
+export enum ReportAnIssueCategory {
+  TYPO = 'typo',
+  BROKEN_LAYOUT_OR_IMAGE = 'broken_layout_or_image',
+  CONFUSING_OR_INCORRECT_ANSWER = 'confusing_or_incorrect_answer',
+  OTHER_OR_NOT_SURE = 'other_or_not_sure',
+}
 
-export type ReportType = 'lesson' | 'site';
+export enum ReportType {
+  LESSON = 'lesson',
+  APP = 'app',
+}
+
+export type DashboardType = 'creator' | 'technical';
+
+export enum TechnicalTeamType {
+  TECH_EXTERNAL = 'tech-external',
+  TECH_INTERNAL = 'tech-internal',
+}
 
 export interface PlatformFeedbackBackendDict {
   source: ReportType;
   report_message: string;
   page_url: string;
-  lesson_metadata_json: LessonFeedbackMetadataBackendDict | null;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
   category: ReportAnIssueCategory | null;
   include_technical_logs: boolean;
   session_info: FeedbackSessionInfo | null;
@@ -130,7 +138,7 @@ export class PlatformFeedbackModel {
     return {
       source: this.source,
       report_message: this.reportMessage,
-      lesson_metadata_json: this.explorationContext
+      lesson_metadata: this.explorationContext
         ? {
             exploration_id: this.explorationContext.explorationId,
             exploration_version: this.explorationContext.explorationVersion,
@@ -151,21 +159,22 @@ export class PlatformFeedbackModel {
   }
 }
 
-export type FeedbackStatus =
-  | 'open'
-  | 'fixed'
-  | 'compliment'
-  | 'not_actionable'
-  | 'transferred_to_github';
+export enum FeedbackStatus {
+  OPEN = 'open',
+  FIXED = 'fixed',
+  COMPLIMENT = 'compliment',
+  NOT_ACTIONABLE = 'not_actionable',
+  TRANSFERRED_TO_GITHUB = 'transferred_to_github',
+}
 
 export interface FeedbackSessionInfo {
-  console_logs_json: {
+  console_logs: {
     error_message: string;
     log_level: 'error' | 'warn' | 'log' | 'info' | 'debug';
     timestamp_msecs: number;
     stack_trace?: string;
   }[];
-  failed_requests_json: {
+  failed_requests: {
     url: string;
     method: string;
     status_code: number;
@@ -173,11 +182,11 @@ export interface FeedbackSessionInfo {
     status_text?: string;
     error_message?: string;
   }[];
-  navigation_history_json: {
+  navigation_history: {
     path: string;
     timestamp_msecs: number;
   }[];
-  environment_json: {
+  environment: {
     client_time_msecs: number;
     timezone_offset_mins: number;
     user_agent: string;
@@ -203,3 +212,105 @@ export interface FeedbackCaptchaConfigResponse {
 export interface FeedbackSubmitResponse {
   id: string;
 }
+
+export interface PlatformFeedbackSummary {
+  id: string;
+  report_message_preview: string;
+  status: FeedbackStatus;
+  source: string;
+  category: ReportAnIssueCategory | null;
+}
+
+export interface PlatformFeedbackBackendResponse {
+  summaries: PlatformFeedbackSummary[];
+  next_cursor: string | null;
+  more: boolean;
+}
+
+export interface PlatformFeedbackDetailResponse {
+  id: string;
+  report_message: string;
+  source: ReportType;
+  status: FeedbackStatus;
+  platform: 'web' | 'android';
+  destination_dashboard: 'tech-external' | 'tech-internal' | 'curriculum';
+  page_url: string;
+  category: ReportAnIssueCategory | null;
+  lesson_metadata: LessonFeedbackMetadataBackendDict | null;
+  include_technical_logs: boolean;
+  session_info: FeedbackSessionInfo | null;
+  screenshot_filename: string | null;
+  screenshot_entity_id: string | null;
+  created_on_msecs: number;
+}
+
+export interface SuccessResponse {
+  success: boolean;
+}
+
+export interface FeedbackFilterState {
+  searchText: string | null;
+  status: FeedbackStatus | null;
+  technicalTeam: TechnicalTeamType;
+  dateRange: {
+    start: Date | null;
+    end: Date | null;
+  };
+}
+
+/** Configuration passed to FeedbackFilterBar to hide/show filters. */
+export interface FeedbackFilterConfig {
+  showTeamFilter: boolean;
+  showDateRangeFilter: boolean;
+  showSearchBar: boolean;
+}
+
+/** Configuration passed to FeedbackCard to control visibility. */
+export interface FeedbackCardConfig {
+  showCategory: boolean;
+  showResponse: boolean;
+  showScreenshot: boolean;
+  showLessonMetadata: boolean;
+  showSessionInfo: boolean;
+}
+
+export const TECHNICAL_DASHBOARD_FILTER_CONFIG: FeedbackFilterConfig = {
+  showTeamFilter: true,
+  showDateRangeFilter: true,
+  showSearchBar: true,
+};
+
+export const TECHNICAL_DASHBOARD_CARD_CONFIG: FeedbackCardConfig = {
+  showCategory: true,
+  showResponse: false,
+  showLessonMetadata: true,
+  showScreenshot: true,
+  showSessionInfo: true,
+};
+
+// Human readable labels for enums.
+export const FEEDBACK_STATUS_LABELS: Record<FeedbackStatus, string> = {
+  [FeedbackStatus.OPEN]: 'Open',
+  [FeedbackStatus.FIXED]: 'Fixed',
+  [FeedbackStatus.NOT_ACTIONABLE]: 'Not Actionable',
+  [FeedbackStatus.COMPLIMENT]: 'Compliment',
+  [FeedbackStatus.TRANSFERRED_TO_GITHUB]: 'Transferred to GitHub',
+};
+
+export const TECHNICAL_TEAM_LABELS: Record<TechnicalTeamType, string> = {
+  [TechnicalTeamType.TECH_EXTERNAL]: 'LEAP',
+  [TechnicalTeamType.TECH_INTERNAL]: 'CORE',
+};
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  [ReportAnIssueCategory.TYPO]: 'Typo',
+  [ReportAnIssueCategory.BROKEN_LAYOUT_OR_IMAGE]: 'Broken Layout / Image',
+  [ReportAnIssueCategory.CONFUSING_OR_INCORRECT_ANSWER]:
+    'Confusing / Incorrect Answer',
+  [ReportAnIssueCategory.OTHER_OR_NOT_SURE]: 'Other / Not Sure',
+};
+
+export const SOURCE_LABELS: Record<string, string> = {
+  [ReportType.LESSON]: 'Lesson',
+  [ReportType.APP]: 'App',
+};

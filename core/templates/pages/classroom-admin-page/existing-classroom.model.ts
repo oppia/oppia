@@ -75,6 +75,7 @@ export class ExistingClassroomData
     classroomId: string,
     name: string,
     urlFragment: string,
+    feedbackRecipientEmail: string,
     courseDetails: string,
     teaserText: string,
     topicListIntro: string,
@@ -84,7 +85,7 @@ export class ExistingClassroomData
     thumbnailData: ImageData,
     bannerData: ImageData
   ) {
-    super(classroomId, name, urlFragment);
+    super(classroomId, name, urlFragment, feedbackRecipientEmail);
     this._courseDetails = courseDetails;
     this._teaserText = teaserText;
     this._topicListIntro = topicListIntro;
@@ -172,6 +173,7 @@ export class ExistingClassroomData
       classroomDict.classroomId,
       classroomDict.name,
       classroomDict.urlFragment,
+      classroomDict.feedbackRecipientEmail,
       classroomDict.courseDetails,
       classroomDict.teaserText,
       classroomDict.topicListIntro,
@@ -188,6 +190,7 @@ export class ExistingClassroomData
       classroomId: this._classroomId,
       name: this._name,
       urlFragment: this._urlFragment,
+      feedbackRecipientEmail: this._feedbackRecipientEmail,
       courseDetails: this._courseDetails,
       teaserText: this._teaserText,
       topicListIntro: this._topicListIntro,
@@ -386,6 +389,7 @@ export class ExistingClassroomData
       this.getClassroomTeaserTextValidationErrors(),
       this.getClassroomNameValidationErrors(),
       this.getClassroomUrlValidationErrors(),
+      this.getFeedbackRecipientEmailValidationErrors(),
       this.validateDependencyGraph(),
     ].filter(error => error !== '');
   }

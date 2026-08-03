@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
-import {NO_ERRORS_SCHEMA, Pipe, ElementRef} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, ElementRef, PipeTransform} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {
   ComponentFixture,
@@ -56,7 +56,7 @@ import {ImageUploadHelperService} from '../../services/image-upload-helper.servi
 
 describe('Preferences Page Component', () => {
   @Pipe({name: 'truncate'})
-  class MockTruncatePipe {
+  class MockTruncatePipe implements PipeTransform {
     transform(value: string, params: Object | undefined): string {
       return value;
     }

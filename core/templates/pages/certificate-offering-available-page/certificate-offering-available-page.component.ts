@@ -13,15 +13,65 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate offering available page component
+ * @fileoverview Certificate offering available page component.
  */
 
 import {Component, Input} from '@angular/core';
 import './certificate-offering-available-page.component.css';
+
+export type CertificateAssessmentStatus = 'passed' | 'failed' | 'not_attempted';
+
+export interface AvailableCertificate {
+  id: string;
+  title: string;
+  status: CertificateAssessmentStatus;
+  assessmentRoute: string[];
+  passedOnDate?: string;
+  failedOnDate?: string;
+}
+
 @Component({
   selector: 'oppia-available-certificate-offering-page',
   templateUrl: './certificate-offering-available-page.component.html',
+  styleUrls: ['./certificate-offering-available-page.component.css'],
 })
 export class AvailableCertificateOfferingPageComponent {
   @Input() classroomUrlFragment: string = '';
+
+  // TODO(#24717-M2.12): Replace hardcoded UI placeholder data with actual backend-fetched data.
+  availableCertificates: AvailableCertificate[] = [
+    {
+      id: 'everyday_arithmetic_number_confidence',
+      title: 'Everyday Arithmetic & Number Confidence',
+      assessmentRoute: [
+        '/certificate-assessment',
+        'everyday_arithmetic_number_confidence',
+      ],
+      status: 'passed',
+      passedOnDate: 'Jan 16, 2026',
+    },
+    {
+      id: 'fractions_decimals_fundamentals',
+      title: 'Fractions & Decimals Fundamentals',
+      assessmentRoute: [
+        '/certificate-assessment',
+        'fractions_decimals_fundamentals',
+      ],
+      status: 'not_attempted',
+    },
+    {
+      id: 'geometry_measurement_basics',
+      title: 'Geometry & Measurement Basics',
+      assessmentRoute: [
+        '/certificate-assessment',
+        'geometry_measurement_basics',
+      ],
+      status: 'failed',
+      failedOnDate: 'Feb 2, 2026',
+    },
+  ];
+
+  getCertificateAssessmentRoute(certificateId: string): string[] {
+    return ['/certificate-assessment', certificateId];
+  }
 }

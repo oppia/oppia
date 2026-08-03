@@ -30,12 +30,15 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CreateNewClassroomModalComponent} from './create-new-classroom-modal.component';
 import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-backend-api.service';
+import {ClassroomAdminDataService} from '../services/classroom-admin-data.service';
+import {NewClassroomData} from '../new-classroom.model';
 
 describe('Create new classroom modal', () => {
   let fixture: ComponentFixture<CreateNewClassroomModalComponent>;
   let componentInstance: CreateNewClassroomModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let classroomBackendApiService: ClassroomBackendApiService;
+  let classroomAdminDataService: ClassroomAdminDataService;
 
   class MockClassroomBackendApiService {
     getNewClassroomIdAsync() {
@@ -88,6 +91,7 @@ describe('Create new classroom modal', () => {
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    classroomAdminDataService = TestBed.inject(ClassroomAdminDataService);
   });
 
   it('should create', () => {
@@ -105,6 +109,7 @@ describe('Create new classroom modal', () => {
     componentInstance.ngOnInit();
     componentInstance.tempClassroom.setClassroomName('physics');
     componentInstance.tempClassroom.setUrlFragment('physics');
+    componentInstance.tempClassroom.setFeedbackEmail('user@email.com');
 
     componentInstance.createClassroom();
     tick();
@@ -113,8 +118,53 @@ describe('Create new classroom modal', () => {
       classroom_id: 'newClassroomId',
       name: 'physics',
       url_fragment: 'physics',
+      feedback_recipient_email: 'user@email.com',
     };
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(expectedDefaultClassroom);
   }));
+
+  it('should return name validation error from the data service', () => {
+    classroomAdminDataService.nameValidationError = 'Name already exists.';
+
+    expect(componentInstance.nameValidationError).toBe('Name already exists.');
+  });
+
+  it('should return url validation error from the data service', () => {
+    classroomAdminDataService.urlValidationError = 'Invalid URL fragment.';
+
+    expect(componentInstance.urlValidationError).toBe('Invalid URL fragment.');
+  });
+
+  it('should return feedback recipient email validation error from the data service', () => {
+    classroomAdminDataService.feedbackRecipientEmailValidationError =
+      'Invalid Email.';
+
+    expect(componentInstance.feedbackRecipientEmailValidationError).toBe(
+      'Invalid Email.'
+    );
+  });
+
+  it('should delegate validateClassroom to the data service', () => {
+    const tempClassroom = new NewClassroomData(
+      'name',
+      'url',
+      'desc',
+      'user@email.com'
+    );
+    const classroom = new NewClassroomData(
+      'name',
+      'url',
+      'desc',
+      'user@email.com'
+    );
+    spyOn(classroomAdminDataService, 'validateClassroom');
+
+    componentInstance.validateClassroom(tempClassroom, classroom);
+
+    expect(classroomAdminDataService.validateClassroom).toHaveBeenCalledWith(
+      tempClassroom,
+      classroom
+    );
+  });
 });

@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from core import feconf
+
 from typing import Dict, List, Optional, TypedDict
 
 
@@ -71,7 +73,7 @@ class PlatformFeedbackDict(TypedDict):
     """Dict representation of a PlatformFeedback domain object."""
 
     id: str
-    feedback_text: str
+    report_message: str
     source: str
     platform: str
     destination_dashboard: str
@@ -80,6 +82,9 @@ class PlatformFeedbackDict(TypedDict):
     category: Optional[str]
     lesson_metadata: Optional[LessonMetadataDict]
     include_technical_logs: bool
+    # Here we use object because session-info diagnostics are heterogeneous
+    # JSON-like payloads (nested dict/list values) from client logs.
+    session_info: Optional[Dict[str, object]]
     screenshot_filename: Optional[str]
     screenshot_entity_id: Optional[str]
     created_on_msecs: float
@@ -89,7 +94,7 @@ class FeedbackSubmitPayloadDict(TypedDict):
     """Normalized payload for FeedbackSubmitHandler POST."""
 
     feedback_text: str
-    lesson_metadata_json: LessonMetadataDict
+    lesson_metadata: LessonMetadataDict
 
 
 class PlatformFeedbackSubmitPayloadDict(TypedDict):
@@ -99,13 +104,32 @@ class PlatformFeedbackSubmitPayloadDict(TypedDict):
     report_message: str
     page_url: str
     category: Optional[str]
-    lesson_metadata_json: Optional[LessonMetadataDict]
+    lesson_metadata: Optional[LessonMetadataDict]
     include_technical_logs: bool
     # Here we use object because session-info diagnostics are heterogeneous
     # JSON-like payloads (nested dict/list values) from client logs.
     session_info: Optional[Dict[str, object]]
     screenshot_filename: Optional[str]
     screenshot_file: Optional[str]
+
+
+class PlatformFeedbackSummaryDict(TypedDict):
+    """Lightweight dict representation of a PlatformFeedback."""
+
+    id: str
+    report_message_preview: str
+    status: str
+    source: str
+    category: Optional[str]
+
+
+class PlatformFeedbackListRequestDict(TypedDict):
+    """Normalized payload for PlatformFeedbackListHandler GET."""
+
+    status: str
+    cursor: Optional[str]
+    date_from_msecs: Optional[float]
+    date_to_msecs: Optional[float]
 
 
 class LessonFeedback:
@@ -182,10 +206,11 @@ class PlatformFeedback:
 
     Fields:
         id: str. Unique identifier of the report.
-        feedback_text: str. The text body of the report.
+        report_message: str. The text body of the report.
         source: str. Origin of the report ("lesson" | "app").
         platform: str. Submission platform ("web" | "android").
-        destination_dashboard: str. Routing target ("creator" | "technical").
+        destination_dashboard: str. Routing target ("curriculum" |
+            "tech-external" | "tech-internal").
         status: str. Current moderation status
             (open | fixed | ignored | compliment | not_actionable).
         category: Optional[str]. Report category; present for lesson reports,
@@ -193,6 +218,8 @@ class PlatformFeedback:
         lesson_metadata: Optional[LessonMetadataDict]. Lesson context snapshot;
             present for lesson reports, None for site reports.
         include_technical_logs: bool. Whether session diagnostics are attached.
+        session_info: Optional[Dict[str, object]]. Session diagnostics; present
+            if include_technical_logs is True and destination_dashboard is not "curriculum".
         screenshot_filename: Optional[str]. GCS filename of the screenshot.
         screenshot_entity_id: Optional[str]. GCS entity ID for the screenshot.
         created_on_msecs: float. Creation timestamp in milliseconds.
@@ -202,7 +229,7 @@ class PlatformFeedback:
     def __init__(
         self,
         report_id: str,
-        feedback_text: str,
+        report_message: str,
         source: str,
         platform: str,
         destination_dashboard: str,
@@ -210,13 +237,16 @@ class PlatformFeedback:
         include_technical_logs: bool,
         created_on_msecs: float,
         page_url: str,
+        # Here we use object because session-info diagnostics are heterogeneous
+        # JSON-like payloads (nested dict/list values) from client logs.
+        session_info: Optional[Dict[str, object]] = None,
         category: Optional[str] = None,
         lesson_metadata: Optional[LessonMetadataDict] = None,
         screenshot_filename: Optional[str] = None,
         screenshot_entity_id: Optional[str] = None,
     ) -> None:
         self.id = report_id
-        self.feedback_text = feedback_text
+        self.report_message = report_message
         self.source = source
         self.platform = platform
         self.destination_dashboard = destination_dashboard
@@ -225,6 +255,11 @@ class PlatformFeedback:
         self.category = category
         self.lesson_metadata = lesson_metadata
         self.include_technical_logs = include_technical_logs
+        self.session_info = (
+            session_info
+            if destination_dashboard != feconf.DESTINATION_CURRICULUM
+            else None
+        )
         self.screenshot_filename = screenshot_filename
         self.screenshot_entity_id = screenshot_entity_id
         self.created_on_msecs = created_on_msecs
@@ -237,7 +272,7 @@ class PlatformFeedback:
         """
         return {
             'id': self.id,
-            'feedback_text': self.feedback_text,
+            'report_message': self.report_message,
             'source': self.source,
             'platform': self.platform,
             'destination_dashboard': self.destination_dashboard,
@@ -246,7 +281,30 @@ class PlatformFeedback:
             'category': self.category,
             'lesson_metadata': self.lesson_metadata,
             'include_technical_logs': self.include_technical_logs,
+            'session_info': (
+                self.session_info
+                if self.destination_dashboard != feconf.DESTINATION_CURRICULUM
+                else None
+            ),
             'screenshot_filename': self.screenshot_filename,
             'screenshot_entity_id': self.screenshot_entity_id,
             'created_on_msecs': self.created_on_msecs,
+        }
+
+    def to_summary_dict(self) -> PlatformFeedbackSummaryDict:
+        """Returns a lightweight summary dict for use in list views.
+
+        Returns:
+            PlatformFeedbackSummaryDict. A summary dict representation of the
+            object.
+        """
+        report_message_preview = self.report_message
+        if len(report_message_preview) > 100:
+            report_message_preview = report_message_preview[:97] + '...'
+        return {
+            'id': self.id,
+            'report_message_preview': report_message_preview,
+            'status': self.status,
+            'source': self.source,
+            'category': self.category,
         }
