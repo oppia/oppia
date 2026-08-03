@@ -33,11 +33,7 @@ export class MathFormulaDetectionService {
       return htmlString.some(s => this.isFormulaAsText(s));
     }
 
-    if (
-      !htmlString ||
-      typeof htmlString !== 'string' ||
-      htmlString.includes('oppia-noninteractive-math')
-    ) {
+    if (!htmlString || htmlString.includes('oppia-noninteractive-math')) {
       return false;
     }
 
@@ -52,6 +48,8 @@ export class MathFormulaDetectionService {
       .map(line => line.trim())
       .filter(line => line.length > 0);
 
-    return lines.some(line => /(\d\s*[+\-*/=])|([+\-*/=]\s*\d)/.test(line));
+    return lines.some(line =>
+      /\b[a-zA-Z0-9]\s*[+\-*/=]\s*[a-zA-Z0-9]\b/.test(line)
+    );
   }
 }
