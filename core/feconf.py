@@ -609,6 +609,14 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
+SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = 'firebase-auth-readonly'
+SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID = (
+    'sensitive-firebase-auth-read-write'
+)
+CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
+    '{service_account_id}@{app_id}.iam.gserviceaccount.com'
+)
+
 OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
@@ -1163,6 +1171,17 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 )
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
+)
+START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
+
+SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
+    '/submit_certificate_assessment_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
+    '/certificate_assessment_result_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
+    '/certificate_assessment_attempts_handler'
 )
 
 # Event types.
