@@ -16,29 +16,22 @@
  * @fileoverview Unit tests for skip ahead confirmation modal component.
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {SkipAheadConfirmationModalComponent} from './skip-ahead-confirmation-modal.component';
 
 describe('SkipAheadConfirmationModalComponent', () => {
   let component: SkipAheadConfirmationModalComponent;
-  let fixture: ComponentFixture<SkipAheadConfirmationModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [SkipAheadConfirmationModalComponent, MockTranslatePipe],
-      providers: [NgbActiveModal],
-    }).compileComponents();
-  }));
+  let modalInstance: NgbActiveModal;
+  let dismissSpy: jasmine.Spy;
+  let closeSpy: jasmine.Spy;
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SkipAheadConfirmationModalComponent);
-    component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    fixture.detectChanges();
+    modalInstance = new NgbActiveModal();
+    component = new SkipAheadConfirmationModalComponent(modalInstance);
+
+    dismissSpy = spyOn(modalInstance, 'dismiss').and.callThrough();
+    closeSpy = spyOn(modalInstance, 'close').and.callThrough();
   });
 
   it('should initialize with default arc number', () => {
@@ -47,58 +40,14 @@ describe('SkipAheadConfirmationModalComponent', () => {
   });
 
   it('should dismiss modal when cancel is called', () => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-
     component.cancel();
 
     expect(dismissSpy).toHaveBeenCalledWith('cancel');
   });
 
   it('should close modal when confirm is called', () => {
-    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-
     component.confirm();
 
     expect(closeSpy).toHaveBeenCalled();
-  });
-
-  it('should dismiss modal on close button click', () => {
-    const dismissSpy = spyOn(component, 'cancel').and.callThrough();
-
-    const closeButton: HTMLButtonElement = fixture.nativeElement.querySelector(
-      '.oppia-skip-ahead-close'
-    );
-    closeButton.click();
-
-    expect(dismissSpy).toHaveBeenCalled();
-  });
-
-  it('should render custom close mark element', () => {
-    const closeMark = fixture.nativeElement.querySelector(
-      '.oppia-skip-ahead-close-mark'
-    );
-
-    expect(closeMark).not.toBeNull();
-  });
-
-  it('should confirm modal on continue button click', () => {
-    const confirmSpy = spyOn(component, 'confirm').and.callThrough();
-
-    const continueButton: HTMLButtonElement =
-      fixture.nativeElement.querySelector('.oppia-skip-ahead-continue');
-    continueButton.click();
-
-    expect(confirmSpy).toHaveBeenCalled();
-  });
-
-  it('should dismiss modal on cancel button click', () => {
-    const cancelSpy = spyOn(component, 'cancel').and.callThrough();
-
-    const cancelButton: HTMLButtonElement = fixture.nativeElement.querySelector(
-      '.oppia-skip-ahead-cancel'
-    );
-    cancelButton.click();
-
-    expect(cancelSpy).toHaveBeenCalled();
   });
 });

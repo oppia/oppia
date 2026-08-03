@@ -1,6 +1,0 @@
-{
-  "extends": "./tsconfig-strict.json",
-  "files": [
-    "core/templates/pages/topic-viewer-page/topic-story-section/topic-story-section.component.spec.ts"
-  ]
-}
