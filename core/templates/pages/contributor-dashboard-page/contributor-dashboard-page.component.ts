@@ -53,6 +53,7 @@ export class ContributorDashboardPageComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
   languageCode!: string;
   topicName!: string;
+  activeEntityType: string = 'exploration';
   activeTabName!: string;
   // The following property is set to null when the
   // user is not logged in.
@@ -101,6 +102,18 @@ export class ContributorDashboardPageComponent implements OnInit {
         this.activeTabName as keyof ContributorDashboardTabsDetails
       ];
     return activeTabDetail.customizationOptions.includes('language');
+  }
+
+  onChangeEntityType(entityType: string): void {
+    this.activeEntityType = entityType;
+  }
+
+  showEntityTypeSelector(): boolean {
+    return (
+      this.activeTabName === 'translateTextTab' ||
+      this.activeTabName === 'myContributionTab' ||
+      !this.activeTabName
+    );
   }
 
   onChangeTopic(topicName: string): void {

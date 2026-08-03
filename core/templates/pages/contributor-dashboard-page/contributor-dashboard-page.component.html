@@ -98,13 +98,24 @@
               </div>
             </div>
             <div class="oppia-dropdown-container"
-                 *ngIf="showTopicSelector()">
-              <div class="oppia-dashboard-topic-container">
-                <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
-                <translation-topic-selector class="oppia-topic-selector"
-                                            [activeTopicName]="topicName"
-                                            (setActiveTopicName)="onChangeTopic($event)">
-                </translation-topic-selector>
+                 *ngIf="showTopicSelector() || showEntityTypeSelector()">
+              <div class="oppia-dropdown-row-1" *ngIf="showTopicSelector()">
+                <div class="oppia-dashboard-topic-container">
+                  <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
+                  <translation-topic-selector class="oppia-topic-selector"
+                                              [activeTopicName]="topicName"
+                                              (setActiveTopicName)="onChangeTopic($event)">
+                  </translation-topic-selector>
+                </div>
+              </div>
+              <div class="oppia-dropdown-row-2" *ngIf="showEntityTypeSelector()">
+                <div class="oppia-dashboard-entity-type-container">
+                  <div class="oppia-dashboard-entity-type-container-label" tabindex="0">Entity Type</div>
+                  <entity-type-selector class="oppia-entity-type-selector"
+                                        [activeEntityType]="activeEntityType"
+                                        (setActiveEntityType)="onChangeEntityType($event)">
+                  </entity-type-selector>
+                </div>
               </div>
             </div>
           </div>
@@ -128,21 +139,32 @@
               </div>
             </div>
             <div class="oppia-dropdown-container"
-                 *ngIf="showLanguageSelector() || showTopicSelector()">
-              <div class="oppia-dashboard-language-container"
-                   *ngIf="showLanguageSelector()">
-                <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
-                <translation-language-selector class="oppia-language-selector"
-                                               [activeLanguageCode]="languageCode"
-                                               (setActiveLanguageCode)="onChangeLanguage($event)">
-                </translation-language-selector>
+                 *ngIf="showLanguageSelector() || showTopicSelector() || showEntityTypeSelector()">
+              <div class="oppia-dropdown-row-1">
+                <div class="oppia-dashboard-language-container"
+                     *ngIf="showLanguageSelector()">
+                  <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
+                  <translation-language-selector class="oppia-language-selector"
+                                                 [activeLanguageCode]="languageCode"
+                                                 (setActiveLanguageCode)="onChangeLanguage($event)">
+                  </translation-language-selector>
+                </div>
+                <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
+                  <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
+                  <translation-topic-selector class="oppia-topic-selector"
+                                              [activeTopicName]="topicName"
+                                              (setActiveTopicName)="onChangeTopic($event)">
+                  </translation-topic-selector>
+                </div>
               </div>
-              <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
-                <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
-                <translation-topic-selector class="oppia-topic-selector"
-                                            [activeTopicName]="topicName"
-                                            (setActiveTopicName)="onChangeTopic($event)">
-                </translation-topic-selector>
+              <div class="oppia-dropdown-row-2" *ngIf="showEntityTypeSelector()">
+                <div class="oppia-dashboard-entity-type-container">
+                  <div class="oppia-dashboard-entity-type-container-label" tabindex="0">Entity Type</div>
+                  <entity-type-selector class="oppia-entity-type-selector"
+                                        [activeEntityType]="activeEntityType"
+                                        (setActiveEntityType)="onChangeEntityType($event)">
+                  </entity-type-selector>
+                </div>
               </div>
             </div>
           </div>
@@ -151,7 +173,7 @@
     </div>
   </div>
   <div *ngIf="activeTabName === 'myContributionTab' || !activeTabName">
-    <oppia-contributions-and-review [activeTopicName]="topicName">
+    <oppia-contributions-and-review [activeTopicName]="topicName" [activeEntityType]="activeEntityType">
     </oppia-contributions-and-review>
   </div>
   <div *ngIf="activeTabName === 'submitQuestionTab'"
@@ -161,7 +183,7 @@
   </div>
   <div *ngIf="activeTabName === 'translateTextTab'"
        class="oppia-opportunities">
-    <oppia-translation-opportunities>
+    <oppia-translation-opportunities [activeEntityType]="activeEntityType">
     </oppia-translation-opportunities>
   </div>
 </div>
@@ -193,33 +215,70 @@
     width: 100%;
   }
   .oppia-outer-container {
+    align-items: flex-start;
     display: flex;
     margin-top: 20px;
     width: 100%;
   }
   .oppia-mascot-container {
-    align-items: center;
+    align-items: flex-start;
     display: flex;
   }
   .oppia-dropdown-container {
     display: flex;
+    flex-direction: column;
     margin-bottom: 20px;
-    width: 50%;
+    margin-left: auto;
+  }
+  .oppia-dropdown-row-1 {
+    display: flex;
+    width: 100%;
+  }
+  .oppia-dropdown-row-2 {
+    display: flex;
+    margin-top: 15px;
+    width: 100%;
   }
   button.oppia-autofocus:focus {
     outline: 0;
   }
-  .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+  .oppia-dashboard-language-container-label,
+  .oppia-dashboard-topic-container-label,
+  .oppia-dashboard-entity-type-container-label {
     align-items: center;
     color: #4a4a4a;
     display: flex;
     font-size: 18px;
+    white-space: nowrap;
+  }
+  .oppia-dashboard-entity-type-container {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    min-width: 240px;
+    width: 240px;
   }
   .oppia-dashboard-language-container {
     align-items: flex-start;
     display: flex;
     flex-direction: column;
-    margin-left: 10%;
+    min-width: 240px;
+    width: 240px;
+  }
+  .oppia-dashboard-topic-container {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    min-width: 240px;
+    width: 240px;
+  }
+  .oppia-dashboard-language-container + .oppia-dashboard-topic-container {
+    margin-left: 20px;
+  }
+  .oppia-entity-type-selector,
+  .oppia-language-selector,
+  .oppia-topic-selector {
+    white-space: nowrap;
     width: 100%;
   }
   .oppia-opportunity-language-selector {
@@ -405,12 +464,7 @@
     padding-bottom: 10px;
     width: 100%;
   }
-  .oppia-dashboard-topic-container {
-    display: flex;
-    flex-direction: column;
-    margin-left: 10px;
-    width: 100%;
-  }
+
   @media (max-width:700px) {
     .oppia-opportunities-tabs-explanation h1,
     .oppia-contributor-username-and-review-rights-container h1 {
@@ -462,18 +516,32 @@
     .oppia-dropdown-container {
       flex-direction: column;
       margin-bottom: 15px;
+      margin-left: 0;
       margin-top: 10px;
       padding: 0 20px;
       width: 100%;
     }
-    .oppia-dashboard-language-container, .oppia-dashboard-topic-container {
+    .oppia-dropdown-row-1 {
+      flex-direction: column;
+      width: 100%;
+    }
+    .oppia-dropdown-row-2 {
+      margin-top: 0;
+      width: 100%;
+    }
+    .oppia-dashboard-language-container,
+    .oppia-dashboard-topic-container,
+    .oppia-dashboard-entity-type-container {
       flex-direction: row;
       justify-content: space-between;
       margin: 0;
       margin-top: 10px;
+      min-width: 0;
       width: 100%;
     }
-    .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+    .oppia-dashboard-language-container-label,
+    .oppia-dashboard-topic-container-label,
+    .oppia-dashboard-entity-type-container-label {
       font-size: 18px;
       margin-right: 0;
       padding: auto 0;

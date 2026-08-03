@@ -18,6 +18,7 @@
 
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OpportunityDict} from './contribution-and-review.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
@@ -52,7 +53,7 @@ interface ReviewExplorationSuggestionRequestBody {
 interface ReviewSkillSuggestionRequestBody {
   action: string;
   review_message: string;
-  skill_difficulty: string;
+  skill_difficulty?: number;
 }
 
 interface UpdateTranslationRequestBody {
@@ -105,7 +106,8 @@ export class ContributionAndReviewBackendApiService {
     offset: number,
     sortKey: string,
     explorationId: string | null,
-    topicName: string | null
+    topicName: string | null,
+    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -118,7 +120,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'exploration',
+        targetType,
         'translate_content',
         limit || 0,
         offset,
@@ -138,7 +140,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration',
+        targetType,
         'translate_content',
         limit,
         offset,

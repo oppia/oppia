@@ -16,7 +16,13 @@
  * @fileoverview Component for the translation opportunities.
  */
 
-import {Component, Injector} from '@angular/core';
+import {
+  Component,
+  Injector,
+  Input,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -38,10 +44,11 @@ import {TranslateTextService} from '../services/translate-text.service';
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
 })
-export class TranslationOpportunitiesComponent {
+export class TranslationOpportunitiesComponent implements OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeEntityType: string = 'exploration';
   OPPIA_AVATAR_IMAGE_URL!: string;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
@@ -110,6 +117,7 @@ export class TranslationOpportunitiesComponent {
         totalCount: totalCount,
         translationsCount: translationsCount,
         reviewerOnlyContentCount: reviewerOnlyContentCount,
+        entityType: this.activeEntityType,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
@@ -185,6 +193,12 @@ export class TranslationOpportunitiesComponent {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.activeEntityType && !changes.activeEntityType.isFirstChange()) {
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+    }
+  }
+
   async loadMoreOpportunitiesAsync(): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
@@ -192,7 +206,8 @@ export class TranslationOpportunitiesComponent {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName()
+        this.translationTopicService.getActiveTopicName(),
+        this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
@@ -204,7 +219,8 @@ export class TranslationOpportunitiesComponent {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName()
+        this.translationTopicService.getActiveTopicName(),
+        this.activeEntityType
       )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }

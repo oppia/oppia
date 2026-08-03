@@ -1325,6 +1325,7 @@ def get_reviewable_translation_suggestions_by_offset(
     offset: int,
     sort_key: Optional[str],
     language: Optional[str] = None,
+    target_type: Optional[str] = None,
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -1338,6 +1339,7 @@ def get_reviewable_translation_suggestions_by_offset(
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
             IDs are fetched.
+        target_type: str|None. Optional target type to filter suggestions.
         limit: int|None. The maximum number of results to return. If None,
             all available results are returned.
         sort_key: str|None. The key to sort the suggestions by.
@@ -1373,7 +1375,12 @@ def get_reviewable_translation_suggestions_by_offset(
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
-                limit, offset, user_id, sort_key, language_codes
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes,
+                target_type=target_type,
             )
         )
     elif len(opportunity_summary_exp_ids) > 0:
@@ -1385,6 +1392,7 @@ def get_reviewable_translation_suggestions_by_offset(
                 sort_key,
                 language_codes,
                 opportunity_summary_exp_ids,
+                target_type=target_type,
             )
         )
 
@@ -1402,7 +1410,9 @@ def get_reviewable_translation_suggestions_by_offset(
 
 
 def get_reviewable_translation_suggestion_target_ids(
-    user_id: str, language_code: Optional[str] = None
+    user_id: str,
+    language_code: Optional[str] = None,
+    target_type: Optional[str] = None,
 ) -> List[str]:
     """Returns a list of translation suggestions matching the
     passed opportunity IDs which the user can review.
@@ -1411,6 +1421,7 @@ def get_reviewable_translation_suggestion_target_ids(
         user_id: str. The ID of the user.
         language_code: str|None. ISO 639-1 language code for which to filter.
             If it is None, all available languages will be returned.
+        target_type: str|None. Optional entity type to filter suggestions by.
 
     Returns:
         list(str). A list of translation suggestion target ids
@@ -1437,7 +1448,7 @@ def get_reviewable_translation_suggestion_target_ids(
         return []
 
     return suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestion_target_ids(
-        user_id, language_codes
+        user_id, language_codes, target_type=target_type
     )
 
 
@@ -1673,15 +1684,26 @@ def get_suggestions_with_editable_explorations(
     Returns:
         list(Suggestion). List of filtered translation suggestions.
     """
-    suggestion_exp_ids = {suggestion.target_id for suggestion in suggestions}
+    suggestion_exp_ids = {
+        suggestion.target_id
+        for suggestion in suggestions
+        if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+    }
+    if not suggestion_exp_ids:
+        return [
+            suggestion
+            for suggestion in suggestions
+            if suggestion.target_type != feconf.ENTITY_TYPE_EXPLORATION
+        ]
     suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         list(suggestion_exp_ids)
     )
     return list(
         filter(
-            lambda suggestion: suggestion_exp_id_to_exp[
-                suggestion.target_id
-            ].edits_allowed,
+            lambda suggestion: (
+                suggestion.target_type != feconf.ENTITY_TYPE_EXPLORATION
+                or suggestion_exp_id_to_exp[suggestion.target_id].edits_allowed
+            ),
             suggestions,
         )
     )
@@ -1965,6 +1987,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionAddQuestion], int]: ...
 
 
@@ -1975,6 +1998,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.SuggestionTranslateContent], int]: ...
 
 
@@ -1985,6 +2009,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
 
 
@@ -1994,6 +2019,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
+    target_type: Optional[str] = None,
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -2005,6 +2031,7 @@ def get_submitted_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning
             of all results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
+        target_type: str|None. Optional target type to filter suggestions.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -2015,7 +2042,12 @@ def get_submitted_suggestions_by_offset(
     """
     submitted_suggestion_models, next_offset = (
         suggestion_models.GeneralSuggestionModel.get_user_created_suggestions_by_offset(
-            limit, offset, suggestion_type, user_id, sort_key
+            limit,
+            offset,
+            suggestion_type,
+            user_id,
+            sort_key,
+            target_type=target_type,
         )
     )
     suggestions = [

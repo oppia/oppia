@@ -134,7 +134,8 @@ export class ContributionAndReviewService {
     fetcher: SuggestionFetcher,
     shouldResetOffset: boolean,
     explorationId: string | null,
-    topicName: string | null
+    topicName: string | null,
+    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -154,7 +155,8 @@ export class ContributionAndReviewService {
         fetcher.offset,
         fetcher.sortKey,
         explorationId,
-        topicName
+        topicName,
+        targetType
       )
       .then(responseBody => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
@@ -187,8 +189,38 @@ export class ContributionAndReviewService {
   }
 
   async fetchTranslationSuggestionsAsync(
-    explorationId: string
+    explorationId: string,
+    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchSuggestionsResponse> {
+    if (targetType !== AppConstants.ENTITY_TYPE.EXPLORATION) {
+      return this.contributionAndReviewBackendApiService
+        .fetchSuggestionsAsync(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          explorationId,
+          null,
+          targetType
+        )
+        .then(fetchSuggestionsResponse => {
+          const responseSuggestionIdToDetails: SuggestionDetailsDict = {};
+          fetchSuggestionsResponse.suggestions.forEach(suggestion => {
+            responseSuggestionIdToDetails[suggestion.suggestion_id] = {
+              suggestion: suggestion,
+              details:
+                fetchSuggestionsResponse.target_id_to_opportunity_dict[
+                  suggestion.target_id
+                ],
+            };
+          });
+          return {
+            suggestionIdToDetails: responseSuggestionIdToDetails,
+            more: false,
+          };
+        });
+    }
+
     const explorationBackendResponse =
       await this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
         explorationId,
@@ -201,7 +233,8 @@ export class ContributionAndReviewService {
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
         explorationId,
-        null
+        null,
+        targetType
       )
       .then(fetchSuggestionsResponse => {
         const exploration: Exploration =
@@ -379,31 +412,35 @@ export class ContributionAndReviewService {
 
   async getUserCreatedTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
-    sortKey: string
+    sortKey: string,
+    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset,
       null,
-      null
+      null,
+      targetType
     );
   }
 
   async getReviewableTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
     sortKey: string,
-    explorationId?: string
+    explorationId?: string,
+    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
     if (explorationId) {
-      return this.fetchTranslationSuggestionsAsync(explorationId);
+      return this.fetchTranslationSuggestionsAsync(explorationId, targetType);
     }
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,
       null,
-      null
+      null,
+      targetType
     );
   }
 
@@ -439,15 +476,21 @@ export class ContributionAndReviewService {
     suggestionId: string,
     action: string,
     reviewMessage: string,
-    skillDifficulty: string,
+    skillDifficulty: number | null,
     onSuccess: (suggestionId: string) => void,
     onFailure: () => void
   ): Promise<void> {
-    const requestBody = {
+    const requestBody: {
+      action: string;
+      review_message: string;
+      skill_difficulty?: number;
+    } = {
       action: action,
       review_message: reviewMessage,
-      skill_difficulty: skillDifficulty,
     };
+    if (skillDifficulty !== null && skillDifficulty !== undefined) {
+      requestBody.skill_difficulty = skillDifficulty;
+    }
 
     return this.contributionAndReviewBackendApiService
       .reviewSkillSuggestionAsync(targetId, suggestionId, requestBody)

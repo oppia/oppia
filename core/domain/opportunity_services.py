@@ -621,7 +621,9 @@ def create_translation_opportunity(
         unique_ids = list(set(entity_ids))
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp_id_to_exploration = (
-                exp_fetchers.get_multiple_explorations_by_id(unique_ids)
+                exp_fetchers.get_multiple_explorations_by_id(
+                    unique_ids, strict=False
+                )
             )
             for exploration_id, exploration in exp_id_to_exploration.items():
                 complete_langs = translation_services.get_languages_with_complete_translation(
@@ -1653,6 +1655,19 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
             entity_type, entity_ids
         )
     )
+
+    missing_ids = [
+        entity_id
+        for entity_id, model in zip(entity_ids, opportunity_models_from_db)
+        if model is None
+    ]
+    if missing_ids:
+        create_translation_opportunity({entity_type: missing_ids})
+        opportunity_models_from_db = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+                entity_type, entity_ids
+            )
+        )
 
     opportunity_models_list = [
         model for model in opportunity_models_from_db if model is not None
