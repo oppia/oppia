@@ -1216,3 +1216,18 @@ class FeaturedTranslationLanguagesTests(test_utils.GenericTestBase):
             'Expected each featured language to be a dict',
         ):
             featured_languages.validate()
+
+    def test_non_list_value_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are intentionally passing a wrong
+        # container type (a dict instead of a list) to verify runtime
+        # validation; the error code is 'arg-type' (a wrong container type),
+        # unlike the 'list-item' case above which uses the correct container
+        # with a wrong element type.
+        featured_languages = translation_domain.FeaturedTranslationLanguages(
+            {'language_code': 'hi', 'explanation': 'x'}  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected featured_translation_languages to be a list',
+        ):
+            featured_languages.validate()
