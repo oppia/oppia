@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,26 +19,32 @@
  * CL.LP. Learner visits the community library and looks around.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-Out Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    loggedOutLearner = await UserFactory.createLoggedOutUser(browser);
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     // Create a new explorations.
     await explorationEditor.createAndPublishExplorationWithCards(
       'Fractions',
-      'Mathematics'
+      'Mathematics',
+      2,
+      true
     );
     await explorationEditor.createAndPublishExplorationWithCards(
       'Algebra',
@@ -50,14 +56,14 @@ describe('Logged-Out Learner', function () {
     );
   });
 
-  it('should be able to discover the community library', async function () {
+  test('should be able to discover the community library', async function () {
     await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
     await loggedOutLearner.expectCommunityLibraryHeadingToBePresent(
       'Imagine what you could learn today...'
     );
   });
 
-  it('should be able to look at different categories in community library', async function () {
+  test('should be able to look at different categories in community library', async function () {
     // Check for the lesson categories.
     await loggedOutLearner.expectCommunityLibraryGroupHeaderToContain([
       'Mathematics & Statistics',
@@ -75,7 +81,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectSearchResultsToContain(['Laws of Motion']);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

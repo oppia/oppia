@@ -164,11 +164,9 @@
 /core/controllers/creator_dashboard*.py @oppia/lace-backend-reviewers
 /core/controllers/learner_dashboard*.py @oppia/lace-backend-reviewers
 /core/controllers/learner_goals*.py @oppia/lace-backend-reviewers
-/core/controllers/learner_playlist*.py @oppia/lace-backend-reviewers
 /core/controllers/subscriptions*.py @oppia/lace-backend-reviewers
 /core/domain/activity*.py @oppia/lace-backend-reviewers
 /core/domain/learner_goals_services*.py @oppia/lace-backend-reviewers
-/core/domain/learner_playlist_services*.py @oppia/lace-backend-reviewers
 /core/domain/learner_progress*.py @oppia/lace-backend-reviewers
 /core/domain/subscription_services*.py @oppia/lace-backend-reviewers
 /core/domain/captcha_services*.py @oppia/lace-backend-reviewers
