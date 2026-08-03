@@ -18,7 +18,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   z-index: 16;
 }
 
-oppia-conversation-skin .supplemental-card-parent-container {
+.supplemental-card-parent-container {
   min-width: 50%;
 }
 
@@ -138,7 +138,7 @@ button.oppia-button-raised.e2e-test-next-lesson-button.mat-focus-indicator.mat-r
   width: 32px;
 }
 
-oppia-conversation-skin .oppia-button-icon {
+.oppia-button-icon {
   color: #fff;
   font-size: 42px;
 }
