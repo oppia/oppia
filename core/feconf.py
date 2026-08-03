@@ -269,10 +269,6 @@ MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
 
-# The maximum number of activities allowed in the playlist of the learner. This
-# limit applies to both the explorations playlist and the collections playlist.
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
-
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
 
@@ -430,10 +426,14 @@ INVALID_CONTENT_ID = 'invalid_content_id'
 DEFAULT_STATE_CONTENT_STR = ''
 
 # Content IDs and prefixes for exploration metadata.
+EXPLORATION_METADATA_CONTENT_ID_PREFIX = 'exploration_'
 EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
 EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
 EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
 EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
+
+# Character limit for exploration title translation.
+EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT = 36
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
@@ -464,6 +464,8 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 # Default content_id for explanation subtitled html.
 DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+# Content ID for skill description.
+SKILL_DESCRIPTION_CONTENT_ID = 'skill_description'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
@@ -543,6 +545,9 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+# Placeholder for the preferences-page URL in email footers.
+EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
+
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
 
@@ -599,6 +604,14 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
+
+SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = 'firebase-auth-readonly'
+SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID = (
+    'sensitive-firebase-auth-read-write'
+)
+CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
+    '{service_account_id}@{app_id}.iam.gserviceaccount.com'
+)
 
 OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
@@ -1008,7 +1021,6 @@ LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
 )
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
-LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LESSON_FEEDBACK_URL = '/feedback'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -1155,6 +1167,17 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 )
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
+)
+START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
+
+SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
+    '/submit_certificate_assessment_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
+    '/certificate_assessment_result_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
+    '/certificate_assessment_attempts_handler'
 )
 
 # Event types.
@@ -1968,3 +1991,5 @@ TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
         'donate',
     ]
 )
+
+DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'
