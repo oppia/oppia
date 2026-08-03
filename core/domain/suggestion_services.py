@@ -36,6 +36,7 @@ from core.domain import (
     opportunity_services,
     question_domain,
     rte_component_registry,
+    skill_fetchers,
     skill_services,
     state_domain,
     suggestion_registry,
@@ -296,11 +297,25 @@ def create_suggestion(
         ):
             content_html = exploration.get_content_html(state_name, content_id)
             if content_html != change_cmd['content_html']:
-
                 raise Exception(
                     'The Exploration content has changed since this translation '
                     'was submitted.'
                 )
+        elif target_type == feconf.ENTITY_TYPE_SKILL:
+            skill = skill_fetchers.get_skill_by_id(target_id, strict=False)
+            if skill is not None:
+                translatable_contents = (
+                    skill.get_translatable_contents_collection().content_id_to_translatable_content
+                )
+                if content_id in translatable_contents:
+                    content_value = translatable_contents[
+                        content_id
+                    ].content_value
+                    if content_value != change_cmd['content_html']:
+                        raise Exception(
+                            'The Skill content has changed since this translation '
+                            'was submitted.'
+                        )
 
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.

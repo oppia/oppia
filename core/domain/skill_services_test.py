@@ -41,11 +41,21 @@ from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models, question_models, skill_models
+    from mypy_imports import (
+        opportunity_models,
+        question_models,
+        skill_models,
+        translation_models,
+    )
 
-opportunity_models, skill_models, question_models = (
+opportunity_models, skill_models, question_models, translation_models = (
     models.Registry.import_models(
-        [models.Names.OPPORTUNITY, models.Names.SKILL, models.Names.QUESTION]
+        [
+            models.Names.OPPORTUNITY,
+            models.Names.SKILL,
+            models.Names.QUESTION,
+            models.Names.TRANSLATION,
+        ]
     )
 )
 
@@ -1203,7 +1213,36 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(model)
         assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id'])
         self.assertEqual(model.content_count, 3)
+        self.assertEqual(model.translation_counts, {})
+
+        # Create and save an entity translation for the skill to simulate translation progress.
+        translation = translation_domain.EntityTranslation.create_empty(
+            feconf.TranslatableEntityType.SKILL, self.SKILL_ID, 'es'
+        )
+        translation.add_translation(
+            '1',
+            '<p>Explicación</p>',
+            translation_domain.TranslatableContentFormat.HTML,
+            False,
+        )
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.SKILL.value,
+            self.SKILL_ID,
+            1,
+            'es',
+            translation.to_dict()['translations'],
+        ).put()
+
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            self.SKILL_ID, 'es', feconf.ENTITY_TYPE_SKILL
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        assert model is not None
+        self.assertEqual(model.translation_counts, {'es': 1})
 
         changelist = [
             skill_domain.SkillChange(
@@ -1233,6 +1272,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             model_id, strict=False
         )
         self.assertIsNotNone(updated_model)
+        assert updated_model is not None
+        self.assertEqual(updated_model.content_count, 3)
+        self.assertEqual(updated_model.topic_ids, ['topic_id'])
+        self.assertEqual(updated_model.translation_counts, {'es': 1})
 
     def test_delete_skill_marked_deleted(self) -> None:
         skill_models.SkillModel.delete_multi(
