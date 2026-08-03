@@ -2734,6 +2734,129 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(last_message.text, 'This looks good!')
         self.logout()
 
+    def test_post_and_accept_skill_translation_suggestion(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='Skill description'
+        )
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': skill_id,
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                    'content_id': 'rubric_0',
+                    'language_code': 'hi',
+                    'content_html': '<p>Skill description</p>',
+                    'translation_html': '<p>Skill description in Hindi</p>',
+                    'data_format': 'html',
+                },
+                'description': 'Skill translation suggestion',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        suggestion = suggestion_services.query_suggestions(
+            [('target_id', skill_id)]
+        )[0]
+        self.assertEqual(suggestion.target_type, feconf.ENTITY_TYPE_SKILL)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda *args: None,
+        ):
+            self.put_json(
+                '%s/skill/%s/%s'
+                % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    skill_id,
+                    suggestion.suggestion_id,
+                ),
+                {
+                    'action': 'accept',
+                    'review_message': 'Accepted skill translation!',
+                },
+                csrf_token=csrf_token,
+            )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
+        )
+        self.logout()
+
+    def test_reject_skill_translation_suggestion(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='Skill description'
+        )
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': skill_id,
+                'target_version_at_submission': 1,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                    'content_id': 'rubric_0',
+                    'language_code': 'hi',
+                    'content_html': '<p>Skill description</p>',
+                    'translation_html': '<p>Skill description in Hindi</p>',
+                    'data_format': 'html',
+                },
+                'description': 'Skill translation suggestion',
+            },
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+        suggestion = suggestion_services.query_suggestions(
+            [('target_id', skill_id)]
+        )[0]
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/skill/%s/%s'
+            % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                skill_id,
+                suggestion.suggestion_id,
+            ),
+            {
+                'action': 'reject',
+                'review_message': 'Rejected skill translation',
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
+        self.logout()
+
     def test_accept_question_suggestion_with_image_region_interactions(
         self,
     ) -> None:

@@ -51,7 +51,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, suggestion_models
 
-(suggestion_models, opportunity_models) = models.Registry.import_models(
+suggestion_models, opportunity_models = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.OPPORTUNITY]
 )
 
@@ -1994,6 +1994,42 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 'Expected invalid_metadata_content_id to be a valid metadata content ID',
             ):
                 suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_skill_translation_suggestion(self) -> None:
+        self.save_new_skill('skill1', self.author_id, description='Skill 1')
+        expected_suggestion_dict = self.suggestion_dict.copy()
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            'skill1',
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+                'content_id': 'description',
+                'language_code': 'hi',
+                'content_html': 'original description',
+                'translation_html': 'translated description',
+                'data_format': 'unicode',
+            },
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+        )
+
+        suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'non_existent_skill_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'The skill with the given id doesn\'t exist.',
+        ):
+            suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)

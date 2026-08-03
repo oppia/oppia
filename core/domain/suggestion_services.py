@@ -36,6 +36,7 @@ from core.domain import (
     opportunity_services,
     question_domain,
     rte_component_registry,
+    skill_fetchers,
     skill_services,
     state_domain,
     suggestion_registry,
@@ -82,10 +83,8 @@ if MYPY:  # pragma: no cover
         suggestion_registry.SuggestionAddQuestion,
     ]
 
-(feedback_models, suggestion_models, user_models) = (
-    models.Registry.import_models(
-        [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
-    )
+feedback_models, suggestion_models, user_models = models.Registry.import_models(
+    [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
 )
 
 transaction_services = models.Registry.import_transaction_services()
@@ -246,10 +245,16 @@ def create_suggestion(
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        category = (
+            exploration.category
+            if target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            else target_type
+        )
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
-            exploration.category,
+            category,
         )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
@@ -268,8 +273,12 @@ def create_suggestion(
         # It resolves the generic placeholder state name to the correct exploration
         # state name by matching content IDs.
         if (
-            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
-            or state_name not in exploration.states
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+            and (
+                state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+                or state_name not in exploration.states
+            )
         ):
             for s_name, state in exploration.states.items():
                 if (
@@ -282,13 +291,31 @@ def create_suggestion(
                     change_cmd = new_change_cmd
                     break
 
-        content_html = exploration.get_content_html(state_name, content_id)
-        if content_html != change_cmd['content_html']:
-
-            raise Exception(
-                'The Exploration content has changed since this translation '
-                'was submitted.'
-            )
+        if (
+            target_type == feconf.ENTITY_TYPE_EXPLORATION
+            and exploration is not None
+        ):
+            content_html = exploration.get_content_html(state_name, content_id)
+            if content_html != change_cmd['content_html']:
+                raise Exception(
+                    'The Exploration content has changed since this translation '
+                    'was submitted.'
+                )
+        elif target_type == feconf.ENTITY_TYPE_SKILL:
+            skill = skill_fetchers.get_skill_by_id(target_id, strict=False)
+            if skill is not None:
+                translatable_contents = (
+                    skill.get_translatable_contents_collection().content_id_to_translatable_content
+                )
+                if content_id in translatable_contents:
+                    content_value = translatable_contents[
+                        content_id
+                    ].content_value
+                    if content_value != change_cmd['content_html']:
+                        raise Exception(
+                            'The Skill content has changed since this translation '
+                            'was submitted.'
+                        )
 
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
@@ -304,19 +331,26 @@ def create_suggestion(
 
         # Do not allow creating a suggestion if the content has already been
         # translated and is up-to-date.
-        entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
-            target_id,
-            exploration.version,
-            language_code,
-        )
-        if content_id in entity_translation.translations:
-            if not entity_translation.translations[content_id].needs_update:
-                raise Exception(
-                    'The content with content_id %s has already been '
-                    'translated to %s and is up-to-date.'
-                    % (content_id, language_code)
-                )
+        translatable_entity_types = [
+            e.value for e in feconf.TranslatableEntityType
+        ]
+        if target_type in translatable_entity_types:
+            target_entity = opportunity_services.get_entity_by_type_and_id(
+                target_type, target_id
+            )
+            entity_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType(target_type),
+                target_id,
+                target_entity.version,
+                language_code,
+            )
+            if content_id in entity_translation.translations:
+                if not entity_translation.translations[content_id].needs_update:
+                    raise Exception(
+                        'The content with content_id %s has already been '
+                        'translated to %s and is up-to-date.'
+                        % (content_id, language_code)
+                    )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
@@ -331,6 +365,7 @@ def create_suggestion(
             False,
             datetime.datetime.utcnow(),
             datetime.datetime.utcnow(),
+            target_type=target_type,
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = '%s%s%s' % (
@@ -408,6 +443,25 @@ def get_suggestion_from_model(
             suggestion_model.suggestion_type
         ]
     )
+    if (
+        suggestion_model.suggestion_type
+        == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+    ):
+        return suggestion_registry.SuggestionTranslateContent(
+            suggestion_model.id,
+            suggestion_model.target_id,
+            suggestion_model.target_version_at_submission,
+            suggestion_model.status,
+            suggestion_model.author_id,
+            suggestion_model.final_reviewer_id,
+            suggestion_model.change_cmd,
+            suggestion_model.score_category,
+            suggestion_model.language_code,
+            suggestion_model.edited_by_reviewer,
+            suggestion_model.last_updated,
+            suggestion_model.created_on,
+            target_type=suggestion_model.target_type,
+        )
     return suggestion_domain_class(
         suggestion_model.id,
         suggestion_model.target_id,
@@ -888,15 +942,17 @@ def accept_suggestion(
         )
 
     # Do not allow accepting a suggestion if the content has already been
-    # translated and is up-to-date. We use the current exploration version
+    # translated and is up-to-date. We use the current entity version
     # (not the version at submission) to match the version used when saving
     # the translation in suggestion_registry.py.
     if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            suggestion.target_type, suggestion.target_id
+        )
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(suggestion.target_type),
             suggestion.target_id,
-            exploration.version,
+            target_entity.version,
             suggestion.language_code,
         )
         if suggestion.change_cmd.content_id in entity_translation.translations:
@@ -1125,6 +1181,36 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
         feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG,
     )
+
+
+def auto_reject_translation_suggestions_for_skill_ids(
+    skill_ids: List[str],
+) -> None:
+    """Rejects all translation suggestions with target IDs matching the
+    supplied skill IDs. These suggestions are being rejected because
+    their corresponding skill was removed or deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
+
+    Args:
+        skill_ids: list(str). The skill IDs corresponding to the target IDs
+            of the translation suggestions.
+    """
+    for skill_id in skill_ids:
+        suggestions = query_suggestions(
+            [
+                ('suggestion_type', feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                ('target_type', feconf.ENTITY_TYPE_SKILL),
+                ('target_id', skill_id),
+                ('status', suggestion_models.STATUS_IN_REVIEW),
+            ]
+        )
+        if suggestions:
+            suggestion_ids = [s.suggestion_id for s in suggestions]
+            reject_suggestions(
+                suggestion_ids,
+                feconf.SUGGESTION_BOT_USER_ID,
+                suggestion_models.DELETED_SKILL_REJECT_MESSAGE,
+            )
 
 
 def auto_reject_translation_suggestions_for_content_ids(

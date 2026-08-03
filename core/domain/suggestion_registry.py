@@ -691,6 +691,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         edited_by_reviewer: bool,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
+        target_type: str = feconf.ENTITY_TYPE_EXPLORATION,
     ) -> None:
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
@@ -698,7 +699,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
+        self.target_type = target_type
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -827,34 +828,45 @@ class SuggestionTranslateContent(BaseSuggestion):
         before accepting the suggestion.
         """
         self.validate()
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        if (
-            self.change_cmd.state_name
-            == constants.DEFAULT_SUGGESTION_STATE_NAME
-        ):
-            translatable_contents = (
-                exploration.get_translatable_contents_collection(
-                    override_metadata_feature_flag=True
-                )
-            )
+        if self.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exploration = exp_fetchers.get_exploration_by_id(self.target_id)
             if (
-                self.change_cmd.content_id
-                not in translatable_contents.content_id_to_translatable_content
+                self.change_cmd.state_name
+                == constants.DEFAULT_SUGGESTION_STATE_NAME
             ):
-                raise utils.ValidationError(
-                    'Expected %s to be a valid metadata content ID'
-                    % self.change_cmd.content_id
+                translatable_contents = (
+                    exploration.get_translatable_contents_collection(
+                        override_metadata_feature_flag=True
+                    )
                 )
-        else:
-            if self.change_cmd.state_name not in exploration.states:
+                if (
+                    self.change_cmd.content_id
+                    not in translatable_contents.content_id_to_translatable_content
+                ):
+                    raise utils.ValidationError(
+                        'Expected %s to be a valid metadata content ID'
+                        % self.change_cmd.content_id
+                    )
+            else:
+                if self.change_cmd.state_name not in exploration.states:
+                    raise utils.ValidationError(
+                        'Expected %s to be a valid state name'
+                        % self.change_cmd.state_name
+                    )
+        elif self.target_type == feconf.ENTITY_TYPE_SKILL:
+            skill = skill_fetchers.get_skill_by_id(self.target_id, strict=False)
+            if skill is None:
                 raise utils.ValidationError(
-                    'Expected %s to be a valid state name'
-                    % self.change_cmd.state_name
+                    'The skill with the given id doesn\'t exist.'
                 )
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        from core.domain import opportunity_services
+
+        target_entity = opportunity_services.get_entity_by_type_and_id(
+            self.target_type, self.target_id
+        )
 
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
@@ -865,9 +877,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
 
         translation_services.add_new_translation(
-            feconf.TranslatableEntityType.EXPLORATION,
+            feconf.TranslatableEntityType(self.target_type),
             self.target_id,
-            exploration.version,
+            target_entity.version,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,
