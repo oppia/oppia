@@ -380,6 +380,43 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the element value matches the expected value.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector of the element.
+   * @param {string} value - The expected value.
+   */
+  async expectElementValueToBe(
+    selector: string | ElementHandle,
+    value: string
+  ): Promise<void> {
+    // Change the selector to the actual element.
+    if (typeof selector === 'string') {
+      await this.expectElementToBeVisible(selector);
+      selector = await this.getElementInParent(selector);
+    }
+
+    // Wait until the element value matches the expected value.
+    try {
+      await this.page.waitForFunction(
+        ({element, value}: {element: Node; value: string}) => {
+          const el = element as HTMLInputElement | HTMLTextAreaElement;
+          return el.value.trim() === value;
+        },
+        {element: selector, value},
+        {timeout: 60000}
+      );
+    } catch (error) {
+      const actualValue = await (selector as ElementHandle).evaluate(
+        el => (el as HTMLInputElement).value
+      );
+      throw new Error(
+        `Element does not have the expected value "${value}". ` +
+          `Found "${actualValue}".\n` +
+          `Original Error: ${error instanceof Error ? error.stack : String(error)}`
+      );
+    }
+  }
+
+  /**
    * This function checks if the viewport is at mobile width.
    */
   isViewportAtMobileWidth(): boolean {
@@ -686,6 +723,25 @@ export class BaseUser {
   }
 
   /**
+   * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} textContent - The expected text content.
+   */
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      ({selector, value}: {selector: string; value: string}) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {selector, value: textContent},
+      {timeout: 60000}
+    );
+  }
+
+  /**
    * Finds child element in parent by matching text values.
    * @param {Page | ElementHandle | undefined} parentElement - Element we're searching through.
    * @param {Record<string, string>} selectors - Relevant selectors.
@@ -742,16 +798,32 @@ export class BaseUser {
   }
 
   /**
-   * Returns text in nested element
-   * @param {string} selector - The selector of the element to get text from.
+   * Gets the trimmed text content of an element.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element.
    */
-  async getTextContent(selector: string): Promise<string> {
-    const element = await this.page.$(selector);
-    const text = await this.page.evaluate(
-      (el: Element) => el.textContent,
-      element as ElementHandle<Element>
-    );
-    return text?.trim() ?? '';
+  async getTextContent(
+    selector: string | ElementHandle<Element>
+  ): Promise<string> {
+    if (typeof selector === 'string') {
+      const element = await this.page.$(selector);
+      if (!element) {
+        throw new Error(`Element not found for selector: ${selector}`);
+      }
+      const text = await this.page.evaluate(el => el.textContent, element);
+      return text?.trim() ?? '';
+    }
+    const text = await selector.evaluate(el => el.textContent);
+    return (text ?? '').trim();
+  }
+
+  /**
+   * Checks if the application is in production mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**

@@ -593,7 +593,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -605,7 +605,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(len(story.story_contents.arcs), 1)
         self.assertEqual(story.story_contents.arcs[0].id, 'arc_1')
-        self.assertEqual(story.story_contents.arcs[0].title, 'Arc 1')
+        self.assertEqual(story.story_contents.arcs[0].title, 'Adventure 1')
         self.assertEqual(
             story.story_contents.arcs[0].node_ids,
             [self.NODE_ID_1, self.NODE_ID_2],
@@ -635,7 +635,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -677,7 +677,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -686,7 +686,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_RENAME_ARC,
                     'arc_id': 'arc_1',
-                    'new_title': 'Arc 1 renamed',
+                    'new_title': 'Adventure 1 renamed',
                 }
             ),
         ]
@@ -694,7 +694,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, changelist, 'Renamed arc.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.arcs[0].title, 'Arc 1 renamed')
+        self.assertEqual(
+            story.story_contents.arcs[0].title, 'Adventure 1 renamed'
+        )
 
     def test_rearrange_arcs(self) -> None:
         changelist = [
@@ -720,7 +722,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -729,7 +731,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_2',
-                    'title': 'Arc 2',
+                    'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -773,7 +775,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -782,7 +784,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_2',
-                    'title': 'Arc 2',
+                    'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -830,7 +832,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': 'Description',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -841,7 +843,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'arc_id': 'arc_1',
                     'property_name': story_domain.ARC_PROPERTY_TITLE,
                     'new_value': 'Updated Arc',
-                    'old_value': 'Arc 1',
+                    'old_value': 'Adventure 1',
                 }
             ),
         ]
@@ -875,7 +877,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': 'Original',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -922,7 +924,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -934,7 +936,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(len(story.story_contents.arcs), 1)
         self.assertEqual(story.story_contents.arcs[0].id, 'arc_1')
-        self.assertEqual(story.story_contents.arcs[0].title, 'Arc 1')
+        self.assertEqual(story.story_contents.arcs[0].title, 'Adventure 1')
 
     def test_update_story_with_delete_arc_command(self) -> None:
         changelist = [
@@ -960,7 +962,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -1002,7 +1004,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -1011,7 +1013,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_RENAME_ARC,
                     'arc_id': 'arc_1',
-                    'new_title': 'Arc 1 renamed',
+                    'new_title': 'Adventure 1 renamed',
                 }
             ),
         ]
@@ -1019,7 +1021,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, changelist, 'Renamed arc.'
         )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.arcs[0].title, 'Arc 1 renamed')
+        self.assertEqual(
+            story.story_contents.arcs[0].title, 'Adventure 1 renamed'
+        )
 
     def test_update_story_with_rearrange_arcs_command(self) -> None:
         changelist = [
@@ -1045,7 +1049,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -1054,7 +1058,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_2',
-                    'title': 'Arc 2',
+                    'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -1063,7 +1067,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_3',
-                    'title': 'Arc 3',
+                    'title': 'Adventure 3',
                     'description': '',
                     # Here we use cast because the literal empty list is inferred as
                     # List[Any], but the change dict expects List[str].
@@ -1110,7 +1114,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1],
                 }
@@ -1119,7 +1123,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_2',
-                    'title': 'Arc 2',
+                    'title': 'Adventure 2',
                     'description': '',
                     'node_ids': [self.NODE_ID_2],
                 }
@@ -1167,7 +1171,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Arc 1',
+                    'title': 'Adventure 1',
                     'description': 'Original desc',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -1178,7 +1182,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'arc_id': 'arc_1',
                     'property_name': story_domain.ARC_PROPERTY_TITLE,
                     'new_value': 'Updated Arc Title',
-                    'old_value': 'Arc 1',
+                    'old_value': 'Adventure 1',
                 }
             ),
             story_domain.StoryChange(

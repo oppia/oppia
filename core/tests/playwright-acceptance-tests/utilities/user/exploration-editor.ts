@@ -30,6 +30,16 @@ const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
+const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
+const basicSettingsDropdown = 'h3.e2e-test-settings-container';
+const languageUpdateDropdown =
+  'mat-select.e2e-test-exploration-language-select';
+const languageDropdownValueSelector =
+  'mat-select.e2e-test-exploration-language-select .mat-select-value';
+const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
+const settingsContainerSelector =
+  '.oppia-editor-card.oppia-settings-card-container';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 
@@ -42,6 +52,7 @@ const solutionInputTextArea =
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -153,6 +164,10 @@ const oppiaWebURL = 'https://www.oppia.org';
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+
+const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
+const previousCardButton = '.e2e-test-back-button';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -410,13 +425,15 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(addNewResponseButton);
       });
     } else {
+      // Capture BEFORE clicking — at this point exactly one modal exists.
+      const staleModal = await this.page
+        .locator('ngb-modal-window')
+        .elementHandle()
+        .catch(() => null);
       await this.clickOnElementWithSelector(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.waitForNetworkIdle();
+      if (staleModal) {
+        await this.page.waitForFunction(el => !el.isConnected, staleModal);
+      }
     }
   }
 
@@ -497,6 +514,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Add a text input interaction to the card.
+   */
+  async addTextInputInteraction(): Promise<void> {
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithSelector(textInputInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Text input interaction has been added successfully.');
+  }
+
+  /**
    * Function to add a voiceover for specific content of the current card.
    * @param {string} language - Language for which the voiceover has to be added.
    * @param {string} languageAccent - Language accent for which the voiceover has to be added.
@@ -574,6 +602,27 @@ export class ExplorationEditor extends BaseUser {
         break;
       }
     }
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   * @param {boolean} skipVerification - Whether to skip verification of the card content.
+   */
+  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+    try {
+      await this.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        await this.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    if (skipVerification) {
+      return;
+    }
+    await this.expectElementToBeVisible(previousCardButton);
   }
 
   /**
@@ -660,6 +709,46 @@ export class ExplorationEditor extends BaseUser {
     await this.updateCardContent(content);
     await this.addInteraction(interaction);
     showMessage('A simple exploration is created.');
+  }
+
+  /**
+   * Customizes the number input interaction.
+   * @param {boolean} allowOnlyPositiveInputs Whether to allow only positive inputs.
+   */
+  async customizeNumberInputInteraction(
+    allowOnlyPositiveInputs: boolean = false
+  ): Promise<void> {
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    await this.expectElementToBeVisible(
+      `${customizeInteractionBodySelector} input[type="checkbox"]`
+    );
+
+    const checked = await this.page.$eval(
+      `${customizeInteractionBodySelector} input[type="checkbox"]`,
+      el => (el as HTMLInputElement).checked
+    );
+    if (checked !== allowOnlyPositiveInputs) {
+      await this.clickOnElementWithSelector(
+        `${customizeInteractionBodySelector} input[type="checkbox"]`
+      );
+    }
+
+    // Verify that the checkbox is (un)checked.
+    await this.page.waitForFunction(
+      ({selector, checked}: {selector: string; checked: boolean}) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement)?.checked === checked;
+      },
+      {
+        selector: `${customizeInteractionBodySelector} input[type="checkbox"]`,
+        checked: allowOnlyPositiveInputs,
+      },
+      {timeout: 60000}
+    );
+
+    // Save the interaction.
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
   }
 
   /**
@@ -816,6 +905,62 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expands the specified settings tab section.
+   * Supports Basic Settings, Advanced Features, Roles, Voice Artists,
+   * Permissions, Feedback, and Controls sections.
+   * Note: Roles and Voice Artists sections are only available for exploration creators.
+   * @param {string} section - The name of the section to expand.
+   */
+  async expandSettingsTabSection(
+    section:
+      | 'Basic Settings'
+      | 'Advanced Features'
+      | 'Roles'
+      | 'Voice Artists'
+      | 'Permissions'
+      | 'Feedback'
+      | 'Controls'
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          'Reason: Sections are already expanded on desktop.'
+      );
+      return;
+    }
+
+    // Generate the selectors for the section header and content.
+    const identifier = section.replace(' ', '-').toLowerCase();
+    const sectionContentSelector = `.e2e-test-${identifier}-content`;
+    const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
+
+    // Check if the section header exists (some sections like Roles and Voice Artists
+    // are only available for exploration creators).
+    const sectionHeaderExists = await this.page.$(sectionHeaderSelector);
+    if (!sectionHeaderExists) {
+      showMessage(
+        `Skipped: Expanding ${section} section.\n` +
+          'Reason: Section is not available (only available for exploration creators).'
+      );
+      return;
+    }
+
+    // Skip if the section is already expanded.
+    if (await this.isElementVisible(sectionContentSelector)) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          'Reason: Section is already expanded on desktop.'
+      );
+      return;
+    }
+
+    // Expand the section.
+    await this.expectElementToBeVisible(sectionHeaderSelector);
+    await this.clickOnElementWithSelector(sectionHeaderSelector);
+    await this.expectElementToBeVisible(sectionContentSelector);
+  }
+
+  /**
    * Verifies that the customize interaction header is visible and contains the expected title.
    * @param {string} title The expected title of the customize interaction header.
    */
@@ -835,6 +980,28 @@ export class ExplorationEditor extends BaseUser {
       commonModalTitleSelector,
       expectedTitle
     );
+  }
+
+  /**
+   * Verifies that the selected language matches the expected language.
+   * @param {string} expectedLanguage - The expected language to verify against the selected language.
+   */
+  async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
+    await this.expectElementToBeVisible(languageDropdownValueSelector);
+
+    const selectedLanguage = await this.getTextContent(
+      languageDropdownValueSelector
+    );
+
+    if (selectedLanguage.includes(expectedLanguage)) {
+      showMessage(
+        `The language ${selectedLanguage} contains the expected language.`
+      );
+    } else {
+      throw new Error(
+        `Expected language: ${expectedLanguage}, but found: "${selectedLanguage}".`
+      );
+    }
   }
 
   /**
@@ -1003,6 +1170,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Open settings tab.(Note->It also opens all the dropdowns present
+   * in the setting tab for mobile view port.)
+   */
+  async navigateToSettingsTab(): Promise<void> {
+    // Ensure the editor is fully loaded before attempting to navigate.
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarDropdown);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      // Open the navbar dropdown, then navigate to Settings.
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileSettingsBarSelector);
+
+      // Open all dropdowns because by default all dropdowns are closed in mobile view.
+      // Use expandSettingsTabSection which checks if already expanded.
+      await this.expectElementToBeVisible(basicSettingsDropdown);
+      await this.expandSettingsTabSection('Basic Settings');
+      await this.expandSettingsTabSection('Advanced Features');
+      await this.expandSettingsTabSection('Roles');
+      await this.expandSettingsTabSection('Voice Artists');
+      await this.expandSettingsTabSection('Permissions');
+      await this.expandSettingsTabSection('Feedback');
+    } else {
+      await this.clickOnElementWithSelector(settingsTabSelector);
+    }
+
+    await this.expectElementToBeVisible(settingsContainerSelector);
+    showMessage('Settings tab is opened successfully.');
+  }
+
+  /**
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
@@ -1091,6 +1295,19 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(toastMessage, false);
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Select language in language selection dropdown.
+   * @param {string} language - The language to select.
+   */
+  async selectLanguage(language: string): Promise<void> {
+    await this.clickOnElementWithSelector(languageUpdateDropdown);
+    await this.clickOnElementWithText(language);
+    await this.waitForNetworkIdle();
+
+    await this.expectSelectedLanguageToBe(language);
+    showMessage(`Language has been set to ${language}.`);
   }
 
   /**
