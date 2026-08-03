@@ -68,6 +68,10 @@
   display: none;
 }
 @media (max-width: 768px) {
+  .topic-header {
+    padding: 12px 0;
+  }
+
   .topic-header-breadcrumbs-desktop {
     display: none;
   }
@@ -75,13 +79,13 @@
     align-items: center;
     display: flex;
     gap: 4px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .topic-header-title {
     color: #00645c;
     font-family: Capriola, sans-serif;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 400;
-    line-height: 32px;
+    line-height: 28px;
   }
 }
