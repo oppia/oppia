@@ -45,7 +45,7 @@
             </div>
             <div class="oppia-feedback-detail-field">
               <span class="oppia-feedback-detail-field-label">Source</span>
-              <span class="oppia-feedback-detail-field-value">{{ sourceLabels[feedback.source] }}</span>
+              <span class="oppia-feedback-detail-field-value">{{ getSourceLabel(feedback.source) }}</span>
             </div>
             <div class="oppia-feedback-detail-field">
               <span class="oppia-feedback-detail-field-label">Platform</span>
@@ -140,7 +140,7 @@
 
         <div class="oppia-feedback-detail-col">
           <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
-            <div class="oppia-feedback-detail-message-text">{{ feedback.report_message }}</div>
+            <div class="oppia-feedback-detail-message-text">{{ getFeedbackMessage() }}</div>
           </oppia-feedback-detail-section>
 
           <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"
