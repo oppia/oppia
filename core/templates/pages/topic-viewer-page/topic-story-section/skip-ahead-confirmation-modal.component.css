@@ -125,10 +125,10 @@
   border-radius: 8px;
   cursor: pointer;
   display: inline-flex;
-  justify-content: center;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 20px;
   font-weight: 600;
+  justify-content: center;
   min-height: 48px;
   padding: 0 16px;
   width: calc(50% - 6px);

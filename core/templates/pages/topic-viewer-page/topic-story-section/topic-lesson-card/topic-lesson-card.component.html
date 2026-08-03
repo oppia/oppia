@@ -1,8 +1,8 @@
 <div class="topic-lesson-card"
      [attr.aria-label]="lessonTitle || 'Lesson card'"
      [class.collapsed]="!isExpanded"
-  [class.completed-lesson]="isCompletedLesson"
-  [class.completed-collapsed]="isCompletedLesson && !isExpanded"
+     [class.completed-lesson]="isCompletedLesson"
+     [class.completed-collapsed]="isCompletedLesson && !isExpanded"
      [class.coming-soon-section-card]="isComingSoonSectionCard">
   <div class="topic-lesson-card-thumbnail" *ngIf="isExpanded"
        [ngStyle]="{'background-color': adventureAccentColor}">

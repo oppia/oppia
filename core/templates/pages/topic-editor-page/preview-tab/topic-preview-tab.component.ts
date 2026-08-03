@@ -41,6 +41,7 @@ interface TopicViewerStorySectionData {
   selector: 'oppia-topic-preview-tab',
   templateUrl: './topic-preview-tab.component.html',
   styleUrls: ['./topic-preview-tab.component.css'],
+  // We need ViewEncapsulation.None because the preview reuses shared topic viewer styles that must remain globally scoped.
   encapsulation: ViewEncapsulation.None,
 })
 export class TopicPreviewTabComponent {

@@ -163,17 +163,17 @@
 
 @media (max-width: 768px) {
   .mastery-challenge-card {
-    gap: 16px;
-    padding: 16px 18px;
+    gap: 14px;
+    padding: 14px 16px;
   }
 
   .mastery-challenge-icon {
-    flex: 0 0 80px;
+    flex: 0 0 72px;
   }
 
   .mastery-challenge-icon-image {
-    height: 80px;
-    width: 80px;
+    height: 72px;
+    width: 72px;
   }
 
   .mastery-challenge-content {
@@ -182,21 +182,21 @@
   }
 
   .mastery-challenge-title {
-    font-size: 24px;
-    line-height: 24px;
+    font-size: 20px;
+    line-height: 22px;
     margin: 0 0 6px;
   }
 
   .mastery-challenge-description {
-    font-size: 17px;
-    line-height: 24px;
+    font-size: 15px;
+    line-height: 21px;
   }
 
   .mastery-challenge-button {
     font-size: 14px;
-    height: 40px;
+    height: 38px;
     min-width: 140px;
-    padding: 0 16px;
+    padding: 0 14px;
   }
 
   .mastery-challenge-button-icon {
@@ -238,27 +238,44 @@
 @media (max-width: 450px) {
   .mastery-challenge-card {
     flex-direction: column;
-    gap: 12px;
-    padding: 16px;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 12px;
   }
 
   .mastery-challenge-icon {
     flex: none;
   }
 
+  .mastery-challenge-icon-image {
+    height: 64px;
+    width: 64px;
+  }
+
   .mastery-challenge-title {
-    font-size: 18px;
+    font-size: 16px;
+    line-height: 20px;
     text-align: center;
   }
 
   .mastery-challenge-description {
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 19px;
     text-align: center;
   }
 
   .mastery-challenge-button {
-    height: 44px;
+    font-size: 15px;
+    height: 40px;
+    min-width: 0;
+    padding: 0 12px;
     width: 100%;
+  }
+
+  .mastery-challenge-button-icon {
+    font-size: 14px;
+    height: 24px;
+    width: 24px;
   }
 
   .mastery-challenge-action-wrapper {

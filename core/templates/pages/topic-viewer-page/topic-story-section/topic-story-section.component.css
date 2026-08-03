@@ -5,7 +5,6 @@
   padding: 0;
   width: 100%;
 }
-
 .story-callout-row {
   align-items: flex-start;
   display: flex;
@@ -736,8 +735,8 @@ topic-mastery-challenge-card {
 
   .skipped-adventure-review-cta {
     font-size: 14px;
-    min-width: 0;
     min-height: 44px;
+    min-width: 0;
     padding: 10px 14px;
     width: 100%;
   }
@@ -1050,4 +1049,3 @@ topic-mastery-challenge-card {
   }
 
 }
-

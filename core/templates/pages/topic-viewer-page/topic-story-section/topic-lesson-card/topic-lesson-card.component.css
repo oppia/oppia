@@ -174,11 +174,6 @@
   font-size: 14px;
 }
 
-.topic-lesson-card-completed-label.topic-lesson-card-completed-label-compact .material-icons {
-  color: #40a84f;
-  font-size: 18px;
-}
-
 .topic-lesson-card-coming-soon-label {
   background: #d6c9ff;
   border-radius: 999px;
@@ -398,6 +393,11 @@
   line-height: 1;
 }
 
+.topic-lesson-card-completed-label.topic-lesson-card-completed-label-compact .material-icons {
+  color: #40a84f;
+  font-size: 18px;
+}
+
 .topic-lesson-language-selector {
   flex: 0 1 auto;
   margin-right: auto;
@@ -456,10 +456,6 @@
     font-size: 13px;
   }
 
-  .topic-lesson-card-completed-label.topic-lesson-card-completed-label-compact .material-icons {
-    font-size: 16px;
-  }
-
   .topic-lesson-card-play-again-button {
     font-size: 13px;
     gap: 6px;
@@ -470,6 +466,10 @@
 
   .topic-lesson-card-play-again-button .material-icons {
     font-size: 20px;
+  }
+
+  .topic-lesson-card-completed-label.topic-lesson-card-completed-label-compact .material-icons {
+    font-size: 16px;
   }
 
   .topic-lesson-card-progress {
@@ -536,6 +536,38 @@
 
   .topic-lesson-card-copy {
     gap: 4px;
+  }
+
+  .topic-lesson-card-title-row.collapsed {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .topic-lesson-card-title-row.collapsed .topic-lesson-card-header {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .topic-lesson-card-play-again-button {
+    height: 36px;
+  }
+
+  .topic-lesson-card-chevron-badge {
+    flex: 0 0 38px;
+    height: 38px;
+    width: 38px;
+  }
+
+  .topic-lesson-card-title-row.collapsed .topic-lesson-card-chevron-badge {
+    margin-left: auto;
+  }
+
+  .topic-lesson-card-title-row.collapsed .topic-lesson-card-play-again-button {
+    justify-content: center;
+    margin-left: 0;
+    min-width: 0;
+    width: 100%;
   }
 
   .topic-lesson-card.coming-soon-section-card .topic-lesson-card-copy,
@@ -613,12 +645,6 @@
   .topic-lesson-card-secondary-button {
     height: 40px;
     width: 100%;
-  }
-
-  .topic-lesson-card-chevron-badge {
-    flex: 0 0 38px;
-    height: 38px;
-    width: 38px;
   }
 
   .topic-lesson-card.coming-soon-section-card .topic-lesson-card-chevron-badge {

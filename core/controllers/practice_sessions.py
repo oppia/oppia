@@ -180,7 +180,7 @@ class PracticeSessionsPageDataHandler(
                 return arcs_with_stories[arc_index - 1]
         target_arc_id = 'arc_%s' % arc_id
         for story, arc in arcs_with_stories:
-            if arc.id == target_arc_id or arc.id == arc_id:
+            if arc.id in (target_arc_id, arc_id):
                 return (story, arc)
         return None
 

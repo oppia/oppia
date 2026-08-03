@@ -16,9 +16,9 @@
  * @fileoverview Modal shown when learner skips ahead to a later arc.
  */
 
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component, Optional, ViewEncapsulation} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 import './skip-ahead-confirmation-modal.component.css';
 
@@ -26,12 +26,30 @@ import './skip-ahead-confirmation-modal.component.css';
   selector: 'oppia-skip-ahead-confirmation-modal',
   templateUrl: './skip-ahead-confirmation-modal.component.html',
   styleUrls: ['./skip-ahead-confirmation-modal.component.css'],
+  // We need ViewEncapsulation.None because this modal is rendered in an overlay container outside component boundaries and must retain styling.
   encapsulation: ViewEncapsulation.None,
 })
-export class SkipAheadConfirmationModalComponent extends ConfirmOrCancelModal {
+export class SkipAheadConfirmationModalComponent {
   targetArcNumber: number = 1;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef
+  ) {}
+
+  confirm<T>(value?: T): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss(value);
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.close(value);
+    }
+  }
+
+  cancel<T>(value: T | 'cancel' = 'cancel'): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss(value);
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.dismiss(value);
+    }
   }
 }
