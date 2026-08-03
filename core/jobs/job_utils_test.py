@@ -20,19 +20,20 @@ from __future__ import annotations
 
 import datetime
 
-from core.jobs import job_utils
+from core.jobs import job_options, job_utils
 from core.platform import models
 from core.tests import test_utils
 
+import apache_beam as beam
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
-(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
-
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class FooModel(datastore_services.Model):
@@ -51,6 +52,20 @@ class CoreModel(base_models.BaseModel):
     """Simple BaseModel subclass with a 'prop' float property."""
 
     prop = datastore_services.FloatProperty()
+
+
+class ResolveProjectIdTests(test_utils.TestBase):
+
+    def test_pipeline_with_valid_options_returns_project_id(self) -> None:
+        with self.swap_to_always_return(
+            app_identity_services, 'get_application_id', 'LOL'
+        ):
+            pipeline = beam.Pipeline(options=job_options.JobOptions())
+            self.assertEqual(job_utils.resolve_project_id(pipeline), 'LOL')
+
+    def test_none_pipeline_raises_value_error(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'must not be None'):
+            job_utils.resolve_project_id(None)
 
 
 class CloneTests(test_utils.TestBase):
