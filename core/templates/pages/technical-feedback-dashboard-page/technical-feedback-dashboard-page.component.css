@@ -23,14 +23,3 @@
   flex: 1;
   max-height: 55vh;
 }
-
-.oppia-technical-feedback-dashboard-page .oppia-feedback-detail-card {
-  border: 0;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  margin: 0;
-  max-height: 80vh;
-  padding: 0;
-  width: 100%;
-}
