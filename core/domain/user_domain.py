@@ -318,13 +318,20 @@ class UserSettings:
                 % self.display_alias
             )
 
-        if self.profile_name_for_certificate is not None and not isinstance(
-            self.profile_name_for_certificate, str
-        ):
-            raise utils.ValidationError(
-                'Expected profile_name_for_certificate to be a string, received %s'
-                % self.profile_name_for_certificate
-            )
+        if self.profile_name_for_certificate is not None:
+            if not isinstance(self.profile_name_for_certificate, str):
+                raise utils.ValidationError(
+                    'Expected profile_name_for_certificate to be a string, received %s'
+                    % self.profile_name_for_certificate
+                )
+            if (
+                len(self.profile_name_for_certificate)
+                > constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE
+            ):
+                raise utils.ValidationError(
+                    'Profile name for certificates should be at most %s characters long.'
+                    % constants.MAX_CHARS_IN_PROFILE_NAME_FOR_CERTIFICATE
+                )
 
         if not isinstance(self.email, str):
             raise utils.ValidationError(
