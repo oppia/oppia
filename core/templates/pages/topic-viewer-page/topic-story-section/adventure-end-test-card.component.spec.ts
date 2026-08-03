@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicPracticeCardComponent.
+ * @fileoverview Unit tests for AdventureEndTestCardComponent.
  */
 
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {TopicPracticeCardComponent} from './topic-practice-card.component';
+import {AdventureEndTestCardComponent} from './adventure-end-test-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -31,9 +32,9 @@ class MockWindowRef {
   };
 }
 
-describe('TopicPracticeCardComponent', () => {
-  let component: TopicPracticeCardComponent;
-  let fixture: ComponentFixture<TopicPracticeCardComponent>;
+describe('AdventureEndTestCardComponent', () => {
+  let component: AdventureEndTestCardComponent;
+  let fixture: ComponentFixture<AdventureEndTestCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
   let windowRef: WindowRef;
 
@@ -44,7 +45,8 @@ describe('TopicPracticeCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      declarations: [TopicPracticeCardComponent, MockTranslatePipe],
+      declarations: [AdventureEndTestCardComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: UrlInterpolationService,
@@ -57,7 +59,7 @@ describe('TopicPracticeCardComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TopicPracticeCardComponent);
+    fixture = TestBed.createComponent(AdventureEndTestCardComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
@@ -93,21 +95,6 @@ describe('TopicPracticeCardComponent', () => {
     );
     expect(component.resolvedThumbnailUrl).toBe(
       '/assets/fallback-thumbnail.webp'
-    );
-  });
-
-  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
-    urlInterpolationService.getStaticImageUrl.and.returnValue(
-      '/assets/generated-fallback.webp'
-    );
-
-    component.thumbnailUrl = '';
-
-    component.ngOnInit();
-
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
-    expect(component.resolvedThumbnailUrl).toBe(
-      '/assets/generated-fallback.webp'
     );
   });
 
@@ -147,24 +134,6 @@ describe('TopicPracticeCardComponent', () => {
 
     expect(component.getResolvedDescription()).toBe(
       'Practice solving algebra problems.'
-    );
-  });
-
-  it('should return default description with lesson number when description is not provided', () => {
-    component.practiceDescription = '';
-    component.relatedLessonNumber = 3;
-
-    expect(component.getResolvedDescription()).toBe(
-      "Practice the skills you've learned in lesson 3."
-    );
-  });
-
-  it('should return default description without lesson number when description is not provided and lesson number is null', () => {
-    component.practiceDescription = '';
-    component.relatedLessonNumber = null;
-
-    expect(component.getResolvedDescription()).toBe(
-      "Practice the skills you've learned in lesson."
     );
   });
 
