@@ -1,0 +1,263 @@
+:host {
+  box-sizing: border-box;
+  display: block;
+  height: calc(100vh - 56px);
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.oppia-feedback-detail-card {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.oppia-feedback-detail-topbar {
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.oppia-feedback-detail-topbar-start,
+.oppia-feedback-detail-topbar-end {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.oppia-feedback-detail-back-btn {
+  align-items: center;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  min-width: 32px;
+  padding: 0;
+  width: 32px;
+}
+
+.oppia-feedback-detail-title {
+  color: #333;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+  margin: 0;
+}
+
+.oppia-feedback-detail-scroll-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.oppia-feedback-detail-columns {
+  display: flex;
+  gap: 24px;
+  min-height: 100%;
+}
+
+.oppia-feedback-detail-col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.oppia-feedback-detail-field {
+  display: flex;
+  font-size: 14px;
+  gap: 8px;
+  line-height: 20px;
+  padding: 4px 0;
+}
+
+.oppia-feedback-detail-field-label {
+  color: black;
+  flex: 0 0 110px;
+  font-weight: 500;
+}
+
+.oppia-feedback-detail-field-value {
+  color: #262626;
+  word-break: break-word;
+}
+
+.oppia-feedback-detail-link {
+  color: #00645c;
+  text-decoration: none;
+}
+
+.oppia-feedback-detail-link:hover,
+.oppia-feedback-detail-link:focus {
+  color: #004d46;
+  text-decoration: underline;
+}
+
+.oppia-feedback-detail-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.oppia-feedback-detail-button:hover,
+.oppia-feedback-detail-button:focus {
+  text-decoration: none;
+}
+
+.oppia-feedback-detail-status-button {
+  text-align: left;
+}
+
+.oppia-feedback-detail-button:disabled {
+  cursor: not-allowed;
+}
+
+.oppia-feedback-detail-status-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.oppia-feedback-detail-screenshot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.oppia-feedback-detail-screenshot-img {
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  max-width: 100%;
+}
+
+.oppia-feedback-detail-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.oppia-feedback-detail-log-block {
+  margin-bottom: 14px;
+}
+
+.oppia-feedback-detail-log-block:last-child {
+  margin-bottom: 0;
+}
+
+.oppia-feedback-detail-log-heading {
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 19px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.oppia-feedback-detail-log-content {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 13px;
+  line-height: 19px;
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
+.oppia-feedback-detail-message-text {
+  color: #262626;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: pre-wrap;
+}
+
+.oppia-feedback-detail-empty {
+  color: #767676;
+  font-size: 14px;
+  font-style: italic;
+  margin: 0;
+}
+
+.oppia-feedback-detail-actions-bar {
+  background-color: #fff;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: 14px;
+  position: sticky;
+  z-index: 10;
+}
+
+.oppia-feedback-detail-status-note {
+  color: #767676;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.oppia-feedback-detail-actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.oppia-feedback-detail-reply-textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  display: block;
+  font-size: 14px;
+  line-height: 20px;
+  max-height: 140px;
+  min-height: 44px;
+  padding: 8px 10px;
+  resize: vertical;
+  width: 100%;
+}
+
+.oppia-feedback-detail-reply-textarea:focus {
+  border-color: #1a73e8;
+  outline: none;
+}
+
+.oppia-feedback-detail-reply-send-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.oppia-feedback-detail-reply-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.oppia-feedback-detail-status-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.oppia-feedback-detail-actions-label-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.oppia-feedback-detail-replies-bar {
+  flex: 1;
+}

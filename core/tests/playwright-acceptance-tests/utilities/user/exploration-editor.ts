@@ -42,6 +42,7 @@ const solutionInputTextArea =
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
@@ -153,6 +154,10 @@ const oppiaWebURL = 'https://www.oppia.org';
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+
+const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
+const previousCardButton = '.e2e-test-back-button';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -410,13 +415,15 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(addNewResponseButton);
       });
     } else {
+      // Capture BEFORE clicking — at this point exactly one modal exists.
+      const staleModal = await this.page
+        .locator('ngb-modal-window')
+        .elementHandle()
+        .catch(() => null);
       await this.clickOnElementWithSelector(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.waitForNetworkIdle();
+      if (staleModal) {
+        await this.page.waitForFunction(el => !el.isConnected, staleModal);
+      }
     }
   }
 
@@ -497,6 +504,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Add a text input interaction to the card.
+   */
+  async addTextInputInteraction(): Promise<void> {
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithSelector(textInputInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
+    await this.expectElementToBeVisible(addInteractionModalSelector, false);
+    showMessage('Text input interaction has been added successfully.');
+  }
+
+  /**
    * Function to add a voiceover for specific content of the current card.
    * @param {string} language - Language for which the voiceover has to be added.
    * @param {string} languageAccent - Language accent for which the voiceover has to be added.
@@ -574,6 +592,27 @@ export class ExplorationEditor extends BaseUser {
         break;
       }
     }
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   * @param {boolean} skipVerification - Whether to skip verification of the card content.
+   */
+  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
+    try {
+      await this.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        await this.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    if (skipVerification) {
+      return;
+    }
+    await this.expectElementToBeVisible(previousCardButton);
   }
 
   /**
