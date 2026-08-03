@@ -729,6 +729,7 @@ class TranslatableContentsHandlerV2(
 
         content_id_to_grouping_key = {}
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            assert isinstance(domain_object, exp_domain.Exploration)
             for state_name, state in domain_object.states.items():
                 translatable_contents_collection = (
                     state.get_translatable_contents_collection()

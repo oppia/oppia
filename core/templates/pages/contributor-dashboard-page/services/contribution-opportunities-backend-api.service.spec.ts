@@ -524,7 +524,7 @@ describe('Contribution Opportunities backend API service', function () {
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
-        '/getreviewableopportunitieshandler',
+        '/getreviewableopportunitieshandler?topic_name=',
         {}
       )
     );
@@ -556,7 +556,7 @@ describe('Contribution Opportunities backend API service', function () {
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=exploration'
+      '/getreviewableopportunitieshandlerv2?topic_name=&language_code=hi&entity_type=exploration'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -634,7 +634,7 @@ describe('Contribution Opportunities backend API service', function () {
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=exploration'
+        '/getreviewableopportunitieshandlerv2?topic_name=&language_code=hi&entity_type=exploration'
       );
       expect(req.request.method).toEqual('GET');
 

@@ -621,7 +621,9 @@ def create_translation_opportunity(
         unique_ids = list(set(entity_ids))
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp_id_to_exploration = (
-                exp_fetchers.get_multiple_explorations_by_id(unique_ids)
+                exp_fetchers.get_multiple_explorations_by_id(
+                    unique_ids, strict=False
+                )
             )
             for exploration_id, exploration in exp_id_to_exploration.items():
                 complete_langs = translation_services.get_languages_with_complete_translation(
