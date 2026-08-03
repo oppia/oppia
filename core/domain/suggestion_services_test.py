@@ -320,6 +320,35 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'test description',
             )
 
+    def test_cannot_create_skill_translation_suggestion_with_invalid_content_html_raise_error(
+        self,
+    ) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Explanation',
+            'content_id': '1',
+            'language_code': 'hi',
+            'content_html': '<p>Different skill explanation html</p>',
+            'translation_html': '<p>Hindi Explanation</p>',
+            'data_format': 'html',
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            'The Skill content has changed since this translation '
+            'was submitted.',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_SKILL,
+                skill_id,
+                1,
+                self.author_id,
+                change_dict,
+                'Skill translation suggestion',
+            )
+
     def test_create_translation_suggestion_fails_if_duplicate_exists(
         self,
     ) -> None:
