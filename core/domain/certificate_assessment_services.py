@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import collections
 import datetime
-import sys
 import random
+import sys
 
 from core import feconf, utils
 from core.constants import constants
@@ -35,7 +35,7 @@ from core.domain import (
 from core.platform import models
 from core.storage.certificate_assessment import gae_models
 
-from typing import Dict, List, TypedDict, cast
+from typing import Dict, List, Optional, Tuple, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -67,6 +67,7 @@ class CertificateAssessmentAttemptNotReadyException(Exception):
 
 
 def _get_current_time() -> datetime.datetime:
+    """Returns the current UTC time."""
     return datetime.datetime.utcnow()
 
 
@@ -394,6 +395,8 @@ def _build_version_data(
     certificate_version: int,
     topic_ids: List[str],
     selected_question_ids: List[str],
+    # Here we use object because the version snapshot mixes topic versions,
+    # question versions and question-topic links of heterogeneous types.
 ) -> Dict[str, object]:
     """Builds the version snapshot for a started attempt."""
     topic_versions = {
@@ -419,10 +422,11 @@ def _build_version_data(
 def _get_in_progress_attempt_for_learner(
     learner_id: str,
 ) -> Optional[gae_models.CertificateAssessmentAttemptModel]:
+    """Returns the learner's in-progress assessment attempt, if any."""
     return gae_models.CertificateAssessmentAttemptModel.query(
         gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id,
-        gae_models.CertificateAssessmentAttemptModel.is_submitted
-        == False,  # pylint: disable=singleton-comparison
+        gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
+        == False,
     ).get()
 
 
@@ -441,6 +445,7 @@ def _get_active_attempt_for_learner(
 def _get_submission_count_for_certificate(
     learner_id: str, certificate_id: str
 ) -> int:
+    """Returns the number of submitted attempts for the given certificate."""
     count = 0
     for attempt in gae_models.CertificateAssessmentAttemptModel.query(
         gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id
@@ -521,6 +526,7 @@ def start_certificate_assessment_attempt(
 
 
 def _normalize_answer(answer: Optional[str]) -> Optional[str]:
+    """Strips whitespace from an answer, preserving None as-is."""
     return None if answer is None else answer.strip()
 
 
@@ -544,7 +550,7 @@ def submit_certificate_assessment_attempt(
     }
     question_versions = attempt_model.version_data['question_versions']
     question_topic_links = attempt_model.version_data['question_topic_links']
-    responses: List[gae_models.CertificateAssessmentResponseModel] = []
+    responses: List[gae_models.CertificateAssessmentResponseCreateDict] = []
     attempt_data: Dict[str, Dict[str, int]] = collections.defaultdict(
         lambda: {
             'total_related_questions': 0,
@@ -567,23 +573,22 @@ def submit_certificate_assessment_attempt(
         if is_correct:
             correct_count += 1
         responses.append(
-            gae_models.CertificateAssessmentResponseModel(
-                id=gae_models.CertificateAssessmentResponseModel._get_new_id(),
-                attempt_id=attempt_id,
-                question_id=question_id,
-                question_version=question_version,
-                selected_answer=(
+            {
+                'attempt_id': attempt_id,
+                'question_id': question_id,
+                'question_version': question_version,
+                'selected_answer': (
                     '' if selected_answer is None else selected_answer
                 ),
-                is_correct=is_correct,
-            )
+                'is_correct': is_correct,
+            }
         )
         for topic_id in question_topic_links[question_id]:
             attempt_data[topic_id]['total_related_questions'] += 1
             if is_correct:
                 attempt_data[topic_id]['total_correct_questions'] += 1
 
-    gae_models.CertificateAssessmentResponseModel.put_multi(responses)
+    gae_models.CertificateAssessmentResponseModel.create_multi(responses)
     attempt_model.attempt_data = dict(attempt_data)
     attempt_model.total_score = (
         float(correct_count) / float(len(question_versions)) * 100.0
@@ -599,7 +604,11 @@ def submit_certificate_assessment_attempt(
 
 
 def get_question_state_data_for_assessment_attempt(
-    learner_id: str, attempt_id: str, question_id: str
+    learner_id: str,
+    attempt_id: str,
+    question_id: str,
+    # Here we use object because question state data is a heterogeneous dict
+    # whose values depend on the interaction type of the question.
 ) -> Dict[str, object]:
     """Returns pinned question state data for an in-progress attempt."""
     attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
