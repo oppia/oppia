@@ -18,19 +18,26 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 
 interface AssessmentQuestion {
   prompt: string;
   choices: string[];
 }
 
+type AssessmentStage =
+  (typeof CertificateAssessmentPlayerPageConstants)[keyof typeof CertificateAssessmentPlayerPageConstants];
+
 @Component({
   selector: 'certificate-assessment-player-page',
   templateUrl: './certificate-assessment-player-page.component.html',
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
+  readonly certificateAssessmentPlayerPageConstants =
+    CertificateAssessmentPlayerPageConstants;
   certificateId = '';
-  currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
+  currentStage: AssessmentStage =
+    CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
   // TODO(#24717-M2.20): This flag value is by default set as false so interrupt card does not render. In the future, this flag will change its value based on conditions.
   showAssessmentInterruptCard = false;
   currentQuestionIndex = 0;
@@ -59,14 +66,16 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     if (currentRoute === 'session') {
-      this.currentStage = 'questions';
+      this.currentStage =
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
     } else if (currentRoute === 'result') {
-      this.currentStage = 'result';
+      this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_RESULT;
     }
   }
 
   showInstructions(): void {
-    this.currentStage = 'instructions';
+    this.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS;
   }
 
   startAssessment(): void {
@@ -75,13 +84,14 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   onRetryAssessment(): void {
     this.showAssessmentInterruptCard = false;
-    this.currentStage = 'intro';
+    this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
     this.currentQuestionIndex = 0;
   }
 
   onResumeAssessment(): void {
     this.showAssessmentInterruptCard = false;
-    this.currentStage = 'questions';
+    this.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
   }
 
   nextQuestion(): void {

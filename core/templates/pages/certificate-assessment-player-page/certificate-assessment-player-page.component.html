@@ -6,17 +6,17 @@
   </oppia-assessment-interrupt>
 
   <oppia-assessment-introduction-card #introCard
-                                      *ngIf="currentStage === 'intro'"
+                                      *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INTRO"
                                       [certificateId]="certificateId"
                                       (continue)="showInstructions()">
   </oppia-assessment-introduction-card>
 
-  <oppia-assessment-instruction-panel *ngIf="currentStage === 'instructions'"
+  <oppia-assessment-instruction-panel *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS"
                                       (startAssessment)="startAssessment()">
   </oppia-assessment-instruction-panel>
 
   <oppia-certificate-assessment-conversation-skin #conversationSkin
-                                                  *ngIf="currentStage === 'questions'"
+                                                  *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
                                                   [currentQuestion]="getCurrentQuestion()"
                                                   [currentQuestionIndex]="currentQuestionIndex"
                                                   [totalQuestions]="mockQuestions.length"
@@ -26,7 +26,7 @@
                                                   (submitAssessment)="submitAssessment()">
   </oppia-certificate-assessment-conversation-skin>
 
-  <oppia-certificate-assessment-result-card *ngIf="currentStage === 'result'"
+  <oppia-certificate-assessment-result-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_RESULT"
                                             [certificateId]="certificateId">
   </oppia-certificate-assessment-result-card>
 </div>
