@@ -169,6 +169,8 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
     """Tests for certificate assessment ACL decorators."""
 
     class SubmitMockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Mock handler for the submit assessment response decorator."""
+
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'attempt_id': {'schema': {'type': 'basestring'}}
@@ -180,6 +182,8 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'attempt_id': attempt_id})
 
     class QuestionMockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        """Mock handler for the certificate question access decorator."""
+
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {'schema': {'type': 'basestring'}}

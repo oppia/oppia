@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import collections
 import datetime
-import random
+import secrets
 import sys
 
 from core import feconf, utils
@@ -29,18 +29,21 @@ from core.domain import (
     certificate_assessment_domain,
     question_services,
     skill_fetchers,
+    state_domain,
     topic_domain,
     topic_fetchers,
 )
 from core.platform import models
 from core.storage.certificate_assessment import gae_models
 
-from typing import Dict, List, Optional, Tuple, TypedDict, cast
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
+datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY: str = (
@@ -64,6 +67,8 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
 
 class CertificateAssessmentAttemptNotReadyException(Exception):
     """Raised when the certificate question pool is no longer valid."""
+
+    pass
 
 
 def _get_current_time() -> datetime.datetime:
@@ -301,9 +306,9 @@ def _get_topic_question_ids_by_difficulty(
     topic_ids: List[str],
 ) -> Dict[str, Dict[str, List[str]]]:
     """Returns available question ids grouped by topic and difficulty."""
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, List[str]]] = {}
-    for topic_id in topic_ids:
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
+    for topic_id, topic in zip(topic_ids, topics):
         question_ids_by_difficulty: Dict[str, List[str]] = (
             collections.defaultdict(list)
         )
@@ -357,6 +362,7 @@ def _get_topic_question_ids_by_difficulty(
 
 def _pick_questions(topic_ids: List[str], total_questions: int) -> List[str]:
     """Selects questions using the validator's topic and difficulty split."""
+    secure_random = secrets.SystemRandom()
     topic_id_to_question_ids_by_difficulty = (
         _get_topic_question_ids_by_difficulty(topic_ids)
     )
@@ -382,11 +388,11 @@ def _pick_questions(topic_ids: List[str], total_questions: int) -> List[str]:
             required_count = difficulty_counts[difficulty]
             if len(available_question_ids) < required_count:
                 raise CertificateAssessmentAttemptNotReadyException()
-            selected_question_ids.extend(
-                random.sample(available_question_ids, required_count)
+            sampled_question_ids = secure_random.sample(
+                available_question_ids, required_count
             )
-            used_question_ids.update(selected_question_ids[-required_count:])
-    random.shuffle(selected_question_ids)
+            selected_question_ids.extend(sampled_question_ids)
+            used_question_ids.update(sampled_question_ids)
     return selected_question_ids
 
 
@@ -395,17 +401,19 @@ def _build_version_data(
     certificate_version: int,
     topic_ids: List[str],
     selected_question_ids: List[str],
-    # Here we use object because the version snapshot mixes topic versions,
-    # question versions and question-topic links of heterogeneous types.
-) -> Dict[str, object]:
+) -> certificate_assessment_domain.CertificateAssessmentAttemptVersionDataDict:
     """Builds the version snapshot for a started attempt."""
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    questions = [
+        question_services.get_question_by_id(question_id)
+        for question_id in selected_question_ids
+    ]
     topic_versions = {
-        topic_id: topic_fetchers.get_topic_by_id(topic_id, strict=True).version
-        for topic_id in topic_ids
+        topic_id: topic.version for topic_id, topic in zip(topic_ids, topics)
     }
     question_versions = {
-        question_id: question_services.get_question_by_id(question_id).version
-        for question_id in selected_question_ids
+        question_id: question.version
+        for question_id, question in zip(selected_question_ids, questions)
     }
     return {
         'certificate_id': certificate_id,
@@ -447,9 +455,15 @@ def _get_submission_count_for_certificate(
 ) -> int:
     """Returns the number of submitted attempts for the given certificate."""
     count = 0
-    for attempt in gae_models.CertificateAssessmentAttemptModel.query(
-        gae_models.CertificateAssessmentAttemptModel.learner_id == learner_id
-    ).fetch():
+    attempt_models: Sequence[gae_models.CertificateAssessmentAttemptModel] = (
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
+            == True,
+        ).fetch()
+    )
+    for attempt in attempt_models:
         if (
             attempt.version_data.get('certificate_id') == certificate_id
             and attempt.is_submitted
@@ -462,66 +476,106 @@ def start_certificate_assessment_attempt(
     certificate_id: str, learner_id: str
 ) -> Tuple[
     certificate_assessment_domain.CertificateAssessmentAttempt,
-    List[Dict[str, int]],
+    List[Dict[str, Union[str, int]]],
 ]:
-    """Starts a new DB-backed certificate assessment attempt."""
-    offering = get_certificate_assessment_offering(certificate_id)
-    validation_result = validate_certificate_assessment_offering(
-        offering.topic_ids, offering.total_questions
-    )
-    if not validation_result['is_valid']:
-        offering_model = (
-            gae_models.CertificateAssessmentOfferingModel.get_by_id(
-                certificate_id
+    """Starts a new DB-backed certificate assessment attempt.
+
+    Args:
+        certificate_id: str. The certificate assessment to start.
+        learner_id: str. The learner starting the attempt.
+
+    Returns:
+        tuple(domain.CertificateAssessmentAttempt, list(dict)). The created
+        attempt and the question/version payload for the client.
+
+    Raises:
+        CertificateAssessmentAttemptNotReadyException. If the assessment can no
+            longer be started because the question pool is invalid.
+        utils.ValidationError. If the learner already has an in-progress
+            attempt.
+    """
+
+    def _start_txn() -> Tuple[
+        certificate_assessment_domain.CertificateAssessmentAttempt,
+        List[Dict[str, Union[str, int]]],
+    ]:
+        if _get_in_progress_attempt_for_learner(learner_id) is not None:
+            raise utils.ValidationError(
+                'You already have an in-progress certificate assessment attempt.'
             )
+        offering = get_certificate_assessment_offering(certificate_id)
+        validation_result = validate_certificate_assessment_offering(
+            offering.topic_ids, offering.total_questions
         )
-        assert offering_model is not None
-        offering_model.async_status = 'Blocked'
-        offering_model.put()
-        raise CertificateAssessmentAttemptNotReadyException(
-            'Sorry, this assessment isn\'t ready anymore! We\'ve alerted the creator, and in the meantime you can try a different assessment.'
-        )
+        if not validation_result['is_valid']:
+            update_certificate_assessment_offering(
+                certificate_id=offering.certificate_id,
+                title=offering.title,
+                description=offering.description,
+                classroom_id=offering.classroom_id,
+                topic_ids=offering.topic_ids,
+                total_questions=offering.total_questions,
+                time_limit_in_minutes=offering.time_limit_in_minutes,
+                demonstrates=offering.demonstrates,
+                async_status='Blocked',
+            )
+            raise CertificateAssessmentAttemptNotReadyException(
+                'Sorry, this assessment isn\'t ready anymore! We\'ve alerted the creator, and in the meantime you can try a different assessment.'
+            )
 
-    if _get_in_progress_attempt_for_learner(learner_id) is not None:
-        raise utils.ValidationError(
-            'You already have an in-progress certificate assessment attempt.'
+        selected_question_ids = _pick_questions(
+            offering.topic_ids, offering.total_questions
         )
-
-    selected_question_ids = _pick_questions(
-        offering.topic_ids, offering.total_questions
-    )
-    version_data = _build_version_data(
-        certificate_id,
-        offering.version,
-        offering.topic_ids,
-        selected_question_ids,
-    )
-    attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
-        learner_id=learner_id,
-        total_score=0.0,
-        attempt_index=_get_submission_count_for_certificate(
-            learner_id, certificate_id
+        version_data = _build_version_data(
+            certificate_id,
+            offering.version,
+            offering.topic_ids,
+            selected_question_ids,
         )
-        + 1,
-        attempt_data={},
-        version_data=version_data,
-        started_at=_get_current_time(),
-        finished_at=None,
-        is_submitted=False,
-    )
-    return (
-        certificate_assessment_domain.CertificateAssessmentAttempt.from_dict(
-            attempt_model.to_dict()
-        ),
-        [
-            {
-                'question_id': question_id,
-                'question_version': version_data['question_versions'][
-                    question_id
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=learner_id,
+            total_score=0.0,
+            attempt_index=_get_submission_count_for_certificate(
+                learner_id, certificate_id
+            )
+            + 1,
+            attempt_data={},
+            # Here we use cast because the storage layer's create method
+            # expects a loose dict for its JSON-backed version_data property,
+            # while the domain layer exposes the strict version_data TypedDict.
+            version_data=cast(
+                Dict[
+                    str,
+                    gae_models.CertificateAssessmentAttemptVersionDataValue,
                 ],
-            }
-            for question_id in selected_question_ids
+                version_data,
+            ),
+            started_at=_get_current_time(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        return (
+            _attempt_model_to_domain(attempt_model),
+            [
+                {
+                    'question_id': question_id,
+                    'question_version': version_data['question_versions'][
+                        question_id
+                    ],
+                }
+                for question_id in selected_question_ids
+            ],
+        )
+
+    # Here we use cast because transaction_services is dynamically imported
+    # from the platform layer, so mypy cannot infer the transaction's return
+    # type from the generic run_in_transaction_wrapper.
+    return cast(
+        Tuple[
+            certificate_assessment_domain.CertificateAssessmentAttempt,
+            List[Dict[str, Union[str, int]]],
         ],
+        transaction_services.run_in_transaction_wrapper(_start_txn)(),
     )
 
 
@@ -597,19 +651,16 @@ def submit_certificate_assessment_attempt(
     )
     attempt_model.finished_at = _get_current_time()
     attempt_model.is_submitted = True
+    attempt_model.update_timestamps()
     attempt_model.put()
-    return certificate_assessment_domain.CertificateAssessmentAttempt.from_dict(
-        attempt_model.to_dict()
-    )
+    return _attempt_model_to_domain(attempt_model)
 
 
 def get_question_state_data_for_assessment_attempt(
     learner_id: str,
     attempt_id: str,
     question_id: str,
-    # Here we use object because question state data is a heterogeneous dict
-    # whose values depend on the interaction type of the question.
-) -> Dict[str, object]:
+) -> state_domain.StateDict:
     """Returns pinned question state data for an in-progress attempt."""
     attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
         attempt_id
@@ -841,6 +892,63 @@ def _model_to_domain(
         async_status=certificate_assessment_offering_model.async_status,
         version=certificate_assessment_offering_model.version,
     )
+
+
+def _attempt_model_to_domain(
+    attempt_model: gae_models.CertificateAssessmentAttemptModel,
+) -> certificate_assessment_domain.CertificateAssessmentAttempt:
+    """Converts a storage model to a domain object."""
+    return certificate_assessment_domain.CertificateAssessmentAttempt(
+        attempt_id=attempt_model.id,
+        learner_id=attempt_model.learner_id,
+        total_score=attempt_model.total_score,
+        attempt_index=attempt_model.attempt_index,
+        attempt_data=attempt_model.attempt_data,
+        version_data=attempt_model.version_data,
+        started_at=attempt_model.started_at,
+        finished_at=attempt_model.finished_at,
+        is_submitted=attempt_model.is_submitted,
+    )
+
+
+def get_certificate_assessment_attempt(
+    attempt_id: str,
+) -> certificate_assessment_domain.CertificateAssessmentAttempt:
+    """Returns the attempt with the given ID.
+
+    Args:
+        attempt_id: str. The ID of the attempt.
+
+    Returns:
+        CertificateAssessmentAttempt. The attempt with the given ID.
+
+    Raises:
+        utils.ValidationError. If the attempt does not exist.
+    """
+    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
+        attempt_id
+    )
+    if attempt_model is None:
+        raise utils.ValidationError('Attempt does not exist.')
+    return _attempt_model_to_domain(attempt_model)
+
+
+def get_active_certificate_assessment_attempt(
+    learner_id: str,
+) -> certificate_assessment_domain.CertificateAssessmentAttempt:
+    """Returns the learner's active in-progress assessment attempt.
+
+    Args:
+        learner_id: str. The ID of the learner.
+
+    Returns:
+        CertificateAssessmentAttempt. The learner's active attempt.
+
+    Raises:
+        utils.ValidationError. If the learner has no active attempt.
+    """
+    attempt_model = _get_active_attempt_for_learner(learner_id)
+    return _attempt_model_to_domain(attempt_model)
 
 
 def create_certificate_assessment_offering(

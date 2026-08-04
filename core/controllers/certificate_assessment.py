@@ -20,7 +20,7 @@ from core import feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import certificate_assessment_services
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class CertificateAssessmentOfferingTopicDict(TypedDict):
@@ -74,7 +74,7 @@ class SubmitCertificateAssessmentAnswerDict(TypedDict):
     """Dict representation of a single submitted answer."""
 
     question_id: str
-    selected_answer: str
+    selected_answer: Optional[str]
 
 
 class SubmitCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
@@ -403,6 +403,7 @@ class StartCertificateAssessmentHandler(
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self) -> None:
         assert self.normalized_payload is not None
+        assert self.user_id is not None
         try:
             attempt, questions = (
                 certificate_assessment_services.start_certificate_assessment_attempt(
@@ -411,10 +412,10 @@ class StartCertificateAssessmentHandler(
             )
         except (
             certificate_assessment_services.CertificateAssessmentAttemptNotReadyException
-        ):
+        ) as e:
             raise self.InvalidInputException(
                 'Sorry, this assessment isn\'t ready anymore! We\'ve alerted the creator, and in the meantime you can try a different assessment.'
-            )
+            ) from e
         self.render_json(
             {
                 'attempt_id': attempt.attempt_id,
@@ -463,9 +464,16 @@ class SubmitCertificateAssessmentHandler(
     @acl_decorators.can_submit_assessment_response
     def post(self, attempt_id: str) -> None:
         assert self.normalized_payload is not None
+        answers: List[Dict[str, Optional[str]]] = [
+            {
+                'question_id': answer['question_id'],
+                'selected_answer': answer['selected_answer'],
+            }
+            for answer in self.normalized_payload['answers']
+        ]
         try:
             attempt = certificate_assessment_services.submit_certificate_assessment_attempt(
-                attempt_id, self.normalized_payload['answers']
+                attempt_id, answers
             )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e) from e
@@ -485,6 +493,7 @@ class CertificateQuestionHandler(
 
     @acl_decorators.can_access_certificate_assessment_attempt
     def get(self, question_id: str, attempt_id: str) -> None:
+        assert self.user_id is not None
         try:
             question_state_data = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
                 self.user_id, attempt_id, question_id

@@ -28,6 +28,7 @@ from core.controllers import base
 from core.domain import (
     android_services,
     blog_services,
+    certificate_assessment_services,
     classroom_config_services,
     email_manager,
     feature_flag_services,
@@ -5136,27 +5137,45 @@ def can_access_certificate_dashboard(
 def can_submit_assessment_response(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Checks whether the current learner can submit the attempt."""
+    """Checks whether the current learner can submit the attempt.
 
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks whether the current
+        learner can submit the assessment attempt.
+
+    Raises:
+        base.UserFacingExceptions.NotLoggedInException. If the learner is not
+            logged in.
+        base.UserFacingExceptions.UnauthorizedUserException. If the attempt
+            does not belong to the learner.
+        base.UserFacingExceptions.InvalidInputException. If the attempt has
+            already been submitted.
+        base.UserFacingExceptions.NotFoundException. If the attempt cannot be
+            found.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_submit(
         self: _SelfBaseHandlerType, attempt_id: str, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
-
-        from core.storage.certificate_assessment import gae_models
-
-        attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
-            attempt_id
-        )
-        if attempt_model is None:
-            raise self.NotFoundException
-        if attempt_model.learner_id != self.user_id:
+        try:
+            attempt = certificate_assessment_services.get_certificate_assessment_attempt(
+                attempt_id
+            )
+        except utils.ValidationError as e:
+            raise self.NotFoundException(str(e)) from e
+        if attempt.learner_id != self.user_id:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have permission to submit this assessment.'
             )
-        if attempt_model.is_submitted:
+        if attempt.is_submitted:
             raise self.InvalidInputException(
                 'This assessment has already been submitted.'
             )
@@ -5168,32 +5187,41 @@ def can_submit_assessment_response(
 def can_access_certificate_assessment_attempt(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Checks access to a learner's active certificate assessment attempt."""
+    """Checks access to a learner's active certificate assessment attempt.
 
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks whether the current
+        learner can access a question from the active certificate assessment
+        attempt.
+
+    Raises:
+        base.UserFacingExceptions.NotLoggedInException. If the learner is not
+            logged in.
+        base.UserFacingExceptions.UnauthorizedUserException. If no active
+            attempt exists.
+        base.UserFacingExceptions.InvalidInputException. If the question does
+            not belong to the active attempt.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
-
-        from core.storage.certificate_assessment import gae_models
-
-        attempt_model = gae_models.CertificateAssessmentAttemptModel.query(
-            gae_models.CertificateAssessmentAttemptModel.learner_id
-            == self.user_id,
-            gae_models.CertificateAssessmentAttemptModel.is_submitted
-            == False,  # pylint: disable=singleton-comparison
-        ).get()
-        if attempt_model is None:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'No active certificate assessment attempt was found.'
-            )
-        if question_id not in attempt_model.version_data['question_versions']:
+        attempt = certificate_assessment_services._get_active_attempt_for_learner(  # pylint: disable=protected-access
+            self.user_id
+        )
+        if question_id not in attempt.version_data['question_versions']:
             raise self.InvalidInputException(
                 'Question is not part of this assessment.'
             )
-        return handler(self, question_id, attempt_id=attempt_model.id, **kwargs)
+        return handler(self, question_id, attempt_id=attempt.id, **kwargs)
 
     return test_can_access
 

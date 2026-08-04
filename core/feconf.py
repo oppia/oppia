@@ -1183,6 +1183,9 @@ CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
 CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
     '/certificate_assessment_attempts_handler'
 )
+CERTIFICATE_QUESTION_HANDLER = (
+    '/certificate_question_handler/<question_id>/<attempt_id>'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

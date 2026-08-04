@@ -388,6 +388,10 @@ class CertificateAssessmentAttempt:
         """Validates the per-topic attempt statistics."""
         if not isinstance(self.attempt_data, dict):
             raise utils.ValidationError('attempt_data must be a dict.')
+        if not self.attempt_data:
+            raise utils.ValidationError(
+                'attempt_data must contain stats for at least one topic.'
+            )
         for topic_id, topic_stats in self.attempt_data.items():
             if not isinstance(topic_id, str) or not topic_id:
                 raise utils.ValidationError(
