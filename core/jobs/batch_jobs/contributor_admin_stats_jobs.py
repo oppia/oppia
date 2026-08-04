@@ -304,6 +304,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             >> beam.GroupByKey()
             | 'Transform translation reviewer stats'
             >> beam.MapTuple(self.transform_translation_review_stats)
+            | 'Filter total translation reviewer stats'
+            >> beam.Filter(lambda res: res is not None)
         )
 
         question_submitter_total_stats_model_results = (
@@ -605,7 +607,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_reviewer_stats: Iterable[
             suggestion_models.TranslationReviewStatsModel
         ],
-    ) -> suggestion_models.TranslationReviewerTotalContributionStatsModel:
+    ) -> Optional[
+        suggestion_models.TranslationReviewerTotalContributionStatsModel
+    ]:
         """Transforms TranslationReviewStatsModel to
         TranslationReviewerTotalContributionStatsModel.
 
@@ -618,21 +622,26 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 (language_code, reviewer_user_id).
 
         Returns:
-            suggestion_models
-            .TranslationReviewerTotalContributionStatsModel.
-            New TranslationReviewerTotalContributionStatsModel model.
+            Optional[suggestion_models.TranslationReviewerTotalContributionStatsModel].
+            A TranslationReviewerTotalContributionStatsModel if valid topic
+            stats exist, otherwise None when all topics are invalid/deleted.
         """
-
-        translation_reviewer_stats = list(translation_reviewer_stats)
 
         language_code, reviewer_user_id = keys
         entity_id = '%s.%s' % (language_code, reviewer_user_id)
 
-        for stat in translation_reviewer_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(
+        translation_reviewer_stats = [
+            stat
+            for stat in translation_reviewer_stats
+            if not GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id
-            ):
-                translation_reviewer_stats.remove(stat)
+            )
+        ]
+
+        if len(translation_reviewer_stats) == 0:
+            # No need to generate total reviewer stats if there is no valid
+            # stats model (e.g. all topics are invalid/deleted).
+            return None
 
         topic_ids = [v.topic_id for v in translation_reviewer_stats]
         reviewed_translations_count = sum(

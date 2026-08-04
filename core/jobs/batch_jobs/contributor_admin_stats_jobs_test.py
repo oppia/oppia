@@ -1711,6 +1711,19 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
         self.assert_job_output_is_empty()
 
+    def test_skip_generation_if_translation_review_has_only_invalid_topics(
+        self,
+    ) -> None:
+        self.translation_review_model_with_invalid_topic.update_timestamps()
+
+        self.put_multi(
+            [
+                self.translation_review_model_with_invalid_topic,
+            ]
+        )
+
+        self.assert_job_output_is_empty()
+
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
