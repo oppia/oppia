@@ -596,10 +596,10 @@ def _check_if_usernames_are_valid(
             datastore_services.any_of(*filters)
         ).fetch()
     )
-    existing_normalized_usernames = [
+    existing_normalized_usernames = {
         user_settings.normalized_username
         for user_settings in existing_users_settings
-    ]
+    }
     invalid_usernames = [
         username
         for username, normalized_username in zip(
