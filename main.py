@@ -1457,6 +1457,10 @@ URLS = [
         certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
     ),
     get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler,
+    ),
+    get_redirect_route(
         feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
         certificate_assessment.StartCertificateAssessmentHandler,
     ),
