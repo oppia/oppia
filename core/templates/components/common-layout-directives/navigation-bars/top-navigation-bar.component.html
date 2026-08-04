@@ -431,7 +431,7 @@
           (mouseover)="openSubmenu($event, 'profileMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item"
-            *ngIf="unreadMySuggestionSummaries.length>0"
+            *ngIf="unreadMySuggestionSummaries.length>0">
           <div class="oppia-navbar-creator-updates">
             <strong>Updates from Creators:</strong>
             <a *ngFor="let summary of unreadMySuggestionSummaries"
