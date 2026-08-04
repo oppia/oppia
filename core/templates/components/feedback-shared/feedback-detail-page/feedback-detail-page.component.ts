@@ -30,8 +30,11 @@ import {
   FeedbackCardConfig,
   FeedbackSessionInfo,
   FeedbackStatus,
+  LessonFeedbackResponse,
   LessonFeedbackDetailResponse,
   PlatformFeedbackDetailResponse,
+  ReportAnIssueCategory,
+  ReportType,
   SOURCE_LABELS,
   TECHNICAL_TEAM_LABELS,
 } from 'domain/feedback/feedback.model';
@@ -54,9 +57,10 @@ export class FeedbackDetailPageComponent {
     private dateTimeFormatService: DateTimeFormatService,
     private windowRef: WindowRef
   ) {}
-  @Input() feedbackDetailResponse!:
+  @Input() feedbackDetailResponse:
     | LessonFeedbackDetailResponse
-    | PlatformFeedbackDetailResponse;
+    | PlatformFeedbackDetailResponse
+    | null = null;
   @Input() feedbackDetailPageConfig!: FeedbackCardConfig;
   @Input() screenshotDataUrl: string | null = null;
   @Input() statusOptions!: FeedbackStatus[];
@@ -74,7 +78,7 @@ export class FeedbackDetailPageComponent {
   replyText: string = '';
   isSendingReply: boolean = false;
 
-  getPlatformLabel(platform: string): string {
+  getPlatformLabel(platform: string | null): string {
     return platform === 'android' ? 'Android' : 'Web';
   }
 
@@ -125,6 +129,46 @@ export class FeedbackDetailPageComponent {
     return this.sourceLabels[source] || 'Lesson';
   }
 
+  getFeedbackCategory(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): ReportAnIssueCategory | null {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? response.category
+      : null;
+  }
+
+  getFeedbackSourceLabel(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? this.getSourceLabel(response.source)
+      : this.getSourceLabel(ReportType.LESSON);
+  }
+
+  getFeedbackPlatformLabel(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string {
+    return this.getPlatformLabel(
+      this.isPlatformFeedbackDetailResponse(response) ? response.platform : null
+    );
+  }
+
+  getFeedbackPageUrl(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): string | null {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? response.page_url
+      : null;
+  }
+
+  getFeedbackResponses(
+    response: LessonFeedbackDetailResponse | PlatformFeedbackDetailResponse
+  ): LessonFeedbackResponse[] {
+    return this.isPlatformFeedbackDetailResponse(response)
+      ? []
+      : response.response_list;
+  }
+
   getDestinationLabel(
     destinationDashboard: 'tech-external' | 'tech-internal' | 'curriculum'
   ): string {
@@ -135,6 +179,10 @@ export class FeedbackDetailPageComponent {
 
   getFeedbackMessage(): string {
     const response = this.feedbackDetailResponse;
+
+    if (response === null) {
+      return '';
+    }
 
     if (this.isPlatformFeedbackDetailResponse(response)) {
       return response.report_message;
@@ -153,9 +201,12 @@ export class FeedbackDetailPageComponent {
   }
 
   private isPlatformFeedbackDetailResponse(
-    response: PlatformFeedbackDetailResponse | LessonFeedbackDetailResponse
+    response:
+      | PlatformFeedbackDetailResponse
+      | LessonFeedbackDetailResponse
+      | null
   ): response is PlatformFeedbackDetailResponse {
-    return 'report_message' in response;
+    return response !== null && 'report_message' in response;
   }
 
   getGithubIssueUrl(): string {
@@ -415,9 +466,14 @@ export class FeedbackDetailPageComponent {
     return JSON.stringify(sessionInfo, null, 2) ?? 'Unable to serialize logs.';
   }
 
-  // TODO(#24716): Stub right now, will be done in the creator feedback tab and
-  // My suggestions tab's PR.
   onReplySend(): void {
-    this.messageSend.emit(this.replyText);
+    const replyText = this.replyText.trim();
+    if (!replyText) {
+      return;
+    }
+    this.isSendingReply = true;
+    this.messageSend.emit(replyText);
+    this.replyText = '';
+    this.isSendingReply = false;
   }
 }

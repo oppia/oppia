@@ -189,10 +189,11 @@ export class FeedbackBackendApiService {
     return await this.http.get<LessonFeedbackDetailResponse>(url).toPromise();
   }
 
-  async updateLessonFeedbackStatusAsync(
+  async updateLessonFeedbackAsync(
     explorationId: string,
     feedbackId: string,
-    newStatus: string
+    newStatus: string,
+    replyText: string | null = null
   ): Promise<SuccessResponse> {
     const url = [
       this.lessonFeedbackUrl,
@@ -202,6 +203,7 @@ export class FeedbackBackendApiService {
     return await this.http
       .post<SuccessResponse>(url, {
         status: newStatus,
+        reply_text: replyText,
       })
       .toPromise();
   }

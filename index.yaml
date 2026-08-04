@@ -692,3 +692,11 @@ indexes:
   - name: status
   - name: created_on
     direction: desc
+
+- kind: LessonFeedbackModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: status
+  - name: created_on
+    direction: desc

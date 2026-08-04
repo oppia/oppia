@@ -37,6 +37,8 @@ import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
+import {AppConstants} from 'app.constants';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {
   CREATOR_DASHBOARD_FILTER_CONFIG,
   CreatorFeedbackType,
@@ -105,6 +107,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     },
   };
   selectedCreatorFeedbackId: string | null = null;
+  creatorFeedbackScreenshotDataUrl: string | null = null;
   creatorFeedbackDetailResponse:
     | PlatformFeedbackDetailResponse
     | LessonFeedbackDetailResponse
@@ -152,6 +155,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     private pageContextService: PageContextService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private feedbackBackendApiService: FeedbackBackendApiService,
+    private assetsBackendApiService: AssetsBackendApiService,
     private windowRef: WindowRef
   ) {}
 
@@ -349,6 +353,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       .then(response => {
         this.selectedCreatorFeedbackId = feedbackId;
         this.creatorFeedbackDetailResponse = response;
+        this.loadCreatorFeedbackScreenshot();
         this.loaderService.hideLoadingScreen();
       });
   }
@@ -364,8 +369,30 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       .then(response => {
         this.selectedCreatorFeedbackId = feedbackId;
         this.creatorFeedbackDetailResponse = response;
+        this.loadCreatorFeedbackScreenshot();
         this.loaderService.hideLoadingScreen();
       });
+  }
+
+  private loadCreatorFeedbackScreenshot(): void {
+    const response = this.creatorFeedbackDetailResponse;
+    this.creatorFeedbackScreenshotDataUrl = null;
+
+    if (
+      response === null ||
+      !('screenshot_entity_id' in response) ||
+      !response.screenshot_entity_id ||
+      !response.screenshot_filename
+    ) {
+      return;
+    }
+
+    this.creatorFeedbackScreenshotDataUrl =
+      this.assetsBackendApiService.getImageUrlForPreview(
+        AppConstants.ENTITY_TYPE.FEEDBACK,
+        response.screenshot_entity_id,
+        response.screenshot_filename
+      );
   }
 
   private getSummaryPreview(
@@ -384,7 +411,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       .trim();
 
     if (!searchText) {
-      state.displayedSummaries = state.summaries;
+      state.displayedSummaries = [...state.summaries];
       return;
     }
 
@@ -489,14 +516,10 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     if (!detail) {
       this.selectedCreatorFeedbackId = null;
       this.creatorFeedbackDetailResponse = null;
+      this.creatorFeedbackScreenshotDataUrl = null;
       return;
     }
-    this.selectedCreatorFeedbackId = detail.feedbackId;
-    if (detail.feedbackType === FeedbackModalType.LESSON_FEEDBACK) {
-      this.loadCreatorLessonFeedbackDetail(detail.feedbackId);
-    } else {
-      this.loadCreatorReportFeedbackDetail(detail.feedbackId);
-    }
+    this.loadCreatorFeedbackDetail(detail.feedbackType, detail.feedbackId);
   }
 
   private readonly onHashChange = (): void => {
@@ -516,6 +539,105 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
         this.loadCreatorReportFeedbackDetail(feedbackId);
         break;
     }
+  }
+
+  private updateLessonFeedbackStatus(status: FeedbackStatus): void {
+    if (
+      this.selectedCreatorFeedbackId === null ||
+      this.creatorFeedbackDetailResponse === null
+    ) {
+      return;
+    }
+
+    const feedbackId = this.selectedCreatorFeedbackId;
+
+    this.feedbackBackendApiService
+      .updateLessonFeedbackAsync(
+        this.pageContextService.getExplorationId(),
+        feedbackId,
+        status,
+        null
+      )
+      .then(() => {
+        this.fetchCreatorFeedbackPage();
+        this.loadCreatorLessonFeedbackDetail(feedbackId);
+
+        this.alertsService.addSuccessMessage(
+          `Feedback status updated to ${status}.`,
+          7000,
+          true
+        );
+      });
+  }
+
+  private updateReportFeedbackStatus(status: FeedbackStatus): void {
+    if (
+      this.selectedCreatorFeedbackId === null ||
+      this.creatorFeedbackDetailResponse === null
+    ) {
+      return;
+    }
+
+    const feedbackId = this.selectedCreatorFeedbackId;
+
+    this.feedbackBackendApiService
+      .updatePlatformFeedbackStatusAsync(
+        'curriculum',
+        this.pageContextService.getExplorationId(),
+        feedbackId,
+        status
+      )
+      .then(() => {
+        this.fetchCreatorFeedbackPage();
+        this.loadCreatorReportFeedbackDetail(feedbackId);
+
+        this.alertsService.addSuccessMessage(
+          `Feedback status updated to ${status}.`,
+          7000,
+          true
+        );
+      });
+  }
+
+  private updateLessonFeedbackReply(replyText: string): void {
+    if (
+      this.selectedCreatorFeedbackId === null ||
+      this.creatorFeedbackDetailResponse === null
+    ) {
+      return;
+    }
+
+    const feedbackId = this.selectedCreatorFeedbackId;
+    const status = this.creatorFeedbackDetailResponse.status;
+    this.feedbackBackendApiService
+      .updateLessonFeedbackAsync(
+        this.pageContextService.getExplorationId(),
+        feedbackId,
+        status,
+        replyText
+      )
+      .then(() => {
+        this.fetchCreatorFeedbackPage();
+        this.loadCreatorLessonFeedbackDetail(feedbackId);
+
+        this.alertsService.addSuccessMessage(
+          'Reply sent successfully.',
+          7000,
+          true
+        );
+      });
+  }
+
+  onCreatorFeedbackStatusChange(status: FeedbackStatus): void {
+    if (this.isCreatorLessonFeedbackFilterSelected()) {
+      this.updateLessonFeedbackStatus(status);
+    } else {
+      this.updateReportFeedbackStatus(status);
+    }
+  }
+
+  onCreatorFeedbackMessageSend(replyText: string): void {
+    this.updateLessonFeedbackReply(replyText);
   }
 
   getDisplayedCreatorFeedbackSummaries():
@@ -571,32 +693,30 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   onCreatorFeedbackFilterChange(filterState: FeedbackFilterState): void {
     const hasSameServerFilters =
       this.hasSameCreatorFeedbackServerFilters(filterState);
+
     this.currentCreatorFeedbackFilterState = filterState;
 
     const state = this.getCurrentCreatorFeedbackListState();
+
     if (
       hasSameServerFilters &&
       (state.summaries.length > 0 ||
         state.nextCursor !== null ||
         state.currentPage > 1)
     ) {
-      const detail = this.getCreatorFeedbackDetailFromUrl();
-
-      if (!detail) {
-        this.selectedCreatorFeedbackId = null;
-        this.creatorFeedbackDetailResponse = null;
-        this.fetchCreatorFeedbackPage();
-        return;
+      if (this.isCreatorLessonFeedbackFilterSelected()) {
+        this.applyCreatorFeedbackSearch(this.creatorLessonFeedbackListState);
+      } else {
+        this.applyCreatorFeedbackSearch(this.creatorReportFeedbackListState);
       }
-
-      this.loadCreatorFeedbackDetail(detail.feedbackType, detail.feedbackId);
       return;
     }
+
     state.currentPage = 1;
     state.nextCursor = null;
     state.cursorHistory = [null];
 
-    this.fetchCreatorFeedbackPage(state.nextCursor);
+    this.fetchCreatorFeedbackPage();
   }
 
   navigateBackToCreatorFeedbackList(): void {
