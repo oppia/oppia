@@ -275,7 +275,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        formResponse.category ?? '',
+        // The isValid() check above guarantees category is non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        formResponse.category!,
         formResponse.username,
         formResponse.languageCode
       )
@@ -306,7 +308,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     ) {
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
-          formResponse.category ?? '',
+          // The isValid() check above guarantees category is non-null.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          formResponse.category!,
           formResponse.languageCode
         )
         .then(usersObject => {
@@ -367,7 +371,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        formResponse.category ?? '',
+        // The isValid() check above guarantees category is non-null.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        formResponse.category!,
         formResponse.username,
         formResponse.languageCode
       )
