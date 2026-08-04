@@ -21,7 +21,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subscription} from 'rxjs';
 import {PageTitleService} from 'services/page-title.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import './topic-preview-tab.component.css';
 
@@ -45,6 +48,9 @@ interface TopicViewerStorySectionData {
   encapsulation: ViewEncapsulation.None,
 })
 export class TopicPreviewTabComponent {
+  private _TAB_STORY: string = 'story';
+  private _TAB_SUBTOPIC: string = 'subtopic';
+  private _TAB_PRACTICE: string = 'practice';
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -55,14 +61,19 @@ export class TopicPreviewTabComponent {
   classroomUrlFragment: string = '';
   classroomName: string = '';
   topicUrlFragment!: string;
+  subtopics!: Subtopic[];
   canonicalStorySummaries!: StorySummary[];
   canonicalStorySectionData: readonly TopicViewerStorySectionData[] = [];
+  activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
+  practiceTabIsDisplayed: boolean = false;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
+    private urlInterpolationService: UrlInterpolationService,
     private pageTitleService: PageTitleService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +86,7 @@ export class TopicPreviewTabComponent {
       this.topicEditorStateService.getClassroomUrlFragment() ?? '';
     this.topicName = this.topic.getName();
     this.topicUrlFragment = this.topic.getUrlFragment();
+    this.subtopics = this.topic.getSubtopics();
     this.canonicalStorySummaries =
       this.topicEditorStateService.getCanonicalStorySummaries();
     for (let idx in this.canonicalStorySummaries) {
@@ -88,6 +100,33 @@ export class TopicPreviewTabComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  changePreviewTab(tabName: string): void {
+    switch (tabName) {
+      case this._TAB_STORY:
+        this.activeTab = this._TAB_STORY;
+        break;
+      case this._TAB_SUBTOPIC:
+        this.activeTab = this._TAB_SUBTOPIC;
+        break;
+      case this._TAB_PRACTICE:
+        this.activeTab = this._TAB_PRACTICE;
+        break;
+    }
+  }
+
+  isPracticeTabEnabled(): boolean {
+    return this.topic.getPracticeTabIsDisplayed();
+  }
+
+  isRedesignedTopicViewerPageFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.RedesignedTopicViewerPage
+      .isEnabled;
   }
 
   trackStoryDataById(

@@ -22,6 +22,8 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {StorySummary} from 'domain/story/story-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicPreviewTabComponent} from './topic-preview-tab.component';
 import {Subject} from 'rxjs';
@@ -33,6 +35,7 @@ describe('Topic Preview Tab Component', () => {
   let topicEditorStateService: MockTopicEditorStateService;
   let testName = 'test_name';
   let topicUrl = 'topic_1';
+  let mockUrl = 'mock_url';
   let storySummaries = [
     new StorySummary(
       'id',
@@ -101,6 +104,20 @@ describe('Topic Preview Tab Component', () => {
     }
   }
 
+  class MockUrlInterpolationService {
+    getStaticImageUrl(imagePath: string): string {
+      return mockUrl;
+    }
+  }
+
+  class MockPlatformFeatureService {
+    status = {
+      RedesignedTopicViewerPage: {
+        isEnabled: false,
+      },
+    };
+  }
+
   beforeEach(waitForAsync(() => {
     mockTranslateService = jasmine.createSpyObj(
       'TranslateService',
@@ -122,6 +139,14 @@ describe('Topic Preview Tab Component', () => {
         {
           provide: TopicEditorStateService,
           useExisting: MockTopicEditorStateService,
+        },
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: TranslateService,
@@ -150,6 +175,7 @@ describe('Topic Preview Tab Component', () => {
     expect(componentInstance.classroomUrlFragment).toEqual('classroom_1');
     expect(componentInstance.topicUrlFragment).toEqual('topic_1');
     expect(componentInstance.topicName).toEqual(testName);
+    expect(componentInstance.subtopics).toEqual([]);
     expect(componentInstance.canonicalStorySummaries).toEqual(storySummaries);
     expect(componentInstance.chapterCount).toEqual(0);
     expect(componentInstance.canonicalStorySectionData.length).toEqual(1);
@@ -224,6 +250,53 @@ describe('Topic Preview Tab Component', () => {
         componentInstance.canonicalStorySectionData[0]
       )
     ).toEqual('id');
+  });
+
+  it('should get static image url', () => {
+    expect(componentInstance.getStaticImageUrl('image_path')).toEqual(mockUrl);
+  });
+
+  it('should navigate among preview tabs', () => {
+    componentInstance.changePreviewTab('story');
+    expect(componentInstance.activeTab).toEqual('story');
+    componentInstance.changePreviewTab('subtopic');
+    expect(componentInstance.activeTab).toEqual('subtopic');
+    componentInstance.changePreviewTab('practice');
+    expect(componentInstance.activeTab).toEqual('practice');
+  });
+
+  it('should return true when practiceTabIsDisplayed is true', () => {
+    topicEditorStateService.setPracticeTabDisplayed(true);
+    componentInstance.ngOnInit();
+    expect(componentInstance.isPracticeTabEnabled()).toBe(true);
+  });
+
+  it('should return false when practiceTabIsDisplayed is false', () => {
+    topicEditorStateService.setPracticeTabDisplayed(false);
+    componentInstance.ngOnInit();
+    expect(componentInstance.isPracticeTabEnabled()).toBe(false);
+  });
+
+  it('should return true when redesigned topic viewer page feature is enabled', () => {
+    const mockPlatformFeatureService = TestBed.inject(
+      PlatformFeatureService
+    ) as unknown as MockPlatformFeatureService;
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    expect(componentInstance.isRedesignedTopicViewerPageFeatureEnabled()).toBe(
+      true
+    );
+  });
+
+  it('should return false when redesigned topic viewer page feature is disabled', () => {
+    const mockPlatformFeatureService = TestBed.inject(
+      PlatformFeatureService
+    ) as unknown as MockPlatformFeatureService;
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      false;
+    expect(componentInstance.isRedesignedTopicViewerPageFeatureEnabled()).toBe(
+      false
+    );
   });
 
   it('should update page title on language change', () => {
