@@ -304,7 +304,6 @@
   "I18N_LEARNER_DASHBOARD_MORNING_GREETING": "শুভ সকাল",
   "I18N_LEARNER_DASHBOARD_NEW_STORY_CONTENT": "নতুন গল্পের সামগ্রী উপলব্ধ",
   "I18N_LEARNER_DASHBOARD_PAGE_TITLE": "শিক্ষার্থীর যতিফলক | ওপিয়া",
-  "I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "পরে চালান",
   "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION": "অগ্রগতি",
   "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_EMPTY_DESC": "দেখে মনে হচ্ছে আপনার কোনও পাঠ চলছে না বা শেষ হয়নি। আপনার প্রথম পাঠ শুরু করতে ওপিয়ার শ্রেণীকক্ষে যান!",
   "I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER": "'<[sectionNameI18nId]>' তালিকা থেকে অপসারণ করবেন?",
