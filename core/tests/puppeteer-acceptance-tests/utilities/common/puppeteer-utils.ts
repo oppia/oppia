@@ -400,29 +400,12 @@ export class BaseUser {
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
 
-    await this.typeInInputField(usernameSelector, username);
-
-    await this.page.waitForFunction(
-      (selector: string, expectedUsername: string) => {
-        const usernameInput = document.querySelector(
-          selector
-        ) as HTMLInputElement | null;
-        return (usernameInput?.value || '').trim() === expectedUsername;
-      },
-      {},
-      usernameSelector,
-      username
+    await this.typeInInputField('input.e2e-test-username-input', username);
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-agree-to-terms-checkbox'
     );
-
-    await this.clickOnElementWithSelector(termsCheckboxSelector);
-
-    await this.page.waitForFunction(
-      (selector: string) => {
-        const checkbox = document.querySelector(selector) as HTMLInputElement;
-        return Boolean(checkbox?.checked);
-      },
-      {},
-      termsCheckboxSelector
+    await this.page.waitForSelector(
+      'button.e2e-test-register-user:not([disabled])'
     );
 
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
