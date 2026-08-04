@@ -3118,6 +3118,84 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             ]
         )
 
+    def test_translation_suggestion_without_contribution_stats_is_skipped(
+        self,
+    ) -> None:
+        # Create an exploration opportunity so that the translation suggestion
+        # is included in the validation pipeline.
+        exp_opportunity = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp_without_contribution_stats',
+            topic_id='topic_without_contribution_stats',
+            chapter_title='A chapter',
+            content_count=1,
+            story_id='story_without_contribution_stats',
+            story_title='A story',
+            topic_name='A topic',
+        )
+        exp_opportunity.update_timestamps()
+
+        # Create a suggestion without a corresponding
+        # TranslationContributionStatsModel or
+        # TranslationSubmitterTotalContributionStatsModel.
+        suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id='translation_suggestion_without_stats',
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_without_contribution_stats',
+            target_version_at_submission=1,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='translation_author',
+            final_reviewer_id=None,
+            change_cmd={},
+            score_category='translation.hi',
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+
+        self.put_multi([exp_opportunity, suggestion])
+
+        self.assert_job_output_is([])
+
+    def test_question_suggestion_without_contribution_stats_is_skipped(
+        self,
+    ) -> None:
+        # Create a skill opportunity so that the question suggestion is included
+        # in the validation pipeline.
+        skill_opportunity = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='skill_without_contribution_stats',
+            skill_description='A skill without contribution stats',
+            question_count=1,
+        )
+        skill_opportunity.update_timestamps()
+
+        # Create a suggestion without a corresponding
+        # QuestionContributionStatsModel or
+        # QuestionSubmitterTotalContributionStatsModel.
+        suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id='question_suggestion_without_stats',
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id='skill_without_contribution_stats',
+            target_version_at_submission=1,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='question_author',
+            final_reviewer_id=None,
+            change_cmd={},
+            score_category='question.skill_without_contribution_stats',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+
+        self.put_multi([skill_opportunity, suggestion])
+
+        self.assert_job_output_is([])
+
     def test_question_missing_total_emits_missing_log(self) -> None:
         # Test missing QuestionSubmitterTotalContributionStatsModel.
 

@@ -1858,6 +1858,11 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             if len(totals) > 0:
                 return result.Ok(kv)
 
+            if len(contribs) == 0:
+                # A total contribution stats model cannot be generated when there are
+                # no corresponding base contribution stats models.
+                return None
+
             # Generate Logs.
             contrib_ids = [str(getattr(c, 'id', None)) for c in contribs]
             suggestion_ids = [str(getattr(s, 'id', None)) for s in suggestions]
