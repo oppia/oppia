@@ -316,6 +316,11 @@ def create_suggestion(
                             'The Skill content has changed since this translation '
                             'was submitted.'
                         )
+                else:
+                    raise Exception(
+                        'Content ID %s does not exist in skill %s.'
+                        % (content_id, target_id)
+                    )
 
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.

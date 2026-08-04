@@ -349,6 +349,35 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'Skill translation suggestion',
             )
 
+    def test_create_skill_translation_suggestion_with_invalid_content_id_fails(
+        self,
+    ) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'invalid_content_id',
+            'language_code': 'hi',
+            'content_html': '<p>Skill explanation</p>',
+            'translation_html': '<p>Hindi Explanation</p>',
+            'data_format': 'html',
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            'Content ID invalid_content_id does not exist in skill %s.'
+            % skill_id,
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_SKILL,
+                skill_id,
+                1,
+                self.author_id,
+                change_dict,
+                'Skill translation suggestion',
+            )
+
     def test_create_translation_suggestion_fails_if_duplicate_exists(
         self,
     ) -> None:
