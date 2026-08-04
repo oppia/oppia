@@ -589,6 +589,9 @@ OPPIA_CONTENT_TAG_DELIMITER = '; '
 AZURE_TRANSLATOR_API_KEY = os.environ.get('AZURE_TRANSLATOR_API_KEY')
 AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
 
+# Dummy variable
+DUMMY_VARIABLE = 'dummy'
+
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
