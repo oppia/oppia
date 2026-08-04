@@ -592,6 +592,9 @@ AZURE_TRANSLATOR_REGION = os.environ.get('AZURE_TRANSLATOR_REGION')
 # Dummy variable
 DUMMY_VARIABLE = 'dummy'
 
+# Another dummy variable
+ANOTHER_DUMMY_VARIABLE = 'another_dummy'
+
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
