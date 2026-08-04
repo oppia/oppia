@@ -53,6 +53,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
 
 interface LearnerDashboardExplorationsData {
   completedExplorationsList: LearnerExplorationSummary[];
@@ -180,6 +181,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
   curatedExplorationIds = new Set<string>();
+  unreadMySuggestionsCount: number = 0;
 
   constructor(
     private alertsService: AlertsService,
@@ -197,7 +199,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private urlService: UrlService,
-    private platFeatService: PlatformFeatureService
+    private platFeatService: PlatformFeatureService,
+    private feedbackBackendApiService: FeedbackBackendApiService
   ) {}
 
   populateCuratedExplorationIds(): void {
@@ -283,6 +286,13 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           this.activeSection =
             LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
         }
+        if (
+          this.isShowRedesignedLearnerDashboardActive() &&
+          this.urlService.getUrlParams().active_tab === 'my-suggestions'
+        ) {
+          this.activeSection =
+            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS;
+        }
 
         return this.getSubtopicMasteryData();
       },
@@ -302,6 +312,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
+
+    if(this.isNewExplorationEditorFeedbackTabEnabled()) {
+      this.fetchUnreadMySuggestionsCount();
+    }
 
     let dashboardCollectionsDataPromise =
       this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
@@ -405,6 +419,14 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
           .MY_CERTIFICATES &&
       !this.isCertificateAssessmentEnabled()
+    ) {
+      return;
+    }
+    if (
+      newActiveSectionName ===
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+          .MY_SUGGESTIONS &&
+      !this.isNewExplorationEditorFeedbackTabEnabled()
     ) {
       return;
     }
@@ -585,6 +607,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.platFeatService.status.EnableCertificateAssessment.isEnabled;
   }
 
+  isNewExplorationEditorFeedbackTabEnabled(): boolean {
+    return this.platFeatService.status.ExplorationEditorNewCreatorFeedbackTab
+      .isEnabled;
+  }
+
   getDashboardTabHeading(): string {
     switch (this.activeSection) {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
@@ -599,9 +626,31 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .MY_CERTIFICATES:
         return 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_SECTION';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .MY_SUGGESTIONS:
+        return 'I18N_LEARNER_DASHBOARD_MY_SUGGESTIONS_SECTION';
       default:
         return `No valid I18N key for heading of ${this.activeSection}`;
     }
+  }
+
+
+  fetchUnreadMySuggestionsCount(): void {
+    this.feedbackBackendApiService
+      .fetchMyFeedbackListAsync()
+      .then(response => {
+        this.unreadMySuggestionsCount = response.summaries.reduce(
+          (count, summary) => count + summary.unread_response_count,
+          0
+        );
+      })
+      .catch(() => {
+        this.unreadMySuggestionsCount = 0;
+      });
+  }
+
+  onMySuggestionsUnreadCountChanged(unreadCount: number): void {
+    this.unreadMySuggestionsCount = unreadCount;
   }
 
   async getSubtopicMasteryData(): Promise<void> {

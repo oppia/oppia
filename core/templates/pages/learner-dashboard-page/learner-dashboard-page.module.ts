@@ -49,6 +49,8 @@ import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.componen
 import {MatDialogModule} from '@angular/material/dialog';
 import {NgCircleProgressModule} from 'ng-circle-progress';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
+import {MySuggestionsTabComponent} from './my-suggestions-tab.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -98,6 +100,7 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
     MyCertificatesTabComponent,
+    MySuggestionsTabComponent,
   ],
   entryComponents: [
     AddGoalsModalComponent,
@@ -120,6 +123,7 @@ import {MyCertificatesTabComponent} from './my-certificates-tab.component';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent,
     MyCertificatesTabComponent,
+    MySuggestionsTabComponent,
   ],
   providers: [LearnerDashboardActivityBackendApiService],
 })

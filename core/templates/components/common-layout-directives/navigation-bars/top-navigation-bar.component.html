@@ -419,12 +419,31 @@
               {{ unreadThreadsCount }}
             </span>
           </div>
+          <div *ngIf="getProfileNotificationCount() !== 0" class="oppia-unread-feedback-indicator">
+            <span class="oppia-unread-feedback-number">
+              {{ getProfileNotificationCount() }}
+            </span>
+          </div>
         </div>
       </a>
       <ul ngbDropdownMenu
           class="dropdown-menu dropdown-menu oppia-navbar-dropdown dropdn e2e-test-profile-dropdown-container"
           (mouseover)="openSubmenu($event, 'profileMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
+        <li class="nav-item"
+            *ngIf="unreadMySuggestionSummaries.length>0"
+          <div class="oppia-navbar-creator-updates">
+            <strong>Updates from Creators:</strong>
+            <a *ngFor="let summary of unreadMySuggestionSummaries"
+               class="oppia-navbar-creator-update-card"
+               [href]="getMySuggestionUpdateUrl(summary.id)"
+               (click)="closeSubmenuIfNotMobile($event)">
+              A creator responded to your feedback!
+            </a>
+          </div>
+        </li>
+        <hr class="oppia-top-right-menu-item-separator"
+            *ngIf="unreadMySuggestionSummaries.length > 0">
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"

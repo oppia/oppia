@@ -532,6 +532,26 @@
   font-weight: bold;
   position: absolute;
 }
+.oppia-top-navigation-bar .oppia-navbar-creator-updates {
+  padding: 8px 16px;
+  width: 280px;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-card {
+  border-left: 3px solid #00645c;
+  color: #333;
+  display: block;
+  font-size: 13px;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  padding: 8px 10px;
+  text-decoration: none;
+}
+.oppia-top-navigation-bar .oppia-navbar-creator-update-card:hover,
+.oppia-top-navigation-bar .oppia-navbar-creator-update-card:focus {
+  background-color: #e8f5f3;
+  color: #00645c;
+  text-decoration: none;
+}
 .oppia-top-navigation-bar .oppia-impact-report-btn {
   align-items: center;
   display: flex;

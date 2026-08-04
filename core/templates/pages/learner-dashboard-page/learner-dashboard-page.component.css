@@ -95,6 +95,22 @@ oppia-learner-dashboard-page .oppia-svg-image {
   color: #00645c;
 }
 
+oppia-learner-dashboard-sidebar-notification-badge {
+  align-items: center;
+  background: #c92820;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  margin-left: auto;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 4px 6px;
+}
+
 .oppia-learner-dashborad-menu-hover:hover {
   background-color: rgba(0, 100, 92, 0.1);
 }

@@ -1,0 +1,208 @@
+.oppia-my-suggestions-tab {
+  color: #333;
+  font-family: "Roboto", Arial, sans-serif;
+  margin-bottom: 48px;
+  width: 100%;
+}
+
+.oppia-my-suggestions-alert {
+  background: #fdecea;
+  border: 1px solid #f4b8b0;
+  border-radius: 4px;
+  color: #9f1d12;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+}
+
+.oppia-my-suggestions-loading,
+.oppia-my-suggestions-empty {
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 4px;
+  padding: 24px;
+}
+
+.oppia-my-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.oppia-my-suggestions-row {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 4px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 14px 16px;
+  text-align: left;
+  width: 100%;
+}
+
+.oppia-my-suggestions-row:hover,
+.oppia-my-suggestions-row:focus {
+  border-color: #00645c;
+  outline: none;
+}
+
+.oppia-my-suggestions-row-main {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.oppia-my-suggestions-preview {
+  overflow-wrap: anywhere;
+}
+
+.oppia-my-suggestions-notification-summary {
+  color: #00645c;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.oppia-my-suggestions-unread {
+  align-items: center;
+  background: #c92820;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 4px 6px;
+}
+
+.oppia-my-suggestions-row-status {
+  border-radius: 999px;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+  margin-left: 16px;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.oppia-my-suggestions-status-submitted {
+  background: #eef3ff;
+  color: #174ea6;
+}
+
+.oppia-my-suggestions-status-reviewed {
+  background: #f1f3f4;
+  color: #4d5156;
+}
+
+.oppia-my-suggestions-status-fixed {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.oppia-my-suggestions-load-more,
+.oppia-my-suggestions-back,
+.oppia-my-suggestions-follow-up-button {
+  background: #00645c;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+.oppia-my-suggestions-load-more:disabled,
+.oppia-my-suggestions-follow-up-button:disabled {
+  background: #9aa0a6;
+  cursor: default;
+}
+
+.oppia-my-suggestions-back {
+  margin-bottom: 16px;
+}
+
+.oppia-my-suggestions-detail-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.oppia-my-suggestions-date {
+  color: #5f6368;
+  font-size: 13px;
+}
+
+.oppia-my-suggestions-message-group,
+.oppia-my-suggestions-follow-up {
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  padding: 18px;
+}
+
+.oppia-my-suggestions-detail:focus {
+  outline: 3px solid #80cbc4;
+  outline-offset: 3px;
+}
+
+.oppia-my-suggestions-response {
+  border-left: 4px solid #2e7d32;
+  margin-top: 14px;
+  padding-left: 14px;
+}
+
+.oppia-my-suggestions-message-group h3,
+.oppia-my-suggestions-response h3,
+.oppia-my-suggestions-follow-up label {
+  color: #00645c;
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.oppia-my-suggestions-message-group p,
+.oppia-my-suggestions-response p {
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.oppia-my-suggestions-response span {
+  color: #5f6368;
+  font-size: 13px;
+}
+
+oppia-my-suggestions-tab textarea {
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  display: block;
+  margin-bottom: 12px;
+  padding: 10px;
+  resize: vertical;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .oppia-my-suggestions-row,
+  .oppia-my-suggestions-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .oppia-my-suggestions-row-status {
+    margin-left: 0;
+  }
+}

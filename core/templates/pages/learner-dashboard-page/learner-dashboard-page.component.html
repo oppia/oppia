@@ -93,6 +93,21 @@
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES | translate }}
           </button>
         </li>
+        <li *ngIf="isNewExplorationEditorFeedbackTabEnabled()">
+          <button aria-label="Go to my suggestions tab"
+                  class="align-items-center d-inline-flex rounded oppia-learner-dash-sidebar_btn text-left w-100 e2e-test-my-suggestions-section"
+                  tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS)">
+            <span aria-hidden="true" class="fas fa-comment-dots fa-lg"></span>
+            {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS | translate }}
+            <span *ngIf="unreadMySuggestionsCount > 0"
+                  class="oppia-learner-dashboard-sidebar-notification-badge">
+              {{ unreadMySuggestionsCount }}
+            </span>
+          </button>
+        </li>
       </ol>
     </nav>
     <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow && !isShowRedesignedLearnerDashboardActive()" headroom>
@@ -194,6 +209,11 @@
         <div class="w-100" *ngIf="isCertificateAssessmentEnabled() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_CERTIFICATES">
           <oppia-my-certificates-tab>
           </oppia-my-certificates-tab>
+        </div>
+        <div class="w-100" *ngIf="isNewExplorationEditorFeedbackTabEnabled() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.MY_SUGGESTIONS">
+          <oppia-my-suggestions-tab
+            (unreadCountChanged)="onMySuggestionsUnreadCountChanged($event)">
+          </oppia-my-suggestions-tab>
         </div>
       </div>
     </div>

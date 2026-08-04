@@ -56,7 +56,11 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {FeedbackModalComponent} from 'base-components/feedback-modal.component';
-import {FeedbackModalType} from 'domain/feedback/feedback.model';
+import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
+import {
+  FeedbackModalType,
+  LessonFeedbackSummary,
+} from 'domain/feedback/feedback.model';
 
 interface LanguageInfo {
   id: string;
@@ -151,6 +155,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
   unreadThreadsCount: number = 0;
+  unreadMySuggestionsCount: number = 0;
+  unreadMySuggestionSummaries: LessonFeedbackSummary[] = [];
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
   isWebFeedbackModalEnabled: boolean = false;
 
@@ -209,6 +215,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private alertsService: AlertsService,
     private feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService,
+    private feedbackBackendApiService: FeedbackBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
@@ -328,6 +335,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
               }
             }
           );
+          if (this.isNewExplorationEditorFeedbackTabEnabled()) {
+            this.fetchUnreadMySuggestions();
+          }
         }
         if (usernameFromUserInfo) {
           this.username = usernameFromUserInfo;
@@ -695,5 +705,38 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     });
 
     modalRef.componentInstance.feedbackModalType = FeedbackModalType.SITE_ISSUE;
+  }
+
+  isNewExplorationEditorFeedbackTabEnabled(): boolean {
+    return this.platformFeatureService.status
+      .ExplorationEditorNewCreatorFeedbackTab.isEnabled;
+  }
+
+  getProfileNotificationCount(): number {
+    return this.unreadMySuggestionsCount;
+  }
+
+  fetchUnreadMySuggestions(): void {
+    this.feedbackBackendApiService
+      .fetchMyFeedbackListAsync()
+      .then(response => {
+        this.unreadMySuggestionSummaries = response.summaries.filter(
+          summary => summary.unread_response_count > 0
+        );
+        this.unreadMySuggestionsCount = this.unreadMySuggestionSummaries.reduce(
+          (count, summary) => count + summary.unread_response_count,
+          0
+        );
+      })
+      .catch(() => {
+        this.unreadMySuggestionsCount = 0;
+        this.unreadMySuggestionSummaries = [];
+      });
+  }
+
+  getMySuggestionUpdateUrl(feedbackId: string): string {
+    return (
+      '/learner-dashboard?active_tab=my-suggestions&feedback_id=' + feedbackId
+    );
   }
 }
