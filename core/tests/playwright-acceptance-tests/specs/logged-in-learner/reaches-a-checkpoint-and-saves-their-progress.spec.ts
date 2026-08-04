@@ -40,8 +40,6 @@ const TOPIC_NAME = 'Positive Numbers';
 const STORY_TITLE = 'Number Adventures';
 const CHAPTER_NAME = 'Positive Numbers';
 
-test.describe.configure({mode: 'serial'});
-
 test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin;
