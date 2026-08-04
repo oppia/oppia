@@ -53,7 +53,6 @@ from core.controllers import (
     learner_dashboard,
     learner_goals,
     learner_group,
-    learner_playlist,
     library,
     moderator,
     oppia_root,
@@ -763,10 +762,6 @@ URLS = [
         learner_goals.LearnerGoalsHandler,
     ),
     get_redirect_route(
-        r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
-        learner_playlist.LearnerPlaylistHandler,
-    ),
-    get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogPostDataHandler,
     ),
@@ -1088,6 +1083,14 @@ URLS = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackListHandler,
+    ),
+    get_redirect_route(
+        r'%s/<feedback_id>' % feconf.MY_FEEDBACK_URL,
+        general_feedback.MyFeedbackDetailHandler,
     ),
     get_redirect_route(
         r'%s' % feconf.LESSON_FEEDBACK_URL,
@@ -1468,6 +1471,10 @@ URLS = [
     get_redirect_route(
         feconf.VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
         certificate_assessment.ValidateCertificateAssessmentOfferingHandler,
+    ),
+    get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler,
     ),
     get_redirect_route(
         feconf.START_CERTIFICATE_ASSESSMENT_HANDLER,
