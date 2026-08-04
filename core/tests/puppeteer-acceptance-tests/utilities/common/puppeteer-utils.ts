@@ -400,10 +400,8 @@ export class BaseUser {
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
 
-    await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
-    );
+    await this.typeInInputField(usernameSelector, username);
+    await this.clickOnElementWithSelector(termsCheckboxSelector);
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
