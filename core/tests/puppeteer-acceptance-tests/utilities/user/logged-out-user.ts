@@ -7585,6 +7585,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expects a collection with the given name to be visible in the community
    * library.
+   * @param {string} collectionName - The name of the collection expected to be visible.
    */
   async expectCollectionToBeVisibleInLibrary(
     collectionName: string
@@ -7685,6 +7686,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expects an exploration with the given title to be listed on the currently
    * open collection page.
+   * @param {string} explorationTitle - The title of the exploration expected to be listed.
    */
   async expectExplorationToBeListedInCollection(
     explorationTitle: string
@@ -7701,6 +7703,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to an exploration from the collection page by clicking its tile.
    * Handles desktop and mobile viewports, and falls back to the first available
    * tile when the target title cannot be matched by text content.
+   * @param {string} explorationTitle - The title of the exploration to navigate to.
    */
   async navigateToExplorationFromCollection(
     explorationTitle: string
@@ -7735,6 +7738,8 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Opens an exploration tile. Prefers a direct href link when available;
    * falls back to the mobile preview-tile flow otherwise.
+   * @param {puppeteer.ElementHandle} tile - The exploration tile to open.
+   * @param {boolean} isMobile - Whether the current viewport is using the mobile layout.
    */
   private async openExplorationTile(
     tile: puppeteer.ElementHandle,

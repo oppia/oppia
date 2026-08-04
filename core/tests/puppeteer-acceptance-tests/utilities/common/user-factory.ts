@@ -380,17 +380,7 @@ export class UserFactory {
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
-
-    // Cookie banner can be absent depending on app/session state.
-    const isCookieBannerVisible = await user.isElementVisible(
-      cookieBannerAcceptButton,
-      true,
-      5000
-    );
-    if (isCookieBannerVisible) {
-      await user.clickOnElementWithSelector(cookieBannerAcceptButton);
-    }
-
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
     activeUsers.push(user);
     return user;
   };
