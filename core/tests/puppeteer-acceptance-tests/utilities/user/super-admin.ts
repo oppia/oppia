@@ -358,7 +358,6 @@ export class SuperAdmin extends BaseUser {
    */
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
-    const normalizedRole = role.toLowerCase();
 
     await this.goto(adminPageRolesTab);
 
