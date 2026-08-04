@@ -1167,8 +1167,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_domain.Topic.create_default_topic(
             'topic_id', 'Topic 1', 'abbrev', 'description', 'fragment'
         )
-        topic.add_uncategorized_skill_id(self.SKILL_ID)
         topic_services.save_new_topic(self.USER_ID, topic)
+        # Use topic_services.add_uncategorized_skill() instead of
+        # topic.add_uncategorized_skill_id() to trigger the opportunity
+        # creation logic that runs when the feature flag is enabled.
+        topic_services.add_uncategorized_skill(
+            self.USER_ID, 'topic_id', self.SKILL_ID
+        )
 
         model_id = f'skill.{self.SKILL_ID}'
         model = opportunity_models.TranslationOpportunityModel.get(
@@ -1185,15 +1190,22 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             feconf.TranslatableEntityType.SKILL, self.SKILL_ID, 'es'
         )
         translation.add_translation(
-            '1',
-            '<p>Explicación</p>',
-            translation_domain.TranslatableContentFormat.HTML,
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'descripción',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             False,
         )
         translation_models.EntityTranslationsModel.create_new(
             feconf.TranslatableEntityType.SKILL.value,
             self.SKILL_ID,
             1,
+            'es',
+            translation.to_dict()['translations'],
+        ).put()
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.SKILL.value,
+            self.SKILL_ID,
+            2,
             'es',
             translation.to_dict()['translations'],
         ).put()

@@ -1243,12 +1243,19 @@ def update_skill(
             translation_counts = translation_services.get_translation_counts(
                 feconf.TranslatableEntityType.SKILL, skill
             )
-            opportunity_services.compute_translation_opportunity_models_with_updated_entity(
+            compute_models_fn = (
+                opportunity_services.compute_translation_opportunity_models_with_updated_entity
+            )
+            updated_opp_models = compute_models_fn(
                 feconf.ENTITY_TYPE_SKILL,
                 skill.id,
                 content_count,
                 translation_counts,
             )
+            if updated_opp_models:
+                opp_model_cls = opportunity_models.TranslationOpportunityModel
+                opp_model_cls.update_timestamps_multi(updated_opp_models)
+                opp_model_cls.put_multi(updated_opp_models)
 
     misconception_is_deleted = any(
         change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION

@@ -33,6 +33,7 @@ from core.domain import (
     rights_domain,
     rights_manager,
     rte_component_registry,
+    skill_domain,
     skill_services,
     state_domain,
     story_domain,
@@ -330,10 +331,36 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
+        # Update the skill explanation to a known value so we can test
+        # the content mismatch check.
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
+                    ),
+                    'old_value': {
+                        'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
+                        'html': '',
+                    },
+                    'new_value': {
+                        'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
+                        'html': '<p>Actual skill explanation</p>',
+                    },
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.author_id,
+            skill_id,
+            changelist,
+            'Updated skill explanation.',
+        )
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Explanation',
-            'content_id': '1',
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
             'language_code': 'hi',
             'content_html': '<p>Different skill explanation html</p>',
             'translation_html': '<p>Hindi Explanation</p>',
