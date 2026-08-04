@@ -1067,6 +1067,12 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     subscription_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
     )
+    # Whether the user wants to receive Contributor Dashboard reviewer
+    # notification emails. This has no datastore-level default so that a None
+    # value can identify legacy entities and preserve their existing behavior.
+    contributor_dashboard_notifications = datastore_services.BooleanProperty(
+        indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1111,6 +1117,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
                 'editor_role_notifications': base_models.EXPORT_POLICY.EXPORTED,
                 'feedback_message_notifications': base_models.EXPORT_POLICY.EXPORTED,
                 'subscription_notifications': base_models.EXPORT_POLICY.EXPORTED,
+                'contributor_dashboard_notifications': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -1124,6 +1131,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
                 'editor_role_notifications': user_email_preferences.editor_role_notifications,
                 'feedback_message_notifications': user_email_preferences.feedback_message_notifications,
                 'subscription_notifications': user_email_preferences.subscription_notifications,
+                'contributor_dashboard_notifications': user_email_preferences.contributor_dashboard_notifications,
             }
         else:
             return {}

@@ -31,6 +31,7 @@ export interface EmailPreferencesBackendDict {
   can_receive_editor_role_email: boolean;
   can_receive_feedback_message_email: boolean;
   can_receive_subscription_email: boolean;
+  can_receive_contributor_dashboard_email: boolean;
 }
 
 interface NonEmailPreferencesBackendDict {

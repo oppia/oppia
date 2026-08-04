@@ -316,6 +316,16 @@
             <div class="checkbox">
               <label>
                 <input type="checkbox"
+                       class="e2e-test-contributor-dashboard-email-checkbox"
+                       formControlName="canReceiveContributorDashboardEmail">
+                <span>
+                  {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_CONTRIBUTOR_DASHBOARD_REVIEW_NOTIFICATIONS' | translate}}
+                </span>
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox"
                        class="e2e-test-feedback-message-email-checkbox"
                        formControlName="canReceiveFeedbackMessageEmail">
                 <span>
