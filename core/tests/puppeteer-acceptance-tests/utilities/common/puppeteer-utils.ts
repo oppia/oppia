@@ -1340,21 +1340,23 @@ export class BaseUser {
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
    * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
-   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
-   * almost all cases and for the page to fully load.
+   * idle within a certain timeframe.
    *
-   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * The default timeout is intentionally short (5 seconds) because this helper is best-effort: on a slow CI runner a
+   * persistently busy network can otherwise consume the full 30 second default on every call, wasting tens of minutes across
+   * large setups (e.g. creating many explorations) and causing acceptance-test flakes that blow past hook timeouts. Downstream
+   * actions still wait on the actual UI elements via waitForSelector, so proceeding before the network is fully idle is safe.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 5000, idleTime: 500}.
    * @param {Page} page The page to wait for network idle. Defaults to the current page.
    */
   async waitForNetworkIdle(
-    options: {timeout?: number; idleTime?: number} = {
-      timeout: 30000,
-      idleTime: 500,
-    },
+    options: {timeout?: number; idleTime?: number} = {},
     page: Page = this.page
   ): Promise<void> {
+    const {timeout = 5000, idleTime = 500} = options;
     try {
-      await page.waitForNetworkIdle(options);
+      await page.waitForNetworkIdle({timeout, idleTime});
     } catch (error) {
       if (error.message.includes('Timeout')) {
         showMessage(

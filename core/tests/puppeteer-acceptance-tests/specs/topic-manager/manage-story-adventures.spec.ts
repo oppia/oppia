@@ -81,7 +81,7 @@ describe('Topic Manager', function () {
     }
 
     await curriculumAdmin.saveStoryDraft();
-  }, 2100000);
+  }, 2700000);
 
   it(
     'should create a new adventure from existing chapters',
