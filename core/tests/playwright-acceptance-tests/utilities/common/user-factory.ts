@@ -295,9 +295,7 @@ export class UserFactory {
     const page = await context.newPage();
     ConsoleReporter.trackConsoleMessagesInPage(page);
 
-    let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
-      LoggedOutUserFactory(page),
-    ]);
+    let user = new LoggedOutUser(page);
 
     await page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
