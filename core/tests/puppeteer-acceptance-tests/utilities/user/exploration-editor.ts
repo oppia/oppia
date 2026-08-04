@@ -8462,6 +8462,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Waits for the next-card button to be visible in the preview tab and
    * asserts that its label matches the expected text (e.g. 'Continue').
+   * @param {string} expectedText - The expected text of the next-card button.
    */
   async expectNextCardButtonTextToBe(expectedText: string): Promise<void> {
     await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
@@ -8485,6 +8486,7 @@ export class ExplorationEditor extends BaseUser {
    * Asserts that the multiple-choice options rendered in the preview tab
    * match the expected set exactly (order-independent, ignoring empty strings).
    * Uses multipleChoiceOptionSelector which is already defined in this file.
+   * @param {string[]} expectedOptions - The expected set of multiple-choice options.
    */
   async expectPreviewMultipleChoiceOptionsToEqual(
     expectedOptions: string[]
@@ -8502,6 +8504,7 @@ export class ExplorationEditor extends BaseUser {
    * Waits for the solution modal body to be visible and asserts that it
    * contains every string in expectedTexts.
    * Uses commonModalBodySelector which is already defined in this file.
+   * @param {string[]} expectedTexts - The strings expected to appear in the solution modal body.
    */
   async expectSolutionModalToContain(expectedTexts: string[]): Promise<void> {
     await this.page.waitForSelector('ngb-modal-window.modal.show .modal-body', {
