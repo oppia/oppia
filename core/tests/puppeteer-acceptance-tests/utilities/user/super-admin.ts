@@ -358,44 +358,23 @@ export class SuperAdmin extends BaseUser {
    */
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
-    const normalizedRole = role.toLowerCase();
-
     await this.goto(adminPageRolesTab);
-
-    await this.page.waitForSelector(roleEditorInputField, {
-      visible: true,
-      timeout: 60000,
-    });
-
-    await this.page.click(roleEditorInputField, {clickCount: 3});
-    await this.page.keyboard.press('Backspace');
     await this.typeInInputField(roleEditorInputField, username);
-
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
-
-    await this.page.waitForSelector(justifyContentDiv, {
-      visible: true,
-      timeout: 30000,
-    });
-
-    const roleFound = await this.page.$$eval(
-      userRoleDescriptionSelector,
-      (elements, expectedRole) =>
-        elements.some(
-          el =>
-            (el as HTMLElement).innerText.trim().toLowerCase() ===
-            String(expectedRole)
-        ),
-      normalizedRole
-    );
-
-    if (!roleFound) {
-      await this.goto(currentPageUrl);
-      throw new Error(`User does not have the "${role}" role.`);
+    await this.page.waitForSelector(justifyContentDiv);
+    const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
+    for (let i = 0; i < userRoleElements.length; i++) {
+      const roleText = await this.page.evaluate(
+        (element: HTMLElement) => element.innerText,
+        userRoleElements[i]
+      );
+      if (roleText.toLowerCase() === role) {
+        showMessage(`User ${username} has the ${role} role!`);
+        await this.goto(currentPageUrl);
+        return;
+      }
     }
-
-    showMessage(`User ${username} has the ${role} role!`);
-    await this.goto(currentPageUrl);
+    throw new Error(`User does not have the "${role}" role!`);
   }
 
   /**
