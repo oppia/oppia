@@ -219,7 +219,7 @@
   margin: 0;
 }
 
-.skipped-adventure-review-cta {
+.skipped-adventure-start-cta {
   align-items: center;
   background: #fff;
   border: 2px solid #5641c7;
@@ -235,22 +235,22 @@
   line-height: 1.15;
   margin-left: auto;
   min-height: 54px;
-  min-width: 244px;
-  padding: 10px 24px;
+  min-width: 184px;
+  padding: 10px 18px;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
 }
 
-.skipped-adventure-review-cta .material-icons {
+.skipped-adventure-start-cta .material-icons {
   font-size: 22px;
 }
 
-.skipped-adventure-review-cta:hover {
+.skipped-adventure-start-cta:hover {
   background: #f8f6ff;
   border-color: #4d39bc;
 }
 
-.skipped-adventure-review-cta:focus-visible {
+.skipped-adventure-start-cta:focus-visible {
   box-shadow: 0 0 0 3px rgba(75, 53, 182, 0.2);
   outline: none;
 }
@@ -733,7 +733,7 @@ topic-mastery-challenge-card {
     font-size: 14px;
   }
 
-  .skipped-adventure-review-cta {
+  .skipped-adventure-start-cta {
     font-size: 14px;
     min-height: 44px;
     min-width: 0;
@@ -741,7 +741,7 @@ topic-mastery-challenge-card {
     width: 100%;
   }
 
-  .skipped-adventure-review-cta .material-icons {
+  .skipped-adventure-start-cta .material-icons {
     font-size: 22px;
   }
 

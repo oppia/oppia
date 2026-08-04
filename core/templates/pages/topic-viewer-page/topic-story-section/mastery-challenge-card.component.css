@@ -72,6 +72,27 @@
   padding: 0 24px;
 }
 
+.mastery-challenge-button:hover:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+.mastery-challenge-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 100, 92, 0.2);
+  outline: none;
+}
+
+.mastery-challenge-button.mastery-challenge-button-locked {
+  background: #fff;
+  border: 2px solid #78a8a2;
+  box-shadow: none;
+  color: #3f7f79;
+}
+
+.mastery-challenge-button.mastery-challenge-button-locked:hover:not(:disabled) {
+  background: #f7fbfa;
+  filter: none;
+}
+
 .mastery-challenge-button-icon {
   align-items: center;
   background: #fbbc04;
@@ -84,6 +105,19 @@
   justify-content: center;
   line-height: 1;
   width: 32px;
+}
+
+.mastery-challenge-button-icon .material-icons {
+  font-size: 18px;
+}
+
+.mastery-challenge-button-icon.mastery-challenge-button-icon-locked {
+  background: #eaf3f2;
+  color: #3f7f79;
+}
+
+.mastery-challenge-button-icon.mastery-challenge-button-icon-locked .material-icons {
+  font-size: 17px;
 }
 
 .mastery-challenge-helper-tooltip {
@@ -200,9 +234,12 @@
   }
 
   .mastery-challenge-button-icon {
-    font-size: 16px;
     height: 26px;
     width: 26px;
+  }
+
+  .mastery-challenge-button-icon .material-icons {
+    font-size: 16px;
   }
 
   .mastery-challenge-helper-tooltip {
@@ -273,9 +310,16 @@
   }
 
   .mastery-challenge-button-icon {
-    font-size: 14px;
     height: 24px;
     width: 24px;
+  }
+
+  .mastery-challenge-button-icon .material-icons {
+    font-size: 14px;
+  }
+
+  .mastery-challenge-button-icon.mastery-challenge-button-icon-locked .material-icons {
+    font-size: 13px;
   }
 
   .mastery-challenge-action-wrapper {

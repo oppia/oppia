@@ -61,10 +61,10 @@
                 This adventure was skipped. You can revisit it anytime.
               </p>
               <button type="button"
-                      class="skipped-adventure-review-cta"
+                      class="skipped-adventure-start-cta"
                       (click)="toggleAdventure(adventureIdx)">
-                <i class="material-icons" aria-hidden="true">visibility</i>
-                Review Adventure
+                <i class="material-icons" aria-hidden="true">play_arrow</i>
+                {{ getSkippedAdventureButtonLabel(adventureIdx) }}
               </button>
             </div>
           </div>
@@ -252,10 +252,10 @@
     </div>
 
     <h3 id="arc-skip-confirmation-title" class="arc-skip-confirmation-title">
-      Skip ahead to {{ pendingArcSkipTargetLabel }}?
+      Skip to {{ pendingArcSkipTargetLabel }}?
     </h3>
     <p class="arc-skip-confirmation-message">
-      Previous Adventures will be marked as skipped, but remain accessible.
+      {{ getArcSkipConfirmationMessage() }}
     </p>
 
     <div class="arc-skip-confirmation-divider" aria-hidden="true"></div>

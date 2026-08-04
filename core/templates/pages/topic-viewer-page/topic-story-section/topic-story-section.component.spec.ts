@@ -243,6 +243,46 @@ describe('TopicStorySectionComponent', () => {
     return storySummarySpy as jasmine.SpyObj<StorySummary>;
   };
 
+  const createLessonCard = (
+    lessonNumber: number,
+    lessonProgressStatus:
+      | 'not_started'
+      | 'in_progress'
+      | 'completed'
+      | 'coming_soon'
+  ) => ({
+    lessonNumber: lessonNumber,
+    lessonTitle: 'Lesson ' + lessonNumber,
+    lessonDescription: '',
+    thumbnailUrl: '',
+    startUrl: '',
+    practiceUrl: '',
+    nodeId: 'node_' + lessonNumber,
+    lessonProgressStatus: lessonProgressStatus,
+    totalCheckpointsCount: 0,
+    visitedCheckpointsCount: 0,
+    isComingSoon: false,
+    isPublished: true,
+    isNewLabelVisible: false,
+    availableTextLanguageCodes: [],
+    availableVoiceoverLanguageCodes: [],
+    availableVoiceoverLanguageAccentDescriptions: {},
+  });
+
+  const createAdventureGroup = (
+    adventureTitle: string,
+    lessonCards: ReturnType<typeof createLessonCard>[]
+  ) => ({
+    adventureTitle: adventureTitle,
+    adventureDescription: '',
+    lessonCards: lessonCards,
+    accentColor: '#27a844',
+    iconBg: '',
+    headerBackgroundColor: '',
+    headerBorderColor: '',
+    arcId: '1',
+  });
+
   it('should expose story meta text helpers', () => {
     component.lessonCount = 2;
     component.practiceCount = 1;
@@ -1884,6 +1924,104 @@ describe('TopicStorySectionComponent', () => {
       'story_id_1',
       []
     );
+  });
+
+  it('should build singular skip confirmation message for one skipped adventure', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(component.showArcSkipConfirmationModal).toBe(true);
+    expect(component.getArcSkipConfirmationMessage()).toBe(
+      'Adventure 1 will be marked as skipped, but you can return to it at any time.'
+    );
+  });
+
+  it('should build plural skip confirmation message for two skipped adventures', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+    ];
+
+    component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
+
+    expect(component.getArcSkipConfirmationMessage()).toBe(
+      'Adventures 1 and 2 will be marked as skipped, but you can return to them at any time.'
+    );
+  });
+
+  it('should build comma-separated skip confirmation message for three skipped adventures', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+      createAdventureGroup('Adventure 4', [createLessonCard(4, 'not_started')]),
+    ];
+
+    component.onNavigationLessonSelected({lessonNumber: 4, adventureIndex: 3});
+
+    expect(component.getArcSkipConfirmationMessage()).toBe(
+      'Adventures 1, 2, and 3 will be marked as skipped, but you can return to them at any time.'
+    );
+  });
+
+  it('should exclude completed adventures from the skip confirmation message', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+      createAdventureGroup('Adventure 3', [createLessonCard(3, 'not_started')]),
+    ];
+
+    component.onNavigationLessonSelected({lessonNumber: 3, adventureIndex: 2});
+
+    expect(component.getArcSkipConfirmationMessage()).toBe(
+      'Adventure 2 will be marked as skipped, but you can return to it at any time.'
+    );
+  });
+
+  it('should return empty skip confirmation message when there is no pending navigation', () => {
+    expect(component.getArcSkipConfirmationMessage()).toBe('');
+  });
+
+  it('should return empty skip confirmation message when no earlier adventures are skipped', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+    expect(component.showArcSkipConfirmationModal).toBe(true);
+
+    component.visibleAdventureGroups[0].lessonCards[0].lessonProgressStatus =
+      'completed';
+
+    expect(component.getArcSkipConfirmationMessage()).toBe('');
+  });
+
+  it('should return Start label for a skipped adventure that was never started', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+    ];
+
+    expect(component.getSkippedAdventureButtonLabel(0)).toBe('Start');
+  });
+
+  it('should return Resume label for a skipped adventure that was started', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'in_progress')]),
+    ];
+
+    expect(component.getSkippedAdventureButtonLabel(0)).toBe('Resume');
+  });
+
+  it('should return Start label when the adventure group is missing', () => {
+    component.visibleAdventureGroups = [];
+
+    expect(component.getSkippedAdventureButtonLabel(0)).toBe('Start');
   });
 
   it('should not persist or restore skipped adventures when story id is missing', () => {

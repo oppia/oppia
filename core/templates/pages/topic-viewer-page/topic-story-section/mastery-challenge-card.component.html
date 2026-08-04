@@ -12,9 +12,14 @@
   <div class="mastery-challenge-action-wrapper">
     <button class="mastery-challenge-button"
             type="button"
+            [class.mastery-challenge-button-locked]="!isUnlocked"
             [disabled]="isUnlocked && !actionUrl"
             (click)="onChallengeButtonClick()">
-      <span class="mastery-challenge-button-icon" aria-hidden="true">★</span>
+      <span class="mastery-challenge-button-icon"
+            [class.mastery-challenge-button-icon-locked]="!isUnlocked"
+            aria-hidden="true">
+        <i class="material-icons">{{ isUnlocked ? 'star' : 'lock' }}</i>
+      </span>
       <span>{{ 'I18N_TOPIC_VIEWER_MASTERY_CHALLENGE_BUTTON' | translate }}</span>
     </button>
 

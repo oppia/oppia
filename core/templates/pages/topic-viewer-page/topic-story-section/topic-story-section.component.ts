@@ -209,8 +209,61 @@ export class TopicStorySectionComponent
     this.pendingArcSkipTargetLabel = '';
   }
 
+  getArcSkipConfirmationMessage(): string {
+    if (this.pendingNavigationAdventureIndex === null) {
+      return '';
+    }
+
+    const skippedAdventureNumbers: number[] = [];
+    for (let index = 0; index < this.pendingNavigationAdventureIndex; index++) {
+      if (!this.isAdventureCompleted(index)) {
+        skippedAdventureNumbers.push(index + 1);
+      }
+    }
+
+    if (skippedAdventureNumbers.length === 0) {
+      return '';
+    }
+
+    const noun =
+      skippedAdventureNumbers.length === 1 ? 'Adventure' : 'Adventures';
+    const pronoun = skippedAdventureNumbers.length === 1 ? 'it' : 'them';
+    return (
+      noun +
+      ' ' +
+      this.joinAdventureNumbers(skippedAdventureNumbers) +
+      ' will be marked as skipped, but you can return to ' +
+      pronoun +
+      ' at any time.'
+    );
+  }
+
+  private joinAdventureNumbers(numbers: number[]): string {
+    if (numbers.length === 1) {
+      return String(numbers[0]);
+    }
+    if (numbers.length === 2) {
+      return numbers.join(' and ');
+    }
+    return (
+      numbers.slice(0, -1).join(', ') + ', and ' + numbers[numbers.length - 1]
+    );
+  }
+
   isAdventureSkipped(adventureIndex: number): boolean {
     return this.skippedAdventureIndices.has(adventureIndex);
+  }
+
+  getSkippedAdventureButtonLabel(adventureIndex: number): string {
+    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
+    if (!adventureGroup) {
+      return 'Start';
+    }
+
+    const hasStarted = adventureGroup.lessonCards.some(
+      card => card.lessonProgressStatus !== 'not_started'
+    );
+    return hasStarted ? 'Resume' : 'Start';
   }
 
   isAdventureCompleted(adventureIndex: number): boolean {

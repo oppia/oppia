@@ -1,7 +1,13 @@
 .adventure-navigation-container {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0;
+  margin: 0 -24px;
+  opacity: 1;
+  padding: 0 24px;
+  z-index: 20;
 }
 
 .adventure-navigation-scroll-area {
@@ -120,6 +126,11 @@
 }
 
 @media (max-width: 768px) {
+  .adventure-navigation-container {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
   .adventure-navigation-wrapper {
     gap: 8px;
     margin: 6px 0 4px;
@@ -151,6 +162,11 @@
 }
 
 @media (max-width: 450px) {
+  .adventure-navigation-container {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
   .adventure-navigation-wrapper {
     gap: 6px;
     margin: 4px 0 2px;
