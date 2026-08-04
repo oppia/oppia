@@ -16,12 +16,16 @@
  * @fileoverview Certificate offering available page component.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+
+import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 import './certificate-offering-available-page.component.css';
 
 export type CertificateAssessmentStatus = 'passed' | 'failed' | 'not_attempted';
 
-export interface AvailableCertificate {
+interface AvailableCertificateViewModel {
   id: string;
   title: string;
   status: CertificateAssessmentStatus;
@@ -35,41 +39,64 @@ export interface AvailableCertificate {
   templateUrl: './certificate-offering-available-page.component.html',
   styleUrls: ['./certificate-offering-available-page.component.css'],
 })
-export class AvailableCertificateOfferingPageComponent {
+export class AvailableCertificateOfferingPageComponent implements OnInit {
   @Input() classroomUrlFragment: string = '';
+  availableCertificateOfferings: AvailableCertificateAssessmentOfferingData[] =
+    [];
+  isLoading = true;
+  hasError = false;
 
-  // TODO(#24717-M2.12): Replace hardcoded UI placeholder data with actual backend-fetched data.
-  availableCertificates: AvailableCertificate[] = [
-    {
-      id: 'everyday_arithmetic_number_confidence',
-      title: 'Everyday Arithmetic & Number Confidence',
-      assessmentRoute: [
-        '/certificate-assessment',
-        'everyday_arithmetic_number_confidence',
-      ],
-      status: 'passed',
-      passedOnDate: 'Jan 16, 2026',
-    },
-    {
-      id: 'fractions_decimals_fundamentals',
-      title: 'Fractions & Decimals Fundamentals',
-      assessmentRoute: [
-        '/certificate-assessment',
-        'fractions_decimals_fundamentals',
-      ],
-      status: 'not_attempted',
-    },
-    {
-      id: 'geometry_measurement_basics',
-      title: 'Geometry & Measurement Basics',
-      assessmentRoute: [
-        '/certificate-assessment',
-        'geometry_measurement_basics',
-      ],
-      status: 'failed',
-      failedOnDate: 'Feb 2, 2026',
-    },
-  ];
+  constructor(
+    private alertsService: AlertsService,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+  ) {}
+
+  async ngOnInit(): Promise<void> {
+    await this.loadAvailableCertificateOfferings();
+  }
+
+  private async loadAvailableCertificateOfferings(): Promise<void> {
+    try {
+      this.availableCertificateOfferings =
+        await this.certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync(
+          this.classroomUrlFragment
+        );
+      this.availableCertificateOfferings.sort((first, second) =>
+        first.title.localeCompare(second.title)
+      );
+    } catch {
+      this.hasError = true;
+      this.alertsService.addWarning(
+        'Failed to load certificate assessment offerings.'
+      );
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private mapAttemptStatus(attemptStatus: string): CertificateAssessmentStatus {
+    switch (attemptStatus) {
+      case 'Passed':
+        return 'passed';
+      case 'Failed':
+        return 'failed';
+      default:
+        return 'not_attempted';
+    }
+  }
+
+  get availableCertificates(): AvailableCertificateViewModel[] {
+    return this.availableCertificateOfferings.map(offering => ({
+      id: offering.certificateId,
+      title: offering.title,
+      status: this.mapAttemptStatus(offering.attemptStatus),
+      assessmentRoute: this.getCertificateAssessmentRoute(
+        offering.certificateId
+      ),
+      passedOnDate: (offering as {passedOnDate?: string}).passedOnDate,
+      failedOnDate: (offering as {failedOnDate?: string}).failedOnDate,
+    }));
+  }
 
   getCertificateAssessmentRoute(certificateId: string): string[] {
     return ['/certificate-assessment', certificateId];

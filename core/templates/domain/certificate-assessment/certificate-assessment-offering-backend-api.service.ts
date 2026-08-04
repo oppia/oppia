@@ -20,6 +20,8 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {
+  AvailableCertificateAssessmentOfferingBackendDict,
+  AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
 } from './certificate-assessment-offering.model';
@@ -66,6 +68,9 @@ interface GetCertificateOfferingsBackendResponse {
   certificate_offerings: CertificateAssessmentOfferingBackendDict[];
 }
 
+interface GetAvailableCertificateOfferingsForClassroomBackendResponse {
+  available_certificate_offerings: AvailableCertificateAssessmentOfferingBackendDict[];
+}
 interface CertificateAssessmentTopicScoreBackendDict {
   total_related_questions: number;
   total_correct_questions: number;
@@ -102,6 +107,15 @@ export class CertificateAssessmentOfferingBackendApiService {
     return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
       '<certificate_id>',
       certificateId
+    );
+  }
+
+  private getAvailableCertificateOfferingsForClassroomHandlerUrl(
+    classroomId: string
+  ): string {
+    return CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
+      '<classroom_id>',
+      classroomId
     );
   }
 
@@ -279,6 +293,29 @@ export class CertificateAssessmentOfferingBackendApiService {
       throw errorResponse?.error?.error || errorResponse.message;
     }
   }
+
+  async getAvailableCertificateOfferingsForClassroomAsync(
+    classroomId: string
+  ): Promise<AvailableCertificateAssessmentOfferingData[]> {
+    try {
+      const response = await this.http
+        .get<GetAvailableCertificateOfferingsForClassroomBackendResponse>(
+          this.getAvailableCertificateOfferingsForClassroomHandlerUrl(
+            classroomId
+          )
+        )
+        .toPromise();
+
+      return response.available_certificate_offerings.map(offering =>
+        AvailableCertificateAssessmentOfferingData.createFromBackendDict(
+          offering
+        )
+      );
+    } catch (errorResponse) {
+      throw errorResponse?.error?.error || errorResponse.message;
+    }
+  }
+
   async getCertificateAssessmentResultAsync(
     attemptId: string
   ): Promise<GetCertificateAssessmentResultBackendResponse> {

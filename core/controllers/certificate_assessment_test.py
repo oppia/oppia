@@ -399,6 +399,34 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
         self.assertFalse(response['is_valid'])
 
 
+class CertificateAssessmentOfferingsForClassroomHandlerTest(
+    test_utils.GenericTestBase
+):
+    """Tests class for CertificateAssessmentOfferingsForClassroomHandler."""
+
+    def test_get_returns_stub_offerings_for_classroom(self) -> None:
+        """Tests that the handler returns stub offerings for a given classroom."""
+
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
+                '<classroom_id>', 'physics_classroom_01'
+            )
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'available_certificate_offerings': [
+                    {
+                        'certificate_id': 'sample_certificate_id',
+                        'title': 'Sample Certificate',
+                        'attempt_status': 'Not Attempted',
+                    }
+                ]
+            },
+        )
+
+
 class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
     """Tests class for StartCertificateAssessmentHandler."""
 

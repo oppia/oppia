@@ -60,6 +60,11 @@
   max-width: 800px !important;
 }
 
+.oppia-certificate-offering-available-page-empty-state {
+  color: #5b6472;
+  margin: 0 0 20px;
+}
+
 .oppia-certificate-offering-available-page-intro {
   font-size: 23px;
   line-height: 1.5;
@@ -194,10 +199,6 @@
 
 .oppia-certificate-offering-available-page-actions .btn-outline-primary:hover {
   background-color: var(--certificate-mint-bg);
-}
-
-.oppia-certificate-offering-available-page-actions .btn-secondary {
-  font-weight: 700;
 }
 
 .oppia-certificate-offering-available-page-footnote {

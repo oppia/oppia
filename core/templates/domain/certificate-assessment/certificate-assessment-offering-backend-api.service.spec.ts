@@ -23,7 +23,10 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {CertificateAssessmentOfferingBackendApiService} from './certificate-assessment-offering-backend-api.service';
-import {CertificateAssessmentOfferingData} from './certificate-assessment-offering.model';
+import {
+  AvailableCertificateAssessmentOfferingData,
+  CertificateAssessmentOfferingData,
+} from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 describe('Certificate Assessment Offering backend api service', () => {
@@ -139,6 +142,101 @@ describe('Certificate Assessment Offering backend api service', () => {
       ),
     ]);
     expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch available certificate offerings for a classroom', fakeAsync(() => {
+    caos
+      .getAvailableCertificateOfferingsForClassroomAsync('math_classroom_01')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
+        '<classroom_id>',
+        'math_classroom_01'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      available_certificate_offerings: [
+        {
+          certificate_id: 'mock_certificate_id',
+          title: 'Sample Certificate',
+          attempt_status: 'Not Attempted',
+        },
+      ],
+    });
+
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalledWith([
+      new AvailableCertificateAssessmentOfferingData(
+        'mock_certificate_id',
+        'Sample Certificate',
+        'Not Attempted'
+      ),
+    ]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use backend error if fetching available offerings for a classroom fails with a nested error message', fakeAsync(() => {
+    caos
+      .getAvailableCertificateOfferingsForClassroomAsync('math_classroom_01')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
+        '<classroom_id>',
+        'math_classroom_01'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: {
+          error: 'Error occurred while fetching classroom offerings.',
+        },
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith({
+      error: 'Error occurred while fetching classroom offerings.',
+    });
+  }));
+
+  it('should fall back to the http error message if fetching available offerings for a classroom fails with no nested backend message', fakeAsync(() => {
+    caos
+      .getAvailableCertificateOfferingsForClassroomAsync('math_classroom_01')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
+        '<classroom_id>',
+        'math_classroom_01'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {},
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      jasmine.stringMatching(
+        /^Http failure response for .*: 500 Internal Server Error$/
+      )
+    );
   }));
 
   it('should include provided topic ids in the stub payload', fakeAsync(() => {
