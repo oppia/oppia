@@ -1367,15 +1367,17 @@ export class BaseUser {
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
    * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
-   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
-   * almost all cases and for the page to fully load.
+   * idle within a certain timeframe.
    *
-   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * The default timeout is intentionally short because this helper is best-effort; on busy CI runners, a long default timeout
+   * can significantly inflate total setup time across many calls.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 5000, idleTime: 500}.
    * @param {Page} page The page to wait for network idle. Defaults to the current page.
    */
   async waitForNetworkIdle(
     options: {timeout?: number; idleTime?: number} = {
-      timeout: 30000,
+      timeout: 5000,
       idleTime: 500,
     },
     page: Page = this.page
