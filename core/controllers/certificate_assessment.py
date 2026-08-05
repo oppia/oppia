@@ -117,6 +117,14 @@ class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
     certificate_id: str
 
 
+class CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict(
+    TypedDict
+):
+    """Dict representation of classroom_id path args."""
+
+    classroom_id: str
+
+
 class ValidateCertificateAssessmentOfferingHandler(
     base.BaseHandler[
         ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict,
@@ -246,28 +254,6 @@ class CertificateAssessmentOfferingHandler(
         self.render_json(
             {'certificate_id': certificate_offering.certificate_id}
         )
-
-
-class CertificateAssessmentClassroomHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler for learner-facing certificate offerings in a classroom."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': {'schema': {'type': 'basestring'}}
-    }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.require_user_id_else_redirect_to_homepage
-    def get(self, classroom_url_fragment: str) -> None:
-        """Returns certificate offerings for the classroom."""
-        if self.user_id is None:
-            raise self.NotLoggedInException
-        certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
-            classroom_url_fragment, self.user_id
-        )
-        self.render_json({'certificate_offerings': certificate_offerings})
 
 
 class CertificateAssessmentOfferingByIdHandler(
@@ -404,6 +390,31 @@ class CertificateAssessmentOfferingByIdHandler(
         ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json({})
+
+
+class CertificateAssessmentOfferingsForClassroomHandler(
+    base.BaseHandler[
+        CertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict,
+    ]
+):
+    """Handler for learner-facing certificate offerings in a classroom."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.require_user_id_else_redirect_to_homepage
+    def get(self, classroom_url_fragment: str) -> None:
+        """Returns certificate offerings for the classroom."""
+        if self.user_id is None:
+            raise self.NotLoggedInException
+        certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            classroom_url_fragment, self.user_id
+        )
+        self.render_json({'certificate_offerings': certificate_offerings})
 
 
 class StartCertificateAssessmentHandler(
