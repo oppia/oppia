@@ -55,7 +55,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     # Language code that would normally be derived from the question_dict in
     # the change_cmd.
     question_language_code = 'en'
-    mocked_datetime_utcnow = datetime.datetime(2020, 6, 15, 5)
+    mocked_current_time = datetime.datetime(2020, 6, 15, 5)
 
     def setUp(self) -> None:
         super().setUp()
@@ -1859,7 +1859,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
         ):
-            with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+            with self.swap(
+                utils,
+                'get_current_utc_datetime',
+                lambda: self.mocked_current_time,
+            ):
                 suggestion_models.GeneralSuggestionModel.create(
                     suggestion_type,
                     feconf.ENTITY_TYPE_EXPLORATION,
@@ -1874,7 +1878,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                     None,
                 )
 
-            with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+            with self.swap(
+                utils,
+                'get_current_utc_datetime',
+                lambda: self.mocked_current_time,
+            ):
                 results = (
                     suggestion_models.GeneralSuggestionModel.get_new_suggestions_waiting_for_review()
                 )
@@ -1950,7 +1958,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_suggestions_waiting_too_long_if_suggestions_waited_less_limit(
         self,
     ) -> None:
-        with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
+        ):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -1966,11 +1976,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             )
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_less_than_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow + datetime.timedelta(days=1)
+            self.mocked_current_time + datetime.timedelta(days=1)
         )
 
-        with self.mock_datetime_utcnow(
-            mocked_datetime_less_than_review_wait_time_threshold
+        with self.swap(
+            utils,
+            'get_current_utc_datetime',
+            lambda: mocked_datetime_less_than_review_wait_time_threshold,
         ):
             with self.swap(
                 suggestion_models,
@@ -1986,7 +1998,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_suggestions_waiting_too_long_if_suggestion_waited_limit(
         self,
     ) -> None:
-        with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
+        ):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -2002,12 +2016,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             )
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_eq_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow
+            self.mocked_current_time
             + datetime.timedelta(days=mocked_threshold_review_wait_time_in_days)
         )
 
-        with self.mock_datetime_utcnow(
-            mocked_datetime_eq_review_wait_time_threshold
+        with self.swap(
+            utils,
+            'get_current_utc_datetime',
+            lambda: mocked_datetime_eq_review_wait_time_threshold,
         ):
             with self.swap(
                 suggestion_models,
@@ -2051,7 +2067,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_suggestions_waiting_too_long_with_diff_review_wait_times(
         self,
     ) -> None:
-        with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+        with self.swap(
+            utils, 'get_current_utc_datetime', lambda: self.mocked_current_time
+        ):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -2065,8 +2083,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'exploration.exp1.thread1',
                 self.translation_language_code,
             )
-        with self.mock_datetime_utcnow(
-            self.mocked_datetime_utcnow + datetime.timedelta(days=2)
+        with self.swap(
+            utils,
+            'get_current_utc_datetime',
+            lambda: self.mocked_current_time + datetime.timedelta(days=2),
         ):
             suggestion_models.GeneralSuggestionModel.create(
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
@@ -2083,11 +2103,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             )
         mocked_threshold_review_wait_time_in_days = 3
         mocked_datetime_past_review_wait_time_threshold = (
-            self.mocked_datetime_utcnow + datetime.timedelta(days=4)
+            self.mocked_current_time + datetime.timedelta(days=4)
         )
 
-        with self.mock_datetime_utcnow(
-            mocked_datetime_past_review_wait_time_threshold
+        with self.swap(
+            utils,
+            'get_current_utc_datetime',
+            lambda: mocked_datetime_past_review_wait_time_threshold,
         ):
             with self.swap(
                 suggestion_models,
@@ -4022,9 +4044,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4050,9 +4072,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4078,9 +4100,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4108,9 +4130,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -4273,9 +4295,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4301,9 +4323,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4329,9 +4351,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4359,9 +4381,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -4487,8 +4509,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_2',
@@ -4513,8 +4535,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_3',
@@ -4539,9 +4561,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4569,9 +4591,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -4633,9 +4655,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4661,9 +4683,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4689,9 +4711,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4719,9 +4741,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT
             ),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
 
@@ -5102,9 +5124,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5123,9 +5145,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5144,9 +5166,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5165,9 +5187,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(155)
+                utils.get_current_utc_date() - datetime.timedelta(155)
             ),
         ).put()
 
@@ -5252,9 +5274,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5273,9 +5295,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5294,8 +5316,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
@@ -5313,9 +5335,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
 
@@ -5412,8 +5434,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.date.today(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_date(),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_2',
@@ -5431,9 +5453,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5452,9 +5474,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5473,9 +5495,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
 
@@ -5527,9 +5549,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5548,8 +5570,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
@@ -5567,8 +5589,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
@@ -5586,9 +5608,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
 
@@ -5625,9 +5647,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5646,8 +5668,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_3',
@@ -5665,8 +5687,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
+            last_contribution_date=utils.get_current_utc_datetime(),
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_4',
@@ -5684,9 +5706,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT
             ),
             rejected_translations_count=(self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=utils.get_current_utc_datetime(),
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(65)
+                utils.get_current_utc_date() - datetime.timedelta(65)
             ),
         ).put()
 
@@ -5942,7 +5964,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -5960,7 +5982,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -5978,7 +6000,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -5996,7 +6018,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6144,7 +6166,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6162,7 +6184,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6180,7 +6202,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6198,7 +6220,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6279,7 +6301,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6297,7 +6319,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6315,7 +6337,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6333,7 +6355,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6384,7 +6406,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125)
+                utils.get_current_utc_date() - datetime.timedelta(125)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6402,7 +6424,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6420,7 +6442,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -6438,7 +6460,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6623,7 +6645,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6638,7 +6660,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6653,7 +6675,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6730,7 +6752,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6745,7 +6767,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6760,7 +6782,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6819,7 +6841,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6834,7 +6856,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6849,7 +6871,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
@@ -6913,7 +6935,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(95)
+                utils.get_current_utc_date() - datetime.timedelta(95)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6928,7 +6950,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(35)
+                utils.get_current_utc_date() - datetime.timedelta(35)
             ),
         ).put()
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6943,7 +6965,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(5)
+                utils.get_current_utc_date() - datetime.timedelta(5)
             ),
         ).put()
 
