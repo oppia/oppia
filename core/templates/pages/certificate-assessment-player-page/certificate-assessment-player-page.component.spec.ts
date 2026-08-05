@@ -312,7 +312,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should open the time-expired modal as a bottom sheet on mobile screens', () => {
     const bottomSheet = TestBed.inject(MatBottomSheet);
-    const windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    const windowDimensionsService = TestBed.inject(
+      WindowDimensionsService
+    ) as jasmine.SpyObj<WindowDimensionsService>;
     windowDimensionsService.getWidth.and.returnValue(400);
     component.showTimeExpiredModal = true;
     component.showUnansweredQuestionModal = false;
@@ -323,7 +325,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
 
   it('should open the unanswered-question modal as a bottom sheet on mobile screens', () => {
     const bottomSheet = TestBed.inject(MatBottomSheet);
-    const windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    const windowDimensionsService = TestBed.inject(
+      WindowDimensionsService
+    ) as jasmine.SpyObj<WindowDimensionsService>;
     windowDimensionsService.getWidth.and.returnValue(400);
     component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = true;
