@@ -3963,7 +3963,7 @@ def update_logged_out_user_progress(
     checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
         state_name
     )
-    checkpoint_url_model.last_updated = datetime.datetime.utcnow()
+    checkpoint_url_model.last_updated = utils.get_current_utc_datetime()
     checkpoint_url_model.update_timestamps()
     checkpoint_url_model.put()
 
