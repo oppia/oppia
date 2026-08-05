@@ -21,6 +21,8 @@ import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import * as fs from 'fs';
+import * as path from 'path';
 import {RTEEditor} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
@@ -165,6 +167,14 @@ const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
+const historyTabButton = '.e2e-test-history-tab';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const historyTabContentContainerSelector = '.e2e-test-exploration-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const historyTableIndex = '.e2e-test-history-table-index';
+const historyListOptions = '.e2e-test-history-table-option';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 const previousCardButton = '.e2e-test-back-button';
@@ -1505,6 +1515,90 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
+  }
+
+  /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.expectElementToBeVisible(mobileHistoryTabButton);
+      await this.clickOnElementWithSelector(mobileHistoryTabButton);
+    } else {
+      await this.clickOnElementWithSelector(historyTabButton);
+    }
+    await this.expectElementToBeVisible(historyTabContentContainerSelector);
+  }
+
+  /**
+   * Function to download a specific version of an Exploration.
+   * Uses Playwright's download event to reliably capture the file,
+   * regardless of the download directory configuration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the exploration is published.
+   */
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean,
+    explorationTitle?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(historyListContent);
+    const historyItems = await this.page.$$(historyListContent);
+
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await this.getElementInParent(
+        historyTableIndex,
+        historyItem
+      );
+      const versionText = await this.getTextContent(versionNumberElement);
+      if (parseInt(versionText ?? '', 10) !== explorationVersion) {
+        continue;
+      }
+
+      const dropdownButton = await this.getElementInParent(
+        historyListOptions,
+        historyItem
+      );
+      await this.clickOnElement(dropdownButton);
+
+      const downloadButton = await this.getElementInParent(
+        downloadExplorationButton,
+        historyItem
+      );
+
+      // Use Playwright's download event to reliably capture the file.
+      const downloadPromise = this.page.waitForEvent('download');
+      await this.clickOnElement(downloadButton);
+      const download = await downloadPromise;
+
+      const suggestedFilename = download.suggestedFilename();
+      const expectedPrefix = isExplorationPublished
+        ? `oppia-${explorationTitle?.replace(/\s+/g, '')}-v`
+        : 'oppia-unpublished_exploration-v';
+      if (!suggestedFilename.startsWith(expectedPrefix)) {
+        throw new Error(
+          `Expected filename to start with "${expectedPrefix}" ` +
+            `but got "${suggestedFilename}".`
+        );
+      }
+      const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+      if (!fs.existsSync(downloadDir)) {
+        fs.mkdirSync(downloadDir, {recursive: true});
+      }
+
+      const savePath = path.join(downloadDir, suggestedFilename);
+      await download.saveAs(savePath);
+
+      // Close the dropdown to prevent it from blocking other elements.
+      await this.page.keyboard.press('Escape');
+
+      showMessage(`${suggestedFilename} file is successfully downloaded`);
+      return;
+    }
+
+    throw new Error(`Version ${explorationVersion} not found in history list.`);
   }
 }
 

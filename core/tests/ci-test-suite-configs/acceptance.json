@@ -117,8 +117,8 @@
     },
     {
       "name": "exploration-editor/download-any-version-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/download-any-version-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/download-any-version-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/verify-statistics-and-previous-explorations",
