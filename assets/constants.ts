@@ -2812,6 +2812,52 @@ export default {
       "x",
       "y"
     ],
+    "foreignobject": [
+      "class",
+      "clip-path",
+      "color",
+      "direction",
+      "display",
+      "fill",
+      "filter",
+      "font-family",
+      "font-size",
+      "font-style",
+      "font-weight",
+      "height",
+      "id",
+      "opacity",
+      "stroke",
+      "style",
+      "transform",
+      "visibility",
+      "width",
+      "x",
+      "y"
+    ],
+    "foreignObject": [
+      "class",
+      "clip-path",
+      "color",
+      "direction",
+      "display",
+      "fill",
+      "filter",
+      "font-family",
+      "font-size",
+      "font-style",
+      "font-weight",
+      "height",
+      "id",
+      "opacity",
+      "stroke",
+      "style",
+      "transform",
+      "visibility",
+      "width",
+      "x",
+      "y"
+    ],
     "font": [
       "about",
       "alignment-baseline",
@@ -4212,6 +4258,18 @@ export default {
       "writing-mode",
       "x",
       "y"
+    ],
+    "span": [
+      "class",
+      "color",
+      "direction",
+      "display",
+      "font-family",
+      "font-size",
+      "font-style",
+      "font-weight",
+      "id",
+      "style"
     ],
     "stop": [
       "about",
@@ -6581,6 +6639,24 @@ export default {
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "TECHNICAL_FEEDBACK_DASHBOARD": {
       "ROUTE": "technical-feedback-dashboard",
+      "TITLE": "Technical Feedback Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "TECHNICAL_FEEDBACK_DETAIL": {
+      "ROUTE": "technical-feedback-dashboard/:team/:reportId",
       "TITLE": "Technical Feedback Dashboard | Oppia",
       "META": [
         {
