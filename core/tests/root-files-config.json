@@ -72,7 +72,8 @@
     "core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css",
     "core/templates/pages/teach-page/teach-page.component.css",
     "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
+    "core/templates/domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
