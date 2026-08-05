@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,27 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for download any version of the exploration from the history tab.
+ * @fileoverview Acceptance Test for download any version of the exploration
+ * from the history tab.
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-describe('Exploration Creator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
+
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
@@ -43,7 +46,6 @@ describe('Exploration Creator', function () {
       'Content',
       INTERACTION_TYPES.END_EXPLORATION
     );
-
     await explorationEditor.saveExplorationDraft();
 
     await explorationEditor.updateCardContent('Modified version 3 ');
@@ -54,34 +56,39 @@ describe('Exploration Creator', function () {
 
     await explorationEditor.updateCardContent('Modified version 5 ');
     await explorationEditor.saveExplorationDraft();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should download any version of Exploration',
-    async function () {
-      // Navigate to the history tab, .
-      await explorationEditor.navigateToHistoryTab();
-      // Before publishing, the Exploration zip file name would be
-      // oppia-unpublished_exploration-v{versionNumber}.zip or
-      // oppia-unpublished_exploration-v{versionNumber} (numberOfDownloadsSameFile).zip.
-      await explorationEditor.downloadExploration(5, false);
-      await explorationEditor.downloadExploration(2, false);
-      // Publish Exploration.
-      await explorationEditor.publishExplorationWithMetadata(
-        'Publish with an interaction',
-        'This is the goal of exploration.',
-        'Algebra'
-      );
-      // After publishing, the Exploration zip file name would be
-      // oppia-{explorationTitle}-v{versionNumber}.zip or
-      // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip .
-      await explorationEditor.downloadExploration(5, true);
-      await explorationEditor.downloadExploration(2, true);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  test('should download any version of Exploration', async function () {
+    // Navigate to the history tab.
+    await explorationEditor.navigateToHistoryTab();
+    // Before publishing, the Exploration zip file name would be
+    // oppia-unpublished_exploration-v{versionNumber}.zip or
+    // oppia-unpublished_exploration-v{versionNumber} (numberOfDownloadsSameFile).zip.
+    await explorationEditor.downloadExploration(5, false);
+    await explorationEditor.downloadExploration(2, false);
 
-  afterAll(async function () {
+    // Publish Exploration.
+    await explorationEditor.publishExplorationWithMetadata(
+      'Publish with an interaction',
+      'This is the goal of exploration.',
+      'Algebra'
+    );
+    // After publishing, the Exploration zip file name would be
+    // oppia-{explorationTitle}-v{versionNumber}.zip or
+    // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip.
+    await explorationEditor.downloadExploration(
+      5,
+      true,
+      'Publish with an interaction'
+    );
+    await explorationEditor.downloadExploration(
+      2,
+      true,
+      'Publish with an interaction'
+    );
+  });
+
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
