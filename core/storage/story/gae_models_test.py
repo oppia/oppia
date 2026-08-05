@@ -16,9 +16,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -245,8 +243,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             id='id',
             title='title',
             description='description',
-            story_model_last_updated=datetime.datetime.utcnow(),
-            story_model_created_on=datetime.datetime.utcnow(),
+            story_model_last_updated=utils.get_current_utc_datetime(),
+            story_model_created_on=utils.get_current_utc_datetime(),
             language_code='language_code',
             node_titles=['Chapter 1'],
             thumbnail_filename='image.svg',

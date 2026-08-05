@@ -83,7 +83,7 @@ forbidden-imports=
 
 disallowed-functions-and-replacements-str=
     assertEquals=>self.assertEqual,
-    now=>datetime.datetime.utcnow,
+    utcnow=>utils.get_current_utc_datetime,
     beam.CombineValues=>beam.CombinePerKey
 
 disallowed-functions-and-replacements-regex=

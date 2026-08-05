@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.jobs import job_options, job_utils
 from core.platform import models
 from core.tests import test_utils
@@ -239,7 +240,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
-        utcnow = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
 
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
@@ -251,7 +252,9 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 3.14,
-                'created_on': utcnow.replace(tzinfo=datetime.timezone.utc),
+                'created_on': current_time.replace(
+                    tzinfo=datetime.timezone.utc
+                ),
                 'last_updated': None,
                 'deleted': False,
             }
@@ -262,7 +265,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
                 id='abc',
                 project=self.oppia_project_id,
                 prop=3.14,
-                created_on=utcnow,
+                created_on=current_time,
             ),
             job_utils.get_ndb_model_from_beam_entity(beam_entity),
         )
@@ -286,8 +289,8 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 123,
-                'created_on': datetime.datetime.utcnow(),
-                'last_updated': datetime.datetime.utcnow(),
+                'created_on': utils.get_current_utc_datetime(),
+                'last_updated': utils.get_current_utc_datetime(),
                 'deleted': False,
             }
         )

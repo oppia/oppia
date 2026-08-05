@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feconf
+from core import feconf, utils
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
 
@@ -106,7 +106,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         }
         # Create Timestamp protobuf.
         datetime_to_execute_task = (
-            datetime.datetime.utcnow() + datetime.timedelta(seconds=20)
+            utils.get_current_utc_datetime() + datetime.timedelta(seconds=20)
         )
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(datetime_to_execute_task)
