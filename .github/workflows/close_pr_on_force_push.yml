@@ -24,15 +24,25 @@ jobs:
             // reflects any rewrite the PR's branch has undergone since the
             // PR was created, regardless of which of opened/synchronize/
             // reopened this run was triggered by.
-            const { data: timeline } = await github.rest.issues.listEventsForTimeline({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.number,
-              per_page: 100,
-            });
-            const wasForcePushed = timeline.some(
-              (e) => e.event === 'head_ref_force_pushed'
+            // NOTE: timelineItems' totalCount always reflects ALL timeline
+            // items on the PR and is NOT affected by the itemTypes filter
+            // (a documented GitHub GraphQL API quirk) -- so we check the
+            // length of the (correctly filtered) nodes list instead.
+            const result = await github.graphql(
+              `query($owner: String!, $repo: String!, $number: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $number) {
+                    timelineItems(first: 1, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) {
+                      nodes {
+                        __typename
+                      }
+                    }
+                  }
+                }
+              }`,
+              { owner: context.repo.owner, repo: context.repo.repo, number: pr.number }
             );
+            const wasForcePushed = result.repository.pullRequest.timelineItems.nodes.length > 0;
 
             if (wasForcePushed) {
               const comment = `Hi @${pr.user.login}, this PR's branch appears to have been force-pushed or rebased, which rewrites commit history. Per our [contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change), force-pushing to a PR branch is not allowed, so this PR is being closed. Please open a new PR from a fresh branch instead of force-pushing. Thanks!`;
