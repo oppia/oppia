@@ -50,8 +50,8 @@ describe('Contributor Dashboard Admin - Translation Configuration', function () 
     // 2. Enable automatic translation suggestions.
     await superAdmin.enableAutoTranslation();
 
-    // 3. Add Hindi -> Azure mapping.
-    await superAdmin.addTranslationProviderMapping('hi', 'azure');
+    // 3. Add Hindi -> GCP mapping.
+    await superAdmin.addTranslationProviderMapping('hi', 'gcp');
 
     // Verify mapping was added.
     let rowCount = await superAdmin.getProviderMappingRowCount();
