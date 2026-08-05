@@ -1,48 +1,34 @@
-<div class="assessment-modal-overlay">
-  <div #assessmentModalCard class="assessment-modal-card"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="unanswered-question-modal-title"
-       aria-describedby="unanswered-question-modal-message"
-       tabindex="-1"
-       (keydown.tab)="trapFocus($event)">
-
-    <div class="assessment-modal-header">
-      <div class="assessment-modal-header-content">
-        <svg class="assessment-modal-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2 L23 21 H1 Z" fill="#f5a623"/>
-          <rect x="11" y="9" width="2" height="6" rx="1" fill="#ffffff"/>
-          <circle cx="12" cy="18" r="1.2" fill="#ffffff"/>
-        </svg>
-        <h2 id="unanswered-question-modal-title" class="assessment-modal-title">{{ 'I18N_UNANSWERED_QUESTION_MODAL_TITLE' | translate }}</h2>
-      </div>
-
-      <button type="button" class="assessment-modal-close-button" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON' | translate" (click)="onGoBackToAssessment()">
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
+<div class="assessment-modal-card">
+  <div class="assessment-modal-header">
+    <div class="assessment-modal-header-content">
+      <img class="assessment-modal-icon" src="/assets/images/certificates/unanswered-warning-icon.svg" alt="">
+      <h2 id="unanswered-question-modal-title" class="assessment-modal-title">{{ 'I18N_UNANSWERED_QUESTION_MODAL_TITLE' | translate }}</h2>
     </div>
 
-    <p id="unanswered-question-modal-message" class="assessment-modal-message">
-      {{ 'I18N_UNANSWERED_QUESTION_MODAL_MESSAGE' | translate:{unansweredQuestionCount: unansweredQuestionCount} }}
-    </p>
+    <button type="button" class="assessment-modal-close-button" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON' | translate" (click)="goBackToAssessment()">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
 
-    <p class="assessment-modal-message">
-      {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_BEFORE' | translate }}
-      <button type="button" class="assessment-modal-inline-key" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_GO_BACK_BUTTON_ALT' | translate" (click)="onGoBackToAssessment()">
-        <svg width="10" height="10" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 4L16 16M16 4L4 16" stroke="#334e68" stroke-width="2.4" stroke-linecap="round"/>
-        </svg>
-      </button>
-      {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_AFTER' | translate }}
-    </p>
+  <p id="unanswered-question-modal-message" class="assessment-modal-message">
+    {{ 'I18N_UNANSWERED_QUESTION_MODAL_MESSAGE' | translate:{unansweredQuestionCount: unansweredQuestionCount} }}
+  </p>
 
-    <div class="assessment-modal-actions">
-      <button type="button" class="btn btn-primary assessment-modal-action-button" (click)="onSubmitAnyway()">
-        {{ 'I18N_UNANSWERED_QUESTION_MODAL_SUBMIT_BUTTON' | translate }}
-      </button>
-    </div>
+  <p class="assessment-modal-message">
+    {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_BEFORE' | translate }}
+    <button type="button" class="assessment-modal-inline-key" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_GO_BACK_BUTTON_ALT' | translate" (click)="goBackToAssessment()">
+      <svg width="10" height="10" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4L16 16M16 4L4 16" stroke="#334e68" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </button>
+    {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_AFTER' | translate }}
+  </p>
 
+  <div class="assessment-modal-actions">
+    <button type="button" class="btn btn-primary assessment-modal-action-button" (click)="submitAnyway()">
+      {{ 'I18N_UNANSWERED_QUESTION_MODAL_SUBMIT_BUTTON' | translate }}
+    </button>
   </div>
 </div>

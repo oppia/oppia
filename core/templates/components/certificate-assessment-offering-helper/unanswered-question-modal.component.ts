@@ -16,77 +16,24 @@
  * @fileoverview Modal shown when a certificate assessment has unanswered questions.
  */
 
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-unanswered-question-modal',
   templateUrl: './unanswered-question-modal.component.html',
   styleUrls: ['./unanswered-question-modal.component.css'],
 })
-export class UnansweredQuestionModalComponent
-  implements AfterViewInit, OnDestroy
-{
+export class UnansweredQuestionModalComponent {
   @Input() unansweredQuestionCount = 3;
-  @Output() submitAnyway = new EventEmitter<void>();
-  @Output() goBackToAssessment = new EventEmitter<void>();
-  @ViewChild('assessmentModalCard')
-  assessmentModalCard!: ElementRef<HTMLElement>;
 
-  // This property is set in ngAfterViewInit and used to restore focus when
-  // the modal is destroyed.
-  private previouslyFocusedElement: HTMLElement | null = null;
+  constructor(private ngbActiveModal: NgbActiveModal) {}
 
-  ngAfterViewInit(): void {
-    this.previouslyFocusedElement = document.activeElement as HTMLElement;
-    this.assessmentModalCard.nativeElement.focus();
+  goBackToAssessment(): void {
+    this.ngbActiveModal.dismiss();
   }
 
-  ngOnDestroy(): void {
-    if (this.previouslyFocusedElement !== null) {
-      this.previouslyFocusedElement.focus();
-    }
-  }
-
-  trapFocus(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') {
-      return;
-    }
-    const focusableElements =
-      this.assessmentModalCard.nativeElement.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-    const firstFocusableElement = focusableElements[0] as
-      | HTMLElement
-      | undefined;
-    const lastFocusableElement = focusableElements[
-      focusableElements.length - 1
-    ] as HTMLElement | undefined;
-    if (event.shiftKey && document.activeElement === firstFocusableElement) {
-      lastFocusableElement?.focus();
-      event.preventDefault();
-    } else if (
-      !event.shiftKey &&
-      document.activeElement === lastFocusableElement
-    ) {
-      firstFocusableElement?.focus();
-      event.preventDefault();
-    }
-  }
-
-  onSubmitAnyway(): void {
-    this.submitAnyway.emit();
-  }
-
-  onGoBackToAssessment(): void {
-    this.goBackToAssessment.emit();
+  submitAnyway(): void {
+    this.ngbActiveModal.close();
   }
 }

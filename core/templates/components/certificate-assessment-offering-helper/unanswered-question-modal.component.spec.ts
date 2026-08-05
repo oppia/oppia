@@ -19,6 +19,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 
@@ -38,19 +39,22 @@ class MockTranslatePipe implements PipeTransform {
 describe('UnansweredQuestionModalComponent', () => {
   let component: UnansweredQuestionModalComponent;
   let fixture: ComponentFixture<UnansweredQuestionModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [NgbModalModule],
       declarations: [UnansweredQuestionModalComponent, MockTranslatePipe],
+      providers: [NgbActiveModal],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UnansweredQuestionModalComponent);
     component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     fixture.detectChanges();
   });
 
-  it('should expose dialog semantics with title and description references', () => {
-    const card = fixture.debugElement.query(By.css('.assessment-modal-card'));
+  it('should render the title and message', () => {
     const title = fixture.debugElement.query(
       By.css('#unanswered-question-modal-title')
     );
@@ -58,171 +62,18 @@ describe('UnansweredQuestionModalComponent', () => {
       By.css('#unanswered-question-modal-message')
     );
 
-    expect(card.attributes.role).toBe('dialog');
-    expect(card.attributes['aria-modal']).toBe('true');
-    expect(card.attributes['aria-labelledby']).toBe(
-      'unanswered-question-modal-title'
-    );
-    expect(card.attributes['aria-describedby']).toBe(
-      'unanswered-question-modal-message'
-    );
-    expect(card.attributes.tabindex).toBe('-1');
     expect(title).toBeTruthy();
     expect(message).toBeTruthy();
   });
 
-  it('should focus the modal card when the modal is initialized', () => {
-    expect(document.activeElement).toBe(
-      component.assessmentModalCard.nativeElement
+  it('should render the unanswered warning icon as a standalone image', () => {
+    const icon = fixture.debugElement.query(By.css('.assessment-modal-icon'));
+
+    expect(icon).toBeTruthy();
+    expect(icon.nativeElement.getAttribute('src')).toBe(
+      '/assets/images/certificates/unanswered-warning-icon.svg'
     );
-  });
-
-  it('should restore focus to the previously focused element on destroy', () => {
-    const triggerElement = document.createElement('button');
-    document.body.appendChild(triggerElement);
-    // Disabled dot-notation as previouslyFocusedElement is a private property
-    // and hence cannot be accessed without this syntax.
-    // eslint-disable-next-line dot-notation
-    component['previouslyFocusedElement'] = triggerElement;
-
-    component.ngOnDestroy();
-
-    expect(document.activeElement).toBe(triggerElement);
-    document.body.removeChild(triggerElement);
-  });
-
-  it('should not restore focus when no element was focused before', () => {
-    // Disabled dot-notation as previouslyFocusedElement is a private property
-    // and hence cannot be accessed without this syntax.
-    // eslint-disable-next-line dot-notation
-    component['previouslyFocusedElement'] = null;
-
-    expect(() => component.ngOnDestroy()).not.toThrowError();
-  });
-
-  it('should wrap focus forward to the first element from the last', () => {
-    const closeButton = fixture.debugElement.query(
-      By.css('.assessment-modal-close-button')
-    ).nativeElement as HTMLElement;
-    const submitButton = fixture.debugElement.query(
-      By.css('.assessment-modal-action-button')
-    ).nativeElement as HTMLElement;
-    submitButton.focus();
-    const event = new KeyboardEvent('keydown', {key: 'Tab'});
-    const preventDefaultSpy = spyOn(event, 'preventDefault');
-
-    component.trapFocus(event);
-
-    expect(document.activeElement).toBe(closeButton);
-    expect(preventDefaultSpy).toHaveBeenCalled();
-  });
-
-  it('should wrap focus backward to the last element from the first', () => {
-    const closeButton = fixture.debugElement.query(
-      By.css('.assessment-modal-close-button')
-    ).nativeElement as HTMLElement;
-    const submitButton = fixture.debugElement.query(
-      By.css('.assessment-modal-action-button')
-    ).nativeElement as HTMLElement;
-    closeButton.focus();
-    const event = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      shiftKey: true,
-    });
-    const preventDefaultSpy = spyOn(event, 'preventDefault');
-
-    component.trapFocus(event);
-
-    expect(document.activeElement).toBe(submitButton);
-    expect(preventDefaultSpy).toHaveBeenCalled();
-  });
-
-  it('should not wrap focus when tabbing forward from a middle element', () => {
-    const goBackButton = fixture.debugElement.query(
-      By.css('.assessment-modal-inline-key')
-    ).nativeElement as HTMLElement;
-    goBackButton.focus();
-    const event = new KeyboardEvent('keydown', {key: 'Tab'});
-
-    component.trapFocus(event);
-
-    expect(document.activeElement).toBe(goBackButton);
-  });
-
-  it('should not wrap focus when tabbing backward from a middle element', () => {
-    const goBackButton = fixture.debugElement.query(
-      By.css('.assessment-modal-inline-key')
-    ).nativeElement as HTMLElement;
-    goBackButton.focus();
-    const event = new KeyboardEvent('keydown', {
-      key: 'Tab',
-      shiftKey: true,
-    });
-
-    component.trapFocus(event);
-
-    expect(document.activeElement).toBe(goBackButton);
-  });
-
-  it('should do nothing for non-Tab key events', () => {
-    const closeButton = fixture.debugElement.query(
-      By.css('.assessment-modal-close-button')
-    ).nativeElement as HTMLElement;
-    closeButton.focus();
-    const event = new KeyboardEvent('keydown', {key: 'Enter'});
-
-    component.trapFocus(event);
-
-    expect(document.activeElement).toBe(closeButton);
-  });
-
-  it('should emit submitAnyway when onSubmitAnyway is called', () => {
-    spyOn(component.submitAnyway, 'emit');
-
-    component.onSubmitAnyway();
-
-    expect(component.submitAnyway.emit).toHaveBeenCalled();
-  });
-
-  it('should emit goBackToAssessment when onGoBackToAssessment is called', () => {
-    spyOn(component.goBackToAssessment, 'emit');
-
-    component.onGoBackToAssessment();
-
-    expect(component.goBackToAssessment.emit).toHaveBeenCalled();
-  });
-
-  it('should emit goBackToAssessment when the header close button is clicked', () => {
-    spyOn(component.goBackToAssessment, 'emit');
-    const closeButton = fixture.debugElement.query(
-      By.css('.assessment-modal-close-button')
-    );
-
-    closeButton.triggerEventHandler('click', null);
-
-    expect(component.goBackToAssessment.emit).toHaveBeenCalled();
-  });
-
-  it('should emit goBackToAssessment when the inline go-back button is clicked', () => {
-    spyOn(component.goBackToAssessment, 'emit');
-    const goBackButton = fixture.debugElement.query(
-      By.css('.assessment-modal-inline-key')
-    );
-
-    goBackButton.triggerEventHandler('click', null);
-
-    expect(component.goBackToAssessment.emit).toHaveBeenCalled();
-  });
-
-  it('should emit submitAnyway when the submit button is clicked', () => {
-    spyOn(component.submitAnyway, 'emit');
-    const submitButton = fixture.debugElement.query(
-      By.css('.assessment-modal-action-button')
-    );
-
-    submitButton.triggerEventHandler('click', null);
-
-    expect(component.submitAnyway.emit).toHaveBeenCalled();
+    expect(icon.nativeElement.getAttribute('alt')).toBe('');
   });
 
   it('should render the unanswered question count provided via the input', () => {
@@ -237,5 +88,54 @@ describe('UnansweredQuestionModalComponent', () => {
       By.css('#unanswered-question-modal-message')
     );
     expect(message.nativeElement.textContent).toContain('5');
+  });
+
+  it('should dismiss the modal when goBackToAssessment is called', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
+
+    component.goBackToAssessment();
+
+    expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should dismiss the modal when the header close button is clicked', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
+    const closeButton = fixture.debugElement.query(
+      By.css('.assessment-modal-close-button')
+    );
+
+    closeButton.triggerEventHandler('click', null);
+
+    expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should dismiss the modal when the inline go-back button is clicked', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
+    const goBackButton = fixture.debugElement.query(
+      By.css('.assessment-modal-inline-key')
+    );
+
+    goBackButton.triggerEventHandler('click', null);
+
+    expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should close the modal when submitAnyway is called', () => {
+    const closeSpy = spyOn(ngbActiveModal, 'close');
+
+    component.submitAnyway();
+
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
+  it('should close the modal when the submit button is clicked', () => {
+    const closeSpy = spyOn(ngbActiveModal, 'close');
+    const submitButton = fixture.debugElement.query(
+      By.css('.assessment-modal-action-button')
+    );
+
+    submitButton.triggerEventHandler('click', null);
+
+    expect(closeSpy).toHaveBeenCalled();
   });
 });

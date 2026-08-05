@@ -18,10 +18,33 @@
 
 import {CommonModule} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
+import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
+import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
+
+class MockNgbModal {
+  open(component: unknown, options: NgbModalOptions): NgbModalRef {
+    return {
+      componentInstance: {},
+      result: Promise.resolve(null),
+      close: () => {},
+      dismiss: () => {},
+    } as NgbModalRef;
+  }
+}
 
 describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
@@ -59,6 +82,10 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
           useValue: {
             navigate: jasmine.createSpy('navigate'),
           },
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -161,34 +188,108 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.getCurrentQuestion()).toEqual(component.mockQuestions[1]);
   });
 
-  it('should hide the modals by default', () => {
+  it('should not render the time-expired modal inline in the page', () => {
     fixture.detectChanges();
 
     expect(
       fixture.debugElement.query(By.css('oppia-time-expired-modal'))
     ).toBeNull();
-    expect(
-      fixture.debugElement.query(By.css('oppia-unanswered-question-modal'))
-    ).toBeNull();
   });
 
-  it('should show the time-expired modal when showTimeExpiredModal is true', () => {
-    fixture.detectChanges();
+  it('should open the time-expired modal when showTimeExpiredModal is true', () => {
+    const ngbModal = TestBed.inject(NgbModal);
+    spyOn(ngbModal, 'open').and.callThrough();
     component.showTimeExpiredModal = true;
+    component.showUnansweredQuestionModal = false;
     fixture.detectChanges();
 
-    expect(
-      fixture.debugElement.query(By.css('oppia-time-expired-modal'))
-    ).toBeTruthy();
+    expect(ngbModal.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-time-expired-modal',
+    });
   });
 
-  it('should show the unanswered-question modal when showUnansweredQuestionModal is true', () => {
+  it('should not open the time-expired modal when showTimeExpiredModal is false', () => {
+    const ngbModal = TestBed.inject(NgbModal);
+    spyOn(ngbModal, 'open').and.callThrough();
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = false;
     fixture.detectChanges();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
+  it('should handle the time-expired modal result when it is dismissed', fakeAsync(() => {
+    const ngbModal = TestBed.inject(NgbModal);
+    const modalRef = {
+      componentInstance: {},
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef;
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+    component.showTimeExpiredModal = true;
+    component.showUnansweredQuestionModal = false;
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(TimeExpiredModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-time-expired-modal',
+    });
+  }));
+
+  it('should open the unanswered-question modal when showUnansweredQuestionModal is true', () => {
+    const ngbModal = TestBed.inject(NgbModal);
+    spyOn(ngbModal, 'open').and.callThrough();
+    component.showTimeExpiredModal = false;
     component.showUnansweredQuestionModal = true;
     fixture.detectChanges();
 
-    expect(
-      fixture.debugElement.query(By.css('oppia-unanswered-question-modal'))
-    ).toBeTruthy();
+    const modalRef = (ngbModal.open as jasmine.Spy).calls.mostRecent()
+      .returnValue as NgbModalRef;
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      UnansweredQuestionModalComponent,
+      {
+        backdrop: 'static',
+        centered: true,
+        windowClass: 'oppia-unanswered-question-modal',
+      }
+    );
+    expect(modalRef.componentInstance.unansweredQuestionCount).toBe(3);
+  });
+
+  it('should handle the unanswered-question modal result when it is dismissed', fakeAsync(() => {
+    const ngbModal = TestBed.inject(NgbModal);
+    const modalRef = {
+      componentInstance: {},
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef;
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = true;
+
+    fixture.detectChanges();
+    flushMicrotasks();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      UnansweredQuestionModalComponent,
+      {
+        backdrop: 'static',
+        centered: true,
+        windowClass: 'oppia-unanswered-question-modal',
+      }
+    );
+  }));
+
+  it('should not open any modal when both modal flags are false', () => {
+    const ngbModal = TestBed.inject(NgbModal);
+    spyOn(ngbModal, 'open').and.callThrough();
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = false;
+    fixture.detectChanges();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
   });
 });

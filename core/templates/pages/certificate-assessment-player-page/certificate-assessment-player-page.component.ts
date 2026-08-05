@@ -18,6 +18,9 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
+import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 
 interface AssessmentQuestion {
   prompt: string;
@@ -56,6 +59,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private ngbModal: NgbModal,
     private router: Router
   ) {}
 
@@ -68,6 +72,38 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     } else if (currentRoute === 'result') {
       this.currentStage = 'result';
     }
+    if (this.showTimeExpiredModal) {
+      this.openTimeExpiredModal();
+    }
+    if (this.showUnansweredQuestionModal) {
+      this.openUnansweredQuestionModal();
+    }
+  }
+
+  openTimeExpiredModal(): void {
+    const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-time-expired-modal',
+    });
+    // The modal result is intentionally left unhandled for now; the viewResult
+    // and dismiss actions will be wired up in TODO(#24717-m2.19) once the
+    // backend is integrated.
+    modalRef.result.catch(() => null);
+  }
+
+  openUnansweredQuestionModal(): void {
+    const modalRef = this.ngbModal.open(UnansweredQuestionModalComponent, {
+      backdrop: 'static',
+      centered: true,
+      windowClass: 'oppia-unanswered-question-modal',
+    });
+    // The unanswered-question count is mocked until the backend is integrated.
+    modalRef.componentInstance.unansweredQuestionCount = 3;
+    // The modal result is intentionally left unhandled for now; the
+    // submitAnyway and goBackToAssessment actions will be wired up in
+    // TODO(#24717-m2.19) once the backend is integrated.
+    modalRef.result.catch(() => null);
   }
 
   showInstructions(): void {

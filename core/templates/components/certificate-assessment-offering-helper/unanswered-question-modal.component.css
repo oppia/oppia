@@ -1,15 +1,3 @@
-.assessment-modal-overlay {
-  align-items: center;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  min-height: 100%;
-  padding: 24px;
-  position: fixed;
-  z-index: 1000;
-}
-
 .assessment-modal-card {
   background: #e9edeb;
   border-radius: 30px;

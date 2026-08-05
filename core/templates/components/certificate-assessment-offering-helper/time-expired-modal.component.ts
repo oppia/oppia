@@ -16,73 +16,22 @@
  * @fileoverview Modal shown when a certificate assessment session times out.
  */
 
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnDestroy,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-time-expired-modal',
   templateUrl: './time-expired-modal.component.html',
   styleUrls: ['./time-expired-modal.component.css'],
 })
-export class TimeExpiredModalComponent implements AfterViewInit, OnDestroy {
-  @Output() viewResult = new EventEmitter<void>();
-  @Output() close = new EventEmitter<void>();
-  @ViewChild('assessmentModalCard')
-  assessmentModalCard!: ElementRef<HTMLElement>;
+export class TimeExpiredModalComponent {
+  constructor(private ngbActiveModal: NgbActiveModal) {}
 
-  // This property is set in ngAfterViewInit and used to restore focus when
-  // the modal is destroyed.
-  private previouslyFocusedElement: HTMLElement | null = null;
-
-  ngAfterViewInit(): void {
-    this.previouslyFocusedElement = document.activeElement as HTMLElement;
-    this.assessmentModalCard.nativeElement.focus();
+  dismiss(): void {
+    this.ngbActiveModal.dismiss();
   }
 
-  ngOnDestroy(): void {
-    if (this.previouslyFocusedElement !== null) {
-      this.previouslyFocusedElement.focus();
-    }
-  }
-
-  trapFocus(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') {
-      return;
-    }
-    const focusableElements =
-      this.assessmentModalCard.nativeElement.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-    const firstFocusableElement = focusableElements[0] as
-      | HTMLElement
-      | undefined;
-    const lastFocusableElement = focusableElements[
-      focusableElements.length - 1
-    ] as HTMLElement | undefined;
-    if (event.shiftKey && document.activeElement === firstFocusableElement) {
-      lastFocusableElement?.focus();
-      event.preventDefault();
-    } else if (
-      !event.shiftKey &&
-      document.activeElement === lastFocusableElement
-    ) {
-      firstFocusableElement?.focus();
-      event.preventDefault();
-    }
-  }
-
-  onClose(): void {
-    this.close.emit();
-  }
-
-  onViewResult(): void {
-    this.viewResult.emit();
+  viewResults(): void {
+    this.ngbActiveModal.close();
   }
 }
