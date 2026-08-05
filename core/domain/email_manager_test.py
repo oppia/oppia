@@ -9101,7 +9101,8 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
         self,
     ) -> None:
         """Tests send_machine_translation_failure_email for an unknown provider
-        that has no documentation link, covering the else branch."""
+        that has no documentation link, covering the else branch.
+        """
         email_messages: List[Tuple[str, str]] = []
 
         def mock_send_mail(
