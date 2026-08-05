@@ -2992,8 +2992,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.ensureEditorTabIsActive();
-
     // If any modal backdrops are still visible, they can intercept clicks.
     // Only wait when needed, and keep it bounded to avoid inflating test time.
     const hasVisibleModalBackdrop = await this.page
@@ -3111,8 +3109,6 @@ export class ExplorationEditor extends BaseUser {
     interactionToAdd: string,
     skipInteractionCustoization: boolean = true
   ): Promise<void> {
-    await this.ensureEditorTabIsActive();
-
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -3987,8 +3983,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to display the Oppia responses section.
    */
   async viewOppiaResponses(): Promise<void> {
-    await this.ensureEditorTabIsActive();
-
     await this.page.waitForSelector(stateResponsesSelector, {
       visible: true,
     });
@@ -4181,8 +4175,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
-    await this.ensureEditorTabIsActive();
-
     let elements;
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
@@ -4333,8 +4325,6 @@ export class ExplorationEditor extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    await this.ensureEditorTabIsActive();
-
     await this.page.waitForSelector(defaultFeedbackTab, {
       visible: true,
     });
