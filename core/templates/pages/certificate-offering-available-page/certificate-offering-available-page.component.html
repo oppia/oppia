@@ -27,6 +27,16 @@
       {{ 'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_SUBHEADING_TEXT' | translate }}
     </p>
 
+    <p class="oppia-certificate-offering-available-page-empty-state"
+       *ngIf="!isLoading && !hasError && availableCertificateOfferings.length === 0">
+      No certificates available yet.
+    </p>
+
+    <p class="oppia-certificate-offering-available-page-empty-state"
+       *ngIf="hasError">
+      Failed to load certificate assessment offerings.
+    </p>
+
     <div class="oppia-certificate-offering-available-page-tiles">
       <article class="oppia-certificate-offering-available-page-tile"
                *ngFor="let certificate of availableCertificates">
