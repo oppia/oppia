@@ -23,7 +23,6 @@ import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import testConstants from '../../utilities/common/test-constants';
 
 const ROLES = testConstants.Roles;
@@ -33,15 +32,10 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-// The backend 400 error is a known consequence of adding an invalid user ID.
-// By ignoring it, we prevent noise in the test output and focus on other unexpected errors.
-// The frontend toast message is directly asserted by test case, ensuring it is displayed correctly.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  new RegExp(
-    'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
-  ),
-  new RegExp('Sorry, we could not find the specified user.'),
-]);
+// TODO(#26974): Once ConsoleReporter is ported to Playwright, re-add the
+// suppression for the expected 400 from adding an invalid user ID as a
+// voiceover artist (see the Puppeteer version of this spec for reference).
+// The frontend toast message for this case is asserted directly below.
 
 test.describe.configure({mode: 'serial'});
 
@@ -125,6 +119,5 @@ test.describe('Voiceover Admin', function () {
 
   test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-    ConsoleReporter.reportConsoleErrors();
   });
 });
