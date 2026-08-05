@@ -173,7 +173,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         job_model = job_models.JobModel(
             id='job_id',
-            last_updated=datetime.datetime.utcnow()
+            last_updated=utils.get_current_utc_datetime()
             - datetime.timedelta(days=181),
         )
         job_model.update_timestamps(update_last_updated_time=False)

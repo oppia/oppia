@@ -215,9 +215,10 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         messages_summary = response_dict['message_summary_list']
         first_message = messages_summary[0]
 
-        self.assertDictContainsSubset(
-            {'text': 'a sample message', 'author_username': 'editor'},
+        self.assertEqual(
             first_message,
+            first_message
+            | {'text': 'a sample message', 'author_username': 'editor'}
         )
 
         # Add another message.
@@ -243,8 +244,9 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         # Check the summary of the second message.
         self.assertEqual(len(messages_summary), 2)
         second_message = messages_summary[1]
-        self.assertDictContainsSubset(
-            {'text': 'Message 1', 'author_username': 'editor'}, second_message
+        self.assertEqual(
+            second_message,
+            second_message | {'text': 'Message 1', 'author_username': 'editor'}
         )
 
         self.logout()

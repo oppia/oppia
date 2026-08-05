@@ -109,11 +109,12 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID)
         )
         self.assertEqual(len(response_dict['feedback_thread_dicts']), 1)
-        self.assertDictContainsSubset(
-            {
-                'status': 'open',
-            },
+        self.assertEqual(
             response_dict['feedback_thread_dicts'][0],
+            response_dict['feedback_thread_dicts'][0]
+            | {
+                'status': 'open',
+            }
         )
 
         # Non-logged-in users can see individual messages.
@@ -124,13 +125,14 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         )
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            response_dict['messages'][0],
+            response_dict['messages'][0]
+            | {
                 'updated_status': 'open',
                 'updated_subject': self._get_unicode_test_string('subject'),
                 'text': self._get_unicode_test_string('text'),
-            },
-            response_dict['messages'][0],
+            }
         )
 
     def test_non_logged_in_users_cannot_create_threads_and_messages(
@@ -195,13 +197,14 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         threadlist = response_dict['feedback_thread_dicts']
         self.assertEqual(len(threadlist), 1)
         self.assertEqual(set(threadlist[0].keys()), set(EXPECTED_THREAD_KEYS))
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            threadlist[0],
+            threadlist[0]
+            | {
                 'status': 'open',
                 'original_author_username': self.EDITOR_USERNAME,
                 'subject': 'New Thread ¡unicode!',
-            },
-            threadlist[0],
+            }
         )
 
         thread_url = '%s/%s' % (
@@ -210,13 +213,14 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         )
         response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            response_dict['messages'][0],
+            response_dict['messages'][0]
+            | {
                 'updated_status': 'open',
                 'updated_subject': 'New Thread ¡unicode!',
                 'text': 'Thread Text ¡unicode!',
-            },
-            response_dict['messages'][0],
+            }
         )
 
     def test_missing_thread_subject_raises_400_error(self) -> None:
@@ -295,27 +299,29 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(response_dict['messages'][0].keys()), set(EXPECTED_MESSAGE_KEYS)
         )
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            response_dict['messages'][0],
+            response_dict['messages'][0]
+            | {
                 'author_username': self.EDITOR_USERNAME,
                 'entity_id': self.EXP_ID,
                 'message_id': 0,
                 'updated_status': 'open',
                 'updated_subject': 'New Thread ¡unicode!',
                 'text': 'Message 0 ¡unicode!',
-            },
-            response_dict['messages'][0],
+            }
         )
-        self.assertDictContainsSubset(
-            {
+        self.assertEqual(
+            response_dict['messages'][1],
+            response_dict['messages'][1]
+            | {
                 'author_username': self.EDITOR_USERNAME,
                 'entity_id': self.EXP_ID,
                 'message_id': 1,
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1',
-            },
-            response_dict['messages'][1],
+            }
         )
 
         self.logout()

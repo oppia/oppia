@@ -114,13 +114,16 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json('/blogadminhandler')
         response_platform_parameters = response_dict['platform_parameters']
-        self.assertDictContainsSubset(
-            {
-                'value': 10,
-            },
+        self.assertEqual(
             response_platform_parameters[
                 platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
+            response_platform_parameters[
+                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            ]
+            | {
+                'value': 10,
+            }
         )
 
         payload = {
@@ -135,13 +138,16 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json('/blogadminhandler')
         response_platform_parameters = response_dict['platform_parameters']
-        self.assertDictContainsSubset(
-            {
-                'value': new_platform_parameter_value,
-            },
+        self.assertEqual(
             response_platform_parameters[
                 platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
+            response_platform_parameters[
+                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            ]
+            | {
+                'value': new_platform_parameter_value,
+            }
         )
 
         self.logout()
@@ -153,13 +159,16 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json('/blogadminhandler')
         response_platform_parameters = response_dict['platform_parameters']
-        self.assertDictContainsSubset(
-            {
-                'value': 10,
-            },
+        self.assertEqual(
             response_platform_parameters[
                 platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
+            response_platform_parameters[
+                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            ]
+            | {
+                'value': 10,
+            }
         )
 
         payload = {
@@ -217,13 +226,16 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json('/blogadminhandler')
         response_platform_parameters = response_dict['platform_parameters']
-        self.assertDictContainsSubset(
-            {
-                'value': 10,
-            },
+        self.assertEqual(
             response_platform_parameters[
                 platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
+            response_platform_parameters[
+                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            ]
+            | {
+                'value': 10,
+            }
         )
 
         payload = {
@@ -256,13 +268,16 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json('/blogadminhandler')
         response_platform_parameters = response_dict['platform_parameters']
-        self.assertDictContainsSubset(
-            {
-                'value': 10,
-            },
+        self.assertEqual(
             response_platform_parameters[
                 platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             ],
+            response_platform_parameters[
+                platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            ]
+            | {
+                'value': 10,
+            }
         )
 
         payload = {

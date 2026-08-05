@@ -479,8 +479,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     }
     LESSON_FEEDBACK_RESPONSE_LIST: List[Dict[str, Union[str, float]]] = []
     LESSON_FEEDBACK_UNREAD_RESPONSE_COUNT = 1
-    LESSON_FEEDBACK_CREATED_ON = datetime.datetime.utcnow()
-    LESSON_FEEDBACK_LAST_UPDATED = datetime.datetime.utcnow()
+    LESSON_FEEDBACK_CREATED_ON = utils.get_current_utc_datetime()
+    LESSON_FEEDBACK_LAST_UPDATED = utils.get_current_utc_datetime()
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.

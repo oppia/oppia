@@ -261,8 +261,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         observed_suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id
         )
-        self.assertDictContainsSubset(
-            expected_suggestion_dict, observed_suggestion.to_dict()
+        self.assertEqual(
+            observed_suggestion.to_dict(),
+            observed_suggestion.to_dict() | expected_suggestion_dict
         )
 
     def test_cannot_create_suggestion_with_invalid_suggestion_type(

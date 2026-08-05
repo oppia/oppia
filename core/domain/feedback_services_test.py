@@ -469,8 +469,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         )
         threads = feedback_services.get_threads('exploration', self.EXP_ID_1)
         self.assertEqual(1, len(threads))
-        self.assertDictContainsSubset(
-            self.EXPECTED_THREAD_DICT, threads[0].to_dict()
+        self.assertEqual(
+            threads[0].to_dict(),
+            threads[0].to_dict() | self.EXPECTED_THREAD_DICT
         )
 
     def test_get_all_threads(self) -> None:
@@ -487,8 +488,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, False
         )
         self.assertEqual(1, len(threads))
-        self.assertDictContainsSubset(
-            self.EXPECTED_THREAD_DICT, threads[0].to_dict()
+        self.assertEqual(
+            threads[0].to_dict(),
+            threads[0].to_dict() | self.EXPECTED_THREAD_DICT
         )
 
         self.EXPECTED_THREAD_DICT_VIEWER['original_author_id'] = self.viewer_id
@@ -506,8 +508,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, False
         )
         self.assertEqual(2, len(threads))
-        self.assertDictContainsSubset(
-            self.EXPECTED_THREAD_DICT_VIEWER, threads[0].to_dict()
+        self.assertEqual(
+            threads[0].to_dict(),
+            threads[0].to_dict() | self.EXPECTED_THREAD_DICT_VIEWER
         )
 
     def test_get_total_open_thread_for_single_exploration(self) -> None:
