@@ -370,7 +370,12 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_id, True, False, False, False
+            self.reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=True,
         )
         self.save_new_valid_exploration(self.target_id, self.author_id)
         # Give reviewer rights to review translations in the given language
@@ -477,6 +482,16 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        user_services.update_email_preferences(
+            self.reviewer_id,
+            False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            can_receive_contributor_dashboard_email=True,
+            bulk_email_db_already_updated=True,
+        )
 
         with self.testapp_swap:
             with self.swap(
@@ -634,7 +649,12 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
-            self.reviewer_id, True, False, False, False
+            self.reviewer_id,
+            True,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=True,
         )
         self.save_new_valid_exploration(self.target_id, self.author_id)
         # Give reviewer rights to review translations in the given language
