@@ -365,7 +365,7 @@ class UserSettings:
         """Updates last_edited_an_exploration to the current datetime for the
         user.
         """
-        self.last_edited_an_exploration = datetime.datetime.utcnow()
+        self.last_edited_an_exploration = utils.get_current_utc_datetime()
 
     def update_first_contribution_msec(
         self, first_contribution_msec: float
@@ -833,6 +833,8 @@ class UserGlobalPrefs:
             receive emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the user can receive
              subscription emails notifying them about new explorations.
+        can_receive_contributor_dashboard_email: bool. Whether the user can
+            receive Contributor Dashboard reviewer notification emails.
     """
 
     def __init__(
@@ -841,6 +843,7 @@ class UserGlobalPrefs:
         can_receive_editor_role_email: bool,
         can_receive_feedback_message_email: bool,
         can_receive_subscription_email: bool,
+        can_receive_contributor_dashboard_email: bool,
     ) -> None:
         """Constructs a UserGlobalPrefs domain object.
 
@@ -853,6 +856,8 @@ class UserGlobalPrefs:
                 receive emails when users submit feedback to their explorations.
             can_receive_subscription_email: bool. Whether the user can receive
                 subscription emails notifying them about new explorations.
+            can_receive_contributor_dashboard_email: bool. Whether the user can
+                receive Contributor Dashboard reviewer notification emails.
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
@@ -860,6 +865,9 @@ class UserGlobalPrefs:
             can_receive_feedback_message_email
         )
         self.can_receive_subscription_email = can_receive_subscription_email
+        self.can_receive_contributor_dashboard_email = (
+            can_receive_contributor_dashboard_email
+        )
 
     @classmethod
     def create_default_prefs(cls) -> UserGlobalPrefs:
@@ -869,6 +877,7 @@ class UserGlobalPrefs:
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
 
@@ -1204,78 +1213,6 @@ class LearnerGoals:
             'topic_ids_to_learn': self.topic_ids_to_learn,
             'topic_ids_to_master': self.topic_ids_to_master,
         }
-
-
-class LearnerPlaylist:
-    """Domain object for the learner playlist model."""
-
-    def __init__(
-        self,
-        user_id: str,
-        exploration_ids: List[str],
-        collection_ids: List[str],
-    ) -> None:
-        self.id = user_id
-        self.exploration_ids = exploration_ids
-        self.collection_ids = collection_ids
-
-    def insert_exploration_id_at_given_position(
-        self, exploration_id: str, position_to_be_inserted: int
-    ) -> None:
-        """Inserts the given exploration id at the given position.
-
-        Args:
-            exploration_id: str. The exploration id to be inserted into the
-                play later list.
-            position_to_be_inserted: int. The position at which it
-                is to be inserted.
-        """
-        self.exploration_ids.insert(position_to_be_inserted, exploration_id)
-
-    def add_exploration_id_to_list(self, exploration_id: str) -> None:
-        """Inserts the exploration id at the end of the list.
-
-        Args:
-            exploration_id: str. The exploration id to be appended to the end
-                of the list.
-        """
-        self.exploration_ids.append(exploration_id)
-
-    def insert_collection_id_at_given_position(
-        self, collection_id: str, position_to_be_inserted: int
-    ) -> None:
-        """Inserts the given collection id at the given position.
-
-        Args:
-            collection_id: str. The collection id to be inserted into the
-                play later list.
-            position_to_be_inserted: int. The position at which it
-                is to be inserted.
-        """
-        self.collection_ids.insert(position_to_be_inserted, collection_id)
-
-    def add_collection_id_to_list(self, collection_id: str) -> None:
-        """Inserts the collection id at the end of the list.
-
-        Args:
-            collection_id: str. The collection id to be appended to the end
-                of the list.
-        """
-        self.collection_ids.append(collection_id)
-
-    def remove_exploration_id(self, exploration_id: str) -> None:
-        """Removes the exploration id from the learner playlist.
-
-        exploration_id: str. The id of the exploration to be removed.
-        """
-        self.exploration_ids.remove(exploration_id)
-
-    def remove_collection_id(self, collection_id: str) -> None:
-        """Removes the collection id from the learner playlist.
-
-        collection_id: str. The id of the collection to be removed.
-        """
-        self.collection_ids.remove(collection_id)
 
 
 class UserContributionProficiency:

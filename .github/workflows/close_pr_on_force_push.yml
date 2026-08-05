@@ -1,0 +1,57 @@
+name: Close PR on force-push or rebase
+on:
+  pull_request:
+    types:
+        - synchronize
+permissions: read-all
+jobs:
+  detect_force_push:
+    runs-on: ubuntu-24.04
+    permissions:
+        pull-requests: write
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Close PR if branch was force-pushed or rebased
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const before = context.payload.before;
+            const after = context.payload.after;
+
+            // A normal (fast-forward) push always keeps 'before' as an
+            // ancestor of 'after', so the comparison reports 0 commits
+            // behind. A force-push or rebase rewrites history, so commits
+            // that were previously on the branch are no longer reachable
+            // from the new head, and 'before' ends up behind/diverged from
+            // 'after' instead. This also correctly does not flag a normal
+            // 'merge the base branch into my PR branch' commit, since that
+            // keeps 'before' as an ancestor of the new merge commit.
+            const { data: comparison } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: before,
+              head: after,
+            });
+
+            if (comparison.behind_by > 0) {
+              const author = pr.user.login;
+              const comment = `Hi @${author}, this PR's branch appears to have been force-pushed or rebased, which rewrites commit history. Per our [contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change), force-pushing to a PR branch is not allowed, so this PR is being closed. Please open a new PR from a fresh branch instead of force-pushing. Thanks!`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: comment,
+              });
+
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed',
+              });
+            }
