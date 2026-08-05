@@ -26,7 +26,7 @@ from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 
-class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentOfferingHandlerUnitTests(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentOfferingHandler."""
 
     def test_get_returns_empty_certificate_offerings(self) -> None:
@@ -130,7 +130,9 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(offering['async_status'], 'Available')
 
 
-class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentOfferingByIdHandlerUnitTests(
+    test_utils.GenericTestBase
+):
     """Tests class for CertificateAssessmentOfferingByIdHandler."""
 
     def test_get_returns_real_certificate_offering(self) -> None:
@@ -324,7 +326,7 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class ValidateCertificateAssessmentOfferingHandlerTest(
+class ValidateCertificateAssessmentOfferingHandlerUnitTests(
     test_utils.GenericTestBase
 ):
     """Tests class for ValidateCertificateAssessmentOfferingHandler."""
@@ -401,7 +403,7 @@ class ValidateCertificateAssessmentOfferingHandlerTest(
         self.assertFalse(response['is_valid'])
 
 
-class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentResultHandlerUnitTests(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentResultHandler."""
 
     def test_get_returns_hardcoded_result_payload(self) -> None:
@@ -426,7 +428,7 @@ class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
+class CertificateAssessmentAttemptsHandlerUnitTests(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentAttemptsHandler."""
 
     def test_get_returns_hardcoded_attempts_list(self) -> None:
@@ -449,7 +451,7 @@ class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class StartCertificateAssessmentHandlerUnitTest(test_utils.GenericTestBase):
+class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for the start certificate assessment handler."""
 
     def test_post_returns_real_attempt_payload(self) -> None:
@@ -481,7 +483,7 @@ class StartCertificateAssessmentHandlerUnitTest(test_utils.GenericTestBase):
         )
 
 
-class SubmitCertificateAssessmentHandlerUnitTest(test_utils.GenericTestBase):
+class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for the submit certificate assessment handler."""
 
     def test_post_returns_submission_confirmation(self) -> None:
@@ -516,7 +518,7 @@ class SubmitCertificateAssessmentHandlerUnitTest(test_utils.GenericTestBase):
         )
 
 
-class CertificateQuestionHandlerUnitTest(test_utils.GenericTestBase):
+class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for the certificate question handler."""
 
     def test_get_returns_question_state_data(self) -> None:
