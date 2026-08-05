@@ -94,6 +94,187 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(feedback.parent_feedback_id, 'parent_id')
 
+    def test_get_learner_feedback_summaries_filters_by_author(self) -> None:
+        expected_feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+        general_feedback_services.create_lesson_feedback(
+            author_id='other_user_id',
+            feedback_text='Other learner feedback.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+
+        summaries, next_cursor, more = (
+            general_feedback_services.get_learner_feedback_summaries('user_id')
+        )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0]['id'], expected_feedback.id)
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_get_lesson_feedback_returns_none_for_missing_feedback(
+        self,
+    ) -> None:
+        self.assertIsNone(
+            general_feedback_services.get_lesson_feedback('missing_feedback')
+        )
+
+    def test_get_lesson_feedback_summaries_applies_filters(self) -> None:
+        expected_feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+        feedback_model = general_feedback_models.LessonFeedbackModel.get_by_id(
+            expected_feedback.id
+        )
+        assert feedback_model is not None
+
+        with mock.patch.object(
+            general_feedback_models.LessonFeedbackModel,
+            'fetch_page',
+            return_value=([feedback_model], 'next_cursor', True),
+        ) as mock_fetch_page:
+            summaries, next_cursor, more = (
+                general_feedback_services.get_lesson_feedback_summaries(
+                    exp_id='exp_id',
+                    status_filter=feconf.STATUS_CHOICES_OPEN,
+                    cursor='cursor',
+                    date_from_msecs=0,
+                    date_to_msecs=9999999999999,
+                )
+            )
+
+        self.assertEqual(len(summaries), 1)
+        self.assertEqual(summaries[0]['id'], expected_feedback.id)
+        self.assertEqual(
+            summaries[0]['feedback_text_preview'], 'This lesson helped.'
+        )
+        self.assertEqual(next_cursor, 'next_cursor')
+        self.assertTrue(more)
+        self.assertEqual(mock_fetch_page.call_args.kwargs['page_size'], 20)
+        self.assertEqual(mock_fetch_page.call_args.kwargs['cursor'], 'cursor')
+        self.assertEqual(
+            mock_fetch_page.call_args.kwargs['exploration_id'], 'exp_id'
+        )
+        self.assertEqual(
+            mock_fetch_page.call_args.kwargs['status_filter'],
+            feconf.STATUS_CHOICES_OPEN,
+        )
+        self.assertIsNotNone(mock_fetch_page.call_args.kwargs['date_from'])
+        self.assertIsNotNone(mock_fetch_page.call_args.kwargs['date_to'])
+
+    def test_get_learner_feedback_rejects_feedback_owned_by_other_user(
+        self,
+    ) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+
+        self.assertIsNone(
+            general_feedback_services.get_learner_feedback(
+                feedback.id, 'other_user_id'
+            )
+        )
+
+    def test_update_lesson_feedback_appends_creator_response(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+
+        updated_feedback = general_feedback_services.update_lesson_feedback(
+            feedback_id=feedback.id,
+            new_status=feconf.STATUS_CHOICES_FIXED,
+            exp_id='exp_id',
+            responder_id='creator_id',
+            reply_text='Thanks, this is fixed.',
+        )
+        feedback_model = general_feedback_models.LessonFeedbackModel.get_by_id(
+            feedback.id
+        )
+
+        self.assertIsNotNone(updated_feedback)
+        assert updated_feedback is not None
+        self.assertEqual(updated_feedback.status, feconf.STATUS_CHOICES_FIXED)
+        self.assertEqual(updated_feedback.unread_response_count, 1)
+        self.assertEqual(
+            updated_feedback.response_list[0]['response_text'],
+            'Thanks, this is fixed.',
+        )
+        self.assertIn('responded_on', updated_feedback.response_list[0])
+        self.assertIsNotNone(feedback_model)
+        assert feedback_model is not None
+        self.assertEqual(
+            feedback_model.response_list[0]['responded_by'], 'creator_id'
+        )
+
+    def test_update_lesson_feedback_updates_status_without_reply(self) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+
+        updated_feedback = general_feedback_services.update_lesson_feedback(
+            feedback_id=feedback.id,
+            new_status=feconf.STATUS_CHOICES_FIXED,
+            exp_id='exp_id',
+            responder_id='creator_id',
+        )
+
+        self.assertIsNotNone(updated_feedback)
+        assert updated_feedback is not None
+        self.assertEqual(updated_feedback.status, feconf.STATUS_CHOICES_FIXED)
+        self.assertEqual(updated_feedback.response_list, [])
+        self.assertEqual(updated_feedback.unread_response_count, 0)
+
+    def test_update_lesson_feedback_returns_none_for_missing_feedback(
+        self,
+    ) -> None:
+        self.assertIsNone(
+            general_feedback_services.update_lesson_feedback(
+                feedback_id='missing_feedback',
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                exp_id='exp_id',
+                responder_id='creator_id',
+            )
+        )
+
+    def test_update_lesson_feedback_rejects_invalid_status(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'Invalid status: invalid'):
+            general_feedback_services.update_lesson_feedback(
+                feedback_id='feedback_id',
+                new_status='invalid',
+                exp_id='exp_id',
+                responder_id='creator_id',
+            )
+
+    def test_update_lesson_feedback_rejects_invalid_exploration(
+        self,
+    ) -> None:
+        feedback = general_feedback_services.create_lesson_feedback(
+            author_id='user_id',
+            feedback_text='This lesson helped.',
+            lesson_metadata=self.get_lesson_metadata(),
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Invalid exploration ID: other_exp_id'
+        ):
+            general_feedback_services.update_lesson_feedback(
+                feedback_id=feedback.id,
+                new_status=feconf.STATUS_CHOICES_FIXED,
+                exp_id='other_exp_id',
+                responder_id='creator_id',
+            )
+
     def test_create_platform_report_for_lesson_routes_to_creator(
         self,
     ) -> None:
