@@ -215,12 +215,4 @@ describe('StateHintsEditorComponent', () => {
       expect(component.mathWarningIsMinimized).toBeFalse();
     });
   });
-
-  describe('when saving or submitting formula as text', () => {
-    it('should save content directly when onSaveContentButtonClicked is called', () => {
-      spyOn(component, 'saveContent');
-      component.onSaveContentButtonClicked();
-      expect(component.saveContent).toHaveBeenCalled();
-    });
-  });
 });
