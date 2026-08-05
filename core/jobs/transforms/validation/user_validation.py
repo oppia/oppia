@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
+from core import feconf, utils
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
@@ -405,7 +403,7 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
             yield user_validation_errors.DraftChangeListLastUpdatedNoneError(
                 model
             )
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         if (
             model.draft_change_list_last_updated
             and model.draft_change_list_last_updated > current_time

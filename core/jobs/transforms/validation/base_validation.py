@@ -31,7 +31,7 @@ import datetime
 import enum
 import re
 
-from core import feconf
+from core import feconf, utils
 from core.domain import change_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
@@ -86,7 +86,7 @@ class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
         cloned_entity = job_utils.clone_model(entity)
 
         expiration_date = (
-            datetime.datetime.utcnow()
+            utils.get_current_utc_datetime()
             - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
         )
 
@@ -275,7 +275,7 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
                 cloned_entity
             )
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = utils.get_current_utc_datetime()
         last_updated_corrected = (
             cloned_entity.last_updated - MAX_CLOCK_SKEW_DURATION
         )

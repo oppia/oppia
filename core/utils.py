@@ -32,7 +32,7 @@ import time
 import unicodedata
 import urllib.parse
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 
 import filetype
@@ -649,6 +649,35 @@ def convert_string_to_naive_datetime_object(
     return datetime.datetime.strptime(date_time_string, DATETIME_FORMAT)
 
 
+def get_current_utc_datetime() -> datetime.datetime:
+    """Returns the current UTC datetime."""
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+
+
+def get_current_utc_date() -> datetime.date:
+    """Returns the current UTC date."""
+    return get_current_utc_datetime().date()
+
+
+def get_current_local_datetime() -> datetime.datetime:
+    """Returns the current local datetime.
+
+    This preserves the existing semantics of datetime.datetime.today().
+    """
+    return datetime.datetime.now()
+
+
+def normalize_datetime_to_utc(dt: datetime.datetime) -> datetime.datetime:
+    """Normalizes a datetime to timezone-aware UTC.
+
+    Naive datetimes are treated as UTC for backwards compatibility.
+    """
+    if dt.tzinfo is None or dt.utcoffset() is None:
+        return dt.replace(tzinfo=datetime.timezone.utc)
+
+    return dt.astimezone(datetime.timezone.utc)
+
+
 def get_current_time_in_millisecs() -> float:
     """Returns time in milliseconds since the Epoch.
 
@@ -685,7 +714,7 @@ def get_number_of_days_since_date(date: datetime.date) -> int:
     Returns:
         int. The number of days past since a given date.
     """
-    return int((datetime.date.today() - date).days)
+    return int((utils.get_current_utc_date() - date).days)
 
 
 def create_string_from_largest_unit_in_timedelta(
@@ -748,6 +777,8 @@ def are_datetimes_close(
         bool. True if difference between two datetimes is less than
         feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
     """
+    later_datetime = normalize_datetime_to_utc(later_datetime)
+    earlier_datetime = normalize_datetime_to_utc(earlier_datetime)
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
 

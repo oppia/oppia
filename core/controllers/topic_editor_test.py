@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
 import os
 
 from core import feature_flag_list, feconf, utils
@@ -314,8 +313,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             ],
             thumbnail_filename='img.svg',
             url_fragment='url',
-            story_model_created_on=datetime.datetime.today(),
-            story_model_last_updated=datetime.datetime.today(),
+            story_model_created_on=utils.get_current_local_datetime(),
+            story_model_last_updated=utils.get_current_local_datetime(),
         )
         story_services.save_story_summary(story_summary)
 

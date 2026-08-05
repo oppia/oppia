@@ -2191,13 +2191,13 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
         )
 
         for exp_id in demo_exploration_ids:
-            start_time = datetime.datetime.utcnow()
+            start_time = utils.get_current_utc_datetime()
 
             exp_services.load_demo(exp_id)
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
             exploration.validate(strict=True)
 
-            duration = datetime.datetime.utcnow() - start_time
+            duration = utils.get_current_utc_datetime() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1e6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)'
