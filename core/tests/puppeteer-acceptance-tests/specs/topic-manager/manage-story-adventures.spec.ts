@@ -94,6 +94,11 @@ describe('Topic Manager', function () {
   it(
     'should create a new adventure from existing chapters',
     async function () {
+      await topicManager.openStoryEditor(
+        'The Adventure Story',
+        'Adventure Topic'
+      );
+
       await topicManager.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
 
       await topicManager.expectScreenshotToMatch(
