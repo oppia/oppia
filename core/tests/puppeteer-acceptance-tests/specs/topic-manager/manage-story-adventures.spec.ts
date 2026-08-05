@@ -31,7 +31,8 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const CHAPTER_TITLES = Array.from({length: 11}, (_, i) => `Chapter ${i + 1}`);
 
 describe('Topic Manager', function () {
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   const explorationIds: string[] = [];
 
@@ -70,6 +71,13 @@ describe('Topic Manager', function () {
       'Adventure Topic'
     );
 
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      [ROLES.TOPIC_MANAGER],
+      'Adventure Topic'
+    );
+
     await curriculumAdmin.addStoryToTopic(
       'The Adventure Story',
       'the-adventure-story',
@@ -86,25 +94,25 @@ describe('Topic Manager', function () {
   it(
     'should create a new adventure from existing chapters',
     async function () {
-      await curriculumAdmin.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
+      await topicManager.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
 
-      await curriculumAdmin.expectScreenshotToMatch(
+      await topicManager.expectScreenshotToMatch(
         'storyEditorAllChaptersInSingleAdventure',
         __dirname
       );
 
-      await curriculumAdmin.splitIntoAdventure('Chapter 3');
-      await curriculumAdmin.expectAdventureCount(2);
-      await curriculumAdmin.expectAdventureHeaderToBeVisible('Adventure 2');
+      await topicManager.splitIntoAdventure('Chapter 3');
+      await topicManager.expectAdventureCount(2);
+      await topicManager.expectAdventureHeaderToBeVisible('Adventure 2');
 
-      await curriculumAdmin.scrollToTopOfPage();
+      await topicManager.scrollToTopOfPage();
 
-      await curriculumAdmin.expectScreenshotToMatch(
+      await topicManager.expectScreenshotToMatch(
         'storyEditorAfterSplitAtChapter3',
         __dirname
       );
 
-      await curriculumAdmin.expectChaptersOrderToBe(CHAPTER_TITLES);
+      await topicManager.expectChaptersOrderToBe(CHAPTER_TITLES);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -112,38 +120,38 @@ describe('Topic Manager', function () {
   it(
     'should edit an adventure metadata',
     async function () {
-      await curriculumAdmin.fillEditAdventureModal(
+      await topicManager.fillEditAdventureModal(
         'Part Two',
         'The second part of the story'
       );
 
-      await curriculumAdmin.expectScreenshotToMatch(
+      await topicManager.expectScreenshotToMatch(
         'storyEditorEditAdventureModal',
         __dirname
       );
 
-      await curriculumAdmin.saveEditAdventureModal();
+      await topicManager.saveEditAdventureModal();
 
-      await curriculumAdmin.expectAdventureToHave(
+      await topicManager.expectAdventureToHave(
         'Part Two',
         'The second part of the story'
       );
 
-      await curriculumAdmin.scrollToTopOfPage();
+      await topicManager.scrollToTopOfPage();
 
-      await curriculumAdmin.expectScreenshotToMatch(
+      await topicManager.expectScreenshotToMatch(
         'storyEditorAfterEditingAdventureMetadata',
         __dirname
       );
 
-      await curriculumAdmin.saveStoryDraft();
+      await topicManager.saveStoryDraft();
 
-      await curriculumAdmin.openStoryEditor(
+      await topicManager.openStoryEditor(
         'The Adventure Story',
         'Adventure Topic'
       );
 
-      await curriculumAdmin.expectAdventureToHave(
+      await topicManager.expectAdventureToHave(
         'Part Two',
         'The second part of the story'
       );
@@ -154,18 +162,18 @@ describe('Topic Manager', function () {
   it(
     'should remove an adventure boundary',
     async function () {
-      await curriculumAdmin.removeAdventureBoundary();
-      await curriculumAdmin.expectAdventureCount(1);
+      await topicManager.removeAdventureBoundary();
+      await topicManager.expectAdventureCount(1);
 
-      await curriculumAdmin.splitIntoAdventure('Chapter 7');
-      await curriculumAdmin.expectAdventureCount(2);
+      await topicManager.splitIntoAdventure('Chapter 7');
+      await topicManager.expectAdventureCount(2);
 
-      await curriculumAdmin.removeAdventureBoundary();
-      await curriculumAdmin.expectAdventureCount(1);
+      await topicManager.removeAdventureBoundary();
+      await topicManager.expectAdventureCount(1);
 
-      await curriculumAdmin.closeStoryEditorMobileNavbarOptions();
+      await topicManager.closeStoryEditorMobileNavbarOptions();
 
-      await curriculumAdmin.expectScreenshotToMatch(
+      await topicManager.expectScreenshotToMatch(
         'storyEditorAfterRemovingAdventureBoundary',
         __dirname
       );
@@ -176,19 +184,19 @@ describe('Topic Manager', function () {
   it(
     'should save changes in the story with adventure groupings',
     async function () {
-      await curriculumAdmin.splitIntoAdventure('Chapter 7');
-      await curriculumAdmin.expectAdventureCount(2);
+      await topicManager.splitIntoAdventure('Chapter 7');
+      await topicManager.expectAdventureCount(2);
 
-      await curriculumAdmin.saveStoryDraft();
+      await topicManager.saveStoryDraft();
 
-      await curriculumAdmin.openStoryEditor(
+      await topicManager.openStoryEditor(
         'The Adventure Story',
         'Adventure Topic'
       );
 
-      await curriculumAdmin.expectAdventureCount(2);
+      await topicManager.expectAdventureCount(2);
 
-      await curriculumAdmin.expectScreenshotToMatch(
+      await topicManager.expectScreenshotToMatch(
         'storyEditorAfterReloadPersistedGroupings',
         __dirname
       );
