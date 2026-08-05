@@ -642,6 +642,9 @@ DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
 DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = True
+# The default preference for Contributor Dashboard reviewer notification
+# emails when no stored email preference is available.
+DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE = True
 # Whether to send an invitation email when the user is granted
 # new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
@@ -1033,6 +1036,7 @@ LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
+MY_FEEDBACK_URL = '/my_feedback'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -1166,6 +1170,9 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 )
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
+)
+CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = (
+    '/certificate_assessment_offerings_for_classroom_handler/<classroom_id>'
 )
 START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
 
