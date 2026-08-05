@@ -46,6 +46,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
+    Any,
     Callable,
     DefaultDict,
     Dict,
@@ -9219,7 +9220,7 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
 
             pass
 
-        def mock_send_mail(*_args: str, **_kwargs: object) -> None:
+        def mock_send_mail(*_args: str, **_kwargs: Any) -> None:
             raise SimulatedEmailFailure()
 
         send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
