@@ -551,7 +551,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         )
         response_id = response.id
 
-        self.assertEqual(len(response_id), 12)
+        self.assertEqual(response_id, 'attempt_id_1-question_id_1')
 
         fetched_model = (
             certificate_models.CertificateAssessmentResponseModel.get_by_id(
@@ -612,28 +612,38 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             [True, False],
         )
 
-    def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
-        """Ensures the ID generator raises after exhausting retries."""
-        get_by_id_swap = self.swap(
-            certificate_models.CertificateAssessmentResponseModel,
-            'get_by_id',
-            lambda *args, **kwargs: True,
+    def test_create_overwrites_existing_response_on_retry(self) -> None:
+        """Ensures a retried submission overwrites the same response."""
+        certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_id='attempt_id_1',
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
         )
-        convert_to_hash_swap = self.swap(
-            utils, 'convert_to_hash', lambda *args, **kwargs: 'duplicate-id'
+        certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_id='attempt_id_1',
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option B',
+            is_correct=False,
         )
 
-        with self.assertRaisesRegex(
-            Exception,
-            (
-                'The id generator for CertificateAssessmentResponseModel '
-                'is producing too many collisions.'
-            ),
-        ), get_by_id_swap, convert_to_hash_swap:
-            certificate_models.CertificateAssessmentResponseModel.create(
-                attempt_id='attempt_id_1',
-                question_id='question_id_1',
-                question_version=1,
-                selected_answer='Option A',
-                is_correct=False,
+        fetched_model = (
+            certificate_models.CertificateAssessmentResponseModel.get_by_id(
+                'attempt_id_1-question_id_1'
             )
+        )
+        self.assertIsNotNone(fetched_model)
+        self.assertEqual(fetched_model.selected_answer, 'Option B')
+        self.assertFalse(fetched_model.is_correct)
+
+        self.assertEqual(
+            len(
+                certificate_models.CertificateAssessmentResponseModel.query(
+                    certificate_models.CertificateAssessmentResponseModel.attempt_id
+                    == 'attempt_id_1'
+                ).fetch()
+            ),
+            1,
+        )

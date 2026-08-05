@@ -27,6 +27,7 @@ from core.domain import (
     certificate_assessment_services,
     classroom_config_domain,
     classroom_config_services,
+    question_fetchers,
     question_services,
     skill_fetchers,
     topic_domain,
@@ -199,7 +200,11 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             )
 
     def _create_assessment_question(
-        self, question_id: str, skill_id: str, answer_text: str
+        self,
+        question_id: str,
+        skill_id: str,
+        answer_text: str,
+        skill_difficulty: float = 0.3,
     ) -> None:
         """Creates a question linked to the given skill for use in assessments."""
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -213,8 +218,26 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             content_id_generator.next_content_id_index,
         )
         question_services.create_new_question_skill_link(
-            owner_id, question_id, skill_id, 0.3
+            owner_id, question_id, skill_id, skill_difficulty
         )
+
+    def _create_assessment_topic_with_skills(self, skill_ids: list[str]) -> str:
+        """Creates a topic containing the given skills and returns its id."""
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        topic_id = topic_fetchers.get_new_topic_id()
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic', 'subtopic'
+        )
+        subtopic.skill_ids = skill_ids
+        self.save_new_topic(
+            topic_id,
+            owner_id,
+            name='Assessment Topic',
+            url_fragment='assessment-topic',
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        return topic_id
 
     def test_start_certificate_assessment_attempt_creates_attempt_and_selects_questions(
         self,
@@ -223,26 +246,24 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         question_id_1 = question_services.get_new_question_id()
         question_id_2 = question_services.get_new_question_id()
         question_id_3 = question_services.get_new_question_id()
-        self._create_assessment_question(question_id_1, 'skill_1', 'Answer 1')
-        self._create_assessment_question(question_id_2, 'skill_2', 'Answer 2')
-        self._create_assessment_question(question_id_3, 'skill_3', 'Answer 3')
-
-        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
-            title='Arithmetic Check',
-            description='Checks arithmetic basics.',
-            classroom_id=self.classroom_id,
-            topic_ids=[self.topic_id],
-            total_questions=3,
-            time_limit_in_minutes=30,
-            demonstrates=['Arithmetic reasoning'],
-            async_status='Available',
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer 1', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
         )
 
         created_offering = certificate_assessment_services.create_certificate_assessment_offering(
             title='Arithmetic Check',
             description='Checks arithmetic basics.',
             classroom_id=self.classroom_id,
-            topic_ids=[self.topic_id],
+            topic_ids=[topic_id],
             total_questions=3,
             time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
@@ -250,63 +271,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
 
         with mock.patch.object(
-            certificate_assessment_services,
-            '_pick_questions',
-            return_value=[question_id_1, question_id_2, question_id_3],
-        ), mock.patch.object(
-            certificate_assessment_services,
-            '_build_version_data',
-            return_value={
-                'certificate_id': created_offering.certificate_id,
-                'certificate_version': 1,
-                'topic_versions': {self.topic_id: 1},
-                'question_versions': {
-                    question_id_1: 1,
-                    question_id_2: 1,
-                    question_id_3: 1,
-                },
-                'question_topic_links': {
-                    question_id_1: [self.topic_id],
-                    question_id_2: [self.topic_id],
-                    question_id_3: [self.topic_id],
-                },
-            },
-        ), mock.patch.object(
-            certificate_assessment_services,
-            'validate_certificate_assessment_offering',
-            return_value={'is_valid': True},
-        ), mock.patch.object(
-            certificate_assessment_services,
-            '_get_current_time',
-            return_value=datetime.datetime(2026, 8, 2, 0, 0),
-        ), mock.patch.object(
-            gae_models.CertificateAssessmentAttemptModel,
-            'create',
-            return_value=mock.Mock(
-                id='attempt_1',
-                learner_id=owner_id,
-                total_score=0.0,
-                attempt_index=1,
-                attempt_data={},
-                version_data={
-                    'certificate_id': created_offering.certificate_id,
-                    'certificate_version': 1,
-                    'topic_versions': {self.topic_id: 1},
-                    'question_versions': {
-                        question_id_1: 1,
-                        question_id_2: 1,
-                        question_id_3: 1,
-                    },
-                    'question_topic_links': {
-                        question_id_1: [self.topic_id],
-                        question_id_2: [self.topic_id],
-                        question_id_3: [self.topic_id],
-                    },
-                },
-                started_at=datetime.datetime(2026, 8, 2, 0, 0),
-                finished_at=None,
-                is_submitted=False,
-            ),
+            secrets.SystemRandom,
+            'sample',
+            side_effect=lambda items, count: items[:count],
         ):
             attempt, questions = (
                 certificate_assessment_services.start_certificate_assessment_attempt(
@@ -317,8 +284,20 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
 
         self.assertEqual(attempt.attempt_index, 1)
         self.assertFalse(attempt.is_submitted)
+        self.assertIsNotNone(attempt.started_at)
         self.assertEqual(
-            attempt.started_at, datetime.datetime(2026, 8, 2, 0, 0)
+            attempt.version_data['certificate_id'],
+            created_offering.certificate_id,
+        )
+        self.assertEqual(attempt.version_data['certificate_version'], 1)
+        self.assertEqual(attempt.version_data['topic_versions'], {topic_id: 1})
+        self.assertEqual(
+            attempt.version_data['question_topic_links'],
+            {
+                question_id_1: [topic_id],
+                question_id_2: [topic_id],
+                question_id_3: [topic_id],
+            },
         )
         self.assertEqual(
             questions,
@@ -329,6 +308,223 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             ],
         )
 
+    def test_get_topic_question_ids_by_difficulty_groups_by_difficulty(
+        self,
+    ) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_skill('skill_easy', owner_id, description='Easy skill')
+        self.save_new_skill(
+            'skill_medium', owner_id, description='Medium skill'
+        )
+        self.save_new_skill('skill_hard', owner_id, description='Hard skill')
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic', 'subtopic'
+        )
+        subtopic.skill_ids = ['skill_easy', 'skill_medium', 'skill_hard']
+        self.save_new_topic(
+            topic_id,
+            owner_id,
+            name='Difficulty Assessment Topic',
+            url_fragment='difficulty-topic',
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        for question_id, skill_id, difficulty in (
+            (question_services.get_new_question_id(), 'skill_easy', 0.3),
+            (question_services.get_new_question_id(), 'skill_medium', 0.6),
+            (question_services.get_new_question_id(), 'skill_hard', 0.9),
+        ):
+            content_id_generator = translation_domain.ContentIdGenerator()
+            self.save_new_question(
+                question_id,
+                owner_id,
+                self._create_valid_question_data(
+                    'Answer', content_id_generator
+                ),
+                [skill_id],
+                content_id_generator.next_content_id_index,
+            )
+            question_services.create_new_question_skill_link(
+                owner_id, question_id, skill_id, difficulty
+            )
+
+        result = getattr(
+            certificate_assessment_services,
+            '_get_topic_question_ids_by_difficulty',
+        )([topic_id])
+
+        self.assertEqual(
+            result[topic_id],
+            {
+                CERTIFICATE_DIFFICULTY_EASY: [
+                    result[topic_id][CERTIFICATE_DIFFICULTY_EASY][0]
+                ],
+                CERTIFICATE_DIFFICULTY_MEDIUM: [
+                    result[topic_id][CERTIFICATE_DIFFICULTY_MEDIUM][0]
+                ],
+                CERTIFICATE_DIFFICULTY_HARD: [
+                    result[topic_id][CERTIFICATE_DIFFICULTY_HARD][0]
+                ],
+            },
+        )
+
+    def test_build_version_data_includes_certificate_and_topic_versions(
+        self,
+    ) -> None:
+        topic = mock.Mock(version=3)
+        question = mock.Mock(version=7)
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[topic],
+        ), mock.patch.object(
+            question_fetchers,
+            'get_questions_by_ids',
+            return_value=[question],
+        ):
+            result = getattr(
+                certificate_assessment_services, '_build_version_data'
+            )('cert_1', 2, ['topic_1'], [('question_1', 'topic_1')])
+
+        self.assertEqual(
+            result,
+            {
+                'certificate_id': 'cert_1',
+                'certificate_version': 2,
+                'topic_versions': {'topic_1': 3},
+                'question_versions': {'question_1': 7},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+        )
+
+    def test_get_active_attempt_for_learner_returns_or_raises(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'No active certificate assessment attempt was found.',
+        ):
+            getattr(
+                certificate_assessment_services,
+                '_get_active_attempt_for_learner',
+            )('learner_1')
+
+        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
+                'question_versions': {'question_1': 1},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        self.assertEqual(
+            getattr(
+                certificate_assessment_services,
+                '_get_active_attempt_for_learner',
+            )('learner_1').id,
+            attempt.id,
+        )
+
+    def test_get_submission_count_for_certificate_filters_by_certificate(
+        self,
+    ) -> None:
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
+                'question_versions': {'question_1': 1},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=datetime.datetime.utcnow(),
+            is_submitted=True,
+        )
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_1',
+            total_score=0.0,
+            attempt_index=2,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_2',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
+                'question_versions': {'question_1': 1},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=datetime.datetime.utcnow(),
+            is_submitted=True,
+        )
+
+        self.assertEqual(
+            getattr(
+                certificate_assessment_services,
+                '_get_submission_count_for_certificate',
+            )('learner_1', 'cert_1'),
+            1,
+        )
+
+    def test_normalize_answer_handles_none(self) -> None:
+        normalize_answer = getattr(
+            certificate_assessment_services, '_normalize_answer'
+        )
+        self.assertIsNone(normalize_answer(None))
+        self.assertEqual(normalize_answer('  answer  '), 'answer')
+
+    def test_get_question_state_data_for_assessment_attempt_raises_for_invalid_cases(
+        self,
+    ) -> None:
+        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
+                'question_versions': {'question_1': 1},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Attempt does not exist.'
+        ):
+            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
+                'learner_1', 'missing_attempt', 'question_1'
+            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'This attempt does not belong to the current learner.',
+        ):
+            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
+                'other_learner', attempt.id, 'question_1'
+            )
+        attempt.is_submitted = True
+        attempt.update_timestamps()
+        attempt.put()
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'This assessment has already been submitted.'
+        ):
+            certificate_assessment_services.get_question_state_data_for_assessment_attempt(
+                'learner_1', attempt.id, 'question_1'
+            )
+
     def test_start_certificate_assessment_attempt_rejects_in_progress_attempt(
         self,
     ) -> None:
@@ -336,14 +532,23 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         question_id_1 = question_services.get_new_question_id()
         question_id_2 = question_services.get_new_question_id()
         question_id_3 = question_services.get_new_question_id()
-        self._create_assessment_question(question_id_1, 'skill_1', 'Answer')
-        self._create_assessment_question(question_id_2, 'skill_2', 'Answer 2')
-        self._create_assessment_question(question_id_3, 'skill_3', 'Answer 3')
+        self._create_assessment_question(
+            question_id_1, 'skill_1', 'Answer', 0.6
+        )
+        self._create_assessment_question(
+            question_id_2, 'skill_2', 'Answer 2', 0.3
+        )
+        self._create_assessment_question(
+            question_id_3, 'skill_3', 'Answer 3', 0.9
+        )
+        topic_id = self._create_assessment_topic_with_skills(
+            ['skill_1', 'skill_2', 'skill_3']
+        )
         created_offering = certificate_assessment_services.create_certificate_assessment_offering(
             title='Arithmetic Check',
             description='Checks arithmetic basics.',
             classroom_id=self.classroom_id,
-            topic_ids=[self.topic_id],
+            topic_ids=[topic_id],
             total_questions=3,
             time_limit_in_minutes=30,
             demonstrates=['Arithmetic reasoning'],
@@ -359,11 +564,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 version_data={
                     'certificate_id': created_offering.certificate_id,
                     'certificate_version': 1,
-                    'topic_versions': {self.topic_id: 1},
+                    'topic_versions': {topic_id: 1},
                     'question_versions': {'dummy_question_id': 1},
-                    'question_topic_links': {
-                        'dummy_question_id': [self.topic_id]
-                    },
+                    'question_topic_links': {'dummy_question_id': [topic_id]},
                 },
                 started_at=datetime.datetime.utcnow(),
                 finished_at=None,
@@ -864,7 +1067,13 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             selected_question_ids,
-            ['q1', 'q3', 'q4', 'q5', 'q6'],
+            [
+                ('q1', 'topic_1'),
+                ('q3', 'topic_1'),
+                ('q4', 'topic_1'),
+                ('q5', 'topic_2'),
+                ('q6', 'topic_2'),
+            ],
         )
 
     def test_get_required_questions_for_topic_share_matches_cycle(self) -> None:

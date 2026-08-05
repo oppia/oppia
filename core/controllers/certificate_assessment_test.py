@@ -482,6 +482,28 @@ class StartCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             }
         )
 
+    def test_post_raises_invalid_input_on_not_ready_exception(self) -> None:
+        handler = (
+            certificate_assessment.StartCertificateAssessmentHandler.__new__(
+                certificate_assessment.StartCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {'certificate_id': 'cert_1'}
+        with mock.patch.object(
+            certificate_assessment_services,
+            'start_certificate_assessment_attempt',
+            side_effect=(
+                certificate_assessment_services.CertificateAssessmentAttemptNotReadyException(
+                    'not ready'
+                )
+            ),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'not ready'
+            ):
+                handler.post()
+
 
 class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for the submit certificate assessment handler."""
@@ -517,6 +539,31 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             {'attempt_id': 'attempt_1', 'is_submitted': True}
         )
 
+    def test_post_raises_invalid_input_on_validation_error(self) -> None:
+        handler = (
+            certificate_assessment.SubmitCertificateAssessmentHandler.__new__(
+                certificate_assessment.SubmitCertificateAssessmentHandler
+            )
+        )
+        handler.user_id = 'user_id_1'
+        handler.normalized_payload = {
+            'answers': [{'question_id': 'q1', 'selected_answer': 'A'}]
+        }
+        attempt = mock.Mock(learner_id='user_id_1', is_submitted=False)
+        with mock.patch.object(
+            gae_models.CertificateAssessmentAttemptModel,
+            'get_by_id',
+            return_value=attempt,
+        ), mock.patch.object(
+            certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            side_effect=utils.ValidationError('invalid attempt'),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'invalid attempt'
+            ):
+                handler.post('attempt_1')
+
 
 class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for the certificate question handler."""
@@ -532,8 +579,11 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
             attempt_index=1,
             attempt_data={},
             version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
                 'question_versions': {'q1': 1},
                 'question_topic_links': {'q1': ['topic_1']},
+                'topic_versions': {'topic_1': 1},
             },
             started_at=datetime.datetime.utcnow(),
             finished_at=None,
@@ -557,3 +607,34 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
                 'question_state_data': {'content': 'state'},
             }
         )
+
+    def test_get_raises_invalid_input_on_validation_error(self) -> None:
+        handler = certificate_assessment.CertificateQuestionHandler.__new__(
+            certificate_assessment.CertificateQuestionHandler
+        )
+        handler.user_id = 'user_id_1'
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='user_id_1',
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'question_versions': {'q1': 1},
+                'question_topic_links': {'q1': ['topic_1']},
+                'topic_versions': {'topic_1': 1},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        with mock.patch.object(
+            certificate_assessment_services,
+            'get_question_state_data_for_assessment_attempt',
+            side_effect=utils.ValidationError('bad question'),
+        ):
+            with self.assertRaisesRegex(
+                handler.InvalidInputException, 'bad question'
+            ):
+                handler.get('q1')  # pylint: disable=no-value-for-parameter

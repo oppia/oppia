@@ -44,6 +44,14 @@ if MYPY:  # pragma: no cover
 transaction_services = models.Registry.import_transaction_services()
 
 
+class QuestionSnapshotNotFoundError(utils.ValidationError):
+    """Error raised when the pinned snapshot of a question version is missing.
+
+    This is a domain-level exception that callers can translate into a
+    user-facing error instead of letting a storage EntityNotFoundError escape.
+    """
+
+
 def create_new_question(
     committer_id: str, question: question_domain.Question, commit_message: str
 ) -> None:
@@ -477,14 +485,23 @@ def get_question_by_id_and_version(
         Question. The domain object representing the pinned question version.
 
     Raises:
-        Exception. If the requested version does not exist.
+        QuestionSnapshotNotFoundError. If the requested version's snapshot
+            does not exist.
     """
     question_snapshot_id = question_models.QuestionModel.get_snapshot_id(
         question_id, question_version
     )
-    question_snapshot_model = question_models.QuestionSnapshotContentModel.get(
-        question_snapshot_id
-    )
+    try:
+        question_snapshot_model = (
+            question_models.QuestionSnapshotContentModel.get(
+                question_snapshot_id
+            )
+        )
+    except question_models.base_models.BaseModel.EntityNotFoundError as e:
+        raise QuestionSnapshotNotFoundError(
+            'Question snapshot for question %s version %s was not found.'
+            % (question_id, question_version)
+        ) from e
     question_model = question_models.QuestionModel(
         id=question_id,
         question_state_data=question_snapshot_model.content[

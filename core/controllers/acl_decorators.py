@@ -5137,7 +5137,7 @@ def can_access_certificate_dashboard(
 def can_submit_assessment_response(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Checks whether the current learner can submit the attempt.
+    """Decorator to check whether the current learner can submit the attempt.
 
     Args:
         handler: function. The function to be decorated.
@@ -5163,6 +5163,25 @@ def can_submit_assessment_response(
     def test_can_submit(
         self: _SelfBaseHandlerType, attempt_id: str, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
+        """Stub handler for certificate assessment submission checks.
+
+        Args:
+            attempt_id: str. The ID of the assessment attempt.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            base.UserFacingExceptions.NotLoggedInException. If the learner is
+                not logged in.
+            base.UserFacingExceptions.UnauthorizedUserException. If the
+                attempt does not belong to the learner.
+            base.UserFacingExceptions.InvalidInputException. If the attempt has
+                already been submitted.
+            base.UserFacingExceptions.NotFoundException. If the attempt cannot
+                be found.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
         try:
@@ -5187,7 +5206,8 @@ def can_submit_assessment_response(
 def can_access_certificate_assessment_attempt(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Checks access to a learner's active certificate assessment attempt.
+    """Decorator to check access to a learner's active certificate assessment
+    attempt.
 
     Args:
         handler: function. The function to be decorated.
@@ -5212,16 +5232,38 @@ def can_access_certificate_assessment_attempt(
     def test_can_access(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
+        """Stub handler for certificate assessment access checks.
+
+        Args:
+            question_id: str. The ID of the question.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            base.UserFacingExceptions.NotLoggedInException. If the learner is
+                not logged in.
+            base.UserFacingExceptions.UnauthorizedUserException. If no active
+                attempt exists.
+            base.UserFacingExceptions.InvalidInputException. If the question
+                does not belong to the active attempt.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
-        attempt = certificate_assessment_services._get_active_attempt_for_learner(  # pylint: disable=protected-access
-            self.user_id
-        )
+        try:
+            attempt = certificate_assessment_services.get_active_certificate_assessment_attempt(
+                self.user_id
+            )
+        except utils.ValidationError as e:
+            raise self.UnauthorizedUserException(str(e)) from e
         if question_id not in attempt.version_data['question_versions']:
             raise self.InvalidInputException(
                 'Question is not part of this assessment.'
             )
-        return handler(self, question_id, attempt_id=attempt.id, **kwargs)
+        return handler(
+            self, question_id, attempt_id=attempt.attempt_id, **kwargs
+        )
 
     return test_can_access
 

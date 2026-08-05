@@ -457,12 +457,12 @@ class StartCertificateAssessmentHandler(
                     self.normalized_payload['certificate_id'], self.user_id
                 )
             )
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e) from e
         except (
             certificate_assessment_services.CertificateAssessmentAttemptNotReadyException
         ) as e:
-            raise self.InvalidInputException(
-                'Sorry, this assessment isn\'t ready anymore! We\'ve alerted the creator, and in the meantime you can try a different assessment.'
-            ) from e
+            raise self.InvalidInputException(str(e)) from e
         self.render_json(
             {
                 'attempt_id': attempt.attempt_id,

@@ -521,7 +521,9 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
     """Storage model for a single response submitted by a learner during
     a certificate assessment attempt.
 
-    The ID of instances of this class are in form of random hash of 12 chars.
+    The ID of instances of this class is the deterministic composite
+    '<attempt_id>-<question_id>'. Using a deterministic ID means a retried
+    submission overwrites the same response instead of creating duplicates.
     """
 
     # The ID of the CertificateAssessmentAttemptModel this response
@@ -609,27 +611,17 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         }
 
     @classmethod
-    def _get_new_id(cls) -> str:
-        """Generates a unique ID in the form of a random hash of 12 chars.
+    def _get_response_id(cls, attempt_id: str, question_id: str) -> str:
+        """Returns the deterministic ID for a question's response.
+
+        Args:
+            attempt_id: str. The ID of the attempt this response belongs to.
+            question_id: str. The ID of the question being answered.
 
         Returns:
-            str. ID of the new CertificateAssessmentResponseModel instance.
-
-        Raises:
-            Exception. The ID generator is producing too many collisions.
+            str. The ID of the CertificateAssessmentResponseModel instance.
         """
-        for _ in range(base_models.MAX_RETRIES):
-            new_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH,
-            )
-            if not cls.get_by_id(new_id):
-                return new_id
-
-        raise Exception(
-            'The id generator for CertificateAssessmentResponseModel '
-            'is producing too many collisions.'
-        )
+        return '%s-%s' % (attempt_id, question_id)
 
     @classmethod
     def create(
@@ -652,7 +644,7 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         Returns:
             CertificateAssessmentResponseModel. Instance of the new entry.
         """
-        instance_id = cls._get_new_id()
+        instance_id = cls._get_response_id(attempt_id, question_id)
         response_instance = cls(
             id=instance_id,
             attempt_id=attempt_id,
@@ -683,7 +675,10 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         """
         response_instances = [
             cls(
-                id=cls._get_new_id(),
+                id=cls._get_response_id(
+                    response_dict['attempt_id'],
+                    response_dict['question_id'],
+                ),
                 attempt_id=response_dict['attempt_id'],
                 question_id=response_dict['question_id'],
                 question_version=response_dict['question_version'],
