@@ -16,11 +16,15 @@
  * @fileoverview Certificate assessment player page component.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Optional} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 interface AssessmentQuestion {
   prompt: string;
@@ -59,8 +63,10 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private ngbModal: NgbModal,
-    private router: Router
+    @Optional() private bottomSheet: MatBottomSheet,
+    @Optional() private ngbModal: NgbModal,
+    private router: Router,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
@@ -80,19 +86,30 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     }
   }
 
+  private isMobileScreenSize(): boolean {
+    return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
+  }
+
   openTimeExpiredModal(): void {
+    if (this.isMobileScreenSize()) {
+      this.bottomSheet.open(TimeExpiredModalComponent);
+      return;
+    }
     const modalRef = this.ngbModal.open(TimeExpiredModalComponent, {
       backdrop: 'static',
       centered: true,
       windowClass: 'oppia-time-expired-modal',
     });
-    // The modal result is intentionally left unhandled for now; the viewResult
-    // and dismiss actions will be wired up in TODO(#24717-m2.19) once the
+    // TODO(#24717-m2.19): Wire the viewResult and dismiss actions once the
     // backend is integrated.
     modalRef.result.catch(() => null);
   }
 
   openUnansweredQuestionModal(): void {
+    if (this.isMobileScreenSize()) {
+      this.bottomSheet.open(UnansweredQuestionModalComponent);
+      return;
+    }
     const modalRef = this.ngbModal.open(UnansweredQuestionModalComponent, {
       backdrop: 'static',
       centered: true,
@@ -100,9 +117,8 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     });
     // The unanswered-question count is mocked until the backend is integrated.
     modalRef.componentInstance.unansweredQuestionCount = 3;
-    // The modal result is intentionally left unhandled for now; the
-    // submitAnyway and goBackToAssessment actions will be wired up in
-    // TODO(#24717-m2.19) once the backend is integrated.
+    // TODO(#24717-m2.19): Wire the submitAnyway and goBackToAssessment actions
+    // once the backend is integrated.
     modalRef.result.catch(() => null);
   }
 

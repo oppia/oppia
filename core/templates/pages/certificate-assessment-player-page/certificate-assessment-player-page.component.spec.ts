@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {
   NgbModal,
   NgbModalOptions,
@@ -33,6 +34,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment-player-page.component';
 
 class MockNgbModal {
@@ -68,6 +70,13 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   const configureComponent = async (
     routePath: string | null
   ): Promise<void> => {
+    const bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    const windowDimensionsServiceSpy = jasmine.createSpyObj(
+      'WindowDimensionsService',
+      ['getWidth']
+    );
+    windowDimensionsServiceSpy.getWidth.and.returnValue(800);
+
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [CertificateAssessmentPlayerPageComponent],
@@ -78,14 +87,22 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
           useValue: activatedRouteStub(routePath),
         },
         {
+          provide: MatBottomSheet,
+          useValue: bottomSheetSpy,
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+        {
           provide: Router,
           useValue: {
             navigate: jasmine.createSpy('navigate'),
           },
         },
         {
-          provide: NgbModal,
-          useClass: MockNgbModal,
+          provide: WindowDimensionsService,
+          useValue: windowDimensionsServiceSpy,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -291,5 +308,29 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     fixture.detectChanges();
 
     expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
+  it('should open the time-expired modal as a bottom sheet on mobile screens', () => {
+    const bottomSheet = TestBed.inject(MatBottomSheet);
+    const windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    windowDimensionsService.getWidth.and.returnValue(400);
+    component.showTimeExpiredModal = true;
+    component.showUnansweredQuestionModal = false;
+    fixture.detectChanges();
+
+    expect(bottomSheet.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
+  });
+
+  it('should open the unanswered-question modal as a bottom sheet on mobile screens', () => {
+    const bottomSheet = TestBed.inject(MatBottomSheet);
+    const windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    windowDimensionsService.getWidth.and.returnValue(400);
+    component.showTimeExpiredModal = false;
+    component.showUnansweredQuestionModal = true;
+    fixture.detectChanges();
+
+    expect(bottomSheet.open).toHaveBeenCalledWith(
+      UnansweredQuestionModalComponent
+    );
   });
 });

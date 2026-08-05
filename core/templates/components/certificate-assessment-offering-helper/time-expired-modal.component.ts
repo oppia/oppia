@@ -16,7 +16,8 @@
  * @fileoverview Modal shown when a certificate assessment session times out.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -25,13 +26,24 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./time-expired-modal.component.css'],
 })
 export class TimeExpiredModalComponent {
-  constructor(private ngbActiveModal: NgbActiveModal) {}
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef
+  ) {}
 
   dismiss(): void {
-    this.ngbActiveModal.dismiss();
+    if (this.ngbActiveModal) {
+      this.ngbActiveModal.dismiss();
+    } else if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+    }
   }
 
   viewResults(): void {
-    this.ngbActiveModal.close();
+    if (this.ngbActiveModal) {
+      this.ngbActiveModal.close();
+    } else if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+    }
   }
 }

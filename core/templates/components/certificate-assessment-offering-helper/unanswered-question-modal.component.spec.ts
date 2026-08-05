@@ -17,9 +17,10 @@
  */
 
 import {Pipe, PipeTransform} from '@angular/core';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 
@@ -39,19 +40,36 @@ class MockTranslatePipe implements PipeTransform {
 describe('UnansweredQuestionModalComponent', () => {
   let component: UnansweredQuestionModalComponent;
   let fixture: ComponentFixture<UnansweredQuestionModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
+  let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
+  let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [NgbModalModule],
+  beforeEach(waitForAsync(() => {
+    const ngbSpy = jasmine.createSpyObj('NgbActiveModal', ['close', 'dismiss']);
+    const matSpy = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
+
+    TestBed.configureTestingModule({
       declarations: [UnansweredQuestionModalComponent, MockTranslatePipe],
-      providers: [NgbActiveModal],
+      providers: [
+        {provide: NgbActiveModal, useValue: ngbSpy},
+        {provide: MatBottomSheetRef, useValue: matSpy},
+      ],
     }).compileComponents();
+  }));
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(UnansweredQuestionModalComponent);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.inject(
+      NgbActiveModal
+    ) as jasmine.SpyObj<NgbActiveModal>;
+    bottomSheetRef = TestBed.inject(
+      MatBottomSheetRef
+    ) as jasmine.SpyObj<MatBottomSheetRef>;
     fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeDefined();
   });
 
   it('should render the title and message', () => {
@@ -90,52 +108,79 @@ describe('UnansweredQuestionModalComponent', () => {
     expect(message.nativeElement.textContent).toContain('5');
   });
 
-  it('should dismiss the modal when goBackToAssessment is called', () => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
+  describe('goBackToAssessment', () => {
+    it('should dismiss NgbActiveModal when available', () => {
+      component.goBackToAssessment();
+      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+    });
 
-    component.goBackToAssessment();
+    it('should dismiss the modal when the header close button is clicked', () => {
+      const closeButton = fixture.debugElement.query(
+        By.css('.assessment-modal-close-button')
+      );
 
-    expect(dismissSpy).toHaveBeenCalled();
+      closeButton.triggerEventHandler('click', null);
+
+      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+    });
+
+    it('should dismiss the modal when the inline go-back button is clicked', () => {
+      const goBackButton = fixture.debugElement.query(
+        By.css('.assessment-modal-inline-key')
+      );
+
+      goBackButton.triggerEventHandler('click', null);
+
+      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+    });
+
+    it('should dismiss MatBottomSheetRef when NgbActiveModal is not available', () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        declarations: [UnansweredQuestionModalComponent, MockTranslatePipe],
+        providers: [{provide: MatBottomSheetRef, useValue: bottomSheetRef}],
+      });
+
+      const newFixture = TestBed.createComponent(
+        UnansweredQuestionModalComponent
+      );
+      const newComponentInstance = newFixture.componentInstance;
+
+      newComponentInstance.goBackToAssessment();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+    });
   });
 
-  it('should dismiss the modal when the header close button is clicked', () => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
-    const closeButton = fixture.debugElement.query(
-      By.css('.assessment-modal-close-button')
-    );
+  describe('submitAnyway', () => {
+    it('should close NgbActiveModal when available', () => {
+      component.submitAnyway();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    });
 
-    closeButton.triggerEventHandler('click', null);
+    it('should close the modal when the submit button is clicked', () => {
+      const submitButton = fixture.debugElement.query(
+        By.css('.assessment-modal-action-button')
+      );
 
-    expect(dismissSpy).toHaveBeenCalled();
-  });
+      submitButton.triggerEventHandler('click', null);
 
-  it('should dismiss the modal when the inline go-back button is clicked', () => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss');
-    const goBackButton = fixture.debugElement.query(
-      By.css('.assessment-modal-inline-key')
-    );
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    });
 
-    goBackButton.triggerEventHandler('click', null);
+    it('should dismiss MatBottomSheetRef when NgbActiveModal is not available', () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        declarations: [UnansweredQuestionModalComponent, MockTranslatePipe],
+        providers: [{provide: MatBottomSheetRef, useValue: bottomSheetRef}],
+      });
 
-    expect(dismissSpy).toHaveBeenCalled();
-  });
+      const newFixture = TestBed.createComponent(
+        UnansweredQuestionModalComponent
+      );
+      const newComponentInstance = newFixture.componentInstance;
 
-  it('should close the modal when submitAnyway is called', () => {
-    const closeSpy = spyOn(ngbActiveModal, 'close');
-
-    component.submitAnyway();
-
-    expect(closeSpy).toHaveBeenCalled();
-  });
-
-  it('should close the modal when the submit button is clicked', () => {
-    const closeSpy = spyOn(ngbActiveModal, 'close');
-    const submitButton = fixture.debugElement.query(
-      By.css('.assessment-modal-action-button')
-    );
-
-    submitButton.triggerEventHandler('click', null);
-
-    expect(closeSpy).toHaveBeenCalled();
+      newComponentInstance.submitAnyway();
+      expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+    });
   });
 });
