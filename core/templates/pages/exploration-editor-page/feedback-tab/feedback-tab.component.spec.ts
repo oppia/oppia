@@ -38,6 +38,15 @@ import {ThreadDataBackendApiService} from './services/thread-data-backend-api.se
 import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorNewCreatorFeedbackTab: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Feedback Tab Component', () => {
   let component: FeedbackTabComponent;
@@ -50,6 +59,7 @@ describe('Feedback Tab Component', () => {
   let threadDataBackendApiService: ThreadDataBackendApiService;
   let userService: UserService;
   let ngbModal: NgbModal;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   class MockNgbModal {
     open() {
@@ -68,6 +78,10 @@ describe('Feedback Tab Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

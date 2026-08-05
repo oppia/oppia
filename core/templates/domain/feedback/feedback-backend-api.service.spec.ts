@@ -33,7 +33,11 @@ import {
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {throwError} from 'rxjs';
-import {FeedbackStatus, TechnicalTeamType} from './feedback.model';
+import {
+  CreatorFeedbackType,
+  FeedbackStatus,
+  TechnicalTeamType,
+} from './feedback.model';
 
 describe('Feedback backend api service', () => {
   let feedbackBackendApiService: FeedbackBackendApiService;
@@ -77,6 +81,7 @@ describe('Feedback backend api service', () => {
       end: new Date('2021-02-01'),
     },
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
   };
 
   const filterState2 = {
@@ -87,6 +92,7 @@ describe('Feedback backend api service', () => {
       end: new Date('2021-02-01'),
     },
     technicalTeam: TechnicalTeamType.TECH_INTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
   };
 
   const filterState3 = {
@@ -97,6 +103,7 @@ describe('Feedback backend api service', () => {
       end: null,
     },
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
   };
 
   const detailedReportResponse = {
@@ -380,7 +387,7 @@ describe('Feedback backend api service', () => {
     const req = httpTestingController.expectOne(
       request =>
         request.method === 'GET' &&
-        request.url === '/platform-feedback/creator/test_exploration_id'
+        request.url === '/platform-feedback/curriculum/test_exploration_id'
     );
     expect(req.request.params.get('status')).toBe(filterState3.status);
     expect(req.request.params.get('cursor')).toBe('cursor');

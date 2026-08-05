@@ -7,28 +7,28 @@
                                 (filterChange)="onCreatorFeedbackFilterChange($event)">
       </oppia-feedback-filter-bar>
 
-        <oppia-feedback-table class="oppia-feedback-table"
-        [feedbackCardConfig]="getCreatorFeedbackDetailCardConfig()"
-                            [feedbackSummaries]="getDisplayedCreatorFeedbackSummaries()"
-                            [currentPage]="getCreatorFeedbackListCurrentPage()"
-                            [moreFeedbackAvailable]="getCreatorFeedbackListMoreAvailable()"
-                            (rowClick)="onCreatorFeedbackRowClick($event)"
-                            (nextPage)="onCreatorFeedbackNextPage()"
-                            (previousPage)="onCreatorFeedbackPreviousPage()">
-        </oppia-feedback-table>
+      <oppia-feedback-table class="oppia-feedback-table"
+      [feedbackCardConfig]="getCreatorFeedbackDetailCardConfig()"
+                          [feedbackSummaries]="getDisplayedCreatorFeedbackSummaries()"
+                          [currentPage]="getCreatorFeedbackListCurrentPage()"
+                          [moreFeedbackAvailable]="getCreatorFeedbackListMoreAvailable()"
+                          (rowClick)="onCreatorFeedbackRowClick($event)"
+                          (nextPage)="onCreatorFeedbackNextPage()"
+                          (previousPage)="onCreatorFeedbackPreviousPage()">
+      </oppia-feedback-table>
     </mat-card>
   </ng-container>
   <ng-template #creatorFeedbackDetailView>
-      <oppia-feedback-detail-page class="oppia-feedback-detail-page"
-                                  [feedbackDetailResponse]="creatorFeedbackDetailResponse"
-                                  [feedbackDetailPageConfig]="getCreatorFeedbackDetailCardConfig()"
-                                  [statusOptions]="statusOptions"
-                                  [screenshotDataUrl]="creatorFeedbackScreenshotDataUrl"
-                                  (statusChange)="onCreatorFeedbackStatusChange($event)"
-                                  (messageSend)="onCreatorFeedbackMessageSend($event)"
-                                  (githubTransfer)="onCreatorFeedbackGithubTransfer($event)"
-                                  (goBack)="navigateBackToCreatorFeedbackList()">
-      </oppia-feedback-detail-page>
+    <oppia-feedback-detail-page class="oppia-feedback-detail-page"
+                                [feedbackDetailResponse]="creatorFeedbackDetailResponse"
+                                [feedbackDetailPageConfig]="getCreatorFeedbackDetailCardConfig()"
+                                [statusOptions]="statusOptions"
+                                [screenshotDataUrl]="creatorFeedbackScreenshotDataUrl"
+                                (statusChange)="onCreatorFeedbackStatusChange($event)"
+                                (messageSend)="onCreatorFeedbackMessageSend($event)"
+                                (githubTransfer)="onCreatorFeedbackGithubTransfer($event)"
+                                (goBack)="navigateBackToCreatorFeedbackList()">
+    </oppia-feedback-detail-page>
   </ng-template>
 </ng-container>
 
@@ -70,7 +70,7 @@
                     class="btn btn-secondary btn-sm e2e-test-oppia-feedback-back-button"
                     (click)="onBackButtonClicked()">
               <i class="fas fa-angle-left oppia-back-arrow-icon oppia-vcenter"
-                title="Return to list of feedback threads">
+                 title="Return to list of feedback threads">
               </i>
             </button>
           </span>

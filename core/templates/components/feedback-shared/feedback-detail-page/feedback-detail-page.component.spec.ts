@@ -235,7 +235,7 @@ describe('FeedbackDetailPageComponent', () => {
   it('should get correct source label', () => {
     const source = ReportType.APP;
     expect(component.getSourceLabel(source)).toBe('App');
-    expect(component.getSourceLabel('new_source')).toBe('new_source');
+    expect(component.getSourceLabel('new_source')).toBe('Lesson');
   });
 
   it('should get correct destination label', () => {
