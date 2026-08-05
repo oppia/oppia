@@ -122,7 +122,7 @@
           </oppia-card-display>
         </div>
       </div>
-      <div class="oppia-learner-dash-section  e2e-test-learner-dash-section" *ngIf="totalLessonsInPlaylists?.length > 0 || (isNonemptyObject(untrackedTopics)) && !isGoalLimitReached()">
+      <div class="oppia-learner-dash-section  e2e-test-learner-dash-section" *ngIf="(isNonemptyObject(untrackedTopics)) && !isGoalLimitReached()">
         <p class="oppia-learner-dash-section-heading e2e-test-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
         <!--TODO(#18384): Add search bar -->
         <!--TODO(#18384): Only untracked topics. Will need to change headings when there are multiple classrooms-->
@@ -135,11 +135,6 @@
           </oppia-card-display>
           <oppia-classroom-button [classroom]="item.key" [variant]="'blue'"></oppia-classroom-button>
         </ng-container>
-        <oppia-card-display *ngIf="totalLessonsInPlaylists.length > 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists.length">
-          <ng-container *ngFor="let lesson of totalLessonsInPlaylists">
-            <lesson-card [story]="lesson" [isSavedSection]="true" (lessonLoaded)="onLessonLoaded()"></lesson-card>
-          </ng-container>
-        </oppia-card-display>
       </div>
       <div class="oppia-learner-dash-section px-3 py-4 w-100 e2e-test-learner-dash-section"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
