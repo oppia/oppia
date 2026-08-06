@@ -1,6 +1,11 @@
 {
   "suites": [
     {
+      "name": "blog-admin",
+      "module": "core/tests/playwright-acceptance-tests/specs/blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles.spec.ts",
+      "framework": "playwright"
+    },
+    {
       "name": "logged-in-learner/serial-chapter",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts",
       "framework": "puppeteer"

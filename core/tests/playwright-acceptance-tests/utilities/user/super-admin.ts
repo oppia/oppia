@@ -64,19 +64,33 @@ export class SuperAdmin extends LoggedInUser {
     await this.typeInInputField(roleEditorInputField, username);
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.clickOnElementWithSelector(addRoleButton);
+    
+    // Click exactly ONCE to open the dropdown
     await this.clickOnElementWithSelector(rolesSelectDropdown);
-    const allRoleElements = await this.page.$$('.mat-option-text');
+    
+    await this.page.waitForSelector('.mat-option-text', { state: 'visible' });
+    
+  const allRoleElements = await this.page.$$('.mat-option-text');
     for (let i = 0; i < allRoleElements.length; i++) {
+      const isVisible = await allRoleElements[i].isVisible();
+      if (!isVisible) {
+        continue;
+      }
       const roleText = await this.page.evaluate(
         (element: SVGElement | HTMLElement) =>
           (element as HTMLElement).innerText,
         allRoleElements[i]
       );
-      if (roleText.toLowerCase() === role) {
-        await allRoleElements[i].evaluate(element =>
-          (element as HTMLElement).click()
-        );
+      
+      // ADD THIS LINE BACK IN:
+      console.log(`Dropdown option found: '${roleText.trim()}'`);
+      
+      if (roleText.trim().toLowerCase() === role.trim().toLowerCase()) {
+        
+        await allRoleElements[i].click();
+        await this.page.waitForSelector('.mat-option-text', { state: 'hidden' });
         await this.waitForStaticAssetsToLoad();
+        
         if (role === topicManagerRole) {
           if (typeof args !== 'string') {
             throw new Error('Expected additional argument to be string.');

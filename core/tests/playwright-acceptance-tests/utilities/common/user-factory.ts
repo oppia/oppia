@@ -17,8 +17,9 @@
  * Uses prototype-based composition to mix role capabilities onto user instances.
  * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
-
-import {Browser} from '@playwright/test';
+import { BlogAdmin } from '../user/blog-admin';
+import { BlogPostEditor } from '../user/blog-post-editor';
+import {Browser,Page} from '@playwright/test';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
 import {BaseUser, BaseUserFactory} from './playwright-utils';
@@ -52,6 +53,8 @@ const USER_ROLE_MAPPING = {
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.BLOG_ADMIN]: (page: Page) => new BlogAdmin(page),
+  [ROLES.BLOG_POST_EDITOR]: (page: Page) => new BlogPostEditor(page),
 } as const;
 
 // Roles that are not reflected on the admin page after assignment.
