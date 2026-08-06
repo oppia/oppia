@@ -103,6 +103,14 @@ export class UserFactory {
       const rolePrototype = Object.getPrototypeOf(role);
 
       Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        if (
+          name !== 'constructor' &&
+          Object.prototype.hasOwnProperty.call(userPrototype, name)
+        ) {
+          throw new Error(
+            `Method '${name}' is already defined by another role. Function name collision detected.`
+          );
+        }
         Object.defineProperty(
           userPrototype,
           name,
