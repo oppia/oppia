@@ -374,6 +374,24 @@ describe('Opportunities List Item Component', () => {
       });
     });
 
+    describe('when totalCount is 0', () => {
+      beforeEach(() => {
+        let opportunity = component.opportunity as ExplorationOpportunity;
+        opportunity.totalCount = 0;
+        opportunity.translationsCount = 0;
+        opportunity.inReviewCount = 0;
+        opportunity.reviewerOnlyContentCount = 0;
+        opportunity.userIsReviewer = false;
+        fixture.detectChanges();
+        component.ngOnInit();
+      });
+
+      it('should set progressPercentage to 100% to avoid division by zero', () => {
+        expect(component.progressPercentage).toBe('100%');
+        expect(component.cardsAvailable).toBe(0);
+      });
+    });
+
     describe('when button is disabled and there is no reviewer-only content', () => {
       beforeEach(() => {
         let opportunity = component.opportunity as ExplorationOpportunity;
