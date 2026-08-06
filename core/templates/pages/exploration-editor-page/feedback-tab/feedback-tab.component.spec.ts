@@ -39,7 +39,6 @@ import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LoaderService} from 'services/loader.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import {FeedbackBackendApiService} from 'domain/feedback/feedback-backend-api.service';
@@ -134,7 +133,6 @@ describe('Feedback Tab Component', () => {
   let userService: UserService;
   let ngbModal: NgbModal;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  let loaderService: LoaderService;
   let windowRef: WindowRef;
   let assetsBackendApiService: AssetsBackendApiService;
   let pageContextService: PageContextService;
@@ -180,7 +178,6 @@ describe('Feedback Tab Component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
     userService = TestBed.inject(UserService);
-    loaderService = TestBed.inject(LoaderService);
     windowRef = TestBed.inject(WindowRef);
     pageContextService = TestBed.inject(PageContextService);
     feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);

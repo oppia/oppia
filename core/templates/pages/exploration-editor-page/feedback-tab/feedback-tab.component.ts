@@ -495,7 +495,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     const feedbackDetailPath = hash.substring(feedbackDetailHashPrefix.length);
     const [urlFeedbackType, urlFeedbackId] = feedbackDetailPath.split('/');
     return {
-      feedbackType: urlFeedbackType,
+      feedbackType: urlFeedbackType as FeedbackModalType,
       feedbackId: decodeURIComponent(urlFeedbackId),
     };
   }
