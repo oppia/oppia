@@ -39,7 +39,11 @@ import {TranslationLanguageService} from 'pages/exploration-editor-page/translat
 import {UserService} from 'services/user.service';
 import {TranslationValidationService} from 'services/translation-validation.service';
 import {AppConstants} from 'app.constants';
-import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
+import {
+  ListSchema,
+  SchemaDefaultValue,
+  UnicodeSchema,
+} from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -55,6 +59,13 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
+const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
+const EXPLORATION_TITLE_CHAR_LIMIT = 36;
+const CONTENT_TYPE_METADATA = 'metadata';
+const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
+const EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category';
+const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -123,7 +134,7 @@ export class TranslationModalComponent {
   activeStatus!: Status;
   activeLanguageCode!: string;
   HTML_SCHEMA!: {
-    type: string;
+    type: 'html';
     ui_config: UiConfig;
   };
 
@@ -140,8 +151,11 @@ export class TranslationModalComponent {
   TRANSLATION_TIPS = AppConstants.TRANSLATION_TIPS;
   isActiveLanguageReviewer: boolean = false;
   hadCopyParagraphError: boolean = false;
+  hasImgCopyError: boolean = false;
   hasImgTextError: boolean = false;
   hasIncompleteTranslationError: boolean = false;
+  hasLengthValidationError: boolean = false;
+  lengthValidationErrorMessage: string = '';
   editorIsShown: boolean = true;
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
@@ -192,6 +206,16 @@ export class TranslationModalComponent {
     return ExpansionTabType;
   }
 
+  wrapTextWithEllipsis(input: string, characterCount: number): string {
+    if (!input) {
+      return '';
+    }
+    if (input.length <= characterCount || characterCount < 3) {
+      return input;
+    }
+    return input.substring(0, characterCount - 3).trim() + '...';
+  }
+
   ngOnInit(): void {
     this.activeLanguageCode =
       this.translationLanguageService.getActiveLanguageCode();
@@ -235,7 +259,8 @@ export class TranslationModalComponent {
         this.modifyTranslationOpportunity.contentId.split('_')[0];
       this.activeContentType = this.getFormattedContentType(
         contentType,
-        this.modifyTranslationOpportunity.interactionId
+        this.modifyTranslationOpportunity.interactionId,
+        this.modifyTranslationOpportunity.contentId
       );
       this.activeWrittenTranslation =
         this.modifyTranslationOpportunity.currentContentTranslation.translation;
@@ -370,6 +395,18 @@ export class TranslationModalComponent {
     return this.SET_OF_STRINGS_SCHEMA;
   }
 
+  get activeWrittenTranslationAsString(): string {
+    return typeof this.activeWrittenTranslation === 'string'
+      ? this.activeWrittenTranslation
+      : this.activeWrittenTranslation[0] || '';
+  }
+
+  get textToTranslateAsString(): string {
+    return typeof this.textToTranslate === 'string'
+      ? this.textToTranslate
+      : this.textToTranslate[0] || '';
+  }
+
   updateActiveState(translatableItem: TranslatableItem): void {
     ({
       text: this.textToTranslate = '',
@@ -381,7 +418,8 @@ export class TranslationModalComponent {
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
-      interactionId
+      interactionId,
+      this.translateTextService.activeContentId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType,
@@ -426,9 +464,17 @@ export class TranslationModalComponent {
     return this.ckEditorCopyContentService.copyModeActive;
   }
 
-  updateHtml($event: string | string[]): void {
+  updateHtml($event: SchemaDefaultValue): void {
     if ($event !== this.activeWrittenTranslation) {
-      this.activeWrittenTranslation = $event;
+      if (typeof $event === 'string') {
+        this.activeWrittenTranslation = $event;
+      } else if (Array.isArray($event)) {
+        this.activeWrittenTranslation = $event.filter(
+          (item): item is string => typeof item === 'string'
+        );
+      } else {
+        return;
+      }
       this.changeDetectorRef.detectChanges();
       this.updateTranslationErrors();
     }
@@ -473,10 +519,25 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType?: string,
-    interactionId?: string | null
+    interactionId?: string | null,
+    contentId?: string | null
   ): string {
     if (!contentType) {
       return '';
+    }
+    if (contentType === CONTENT_TYPE_METADATA && contentId) {
+      if (contentId === EXPLORATION_TITLE_CONTENT_ID) {
+        return 'title';
+      }
+      if (contentId === EXPLORATION_OBJECTIVE_CONTENT_ID) {
+        return 'objective';
+      }
+      if (contentId === EXPLORATION_CATEGORY_CONTENT_ID) {
+        return 'category';
+      }
+      if (contentId.startsWith(EXPLORATION_TAG_CONTENT_ID_PREFIX)) {
+        return 'tag';
+      }
     }
     switch (contentType) {
       case 'interaction':
@@ -528,7 +589,11 @@ export class TranslationModalComponent {
   }
 
   hasSubmitValidationErrors(): boolean {
-    return this.hasImgTextError || this.hasIncompleteTranslationError;
+    return (
+      this.hasImgTextError ||
+      this.hasIncompleteTranslationError ||
+      this.hasLengthValidationError
+    );
   }
 
   suggestTranslatedText(): void {
@@ -591,6 +656,7 @@ export class TranslationModalComponent {
     ) {
       this.hasImgTextError = false;
       this.hasIncompleteTranslationError = false;
+      this.hasLengthValidationError = false;
       return;
     }
 
@@ -605,6 +671,18 @@ export class TranslationModalComponent {
       translationError.hasDuplicateDescriptions;
     this.hasIncompleteTranslationError =
       translationError.hasUntranslatedElements;
+
+    this.hasLengthValidationError = false;
+    this.lengthValidationErrorMessage = '';
+    const activeContentId = this.translateTextService.activeContentId;
+    if (activeContentId === EXPLORATION_TITLE_CONTENT_ID) {
+      if (this.activeWrittenTranslation.length > EXPLORATION_TITLE_CHAR_LIMIT) {
+        this.hasLengthValidationError = true;
+        this.lengthValidationErrorMessage =
+          'Translation exceeds the allowed character limit. The translation ' +
+          `for the above content must be ${EXPLORATION_TITLE_CHAR_LIMIT} characters or fewer.`;
+      }
+    }
   }
 
   private closeWithoutUnsavedCheck(): void {
@@ -620,6 +698,7 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
+    this.pageContextService.resetImageSaveDestination();
     this.windowRef.nativeWindow.removeEventListener(
       'beforeunload',
       this.beforeUnloadHandler

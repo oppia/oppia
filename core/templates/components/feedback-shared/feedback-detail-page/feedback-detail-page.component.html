@@ -1,0 +1,208 @@
+<ng-container *ngIf="feedbackDetailResponse as feedback; else loadingState">
+  <div class="oppia-feedback-detail-card">
+
+    <header class="oppia-feedback-detail-topbar">
+      <div class="oppia-feedback-detail-topbar-start">
+        <button type="button"
+                class="btn btn-secondary btn-sm oppia-feedback-detail-back-btn"
+                aria-label="Back to feedback dashboard"
+                (click)="goBack.emit()">
+          <i class="fas fa-angle-left" aria-hidden="true"></i>
+        </button>
+        <h2 class="oppia-feedback-detail-title">
+          Feedback Detail
+        </h2>
+      </div>
+      <div class="oppia-feedback-detail-topbar-end">
+        <oppia-feedback-chip [value]="feedback.status"
+                             [type]="'status'">
+        </oppia-feedback-chip>
+        <oppia-feedback-chip *ngIf="feedback.category"
+                             [value]="feedback.category"
+                             [type]="'category'">
+        </oppia-feedback-chip>
+      </div>
+    </header>
+
+    <div class="oppia-feedback-detail-scroll-area">
+      <div class="oppia-feedback-detail-columns">
+
+        <div class="oppia-feedback-detail-col">
+          <oppia-feedback-detail-section heading="Details"
+                                         [isCollapsible]="true"
+                                         iconClass="fas fa-info-circle">
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">Submitted</span>
+              <span class="oppia-feedback-detail-field-value">{{ formatDate(feedback.created_on_msecs) }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">Status</span>
+              <span class="oppia-feedback-detail-field-value">{{ statusLabels[feedback.status] }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field" *ngIf="feedback.category">
+              <span class="oppia-feedback-detail-field-label">Category</span>
+              <span class="oppia-feedback-detail-field-value">{{ categoryLabels[feedback.category] }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">Source</span>
+              <span class="oppia-feedback-detail-field-value">{{ sourceLabels[feedback.source] }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">Platform</span>
+              <span class="oppia-feedback-detail-field-value">{{ getPlatformLabel(feedback.platform) }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field" *ngIf="feedback.page_url">
+              <span class="oppia-feedback-detail-field-label">Page URL</span>
+              <a [href]="feedback.page_url"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="oppia-feedback-detail-field-value oppia-feedback-detail-link">
+                {{ feedback.page_url }}
+              </a>
+            </div>
+            <div class="oppia-feedback-detail-screenshot" *ngIf="screenshotDataUrl">
+              <img class="oppia-feedback-detail-screenshot-img" [src]="screenshotDataUrl" alt="Screenshot">
+              <a [href]="screenshotDataUrl"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
+                Open screenshot in new tab
+              </a>
+            </div>
+          </oppia-feedback-detail-section>
+
+          <oppia-feedback-detail-section *ngIf="feedback.lesson_metadata as lessonMetadata"
+                                         heading="Lesson Context"
+                                         [isCollapsible]="true"
+                                         iconClass="fas fa-map-marker-alt">
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">Exploration</span>
+              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.exploration_id }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">Version</span>
+              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.exploration_version }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">State</span>
+              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.state_name }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field">
+              <span class="oppia-feedback-detail-field-label">State index</span>
+              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.state_index }}</span>
+            </div>
+            <div class="oppia-feedback-detail-field" *ngIf="lessonMetadata.learner_current_answer">
+              <span class="oppia-feedback-detail-field-label">Learner answer</span>
+              <span class="oppia-feedback-detail-field-value">{{ lessonMetadata.learner_current_answer }}</span>
+            </div>
+            <div class="oppia-feedback-detail-link-row">
+              <a *ngIf="getReportedLessonUrl()"
+                 [href]="getReportedLessonUrl()"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
+                Open reported lesson version
+              </a>
+              <a *ngIf="getReportedStateEditorUrl()"
+                 [href]="getReportedStateEditorUrl()"
+                 target="_blank" rel="noopener noreferrer"
+                 class="btn btn-primary btn-sm oppia-feedback-detail-button">
+                Open current state in editor
+              </a>
+            </div>
+          </oppia-feedback-detail-section>
+
+          <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showSessionInfo"
+                                         heading="Session Information" iconClass="fas fa-file-alt" [isCollapsible]="true">
+            <ng-container *ngIf="sessionInfo as logs; else noSessionInfo">
+              <div class="oppia-feedback-detail-log-block">
+                <div class="oppia-feedback-detail-log-heading">Environment</div>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.environment | json }}</pre>
+              </div>
+              <div class="oppia-feedback-detail-log-block">
+                <div class="oppia-feedback-detail-log-heading">Console logs</div>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.console_logs | json }}</pre>
+              </div>
+              <div class="oppia-feedback-detail-log-block">
+                <div class="oppia-feedback-detail-log-heading">Failed requests</div>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.failed_requests | json }}</pre>
+              </div>
+              <div class="oppia-feedback-detail-log-block">
+                <div class="oppia-feedback-detail-log-heading">Navigation history</div>
+                <pre class="oppia-feedback-detail-log-content">{{ logs.navigation_history | json }}</pre>
+              </div>
+            </ng-container>
+            <ng-template #noSessionInfo>
+              <p class="oppia-feedback-detail-empty">No session information was attached to this report.</p>
+            </ng-template>
+          </oppia-feedback-detail-section>
+        </div>
+
+        <div class="oppia-feedback-detail-col">
+          <oppia-feedback-detail-section heading="User's Feedback Message" iconClass="fas fa-comment">
+            <div class="oppia-feedback-detail-message-text">{{ feedback.report_message }}</div>
+          </oppia-feedback-detail-section>
+
+          <oppia-feedback-detail-section *ngIf="feedbackDetailPageConfig.showResponse"
+                                         heading="Replies"
+                                         [isCollapsible]="true"
+                                         iconClass="fas fa-comments"
+                                         class="oppia-feedback-detail-replies-bar">
+          </oppia-feedback-detail-section>
+
+          <div class="oppia-feedback-detail-actions-bar">
+            <oppia-feedback-detail-section heading="Actions"
+                                           [isCollapsible]="true"
+                                           iconClass="fas fa-cogs">
+              <section *ngIf="feedbackDetailPageConfig.showResponse"
+                       class="oppia-feedback-detail-reply-row">
+                <label class="oppia-feedback-detail-actions-label" for="reply-textarea">
+                  Reply to reporter
+                </label>
+                <textarea id="reply-textarea"
+                          class="oppia-feedback-detail-reply-textarea"
+                          [(ngModel)]="replyText"
+                          [disabled]="isSendingReply"
+                          rows="2"
+                          placeholder="Write a reply the reporter will see...">
+                </textarea>
+                <div class="oppia-feedback-detail-reply-send-row">
+                  <button type="button"
+                          class="btn btn-success oppia-feedback-detail-button"
+                          [disabled]="!replyText.trim() || isSendingReply"
+                          (click)="onReplySend()">
+                    <span *ngIf="!isSendingReply">Send</span>
+                    <span *ngIf="isSendingReply">Sending…</span>
+                  </button>
+                </div>
+              </section>
+              <section class="oppia-feedback-detail-status-row">
+                <span class="oppia-feedback-detail-actions-label">Change status:</span>
+                <span *ngIf="feedbackDetailPageConfig.showResponse"
+                      class="oppia-feedback-detail-status-note">
+                  Note: (Choosing Fixed status will also report the user)
+                </span>
+                <div class="oppia-feedback-detail-actions-buttons">
+                  <button *ngFor="let statusOption of statusOptions"
+                          type="button"
+                          [disabled]="statusOption === feedback.status"
+                          [attr.aria-pressed]="statusOption === feedback.status"
+                          class="btn btn-primary oppia-feedback-detail-status-button"
+                          (click)="onStatusOptionClick(statusOption)">
+                    {{ statusLabels[statusOption] }}
+                  </button>
+                </div>
+              </section>
+            </oppia-feedback-detail-section>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ng-container>
+
+<ng-template #loadingState>
+  <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
+</ng-template>

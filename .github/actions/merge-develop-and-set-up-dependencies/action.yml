@@ -32,39 +32,7 @@ runs:
         echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
       shell: bash
 
-    - name: Cache Python dev dependencies
-      id: restore_python_dev_dependencies_cache
-      uses: actions/cache@v4
-      # We need to include install_python_dev_dependencies.py in the cache key
-      # because it has the version numbers for pip, pip-tools and setuptools.
-      with:
-        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
-        path: |
-          /opt/hostedtoolcache/Python/3.10.16/x64
-
-    # TODO (#22567): Fix pip not working properly when fetched from cache.
-    - name: Check pip installation and fix if needed
-      run: |
-        set -e
-        echo "Checking if pip is properly installed..."
-
-        # This shows pip-related environment and configuration info for debugging:
-        # https://pip.pypa.io/en/stable/cli/pip_debug/
-        if ! python -m pip debug; then
-          echo "pip is broken. Clearing pip cache..."
-          python -m pip cache purge || true
-          echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
-          curl -sS https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-          python -m pip uninstall pip -y
-          python /tmp/get-pip.py pip==25.3
-          python -m scripts.install_python_dev_dependencies
-        else
-          echo "pip is working correctly."
-        fi
-      shell: bash
-
     - name: Install third-party Python dev dependencies
-      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -111,11 +79,6 @@ runs:
     # Note that, in the case of a cache miss, the cache is populated when the
     # job completes successfully. See
     # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#cache-hits-and-misses
-    - name: Write the exact Python version to a file for cache-busting.
-      run: |
-        echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
-      shell: bash
-
     - name: Cache third_party and node_modules
       id: restore_third_party_and_node_modules_cache
       uses: actions/cache@v4
@@ -145,7 +108,7 @@ runs:
       shell: bash
 
     - name: Install third-party libs on cache miss (retries on error)
-      if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
+      if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit != 'true'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -163,7 +126,6 @@ runs:
       shell: bash
 
     - name: Check Yarn Cache
-      # Check the yarn cache again to see what packages were just
-      # installed.
+      # Check the yarn cache to see what packages were installed.
       run: yarn cache list
       shell: bash

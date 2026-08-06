@@ -193,10 +193,10 @@ class BaseModel(datastore_services.Model):
         super()._pre_put_hook()
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
+            self.created_on = utils.get_current_utc_datetime()
 
         if self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
+            self.last_updated = utils.get_current_utc_datetime()
             self._last_updated_timestamp_is_fresh = True
 
         if not self._last_updated_timestamp_is_fresh:
@@ -416,10 +416,10 @@ class BaseModel(datastore_services.Model):
         self._last_updated_timestamp_is_fresh = True
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.utcnow()
+            self.created_on = utils.get_current_utc_datetime()
 
         if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.utcnow()
+            self.last_updated = utils.get_current_utc_datetime()
 
     @classmethod
     def update_timestamps_multi(
@@ -614,7 +614,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     def put_for_human(self) -> None:
         """Stores the model instance on behalf of a human."""
-        self.last_updated_by_human = datetime.datetime.utcnow()
+        self.last_updated_by_human = utils.get_current_utc_datetime()
         return super().put()
 
     def put_for_bot(self) -> None:
@@ -640,7 +640,7 @@ class BaseHumanMaintainedModel(BaseModel):
         Returns:
             list(future). A list of futures.
         """
-        now = datetime.datetime.utcnow()
+        now = utils.get_current_utc_datetime()
         for instance in instances:
             instance.last_updated_by_human = now
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
@@ -2077,9 +2077,11 @@ class BaseFeedbackModel(BaseModel):
         feedback_text: str. The main text body submitted by the learner.
         status: str. Current moderation status of the feedback entry
             (open | closed | ignored | not_actionable).
+        exploration_id: Optional[str]. ID of the exploration, or None for
+            site-level (non-lesson) submissions.
         lesson_metadata_schema_version: Optional[int]. Schema version for the
-            lesson_metadata_json blob. Allows future migrations.
-        lesson_metadata_json: Optional[Dict]. Lesson Metadata at
+            lesson_metadata blob. Allows future migrations.
+        lesson_metadata: Optional[Dict]. Lesson Metadata at
             submission time. Contains:
                 exploration_id (str),
                 exploration_version (int),
@@ -2108,11 +2110,15 @@ class BaseFeedbackModel(BaseModel):
         indexed=True,
         choices=feconf.STATUS_CHOICES,
     )
+    exploration_id = datastore_services.StringProperty(
+        required=False,
+        indexed=True,
+    )
     lesson_metadata_schema_version = datastore_services.IntegerProperty(
         required=False,
         indexed=True,
     )
-    lesson_metadata_json = datastore_services.JsonProperty(
+    lesson_metadata = datastore_services.JsonProperty(
         required=False,
         indexed=False,
     )
@@ -2214,3 +2220,88 @@ class BaseFeedbackModel(BaseModel):
         raise Exception(
             '%s ID generator is producing too many collisions.' % cls.__name__
         )
+
+    @classmethod
+    def _get_filtered_query(
+        cls,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = 'open',
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+    ) -> datastore_services.Query:
+        """Returns a query object filtered by the given parameters.
+
+        Args:
+            author_id: Optional[str]. If provided, filters by author ID.
+            status_filter: Optional[str]. If provided, filters by status.
+            exploration_id: Optional[str]. If provided, filters by
+                exploration ID.
+            date_from: Optional[datetime.datetime]. If provided, filters for
+                entries created on or after this date.
+            date_to: Optional[datetime.datetime]. If provided, filters for
+                entries created on or before this date.
+
+        Returns:
+            Query. The filtered query object.
+        """
+        query = cls.query()
+        # Ignoring deleted threads as they are not relevant for operations.
+        query = query.filter(cls.deleted.IN([False]))
+
+        if author_id is not None:
+            query = query.filter(cls.author_id == author_id)
+        if status_filter and status_filter in feconf.STATUS_CHOICES:
+            query = query.filter(cls.status == status_filter)
+        if exploration_id is not None:
+            query = query.filter(cls.exploration_id == exploration_id)
+        if date_from is not None:
+            query = query.filter(cls.created_on >= date_from)
+        if date_to is not None:
+            query = query.filter(cls.created_on <= date_to)
+
+        return query
+
+    @classmethod
+    # Here we use type Any because subclasses can extend the filtered query with
+    # model-specific keyword filters.
+    def fetch_page(
+        cls,
+        page_size: int,
+        cursor: Optional[str] = None,
+        author_id: Optional[str] = None,
+        status_filter: Optional[str] = None,
+        exploration_id: Optional[str] = None,
+        date_from: Optional[datetime.datetime] = None,
+        date_to: Optional[datetime.datetime] = None,
+        **kwargs: Any,
+    ) -> tuple[Sequence['BaseFeedbackModel'], Optional[str], bool]:
+        """Fetches a page of feedback entries sorted by created_on_desc."""
+        query = cls._get_filtered_query(
+            author_id=author_id,
+            status_filter=status_filter,
+            exploration_id=exploration_id,
+            date_from=date_from,
+            date_to=date_to,
+            **kwargs,
+        ).order(-cls.created_on)
+
+        start_cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
+        results: Sequence[BaseFeedbackModel]
+        results, next_cursor, more = query.fetch_page(
+            page_size, start_cursor=start_cursor
+        )
+
+        next_cursor_str: Optional[str] = None
+        if len(results) < page_size:
+            more = False
+        elif next_cursor and more:
+            more = bool(query.fetch_page(1, start_cursor=next_cursor)[0])
+        if next_cursor and more:
+            raw_next_cursor = next_cursor.urlsafe()
+            next_cursor_str = (
+                raw_next_cursor.decode('utf-8')
+                if isinstance(raw_next_cursor, bytes)
+                else raw_next_cursor
+            )
+        return results, next_cursor_str, more

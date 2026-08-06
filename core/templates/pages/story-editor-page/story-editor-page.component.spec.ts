@@ -152,6 +152,7 @@ describe('Story Editor Page Component', () => {
     nativeWindow = {
       open: (url: string) => {},
       addEventListener: (value1: string, value2: () => void) => {},
+      removeEventListener: (value1: string, value2: () => void) => {},
     };
   }
 

@@ -2237,58 +2237,6 @@ class AppEngineTestBase(TestBase):
             'modifying the constants file during tests.'
         )
 
-    @contextlib.contextmanager
-    def mock_datetime_utcnow(
-        self, mocked_now: datetime.datetime
-    ) -> Iterator[None]:
-        """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value for utcnow.
-
-        Example:
-            import datetime
-            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-            with mock_datetime_utcnow(mocked_now):
-                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            actual_now = datetime.datetime.utcnow() # Returns actual time.
-
-        Args:
-            mocked_now: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-
-        Raises:
-            Exception. Given argument is not a datetime.
-        """
-        if not isinstance(mocked_now, datetime.datetime):
-            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
-
-        old_datetime = datetime.datetime
-
-        class MockDatetimeType(type):
-            """Overrides isinstance() behavior."""
-
-            @classmethod
-            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
-                return isinstance(instance, old_datetime)
-
-        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
-            """Always returns mocked_now as the current UTC time."""
-
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with datetime.datetime's utcnow().
-            @classmethod
-            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
-                """Returns the mocked datetime."""
-                return mocked_now
-
-        setattr(datetime, 'datetime', MockDatetime)
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', old_datetime)
-
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -2324,6 +2272,8 @@ class GenericTestBase(AppEngineTestBase):
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
     RELEASE_COORDINATOR_USERNAME: Final = 'releasecoordinator'
+    TECH_LEAD_EMAIL: Final = 'techlead@example.com'
+    TECH_LEAD_USERNAME: Final = 'techlead'
     OWNER_EMAIL: Final = 'owner@example.com'
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'
@@ -4589,6 +4539,7 @@ version: 1
         classroom_id: str = 'math_classroom_id',
         name: str = 'math',
         url_fragment: str = 'math',
+        feedback_recipient_email: str = 'user@email.com',
         course_details: str = 'Course Details',
         teaser_text: str = 'Teaser Text',
         topic_list_intro: str = 'Topic list intro',
@@ -4606,6 +4557,7 @@ version: 1
             classroom_id: str. Classroom ID of the newly-created classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            feedback_recipient_email: str. The email of the feedback recipient.
             course_details: str. A text to provide course details present in
                 the classroom.
             teaser_text: str. A text to provide a summary of the classroom.
@@ -4633,6 +4585,7 @@ version: 1
             classroom_id=classroom_id,
             name=name,
             url_fragment=url_fragment,
+            feedback_recipient_email=feedback_recipient_email,
             teaser_text=teaser_text,
             course_details=course_details,
             topic_list_intro=topic_list_intro,

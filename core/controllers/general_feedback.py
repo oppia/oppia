@@ -23,6 +23,7 @@ from core import feconf, utils
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     captcha_services,
+    exp_fetchers,
     fs_services,
     general_feedback_domain,
     general_feedback_services,
@@ -32,13 +33,6 @@ from typing import Dict
 
 _MAX_FEEDBACK_TEXT_LENGTH = 2500
 _MAX_FILENAME_LENGTH = 200
-_ALLOWED_REPORT_SOURCES = ('lesson', 'site')
-_ALLOWED_REPORT_CATEGORIES = (
-    'typo',
-    'broken_layout_or_image',
-    'confusing_or_incorrect_answer',
-    'other_or_not_sure',
-)
 
 
 def _resolve_feedback_screenshot_entity_id(
@@ -67,6 +61,159 @@ def _resolve_feedback_screenshot_entity_id(
     return entity_id
 
 
+class MyFeedbackListHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        general_feedback_domain.GeneralFeedbackListRequestDict,
+    ]
+):
+    """Handler for list of learner's feedback in My Suggestions tab."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+                'default_value': None,
+            },
+            'cursor': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None,
+            },
+            'date_from_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+            'date_to_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+        },
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns the learner's feedback list."""
+        if self.user_id is None:
+            raise self.UnauthorizedUserException(
+                'You must be logged in to submit feedback.'
+            )
+
+        assert self.normalized_request is not None
+        req = self.normalized_request
+        summaries, next_cursor, more = (
+            general_feedback_services.get_learner_feedback_summaries(
+                author_id=self.user_id,
+                status_filter=req.get('status'),
+                cursor=req.get('cursor'),
+                date_from_msecs=req.get('date_from_msecs'),
+                date_to_msecs=req.get('date_to_msecs'),
+            )
+        )
+        self.render_json(
+            {
+                'summaries': summaries,
+                'next_cursor': next_cursor,
+                'more': more,
+            }
+        )
+
+
+class MyFeedbackDetailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler for learner-facing feedback details."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'feedback_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'feedback_text': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': _MAX_FEEDBACK_TEXT_LENGTH,
+                        },
+                    ],
+                }
+            }
+        },
+    }
+
+    @acl_decorators.open_access
+    def get(self, feedback_id: str) -> None:
+        """Returns learner-owned feedback details."""
+        if self.user_id is None:
+            raise self.UnauthorizedUserException(
+                'You must be logged in to view feedback.'
+            )
+
+        feedback = general_feedback_services.get_learner_feedback(
+            feedback_id=feedback_id,
+            author_id=self.user_id,
+        )
+        if feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+        self.render_json(feedback.to_learner_dict())
+
+    @acl_decorators.open_access
+    def post(self, feedback_id: str) -> None:
+        """Creates a learner follow-up with parent_feedback_id set."""
+        if self.user_id is None:
+            raise self.UnauthorizedUserException(
+                'You must be logged in to submit feedback.'
+            )
+
+        assert self.normalized_payload is not None
+        payload = self.normalized_payload
+        parent_feedback = general_feedback_services.get_learner_feedback(
+            feedback_id=feedback_id,
+            author_id=self.user_id,
+        )
+        if parent_feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+
+        lesson_metadata = parent_feedback.lesson_metadata.copy()
+        exploration = exp_fetchers.get_exploration_by_id(
+            lesson_metadata['exploration_id'], strict=False
+        )
+        if exploration is None:
+            raise self.NotFoundException(
+                'Exploration with ID %s does not exist.'
+                % lesson_metadata['exploration_id']
+            )
+        lesson_metadata['exploration_version'] = exploration.version
+
+        general_feedback_services.create_lesson_feedback(
+            parent_feedback_id=feedback_id,
+            author_id=self.user_id,
+            feedback_text=payload['feedback_text'],
+            lesson_metadata=lesson_metadata,
+        )
+        self.render_json({'success': True})
+
+
 class LessonFeedbackSubmitHandler(
     base.BaseHandler[
         general_feedback_domain.FeedbackSubmitPayloadDict,
@@ -90,7 +237,7 @@ class LessonFeedbackSubmitHandler(
                     ],
                 }
             },
-            'lesson_metadata_json': {
+            'lesson_metadata': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
@@ -114,7 +261,7 @@ class LessonFeedbackSubmitHandler(
         assert self.normalized_payload is not None
         payload = self.normalized_payload
         feedback_text = payload['feedback_text']
-        lesson_metadata_json = payload['lesson_metadata_json']
+        lesson_metadata = payload['lesson_metadata']
 
         domain_objects_validator.validate_lesson_feedback_submit_payload_coupling(
             payload=payload
@@ -123,10 +270,208 @@ class LessonFeedbackSubmitHandler(
         feedback = general_feedback_services.create_lesson_feedback(
             author_id=self.user_id,
             feedback_text=feedback_text,
-            lesson_metadata_json=lesson_metadata_json,
+            lesson_metadata=lesson_metadata,
         )
 
         self.render_json({'id': feedback.id})
+
+
+class LessonFeedbackDetailHandler(
+    base.BaseHandler[
+        general_feedback_domain.LessonFeedbackUpdatePayloadDict, Dict[str, str]
+    ]
+):
+    """Handles retrieval of lesson feedback for the Creator Feedback Tab.
+
+    GET /feedback/<exploration_id>/<feedback_id>
+    POST /feedback/<exploration_id>/<feedback_id>
+
+    URL path args:
+        exploration_id: str. The exploration ID of the requested feedback.
+        feedback_id: str. The feedback identifier.
+
+    POST payload:
+        status: str. The new moderation status.
+        reply_text: str. The reply text.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+        'feedback_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+            },
+            'reply_text': {
+                'schema': {
+                    'type': 'unicode_or_none',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': _MAX_FEEDBACK_TEXT_LENGTH,
+                        }
+                    ],
+                },
+                'default_value': None,
+            },
+        },
+    }
+
+    @acl_decorators.can_edit_exploration
+    def get(
+        self,
+        exploration_id: str,
+        feedback_id: str,
+    ) -> None:
+        feedback = general_feedback_services.get_lesson_feedback(feedback_id)
+        if feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+        if feedback.lesson_metadata['exploration_id'] != exploration_id:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist for exploration %s.'
+                % (feedback_id, exploration_id)
+            )
+        self.render_json(feedback.to_dict())
+
+    @acl_decorators.can_edit_exploration
+    def post(
+        self,
+        exploration_id: str,
+        feedback_id: str,
+    ) -> None:
+        assert self.normalized_payload is not None
+        assert self.user_id is not None
+        payload = self.normalized_payload
+        status = payload['status']
+        reply_text = payload.get('reply_text')
+        try:
+            updated_feedback = general_feedback_services.update_lesson_feedback(
+                feedback_id=feedback_id,
+                new_status=status,
+                exp_id=exploration_id,
+                responder_id=self.user_id,
+                reply_text=reply_text,
+            )
+        except ValueError as e:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            ) from e
+        if updated_feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % feedback_id
+            )
+        self.render_json({'success': True})
+
+
+class LessonFeedbackListHandler(
+    base.BaseHandler[
+        Dict[str, str], general_feedback_domain.GeneralFeedbackListRequestDict
+    ]
+):
+    """Handles retrieval of Lesson feedback for the Creator.
+
+    GET /feedback/<exploration_id>
+
+    URL path args:
+        exploration_id: str. The exploration id to retrieve feedback for.
+
+    Query params:
+        status: Optional[str]. Filters feedback by status.
+        cursor: Optional[str]. Pagination cursor returned by a previous
+            request.
+        date_from_msecs: Optional[float]. Filters feedback from this date.
+        date_to_msecs: Optional[float]. Filters feedback until this date.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+                'default_value': feconf.STATUS_CHOICES_OPEN,
+            },
+            'cursor': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None,
+            },
+            'date_from_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+            'date_to_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+        },
+    }
+
+    @acl_decorators.can_edit_exploration
+    def get(
+        self,
+        exploration_id: str,
+    ) -> None:
+        assert self.normalized_request is not None
+        req = self.normalized_request
+        status = req.get('status')
+        cursor = req.get('cursor')
+        date_from_msecs = req.get('date_from_msecs')
+        date_to_msecs = req.get('date_to_msecs')
+        summaries, next_cursor, more = (
+            general_feedback_services.get_lesson_feedback_summaries(
+                exp_id=exploration_id,
+                status_filter=status,
+                cursor=cursor,
+                date_from_msecs=date_from_msecs,
+                date_to_msecs=date_to_msecs,
+            )
+        )
+        self.render_json(
+            {
+                'summaries': summaries,
+                'next_cursor': next_cursor,
+                'more': more,
+            }
+        )
 
 
 class PlatformFeedbackSubmitHandler(
@@ -151,7 +496,7 @@ class PlatformFeedbackSubmitHandler(
             'source': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': _ALLOWED_REPORT_SOURCES,
+                    'choices': feconf.SOURCE_CHOICES,
                 },
             },
             'report_message': {
@@ -168,11 +513,11 @@ class PlatformFeedbackSubmitHandler(
             'category': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': _ALLOWED_REPORT_CATEGORIES,
+                    'choices': feconf.CATEGORY_CHOICES,
                 },
                 'default_value': None,
             },
-            'lesson_metadata_json': {
+            'lesson_metadata': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
@@ -217,11 +562,6 @@ class PlatformFeedbackSubmitHandler(
             'page_url': {
                 'schema': {
                     'type': 'basestring',
-                    'post_normalizers': [
-                        {
-                            'id': 'sanitize_url',
-                        }
-                    ],
                 }
             },
             'captcha_token': {
@@ -250,7 +590,7 @@ class PlatformFeedbackSubmitHandler(
         page_url = payload['page_url']
         assert page_url is not None
         category = payload.get('category')
-        lesson_metadata_json = payload.get('lesson_metadata_json')
+        lesson_metadata = payload.get('lesson_metadata')
         include_technical_logs = payload.get('include_technical_logs', False)
         session_info = payload.get('session_info')
         screenshot_filename = payload.get('screenshot_filename')
@@ -278,14 +618,235 @@ class PlatformFeedbackSubmitHandler(
             source=source,
             page_url=page_url,
             category=category,
-            lesson_metadata_json=lesson_metadata_json,
-            session_info_json=session_info,
+            lesson_metadata=lesson_metadata,
+            session_info=session_info,
             screenshot_filename=screenshot_filename,
             screenshot_entity_id=screenshot_entity_id,
             include_technical_logs=include_technical_logs,
         )
 
         self.render_json({'id': report.id})
+
+
+class PlatformFeedbackListHandler(
+    base.BaseHandler[
+        Dict[str, str], general_feedback_domain.GeneralFeedbackListRequestDict
+    ]
+):
+    """Handles retrieval of platform feedback for the Creator and Technical
+    Dashboards.
+
+    GET /platform-feedback/<dashboard>/<dashboard_id>
+
+    URL path args:
+        dashboard: str. The dashboard for which feedback is requested.
+            Allowed values:
+                - creator
+                - technical
+        dashboard_id: str. Identifier associated with the requested dashboard.
+            For the Creator Dashboard, this is the exploration ID.
+            For the Technical Dashboard, this is the team identifier
+            ("tech-external" or "tech-internal").
+
+    Query params:
+        status: Optional[str]. Filters feedback by status.
+        cursor: Optional[str]. Pagination cursor returned by a previous
+            request.
+        date_from_msecs: Optional[float]. Filters feedback from this date.
+        date_to_msecs: Optional[float]. Filters feedback until this date.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+        - Technical Dashboard: Requires permission to access the technical feedback dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'dashboard': {
+            'schema': {
+                'type': 'basestring',
+                'choices': feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES,
+            },
+        },
+        'dashboard_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+                'default_value': feconf.STATUS_CHOICES_OPEN,
+            },
+            'cursor': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': None,
+            },
+            'date_from_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+            'date_to_msecs': {
+                'schema': {
+                    'type': 'float',
+                },
+                'default_value': None,
+            },
+        },
+    }
+
+    @acl_decorators.can_access_platform_feedback_reports
+    def get(
+        self,
+        dashboard: str,
+        dashboard_id: str,
+    ) -> None:
+        assert self.normalized_request is not None
+        req = self.normalized_request
+        status = req.get('status')
+        cursor = req.get('cursor')
+        date_from_msecs = req.get('date_from_msecs')
+        date_to_msecs = req.get('date_to_msecs')
+        summaries, next_cursor, more = (
+            general_feedback_services.get_platform_feedback_summaries(
+                dashboard=dashboard,
+                dashboard_id=dashboard_id,
+                status_filter=status,
+                cursor=cursor,
+                date_from_msecs=date_from_msecs,
+                date_to_msecs=date_to_msecs,
+            )
+        )
+        self.render_json(
+            {
+                'summaries': summaries,
+                'next_cursor': next_cursor,
+                'more': more,
+            }
+        )
+
+
+class PlatformFeedbackDetailHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles retrieval of platform feedback for the Creator and Technical
+    Dashboards.
+
+    GET /platform-feedback/<dashboard>/<dashboard_id>/<report_id>
+    POST /platform-feedback/<dashboard>/<dashboard_id>/<report_id>
+
+    URL path args:
+        dashboard: str. The dashboard for which feedback is requested.
+            Allowed values:
+                - creator
+                - technical
+        dashboard_id: str. Identifier associated with the requested dashboard.
+            For the Creator Dashboard, this is the exploration ID.
+            For the Technical Dashboard, this is the team identifier
+            ("tech-external" or "tech-internal").
+        report_id: str. The feedback identifier.
+
+    POST payload:
+        status: str. The new moderation status.
+
+    Access:
+        - Creator Dashboard: Requires edit access to the exploration.
+        - Technical Dashboard: Requires permission to access the technical feedback dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'dashboard': {
+            'schema': {
+                'type': 'basestring',
+                'choices': feconf.PLATFORM_FEEDBACK_DASHBOARD_CHOICES,
+            },
+        },
+        'dashboard_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+        'report_id': {
+            'schema': {
+                'type': 'basestring',
+            },
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'status': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.STATUS_CHOICES,
+                },
+            },
+        },
+    }
+
+    @acl_decorators.can_access_platform_feedback_reports
+    def get(
+        self,
+        dashboard: str,
+        dashboard_id: str,
+        report_id: str,
+    ) -> None:
+        feedback = general_feedback_services.get_platform_feedback(
+            report_id=report_id,
+        )
+        if feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % report_id
+            )
+        try:
+            general_feedback_services.validate_platform_feedback_belongs_to_dashboard(
+                feedback=feedback,
+                dashboard=dashboard,
+                dashboard_id=dashboard_id,
+            )
+        except ValueError as e:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % report_id
+            ) from e
+        self.render_json(feedback.to_dict())
+
+    @acl_decorators.can_access_platform_feedback_reports
+    def post(
+        self,
+        dashboard: str,
+        dashboard_id: str,
+        report_id: str,
+    ) -> None:
+        assert self.normalized_payload is not None
+        payload = self.normalized_payload
+        status = payload['status']
+        try:
+            updated_feedback = general_feedback_services.update_platform_feedback_status_for_dashboard(
+                report_id=report_id,
+                new_status=status,
+                dashboard=dashboard,
+                dashboard_id=dashboard_id,
+            )
+        except ValueError as e:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % report_id
+            ) from e
+        if updated_feedback is None:
+            raise self.NotFoundException(
+                'Feedback with ID %s does not exist.' % report_id
+            )
+        self.render_json({'success': True})
 
 
 class GeneralFeedbackCaptchaConfigHandler(

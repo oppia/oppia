@@ -771,7 +771,7 @@ class BlogAuthorDetails:
             author_id=user_id,
             displayed_author_name='Deleted User',
             author_bio='',
-            last_updated=datetime.datetime.utcnow(),
+            last_updated=utils.get_current_utc_datetime(),
         )
 
     @classmethod

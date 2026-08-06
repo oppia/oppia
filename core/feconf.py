@@ -228,10 +228,10 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_logs_json',
-    'failed_requests_json',
-    'navigation_history_json',
-    'environment_json',
+    'console_logs',
+    'failed_requests',
+    'navigation_history',
+    'environment',
 )
 
 # Allowed formats of how HTML is present in rule specs.
@@ -268,10 +268,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-
-# The maximum number of activities allowed in the playlist of the learner. This
-# limit applies to both the explorations playlist and the collections playlist.
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
@@ -430,10 +426,14 @@ INVALID_CONTENT_ID = 'invalid_content_id'
 DEFAULT_STATE_CONTENT_STR = ''
 
 # Content IDs and prefixes for exploration metadata.
+EXPLORATION_METADATA_CONTENT_ID_PREFIX = 'exploration_'
 EXPLORATION_TITLE_CONTENT_ID = 'exploration_title'
 EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective'
 EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category'
 EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag'
+
+# Character limit for exploration title translation.
+EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT = 36
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
@@ -464,6 +464,8 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 # Default content_id for explanation subtitled html.
 DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+# Content ID for skill description.
+SKILL_DESCRIPTION_CONTENT_ID = 'skill_description'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
@@ -543,6 +545,9 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+# Placeholder for the preferences-page URL in email footers.
+EMAIL_FOOTER_PREFERENCES_LINK_PLACEHOLDER = 'LINK_TO_PREFERENCES_PAGE'
+
 GAE_DEVELOPMENT_SERVER_PORT = 8181
 GAE_ADMIN_SERVER_PORT = 8000
 
@@ -600,6 +605,14 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
+SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID = 'firebase-auth-readonly'
+SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID = (
+    'sensitive-firebase-auth-read-write'
+)
+CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
+    '{service_account_id}@{app_id}.iam.gserviceaccount.com'
+)
+
 OPPIA_VERSION = '3.5.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
@@ -629,6 +642,9 @@ DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
 DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = True
+# The default preference for Contributor Dashboard reviewer notification
+# emails when no stored email preference is available.
+DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE = True
 # Whether to send an invitation email when the user is granted
 # new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
@@ -749,6 +765,10 @@ MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The maximum number of questions to be fetched at one time.
 MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
+# The minimum number of questions required per skill before a story
+# referencing that skill can be published.
+MIN_QUESTIONS_PER_SKILL_FOR_PUBLISH = 10
 
 # The minimum score required for a user to review suggestions of a particular
 # category.
@@ -1004,7 +1024,6 @@ LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
 )
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
-LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LESSON_FEEDBACK_URL = '/feedback'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -1017,6 +1036,7 @@ LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
+MY_FEEDBACK_URL = '/my_feedback'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -1087,6 +1107,7 @@ USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 STUDY_GUIDE_EDITOR_DATA_URL_PREFIX = '/study_guide_editor_handler/data'
+TECHNICAL_FEEDBACK_DASHBOARD_URL = '/technical-feedback-dashboard'
 TOPIC_VIEWER_URL_PREFIX = '/learn/<classroom_url_fragment>/<topic_url_fragment>'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
@@ -1149,6 +1170,20 @@ CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
 )
 VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/validate_certificate_assessment_offering_handler'
+)
+CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER = (
+    '/certificate_assessment_offerings_for_classroom_handler/<classroom_id>'
+)
+START_CERTIFICATE_ASSESSMENT_HANDLER = '/start_certificate_assessment_handler'
+
+SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER = (
+    '/submit_certificate_assessment_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_RESULT_HANDLER = (
+    '/certificate_assessment_result_handler/<attempt_id>'
+)
+CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER = (
+    '/certificate_assessment_attempts_handler'
 )
 
 # Event types.
@@ -1281,6 +1316,7 @@ ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
 ROLE_ID_TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR'
+ROLE_ID_TECH_TEAM_LEAD = 'TECH_TEAM_LEAD'
 
 ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER,
@@ -1303,6 +1339,7 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_VOICEOVER_ADMIN,
     ROLE_ID_QUESTION_COORDINATOR,
     ROLE_ID_TRANSLATION_COORDINATOR,
+    ROLE_ID_TECH_TEAM_LEAD,
 ]
 
 # Intent of the User making query to role structure via admin interface. Used
@@ -1923,16 +1960,26 @@ PLATFORM_ANDROID: Final = 'android'
 PLATFORM_CHOICES: Final = [PLATFORM_WEB, PLATFORM_ANDROID]
 
 # Destination choices.
-DESTINATION_CREATOR: Final = 'creator'
-DESTINATION_TECHNICAL_LEAP_TEAM: Final = 'LEAP'
-DESTINATION_TECHNICAL_CORE_TEAM: Final = 'CORE'
+DESTINATION_CURRICULUM: Final = 'curriculum'
+DESTINATION_TECHNICAL: Final = 'technical'
+DESTINATION_TECHNICAL_EXTERNAL_TEAM: Final = 'tech-external'
+DESTINATION_TECHNICAL_INTERNAL_TEAM: Final = 'tech-internal'
 DESTINATION_CHOICES: Final = [
-    DESTINATION_CREATOR,
-    DESTINATION_TECHNICAL_LEAP_TEAM,
-    DESTINATION_TECHNICAL_CORE_TEAM,
+    DESTINATION_CURRICULUM,
+    DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+    DESTINATION_TECHNICAL_INTERNAL_TEAM,
+]
+PLATFORM_FEEDBACK_DASHBOARD_CHOICES: Final = [
+    DESTINATION_CURRICULUM,
+    DESTINATION_TECHNICAL,
+]
+TECHNICAL_FEEDBACK_TEAM_CHOICES: Final = [
+    DESTINATION_TECHNICAL_EXTERNAL_TEAM,
+    DESTINATION_TECHNICAL_INTERNAL_TEAM,
 ]
 
-LEAP_DASHBOARD_PATHS = frozenset(
+
+TECHNICAL_EXTERNAL_DASHBOARD_PATHS = frozenset(
     [
         'about',
         'community-library',
@@ -1950,3 +1997,5 @@ LEAP_DASHBOARD_PATHS = frozenset(
         'donate',
     ]
 )
+
+DEFAULT_CLASSROOM_FEEDBACK_RECIPIENT_EMAIL = 'lesson-creation-leads@oppia.org'
