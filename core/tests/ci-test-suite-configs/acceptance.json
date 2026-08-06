@@ -37,13 +37,13 @@
     },
     {
       "name": "interested-donor/learn-about-the-organization",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-donor/make-a-donation",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/make-a-donation.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/interested-donor/make-a-donation.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "interested-parent/attempt-to-contact-the-organization",

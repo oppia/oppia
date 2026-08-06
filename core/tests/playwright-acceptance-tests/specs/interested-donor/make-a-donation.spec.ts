@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,25 +19,28 @@
  * ID.DP. Donor makes a donation
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Interested Donor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Interested Donor', function () {
   let interestedDonor: LoggedOutUser;
 
-  beforeAll(async function () {
-    interestedDonor = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    interestedDonor = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it('should be able to find the donate page', async function () {
+  test('should be able to find the donate page', async function () {
     await interestedDonor.clickDonateButtonInGetInvolvedMenuOnNavbar();
     await interestedDonor.isDonorBoxVisbleOnDonatePage();
-    await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
+    await interestedDonor.expectScreenshotToMatch('donatePage');
 
     await interestedDonor.navigateToSplashPage();
     await interestedDonor.clickDonateButtonOnNavbar();
     await interestedDonor.isDonorBoxVisbleOnDonatePage();
-    await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
+    await interestedDonor.expectScreenshotToMatch('donatePage');
 
     await interestedDonor.expectDonationPageHeadingToBe(' Our Impact ');
     await interestedDonor.expectOurImpactSectionInDonationPageToBePresent();
@@ -54,7 +57,7 @@ describe('Interested Donor', function () {
     await interestedDonor.dismissDonationThanksModalOnDonatePage();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

@@ -875,6 +875,16 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls to the bottom of the page.
+   */
+  async scrollToBottomOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Close all browsers for live BaseUser instances. This mirrors Puppeteer's
    * `closeBrowser` behaviour that closes all user contexts and captures
    * failure screenshots when required.
