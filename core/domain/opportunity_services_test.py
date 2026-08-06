@@ -2581,3 +2581,52 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             'exp_1'
         )
         self.assertNotIn('hi', model.incomplete_translation_language_codes)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_remove_topic_from_translation_opportunities_updates_multi_topics(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']},
+            topic_ids=['topic_id_1', 'topic_id_2'],
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_1', 'topic_id_2'])
+
+        opportunity_services.remove_topic_from_translation_opportunities(
+            'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
+        )
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_2'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_remove_topic_from_translation_opportunities_retains_model_when_empty(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']},
+            topic_ids=['topic_id_1'],
+        )
+        model_id = 'skill.skill_id_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+
+        opportunity_services.remove_topic_from_translation_opportunities(
+            'topic_id_1', {feconf.ENTITY_TYPE_SKILL: ['skill_id_1']}
+        )
+        updated_model = opportunity_models.TranslationOpportunityModel.get(
+            model_id
+        )
+        assert updated_model is not None
+        self.assertEqual(updated_model.topic_ids, [])
