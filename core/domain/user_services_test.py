@@ -2178,6 +2178,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_groups_data[0].user_group_id, 'USERGROUP1', ['testuser1']
         )
 
+        self.assertNotIn('TestUser1', user_groups_data[0].member_usernames)
+
         updated_user_groups_data = user_services.get_all_user_groups()
         self.assertIn('TestUser1', updated_user_groups_data[0].member_usernames)
 
