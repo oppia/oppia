@@ -809,40 +809,13 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    await this.waitForElementToBeClickable(selector);
-
-    try {
-      await this.page.$eval(selector, element => {
-        if (
-          element instanceof HTMLInputElement ||
-          element instanceof HTMLTextAreaElement
-        ) {
-          const valueSetter = Object.getOwnPropertyDescriptor(
-            element instanceof HTMLTextAreaElement
-              ? HTMLTextAreaElement.prototype
-              : HTMLInputElement.prototype,
-            'value'
-          )?.set;
-
-          valueSetter?.call(element, '');
-          element.dispatchEvent(new Event('input', {bubbles: true}));
-          element.dispatchEvent(new Event('change', {bubbles: true}));
-          return;
-        }
-
-        element.textContent = '';
-        element.dispatchEvent(new Event('input', {bubbles: true}));
-      });
-      return;
-    } catch (error) {
-      const element = await this.getElementInParent(selector);
-      await this.waitForElementToBeClickable(element);
-      await element.click();
-      await this.page.keyboard.down('Control');
-      await this.page.keyboard.press('A');
-      await this.page.keyboard.up('Control');
-      await this.page.keyboard.press('Backspace');
-    }
+    const element = await this.getElementInParent(selector);
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('A');
+    await this.page.keyboard.up('Control');
+    await this.page.keyboard.press('Backspace');
   }
 
   /**
