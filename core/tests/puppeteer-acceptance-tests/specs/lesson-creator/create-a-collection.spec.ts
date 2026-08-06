@@ -41,10 +41,10 @@ describe('LC.12 Visit Creator Dashboard', function () {
       'lessoncreator@example.com'
     );
 
-    // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+    // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
     // once fixed, allow testing for mobile viewport.
     if (lessonCreator.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO #26642');
+      showMessage('Skipping the test, check issue #26642');
       return;
     }
 
@@ -52,10 +52,10 @@ describe('LC.12 Visit Creator Dashboard', function () {
   }, DEFAULT_TIMEOUT);
 
   it('should view contribution stats', async function () {
-    // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+    // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
     // once fixed, allow testing for mobile viewport.
     if (lessonCreator.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO #26642');
+      showMessage('Skipping the test, check issue #26642');
       return;
     }
 
@@ -129,10 +129,10 @@ describe('LC.12 Visit Creator Dashboard', function () {
   it(
     'should view explorations in grid view',
     async function () {
-      // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+      // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
       // once fixed, allow testing for mobile viewport.
       if (lessonCreator.isViewportAtMobileWidth()) {
-        showMessage('Skipping the test, TODO #26642');
+        showMessage('Skipping the test, check issue #26642');
         return;
       }
 
@@ -160,10 +160,10 @@ describe('LC.12 Visit Creator Dashboard', function () {
   it(
     'should view explorations in list view',
     async function () {
-      // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+      // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
       // once fixed, allow testing for mobile viewport.
       if (lessonCreator.isViewportAtMobileWidth()) {
-        showMessage('Skipping the test, TODO #26642');
+        showMessage('Skipping the test, check issue #26642');
         return;
       }
 
