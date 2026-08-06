@@ -58,7 +58,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(exp_models, stats_models, translation_models, user_models) = (
+exp_models, stats_models, translation_models, user_models = (
     models.Registry.import_models(
         [
             models.Names.EXPLORATION,
@@ -578,8 +578,7 @@ param_changes: []
 solicit_answer_details: false
 """
         ),
-        feconf.DEFAULT_INIT_STATE_NAME: (
-            """card_is_checkpoint: true
+        feconf.DEFAULT_INIT_STATE_NAME: ("""card_is_checkpoint: true
 classifier_model_id: null
 content:
   content_id: content_0
@@ -613,9 +612,7 @@ interaction:
 linked_skill_id: null
 param_changes: []
 solicit_answer_details: false
-"""
-        )
-        % feconf.DEFAULT_INIT_STATE_NAME,
+""") % feconf.DEFAULT_INIT_STATE_NAME,
     }
 
     SAMPLE_STATE_STRING = """card_is_checkpoint: false
@@ -3510,7 +3507,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
     EXP_ID2: Final = '2'
     EXP_ID3: Final = '3'
     # 30 days into the future.
-    NEWER_DATETIME: Final = datetime.datetime.utcnow() + datetime.timedelta(30)
+    NEWER_DATETIME: Final = (
+        utils.get_current_utc_datetime() + datetime.timedelta(30)
+    )
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST: Final = [

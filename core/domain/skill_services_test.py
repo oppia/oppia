@@ -949,6 +949,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             )
 
     def test_update_skill(self) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]},
+            topic_ids=['topic_id_1'],
+        )
         changelist = [
             skill_domain.SkillChange(
                 {
@@ -1195,18 +1199,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_update_skill_contents_updates_v2_translation_opportunity(
-        self,
-    ) -> None:
+    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
             'topic_id', 'Topic 1', 'abbrev', 'description', 'fragment'
         )
-        topic.add_uncategorized_skill_id(self.SKILL_ID)
         topic_services.save_new_topic(self.USER_ID, topic)
-
-        opportunity_services.create_translation_opportunity(
-            {feconf.ENTITY_TYPE_SKILL: [self.SKILL_ID]}, topic_ids=['topic_id']
+        # Use topic_services.add_uncategorized_skill() instead of
+        # topic.add_uncategorized_skill_id() to trigger the opportunity
+        # creation logic that runs when the feature flag is enabled.
+        topic_services.add_uncategorized_skill(
+            self.USER_ID, 'topic_id', self.SKILL_ID
         )
+
         model_id = f'skill.{self.SKILL_ID}'
         model = opportunity_models.TranslationOpportunityModel.get(
             model_id, strict=False
@@ -1222,15 +1226,22 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             feconf.TranslatableEntityType.SKILL, self.SKILL_ID, 'es'
         )
         translation.add_translation(
-            '1',
-            '<p>Explicación</p>',
-            translation_domain.TranslatableContentFormat.HTML,
+            feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'descripción',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             False,
         )
         translation_models.EntityTranslationsModel.create_new(
             feconf.TranslatableEntityType.SKILL.value,
             self.SKILL_ID,
             1,
+            'es',
+            translation.to_dict()['translations'],
+        ).put()
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.SKILL.value,
+            self.SKILL_ID,
+            2,
             'es',
             translation.to_dict()['translations'],
         ).put()
@@ -1247,17 +1258,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             skill_domain.SkillChange(
                 {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-                    'property_name': (
-                        skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
-                    ),
-                    'old_value': {
-                        'content_id': '1',
-                        'html': '<p>Explanation</p>',
-                    },
-                    'new_value': {
-                        'content_id': '1',
-                        'html': '<p>New Explanation</p>',
+                    'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
+                    'new_misconception_dict': {
+                        'id': self.skill.next_misconception_id,
+                        'name': 'new misconception',
+                        'notes': '<p>notes</p>',
+                        'feedback': '<p>feedback</p>',
+                        'must_be_addressed': True,
                     },
                 }
             )
@@ -1266,14 +1273,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID,
             self.SKILL_ID,
             changelist,
-            'Updated explanation.',
+            'Added misconception.',
         )
         updated_model = opportunity_models.TranslationOpportunityModel.get(
             model_id, strict=False
         )
         self.assertIsNotNone(updated_model)
         assert updated_model is not None
-        self.assertEqual(updated_model.content_count, 3)
+        self.assertEqual(updated_model.content_count, 4)
         self.assertEqual(updated_model.topic_ids, ['topic_id'])
         self.assertEqual(updated_model.translation_counts, {'es': 1})
 

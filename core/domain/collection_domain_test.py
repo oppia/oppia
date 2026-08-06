@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.domain import collection_domain, collection_services
@@ -32,9 +30,7 @@ from core.tests import test_utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = (
-    (
-        """category: A category
+SAMPLE_YAML_CONTENT = ("""category: A category
 language_code: en
 nodes:
 - exploration_id: an_exploration_id
@@ -42,10 +38,7 @@ objective: An objective
 schema_version: %d
 tags: []
 title: A title
-"""
-    )
-    % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-)
+""") % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class CollectionChangeTests(test_utils.GenericTestBase):
@@ -1141,7 +1134,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         self.collection_summary_dict = {
             'category': 'category',
             'status': constants.ACTIVITY_STATUS_PRIVATE,
@@ -1267,8 +1260,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_private())
 
@@ -1291,8 +1284,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_editable_by('other_id'))
 
@@ -1319,8 +1312,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')
@@ -1352,8 +1345,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')

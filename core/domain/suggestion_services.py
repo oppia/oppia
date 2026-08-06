@@ -240,8 +240,8 @@ def create_suggestion(
                 score_category,
                 language_code,
                 False,
-                datetime.datetime.utcnow(),
-                datetime.datetime.utcnow(),
+                utils.get_current_utc_datetime(),
+                utils.get_current_utc_datetime(),
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -316,12 +316,6 @@ def create_suggestion(
                             'The Skill content has changed since this translation '
                             'was submitted.'
                         )
-                else:
-                    raise Exception(
-                        'Content ID %s does not exist in skill %s.'
-                        % (content_id, target_id)
-                    )
-
         # Do not allow creating a suggestion if there is already a suggestion
         # in review for the same content_id and language_code.
         existing_suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
@@ -343,19 +337,24 @@ def create_suggestion(
             target_entity = opportunity_services.get_entity_by_type_and_id(
                 target_type, target_id
             )
-            entity_translation = translation_fetchers.get_entity_translation(
-                feconf.TranslatableEntityType(target_type),
-                target_id,
-                target_entity.version,
-                language_code,
-            )
-            if content_id in entity_translation.translations:
-                if not entity_translation.translations[content_id].needs_update:
-                    raise Exception(
-                        'The content with content_id %s has already been '
-                        'translated to %s and is up-to-date.'
-                        % (content_id, language_code)
+            if target_entity is not None:
+                entity_translation = (
+                    translation_fetchers.get_entity_translation(
+                        feconf.TranslatableEntityType(target_type),
+                        target_id,
+                        target_entity.version,
+                        language_code,
                     )
+                )
+                if content_id in entity_translation.translations:
+                    if not entity_translation.translations[
+                        content_id
+                    ].needs_update:
+                        raise Exception(
+                            'The content with content_id %s has already been '
+                            'translated to %s and is up-to-date.'
+                            % (content_id, language_code)
+                        )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id,
@@ -368,8 +367,8 @@ def create_suggestion(
             score_category,
             language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
             target_type=target_type,
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
@@ -403,8 +402,8 @@ def create_suggestion(
             score_category,
             add_question_language_code,
             False,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)

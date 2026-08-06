@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models, base_models
 
-(base_models, app_feedback_report_models) = models.Registry.import_models(
+base_models, app_feedback_report_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT]
 )
 
@@ -349,7 +349,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(exported_data, expected_data)
 
     def test_get_all_unscrubbed_expiring_report_models(self) -> None:
-        expired_timestamp = datetime.datetime.utcnow() - (
+        expired_timestamp = utils.get_current_utc_datetime() - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN
             + datetime.timedelta(days=10)
         )
