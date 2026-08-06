@@ -967,9 +967,8 @@ def get_exp_thread_summaries(
             author_second_last_message = (
                 author_id and user_services.get_username(author_id)
             )
-        if exp_model is None:
-            continue
-
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_model is not None
         if not last_message_is_read:
             number_of_unread_threads += 1
         thread_summaries.append(
