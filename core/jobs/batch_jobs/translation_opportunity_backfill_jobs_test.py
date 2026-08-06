@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import feature_flag_list, feconf
 from core.constants import constants
-from core.domain import exp_domain, rights_manager
+from core.domain import exp_domain, rights_manager, skill_domain, skill_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_backfill_jobs
 from core.jobs.types import job_run_result
@@ -45,6 +45,7 @@ if MYPY:
     translation_models,
     story_models,
     topic_models,
+    skill_models,
 ) = models.Registry.import_models(
     [
         models.Names.EXPLORATION,
@@ -52,6 +53,7 @@ if MYPY:
         models.Names.TRANSLATION,
         models.Names.STORY,
         models.Names.TOPIC,
+        models.Names.SKILL,
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
@@ -911,6 +913,157 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Total Translation Counts (Existing): hi: 1\n'
                         '- Total Translation Counts (Computed): None'
                     )
+                ),
+            ]
+        )
+
+
+class SkillOpportunityJobTestBase(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
+    """Base class for testing skill translation opportunity jobs."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup('skillauthor@example.com', 'skillauthor')
+        self.admin_id = self.get_user_id_from_email('skillauthor@example.com')
+        self.skill_id = 'skill_1'
+
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>']
+            ),
+        ]
+
+        skill = skill_domain.Skill.create_default_skill(
+            self.skill_id, 'Skill Description', rubrics
+        )
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id='topic_id',
+            name='topic title',
+            canonical_name='topic title',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='topic',
+            uncategorized_skill_ids=[self.skill_id],
+            page_title_fragment_for_web='fragm',
+        )
+        topic_model.update_timestamps()
+        datastore_services.put_multi([topic_model])
+
+
+class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
+    """Tests for BackfillSkillOpportunityModelJob."""
+
+    JOB_CLASS = (
+        translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob
+    )
+
+    def test_creates_skill_translation_opportunity_model(self) -> None:
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = opportunity_models.TranslationOpportunityModel.get(
+            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                feconf.TranslatableEntityType.SKILL.value, self.skill_id
+            )
+        )
+        self.assertIsNotNone(model)
+        self.assertEqual(model.entity_type, 'skill')
+        self.assertEqual(model.entity_id, self.skill_id)
+        self.assertEqual(model.topic_ids, ['topic_id'])
+        self.assertEqual(model.content_count, 1)
+
+    def test_deletes_orphaned_skill_translation_opportunity_model(
+        self,
+    ) -> None:
+        orphaned_model = opportunity_models.TranslationOpportunityModel(
+            id='skill.orphaned_skill_id',
+            entity_type='skill',
+            entity_id='orphaned_skill_id',
+            topic_ids=['topic_id'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 1},
+        )
+        orphaned_model.update_timestamps()
+        orphaned_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL DELETION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                'skill.orphaned_skill_id'
+            )
+        )
+
+
+class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
+    """Tests for AuditBackfillSkillOpportunityModelJob."""
+
+    JOB_CLASS = (
+        translation_opportunity_backfill_jobs.AuditBackfillSkillOpportunityModelJob
+    )
+
+    def test_audit_identifies_matching_skill_model(self) -> None:
+        matching_model = opportunity_models.TranslationOpportunityModel(
+            id='skill.skill_1',
+            entity_type=feconf.TranslatableEntityType.SKILL.value,
+            entity_id=self.skill_id,
+            topic_ids=['topic_id'],
+            content_count=1,
+            incomplete_translation_language_codes=[
+                lang['id']
+                for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+                if lang['id'] != 'en'
+            ],
+            translation_counts={},
+        )
+        matching_model.update_timestamps()
+        matching_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 1\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 1\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
                 ),
             ]
         )
