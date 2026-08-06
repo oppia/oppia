@@ -504,7 +504,6 @@ def get_featured_translation_languages() -> (
         translation languages.
     """
     model = translation_models.FeaturedTranslationLanguagesModel.get(
-        translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
         strict=False,
     )
     if model is None:
@@ -549,15 +548,13 @@ def save_featured_translation_languages(
     featured_languages_domain_object.validate()
 
     model = translation_models.FeaturedTranslationLanguagesModel.get(
-        translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
         strict=False,
     )
     if model is None:
-        model = translation_models.FeaturedTranslationLanguagesModel(
-            id=translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
-            featured_translation_languages=featured_translation_languages,
+        translation_models.FeaturedTranslationLanguagesModel.create(
+            featured_translation_languages
         )
     else:
         model.featured_translation_languages = featured_translation_languages
-    model.update_timestamps()
-    model.put()
+        model.update_timestamps()
+        model.put()

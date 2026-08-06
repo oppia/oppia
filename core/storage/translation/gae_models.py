@@ -492,6 +492,66 @@ class FeaturedTranslationLanguagesModel(base_models.BaseModel):
             },
         )
 
+    # Here we use MyPy ignore because we intentionally drop the entity_id
+    # argument of the base method: this is a singleton, whose id is always
+    # FEATURED_TRANSLATION_LANGUAGES_MODEL_ID.
+    @classmethod
+    def get(  # type: ignore[override]
+        cls, strict: bool = True
+    ) -> Optional[FeaturedTranslationLanguagesModel]:
+        """Retrieves the singleton featured translation languages model.
+
+        Args:
+            strict: bool. Whether to fail noisily if no model exists.
+
+        Returns:
+            FeaturedTranslationLanguagesModel|None. The singleton instance, or
+            None if it does not exist and strict is False.
+        """
+        return super().get(
+            FEATURED_TRANSLATION_LANGUAGES_MODEL_ID, strict=strict
+        )
+
+    @classmethod
+    def create(
+        cls, featured_translation_languages: List[Dict[str, str]]
+    ) -> FeaturedTranslationLanguagesModel:
+        """Creates the singleton instance.
+
+        Args:
+            featured_translation_languages: list(dict). The ordered list of
+                featured translation languages, each a dict with keys
+                'language_code' and 'explanation'.
+
+        Returns:
+            FeaturedTranslationLanguagesModel. The newly created instance.
+
+        Raises:
+            Exception. The singleton instance already exists.
+        """
+        if cls.get(strict=False) is not None:
+            raise Exception(
+                'The featured translation languages model already exists.'
+            )
+        entity = cls(
+            id=FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
+            featured_translation_languages=featured_translation_languages,
+        )
+        entity.update_timestamps()
+        entity.put()
+        return entity
+
+    # Here we use MyPy ignore because we constrain the base put() to enforce
+    # that this model can only ever be stored under the fixed singleton id.
+    def put(self) -> None:  # type: ignore[override]
+        """Saves the singleton instance, enforcing the fixed id."""
+        if self.id != FEATURED_TRANSLATION_LANGUAGES_MODEL_ID:
+            raise Exception(
+                'The featured translation languages model id must be \'%s\'.'
+                % FEATURED_TRANSLATION_LANGUAGES_MODEL_ID
+            )
+        super().put()
+
 
 class AutoTranslationCacheModel(base_models.BaseModel):
     """Model for caching AI-generated translations to avoid duplicate

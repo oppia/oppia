@@ -977,16 +977,11 @@ class FeaturedTranslationLanguagesServicesTests(test_utils.GenericTestBase):
     """Tests for the featured translation languages services."""
 
     def test_get_returns_saved_datastore_value(self) -> None:
-        # Create the model directly to test the read path independently of
-        # save_featured_translation_languages().
-        model = translation_models.FeaturedTranslationLanguagesModel(
-            id=translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
-            featured_translation_languages=[
-                {'language_code': 'hi', 'explanation': 'High demand'}
-            ],
+        # Create the model via the model's own create() method, to test the
+        # read path independently of save_featured_translation_languages().
+        translation_models.FeaturedTranslationLanguagesModel.create(
+            [{'language_code': 'hi', 'explanation': 'High demand'}]
         )
-        model.update_timestamps()
-        model.put()
 
         self.assertEqual(
             translation_services.get_featured_translation_languages(),

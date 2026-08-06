@@ -609,24 +609,29 @@ class FeaturedTranslationLanguagesModelTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_retrieve_singleton(self) -> None:
-        model = translation_models.FeaturedTranslationLanguagesModel(
-            id=translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID,
-            featured_translation_languages=[
-                {'language_code': 'hi', 'explanation': 'High demand'}
-            ],
+        translation_models.FeaturedTranslationLanguagesModel.create(
+            [{'language_code': 'hi', 'explanation': 'High demand'}]
         )
-        model.update_timestamps()
-        model.put()
-
         retrieved_model = (
-            translation_models.FeaturedTranslationLanguagesModel.get(
-                translation_models.FEATURED_TRANSLATION_LANGUAGES_MODEL_ID
-            )
+            translation_models.FeaturedTranslationLanguagesModel.get()
         )
         self.assertEqual(
             retrieved_model.featured_translation_languages,
             [{'language_code': 'hi', 'explanation': 'High demand'}],
         )
+
+    def test_create_raises_if_instance_already_exists(self) -> None:
+        translation_models.FeaturedTranslationLanguagesModel.create([])
+        with self.assertRaisesRegex(Exception, 'model already exists'):
+            translation_models.FeaturedTranslationLanguagesModel.create([])
+
+    def test_put_with_wrong_id_raises(self) -> None:
+        model = translation_models.FeaturedTranslationLanguagesModel(
+            id='wrong_id', featured_translation_languages=[]
+        )
+        model.update_timestamps()
+        with self.assertRaisesRegex(Exception, 'model id must be'):
+            model.put()
 
 
 class MachineTranslationPolicyModelTests(test_utils.GenericTestBase):
