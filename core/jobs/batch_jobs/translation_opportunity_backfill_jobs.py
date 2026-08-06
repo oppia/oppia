@@ -20,7 +20,14 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain, exp_fetchers, topic_domain, topic_fetchers
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    skill_domain,
+    skill_fetchers,
+    topic_domain,
+    topic_fetchers,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -36,6 +43,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import (
         exp_models,
         opportunity_models,
+        skill_models,
         story_models,
         topic_models,
         translation_models,
@@ -47,6 +55,7 @@ if MYPY:  # pragma: no cover
     translation_models,
     story_models,
     topic_models,
+    skill_models,
 ) = models.Registry.import_models(
     [
         models.Names.EXPLORATION,
@@ -54,6 +63,7 @@ if MYPY:  # pragma: no cover
         models.Names.TRANSLATION,
         models.Names.STORY,
         models.Names.TOPIC,
+        models.Names.SKILL,
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
@@ -483,3 +493,420 @@ class AuditBackfillTranslationOpportunityModelJob(
             compare_results,
             summary_results,
         ) | 'Flatten results' >> beam.Flatten()
+
+
+class BackfillSkillOpportunityModelJob(base_jobs.JobBase):
+    """Backfills TranslationOpportunityModels from existing SkillModels and TopicModels."""
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    @staticmethod
+    def _create_skill_translation_opportunity(
+        element: Tuple[
+            str,
+            Dict[
+                str,
+                Iterable[
+                    Union[
+                        str,
+                        skill_domain.Skill,
+                        translation_models.EntityTranslationsModel,
+                    ]
+                ],
+            ],
+        ],
+    ) -> result.Result[opportunity_models.TranslationOpportunityModel, str]:
+        """Creates a TranslationOpportunityModel from the grouped data."""
+        skill_id = element[0]
+        grouped_data = element[1]
+
+        # Here we use cast because we are narrowing down the type of topic_ids.
+        topic_ids = list(set(cast(Iterable[str], grouped_data['topic_ids'])))
+        if not topic_ids:
+            return result.Err('Missing topic_id')
+
+        # Here we use cast because we are narrowing down the type of skills.
+        skills = list(cast(Iterable[skill_domain.Skill], grouped_data['skill']))
+        if not skills:
+            return result.Err('Missing SkillModel')
+        skill = skills[0]
+
+        # Here we use cast because we are narrowing down the type of translations.
+        translations = [
+            t
+            for t in cast(
+                Iterable[translation_models.EntityTranslationsModel],
+                grouped_data['translations'],
+            )
+            if t.entity_version == skill.version
+        ]
+        with datastore_services.get_ndb_context():
+            content_count = skill.get_content_count()
+
+            translation_counts = {}
+            for translation_model in translations:
+                lang_code = translation_model.language_code
+                count = 0
+                for (
+                    translated_content
+                ) in translation_model.translations.values():
+                    if not translated_content['needs_update']:
+                        count += 1
+                translation_counts[lang_code] = count
+
+            audio_language_codes = set(
+                language['id']
+                for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            )
+            complete_languages = [
+                lang
+                for lang, count in translation_counts.items()
+                if count == content_count
+            ]
+            incomplete_translation_language_codes = sorted(
+                list(audio_language_codes - set(complete_languages))
+            )
+            if skill.language_code in incomplete_translation_language_codes:
+                incomplete_translation_language_codes.remove(
+                    skill.language_code
+                )
+
+            model = opportunity_models.TranslationOpportunityModel(
+                id=opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                    feconf.TranslatableEntityType.SKILL.value, skill_id
+                ),
+                entity_type=feconf.TranslatableEntityType.SKILL.value,
+                entity_id=skill_id,
+                topic_ids=topic_ids,
+                content_count=content_count,
+                incomplete_translation_language_codes=incomplete_translation_language_codes,
+                translation_counts=translation_counts,
+            )
+            model.update_timestamps()
+        return result.Ok(model)
+
+    def _compute_skill_translation_opportunities(
+        self,
+    ) -> beam.PCollection[
+        result.Result[opportunity_models.TranslationOpportunityModel, str]
+    ]:
+        """Computes the new skill translation opportunity models from datastore."""
+
+        def extract_skill_topic_ids(
+            topic: topic_domain.Topic,
+        ) -> Iterable[Tuple[str, str]]:
+            for skill_id in topic.get_all_skill_ids():
+                yield (skill_id, topic.id)
+
+        topic_skill_ids_pcoll = (
+            self.pipeline
+            | 'Get all TopicModels for skill opportunities'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+            | 'Get topic from model for skill opportunities'
+            >> beam.Map(topic_fetchers.get_topic_from_model)
+            | 'Extract skill_id and topic_id'
+            >> beam.FlatMap(extract_skill_topic_ids)
+        )
+
+        skill_models_pcoll = (
+            self.pipeline
+            | 'Get all SkillModels'
+            >> ndb_io.GetModels(
+                skill_models.SkillModel.get_all(include_deleted=False)
+            )
+            | 'Get skill from model'
+            >> beam.Map(skill_fetchers.get_skill_from_model)
+            | 'Map skill to skill_id'
+            >> beam.Map(lambda skill: (skill.id, skill))
+        )
+
+        entity_translations_pcoll = (
+            self.pipeline
+            | 'Get all EntityTranslationsModels for skills'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter skill translations'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.SKILL.value
+            )
+            | 'Map translation to skill_id'
+            >> beam.Map(lambda model: (model.entity_id, model))
+        )
+
+        grouped_data = {
+            'topic_ids': topic_skill_ids_pcoll,
+            'skill': skill_models_pcoll,
+            'translations': entity_translations_pcoll,
+        } | 'Group by skill_id' >> beam.CoGroupByKey()
+
+        return (
+            grouped_data
+            | 'Create Skill TranslationOpportunityModels'
+            >> beam.Map(self._create_skill_translation_opportunity)
+        )
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        created_models_results = self._compute_skill_translation_opportunities()
+
+        computed_opp_models_pcoll = (
+            created_models_results
+            | 'Filter OK results for skill cleanup'
+            >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap models for skill cleanup'
+            >> beam.Map(lambda res: res.unwrap())
+        )
+
+        existing_opp_models_pcoll = (
+            self.pipeline
+            | 'Get all skill TranslationOpportunityModels for cleanup'
+            >> ndb_io.GetModels(
+                opportunity_models.TranslationOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter skill opportunity models'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.SKILL.value
+            )
+        )
+
+        computed_by_id = (
+            computed_opp_models_pcoll
+            | 'Map computed skill opp by id'
+            >> beam.Map(lambda model: (model.id, model))
+        )
+        existing_by_id = (
+            existing_opp_models_pcoll
+            | 'Map existing skill opp by id'
+            >> beam.Map(lambda model: (model.id, model))
+        )
+
+        grouped_opp_models = {
+            'computed': computed_by_id,
+            'existing': existing_by_id,
+        } | 'Group skill opp models for deletion' >> beam.CoGroupByKey()
+
+        def get_orphans(
+            element: Tuple[
+                str,
+                Dict[
+                    str,
+                    Iterable[opportunity_models.TranslationOpportunityModel],
+                ],
+            ],
+        ) -> Iterable[opportunity_models.TranslationOpportunityModel]:
+            _, grouped_data = element
+            existing = list(grouped_data['existing'])
+            computed = list(grouped_data['computed'])
+            if existing and not computed:
+                yield existing[0]
+
+        orphans_pcoll = (
+            grouped_opp_models
+            | 'Extract orphan skill opp models' >> beam.FlatMap(get_orphans)
+        )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                computed_opp_models_pcoll
+                | 'Put skill opp models' >> ndb_io.PutModels()
+            )
+
+            unused_delete_results = (
+                orphans_pcoll
+                | 'Get orphan skill opp keys'
+                >> beam.Map(lambda model: model.key)
+                | 'Delete orphan skill opp models' >> ndb_io.DeleteModels()
+            )
+
+        creation_results = (
+            created_models_results
+            | 'Generate skill creation results'
+            >> job_result_transforms.ResultsToJobRunResults(
+                'SKILL TRANSLATION OPPORTUNITY MODEL CREATION'
+            )
+        )
+
+        deletion_results = (
+            orphans_pcoll
+            | 'Generate skill deletion results'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'SKILL TRANSLATION OPPORTUNITY MODEL DELETION'
+            )
+        )
+
+        return (
+            creation_results,
+            deletion_results,
+        ) | 'Flatten skill results' >> beam.Flatten()
+
+
+class AuditBackfillSkillOpportunityModelJob(BackfillSkillOpportunityModelJob):
+    """Audit job for BackfillSkillOpportunityModelJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        created_models_results = self._compute_skill_translation_opportunities()
+
+        computed_opp_models_pcoll = (
+            created_models_results
+            | 'Filter OK results for skill audit'
+            >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap models for skill audit'
+            >> beam.Map(lambda res: res.unwrap())
+            | 'Map computed skill models'
+            >> beam.Map(lambda model: (model.id, model))
+        )
+
+        existing_opp_models_pcoll = (
+            self.pipeline
+            | 'Get all skill TranslationOpportunityModels for audit'
+            >> ndb_io.GetModels(
+                opportunity_models.TranslationOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter skill opportunity models for audit'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.SKILL.value
+            )
+            | 'Map existing skill models'
+            >> beam.Map(lambda model: (model.id, model))
+        )
+
+        def compare_models(
+            element: Tuple[
+                str,
+                Dict[
+                    str,
+                    Iterable[opportunity_models.TranslationOpportunityModel],
+                ],
+            ],
+        ) -> Iterable[Tuple[str, int]]:
+            opp_id, grouped_data = element
+            existing = list(grouped_data['existing'])
+            computed = list(grouped_data['computed'])
+
+            if not computed:
+                yield ('orphaned', 1)
+                exist_model = existing[0]
+                yield ('exist_content_count', exist_model.content_count)
+                for lang, count in exist_model.translation_counts.items():
+                    yield (f'exist_translation_count_{lang}', count)
+                return
+
+            comp_model = computed[0]
+            yield ('comp_content_count', comp_model.content_count)
+            for lang, count in comp_model.translation_counts.items():
+                yield (f'comp_translation_count_{lang}', count)
+
+            if not existing:
+                yield ('missing', 1)
+                return
+
+            exist_model = existing[0]
+            yield ('exist_content_count', exist_model.content_count)
+            for lang, count in exist_model.translation_counts.items():
+                yield (f'exist_translation_count_{lang}', count)
+
+            if (
+                exist_model.content_count != comp_model.content_count
+                or exist_model.translation_counts
+                != comp_model.translation_counts
+            ):
+                yield ('discrepancy', 1)
+                yield (
+                    f'error_details: Discrepancy for model {opp_id}: '
+                    f'Existing (content_count={exist_model.content_count}, '
+                    f'translation_counts={exist_model.translation_counts}), '
+                    f'Computed (content_count={comp_model.content_count}, '
+                    f'translation_counts={comp_model.translation_counts})',
+                    1,
+                )
+            else:
+                yield ('match', 1)
+
+        def generate_audit_results(
+            key_and_counts: Iterable[Tuple[str, int]],
+        ) -> Iterable[job_run_result.JobRunResult]:
+            totals: Dict[str, int] = {}
+            error_details: List[str] = []
+            for key, count in key_and_counts:
+                if key.startswith('error_details:'):
+                    error_details.append(key.split('error_details: ')[1])
+                else:
+                    totals[key] = totals.get(key, 0) + count
+
+            exist_translation_totals = {}
+            comp_translation_totals = {}
+            for key, count in totals.items():
+                if key.startswith('exist_translation_count_'):
+                    lang = key.split('exist_translation_count_')[1]
+                    exist_translation_totals[lang] = count
+                elif key.startswith('comp_translation_count_'):
+                    lang = key.split('comp_translation_count_')[1]
+                    comp_translation_totals[lang] = count
+
+            exist_translation_totals_str = (
+                ', '.join(
+                    f'{lang}: {count}'
+                    for lang, count in sorted(exist_translation_totals.items())
+                )
+                or 'None'
+            )
+            comp_translation_totals_str = (
+                ', '.join(
+                    f'{lang}: {count}'
+                    for lang, count in sorted(comp_translation_totals.items())
+                )
+                or 'None'
+            )
+
+            yield job_run_result.JobRunResult.as_stdout(
+                f'Audit Summary:\n'
+                f'- Matches: {totals.get("match", 0)}\n'
+                f'- Missing in Datastore: {totals.get("missing", 0)}\n'
+                f'- Discrepancies: {totals.get("discrepancy", 0)}\n'
+                f'- Orphaned in Datastore: {totals.get("orphaned", 0)}\n'
+                f'- Total Content Count (Existing): {totals.get("exist_content_count", 0)}\n'
+                f'- Total Content Count (Computed): {totals.get("comp_content_count", 0)}\n'
+                f'- Total Translation Counts (Existing): {exist_translation_totals_str}\n'
+                f'- Total Translation Counts (Computed): {comp_translation_totals_str}'
+            )
+
+            for detail in error_details:
+                yield job_run_result.JobRunResult.as_stderr(detail)
+
+        compare_results = (
+            {
+                'existing': existing_opp_models_pcoll,
+                'computed': computed_opp_models_pcoll,
+            }
+            | 'Group skill opp models for audit' >> beam.CoGroupByKey()
+            | 'Compare skill models' >> beam.FlatMap(compare_models)
+            | 'Combine skill counts' >> beam.combiners.ToList()
+            | 'Generate skill audit results'
+            >> beam.FlatMap(generate_audit_results)
+        )
+
+        summary_results = (
+            created_models_results
+            | 'Generate skill creation summary results'
+            >> job_result_transforms.ResultsToJobRunResults(
+                'SKILL TRANSLATION OPPORTUNITY MODEL CREATION'
+            )
+        )
+
+        return (
+            compare_results,
+            summary_results,
+        ) | 'Flatten skill audit results' >> beam.Flatten()
