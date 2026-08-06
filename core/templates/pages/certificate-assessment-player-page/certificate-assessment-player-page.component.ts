@@ -19,14 +19,31 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
-interface AssessmentQuestion {
+export type AssessmentQuestionType =
+  | 'multiple_choice'
+  | 'multiple_select'
+  | 'text_input'
+  | 'numeric_input';
+
+export interface AssessmentQuestionOption {
+  id: string;
+  text: string;
+}
+
+export interface AssessmentQuestion {
+  id: string;
+  type: AssessmentQuestionType;
   prompt: string;
-  choices: string[];
+  hint: string;
+  options: AssessmentQuestionOption[];
+  placeholder?: string;
+  correctAnswerText: string;
 }
 
 @Component({
   selector: 'certificate-assessment-player-page',
   templateUrl: './certificate-assessment-player-page.component.html',
+  styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
@@ -34,18 +51,50 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
-      prompt: 'Mock question 1: What is 2 + 2?',
-      choices: ['3', '4', '5'],
+      id: 'q1',
+      type: 'multiple_choice',
+      prompt: 'Which number completes the sequence: 2, 4, 6, ?',
+      hint: 'Choose one option.',
+      options: [
+        {id: 'a', text: '7'},
+        {id: 'b', text: '8'},
+        {id: 'c', text: '9'},
+      ],
+      correctAnswerText: '8',
     },
     {
-      prompt: 'Mock question 2: Pick the correct answer.',
-      choices: ['Option A', 'Option B', 'Option C'],
+      id: 'q2',
+      type: 'multiple_select',
+      prompt: 'Select all prime numbers.',
+      hint: 'More than one option may be correct.',
+      options: [
+        {id: 'a', text: '2'},
+        {id: 'b', text: '3'},
+        {id: 'c', text: '4'},
+        {id: 'd', text: '5'},
+      ],
+      correctAnswerText: '2, 3, 5',
     },
     {
-      prompt: 'Mock question 3: Final sample question.',
-      choices: ['Yes', 'No', 'Maybe'],
+      id: 'q3',
+      type: 'text_input',
+      prompt: 'Type the name of the shape with three sides.',
+      hint: 'Use plain text.',
+      options: [],
+      placeholder: 'Enter your answer',
+      correctAnswerText: 'Triangle',
+    },
+    {
+      id: 'q4',
+      type: 'numeric_input',
+      prompt: 'What is 12 divided by 3?',
+      hint: 'Enter a number.',
+      options: [],
+      placeholder: '0',
+      correctAnswerText: '4',
     },
   ];
+  submittedResponses: string[] = [];
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -78,10 +127,19 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     }
   }
 
+  previousQuestion(): void {
+    if (this.currentQuestionIndex === 0) {
+      return;
+    }
+    this.currentQuestionIndex -= 1;
+  }
+
   submitAssessment(): void {
     const attemptId = `attempt-${Date.now()}`;
     this.router.navigate([
-      `/certificate-assessment/${this.certificateId}/result`,
+      '/certificate-assessment',
+      this.certificateId,
+      'result',
       attemptId,
     ]);
   }
@@ -94,5 +152,17 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   getCurrentQuestion(): AssessmentQuestion {
     return this.mockQuestions[this.currentQuestionIndex];
+  }
+
+  isCurrentQuestionLast(): boolean {
+    return this.currentQuestionIndex === this.mockQuestions.length - 1;
+  }
+
+  getSavedResponse(): string {
+    return this.submittedResponses[this.currentQuestionIndex] || '';
+  }
+
+  updateResponse(response: string): void {
+    this.submittedResponses[this.currentQuestionIndex] = response;
   }
 }
