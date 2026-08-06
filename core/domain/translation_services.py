@@ -551,6 +551,9 @@ def save_featured_translation_languages(
         strict=False,
     )
     if model is None:
+        # Here we use cast because the stored dicts have the same shape as
+        # FeaturedTranslationLanguageDict, but the model's create() takes the
+        # generic List[Dict[str, str]] type to avoid a storage->domain import.
         translation_models.FeaturedTranslationLanguagesModel.create(
             cast(List[Dict[str, str]], featured_translation_languages)
         )
