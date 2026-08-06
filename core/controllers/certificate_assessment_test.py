@@ -485,9 +485,10 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
             certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.NotLoggedInException,
             '^$',
         ):
-            certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.get.__wrapped__(
-                handler, self.classroom_url_fragment
-            )
+            getattr(
+                certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.get,
+                '__wrapped__',
+            )(handler, self.classroom_url_fragment)
 
 
 class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):

@@ -499,7 +499,10 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
 
         def _new_attempt_model(
-            certificate_id: str, total_score: float, finished_minutes: int
+            certificate_id: str,
+            total_score: float,
+            attempt_index: int,
+            finished_minutes: int,
         ) -> mock.Mock:
             attempt_model = mock.Mock()
             attempt_model.certificate_id = None
@@ -510,18 +513,26 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 'question_versions': {'question_id_1': 1},
                 'question_topic_links': {'question_id_1': [self.topic_id]},
             }
-            attempt_model.attempt_index = 1
+            attempt_model.attempt_index = attempt_index
             attempt_model.finished_at = started_at + datetime.timedelta(
                 minutes=finished_minutes
             )
             attempt_model.total_score = total_score
             return attempt_model
 
-        latest_attempt = _new_attempt_model(offering.certificate_id, 90.0, 20)
-        unrelated_attempt = _new_attempt_model(
-            'unrelated_certificate_id', 95.0, 25
+        latest_attempt = _new_attempt_model(
+            offering.certificate_id, 90.0, 1, 20
         )
-        older_attempt = _new_attempt_model(offering.certificate_id, 70.0, 5)
+        unrelated_attempt = _new_attempt_model(
+            'unrelated_certificate_id', 95.0, 1, 25
+        )
+        older_attempt = _new_attempt_model(offering.certificate_id, 70.0, 1, 5)
+        higher_index_attempt = _new_attempt_model(
+            offering.certificate_id, 80.0, 2, 30
+        )
+        later_finished_attempt = _new_attempt_model(
+            offering.certificate_id, 85.0, 2, 40
+        )
 
         with mock.patch.object(
             gae_models.CertificateAssessmentAttemptModel,
@@ -532,6 +543,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                         latest_attempt,
                         unrelated_attempt,
                         older_attempt,
+                        higher_index_attempt,
+                        later_finished_attempt,
                     ]
                 )
             ),
