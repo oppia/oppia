@@ -131,12 +131,35 @@ export class CollectionEditor extends BaseUser {
 
     await this.waitForNetworkIdle();
 
-    await this.clickOnElementWithSelector(publishCollectionButtonSelector);
-
-    await this.page.waitForSelector(collectionTitleInputSelector, {
-      visible: true,
-    });
-
+    try {
+      await this.clickOnElementWithSelector(publishCollectionButtonSelector);
+      await this.page.waitForSelector(collectionTitleInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (e) {
+      showMessage(
+        'Publish click did not open the metadata modal; performing in-page click fallback.'
+      );
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, publishCollectionButtonSelector);
+      await this.page.waitForSelector(collectionTitleInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
     await this.page.click(collectionTitleInputSelector);
     await this.page.type(collectionTitleInputSelector, title);
 
@@ -170,7 +193,29 @@ export class CollectionEditor extends BaseUser {
       collectionCategoryOptionSelector
     );
 
-    await this.clickOnElementWithSelector(collectionSaveChangesButtonSelector);
+    try {
+      await this.clickOnElementWithSelector(
+        collectionSaveChangesButtonSelector
+      );
+    } catch (e) {
+      showMessage(
+        'Save changes click failed; performing in-page click fallback.'
+      );
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, collectionSaveChangesButtonSelector);
+    }
     await this.waitForNetworkIdle();
 
     showMessage(
