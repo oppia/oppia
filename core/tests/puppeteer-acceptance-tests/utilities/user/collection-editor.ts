@@ -122,10 +122,6 @@ export class CollectionEditor extends BaseUser {
       });
     }
 
-    await this.page.waitForSelector(commitMessageInputSelector, {
-      visible: true,
-    });
-
     await this.page.type(
       commitMessageInputSelector,
       'Initial collection setup.'
