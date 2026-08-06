@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
-base_models, certificate_models = models.Registry.import_models(
+(base_models, certificate_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
