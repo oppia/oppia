@@ -811,11 +811,38 @@ export class BaseUser {
   async clearAllTextFrom(selector: string): Promise<void> {
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
-    await this.page.keyboard.press('Backspace');
+
+    const isTextInput = await element.evaluate(
+      el => el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement
+    );
+
+    if (isTextInput) {
+      // Clear input/textarea elements via the native value setter and dispatch
+      // input/change events. This updates Angular's ngModel deterministically
+      // without depending on focus/selection timing, which can be flaky right
+      // after an element (e.g. a modal input) becomes clickable.
+      await element.evaluate(el => {
+        const valueSetter = Object.getOwnPropertyDescriptor(
+          el instanceof HTMLTextAreaElement
+            ? HTMLTextAreaElement.prototype
+            : HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        valueSetter?.call(el, '');
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+      });
+    } else {
+      // Rich-text editors (e.g. CKEditor) expose contenteditable divs, which
+      // cannot be cleared by setting their text directly without desyncing the
+      // editor's internal model. Clear them with real keyboard events instead.
+      await element.click();
+      await this.page.keyboard.down('Control');
+      await this.page.keyboard.press('A');
+      await this.page.keyboard.up('Control');
+      await this.page.keyboard.press('Backspace');
+    }
   }
 
   /**

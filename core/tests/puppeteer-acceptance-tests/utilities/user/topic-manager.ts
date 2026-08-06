@@ -5809,6 +5809,19 @@ export class TopicManager extends BaseUser {
     await this.clickOnElement(editButtons[1]);
     await this.expectElementToBeVisible(editArcTitleFieldSelector);
 
+    // Wait until the modal form is fully initialized (title populated) before
+    // clearing, otherwise the clear may run before ngModel sets the value.
+    await this.page.waitForFunction(
+      (modalSelector: string) => {
+        const el = document.querySelector(
+          modalSelector
+        ) as HTMLInputElement | null;
+        return el !== null && el.value.length > 0;
+      },
+      {timeout: 15000},
+      editArcTitleFieldSelector
+    );
+
     await this.clearAllTextFrom(editArcTitleFieldSelector);
     await this.typeInInputField(editArcTitleFieldSelector, title);
     await this.expectElementValueToBe(editArcTitleFieldSelector, title);

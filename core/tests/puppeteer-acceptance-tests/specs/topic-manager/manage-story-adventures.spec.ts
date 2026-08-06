@@ -101,6 +101,8 @@ describe('Topic Manager', function () {
 
       await topicManager.expectAllChaptersInSingleAdventure(CHAPTER_TITLES);
 
+      await topicManager.scrollToTopOfPage();
+
       await topicManager.expectScreenshotToMatch(
         'storyEditorAllChaptersInSingleAdventure',
         __dirname
