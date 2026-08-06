@@ -494,17 +494,6 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     }
     const feedbackDetailPath = hash.substring(feedbackDetailHashPrefix.length);
     const [urlFeedbackType, urlFeedbackId] = feedbackDetailPath.split('/');
-
-    if (
-      urlFeedbackType !== FeedbackModalType.LESSON_FEEDBACK &&
-      urlFeedbackType !== FeedbackModalType.LESSON_ISSUE
-    ) {
-      return null;
-    }
-
-    if (!urlFeedbackId) {
-      return null;
-    }
     return {
       feedbackType: urlFeedbackType,
       feedbackId: decodeURIComponent(urlFeedbackId),

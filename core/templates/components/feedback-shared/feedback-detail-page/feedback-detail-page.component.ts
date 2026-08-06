@@ -222,32 +222,44 @@ export class FeedbackDetailPageComponent {
     const params = new URLSearchParams();
     params.append('template', '6_technical_feedback_report.yml');
     params.append('title', title);
-    params.append('describe-the-bug', this.getGithubIssueDescription());
+    params.append('describe-the-bug', this.getGithubIssueDescription(response));
     params.append('page-url', response?.page_url || 'Not provided');
-    params.append('steps-to-reproduce', this.getGithubIssueSteps());
-    params.append('expected-behavior', this.getGithubIssueExpectedBehavior());
-    params.append('screenshots-videos', this.getGithubIssueScreenshotDetails());
-    params.append('device', this.getGithubIssueDevice());
-    params.append('operating-system', this.getGithubIssueOperatingSystem());
-    params.append('browsers', this.getGithubIssueBrowserName());
-    params.append('browser-version', this.getGithubIssueBrowserVersion());
-    params.append('additional-context', this.getGithubIssueAdditionalContext());
+    params.append('steps-to-reproduce', this.getGithubIssueSteps(response));
+    params.append(
+      'expected-behavior',
+      this.getGithubIssueExpectedBehavior(response)
+    );
+    params.append(
+      'screenshots-videos',
+      this.getGithubIssueScreenshotDetails(response)
+    );
+    params.append('device', this.getGithubIssueDevice(response));
+    params.append(
+      'operating-system',
+      this.getGithubIssueOperatingSystem(response)
+    );
+    params.append('browsers', this.getGithubIssueBrowserName(response));
+    params.append(
+      'browser-version',
+      this.getGithubIssueBrowserVersion(response)
+    );
+    params.append(
+      'additional-context',
+      this.getGithubIssueAdditionalContext(response)
+    );
 
     return `https://github.com/oppia/oppia/issues/new?${params.toString()}`;
   }
 
-  private getGithubIssueDescription(): string {
-    const response = this.feedbackDetailResponse;
-    if (!this.isPlatformFeedbackDetailResponse(response)) {
-      return '';
-    }
-
+  private getGithubIssueDescription(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     return [
       response.report_message,
       '',
       'Transferred from the Oppia Technical feedback dashboard.',
       `Report ID: ${response.id}`,
-      `Feedback report: ${this.getFeedbackReportUrl()}`,
+      `Feedback report: ${this.getFeedbackReportUrl(response)}`,
       `Submitted: ${this.formatDate(response.created_on_msecs)}`,
       `Source: ${this.getSourceLabel(response.source)}`,
       `Category: ${this.getCategoryLabel(response.category)}`,
@@ -256,11 +268,9 @@ export class FeedbackDetailPageComponent {
     ].join('\n');
   }
 
-  private getFeedbackReportUrl(): string {
-    const response = this.feedbackDetailResponse;
-    if (!this.isPlatformFeedbackDetailResponse(response)) {
-      return '';
-    }
+  private getFeedbackReportUrl(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     const reportPath = `/technical-feedback-dashboard/${encodeURIComponent(
       response.destination_dashboard
     )}/${encodeURIComponent(response.id)}`;
@@ -268,12 +278,9 @@ export class FeedbackDetailPageComponent {
     return `${this.windowRef.nativeWindow.location.origin}${reportPath}`;
   }
 
-  private getGithubIssueSteps(): string {
-    const response = this.feedbackDetailResponse;
-    if (!this.isPlatformFeedbackDetailResponse(response)) {
-      return '';
-    }
-
+  private getGithubIssueSteps(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     const issueLines = [
       '1. Review the transferred feedback report details.',
       `2. Open the reported page: ${response.page_url || 'Not provided'}`,
@@ -295,15 +302,15 @@ export class FeedbackDetailPageComponent {
     return issueLines.join('\n');
   }
 
-  private getGithubIssueExpectedBehavior(): string {
+  private getGithubIssueExpectedBehavior(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     return 'The reported user-facing problem should not occur.';
   }
 
-  private getGithubIssueScreenshotDetails(): string {
-    const response = this.feedbackDetailResponse;
-    if (!this.isPlatformFeedbackDetailResponse(response)) {
-      return 'No screenshot was attached to this report.';
-    }
+  private getGithubIssueScreenshotDetails(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     if (!response.screenshot_filename) {
       return 'No screenshot was attached to this report.';
     }
@@ -321,12 +328,9 @@ export class FeedbackDetailPageComponent {
     ].join('\n');
   }
 
-  private getGithubIssueAdditionalContext(): string {
-    const response = this.feedbackDetailResponse;
-    if (!this.isPlatformFeedbackDetailResponse(response)) {
-      return '';
-    }
-
+  private getGithubIssueAdditionalContext(
+    response: PlatformFeedbackDetailResponse
+  ): string {
     return [
       '## Feedback metadata',
       '',
@@ -344,21 +348,27 @@ export class FeedbackDetailPageComponent {
       '## Session logs',
       '',
       '```json',
-      this.getGithubIssueSessionLogJson(),
+      this.getGithubIssueSessionLogJson(response),
       '```',
     ].join('\n');
   }
 
-  private getGithubIssueBrowserVersion(): string {
-    return this.getBrowserDetailsFromUserAgent().version;
+  private getGithubIssueBrowserVersion(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    return this.getBrowserDetailsFromUserAgent(response).version;
   }
 
-  private getGithubIssueBrowserName(): string {
-    return this.getBrowserDetailsFromUserAgent().name;
+  private getGithubIssueBrowserName(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    return this.getBrowserDetailsFromUserAgent(response).name;
   }
 
-  private getGithubIssueOperatingSystem(): string {
-    const userAgent = this.getUserAgent();
+  private getGithubIssueOperatingSystem(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    const userAgent = this.getUserAgent(response);
     if (!userAgent) {
       return 'Other';
     }
@@ -386,8 +396,10 @@ export class FeedbackDetailPageComponent {
     return 'Other';
   }
 
-  private getGithubIssueDevice(): string {
-    const userAgent = this.getUserAgent();
+  private getGithubIssueDevice(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    const userAgent = this.getUserAgent(response);
     if (!userAgent) {
       return 'Desktop';
     }
@@ -397,8 +409,10 @@ export class FeedbackDetailPageComponent {
       : 'Desktop';
   }
 
-  private getBrowserDetailsFromUserAgent(): BrowserDetails {
-    const userAgent = this.getUserAgent();
+  private getBrowserDetailsFromUserAgent(
+    response: PlatformFeedbackDetailResponse
+  ): BrowserDetails {
+    const userAgent = this.getUserAgent(response);
     if (!userAgent) {
       return {
         name: 'Other',
@@ -444,21 +458,16 @@ export class FeedbackDetailPageComponent {
     };
   }
 
-  private getUserAgent(): string | null {
-    if (this.isPlatformFeedbackDetailResponse(this.feedbackDetailResponse)) {
-      return (
-        this.feedbackDetailResponse?.session_info?.environment.user_agent ??
-        null
-      );
-    }
-    return null;
+  private getUserAgent(
+    response: PlatformFeedbackDetailResponse
+  ): string | null {
+    return response?.session_info?.environment.user_agent ?? null;
   }
 
-  private getGithubIssueSessionLogJson(): string {
-    if (!this.isPlatformFeedbackDetailResponse(this.feedbackDetailResponse)) {
-      return 'No session logs were attached to this report.';
-    }
-    const sessionInfo = this.feedbackDetailResponse?.session_info;
+  private getGithubIssueSessionLogJson(
+    response: PlatformFeedbackDetailResponse
+  ): string {
+    const sessionInfo = response?.session_info;
     if (!sessionInfo) {
       return 'No session logs were attached to this report.';
     }

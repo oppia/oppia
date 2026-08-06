@@ -36,6 +36,7 @@ import {
   PlatformFeedbackDetailResponse,
   SuccessResponse,
   LessonFeedbackDetailResponse,
+  FeedbackStatus,
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
@@ -192,7 +193,7 @@ export class FeedbackBackendApiService {
   async updateLessonFeedbackAsync(
     explorationId: string,
     feedbackId: string,
-    newStatus: string,
+    newStatus: FeedbackStatus,
     replyText: string | null = null
   ): Promise<SuccessResponse> {
     const url = [
