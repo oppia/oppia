@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,22 +19,25 @@
  * ID.DJ. Donor learns about the organization
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Interested Donor', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Interested Donor', function () {
   let interestedDonor: LoggedOutUser;
 
-  beforeAll(async function () {
-    interestedDonor = await UserFactory.createLoggedOutUser();
+  test.beforeAll(async function ({browser}) {
+    interestedDonor = await UserFactory.createLoggedOutUser(browser);
   });
 
-  it('should be able to learn more about the organization', async function () {
+  test('should be able to learn more about the organization', async function () {
     await interestedDonor.navigateToSplashPage();
 
     // Visit "About" page.
     await interestedDonor.clickAboutButtonInAboutMenuOnNavbar();
-    await interestedDonor.expectScreenshotToMatch('aboutPage', __dirname);
+    await interestedDonor.expectScreenshotToMatch('aboutPage');
 
     // Empowering Learners around the globe.
     await interestedDonor.expectAboutUsPageHeadingToBe(
@@ -76,18 +79,18 @@ describe('Interested Donor', function () {
     await interestedDonor.expectViewReportButtonInAboutPageToBeVisible();
   });
 
-  it('should be able to view impact reports', async function () {
+  test('should be able to view impact reports', async function () {
     await interestedDonor.verifyImpactReportButtonInAboutMenuOnNavbar();
   });
 
-  it('should be able to read more what organization has done', async function () {
+  test('should be able to read more what organization has done', async function () {
     await interestedDonor.clickAboutButtonInAboutMenuOnNavbar();
     await interestedDonor.scrollToBottomOfPage();
     await interestedDonor.clickOnBlogLinkInFooter();
-    await interestedDonor.expectScreenshotToMatch('blogPage', __dirname);
+    await interestedDonor.expectScreenshotToMatch('blogPage');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
