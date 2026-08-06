@@ -345,7 +345,7 @@ class UserSettings:
         """Updates last_edited_an_exploration to the current datetime for the
         user.
         """
-        self.last_edited_an_exploration = datetime.datetime.utcnow()
+        self.last_edited_an_exploration = utils.get_current_utc_datetime()
 
     def update_first_contribution_msec(
         self, first_contribution_msec: float
@@ -812,6 +812,8 @@ class UserGlobalPrefs:
             receive emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the user can receive
              subscription emails notifying them about new explorations.
+        can_receive_contributor_dashboard_email: bool. Whether the user can
+            receive Contributor Dashboard reviewer notification emails.
     """
 
     def __init__(
@@ -820,6 +822,7 @@ class UserGlobalPrefs:
         can_receive_editor_role_email: bool,
         can_receive_feedback_message_email: bool,
         can_receive_subscription_email: bool,
+        can_receive_contributor_dashboard_email: bool,
     ) -> None:
         """Constructs a UserGlobalPrefs domain object.
 
@@ -832,6 +835,8 @@ class UserGlobalPrefs:
                 receive emails when users submit feedback to their explorations.
             can_receive_subscription_email: bool. Whether the user can receive
                 subscription emails notifying them about new explorations.
+            can_receive_contributor_dashboard_email: bool. Whether the user can
+                receive Contributor Dashboard reviewer notification emails.
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
@@ -839,6 +844,9 @@ class UserGlobalPrefs:
             can_receive_feedback_message_email
         )
         self.can_receive_subscription_email = can_receive_subscription_email
+        self.can_receive_contributor_dashboard_email = (
+            can_receive_contributor_dashboard_email
+        )
 
     @classmethod
     def create_default_prefs(cls) -> UserGlobalPrefs:
@@ -848,6 +856,7 @@ class UserGlobalPrefs:
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
 

@@ -625,6 +625,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             'can_receive_editor_role_email': False,
             'can_receive_feedback_message_email': False,
             'can_receive_subscription_email': 1,
+            'can_receive_contributor_dashboard_email': False,
         }
         with self.assertRaisesRegex(
             Exception,
@@ -664,6 +665,55 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                     {'updates': [{'update_type': update_type, 'data': 1}]},
                     csrf_token=csrf_token,
                 )
+        self.logout()
+
+    def test_non_boolean_contributor_dashboard_email_value_raises_exception(
+        self,
+    ) -> None:
+        """Tests that the Contributor Dashboard preference must be boolean."""
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        data = {
+            'can_receive_email_updates': False,
+            'can_receive_editor_role_email': False,
+            'can_receive_feedback_message_email': False,
+            'can_receive_subscription_email': False,
+            'can_receive_contributor_dashboard_email': 1,
+        }
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Non-boolean values found for keys: '
+            'can_receive_contributor_dashboard_email',
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {
+                            'update_type': 'email_preferences',
+                            'data': data,
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_get_returns_contributor_dashboard_email_preference(
+        self,
+    ) -> None:
+        """Tests that GET returns the Contributor Dashboard preference."""
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+
+        self.assertEqual(
+            response['can_receive_contributor_dashboard_email'],
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
+        )
+
         self.logout()
 
 
@@ -919,6 +969,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                         'can_receive_editor_role_email': True,
                         'can_receive_feedback_message_email': True,
                         'can_receive_subscription_email': True,
+                        'can_receive_contributor_dashboard_email': True,
                     },
                 }
             ]
@@ -934,6 +985,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.can_receive_editor_role_email)
         self.assertTrue(email_preferences.can_receive_feedback_message_email)
         self.assertTrue(email_preferences.can_receive_subscription_email)
+        self.assertTrue(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
 
         payload = {
             'updates': [
@@ -944,6 +998,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                         'can_receive_editor_role_email': False,
                         'can_receive_feedback_message_email': False,
                         'can_receive_subscription_email': False,
+                        'can_receive_contributor_dashboard_email': False,
                     },
                 }
             ]
@@ -959,6 +1014,81 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
+        self.assertFalse(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
+
+    def test_missing_contributor_dashboard_email_preference_raises_exception(
+        self,
+    ) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        data = {
+            'can_receive_email_updates': False,
+            'can_receive_editor_role_email': False,
+            'can_receive_feedback_message_email': False,
+            'can_receive_subscription_email': False,
+        }
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Missing keys: can_receive_contributor_dashboard_email',
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {
+                            'update_type': 'email_preferences',
+                            'data': data,
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
+    def test_contributor_dashboard_preference_is_independent_of_marketing(
+        self,
+    ) -> None:
+        """Tests that marketing and Contributor Dashboard preferences differ."""
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'updates': [
+                {
+                    'update_type': 'email_preferences',
+                    'data': {
+                        'can_receive_email_updates': False,
+                        'can_receive_editor_role_email': True,
+                        'can_receive_feedback_message_email': True,
+                        'can_receive_subscription_email': True,
+                        'can_receive_contributor_dashboard_email': True,
+                    },
+                }
+            ]
+        }
+
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            payload,
+            csrf_token=csrf_token,
+        )
+
+        email_preferences = user_services.get_email_preferences(editor_id)
+
+        self.assertFalse(email_preferences.can_receive_email_updates)
+        self.assertTrue(
+            email_preferences.can_receive_contributor_dashboard_email
+        )
+
+        self.logout()
 
 
 class SignupTests(test_utils.GenericTestBase):
@@ -1455,6 +1585,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
     def test_get_function(self) -> None:
@@ -1555,17 +1686,22 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
     )
     def test_post(self) -> None:
         with self.swap_secret:
+            # Start with both marketing and Contributor Dashboard emails disabled.
             user_services.update_email_preferences(
                 self.editor_id,
                 False,
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                False,
             )
             email_preferences = user_services.get_email_preferences(
                 self.editor_id
             )
-            self.assertEqual(email_preferences.can_receive_email_updates, False)
+            self.assertFalse(email_preferences.can_receive_email_updates)
+            self.assertFalse(
+                email_preferences.can_receive_contributor_dashboard_email
+            )
 
             # User subscribed externally.
             json_response = self.post_json(
@@ -1578,10 +1714,25 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 use_payload=False,
             )
             self.assertEqual(json_response, {})
+
             email_preferences = user_services.get_email_preferences(
                 self.editor_id
             )
-            self.assertEqual(email_preferences.can_receive_email_updates, True)
+            self.assertTrue(email_preferences.can_receive_email_updates)
+            self.assertFalse(
+                email_preferences.can_receive_contributor_dashboard_email
+            )
+
+            # Prepare the opposite Contributor Dashboard preference before
+            # testing external unsubscription.
+            user_services.update_email_preferences(
+                self.editor_id,
+                True,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+                True,
+            )
 
             # User unsubscribed externally.
             json_response = self.post_json(
@@ -1594,10 +1745,14 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 use_payload=False,
             )
             self.assertEqual(json_response, {})
+
             email_preferences = user_services.get_email_preferences(
                 self.editor_id
             )
-            self.assertEqual(email_preferences.can_receive_email_updates, False)
+            self.assertFalse(email_preferences.can_receive_email_updates)
+            self.assertTrue(
+                email_preferences.can_receive_contributor_dashboard_email
+            )
 
 
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):
