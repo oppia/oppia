@@ -198,6 +198,7 @@
 	"I18N_PREFERENCES_EMAIL": "رایانامه",
 	"I18N_PREFERENCES_HEADING": "ترجیحات",
 	"I18N_PREFERENCES_PICTURE": "تصویر",
+	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_SELECT": "انتخاب زبان‌های ترجیحی",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ADD": "افزودن تصویر پروفایل",
 	"I18N_PREFERENCES_PROFILE_PICTURE_DRAG": "کشیدن به چیدنگاه و تغییر اندازه:",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ERROR": "خطا: نمی‌توان فایل تصویر را خواند.",
