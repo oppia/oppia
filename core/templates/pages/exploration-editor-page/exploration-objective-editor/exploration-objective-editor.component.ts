@@ -18,10 +18,12 @@
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
+import './exploration-objective-editor.component.css';
 
 @Component({
   selector: 'oppia-exploration-objective-editor',
   templateUrl: './exploration-objective-editor.component.html',
+  styleUrls: ['./exploration-objective-editor.component.css'],
 })
 export class ExplorationObjectiveEditorComponent {
   // These properties below are initialized using Angular lifecycle hooks
