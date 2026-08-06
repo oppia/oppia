@@ -1152,6 +1152,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             editor_role_notifications=False,
             feedback_message_notifications=False,
             subscription_notifications=False,
+            contributor_dashboard_notifications=False,
         ).put()
 
     def test_get_deletion_policy(self) -> None:
@@ -1177,6 +1178,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
                 'feedback_message_notifications': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'subscription_notifications': base_models.EXPORT_POLICY.EXPORTED,
+                'contributor_dashboard_notifications': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -1220,6 +1222,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
                 'editor_role_notifications': True,
                 'feedback_message_notifications': True,
                 'subscription_notifications': True,
+                'contributor_dashboard_notifications': None,
             },
             user_data,
         )
@@ -1235,6 +1238,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
                 'editor_role_notifications': False,
                 'feedback_message_notifications': False,
                 'subscription_notifications': False,
+                'contributor_dashboard_notifications': False,
             },
         )
 

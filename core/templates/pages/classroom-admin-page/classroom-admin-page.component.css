@@ -1,0 +1,283 @@
+.classroom-editor {
+  display: flex;
+  width: 90%;
+}
+.topics-form-field {
+  width: 400px;
+}
+.topic-drag-indicator {
+  padding: 10px;
+}
+.drag-and-drop-list {
+  background: #fff;
+  border: solid 1px #ccc;
+  border-radius: 4px;
+  display: block;
+  max-width: 100%;
+  min-height: 60px;
+  overflow: hidden;
+}
+
+.drag-and-drop-box {
+  align-items: center;
+  background: fff;
+  border-bottom: solid 1px #ccc;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.87);
+  cursor: move;
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  justify-content: space-between;
+  padding: 10px 10px;
+}
+.cdk-drag-preview {
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+}
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+.drag-and-drop-list.cdk-drop-list-dragging .drag-and-drop-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+.topic-and-prerequisites-wrapper {
+  display: flex;
+}
+.cyclic-check-error {
+  margin: 0 10px;
+}
+.add-new-topic {
+  margin-top: 10px;
+}
+.new-topic-input {
+  display: inline;
+  margin-right: 10px;
+  width: 200px;
+}
+.topics-name {
+  overflow: auto;
+  padding: 10px;
+  width: 100px;
+}
+.topic-dependency-description {
+  margin: 10px 0;
+}
+.prerequisite-topics-container {
+  display: -webkit-inline-box;
+  padding: 10px;
+  width: 450px;
+}
+.topic-dependency-container-header {
+  display: flex;
+  justify-content: space-around;
+}
+.topic-dependency-container {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+/* TODO(#16156): Remove the instances of /deep/ from the codebase. */
+:host /deep/ .oppia-update-classroom-data-spinning-button circle {
+  stroke: #fff;
+}
+.oppia-update-classroom-data-spinning-button {
+  margin: 0 5px;
+}
+.create-new-classroom-button-wrapper {
+  width: fit-content;
+}
+.save-classroom-changes {
+  margin-top: 5px;
+}
+.cancel-classroom-changes, .publish-classroom-btn {
+  margin-right: 5px;
+  margin-top: 5px;
+}
+.classroom-field {
+  width: 400px;
+  word-wrap: break-word;
+}
+.oppia-classroom-input-container {
+  margin-top: 10px;
+}
+.loading-spinner {
+  margin-left: 45%;
+}
+.classroom-details {
+  margin: 10px 20px;
+  padding: 0 15px;
+}
+.action-buttons {
+  float: right;
+  margin: 10px;
+}
+.oppia-edit-icon {
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  right: 8%;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
+}
+.oppia-classroom-tile {
+  align-items: center;
+  background: #e0f2f1;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 20px;
+  padding: 10px;
+  width: 94%;
+}
+.card-content {
+  padding: 20px
+}
+.oppia-editor-card-with-avatar {
+  margin-bottom: 200px;
+  margin-top: 200px;
+}
+.add-new-classroom {
+  background-color: #00645c;
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 12px;
+  margin-top: 10px;
+}
+.add-new-classroom:hover {
+  color: #fff;
+}
+.add-new-classroom:disabled {
+  background-color: #e8e7e3;
+  color: rgba(0,0,0,0.87);
+}
+.oppia-warning-text {
+  color: #f00;
+  font-size: 0.8em;
+  width: 500px
+}
+.classroom-tile-name {
+  overflow: hidden;
+}
+.new-topic-input-container {
+  align-items: end;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+.topic-selector-container {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  width: 100%;
+}
+.new-topic-input-container button.cancel-btn {
+  bottom: 14px;
+  position: relative;
+  width: 75px;
+}
+.topics-selector-form-field {
+  width: 100%;
+}
+.mat-icon.save-draft-button-warning {
+  color: #eec302;
+  float: right;
+  font-size: 20px;
+  height: fit-content;
+  margin-left: 3px;
+  z-index: 10;
+}
+
+.topic-and-prerequisites-text-container {
+  align-items: start;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.oppia-on-off-switch-inner:before {
+  content: 'Public';
+  padding-left: 6px;
+}
+
+.oppia-on-off-switch-inner:after {
+  content: 'Private';
+  padding-right: 3px;
+}
+
+.oppia-on-off-switch-main {
+  right: 44px;
+}
+
+.top-content-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-editor-card-with-avatar {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    max-width: 100%;
+  }
+
+  .card-content {
+    padding: 35px 10px;
+  }
+
+  .oppia-classroom-input-container {
+    padding-left: 0;
+    width: 100%;
+  }
+
+  .oppia-classroom-input-container span {
+    display: block;
+    padding-left: 0;
+  }
+
+  .oppia-classroom-tile {
+    box-sizing: border-box;
+    margin: 10px 0;
+    width: 100%;
+  }
+
+  .classroom-details {
+    margin-bottom: 10px;
+    padding: 0;
+  }
+
+  .topic-and-prerequisites-container {
+    margin: 0;
+    position: static;
+    right: auto;
+  }
+
+  .new-topic-input-container {
+    width: 100%;
+  }
+
+  .create-new-classroom-button-wrapper {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .btn.add-new-classroom {
+    width: 100%;
+  }
+
+  .topic-dependency-container {
+    margin-bottom: 10px;
+    overflow: auto;
+  }
+}
