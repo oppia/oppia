@@ -552,7 +552,7 @@ def save_featured_translation_languages(
     )
     if model is None:
         translation_models.FeaturedTranslationLanguagesModel.create(
-            featured_translation_languages
+            cast(List[Dict[str, str]], featured_translation_languages)
         )
     else:
         model.featured_translation_languages = featured_translation_languages

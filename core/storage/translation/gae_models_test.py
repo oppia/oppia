@@ -615,6 +615,7 @@ class FeaturedTranslationLanguagesModelTests(test_utils.GenericTestBase):
         retrieved_model = (
             translation_models.FeaturedTranslationLanguagesModel.get()
         )
+        assert retrieved_model is not None
         self.assertEqual(
             retrieved_model.featured_translation_languages,
             [{'language_code': 'hi', 'explanation': 'High demand'}],
