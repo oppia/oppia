@@ -189,10 +189,18 @@ export class OpportunitiesListItemComponent {
           this.inReviewProgressStyle = {
             width: inReviewTranslationsPercentage + '%',
           };
+          let maxTranslatableCards = this.opportunity.totalCount;
+          if (
+            !this.opportunity.userIsReviewer &&
+            this.opportunity.reviewerOnlyContentCount !== undefined
+          ) {
+            maxTranslatableCards -= this.opportunity.reviewerOnlyContentCount;
+          }
+
           this.opportunityButtonDisabled =
             this.opportunity.translationsCount +
-              this.opportunity.inReviewCount ===
-            this.opportunity.totalCount;
+              this.opportunity.inReviewCount >=
+            maxTranslatableCards;
 
           if (this.opportunityButtonDisabled) {
             if (

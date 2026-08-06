@@ -350,21 +350,20 @@ describe('Opportunities List Item Component', () => {
       });
     });
 
-    describe('when totalCount is 0 (all remaining content is reviewer-only)', () => {
+    describe('when all remaining content is reviewer-only', () => {
       beforeEach(() => {
         let opportunity = component.opportunity as ExplorationOpportunity;
-        opportunity.totalCount = 0;
-        opportunity.translationsCount = 0;
-        opportunity.inReviewCount = 0;
-        opportunity.reviewerOnlyContentCount = 5;
+        opportunity.totalCount = 10;
+        opportunity.translationsCount = 5;
+        opportunity.inReviewCount = 3;
+        opportunity.reviewerOnlyContentCount = 2;
         opportunity.userIsReviewer = false;
         fixture.detectChanges();
         component.ngOnInit();
       });
 
-      it('should set progressPercentage to 100% to avoid division by zero', () => {
-        expect(component.progressPercentage).toBe('100%');
-        expect(component.cardsAvailable).toBe(0);
+      it('should calculate cardsAvailable correctly', () => {
+        expect(component.cardsAvailable).toBe(2);
       });
 
       it('should disable the button and show the correct generic tooltip', () => {

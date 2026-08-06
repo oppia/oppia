@@ -492,7 +492,7 @@ class BaseTranslatableObject:
 
     def get_reviewer_only_content_count(self) -> int:
         """Returns the total number of content items in the exploration that
-        are only translatable by reviewers (e.g. content with
+        are only translatable by reviewers (e.g. rule inputs, content with
         'set_of_strings' data format).
 
         Returns:
