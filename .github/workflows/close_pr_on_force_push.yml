@@ -1,0 +1,63 @@
+name: Close PR on force-push or rebase
+on:
+  pull_request:
+    types:
+        - opened
+        - synchronize
+        - reopened
+permissions: read-all
+jobs:
+  detect_force_push:
+    runs-on: ubuntu-24.04
+    permissions:
+        issues: write
+        pull-requests: write
+    steps:
+      - name: Close PR if branch was force-pushed or rebased
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            // head_ref_force_pushed is the same timeline event GitHub's own
+            // UI uses to show the "force-pushed" badge on a PR, so this
+            // reflects any rewrite the PR's branch has undergone since the
+            // PR was created, regardless of which of opened/synchronize/
+            // reopened this run was triggered by.
+            // NOTE: timelineItems' totalCount always reflects ALL timeline
+            // items on the PR and is NOT affected by the itemTypes filter
+            // (a documented GitHub GraphQL API quirk) -- so we check the
+            // length of the (correctly filtered) nodes list instead.
+            const result = await github.graphql(
+              `query($owner: String!, $repo: String!, $number: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $number) {
+                    timelineItems(first: 1, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) {
+                      nodes {
+                        __typename
+                      }
+                    }
+                  }
+                }
+              }`,
+              { owner: context.repo.owner, repo: context.repo.repo, number: pr.number }
+            );
+            const wasForcePushed = result.repository.pullRequest.timelineItems.nodes.length > 0;
+
+            if (wasForcePushed) {
+              const comment = `Hi @${pr.user.login}, this PR's branch appears to have been force-pushed or rebased, which rewrites commit history. Per our [contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change), force-pushing to a PR branch is not allowed, so this PR is being closed. Please open a new PR from a fresh branch instead of force-pushing. Thanks!`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: comment,
+              });
+
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed',
+              });
+            }

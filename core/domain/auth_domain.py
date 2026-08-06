@@ -37,12 +37,6 @@ AuthIdUserIdPair = collections.namedtuple(
 )
 
 
-# The minimum fields needed to link an Oppia user with authentication providers.
-ExternalAccount = collections.namedtuple(
-    'ExternalAccount', ['auth_id', 'email', 'disabled']
-)
-
-
 class InvalidAuthSessionError(Exception):
     """Error raised when an invalid auth session is detected."""
 
