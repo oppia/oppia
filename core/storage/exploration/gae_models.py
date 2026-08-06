@@ -184,7 +184,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         )
         if max_age:
             query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age
+                cls.last_updated >= utils.get_current_utc_datetime() - max_age
             )
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor
