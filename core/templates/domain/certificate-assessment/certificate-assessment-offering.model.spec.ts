@@ -19,7 +19,44 @@
 import {
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingBackendDict,
+  AvailableCertificateAssessmentOfferingData,
+  AvailableCertificateAssessmentOfferingBackendDict,
 } from './certificate-assessment-offering.model';
+
+describe('Available Certificate Assessment Offering Data Model', () => {
+  let backendDict: AvailableCertificateAssessmentOfferingBackendDict;
+
+  beforeEach(() => {
+    backendDict = {
+      certificate_id: 'cert_id_1',
+      title: 'Math Assessment',
+      attempt_status: 'Not_Attempted',
+    };
+  });
+
+  it('should correctly create an instance via the constructor', () => {
+    const offering = new AvailableCertificateAssessmentOfferingData(
+      'cert_id_1',
+      'Math Assessment',
+      'Not_Attempted'
+    );
+
+    expect(offering.certificateId).toEqual('cert_id_1');
+    expect(offering.title).toEqual('Math Assessment');
+    expect(offering.attemptStatus).toEqual('Not_Attempted');
+  });
+
+  it('should correctly create an instance from a backend dictionary', () => {
+    const offering =
+      AvailableCertificateAssessmentOfferingData.createFromBackendDict(
+        backendDict
+      );
+
+    expect(offering.certificateId).toEqual('cert_id_1');
+    expect(offering.title).toEqual('Math Assessment');
+    expect(offering.attemptStatus).toEqual('Not_Attempted');
+  });
+});
 
 describe('Certificate Assessment Offering Data Model', () => {
   let backendDict: CertificateAssessmentOfferingBackendDict;

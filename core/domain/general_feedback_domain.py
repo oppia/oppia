@@ -59,7 +59,29 @@ class LessonFeedbackDict(TypedDict):
     """Dict representation of a LessonFeedback domain object."""
 
     id: str
-    author_id: Optional[str]
+    feedback_text: str
+    status: str
+    lesson_metadata: LessonMetadataDict
+    parent_feedback_id: Optional[str]
+    response_list: List[LessonFeedbackResponseDict]
+    unread_response_count: int
+    created_on_msecs: float
+
+
+class LessonFeedbackSummaryDict(TypedDict):
+    """Lightweight dict representation of a LessonFeedback."""
+
+    id: str
+    feedback_text_preview: str
+    status: str
+    source: str
+    unread_response_count: int
+
+
+class LearnerLessonFeedbackDetailDict(TypedDict):
+    """Learner-facing dict representation of a LessonFeedback."""
+
+    id: str
     feedback_text: str
     status: str
     lesson_metadata: LessonMetadataDict
@@ -123,13 +145,20 @@ class PlatformFeedbackSummaryDict(TypedDict):
     category: Optional[str]
 
 
-class PlatformFeedbackListRequestDict(TypedDict):
-    """Normalized payload for PlatformFeedbackListHandler GET."""
+class GeneralFeedbackListRequestDict(TypedDict):
+    """Normalized payload for LessonFeedbackListHandler and PlatformFeedbackListHandler GET."""
 
-    status: str
+    status: Optional[str]
     cursor: Optional[str]
     date_from_msecs: Optional[float]
     date_to_msecs: Optional[float]
+
+
+class LessonFeedbackUpdatePayloadDict(TypedDict):
+    """Normalized payload for LessonFeedbackDetailHandler POST."""
+
+    status: str
+    reply_text: Optional[str]
 
 
 class LessonFeedback:
@@ -186,7 +215,42 @@ class LessonFeedback:
         """
         return {
             'id': self.id,
-            'author_id': self.author_id,
+            'feedback_text': self.feedback_text,
+            'status': self.status,
+            'lesson_metadata': self.lesson_metadata,
+            'parent_feedback_id': self.parent_feedback_id,
+            'response_list': self.response_list,
+            'unread_response_count': self.unread_response_count,
+            'created_on_msecs': self.created_on_msecs,
+        }
+
+    def to_summary_dict(self) -> LessonFeedbackSummaryDict:
+        """Returns a lightweight summary dict for use in list views.
+
+        Returns:
+            LessonFeedbackSummaryDict. A summary dict representation of the
+            object.
+        """
+        feedback_text_preview = self.feedback_text
+        if len(feedback_text_preview) > 100:
+            feedback_text_preview = feedback_text_preview[:97] + '...'
+        return {
+            'id': self.id,
+            'feedback_text_preview': feedback_text_preview,
+            'status': self.status,
+            'source': feconf.SOURCE_LESSON,
+            'unread_response_count': self.unread_response_count,
+        }
+
+    def to_learner_dict(self) -> LearnerLessonFeedbackDetailDict:
+        """Returns the learner-facing dict representation of this feedback.
+
+        Returns:
+            LearnerLessonFeedbackDetailDict. A dict representation that omits
+            internal author fields.
+        """
+        return {
+            'id': self.id,
             'feedback_text': self.feedback_text,
             'status': self.status,
             'lesson_metadata': self.lesson_metadata,
