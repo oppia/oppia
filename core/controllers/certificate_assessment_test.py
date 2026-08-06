@@ -475,6 +475,20 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
             'Not Attempted',
         )
 
+    def test_get_raises_not_logged_in_when_user_id_is_missing(self) -> None:
+        handler = certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.__new__(
+            certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler
+        )
+        handler.user_id = None
+
+        with self.assertRaisesRegex(
+            certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.NotLoggedInException,
+            '^$',
+        ):
+            certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.get.__wrapped__(
+                handler, self.classroom_url_fragment
+            )
+
 
 class StartCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
     """Tests class for StartCertificateAssessmentHandler."""

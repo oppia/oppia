@@ -475,6 +475,77 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
         self.assertEqual(offerings, [])
 
+    def test_get_certificate_offerings_for_classroom_empty_offerings(
+        self,
+    ) -> None:
+        offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            self.classroom_url_fragment, 'learner_id_1'
+        )
+        self.assertEqual(offerings, [])
+
+    def test_get_certificate_offerings_for_classroom_uses_version_data_and_ignores_unrelated_attempts(
+        self,
+    ) -> None:
+        offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Fallback',
+            description='desc',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Skill'],
+            async_status='Available',
+        )
+        started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
+
+        def _new_attempt_model(
+            certificate_id: str, total_score: float, finished_minutes: int
+        ) -> mock.Mock:
+            attempt_model = mock.Mock()
+            attempt_model.certificate_id = None
+            attempt_model.version_data = {
+                'certificate_id': certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {self.topic_id: 1},
+                'question_versions': {'question_id_1': 1},
+                'question_topic_links': {'question_id_1': [self.topic_id]},
+            }
+            attempt_model.attempt_index = 1
+            attempt_model.finished_at = started_at + datetime.timedelta(
+                minutes=finished_minutes
+            )
+            attempt_model.total_score = total_score
+            return attempt_model
+
+        latest_attempt = _new_attempt_model(offering.certificate_id, 90.0, 20)
+        unrelated_attempt = _new_attempt_model(
+            'unrelated_certificate_id', 95.0, 25
+        )
+        older_attempt = _new_attempt_model(offering.certificate_id, 70.0, 5)
+
+        with mock.patch.object(
+            gae_models.CertificateAssessmentAttemptModel,
+            'query',
+            return_value=mock.Mock(
+                fetch=mock.Mock(
+                    return_value=[
+                        latest_attempt,
+                        unrelated_attempt,
+                        older_attempt,
+                    ]
+                )
+            ),
+        ):
+            offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+                self.classroom_url_fragment, 'learner_id_1'
+            )
+
+        self.assertEqual(len(offerings), 1)
+        self.assertEqual(
+            offerings[0]['certificate_id'], offering.certificate_id
+        )
+        self.assertEqual(offerings[0]['attempt_status'], 'Passed')
+
 
 class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
     """Tests for validate_certificate_assessment_offering."""
@@ -1315,4 +1386,68 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             topic_errors[CERTIFICATE_DIFFICULTY_EASY]['required'], 1
+        )
+
+    def test_validation_returns_valid_when_questions_satisfy_all_buckets(
+        self,
+    ) -> None:
+        topic = mock.Mock()
+        topic.name = 'Mock Topic'
+        topic.get_all_skill_ids.return_value = [
+            'skill_easy',
+            'skill_medium',
+            'skill_hard',
+        ]
+        skill = mock.Mock()
+        skill.description = 'Skill description'
+
+        question_links = [
+            mock.Mock(question_id='easy_1', skill_difficulty=0.3),
+            mock.Mock(question_id='medium_1', skill_difficulty=0.6),
+            mock.Mock(question_id='hard_1', skill_difficulty=0.9),
+        ]
+
+        with mock.patch.object(
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[topic],
+        ), mock.patch.object(
+            skill_models.SkillModel,
+            'get_multi',
+            return_value=[mock.Mock(), mock.Mock(), mock.Mock()],
+        ), mock.patch.object(
+            skill_fetchers,
+            'get_skill_from_model',
+            return_value=skill,
+        ), mock.patch.object(
+            question_services,
+            'get_question_skill_links_of_skill',
+            return_value=question_links,
+        ):
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=[self.topic_id],
+                total_questions=3,
+            )
+
+        self.assertTrue(result['is_valid'])
+        self.assertEqual(
+            result['validation_message'], 'Certificate assessment is valid.'
+        )
+
+    def test_validation_handles_missing_topic_object(self) -> None:
+        with mock.patch.object(
+            certificate_assessment_services,
+            '_get_topic_name_to_question_ids_map',
+            return_value=({'topic_1': []}, [None]),
+        ):
+            result = certificate_assessment_services.validate_certificate_assessment_offering(
+                topic_ids=['topic_1'],
+                total_questions=3,
+            )
+
+        self.assertFalse(result['is_valid'])
+        self.assertIn(
+            'topic_1 does not have enough questions in every difficulty '
+            'bucket.',
+            result['validation_message'],
         )
