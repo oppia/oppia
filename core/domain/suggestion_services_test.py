@@ -479,7 +479,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id,
                 exp.version,
-                'author_2',
+                self.normal_user_id,
                 change_dict,
                 'test description',
             )

@@ -1242,7 +1242,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
     def test_get_blog_post_summaries_with_no_query(self) -> None:
         # An empty query should return all published blog posts.
-        blog_post_ids, search_offset = (
+        (blog_post_ids, search_offset) = (
             blog_services.get_blog_post_ids_matching_query(
                 '',
                 [],
@@ -1383,7 +1383,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             found_blog_post_ids = []
 
             # Page 1: 2 initial blog posts.
-            blog_post_ids, search_offset = (
+            (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
                     [],
@@ -1395,7 +1395,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             found_blog_post_ids += blog_post_ids
 
             # Page 2: 2 more blog posts.
-            blog_post_ids, search_offset = (
+            (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
                     [],
@@ -1408,7 +1408,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             found_blog_post_ids += blog_post_ids
 
             # Page 3: 2 final blog posts.
-            blog_post_ids, search_offset = (
+            (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
                     [],
@@ -1458,7 +1458,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             blog_services.delete_blog_post(self.all_blog_post_ids[1])
 
         with logging_swap, search_results_page_size_swap, max_iterations_swap:
-            blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
+            (blog_post_ids, _) = blog_services.get_blog_post_ids_matching_query(
                 '',
                 [],
                 feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,

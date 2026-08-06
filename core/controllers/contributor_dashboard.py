@@ -24,13 +24,10 @@ from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
-    exp_domain,
     exp_fetchers,
     feature_flag_services,
     opportunity_domain,
     opportunity_services,
-    skill_domain,
-    skill_fetchers,
     suggestion_registry,
     suggestion_services,
     topic_fetchers,
@@ -677,15 +674,9 @@ class TranslatableContentsHandlerV2(
         entity_id = self.normalized_request['entity_id']
         language_code = self.normalized_request['language_code']
 
-        domain_object: Optional[
-            Union[exp_domain.Exploration, skill_domain.Skill]
-        ] = None
+        domain_object = None
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             domain_object = exp_fetchers.get_exploration_by_id(
-                entity_id, strict=False
-            )
-        elif entity_type == feconf.ENTITY_TYPE_SKILL:
-            domain_object = skill_fetchers.get_skill_by_id(
                 entity_id, strict=False
             )
         else:
@@ -729,7 +720,6 @@ class TranslatableContentsHandlerV2(
 
         content_id_to_grouping_key = {}
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            assert isinstance(domain_object, exp_domain.Exploration)
             for state_name, state in domain_object.states.items():
                 translatable_contents_collection = (
                     state.get_translatable_contents_collection()
@@ -1327,7 +1317,7 @@ class TranslationPreferenceHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
-        self.render_json(
+        return self.render_json(
             {
                 'preferred_translation_language_code': (
                     user_settings.preferred_translation_language_code

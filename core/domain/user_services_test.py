@@ -55,7 +55,7 @@ if MYPY:  # pragma: no cover
     )
 
 datastore_services = models.Registry.import_datastore_services()
-auth_models, user_models, audit_models, suggestion_models = (
+(auth_models, user_models, audit_models, suggestion_models) = (
     models.Registry.import_models(
         [
             models.Names.AUTH,
@@ -2616,7 +2616,8 @@ class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = 'exp_id0'
 
-    SAMPLE_EXPLORATION_YAML: Final = """
+    SAMPLE_EXPLORATION_YAML: Final = (
+        """
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -2777,6 +2778,7 @@ states_schema_version: 42
 tags: []
 title: Title
 """
+    )
 
     def setUp(self) -> None:
         super().setUp()
