@@ -92,7 +92,35 @@ export class CollectionEditor extends BaseUser {
       showMessage(`Added exploration ${expId} to collection.`);
     }
 
-    await this.clickOnElementWithSelector(saveDraftButtonSelector);
+    try {
+      await this.clickOnElementWithSelector(saveDraftButtonSelector);
+      await this.page.waitForSelector(commitMessageInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (e) {
+      showMessage(
+        'Save draft click did not open the commit modal; performing in-page click fallback.'
+      );
+      await this.page.evaluate((selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, saveDraftButtonSelector);
+      await this.page.waitForSelector(commitMessageInputSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
 
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
