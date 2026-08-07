@@ -700,3 +700,12 @@ indexes:
   - name: status
   - name: created_on
     direction: desc
+
+- kind: PlatformFeedbackModel
+  properties:
+  - name: deleted
+  - name: destination_dashboard
+  - name: exploration_id
+  - name: status
+  - name: created_on
+    direction: desc

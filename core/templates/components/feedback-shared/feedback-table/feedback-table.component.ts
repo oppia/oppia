@@ -30,6 +30,7 @@ import type {
   PlatformFeedbackSummary,
   FeedbackCardConfig,
   LessonFeedbackSummary,
+  ReportAnIssueCategory,
 } from 'domain/feedback/feedback.model';
 import './feedback-table.component.css';
 
@@ -40,9 +41,9 @@ import './feedback-table.component.css';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackTableComponent {
-  @Input() feedbackSummaries:
-    | LessonFeedbackSummary[]
-    | PlatformFeedbackSummary[] = [];
+  @Input() feedbackSummaries: Array<
+    LessonFeedbackSummary | PlatformFeedbackSummary
+  > = [];
   @Input() currentPage = 1;
   @Input() feedbackCardConfig!: FeedbackCardConfig;
   @Input() moreFeedbackAvailable = false;
@@ -73,7 +74,7 @@ export class FeedbackTableComponent {
 
   getFeedbackCategory(
     feedback: PlatformFeedbackSummary | LessonFeedbackSummary
-  ): string | null {
+  ): ReportAnIssueCategory | null {
     if ('category' in feedback) {
       return feedback.category;
     }
