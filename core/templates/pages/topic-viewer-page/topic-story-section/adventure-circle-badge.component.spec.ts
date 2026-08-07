@@ -44,6 +44,7 @@ describe('AdventureCircleBadgeComponent', () => {
     expect(component.borderColor).toBe('#7f8c8d');
     expect(component.textColor).toBe('#334155');
     expect(component.size).toBe('md');
+    expect(component.title).toBe('');
   });
 
   it('should return default class when size is md', () => {
@@ -84,5 +85,41 @@ describe('AdventureCircleBadgeComponent', () => {
     expect(component.circleClass).toBe(
       'adventure-circle-badge adventure-circle-badge--sm'
     );
+  });
+
+  it('should use the explicit title for the tooltip', () => {
+    component.title = 'Go to lesson 1';
+    component.label = '1';
+    component.iconName = '';
+    fixture.detectChanges();
+
+    const badgeElement = fixture.nativeElement.querySelector(
+      '.adventure-circle-badge'
+    );
+    expect(badgeElement.getAttribute('title')).toBe('Go to lesson 1');
+  });
+
+  it('should fall back to the label for the tooltip when no title is provided', () => {
+    component.title = '';
+    component.label = '1';
+    component.iconName = '';
+    fixture.detectChanges();
+
+    const badgeElement = fixture.nativeElement.querySelector(
+      '.adventure-circle-badge'
+    );
+    expect(badgeElement.getAttribute('title')).toBe('1');
+  });
+
+  it('should fall back to the icon name for the tooltip when no title or label is provided', () => {
+    component.title = '';
+    component.label = '';
+    component.iconName = 'done';
+    fixture.detectChanges();
+
+    const badgeElement = fixture.nativeElement.querySelector(
+      '.adventure-circle-badge'
+    );
+    expect(badgeElement.getAttribute('title')).toBe('done');
   });
 });

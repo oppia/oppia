@@ -474,8 +474,10 @@ topic-mastery-challenge-card {
 .arc-skip-confirmation-modal {
   background: #fff;
   border-radius: 10px;
+  max-height: calc(100vh - 32px);
   max-width: 560px;
   min-height: 0;
+  overflow-y: auto;
   padding: 24px 24px 20px;
   position: relative;
   width: min(560px, calc(100vw - 32px));
@@ -637,8 +639,10 @@ topic-mastery-challenge-card {
   background: #fff;
   border: 1px solid #edf1f7;
   border-radius: 16px;
+  max-height: calc(100vh - 32px);
   max-width: 620px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 22px 28px 24px;
   position: relative;
   text-align: center;

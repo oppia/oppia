@@ -39,13 +39,13 @@
                                       [borderColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
                                       [textColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
-                                      (click)="onPracticeClick(adventureIdx)"
+                                      (click)="onPracticeClick(adventureGroup.arcId)"
                                       [attr.aria-label]="'Go to practice'"
                                       title="Go to practice"
                                       role="button"
                                       tabindex="0"
-                                      (keydown.enter)="onPracticeClick(adventureIdx)"
-                                      (keydown.space)="onPracticeClick(adventureIdx); $event.preventDefault()">
+                                      (keydown.enter)="onPracticeClick(adventureGroup.arcId)"
+                                      (keydown.space)="onPracticeClick(adventureGroup.arcId); $event.preventDefault()">
         </topic-adventure-circle-badge>
       </div>
 

@@ -84,6 +84,36 @@ describe('MasteryChallengeCardComponent', () => {
     expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
   });
 
+  it('should not navigate when the default action URL placeholder is used', () => {
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.actionUrl = '#';
+    component.isUnlocked = true;
+
+    component.onChallengeButtonClick();
+
+    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+  });
+
+  it('should report that the default placeholder is not an action URL', () => {
+    expect(component.actionUrl).toBe('#');
+    expect(component.hasActionUrl()).toBeFalse();
+    component.actionUrl = '';
+    expect(component.hasActionUrl()).toBeFalse();
+    component.actionUrl = '/practice/session/1';
+    expect(component.hasActionUrl()).toBeTrue();
+  });
+
+  it('should disable the button when unlocked with only the default placeholder URL', () => {
+    component.isUnlocked = true;
+    component.actionUrl = '#';
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector(
+      '.mastery-challenge-button'
+    );
+    expect(button.disabled).toBeTrue();
+  });
+
   it('should show helper tooltip for 5 seconds for a locked challenge', fakeAsync(() => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.actionUrl = '/practice/session/1';

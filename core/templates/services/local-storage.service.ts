@@ -458,6 +458,27 @@ export class LocalStorageService {
   }
 
   /**
+   * Parse the stored skipped adventures dict, falling back to an empty dict if
+   * the stored value is not valid JSON.
+   * @returns The stored skipped adventures dict, or an empty dict.
+   */
+  private parseSkippedAdventuresDict(): {[storyId: string]: number[]} {
+    const stringifiedSkippedAdventures = (this.storage as Storage).getItem(
+      this.SKIPPED_ADVENTURES_KEY
+    );
+    if (!stringifiedSkippedAdventures) {
+      return {};
+    }
+    try {
+      return JSON.parse(stringifiedSkippedAdventures) as {
+        [storyId: string]: number[];
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  /**
    * Save the given skipped adventure indices for a story to localStorage.
    * @param storyId The id of the story the skipped adventures belong to.
    * @param skippedAdventureIndices The indices of the skipped adventures.
@@ -467,15 +488,7 @@ export class LocalStorageService {
     skippedAdventureIndices: number[]
   ): void {
     if (this.isStorageAvailable()) {
-      let skippedAdventuresDict: {[storyId: string]: number[]} = {};
-
-      const stringifiedSkippedAdventures = (this.storage as Storage).getItem(
-        this.SKIPPED_ADVENTURES_KEY
-      );
-      if (stringifiedSkippedAdventures) {
-        skippedAdventuresDict = JSON.parse(stringifiedSkippedAdventures);
-      }
-
+      const skippedAdventuresDict = this.parseSkippedAdventuresDict();
       skippedAdventuresDict[storyId] = skippedAdventureIndices;
       (this.storage as Storage).setItem(
         this.SKIPPED_ADVENTURES_KEY,
@@ -492,15 +505,9 @@ export class LocalStorageService {
    */
   getSkippedAdventures(storyId: string): number[] {
     if (this.isStorageAvailable()) {
-      const stringifiedSkippedAdventures = (this.storage as Storage).getItem(
-        this.SKIPPED_ADVENTURES_KEY
-      );
-      if (stringifiedSkippedAdventures) {
-        const skippedAdventuresDict = JSON.parse(stringifiedSkippedAdventures);
-        const skippedAdventures = skippedAdventuresDict[storyId];
-        if (Array.isArray(skippedAdventures)) {
-          return skippedAdventures;
-        }
+      const skippedAdventures = this.parseSkippedAdventuresDict()[storyId];
+      if (Array.isArray(skippedAdventures)) {
+        return skippedAdventures;
       }
     }
     return [];

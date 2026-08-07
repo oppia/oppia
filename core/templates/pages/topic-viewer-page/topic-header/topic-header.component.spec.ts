@@ -147,6 +147,40 @@ describe('TopicHeaderComponent', () => {
     expect(component.topicUrlFragment).toBe('');
   });
 
+  it('should derive the topic URL fragment on /explore paths', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+    urlService.getPathname.and.returnValue('/explore/place-values');
+    urlService.getClassroomUrlFragmentFromLearnerUrl.calls.reset();
+    urlService.getTopicUrlFragmentFromLearnerUrl.calls.reset();
+
+    component.ngOnInit();
+
+    expect(
+      urlService.getClassroomUrlFragmentFromLearnerUrl
+    ).not.toHaveBeenCalled();
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(component.classroomUrlFragment).toBe('');
+    expect(component.topicUrlFragment).toBe('place-values');
+  });
+
+  it('should derive the topic URL fragment on /lesson paths', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+    urlService.getPathname.and.returnValue('/lesson/place-values');
+    urlService.getClassroomUrlFragmentFromLearnerUrl.calls.reset();
+    urlService.getTopicUrlFragmentFromLearnerUrl.calls.reset();
+
+    component.ngOnInit();
+
+    expect(
+      urlService.getClassroomUrlFragmentFromLearnerUrl
+    ).not.toHaveBeenCalled();
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(component.classroomUrlFragment).toBe('');
+    expect(component.topicUrlFragment).toBe('place-values');
+  });
+
   it('should delegate RTL detection to I18nLanguageCodeService', () => {
     expect(component.isLanguageRTL()).toBeFalse();
     (

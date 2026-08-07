@@ -45,7 +45,7 @@
                   [class.topic-lesson-card-completed-label-compact]="!isExpanded && isCompletedLesson"
                   *ngIf="isCompletedLesson">
               <i class="material-icons" aria-hidden="true">check_circle</i>
-              Completed
+              {{ 'I18N_TOPIC_VIEWER_LESSON_COMPLETED_LABEL' | translate }}
             </span>
           </div>
           <p class="topic-lesson-card-description" *ngIf="isExpanded || isComingSoonSectionCard">
@@ -58,7 +58,7 @@
                 [disabled]="isComingSoonLesson || !startUrl"
                 (click)="onPlayAgainClick($event)">
           <i class="material-icons" aria-hidden="true">replay</i>
-          Play Again
+          {{ 'I18N_TOPIC_VIEWER_LESSON_PLAY_AGAIN_BUTTON' | translate }}
         </button>
         <button class="topic-lesson-card-chevron-badge"
                 type="button"

@@ -461,8 +461,8 @@ class PracticeSessionAccessValidationPage(
             raise self.NotFoundException(
                 'Arc with id %s is not part of this topic.' % arc_id
             )
-        valid_indices = {arc.id.replace('arc_', '') for arc in all_arcs}
-        if arc_id not in valid_indices:
+        valid_arc_ids = {arc.id for arc in all_arcs}
+        if arc_id not in valid_arc_ids:
             raise self.NotFoundException(
                 'Arc with id %s is not part of this topic.' % arc_id
             )

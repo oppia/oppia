@@ -49,9 +49,13 @@ export class MasteryChallengeCardComponent implements OnDestroy {
   }
 
   navigateToAction(): void {
-    if (this.actionUrl) {
+    if (this.hasActionUrl()) {
       this.windowRef.nativeWindow.location.assign(this.actionUrl);
     }
+  }
+
+  hasActionUrl(): boolean {
+    return this.actionUrl !== '' && this.actionUrl !== '#';
   }
 
   private showHelperTooltip(): void {

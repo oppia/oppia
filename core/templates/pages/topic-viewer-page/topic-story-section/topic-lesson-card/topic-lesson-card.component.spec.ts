@@ -793,10 +793,10 @@ describe('TopicLessonCardComponent', () => {
     spyOn(component, 'onStartButtonClick');
     component.startUrl = '/explore/123';
     component.isExpanded = true;
-    const event = {
-      preventDefault: jasmine.createSpy('preventDefault'),
-      stopPropagation: jasmine.createSpy('stopPropagation'),
-    } as unknown as Event;
+    const event = jasmine.createSpyObj<Event>('Event', [
+      'preventDefault',
+      'stopPropagation',
+    ]);
 
     component.onPlayAgainClick(event);
 

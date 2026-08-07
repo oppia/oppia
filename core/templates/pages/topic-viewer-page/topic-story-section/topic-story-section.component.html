@@ -45,20 +45,20 @@
         <div *ngFor="let adventureGroup of visibleAdventureGroups; index as adventureIdx">
           <div *ngIf="isAdventureSkipped(adventureIdx) && !isAdventureExpanded(adventureIdx)"
                class="skipped-adventure-card"
-               [attr.aria-label]="adventureGroup.adventureTitle + ' was skipped. Expand to review.'">
+               [attr.aria-label]="'I18N_TOPIC_VIEWER_SKIPPED_ADVENTURE_ARIA_LABEL' | translate: {adventureTitle: adventureGroup.adventureTitle}">
             <div class="skipped-adventure-header-row">
               <div class="skipped-adventure-left-cluster">
                 <div class="skipped-adventure-icon" aria-hidden="true">
                   <i class="material-icons">fast_forward</i>
                 </div>
                 <h4 class="skipped-adventure-name">{{ adventureGroup.adventureTitle }}</h4>
-                <span class="skipped-adventure-badge">SKIPPED</span>
+                <span class="skipped-adventure-badge">{{ 'I18N_TOPIC_VIEWER_SKIPPED_ADVENTURE_BADGE' | translate }}</span>
               </div>
             </div>
 
             <div class="skipped-adventure-body-row">
               <p class="skipped-adventure-message">
-                This adventure was skipped. You can revisit it anytime.
+                {{ 'I18N_TOPIC_VIEWER_SKIPPED_ADVENTURE_MESSAGE' | translate }}
               </p>
               <button type="button"
                       class="skipped-adventure-start-cta"
@@ -121,7 +121,7 @@
               </div>
 
               <div class="story-practice-card-wrapper"
-                   [id]="'practice-card-' + adventureIdx"
+                   [id]="'practice-card-' + adventureGroup.arcId"
                    *ngIf="shouldShowAdventureEndTestCard(adventureIdx)">
                 <topic-adventure-end-test-card
                   [practiceTitle]="practiceCard.practiceTitle"
@@ -182,15 +182,15 @@
       <section
                class="coming-soon-chapters-section e2e-test-coming-soon-chapters"
                *ngIf="comingSoonLessonCards.length > 0"
-               [attr.aria-label]="'Coming soon chapters'">
+               [attr.aria-label]="'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS_ARIA_LABEL' | translate">
         <div class="coming-soon-chapters-header">
           <div class="coming-soon-chapters-icon" aria-hidden="true">
             <i class="material-icons">schedule</i>
           </div>
           <div class="coming-soon-chapters-heading-text">
-            <h4 class="coming-soon-chapters-title">COMING SOON CHAPTERS</h4>
+            <h4 class="coming-soon-chapters-title">{{ 'I18N_TOPIC_VIEWER_COMING_SOON_CHAPTERS_HEADING' | translate }}</h4>
             <p class="coming-soon-chapters-count">
-              {{ comingSoonLessonCards.length }} chapter{{ comingSoonLessonCards.length === 1 ? '' : 's' }}
+              {{ 'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count: comingSoonLessonCards.length, messageFormat: true} }}
             </p>
           </div>
         </div>
@@ -237,10 +237,13 @@
            role="dialog"
            aria-modal="true"
            aria-labelledby="arc-skip-confirmation-title"
+           tabindex="-1"
+           #arcSkipConfirmationDialog
+           (keydown.tab)="onDialogTab($event)"
            (click)="$event.stopPropagation()">
     <button type="button"
             class="arc-skip-confirmation-close"
-            aria-label="Close"
+            [attr.aria-label]="'I18N_TOPIC_VIEWER_CLOSE_BUTTON' | translate"
             (click)="onArcSkipConfirmationCancel()">
       <i class="material-icons" aria-hidden="true">close</i>
     </button>
@@ -255,7 +258,7 @@
     </div>
 
     <h3 id="arc-skip-confirmation-title" class="arc-skip-confirmation-title">
-      Skip to {{ pendingArcSkipTargetLabel }}?
+      {{ 'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_TITLE' | translate: {adventureLabel: pendingArcSkipTargetLabel} }}
     </h3>
     <p class="arc-skip-confirmation-message">
       {{ getArcSkipConfirmationMessage() }}
@@ -267,12 +270,12 @@
       <button type="button"
               class="arc-skip-confirmation-cancel"
               (click)="onArcSkipConfirmationCancel()">
-        Cancel
+        {{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}
       </button>
       <button type="button"
               class="arc-skip-confirmation-proceed"
               (click)="onArcSkipConfirmationProceed()">
-        Continue
+        {{ 'I18N_MODAL_CONTINUE_BUTTON' | translate }}
       </button>
     </div>
   </section>
@@ -284,7 +287,10 @@
   <section class="adventure-mastered-modal"
            role="dialog"
            aria-modal="true"
-           aria-labelledby="adventure-mastered-title">
+           aria-labelledby="adventure-mastered-title"
+           tabindex="-1"
+           #adventureMasteredDialog
+           (keydown.tab)="onDialogTab($event)">
     <div class="adventure-mastered-confetti" aria-hidden="true">
       <span class="adventure-mastered-confetti-piece piece-1"></span>
       <span class="adventure-mastered-confetti-piece piece-2"></span>
@@ -313,7 +319,7 @@
     <button type="button"
             class="adventure-mastered-continue"
             (click)="onAdventureMasteredContinue()">
-      Continue to Topic
+      {{ 'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_CONTINUE_BUTTON' | translate }}
     </button>
   </section>
 </div>

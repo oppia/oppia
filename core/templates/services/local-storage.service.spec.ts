@@ -393,5 +393,29 @@ describe('LocalStorageService', () => {
 
       expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
     });
+
+    it('should handle corrupt skipped adventures data in storage', () => {
+      localStorage.setItem(
+        localStorageService.SKIPPED_ADVENTURES_KEY,
+        '{invalid json'
+      );
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([]);
+
+      localStorageService.updateSkippedAdventures('story_1', [0, 1]);
+
+      expect(localStorageService.getSkippedAdventures('story_1')).toEqual([
+        0, 1,
+      ]);
+    });
+
+    it('should return an empty list when the stored value is not an array', () => {
+      (localStorageService.storage as Storage).setItem(
+        localStorageService.SKIPPED_ADVENTURES_KEY,
+        JSON.stringify({story_4: 'not-an-array'})
+      );
+
+      expect(localStorageService.getSkippedAdventures('story_4')).toEqual([]);
+    });
   });
 });

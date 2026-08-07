@@ -18,13 +18,17 @@
 
 import {
   Component,
+  ElementRef,
+  HostListener,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import {Subscription} from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
 
 import {AppConstants} from 'app.constants';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
@@ -45,6 +49,7 @@ import constants from 'assets/constants';
 import './topic-story-section.component.css';
 
 import {AdventureNavigationLessonSelection} from './adventure-navigation.component';
+import {LessonProgressStatus} from './topic-lesson-card/topic-lesson-card.component';
 
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
@@ -60,11 +65,7 @@ interface LessonCardData {
   startUrl: string;
   practiceUrl: string;
   nodeId: string;
-  lessonProgressStatus:
-    | 'not_started'
-    | 'in_progress'
-    | 'completed'
-    | 'coming_soon';
+  lessonProgressStatus: LessonProgressStatus;
   totalCheckpointsCount: number;
   visitedCheckpointsCount: number;
   isComingSoon: boolean;
@@ -102,6 +103,7 @@ interface AdventureNavigationGroupData {
   accentColor: string;
   showPractice: boolean;
   isPracticeCompleted: boolean;
+  arcId: string;
 }
 
 @Component({
@@ -151,6 +153,13 @@ export class TopicStorySectionComponent
   private pendingNavigationLessonNumber: number | null = null;
   private pendingNavigationAdventureIndex: number | null = null;
   private completedAdventurePracticeArcIds: Set<string> = new Set();
+  private hasHandledArcMasteredQueryParams: boolean = false;
+  private modalFocusRestoreElement: HTMLElement | null = null;
+
+  @ViewChild('arcSkipConfirmationDialog')
+  arcSkipConfirmationDialog!: ElementRef<HTMLElement>;
+  @ViewChild('adventureMasteredDialog')
+  adventureMasteredDialog!: ElementRef<HTMLElement>;
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -173,15 +182,18 @@ export class TopicStorySectionComponent
     selection: AdventureNavigationLessonSelection
   ): void {
     const lessonNumber = selection.lessonNumber;
-    const adventureIndex = this.visibleAdventureGroups.findIndex(group =>
-      group.lessonCards.some(card => card.lessonNumber === lessonNumber)
-    );
+    const adventureIndex = selection.adventureIndex;
 
     if (adventureIndex !== -1 && this.shouldConfirmArcSkip(adventureIndex)) {
       this.pendingNavigationLessonNumber = lessonNumber;
       this.pendingNavigationAdventureIndex = adventureIndex;
-      this.pendingArcSkipTargetLabel = `Adventure ${adventureIndex + 1}`;
+      this.pendingArcSkipTargetLabel = this.translateService.instant(
+        'I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL',
+        {adventureNumber: adventureIndex + 1}
+      );
+      this.captureModalFocus();
       this.showArcSkipConfirmationModal = true;
+      this.focusActiveModalDialog();
       return;
     }
 
@@ -193,6 +205,7 @@ export class TopicStorySectionComponent
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
+    this.restoreModalFocus();
   }
 
   onArcSkipConfirmationProceed(): void {
@@ -213,6 +226,7 @@ export class TopicStorySectionComponent
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
+    this.restoreModalFocus();
   }
 
   onAdventureMasteredContinue(): void {
@@ -232,29 +246,120 @@ export class TopicStorySectionComponent
     }
     this.showAdventureMasteredModal = false;
     this.masteredAdventureIndex = null;
+    this.hasHandledArcMasteredQueryParams = true;
+    this.restoreModalFocus();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Escape') {
+      return;
+    }
+    if (this.showArcSkipConfirmationModal) {
+      this.onArcSkipConfirmationCancel();
+    } else if (this.showAdventureMasteredModal) {
+      this.onAdventureMasteredContinue();
+    }
+  }
+
+  onDialogTab(event: KeyboardEvent): void {
+    const dialogElement = this.showAdventureMasteredModal
+      ? this.adventureMasteredDialog?.nativeElement
+      : this.arcSkipConfirmationDialog?.nativeElement;
+    if (!dialogElement) {
+      return;
+    }
+
+    const focusableElements = this.getFocusableElements(dialogElement);
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+    const activeElement = document.activeElement as HTMLElement | null;
+
+    if (
+      event.shiftKey &&
+      (activeElement === firstFocusable || activeElement === dialogElement)
+    ) {
+      event.preventDefault();
+      lastFocusable.focus();
+    } else if (!event.shiftKey && activeElement === lastFocusable) {
+      event.preventDefault();
+      firstFocusable.focus();
+    }
+  }
+
+  private getFocusableElements(dialogElement: HTMLElement): HTMLElement[] {
+    const focusableSelector = [
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+    return Array.from(
+      dialogElement.querySelectorAll<HTMLElement>(focusableSelector)
+    );
+  }
+
+  private captureModalFocus(): void {
+    this.modalFocusRestoreElement =
+      document.activeElement as HTMLElement | null;
+  }
+
+  private focusActiveModalDialog(): void {
+    // Defer focus so Angular has rendered the dialog into the DOM.
+    setTimeout(() => {
+      const dialogElement = this.showAdventureMasteredModal
+        ? this.adventureMasteredDialog?.nativeElement
+        : this.arcSkipConfirmationDialog?.nativeElement;
+      if (dialogElement) {
+        dialogElement.focus();
+      }
+    }, 0);
+  }
+
+  private restoreModalFocus(): void {
+    if (this.modalFocusRestoreElement) {
+      this.modalFocusRestoreElement.focus();
+    }
+    this.modalFocusRestoreElement = null;
   }
 
   getAdventureMasteredTitle(): string {
     if (this.masteredAdventureIndex === null) {
-      return 'Adventure Mastered!';
+      return this.translateService.instant(
+        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_TITLE'
+      );
     }
-    return `Adventure ${this.masteredAdventureIndex + 1} Mastered!`;
+    return this.translateService.instant(
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE',
+      {adventureNumber: this.masteredAdventureIndex + 1}
+    );
   }
 
   getAdventureMasteredSubtitle(): string {
     if (this.masteredAdventureIndex === null) {
-      return 'Keep the momentum going!';
+      return this.translateService.instant(
+        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE'
+      );
     }
 
     const unlockedAdventureNumber = this.masteredAdventureIndex + 2;
     if (unlockedAdventureNumber <= this.visibleAdventureGroups.length) {
-      return (
-        `You've unlocked Adventure ${unlockedAdventureNumber}. ` +
-        'Keep the momentum going!'
+      return this.translateService.instant(
+        'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE',
+        {adventureNumber: unlockedAdventureNumber}
       );
     }
 
-    return "You've mastered all available adventures. Keep the momentum going!";
+    return this.translateService.instant(
+      'I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE'
+    );
   }
 
   getArcSkipConfirmationMessage(): string {
@@ -273,16 +378,13 @@ export class TopicStorySectionComponent
       return '';
     }
 
-    const noun =
-      skippedAdventureNumbers.length === 1 ? 'Adventure' : 'Adventures';
-    const pronoun = skippedAdventureNumbers.length === 1 ? 'it' : 'them';
-    return (
-      noun +
-      ' ' +
-      this.joinAdventureNumbers(skippedAdventureNumbers) +
-      ' will be marked as skipped, but you can return to ' +
-      pronoun +
-      ' at any time.'
+    return this.translateService.instant(
+      'I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE',
+      {
+        count: skippedAdventureNumbers.length,
+        adventureNumbers: this.joinAdventureNumbers(skippedAdventureNumbers),
+        messageFormat: true,
+      }
     );
   }
 
@@ -305,13 +407,21 @@ export class TopicStorySectionComponent
   getSkippedAdventureButtonLabel(adventureIndex: number): string {
     const adventureGroup = this.visibleAdventureGroups[adventureIndex];
     if (!adventureGroup) {
-      return 'Start';
+      return this.translateService.instant(
+        'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+      );
     }
 
     const hasStarted = adventureGroup.lessonCards.some(
       card => card.lessonProgressStatus !== 'not_started'
     );
-    return hasStarted ? 'Resume' : 'Start';
+    return hasStarted
+      ? this.translateService.instant(
+          'I18N_TOPIC_VIEWER_ADVENTURE_RESUME_BUTTON'
+        )
+      : this.translateService.instant(
+          'I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON'
+        );
   }
 
   isAdventureCompleted(adventureIndex: number): boolean {
@@ -414,10 +524,10 @@ export class TopicStorySectionComponent
     );
   }
 
-  onNavigationPracticeSelected(adventureIndex: number): void {
+  onNavigationPracticeSelected(arcId: string): void {
     // Scroll to the practice card of the specific adventure after Angular finishes updating the DOM.
     setTimeout(() => {
-      const el = document.getElementById('practice-card-' + adventureIndex);
+      const el = document.getElementById('practice-card-' + arcId);
       if (el) {
         el.scrollIntoView({behavior: 'smooth', block: 'start'});
       }
@@ -432,7 +542,8 @@ export class TopicStorySectionComponent
     private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -512,9 +623,7 @@ export class TopicStorySectionComponent
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  private getLessonProgressStatus(
-    node: StoryNode
-  ): 'not_started' | 'in_progress' | 'completed' | 'coming_soon' {
+  private getLessonProgressStatus(node: StoryNode): LessonProgressStatus {
     if (this.isChapterDisplayedAsComingSoon(node) || !node.getExplorationId()) {
       return 'coming_soon';
     }
@@ -861,6 +970,7 @@ export class TopicStorySectionComponent
           isPracticeCompleted:
             visibleLessons.length > 0 &&
             this.completedAdventurePracticeArcIds.has(group.arcId),
+          arcId: group.arcId,
         };
       })
       .filter(group => group.lessons.length > 0);
@@ -881,7 +991,10 @@ export class TopicStorySectionComponent
   }
 
   private maybeShowAdventureMasteredModal(): void {
-    if (this.showAdventureMasteredModal) {
+    if (
+      this.showAdventureMasteredModal ||
+      this.hasHandledArcMasteredQueryParams
+    ) {
       return;
     }
 
@@ -915,8 +1028,11 @@ export class TopicStorySectionComponent
     this.completedAdventurePracticeArcIds.add(masteredArcId);
     this.updateVisibleSections();
 
+    this.hasHandledArcMasteredQueryParams = true;
     this.showAdventureMasteredModal = true;
     this.masteredAdventureIndex = adventureIndex;
+    this.captureModalFocus();
+    this.focusActiveModalDialog();
   }
 
   private normalizeArcIdFromQueryValue(rawArcId: string): string | null {

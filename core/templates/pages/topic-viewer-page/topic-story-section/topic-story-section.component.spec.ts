@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 import {SimpleChange} from '@angular/core';
 import {EventEmitter} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -43,6 +44,48 @@ import {LocalStorageService} from 'services/local-storage.service';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
+
+class MockTranslateService {
+  instant(
+    key: string,
+    params: {[key: string]: string | number | boolean} = {}
+  ): string {
+    const translations: {[key: string]: string} = {
+      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_ALL_COMPLETE_SUBTITLE:
+        "You've mastered all available adventures. Keep the momentum going!",
+      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_MOMENTUM_SUBTITLE:
+        'Keep the momentum going!',
+      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_NUMBER_TITLE:
+        'Adventure <[adventureNumber]> Mastered!',
+      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_TITLE: 'Adventure Mastered!',
+      I18N_TOPIC_VIEWER_ADVENTURE_MASTERED_UNLOCKED_SUBTITLE:
+        "You've unlocked Adventure <[adventureNumber]>. Keep the momentum going!",
+      I18N_TOPIC_VIEWER_ADVENTURE_NUMBER_LABEL: 'Adventure <[adventureNumber]>',
+      I18N_TOPIC_VIEWER_ADVENTURE_RESUME_BUTTON: 'Resume',
+      I18N_TOPIC_VIEWER_ADVENTURE_START_BUTTON: 'Start',
+      I18N_TOPIC_VIEWER_ARC_SKIP_CONFIRMATION_MESSAGE:
+        '{count, plural, one{Adventure <[adventureNumbers]> will be marked as skipped, but you can return to it at any time.} other{Adventures <[adventureNumbers]> will be marked as skipped, but you can return to them at any time.}}',
+    };
+
+    let result = translations[key];
+    if (result === undefined) {
+      result = key;
+    }
+
+    if (params.messageFormat === true) {
+      const pluralMatch = result.match(/one\{(.*?)\} other\{(.*?)\}/s);
+      if (pluralMatch) {
+        result = Number(params.count) === 1 ? pluralMatch[1] : pluralMatch[2];
+      }
+    }
+
+    for (const paramName of Object.keys(params)) {
+      result = result.split(`<[${paramName}]>`).join(String(params[paramName]));
+    }
+
+    return result;
+  }
+}
 
 describe('TopicStorySectionComponent', () => {
   let component: TopicStorySectionComponent;
@@ -159,6 +202,10 @@ describe('TopicStorySectionComponent', () => {
         {
           provide: WindowRef,
           useValue: windowRef,
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -2045,11 +2092,11 @@ describe('TopicStorySectionComponent', () => {
       null
     );
 
-    component.onNavigationPracticeSelected(0);
+    component.onNavigationPracticeSelected('1');
 
     tick(300);
 
-    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-0');
+    expect(getElementByIdSpy).toHaveBeenCalledWith('practice-card-1');
   }));
 
   it('should select first not_started lesson as active when no in_progress', () => {
@@ -2322,7 +2369,7 @@ describe('TopicStorySectionComponent', () => {
     spyOn(document, 'getElementById').and.returnValue(mockElement);
     spyOn(mockElement, 'scrollIntoView');
 
-    component.onNavigationPracticeSelected(0);
+    component.onNavigationPracticeSelected('1');
 
     tick(300);
 
@@ -2709,6 +2756,7 @@ describe('TopicStorySectionComponent', () => {
         accentColor: '#27a844',
         showPractice: true,
         isPracticeCompleted: false,
+        arcId: '1',
       },
     ]);
   });
@@ -3443,6 +3491,211 @@ describe('TopicStorySectionComponent', () => {
     component.topicUrlFragment = 'topic';
 
     component.ngOnInit();
+    tick();
+
+    expect(component.showAdventureMasteredModal).toBe(false);
+  }));
+
+  it('should close the arc skip confirmation modal when Escape is pressed', () => {
+    component.showArcSkipConfirmationModal = true;
+    fixture.detectChanges();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
+
+    expect(component.showArcSkipConfirmationModal).toBe(false);
+  });
+
+  it('should close the adventure mastered modal when Escape is pressed', () => {
+    component.showAdventureMasteredModal = true;
+    fixture.detectChanges();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
+
+    expect(component.showAdventureMasteredModal).toBe(false);
+  });
+
+  it('should ignore Escape when no modal is open and ignore non-Escape keys', () => {
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
+    expect(component.showArcSkipConfirmationModal).toBe(false);
+    expect(component.showAdventureMasteredModal).toBe(false);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
+    expect(component.showArcSkipConfirmationModal).toBe(false);
+    expect(component.showAdventureMasteredModal).toBe(false);
+  });
+
+  it('should move focus into the skip confirmation modal and restore it on close', fakeAsync(() => {
+    const triggerElement = document.createElement('button');
+    document.body.appendChild(triggerElement);
+    triggerElement.focus();
+
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'not_started')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+
+    component.onNavigationLessonSelected({lessonNumber: 2, adventureIndex: 1});
+
+    expect(component.showArcSkipConfirmationModal).toBe(true);
+
+    fixture.detectChanges();
+    tick();
+
+    const dialogElement = fixture.nativeElement.querySelector(
+      '.arc-skip-confirmation-modal'
+    );
+    expect(document.activeElement).toBe(dialogElement);
+
+    component.onArcSkipConfirmationCancel();
+
+    expect(document.activeElement).toBe(triggerElement);
+    document.body.removeChild(triggerElement);
+  }));
+
+  it('should trap Tab focus within the skip confirmation modal', () => {
+    component.showArcSkipConfirmationModal = true;
+    fixture.detectChanges();
+
+    const dialogElement = fixture.nativeElement.querySelector(
+      '.arc-skip-confirmation-modal'
+    );
+    const buttons = dialogElement.querySelectorAll('button');
+
+    (buttons[buttons.length - 1] as HTMLElement).focus();
+    dialogElement.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
+    );
+    expect(document.activeElement).toBe(buttons[0]);
+
+    (buttons[1] as HTMLElement).focus();
+    dialogElement.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Tab', bubbles: true})
+    );
+    expect(document.activeElement).toBe(buttons[1]);
+
+    (buttons[0] as HTMLElement).focus();
+    dialogElement.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true, bubbles: true})
+    );
+    expect(document.activeElement).toBe(buttons[buttons.length - 1]);
+  });
+
+  it('should move focus to the last element on Shift+Tab when the dialog is focused', () => {
+    component.showArcSkipConfirmationModal = true;
+    fixture.detectChanges();
+
+    const dialogElement = fixture.nativeElement.querySelector(
+      '.arc-skip-confirmation-modal'
+    );
+    const buttons = dialogElement.querySelectorAll('button');
+
+    dialogElement.focus();
+    dialogElement.dispatchEvent(
+      new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true, bubbles: true})
+    );
+
+    expect(document.activeElement).toBe(buttons[buttons.length - 1]);
+  });
+
+  it('should do nothing on Tab when no dialog is open', () => {
+    const event = new KeyboardEvent('keydown', {key: 'Tab'});
+
+    component.onDialogTab(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it('should prevent Tab navigation when the dialog has no focusable elements', () => {
+    component.showAdventureMasteredModal = true;
+    component.adventureMasteredDialog = new ElementRef(
+      document.createElement('div')
+    );
+
+    const event = new KeyboardEvent('keydown', {key: 'Tab'});
+    component.onDialogTab(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it('should not show the mastered modal again after it has been handled', fakeAsync(() => {
+    const createNode = (nodeId: string, title: string) => {
+      const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+        'getTitle',
+        'getDescription',
+        'getThumbnailFilename',
+        'getExplorationId',
+        'getId',
+        'getStatus',
+        'getAvailableTextLanguageCodes',
+        'getAvailableVoiceoverLanguageCodes',
+        'getAvailableVoiceoverLanguageAccentDescriptions',
+      ]);
+      storyNodeSpy.getTitle.and.returnValue(title);
+      storyNodeSpy.getDescription.and.returnValue('Desc');
+      storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+      storyNodeSpy.getExplorationId.and.returnValue('exp_' + nodeId);
+      storyNodeSpy.getId.and.returnValue(nodeId);
+      storyNodeSpy.getStatus.and.returnValue('Published');
+      storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+      storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+      storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+        {}
+      );
+      return storyNodeSpy;
+    };
+
+    const node1 = createNode('node_1', 'Node 1');
+    const node2 = createNode('node_2', 'Node 2');
+    const node3 = createNode('node_3', 'Node 3');
+    const node4 = createNode('node_4', 'Node 4');
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2', 'Node 3', 'Node 4'],
+      [node1, node2, node3, node4],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1', 'node_2', 'node_3'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_4'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.callFake(
+      (title: string) => title !== 'Node 4'
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    expect(component.showAdventureMasteredModal).toBe(true);
+
+    component.onAdventureMasteredContinue();
+
+    component.ngOnChanges({
+      storySummary: new SimpleChange(
+        component.storySummary,
+        component.storySummary,
+        false
+      ),
+    });
     tick();
 
     expect(component.showAdventureMasteredModal).toBe(false);

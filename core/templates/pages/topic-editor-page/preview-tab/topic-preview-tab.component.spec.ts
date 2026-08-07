@@ -32,6 +32,7 @@ describe('Topic Preview Tab Component', () => {
   let fixture: ComponentFixture<TopicPreviewTabComponent>;
   let componentInstance: TopicPreviewTabComponent;
   let mockTranslateService: jasmine.SpyObj<TranslateService>;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let topicEditorStateService: MockTopicEditorStateService;
   let testName = 'test_name';
   let topicUrl = 'topic_1';
@@ -126,6 +127,7 @@ describe('Topic Preview Tab Component', () => {
         onLangChange: new Subject(),
       }
     );
+    mockPlatformFeatureService = new MockPlatformFeatureService();
 
     TestBed.configureTestingModule({
       imports: [
@@ -146,7 +148,7 @@ describe('Topic Preview Tab Component', () => {
         },
         {
           provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: TranslateService,
@@ -278,9 +280,6 @@ describe('Topic Preview Tab Component', () => {
   });
 
   it('should return true when redesigned topic viewer page feature is enabled', () => {
-    const mockPlatformFeatureService = TestBed.inject(
-      PlatformFeatureService
-    ) as unknown as MockPlatformFeatureService;
     mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
       true;
     expect(componentInstance.isRedesignedTopicViewerPageFeatureEnabled()).toBe(
@@ -289,14 +288,31 @@ describe('Topic Preview Tab Component', () => {
   });
 
   it('should return false when redesigned topic viewer page feature is disabled', () => {
-    const mockPlatformFeatureService = TestBed.inject(
-      PlatformFeatureService
-    ) as unknown as MockPlatformFeatureService;
     mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
       false;
     expect(componentInstance.isRedesignedTopicViewerPageFeatureEnabled()).toBe(
       false
     );
+  });
+
+  it('should default story description to an empty string when absent', () => {
+    const storySummarySpy = jasmine.createSpyObj('StorySummary', [
+      'getId',
+      'getTitle',
+      'getDescription',
+      'getNodeTitles',
+    ]);
+    storySummarySpy.getId.and.returnValue('id');
+    storySummarySpy.getTitle.and.returnValue('title');
+    storySummarySpy.getDescription.and.returnValue('');
+    storySummarySpy.getNodeTitles.and.returnValue([]);
+    componentInstance.canonicalStorySummaries = [storySummarySpy];
+
+    componentInstance.ngOnInit();
+
+    expect(
+      componentInstance.canonicalStorySectionData[0].storyDescription
+    ).toBe('');
   });
 
   it('should update page title on language change', () => {

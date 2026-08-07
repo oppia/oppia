@@ -71,6 +71,7 @@ describe('AdventureNavigationComponent', () => {
         accentColor: '#27a844',
         showPractice: false,
         isPracticeCompleted: false,
+        arcId: '1',
       },
     ];
 
@@ -97,9 +98,9 @@ describe('AdventureNavigationComponent', () => {
   it('should emit practiceSelected event when onPracticeClick is called', () => {
     spyOn(component.practiceSelected, 'emit');
 
-    component.onPracticeClick(2);
+    component.onPracticeClick('2');
 
-    expect(component.practiceSelected.emit).toHaveBeenCalledWith(2);
+    expect(component.practiceSelected.emit).toHaveBeenCalledWith('2');
   });
 
   it('should show a check icon for completed practice in navigation', () => {
@@ -109,6 +110,7 @@ describe('AdventureNavigationComponent', () => {
         accentColor: '#27a844',
         showPractice: true,
         isPracticeCompleted: true,
+        arcId: '1',
       },
     ];
 
@@ -249,6 +251,7 @@ describe('AdventureNavigationComponent', () => {
             accentColor: '#000',
             showPractice: true,
             isPracticeCompleted: false,
+            arcId: '1',
           },
         ],
         false

@@ -36,6 +36,12 @@ const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = 'initialContentLanguageCode';
 const INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
   'initialVoiceoverLanguageCode';
 
+export type LessonProgressStatus =
+  | 'not_started'
+  | 'in_progress'
+  | 'completed'
+  | 'coming_soon';
+
 @Component({
   selector: 'topic-lesson-card',
   templateUrl: './topic-lesson-card.component.html',
@@ -51,11 +57,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() practiceUrl: string = '';
   @Input() adventureAccentColor: string = '#00645c';
   @Input() isActiveLesson: boolean = false;
-  @Input() lessonProgressStatus:
-    | 'not_started'
-    | 'in_progress'
-    | 'completed'
-    | 'coming_soon' = 'not_started';
+  @Input() lessonProgressStatus: LessonProgressStatus = 'not_started';
   @Input() totalCheckpointsCount: number = 0;
   @Input() visitedCheckpointsCount: number = 0;
   @Input() availableTextLanguageCodes: string[] = [];
@@ -71,11 +73,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   selectedTextLanguageCode: string | null = null;
   selectedVoiceoverLanguageCode: string | null = null;
   isExpanded: boolean = false;
-  private previousLessonProgressStatus:
-    | 'not_started'
-    | 'in_progress'
-    | 'completed'
-    | 'coming_soon' = 'not_started';
+  private previousLessonProgressStatus: LessonProgressStatus = 'not_started';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -115,11 +113,8 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     }
 
     if (changes.lessonProgressStatus) {
-      const currentStatus = changes.lessonProgressStatus.currentValue as
-        | 'not_started'
-        | 'in_progress'
-        | 'completed'
-        | 'coming_soon';
+      const currentStatus = changes.lessonProgressStatus
+        .currentValue as LessonProgressStatus;
       if (
         currentStatus === 'completed' &&
         this.previousLessonProgressStatus !== 'completed' &&
