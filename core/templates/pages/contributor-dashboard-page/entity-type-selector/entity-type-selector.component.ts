@@ -48,6 +48,10 @@ export class EntityTypeSelectorComponent implements OnInit {
   dropdownShown = false;
   entityTypeOptions: EntityTypeOption[] = [
     {
+      id: 'all',
+      label: 'All',
+    },
+    {
       id: AppConstants.ENTITY_TYPE.EXPLORATION,
       label: 'Lessons',
     },
@@ -59,7 +63,7 @@ export class EntityTypeSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.activeEntityType) {
-      this.activeEntityType = AppConstants.ENTITY_TYPE.EXPLORATION;
+      this.activeEntityType = 'all';
     }
     this.setActiveEntityType.emit(this.activeEntityType);
   }
@@ -84,7 +88,7 @@ export class EntityTypeSelectorComponent implements OnInit {
     const activeOption = this.entityTypeOptions.find(
       option => option.id === this.activeEntityType
     );
-    return activeOption ? activeOption.label : 'Lessons';
+    return activeOption ? activeOption.label : 'All';
   }
 
   /**

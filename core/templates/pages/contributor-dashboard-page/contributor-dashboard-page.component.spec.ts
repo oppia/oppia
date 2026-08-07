@@ -32,11 +32,21 @@ import {ContributionOpportunitiesService} from './services/contribution-opportun
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
-import {LocalStorageService} from 'services/local-storage.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UserInfo} from 'domain/user/user-info.model';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    };
+  }
+}
 
 describe('Contributor dashboard page', () => {
   let component: ContributorDashboardPageComponent;
@@ -46,6 +56,7 @@ describe('Contributor dashboard page', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
@@ -59,6 +70,7 @@ describe('Contributor dashboard page', () => {
   let contributionAndReviewService: ContributionAndReviewService;
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -72,6 +84,10 @@ describe('Contributor dashboard page', () => {
         TranslationTopicService,
         ContributionOpportunitiesService,
         ContributionAndReviewService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -350,16 +366,22 @@ describe('Contributor dashboard page', () => {
       expect(component.activeEntityType).toBe('skill');
     });
 
-    it('should show entity type selector based on active tab', () => {
+    it('should show entity type selector based on active tab and feature flag', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
       );
 
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
       expect(component.activeTabName).toBe('myContributionTab');
-      expect(component.showEntityTypeSelector()).toBe(false);
+      expect(component.showEntityTypeSelector()).toBe(true);
 
       component.onTabClick('translateTextTab');
       expect(component.showEntityTypeSelector()).toBe(true);
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+      expect(component.showEntityTypeSelector()).toBe(false);
     });
 
     it('should show topic selector for questions reviews', () => {

@@ -99,17 +99,15 @@
             </div>
             <div class="oppia-dropdown-container"
                  *ngIf="showTopicSelector() || showEntityTypeSelector()">
-              <div class="oppia-dropdown-row-1" *ngIf="showTopicSelector()">
-                <div class="oppia-dashboard-topic-container">
+              <div class="oppia-dropdown-row">
+                <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
                   <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
                   <translation-topic-selector class="oppia-topic-selector"
                                               [activeTopicName]="topicName"
                                               (setActiveTopicName)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
-              </div>
-              <div class="oppia-dropdown-row-2" *ngIf="showEntityTypeSelector()">
-                <div class="oppia-dashboard-entity-type-container">
+                <div class="oppia-dashboard-entity-type-container" *ngIf="showEntityTypeSelector()">
                   <div class="oppia-dashboard-entity-type-container-label" tabindex="0">Entity Type</div>
                   <entity-type-selector class="oppia-entity-type-selector"
                                         [activeEntityType]="activeEntityType"
@@ -140,7 +138,7 @@
             </div>
             <div class="oppia-dropdown-container"
                  *ngIf="showLanguageSelector() || showTopicSelector() || showEntityTypeSelector()">
-              <div class="oppia-dropdown-row-1">
+              <div class="oppia-dropdown-row">
                 <div class="oppia-dashboard-language-container"
                      *ngIf="showLanguageSelector()">
                   <div class="oppia-dashboard-language-container-label" tabindex="0">Translate to</div>
@@ -156,9 +154,7 @@
                                               (setActiveTopicName)="onChangeTopic($event)">
                   </translation-topic-selector>
                 </div>
-              </div>
-              <div class="oppia-dropdown-row-2" *ngIf="showEntityTypeSelector()">
-                <div class="oppia-dashboard-entity-type-container">
+                <div class="oppia-dashboard-entity-type-container" *ngIf="showEntityTypeSelector()">
                   <div class="oppia-dashboard-entity-type-container-label" tabindex="0">Entity Type</div>
                   <entity-type-selector class="oppia-entity-type-selector"
                                         [activeEntityType]="activeEntityType"
@@ -230,13 +226,9 @@
     margin-bottom: 20px;
     margin-left: auto;
   }
-  .oppia-dropdown-row-1 {
+  .oppia-dropdown-row {
     display: flex;
-    width: 100%;
-  }
-  .oppia-dropdown-row-2 {
-    display: flex;
-    margin-top: 15px;
+    flex-direction: row;
     width: 100%;
   }
   button.oppia-autofocus:focus {
@@ -272,7 +264,9 @@
     min-width: 240px;
     width: 240px;
   }
-  .oppia-dashboard-language-container + .oppia-dashboard-topic-container {
+  .oppia-dashboard-language-container + .oppia-dashboard-topic-container,
+  .oppia-dashboard-topic-container + .oppia-dashboard-entity-type-container,
+  .oppia-dashboard-language-container + .oppia-dashboard-entity-type-container {
     margin-left: 20px;
   }
   .oppia-entity-type-selector,

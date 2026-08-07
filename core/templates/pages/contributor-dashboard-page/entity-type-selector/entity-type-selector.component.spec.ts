@@ -36,10 +36,10 @@ describe('EntityTypeSelectorComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize activeEntityType to exploration if not provided', () => {
+  it('should initialize activeEntityType to all if not provided', () => {
     component.activeEntityType = '';
     component.ngOnInit();
-    expect(component.activeEntityType).toBe('exploration');
+    expect(component.activeEntityType).toBe('all');
   });
 
   it('should toggle dropdown visibility', () => {
@@ -59,6 +59,9 @@ describe('EntityTypeSelectorComponent', () => {
   });
 
   it('should return correct label for active entity type', () => {
+    component.activeEntityType = 'all';
+    expect(component.getActiveEntityTypeLabel()).toBe('All');
+
     component.activeEntityType = 'exploration';
     expect(component.getActiveEntityTypeLabel()).toBe('Lessons');
 
@@ -66,7 +69,7 @@ describe('EntityTypeSelectorComponent', () => {
     expect(component.getActiveEntityTypeLabel()).toBe('Skills');
 
     component.activeEntityType = 'unknown';
-    expect(component.getActiveEntityTypeLabel()).toBe('Lessons');
+    expect(component.getActiveEntityTypeLabel()).toBe('All');
   });
 
   it('should close dropdown when clicking outside component', () => {
