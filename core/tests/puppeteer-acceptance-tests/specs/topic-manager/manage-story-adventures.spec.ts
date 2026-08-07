@@ -180,6 +180,8 @@ describe('Topic Manager', function () {
 
       await topicManager.closeStoryEditorMobileNavbarOptions();
 
+      await topicManager.scrollToTopOfPage();
+
       await topicManager.expectScreenshotToMatch(
         'storyEditorAfterRemovingAdventureBoundary',
         __dirname
