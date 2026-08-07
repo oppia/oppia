@@ -403,28 +403,42 @@ def get_entity_by_type_and_id(
     Raises:
         ValueError. If an unsupported entity type is provided.
     """
-    if strict:
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return exp_fetchers.get_exploration_by_id(entity_id)
-        elif entity_type == feconf.ENTITY_TYPE_STORY:
-            return story_fetchers.get_story_by_id(entity_id)
-        elif entity_type == feconf.ENTITY_TYPE_SKILL:
-            return skill_fetchers.get_skill_by_id(entity_id)
-        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
-            return topic_fetchers.get_topic_by_id(entity_id)
-        else:
-            raise ValueError(f'Unsupported entity type: {entity_type}')
-
+    entity: Optional[
+        Union[
+            exp_domain.Exploration,
+            story_domain.Story,
+            skill_domain.Skill,
+            topic_domain.Topic,
+        ]
+    ] = None
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-        return exp_fetchers.get_exploration_by_id(entity_id, strict=False)
+        entity = (
+            exp_fetchers.get_exploration_by_id(entity_id)
+            if strict
+            else exp_fetchers.get_exploration_by_id(entity_id, strict=False)
+        )
     elif entity_type == feconf.ENTITY_TYPE_STORY:
-        return story_fetchers.get_story_by_id(entity_id, strict=False)
+        entity = (
+            story_fetchers.get_story_by_id(entity_id)
+            if strict
+            else story_fetchers.get_story_by_id(entity_id, strict=False)
+        )
     elif entity_type == feconf.ENTITY_TYPE_SKILL:
-        return skill_fetchers.get_skill_by_id(entity_id, strict=False)
+        entity = (
+            skill_fetchers.get_skill_by_id(entity_id)
+            if strict
+            else skill_fetchers.get_skill_by_id(entity_id, strict=False)
+        )
     elif entity_type == feconf.ENTITY_TYPE_TOPIC:
-        return topic_fetchers.get_topic_by_id(entity_id, strict=False)
+        entity = (
+            topic_fetchers.get_topic_by_id(entity_id)
+            if strict
+            else topic_fetchers.get_topic_by_id(entity_id, strict=False)
+        )
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
+
+    return entity
 
 
 def get_translation_opportunity_summary_from_model(
