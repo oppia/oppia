@@ -41,9 +41,10 @@ import './feedback-table.component.css';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackTableComponent {
-  @Input() feedbackSummaries: Array<
-    LessonFeedbackSummary | PlatformFeedbackSummary
-  > = [];
+  @Input() feedbackSummaries: (
+    | LessonFeedbackSummary
+    | PlatformFeedbackSummary
+  )[] = [];
   @Input() currentPage = 1;
   @Input() feedbackCardConfig!: FeedbackCardConfig;
   @Input() moreFeedbackAvailable = false;

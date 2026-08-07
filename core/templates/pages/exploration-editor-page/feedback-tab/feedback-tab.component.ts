@@ -482,7 +482,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = `/feedback/${feedbackType}/${encodeURIComponent(feedbackId)}`;
   }
 
-  private getCreatorFeedbackDetailFromUrl(): {
+  getCreatorFeedbackDetailFromUrl(): {
     feedbackType: FeedbackModalType;
     feedbackId: string;
   } | null {
@@ -500,7 +500,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     };
   }
 
-  private syncCreatorFeedbackFromUrl(): void {
+  syncCreatorFeedbackFromUrl(): void {
     const detail = this.getCreatorFeedbackDetailFromUrl();
     if (!detail) {
       this.selectedCreatorFeedbackId = null;
