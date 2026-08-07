@@ -117,8 +117,8 @@
     },
     {
       "name": "exploration-editor/download-any-version-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/download-any-version-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/exploration-editor/download-any-version-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "exploration-editor/verify-statistics-and-previous-explorations",
@@ -367,23 +367,23 @@
     },
     {
       "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/discover-the-website-and-navigate-to-math-classroom.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/discover-the-website-and-navigate-to-math-classroom.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/pick-a-lesson-to-learn",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/search-for-a-specific-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/visits-the-community-library-and-look-around",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
@@ -422,13 +422,13 @@
     },
     {
       "name": "logged-out-learner/use-the-feedback-and-help-cards",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/sets-goal-on-learner-dashboard",
@@ -438,11 +438,6 @@
     {
       "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
       "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts",
-      "framework": "playwright"
-    },
-    {
-      "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
-      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts",
       "framework": "playwright"
     },
     {
@@ -472,18 +467,18 @@
     },
     {
       "name": "logged-out-learner/access-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/access-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/access-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/complete-the-embedded-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/changes-site-language-to-rtl",

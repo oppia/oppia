@@ -1,0 +1,270 @@
+.adventure-end-test-card {
+  background: #ecf7f6;
+  border: 1px solid #d3ebe8;
+  border-radius: 8px;
+  display: flex;
+  height: 212px;
+  min-height: 212px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.adventure-end-test-card-thumbnail {
+  align-items: center;
+  background: #e2f2ef;
+  display: flex;
+  flex: 0 0 auto;
+  height: 100%;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  width: 212px;
+}
+
+.adventure-end-test-card-image {
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+}
+
+.adventure-end-test-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 24px 24px 18px;
+}
+
+.adventure-end-test-card-header-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+.adventure-end-test-card-badge {
+  flex: 0 0 auto;
+}
+
+.adventure-end-test-card-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.adventure-end-test-card-title-row {
+  align-items: center;
+  display: flex;
+}
+
+.adventure-end-test-card-title {
+  color: #3b3b3b;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0;
+}
+
+.adventure-end-test-card-description {
+  color: #3d3d3d;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 0;
+  max-width: 520px;
+  overflow-wrap: break-word;
+}
+
+.adventure-end-test-card-actions {
+  align-items: flex-start;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.adventure-end-test-card-practice-button {
+  align-items: center;
+  background: #00645c;
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+  color: #fff;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  gap: 6px;
+  height: 48px;
+  justify-content: center;
+  min-width: 220px;
+  outline: none;
+  padding: 0 20px;
+  text-decoration: none;
+}
+
+.adventure-end-test-card-practice-button:focus-visible {
+  outline: 2px solid #3730a3;
+  outline-offset: 2px;
+}
+
+@media (min-width: 769px) {
+  .adventure-end-test-card-content {
+    justify-content: center;
+  }
+
+  .adventure-end-test-card-header-row {
+    align-items: flex-start;
+  }
+
+  .adventure-end-test-card-title {
+    color: #3b3b3b;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 24px;
+  }
+
+  .adventure-end-test-card-title-row {
+    margin-top: 10px;
+  }
+
+  .adventure-end-test-card-description {
+    color: #3d3d3d;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 24px;
+    margin-top: -8px;
+    max-width: 500px;
+  }
+
+  .adventure-end-test-card-actions {
+    align-self: center;
+    margin-right: 14px;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .adventure-end-test-card {
+    height: auto;
+    min-height: 0;
+  }
+
+  .adventure-end-test-card-thumbnail {
+    align-self: stretch;
+    flex: 0 0 140px;
+    height: auto;
+  }
+
+  .adventure-end-test-card-content {
+    padding: 14px 16px;
+  }
+
+  .adventure-end-test-card-header-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .adventure-end-test-card-badge {
+    margin-bottom: -4px;
+  }
+
+  .adventure-end-test-card-copy {
+    gap: 8px;
+  }
+
+  .adventure-end-test-card-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .adventure-end-test-card-title-row {
+    gap: 0;
+  }
+
+  .adventure-end-test-card-description {
+    font-size: 15px;
+    line-height: 22px;
+    max-width: none;
+  }
+
+  .adventure-end-test-card-actions {
+    gap: 10px;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+
+  .adventure-end-test-card-practice-button {
+    font-size: 14px;
+    height: 40px;
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 450px) {
+  .adventure-end-test-card {
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .adventure-end-test-card-thumbnail {
+    flex: none;
+    height: 120px;
+    min-height: 120px;
+    width: 100%;
+  }
+
+  .adventure-end-test-card-image {
+    height: 100%;
+    width: 100%;
+  }
+
+  .adventure-end-test-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .adventure-end-test-card-title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    margin: 0;
+  }
+
+  .adventure-end-test-card-description {
+    font-size: 13px;
+    line-height: 18px;
+    margin: 0;
+    padding-left: 0;
+  }
+
+  .adventure-end-test-card-actions {
+    align-items: stretch;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  .adventure-end-test-card-practice-button {
+    font-size: 14px;
+    height: 44px;
+    min-width: 100%;
+    width: 100%;
+  }
+}

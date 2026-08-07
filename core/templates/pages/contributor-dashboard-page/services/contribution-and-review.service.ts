@@ -263,6 +263,23 @@ export class ContributionAndReviewService {
       );
       sortedTranslationCards.push(...cardsForState);
     }
+
+    // Generic cards represent exploration-wide metadata translations (such as
+    // title and objective) that do not belong to any specific exploration state.
+    // Based on the consensus from the product and UX team (Sean and Aanu),
+    // these generic cards must be sorted independently and prepended at the
+    // beginning of the sorted state-specific cards list. This separate ordering is
+    // intentional to provide translators with a general understanding of the
+    // storyline before they begin translations of the state-specific lesson content.
+    const genericCards =
+      translationSuggestionsByState.get(
+        AppConstants.DEFAULT_SUGGESTION_STATE_NAME
+      ) || [];
+    genericCards.sort(
+      ContributionAndReviewService.compareTranslationSuggestions
+    );
+    sortedTranslationCards.unshift(...genericCards);
+
     return sortedTranslationCards;
   }
 

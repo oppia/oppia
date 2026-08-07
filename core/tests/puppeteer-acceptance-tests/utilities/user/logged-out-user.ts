@@ -401,7 +401,7 @@ const pauseVoiceoverButton = '.e2e-test-pause-circle';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
-const playLaterButton = '.e2e-test-add-to-playlist-btn';
+
 const newsletterEmailInputField = '.e2e-test-newsletter-input';
 const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
 const newsletterSubscriptionThanksMessage =
@@ -587,7 +587,7 @@ const revisionTabSelector = 'subtopics-list';
 
 const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
 const startPracticeButtonSelector = '.e2e-test-practice-start-button';
-const practiceSessionContainerSelector = 'practice-session-page';
+const practiceSessionContainerSelector = '.e2e-test-practice-session-container';
 
 const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
@@ -3716,14 +3716,6 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl, verifyURL);
-  }
-
-  /**
-   * Function to verify that the user cannot add an exploration to the Play Later list.
-   */
-  async expectCannotAddExplorationToPlayLater(): Promise<void> {
-    const isButtonVisible = (await this.page.$(playLaterButton)) !== null;
-    expect(isButtonVisible).toBe(false);
   }
 
   /**
@@ -7053,6 +7045,10 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOnElementWithSelector(startPracticeButtonSelector);
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
+    });
+    await this.page.waitForSelector(practiceSessionContainerSelector, {
+      visible: true,
+      timeout: 30000,
     });
   }
 
