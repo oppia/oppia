@@ -28,6 +28,7 @@ from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
+    exp_domain,
     exp_fetchers,
     feature_flag_services,
     feedback_services,
@@ -216,10 +217,11 @@ def create_suggestion(
     )
 
     status = suggestion_models.STATUS_IN_REVIEW
-
+    exploration: Optional[exp_domain.Exploration] = None
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+        assert exploration is not None
         score_category = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -3329,16 +3331,15 @@ def update_translation_contribution_stats_at_submission(
             submitted.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
+    topic_id = 'uncategorized'
+    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
         )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+        if exp_opportunity is not None:
+            topic_id = exp_opportunity.topic_id
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3505,16 +3506,15 @@ def update_translation_contribution_stats_at_review(
             reviewed.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
+    topic_id = 'uncategorized'
+    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
         )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+        if exp_opportunity is not None:
+            topic_id = exp_opportunity.topic_id
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3665,16 +3665,15 @@ def update_translation_review_stats(
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
         )
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
+    topic_id = 'uncategorized'
+    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
         )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+        if exp_opportunity is not None:
+            topic_id = exp_opportunity.topic_id
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )

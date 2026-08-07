@@ -30,6 +30,7 @@ from core.domain import (
     exp_services,
     fs_services,
     html_cleaner,
+    opportunity_services,
     platform_parameter_list,
     platform_parameter_services,
     question_domain,
@@ -828,43 +829,36 @@ class SuggestionTranslateContent(BaseSuggestion):
         before accepting the suggestion.
         """
         self.validate()
-        if self.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-            exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        entity = opportunity_services.get_entity_by_type_and_id(
+            self.target_type, self.target_id
+        )
+        if (
+            self.change_cmd.state_name
+            == constants.DEFAULT_SUGGESTION_STATE_NAME
+        ):
+            translatable_contents = entity.get_translatable_contents_collection(
+                override_metadata_feature_flag=True
+            )
             if (
-                self.change_cmd.state_name
-                == constants.DEFAULT_SUGGESTION_STATE_NAME
+                self.change_cmd.content_id
+                not in translatable_contents.content_id_to_translatable_content
             ):
-                translatable_contents = (
-                    exploration.get_translatable_contents_collection(
-                        override_metadata_feature_flag=True
-                    )
-                )
-                if (
-                    self.change_cmd.content_id
-                    not in translatable_contents.content_id_to_translatable_content
-                ):
-                    raise utils.ValidationError(
-                        'Expected %s to be a valid metadata content ID'
-                        % self.change_cmd.content_id
-                    )
-            else:
-                if self.change_cmd.state_name not in exploration.states:
-                    raise utils.ValidationError(
-                        'Expected %s to be a valid state name'
-                        % self.change_cmd.state_name
-                    )
-        elif self.target_type == feconf.ENTITY_TYPE_SKILL:
-            skill = skill_fetchers.get_skill_by_id(self.target_id, strict=False)
-            if skill is None:
                 raise utils.ValidationError(
-                    'The skill with the given id doesn\'t exist.'
+                    'Expected %s to be a valid content ID'
+                    % self.change_cmd.content_id
+                )
+        else:
+            if not isinstance(entity, exp_domain.Exploration) or (
+                self.change_cmd.state_name not in entity.states
+            ):
+                raise utils.ValidationError(
+                    'Expected %s to be a valid state name'
+                    % self.change_cmd.state_name
                 )
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
-        from core.domain import opportunity_services
-
-        target_entity = opportunity_services.get_entity_by_type_and_id(
+        entity = opportunity_services.get_entity_by_type_and_id(
             self.target_type, self.target_id
         )
 
@@ -879,7 +873,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         translation_services.add_new_translation(
             feconf.TranslatableEntityType(self.target_type),
             self.target_id,
-            target_entity.version,
+            entity.version,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,

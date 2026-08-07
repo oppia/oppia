@@ -220,10 +220,8 @@ class SuggestionHandler(
             self.normalized_payload['description'],
         )
 
-        if (
-            suggestion.suggestion_type
-            == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-            and suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
         ):
             (
                 suggestion_services
@@ -677,6 +675,10 @@ class SuggestionToSkillActionHandler(
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestion_services.update_question_review_stats(suggestion)
+        elif suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 
