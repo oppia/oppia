@@ -86,6 +86,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.navigateToExplorationFromCollection(
       FIRST_EXPLORATION_TITLE
     );
+
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent();
     await loggedOutLearner.continueToNextCard();
 
@@ -98,6 +99,7 @@ describe('Logged-Out Learner', function () {
 
   it('should return to the collection after completing the exploration', async function () {
     await loggedOutLearner.clickBackToCollectionButton();
+
     await loggedOutLearner.expectToBeOnPage('/collection/');
   });
 
