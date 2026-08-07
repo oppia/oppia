@@ -20,7 +20,7 @@ from core import feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import certificate_assessment_services
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 
 class CertificateAssessmentOfferingTopicDict(TypedDict):
@@ -74,7 +74,13 @@ class SubmitCertificateAssessmentAnswerDict(TypedDict):
     """Dict representation of a single submitted answer."""
 
     question_id: str
-    selected_answer: Optional[str]
+    # Here we use type Any because the selected answer can be any of the
+    # accepted interaction answer types (int, float, str, dict, list, or
+    # None), which cannot be expressed as a single specific type in the
+    # payload schema.
+    selected_answer: Optional[Any]
+    # Whether the client's answer classification marked the answer as correct.
+    is_correct: bool
 
 
 class SubmitCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
@@ -497,11 +503,24 @@ class SubmitCertificateAssessmentHandler(
                             },
                             {
                                 'name': 'selected_answer',
-                                'schema': {'type': 'basestring'},
+                                'schema': {
+                                    'type': 'weak_multiple',
+                                    'options': [
+                                        'int',
+                                        'float',
+                                        'basestring',
+                                        'dict',
+                                        'list',
+                                    ],
+                                },
                                 'default_value': None,
                             },
+                            {
+                                'name': 'is_correct',
+                                'schema': {'type': 'bool'},
+                            },
                         ],
-                        'required': ['question_id'],
+                        'required': ['question_id', 'is_correct'],
                     },
                 }
             },
@@ -511,10 +530,14 @@ class SubmitCertificateAssessmentHandler(
     @acl_decorators.can_submit_assessment_response
     def post(self, attempt_id: str) -> None:
         assert self.normalized_payload is not None
-        answers: List[Dict[str, Optional[str]]] = [
+        # Here we use type Any because each submitted answer can hold a value
+        # of any accepted interaction answer type (int, float, str, dict,
+        # list, or None), as validated by the weak_multiple schema.
+        answers: List[Dict[str, Any]] = [
             {
                 'question_id': answer['question_id'],
                 'selected_answer': answer['selected_answer'],
+                'is_correct': answer['is_correct'],
             }
             for answer in self.normalized_payload['answers']
         ]

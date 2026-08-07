@@ -487,7 +487,9 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         Args:
             learner_id: str. The ID of the learner making the attempt.
             total_score: float. The total score achieved in this attempt.
-            attempt_index: int. The index of this attempt for the learner.
+            attempt_index: int. The 1-based count of submitted attempts for
+                this learner and certificate. In-progress attempts should be
+                stored with a placeholder value until submission time.
             attempt_data: dict. Per-topic stats about questions answered.
             version_data: dict. Versions of the certificate, topics,
                 questions, and question-topic-links used for this attempt.

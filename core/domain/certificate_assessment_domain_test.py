@@ -377,6 +377,15 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
         attempt.is_submitted = False
         attempt.validate()
 
+    def test_validate_rejects_non_dict_attempt_data(self) -> None:
+        attempt = self._get_sample_attempt()
+        # Here we use MyPy ignore because this test intentionally assigns an
+        # invalid value to exercise the validation branch.
+        attempt.attempt_data = None  # type: ignore[assignment]
+
+        with self.assertRaisesRegex(Exception, 'attempt_data must be a dict.'):
+            attempt.validate()
+
     def test_validate_rejects_empty_attempt_id(self) -> None:
         attempt = self._get_sample_attempt()
         attempt.attempt_id = ''

@@ -48,6 +48,9 @@ from core.domain import (
     user_services,
 )
 from core.platform import models
+from core.storage.certificate_assessment import (
+    gae_models as certificate_assessment_models,
+)
 from core.tests import test_utils
 
 import webapp2

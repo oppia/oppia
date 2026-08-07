@@ -30,6 +30,7 @@ from core.domain import (
     state_domain,
 )
 from core.platform import models
+from core.storage.base_model import gae_models as base_models
 
 from typing import Dict, List, Literal, Optional, Tuple, Union, cast, overload
 
@@ -50,6 +51,8 @@ class QuestionSnapshotNotFoundError(utils.ValidationError):
     This is a domain-level exception that callers can translate into a
     user-facing error instead of letting a storage EntityNotFoundError escape.
     """
+
+    pass
 
 
 def create_new_question(
@@ -497,7 +500,7 @@ def get_question_by_id_and_version(
                 question_snapshot_id
             )
         )
-    except question_models.base_models.BaseModel.EntityNotFoundError as e:
+    except base_models.BaseModel.EntityNotFoundError as e:
         raise QuestionSnapshotNotFoundError(
             'Question snapshot for question %s version %s was not found.'
             % (question_id, question_version)

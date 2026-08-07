@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import collections
 import datetime
+import json
 import secrets
 import sys
 
@@ -522,10 +523,7 @@ def start_certificate_assessment_attempt(
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             total_score=0.0,
-            attempt_index=_get_submission_count_for_certificate(
-                learner_id, certificate_id
-            )
-            + 1,
+            attempt_index=0,
             attempt_data={},
             # Here we use cast because the storage layer's create method
             # expects a loose dict for its JSON-backed version_data property,
@@ -596,19 +594,25 @@ def start_certificate_assessment_attempt(
     )
 
 
-def _normalize_answer(answer: Optional[str]) -> Optional[str]:
-    """Strips whitespace from an answer, preserving None as-is."""
-    return None if answer is None else answer.strip()
-
-
 def submit_certificate_assessment_attempt(
-    attempt_id: str, answers: List[Dict[str, Optional[str]]]
+    attempt_id: str,
+    answers: List[
+        Dict[str, Union[state_domain.AcceptableCorrectAnswerTypes, bool]]
+    ],
 ) -> certificate_assessment_domain.CertificateAssessmentAttempt:
-    """Scores a submitted attempt against the pinned question versions.
+    """Records a submitted attempt using the client-computed correctness flags.
+
+    Answer correctness is determined by the frontend's answer-classification
+    rules (the same rules the exploration player and question player use), so
+    the backend stores the learner's answer and the client-computed is_correct
+    flag without re-evaluating the answer server-side.
 
     Args:
         attempt_id: str. The ID of the attempt being submitted.
-        answers: list(dict). The submitted answers keyed by question ID.
+        answers: list(dict). The submitted answers, each with a question_id, a
+            selected_answer whose type depends on the question's interaction
+            (str, int, Dict[str, str], List[str], or List[List[str]]), and an
+            is_correct flag computed by the client's answer classification.
 
     Returns:
         CertificateAssessmentAttempt. The updated submitted attempt.
@@ -628,8 +632,7 @@ def submit_certificate_assessment_attempt(
         )
 
     answers_by_question_id = {
-        answer['question_id']: _normalize_answer(answer.get('selected_answer'))
-        for answer in answers
+        answer['question_id']: answer for answer in answers
     }
     question_versions = attempt_model.version_data['question_versions']
     question_topic_links = attempt_model.version_data['question_topic_links']
@@ -642,17 +645,9 @@ def submit_certificate_assessment_attempt(
     )
     correct_count = 0
     for question_id, question_version in question_versions.items():
-        question = question_services.get_question_by_id_and_version(
-            question_id, question_version
-        )
-        selected_answer = answers_by_question_id.get(question_id)
-        solution = question.question_state_data.interaction.solution
-        correct_answer = None if solution is None else solution.correct_answer
-        is_correct = (
-            selected_answer is not None
-            and correct_answer is not None
-            and selected_answer == correct_answer
-        )
+        answer = answers_by_question_id.get(question_id, {})
+        selected_answer = answer.get('selected_answer')
+        is_correct = bool(answer.get('is_correct', False))
         if is_correct:
             correct_count += 1
         responses.append(
@@ -661,7 +656,13 @@ def submit_certificate_assessment_attempt(
                 'question_id': question_id,
                 'question_version': question_version,
                 'selected_answer': (
-                    '' if selected_answer is None else selected_answer
+                    ''
+                    if selected_answer is None
+                    else (
+                        selected_answer
+                        if isinstance(selected_answer, str)
+                        else json.dumps(selected_answer)
+                    )
                 ),
                 'is_correct': is_correct,
             }
@@ -686,6 +687,13 @@ def submit_certificate_assessment_attempt(
             raise utils.ValidationError(
                 'This assessment has already been submitted.'
             )
+        attempt_model.attempt_index = (
+            _get_submission_count_for_certificate(
+                attempt_model.learner_id,
+                attempt_model.version_data['certificate_id'],
+            )
+            + 1
+        )
         gae_models.CertificateAssessmentResponseModel.create_multi(responses)
         attempt_model.attempt_data = dict(attempt_data)
         attempt_model.total_score = (

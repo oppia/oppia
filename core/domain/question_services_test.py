@@ -808,6 +808,39 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.language_code, 'bn')
         self.assertEqual(question.version, 2)
 
+    def test_update_question_ignores_unrelated_change_and_updates_next_index(
+        self,
+    ) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        original_next_content_id_index = question.next_content_id_index
+
+        change_list: list[question_domain.QuestionChange] = [
+            question_domain.CreateNewQuestionCmd({'cmd': 'create_new'}),
+            question_domain.QuestionChange(
+                {
+                    'cmd': 'update_question_property',
+                    'property_name': 'next_content_id_index',
+                    'old_value': original_next_content_id_index,
+                    'new_value': original_next_content_id_index + 1,
+                }
+            ),
+        ]
+
+        question_services.update_question(
+            self.editor_id,
+            self.question_id,
+            change_list,
+            'updated next content id index',
+        )
+
+        updated_question = question_services.get_question_by_id(
+            self.question_id
+        )
+        self.assertEqual(
+            updated_question.next_content_id_index,
+            original_next_content_id_index + 1,
+        )
+
     def test_update_inapplicable_skill_misconception_ids(self) -> None:
         self.assertEqual(
             self.question.inapplicable_skill_misconception_ids,
