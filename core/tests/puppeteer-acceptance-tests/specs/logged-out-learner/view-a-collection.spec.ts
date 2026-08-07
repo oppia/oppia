@@ -40,14 +40,7 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
-    await loggedOutLearner.navigateToCommunityLibraryPage();
-    const langText = await loggedOutLearner.page.$eval(
-      '.e2e-test-language-dropdown',
-      el => el.textContent?.trim() ?? ''
-    );
-    if (!langText.toLowerCase().includes('en')) {
-      await loggedOutLearner.changeSiteLanguage('en');
-    }
+
     lessonCreator = (await UserFactory.createNewUser(
       'lessonCreator',
       'lessoncreator@example.com',
