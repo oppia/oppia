@@ -138,8 +138,7 @@
 }
 
 .story-card-body {
-  display: flex;
-  flex-direction: column;
+  display: block;
   min-height: 484px;
   padding: 0 24px 24px;
 }
@@ -1082,8 +1081,7 @@ topic-mastery-challenge-card {
   }
 
   .story-card-body {
-    display: flex;
-    flex-direction: column;
+    display: block;
     min-height: 462px;
   }
 

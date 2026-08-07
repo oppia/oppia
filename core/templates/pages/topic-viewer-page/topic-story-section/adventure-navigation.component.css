@@ -7,9 +7,10 @@
   margin: 0 -24px;
   opacity: 1;
   padding: 0 24px;
+  position: -webkit-sticky;
   position: sticky;
   top: 56px;
-  z-index: 20;
+  z-index: 30;
 }
 
 .adventure-navigation-scroll-area {
