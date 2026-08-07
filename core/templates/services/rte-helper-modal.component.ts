@@ -32,7 +32,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import {UnicodeSchema} from 'services/schema-default-value.service';
+import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -165,7 +165,11 @@ export class RteHelperModalComponent {
 
     this.customizationArgSpecs.forEach(spec => {
       if (spec.schema) {
-        const schema = spec.schema as UnicodeSchema;
+        const schema = (
+          spec.schema.type === 'list'
+            ? (spec.schema as ListSchema).items
+            : spec.schema
+        ) as UnicodeSchema;
         if (!schema.ui_config) {
           schema.ui_config = {};
         }
