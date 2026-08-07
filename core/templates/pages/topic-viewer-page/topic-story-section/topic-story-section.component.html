@@ -78,8 +78,10 @@
                  (keydown.enter)="toggleAdventure(adventureIdx)"
                  (keydown.space)="toggleAdventure(adventureIdx); $event.preventDefault()">
               <div class="adventure-header-left">
-                <div class="adventure-flag-icon" [ngStyle]="{'background-color': adventureGroup.iconBg}">
-                  <i class="material-icons">menu_book</i>
+                <div class="adventure-flag-icon"
+                     [class.adventure-flag-icon-completed]="isAdventureCompleted(adventureIdx)"
+                     [ngStyle]="{'background-color': isAdventureCompleted(adventureIdx) ? '#27a844' : adventureGroup.iconBg}">
+                  <i class="material-icons">{{ isAdventureCompleted(adventureIdx) ? 'check' : 'menu_book' }}</i>
                 </div>
                 <div class="adventure-header-text">
                   <h4 class="adventure-title">{{ adventureGroup.adventureTitle }}</h4>
@@ -128,6 +130,7 @@
                   [studyUrl]="practiceCard.studyUrl"
                   [cardBackgroundColor]="adventureGroup.headerBackgroundColor"
                   [cardAccentColor]="adventureGroup.accentColor"
+                  [isPracticeCompleted]="isAdventurePracticeCompleted(adventureIdx)"
                   [practiceUrl]="getEndOfArcUrl(adventureGroup.arcId)">
                 </topic-adventure-end-test-card>
               </div>
@@ -272,5 +275,45 @@
         Continue
       </button>
     </div>
+  </section>
+</div>
+
+<div *ngIf="showAdventureMasteredModal"
+     class="adventure-mastered-modal-backdrop"
+     role="presentation">
+  <section class="adventure-mastered-modal"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="adventure-mastered-title">
+    <div class="adventure-mastered-confetti" aria-hidden="true">
+      <span class="adventure-mastered-confetti-piece piece-1"></span>
+      <span class="adventure-mastered-confetti-piece piece-2"></span>
+      <span class="adventure-mastered-confetti-piece piece-3"></span>
+      <span class="adventure-mastered-confetti-piece piece-4"></span>
+      <span class="adventure-mastered-confetti-piece piece-5"></span>
+      <span class="adventure-mastered-confetti-piece piece-6"></span>
+      <span class="adventure-mastered-confetti-piece piece-7"></span>
+      <span class="adventure-mastered-confetti-piece piece-8"></span>
+      <span class="adventure-mastered-confetti-piece piece-9"></span>
+      <span class="adventure-mastered-confetti-piece piece-10"></span>
+    </div>
+
+    <img class="adventure-mastered-trophy"
+         src="/assets/images/icons/mastery-challenge-trophy.svg"
+         alt=""
+         aria-hidden="true">
+
+    <h3 id="adventure-mastered-title" class="adventure-mastered-title">
+      {{ getAdventureMasteredTitle() }}
+    </h3>
+    <p class="adventure-mastered-message">
+      {{ getAdventureMasteredSubtitle() }}
+    </p>
+
+    <button type="button"
+            class="adventure-mastered-continue"
+            (click)="onAdventureMasteredContinue()">
+      Continue to Topic
+    </button>
   </section>
 </div>

@@ -39,6 +39,7 @@ interface AdventureNavigationGroup {
   }[];
   accentColor: string;
   showPractice: boolean;
+  isPracticeCompleted: boolean;
 }
 
 export interface AdventureNavigationLessonSelection {

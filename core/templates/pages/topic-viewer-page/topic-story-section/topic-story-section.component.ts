@@ -49,6 +49,8 @@ import {AdventureNavigationLessonSelection} from './adventure-navigation.compone
 const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
 const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
 const FALLBACK_LESSON_THUMBNAIL_PATH = '/splash/student_desk1x.webp';
+const ARC_MASTERED_QUERY_PARAM = 'arc_mastered';
+const ARC_ID_QUERY_PARAM = 'arc_id';
 
 interface LessonCardData {
   lessonNumber: number;
@@ -99,6 +101,7 @@ interface AdventureNavigationGroupData {
   }[];
   accentColor: string;
   showPractice: boolean;
+  isPracticeCompleted: boolean;
 }
 
 @Component({
@@ -142,9 +145,12 @@ export class TopicStorySectionComponent
   skippedAdventureIndices: Set<number> = new Set();
   navigatedLessonNumber: number | null = null;
   showArcSkipConfirmationModal: boolean = false;
+  showAdventureMasteredModal: boolean = false;
+  masteredAdventureIndex: number | null = null;
   pendingArcSkipTargetLabel: string = '';
   private pendingNavigationLessonNumber: number | null = null;
   private pendingNavigationAdventureIndex: number | null = null;
+  private completedAdventurePracticeArcIds: Set<string> = new Set();
 
   private directiveSubscriptions: Subscription = new Subscription();
 
@@ -207,6 +213,48 @@ export class TopicStorySectionComponent
     this.pendingNavigationLessonNumber = null;
     this.pendingNavigationAdventureIndex = null;
     this.pendingArcSkipTargetLabel = '';
+  }
+
+  onAdventureMasteredContinue(): void {
+    if (this.masteredAdventureIndex !== null) {
+      this._expandedAdventureIndices.delete(this.masteredAdventureIndex);
+
+      const nextAdventureIndex = this.masteredAdventureIndex + 1;
+      if (nextAdventureIndex < this.visibleAdventureGroups.length) {
+        this._expandedAdventureIndices.add(nextAdventureIndex);
+        const nextAdventureFirstLesson =
+          this.visibleAdventureGroups[nextAdventureIndex].lessonCards[0];
+        if (nextAdventureFirstLesson) {
+          this.activeLessonNumber = nextAdventureFirstLesson.lessonNumber;
+          this.navigatedLessonNumber = nextAdventureFirstLesson.lessonNumber;
+        }
+      }
+    }
+    this.showAdventureMasteredModal = false;
+    this.masteredAdventureIndex = null;
+  }
+
+  getAdventureMasteredTitle(): string {
+    if (this.masteredAdventureIndex === null) {
+      return 'Adventure Mastered!';
+    }
+    return `Adventure ${this.masteredAdventureIndex + 1} Mastered!`;
+  }
+
+  getAdventureMasteredSubtitle(): string {
+    if (this.masteredAdventureIndex === null) {
+      return 'Keep the momentum going!';
+    }
+
+    const unlockedAdventureNumber = this.masteredAdventureIndex + 2;
+    if (unlockedAdventureNumber <= this.visibleAdventureGroups.length) {
+      return (
+        `You've unlocked Adventure ${unlockedAdventureNumber}. ` +
+        'Keep the momentum going!'
+      );
+    }
+
+    return "You've mastered all available adventures. Keep the momentum going!";
   }
 
   getArcSkipConfirmationMessage(): string {
@@ -275,6 +323,14 @@ export class TopicStorySectionComponent
     return adventureGroup.lessonCards.every(
       card => card.lessonProgressStatus === 'completed'
     );
+  }
+
+  isAdventurePracticeCompleted(adventureIndex: number): boolean {
+    const adventureGroup = this.visibleAdventureGroups[adventureIndex];
+    if (!adventureGroup) {
+      return false;
+    }
+    return this.completedAdventurePracticeArcIds.has(adventureGroup.arcId);
   }
 
   isStoryCompleted(): boolean {
@@ -549,6 +605,7 @@ export class TopicStorySectionComponent
     this.adventureGroups = this.buildAdventureGroups(allNodes);
     this.restoreSkippedAdventures();
     this.updateVisibleSections();
+    this.maybeShowAdventureMasteredModal();
   }
 
   private buildAdventureGroups(allNodes: StoryNode[]): AdventureGroupData[] {
@@ -650,6 +707,7 @@ export class TopicStorySectionComponent
     this.restoreSkippedAdventures();
     this.updateVisibleSections();
     this.activeLessonNumber = this.getActiveLessonNumber();
+    this.maybeShowAdventureMasteredModal();
 
     this.isPracticeCardVisible = this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
@@ -800,6 +858,9 @@ export class TopicStorySectionComponent
           }),
           accentColor: group.accentColor,
           showPractice: visibleLessons.length > 0,
+          isPracticeCompleted:
+            visibleLessons.length > 0 &&
+            this.completedAdventurePracticeArcIds.has(group.arcId),
         };
       })
       .filter(group => group.lessons.length > 0);
@@ -817,6 +878,58 @@ export class TopicStorySectionComponent
         firstNonSkippedIndex === -1 ? 0 : firstNonSkippedIndex,
       ]);
     }
+  }
+
+  private maybeShowAdventureMasteredModal(): void {
+    if (this.showAdventureMasteredModal) {
+      return;
+    }
+
+    const arcMasteredFlagValues = this.urlService.getQueryFieldValuesAsList(
+      ARC_MASTERED_QUERY_PARAM
+    );
+    const arcIdValues =
+      this.urlService.getQueryFieldValuesAsList(ARC_ID_QUERY_PARAM);
+
+    if (
+      arcMasteredFlagValues.length === 0 ||
+      arcMasteredFlagValues[0] !== 'true' ||
+      arcIdValues.length === 0
+    ) {
+      return;
+    }
+
+    const masteredArcId = this.normalizeArcIdFromQueryValue(arcIdValues[0]);
+    if (!masteredArcId) {
+      return;
+    }
+
+    const adventureIndex = this.visibleAdventureGroups.findIndex(
+      group => group.arcId === masteredArcId
+    );
+
+    if (adventureIndex === -1 || !this.isAdventureCompleted(adventureIndex)) {
+      return;
+    }
+
+    this.completedAdventurePracticeArcIds.add(masteredArcId);
+    this.updateVisibleSections();
+
+    this.showAdventureMasteredModal = true;
+    this.masteredAdventureIndex = adventureIndex;
+  }
+
+  private normalizeArcIdFromQueryValue(rawArcId: string): string | null {
+    if (!rawArcId) {
+      return null;
+    }
+
+    const match = rawArcId.match(/^\d+/);
+    if (!match) {
+      return null;
+    }
+
+    return match[0];
   }
 
   private isChapterReadyToPublish(node: StoryNode): boolean {

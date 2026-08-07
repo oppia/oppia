@@ -31,11 +31,11 @@
         </topic-adventure-circle-badge>
 
         <topic-adventure-circle-badge *ngIf="adventureGroup.showPractice"
-                            [iconName]="'edit'"
+                            [iconName]="adventureGroup.isPracticeCompleted ? 'check' : 'edit'"
                                       [size]="'sm'"
-                                      [backgroundColor]="'#fff'"
-                                      [borderColor]="adventureGroup.accentColor"
-                                      [textColor]="adventureGroup.accentColor"
+                                      [backgroundColor]="adventureGroup.isPracticeCompleted ? '#e7f6e9' : '#fff'"
+                                      [borderColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
+                                      [textColor]="adventureGroup.isPracticeCompleted ? '#40a84f' : adventureGroup.accentColor"
                                       class="adventure-navigation-clickable"
                                       (click)="onPracticeClick(adventureIdx)"
                                       [attr.aria-label]="'Go to practice'"

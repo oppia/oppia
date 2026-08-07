@@ -2575,6 +2575,9 @@ describe('TopicStorySectionComponent', () => {
     ]);
     expect(component.adventureNavigationGroups[0].accentColor).toBe('#27a844');
     expect(component.adventureNavigationGroups[0].showPractice).toBe(true);
+    expect(component.adventureNavigationGroups[0].isPracticeCompleted).toBe(
+      false
+    );
   });
 
   it('should mark completed lessons in adventureNavigationGroups', async () => {
@@ -2705,6 +2708,7 @@ describe('TopicStorySectionComponent', () => {
         lessons: [{lessonNumber: 1, isCompleted: false}],
         accentColor: '#27a844',
         showPractice: true,
+        isPracticeCompleted: false,
       },
     ]);
   });
@@ -2984,6 +2988,162 @@ describe('TopicStorySectionComponent', () => {
     // When getStatus throws and serial flag is enabled, isComingSoon falls back to false
     // (getExplorationId is set so it won't be coming_soon via the null check)
     expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
+  });
+
+  it('should show adventure mastered modal when returning from completed arc test', fakeAsync(() => {
+    const createNode = (nodeId: string, title: string) => {
+      const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+        'getTitle',
+        'getDescription',
+        'getThumbnailFilename',
+        'getExplorationId',
+        'getId',
+        'getStatus',
+        'getAvailableTextLanguageCodes',
+        'getAvailableVoiceoverLanguageCodes',
+        'getAvailableVoiceoverLanguageAccentDescriptions',
+      ]);
+      storyNodeSpy.getTitle.and.returnValue(title);
+      storyNodeSpy.getDescription.and.returnValue('Desc');
+      storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+      storyNodeSpy.getExplorationId.and.returnValue('exp_' + nodeId);
+      storyNodeSpy.getId.and.returnValue(nodeId);
+      storyNodeSpy.getStatus.and.returnValue('Published');
+      storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+      storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+      storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+        {}
+      );
+      return storyNodeSpy;
+    };
+
+    const node1 = createNode('node_1', 'Node 1');
+    const node2 = createNode('node_2', 'Node 2');
+    const node3 = createNode('node_3', 'Node 3');
+    const node4 = createNode('node_4', 'Node 4');
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2', 'Node 3', 'Node 4'],
+      [node1, node2, node3, node4],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1', 'node_2', 'node_3'],
+        },
+        {
+          id: 'arc_2',
+          title: 'Adventure 2',
+          description: 'Second adventure',
+          node_ids: ['node_4'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.callFake(
+      (title: string) => title !== 'Node 4'
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.masteredAdventureIndex).toBe(0);
+    expect(component.getAdventureMasteredTitle()).toBe('Adventure 1 Mastered!');
+  }));
+
+  it('should handle malformed arc_id query values when showing mastered modal', fakeAsync(() => {
+    const createNode = (nodeId: string, title: string) => {
+      const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+        'getTitle',
+        'getDescription',
+        'getThumbnailFilename',
+        'getExplorationId',
+        'getId',
+        'getStatus',
+        'getAvailableTextLanguageCodes',
+        'getAvailableVoiceoverLanguageCodes',
+        'getAvailableVoiceoverLanguageAccentDescriptions',
+      ]);
+      storyNodeSpy.getTitle.and.returnValue(title);
+      storyNodeSpy.getDescription.and.returnValue('Desc');
+      storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+      storyNodeSpy.getExplorationId.and.returnValue('exp_' + nodeId);
+      storyNodeSpy.getId.and.returnValue(nodeId);
+      storyNodeSpy.getStatus.and.returnValue('Published');
+      storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
+      storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+      storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+        {}
+      );
+      return storyNodeSpy;
+    };
+
+    const node1 = createNode('node_1', 'Node 1');
+    const node2 = createNode('node_2', 'Node 2');
+    const node3 = createNode('node_3', 'Node 3');
+
+    component.storySummary = createStorySummarySpy(
+      ['Node 1', 'Node 2', 'Node 3'],
+      [node1, node2, node3],
+      [
+        {
+          id: 'arc_1',
+          title: 'Adventure 1',
+          description: 'First adventure',
+          node_ids: ['node_1', 'node_2', 'node_3'],
+        },
+      ]
+    );
+    (component.storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(
+      true
+    );
+    urlService.getQueryFieldValuesAsList.and.callFake((fieldName: string) => {
+      if (fieldName === 'arc_mastered') {
+        return ['true'];
+      }
+      if (fieldName === 'arc_id') {
+        return ['1/story'];
+      }
+      return [];
+    });
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.ngOnInit();
+    tick();
+
+    expect(component.showAdventureMasteredModal).toBe(true);
+    expect(component.masteredAdventureIndex).toBe(0);
+  }));
+
+  it('should collapse mastered adventure when continuing from mastered modal', () => {
+    component.visibleAdventureGroups = [
+      createAdventureGroup('Adventure 1', [createLessonCard(1, 'completed')]),
+      createAdventureGroup('Adventure 2', [createLessonCard(2, 'not_started')]),
+    ];
+    component.masteredAdventureIndex = 0;
+    component.showAdventureMasteredModal = true;
+    component._expandedAdventureIndices = new Set([0]);
+
+    component.onAdventureMasteredContinue();
+
+    expect(component.showAdventureMasteredModal).toBe(false);
+    expect(component.masteredAdventureIndex).toBeNull();
+    expect(component.isAdventureExpanded(0)).toBe(false);
+    expect(component.isAdventureExpanded(1)).toBe(true);
+    expect(component.activeLessonNumber).toBe(2);
   });
 
   it('should return false from isChapterPublished when getStatus returns null', () => {

@@ -176,7 +176,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       this.urlService.getTopicUrlFragmentFromLearnerUrl();
     const practiceSessionsDataUrl = this._getDataUrl();
     const practiceSessionsUrl = this._getRetryUrl();
-    const topicViewerUrl = this.urlInterpolationService.interpolateUrl(
+    let topicViewerUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.TOPIC_VIEWER_PAGE,
       {
         topic_url_fragment: topicUrlFragment,
@@ -184,6 +184,19 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
           this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
       }
     );
+
+    if (this.sessionType === PracticeSessionType.Arc && this.arcId) {
+      topicViewerUrl = this.urlService.addField(
+        topicViewerUrl,
+        'arc_mastered',
+        'true'
+      );
+      topicViewerUrl = this.urlService.addField(
+        topicViewerUrl,
+        'arc_id',
+        this.arcId
+      );
+    }
 
     this.practiceSessionsBackendApiService
       .fetchPracticeSessionsData(practiceSessionsDataUrl)

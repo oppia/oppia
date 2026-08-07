@@ -70,6 +70,7 @@ describe('AdventureNavigationComponent', () => {
         ],
         accentColor: '#27a844',
         showPractice: false,
+        isPracticeCompleted: false,
       },
     ];
 
@@ -99,6 +100,24 @@ describe('AdventureNavigationComponent', () => {
     component.onPracticeClick(2);
 
     expect(component.practiceSelected.emit).toHaveBeenCalledWith(2);
+  });
+
+  it('should show a check icon for completed practice in navigation', () => {
+    component.adventureGroups = [
+      {
+        lessons: [{lessonNumber: 1, isCompleted: true}],
+        accentColor: '#27a844',
+        showPractice: true,
+        isPracticeCompleted: true,
+      },
+    ];
+
+    fixture.detectChanges();
+
+    const badges = fixture.nativeElement.querySelectorAll(
+      'topic-adventure-circle-badge'
+    );
+    expect(badges[1].iconName).toBe('check');
   });
 
   it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {
@@ -229,6 +248,7 @@ describe('AdventureNavigationComponent', () => {
             lessons: [{lessonNumber: 1, isCompleted: false}],
             accentColor: '#000',
             showPractice: true,
+            isPracticeCompleted: false,
           },
         ],
         false

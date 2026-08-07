@@ -307,6 +307,10 @@
   line-height: 1;
 }
 
+.adventure-flag-icon-completed .material-icons {
+  font-size: 28px;
+}
+
 .adventure-header-text {
   display: flex;
   flex-direction: column;
@@ -612,6 +616,170 @@ topic-mastery-challenge-card {
 
 .arc-skip-confirmation-cancel:focus-visible,
 .arc-skip-confirmation-proceed:focus-visible {
+  outline: 2px solid #00645c;
+  outline-offset: 2px;
+}
+
+.adventure-mastered-modal-backdrop {
+  align-items: center;
+  background: rgba(16, 24, 40, 0.52);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 16px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1210;
+}
+
+.adventure-mastered-modal {
+  background: #fff;
+  border: 1px solid #edf1f7;
+  border-radius: 16px;
+  max-width: 620px;
+  overflow: hidden;
+  padding: 22px 28px 24px;
+  position: relative;
+  text-align: center;
+  width: min(620px, calc(100vw - 32px));
+}
+
+.adventure-mastered-confetti {
+  height: 120px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.adventure-mastered-confetti-piece {
+  border-radius: 999px;
+  display: inline-block;
+  position: absolute;
+}
+
+.adventure-mastered-confetti-piece.piece-1 {
+  background: #ffb703;
+  height: 16px;
+  left: 10%;
+  top: 30px;
+  width: 6px;
+}
+
+.adventure-mastered-confetti-piece.piece-2 {
+  background: #3b82f6;
+  height: 6px;
+  left: 22%;
+  top: 56px;
+  width: 16px;
+}
+
+.adventure-mastered-confetti-piece.piece-3 {
+  background: #22c55e;
+  height: 10px;
+  left: 36%;
+  top: 22px;
+  width: 10px;
+}
+
+.adventure-mastered-confetti-piece.piece-4 {
+  background: #f97316;
+  height: 6px;
+  left: 47%;
+  top: 48px;
+  width: 14px;
+}
+
+.adventure-mastered-confetti-piece.piece-5 {
+  background: #a855f7;
+  height: 12px;
+  left: 62%;
+  top: 30px;
+  width: 8px;
+}
+
+.adventure-mastered-confetti-piece.piece-6 {
+  background: #06b6d4;
+  height: 8px;
+  left: 76%;
+  top: 54px;
+  width: 8px;
+}
+
+.adventure-mastered-confetti-piece.piece-7 {
+  background: #ec4899;
+  height: 6px;
+  left: 88%;
+  top: 38px;
+  width: 14px;
+}
+
+.adventure-mastered-confetti-piece.piece-8 {
+  background: #ffb703;
+  height: 12px;
+  left: 16%;
+  top: 78px;
+  width: 12px;
+}
+
+.adventure-mastered-confetti-piece.piece-9 {
+  background: #7c3aed;
+  height: 12px;
+  left: 70%;
+  top: 84px;
+  width: 12px;
+}
+
+.adventure-mastered-confetti-piece.piece-10 {
+  background: #14b8a6;
+  height: 10px;
+  left: 83%;
+  top: 72px;
+  width: 10px;
+}
+
+.adventure-mastered-trophy {
+  display: block;
+  height: 150px;
+  margin: 52px auto 14px;
+  width: 150px;
+}
+
+.adventure-mastered-title {
+  color: #111827;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.18;
+  margin: 0;
+}
+
+.adventure-mastered-message {
+  color: #374151;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.45;
+  margin: 14px auto 22px;
+  max-width: 410px;
+}
+
+.adventure-mastered-continue {
+  background: #00645c;
+  border: 2px solid #00645c;
+  border-radius: 6px;
+  color: #fff;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  min-height: 56px;
+  min-width: 300px;
+  padding: 10px 22px;
+}
+
+.adventure-mastered-continue:focus-visible {
   outline: 2px solid #00645c;
   outline-offset: 2px;
 }
@@ -1045,6 +1213,39 @@ topic-mastery-challenge-card {
     font-size: 14px;
     min-width: 0;
     padding: 10px 12px;
+    width: 100%;
+  }
+
+  .adventure-mastered-modal {
+    border-radius: 12px;
+    padding: 16px 16px 18px;
+    width: min(560px, calc(100vw - 24px));
+  }
+
+  .adventure-mastered-confetti {
+    height: 90px;
+  }
+
+  .adventure-mastered-trophy {
+    height: 112px;
+    margin: 36px auto 12px;
+    width: 112px;
+  }
+
+  .adventure-mastered-title {
+    font-size: 30px;
+  }
+
+  .adventure-mastered-message {
+    font-size: 16px;
+    margin: 10px auto 16px;
+    max-width: 100%;
+  }
+
+  .adventure-mastered-continue {
+    font-size: 16px;
+    min-height: 48px;
+    min-width: 0;
     width: 100%;
   }
 
