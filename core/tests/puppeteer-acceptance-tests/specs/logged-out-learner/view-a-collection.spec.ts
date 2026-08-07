@@ -40,7 +40,8 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
-
+    const client = await loggedOutLearner.page.target().createCDPSession();
+    await client.send('Network.clearBrowserCookies');
     lessonCreator = (await UserFactory.createNewUser(
       'lessonCreator',
       'lessoncreator@example.com',
