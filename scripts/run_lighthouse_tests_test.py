@@ -153,6 +153,29 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ):
             run_lighthouse_tests.inject_entities_into_url(url, entities)
 
+    def test_inject_entities_into_url_with_multiple_entities(self) -> None:
+        entities = {'topic_id': '4', 'story_id': '5'}
+        url = (
+            'http://localhost:8181/topic_editor/{{topic_id}}/'
+            'story_editor/{{story_id}}'
+        )
+        expected_injected_url = (
+            'http://localhost:8181/topic_editor/4/story_editor/5'
+        )
+        self.assertEqual(
+            run_lighthouse_tests.inject_entities_into_url(url, entities),
+            expected_injected_url,
+        )
+
+    def test_inject_entities_into_url_with_repeated_entity(self) -> None:
+        entities = {'topic_id': '4'}
+        url = 'http://localhost:8181/topic_editor/{{topic_id}}/' '{{topic_id}}'
+        expected_injected_url = 'http://localhost:8181/topic_editor/4/4'
+        self.assertEqual(
+            run_lighthouse_tests.inject_entities_into_url(url, entities),
+            expected_injected_url,
+        )
+
     def test_get_lighthouse_pages_config(self) -> None:
         with self.lighthouse_pages_json_filepath_swap:
             pages_config = run_lighthouse_tests.get_lighthouse_pages_config()

@@ -250,7 +250,7 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
-        injected_url = url.replace(
+        injected_url = injected_url.replace(
             '{{%s}}' % entity_name, entities[entity_name]
         )
     return injected_url
