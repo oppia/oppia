@@ -646,17 +646,14 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
     def test_post_accepts_non_string_selected_answer(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        empty_topic_versions: Dict[str, int] = {}
-        empty_question_versions: Dict[str, int] = {}
-        empty_question_topic_links: Dict[str, List[str]] = {}
         version_data: Dict[
             str, Union[str, int, Dict[str, int], Dict[str, List[str]]]
         ] = {
             'certificate_id': 'cert_1',
             'certificate_version': 1,
-            'topic_versions': empty_topic_versions,
-            'question_versions': empty_question_versions,
-            'question_topic_links': empty_question_topic_links,
+            'topic_versions': {'topic_1': 1},
+            'question_versions': {'q1': 1},
+            'question_topic_links': {'q1': ['topic_1']},
         }
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=owner_id,
@@ -689,6 +686,65 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response, {'attempt_id': attempt.id, 'is_submitted': True}
+        )
+
+    def test_post_defaults_selected_answer_to_none_when_omitted(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        version_data: Dict[
+            str, Union[str, int, Dict[str, int], Dict[str, List[str]]]
+        ] = {
+            'certificate_id': 'cert_1',
+            'certificate_version': 1,
+            'topic_versions': {'topic_1': 1},
+            'question_versions': {'q1': 1},
+            'question_topic_links': {'q1': ['topic_1']},
+        }
+        attempt = gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=owner_id,
+            total_score=0.0,
+            attempt_index=1,
+            attempt_data={},
+            version_data=version_data,
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with mock.patch.object(
+            certificate_assessment_services,
+            'submit_certificate_assessment_attempt',
+            return_value=mock.Mock(attempt_id=attempt.id),
+        ) as submit_mock:
+            response = self.post_json(
+                feconf.SUBMIT_CERTIFICATE_ASSESSMENT_HANDLER.replace(
+                    '<attempt_id>', attempt.id
+                ),
+                {
+                    'answers': [
+                        {
+                            'question_id': 'q1',
+                            'is_correct': True,
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
+        self.assertEqual(
+            response, {'attempt_id': attempt.id, 'is_submitted': True}
+        )
+        submit_mock.assert_called_once_with(
+            attempt.id,
+            [
+                {
+                    'question_id': 'q1',
+                    'selected_answer': None,
+                    'is_correct': True,
+                }
+            ],
         )
 
     def test_post_raises_invalid_input_when_is_correct_is_missing(self) -> None:

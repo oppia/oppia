@@ -323,7 +323,6 @@ def _get_topic_question_ids_by_difficulty(
         question_ids_by_difficulty: Dict[str, List[str]] = (
             collections.defaultdict(list)
         )
-        seen_question_ids: set[str] = set()
         skill_ids = list(topic.get_all_skill_ids())
         skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
         for skill_id, skill_model in zip(skill_ids, skill_models_list):
@@ -335,36 +334,21 @@ def _get_topic_question_ids_by_difficulty(
             ) in question_services.get_question_skill_links_of_skill(
                 skill_id, skill.description
             ):
-                if question_skill_link.question_id in seen_question_ids:
+                # Add the question to every difficulty bucket that any of its
+                # linked skills produce, matching the validator's available
+                # pool, so a validator-approved offering can always be picked.
+                difficulty_label = _get_difficulty_label(
+                    question_skill_link.skill_difficulty
+                )
+                if difficulty_label is None:
                     continue
-                seen_question_ids.add(question_skill_link.question_id)
                 if (
-                    question_skill_link.skill_difficulty
-                    == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-                        constants.SKILL_DIFFICULTY_EASY
-                    ]
+                    question_skill_link.question_id
+                    not in question_ids_by_difficulty[difficulty_label]
                 ):
-                    question_ids_by_difficulty[
-                        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
-                    ].append(question_skill_link.question_id)
-                elif (
-                    question_skill_link.skill_difficulty
-                    == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-                        constants.SKILL_DIFFICULTY_MEDIUM
-                    ]
-                ):
-                    question_ids_by_difficulty[
-                        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM
-                    ].append(question_skill_link.question_id)
-                elif (
-                    question_skill_link.skill_difficulty
-                    == constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-                        constants.SKILL_DIFFICULTY_HARD
-                    ]
-                ):
-                    question_ids_by_difficulty[
-                        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
-                    ].append(question_skill_link.question_id)
+                    question_ids_by_difficulty[difficulty_label].append(
+                        question_skill_link.question_id
+                    )
         topic_id_to_question_ids_by_difficulty[topic_id] = (
             question_ids_by_difficulty
         )
@@ -467,26 +451,40 @@ def _get_active_attempt_for_learner(
     return attempt_model
 
 
-def _get_submission_count_for_certificate(
+def _get_next_attempt_index_for_certificate(
     learner_id: str, certificate_id: str
 ) -> int:
-    """Returns the number of submitted attempts for the given certificate."""
-    count = 0
+    """Returns the next 1-based attempt index for the given certificate.
+
+    The index is derived from the highest submitted attempt index instead of
+    from a count of submitted attempts. A count would need a global query
+    filtered on is_submitted, which is not strongly consistent inside the
+    submission transaction, and could therefore yield a stale or duplicated
+    index for concurrent submissions.
+
+    Args:
+        learner_id: str. The learner submitting the attempt.
+        certificate_id: str. The certificate being attempted.
+
+    Returns:
+        int. The 1-based index to assign to the next submitted attempt.
+    """
     attempt_models: Sequence[gae_models.CertificateAssessmentAttemptModel] = (
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
-            == learner_id,
-            gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
-            == True,
+            == learner_id
         ).fetch()
     )
-    for attempt in attempt_models:
-        if (
-            attempt.version_data.get('certificate_id') == certificate_id
-            and attempt.is_submitted
-        ):
-            count += 1
-    return count
+    highest_submitted_index = max(
+        (
+            attempt.attempt_index
+            for attempt in attempt_models
+            if attempt.is_submitted
+            and attempt.version_data.get('certificate_id') == certificate_id
+        ),
+        default=0,
+    )
+    return highest_submitted_index + 1
 
 
 def start_certificate_assessment_attempt(
@@ -539,8 +537,10 @@ def start_certificate_assessment_attempt(
             finished_at=None,
             is_submitted=False,
         )
+        attempt = _attempt_model_to_domain(attempt_model)
+        attempt.validate()
         return (
-            _attempt_model_to_domain(attempt_model),
+            attempt,
             [
                 {
                     'question_id': question_id,
@@ -687,14 +687,17 @@ def submit_certificate_assessment_attempt(
             raise utils.ValidationError(
                 'This assessment has already been submitted.'
             )
-        attempt_model.attempt_index = (
-            _get_submission_count_for_certificate(
-                attempt_model.learner_id,
-                attempt_model.version_data['certificate_id'],
-            )
-            + 1
+        attempt_model.attempt_index = _get_next_attempt_index_for_certificate(
+            attempt_model.learner_id,
+            attempt_model.version_data['certificate_id'],
         )
-        gae_models.CertificateAssessmentResponseModel.create_multi(responses)
+        # The responses are stored in a single entity keyed by the attempt ID,
+        # so the attempt and its responses belong to one entity group and the
+        # transaction never touches more entity groups than the number of
+        # questions would otherwise require.
+        gae_models.CertificateAssessmentResponseModel.create(
+            attempt_id=attempt_id, responses=responses
+        )
         attempt_model.attempt_data = dict(attempt_data)
         attempt_model.total_score = (
             float(correct_count) / float(len(question_versions)) * 100.0
@@ -703,9 +706,11 @@ def submit_certificate_assessment_attempt(
         )
         attempt_model.finished_at = _get_current_time()
         attempt_model.is_submitted = True
+        attempt = _attempt_model_to_domain(attempt_model)
+        attempt.validate()
         attempt_model.update_timestamps()
         attempt_model.put()
-        return _attempt_model_to_domain(attempt_model)
+        return attempt
 
     # Here we use cast because transaction_services is dynamically imported
     # from the platform layer, so mypy cannot infer the transaction's return

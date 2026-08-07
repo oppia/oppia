@@ -1111,6 +1111,27 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'No questions exists with'):
             question_services.get_interaction_id_for_question('fake_q_id')
 
+    def test_get_question_by_id_and_version_returns_pinned_version(
+        self,
+    ) -> None:
+        question = question_services.get_question_by_id_and_version(
+            self.question_id, 1
+        )
+        self.assertEqual(question.id, self.question_id)
+        self.assertEqual(question.version, 1)
+
+    def test_get_question_by_id_and_version_raises_for_missing_snapshot(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            question_services.QuestionSnapshotNotFoundError,
+            'Question snapshot for question %s version 2 was not found.'
+            % self.question_id,
+        ):
+            question_services.get_question_by_id_and_version(
+                self.question_id, 2
+            )
+
     def test_untag_deleted_misconceptions_on_no_change_to_skill(self) -> None:
         misconceptions = [
             skill_domain.Misconception(

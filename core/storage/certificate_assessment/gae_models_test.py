@@ -424,10 +424,15 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         )
         gae_models.CertificateAssessmentResponseModel.create(
             attempt_id=attempt.id,
-            question_id='question_id_1',
-            question_version=1,
-            selected_answer='Option A',
-            is_correct=True,
+            responses=[
+                {
+                    'attempt_id': attempt.id,
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                }
+            ],
         )
 
         self.assertTrue(
@@ -467,10 +472,15 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         )
         response = gae_models.CertificateAssessmentResponseModel.create(
             attempt_id=attempt.id,
-            question_id='question_id_1',
-            question_version=1,
-            selected_answer='Option A',
-            is_correct=True,
+            responses=[
+                {
+                    'attempt_id': attempt.id,
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                }
+            ],
         )
 
         gae_models.CertificateAssessmentResponseModel.apply_deletion_policy(
@@ -517,10 +527,15 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             responses.append(
                 gae_models.CertificateAssessmentResponseModel.create(
                     attempt_id=attempt.id,
-                    question_id='question_id_1',
-                    question_version=1,
-                    selected_answer='Option A',
-                    is_correct=True,
+                    responses=[
+                        {
+                            'attempt_id': attempt.id,
+                            'question_id': 'question_id_1',
+                            'question_version': 1,
+                            'selected_answer': 'Option A',
+                            'is_correct': True,
+                        }
+                    ],
                 )
             )
 
@@ -544,14 +559,19 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_retrieve_lifecycle(self) -> None:
         response = certificate_models.CertificateAssessmentResponseModel.create(
             attempt_id='attempt_id_1',
-            question_id='question_id_1',
-            question_version=1,
-            selected_answer='Option A',
-            is_correct=True,
+            responses=[
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                }
+            ],
         )
         response_id = response.id
 
-        self.assertEqual(response_id, 'attempt_id_1-question_id_1')
+        self.assertEqual(response_id, 'attempt_id_1')
 
         fetched_model = (
             certificate_models.CertificateAssessmentResponseModel.get_by_id(
@@ -560,83 +580,105 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.attempt_id, 'attempt_id_1')
-        self.assertEqual(fetched_model.question_id, 'question_id_1')
-        self.assertEqual(fetched_model.question_version, 1)
-        self.assertEqual(fetched_model.selected_answer, 'Option A')
-        self.assertTrue(fetched_model.is_correct)
+        self.assertEqual(
+            fetched_model.responses,
+            [
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                }
+            ],
+        )
 
-    def test_create_multi_and_retrieve_lifecycle(self) -> None:
-        responses = (
-            certificate_models.CertificateAssessmentResponseModel.create_multi(
-                [
-                    {
-                        'attempt_id': 'attempt_id_1',
-                        'question_id': 'question_id_1',
-                        'question_version': 1,
-                        'selected_answer': 'Option A',
-                        'is_correct': True,
-                    },
-                    {
-                        'attempt_id': 'attempt_id_1',
-                        'question_id': 'question_id_2',
-                        'question_version': 1,
-                        'selected_answer': 'Option B',
-                        'is_correct': False,
-                    },
-                ]
+    def test_create_stores_all_responses_in_single_entity(self) -> None:
+        response = certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_id='attempt_id_1',
+            responses=[
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                },
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_2',
+                    'question_version': 1,
+                    'selected_answer': 'Option B',
+                    'is_correct': False,
+                },
+            ],
+        )
+
+        self.assertEqual(len(response.responses), 2)
+
+        fetched_model = (
+            certificate_models.CertificateAssessmentResponseModel.get_by_id(
+                response.id
             )
         )
-
-        self.assertEqual(len(responses), 2)
-        self.assertNotEqual(responses[0].id, responses[1].id)
-
-        fetched_models = (
-            certificate_models.CertificateAssessmentResponseModel.get_multi(
-                [response.id for response in responses]
-            )
-        )
+        self.assertIsNotNone(fetched_model)
         self.assertEqual(
-            [fetched_model.attempt_id for fetched_model in fetched_models],
-            ['attempt_id_1', 'attempt_id_1'],
-        )
-        self.assertEqual(
-            [fetched_model.question_id for fetched_model in fetched_models],
-            ['question_id_1', 'question_id_2'],
-        )
-        self.assertEqual(
-            [fetched_model.selected_answer for fetched_model in fetched_models],
-            ['Option A', 'Option B'],
-        )
-        self.assertEqual(
-            [fetched_model.is_correct for fetched_model in fetched_models],
-            [True, False],
+            fetched_model.responses,
+            [
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                },
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_2',
+                    'question_version': 1,
+                    'selected_answer': 'Option B',
+                    'is_correct': False,
+                },
+            ],
         )
 
     def test_create_overwrites_existing_response_on_retry(self) -> None:
-        """Ensures a retried submission overwrites the same response."""
+        """Ensures a retried submission overwrites the same entity."""
         certificate_models.CertificateAssessmentResponseModel.create(
             attempt_id='attempt_id_1',
-            question_id='question_id_1',
-            question_version=1,
-            selected_answer='Option A',
-            is_correct=True,
+            responses=[
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option A',
+                    'is_correct': True,
+                }
+            ],
         )
         certificate_models.CertificateAssessmentResponseModel.create(
             attempt_id='attempt_id_1',
-            question_id='question_id_1',
-            question_version=1,
-            selected_answer='Option B',
-            is_correct=False,
+            responses=[
+                {
+                    'attempt_id': 'attempt_id_1',
+                    'question_id': 'question_id_1',
+                    'question_version': 1,
+                    'selected_answer': 'Option B',
+                    'is_correct': False,
+                }
+            ],
         )
 
         fetched_model = (
             certificate_models.CertificateAssessmentResponseModel.get_by_id(
-                'attempt_id_1-question_id_1'
+                'attempt_id_1'
             )
         )
         self.assertIsNotNone(fetched_model)
-        self.assertEqual(fetched_model.selected_answer, 'Option B')
-        self.assertFalse(fetched_model.is_correct)
+        self.assertEqual(
+            fetched_model.responses[0]['selected_answer'], 'Option B'
+        )
+        self.assertFalse(fetched_model.responses[0]['is_correct'])
 
         self.assertEqual(
             len(

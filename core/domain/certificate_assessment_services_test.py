@@ -39,7 +39,7 @@ from core.platform import models
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
-from typing import Sequence, TypedDict
+from typing import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -331,11 +331,13 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             subtopics=[subtopic],
             next_subtopic_id=2,
         )
+        question_ids_by_difficulty = {}
         for question_id, skill_id, difficulty in (
             (question_services.get_new_question_id(), 'skill_easy', 0.3),
             (question_services.get_new_question_id(), 'skill_medium', 0.6),
             (question_services.get_new_question_id(), 'skill_hard', 0.9),
         ):
+            question_ids_by_difficulty[difficulty] = question_id
             content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id,
@@ -358,15 +360,11 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             result[topic_id],
             {
-                CERTIFICATE_DIFFICULTY_EASY: [
-                    result[topic_id][CERTIFICATE_DIFFICULTY_EASY][0]
-                ],
+                CERTIFICATE_DIFFICULTY_EASY: [question_ids_by_difficulty[0.3]],
                 CERTIFICATE_DIFFICULTY_MEDIUM: [
-                    result[topic_id][CERTIFICATE_DIFFICULTY_MEDIUM][0]
+                    question_ids_by_difficulty[0.6]
                 ],
-                CERTIFICATE_DIFFICULTY_HARD: [
-                    result[topic_id][CERTIFICATE_DIFFICULTY_HARD][0]
-                ],
+                CERTIFICATE_DIFFICULTY_HARD: [question_ids_by_difficulty[0.9]],
             },
         )
 
@@ -378,22 +376,27 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             'skill_missing',
             'skill_1',
             'skill_2',
+            'skill_3',
             'skill_unclassified',
         ]
         skill_1 = mock.Mock()
         skill_1.description = 'Skill 1 description'
         skill_2 = mock.Mock()
         skill_2.description = 'Skill 2 description'
+        skill_3 = mock.Mock()
+        skill_3.description = 'Skill 3 description'
         skill_unclassified = mock.Mock()
         skill_unclassified.description = 'Skill unclassified description'
         skill_1_links = [mock.Mock(question_id='q_1', skill_difficulty=0.6)]
         skill_2_links = [mock.Mock(question_id='q_1', skill_difficulty=0.3)]
+        skill_3_links = [mock.Mock(question_id='q_1', skill_difficulty=0.6)]
         skill_unclassified_links = [
             mock.Mock(question_id='q_unclassified', skill_difficulty=0.5)
         ]
         links_by_skill_id = {
             'skill_1': skill_1_links,
             'skill_2': skill_2_links,
+            'skill_3': skill_3_links,
             'skill_unclassified': skill_unclassified_links,
         }
 
@@ -404,7 +407,13 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             skill_models.SkillModel,
             'get_multi',
-            return_value=[None, skill_1, skill_2, skill_unclassified],
+            return_value=[
+                None,
+                skill_1,
+                skill_2,
+                skill_3,
+                skill_unclassified,
+            ],
         ), mock.patch.object(
             skill_fetchers,
             'get_skill_from_model',
@@ -424,7 +433,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             result['topic_1'][CERTIFICATE_DIFFICULTY_MEDIUM], ['q_1']
         )
-        self.assertEqual(result['topic_1'][CERTIFICATE_DIFFICULTY_EASY], [])
+        self.assertEqual(
+            result['topic_1'][CERTIFICATE_DIFFICULTY_EASY], ['q_1']
+        )
         self.assertEqual(result['topic_1'][CERTIFICATE_DIFFICULTY_HARD], [])
 
     def test_build_version_data_includes_certificate_and_topic_versions(
@@ -490,25 +501,27 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             attempt.id,
         )
 
-    def test_get_submission_count_for_certificate_filters_by_certificate(
+    def test_get_next_attempt_index_uses_highest_submitted_index(
         self,
     ) -> None:
-        gae_models.CertificateAssessmentAttemptModel.create(
-            learner_id='learner_1',
-            total_score=0.0,
-            attempt_index=1,
-            attempt_data={},
-            version_data={
-                'certificate_id': 'cert_1',
-                'certificate_version': 1,
-                'topic_versions': {'topic_1': 1},
-                'question_versions': {'question_1': 1},
-                'question_topic_links': {'question_1': ['topic_1']},
-            },
-            started_at=datetime.datetime.utcnow(),
-            finished_at=datetime.datetime.utcnow(),
-            is_submitted=True,
-        )
+        for attempt_index in (1, 3):
+            gae_models.CertificateAssessmentAttemptModel.create(
+                learner_id='learner_1',
+                total_score=0.0,
+                attempt_index=attempt_index,
+                attempt_data={},
+                version_data={
+                    'certificate_id': 'cert_1',
+                    'certificate_version': 1,
+                    'topic_versions': {'topic_1': 1},
+                    'question_versions': {'question_1': 1},
+                    'question_topic_links': {'question_1': ['topic_1']},
+                },
+                started_at=datetime.datetime.utcnow(),
+                finished_at=datetime.datetime.utcnow(),
+                is_submitted=True,
+            )
+        # A submitted attempt for a different certificate is not counted.
         gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
             total_score=0.0,
@@ -525,12 +538,36 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             finished_at=datetime.datetime.utcnow(),
             is_submitted=True,
         )
+        # An in-progress attempt is ignored even if it carries a higher index.
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id='learner_1',
+            total_score=0.0,
+            attempt_index=5,
+            attempt_data={},
+            version_data={
+                'certificate_id': 'cert_1',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
+                'question_versions': {'question_1': 1},
+                'question_topic_links': {'question_1': ['topic_1']},
+            },
+            started_at=datetime.datetime.utcnow(),
+            finished_at=None,
+            is_submitted=False,
+        )
 
         self.assertEqual(
             getattr(
                 certificate_assessment_services,
-                '_get_submission_count_for_certificate',
+                '_get_next_attempt_index_for_certificate',
             )('learner_1', 'cert_1'),
+            4,
+        )
+        self.assertEqual(
+            getattr(
+                certificate_assessment_services,
+                '_get_next_attempt_index_for_certificate',
+            )('learner_1', 'cert_missing'),
             1,
         )
 
@@ -875,31 +912,32 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             },
         )
 
-        response_models: Sequence[
-            gae_models.CertificateAssessmentResponseModel
-        ] = gae_models.CertificateAssessmentResponseModel.query(
-            gae_models.CertificateAssessmentResponseModel.attempt_id
-            == attempt_model.id
-        ).fetch()
-        self.assertEqual(len(response_models), 3)
+        response_model = (
+            gae_models.CertificateAssessmentResponseModel.get_by_id(
+                attempt_model.id
+            )
+        )
+        self.assertIsNotNone(response_model)
         response_by_question_id = {
-            response.question_id: response for response in response_models
+            response['question_id']: response
+            for response in response_model.responses
         }
+        self.assertEqual(len(response_by_question_id), 3)
         self.assertEqual(
-            response_by_question_id[question_id_1].selected_answer,
+            response_by_question_id[question_id_1]['selected_answer'],
             '  Solution  ',
         )
-        self.assertTrue(response_by_question_id[question_id_1].is_correct)
+        self.assertTrue(response_by_question_id[question_id_1]['is_correct'])
         self.assertEqual(
-            response_by_question_id[question_id_2].selected_answer,
+            response_by_question_id[question_id_2]['selected_answer'],
             'Wrong answer',
         )
-        self.assertFalse(response_by_question_id[question_id_2].is_correct)
+        self.assertFalse(response_by_question_id[question_id_2]['is_correct'])
         self.assertEqual(
-            response_by_question_id[question_id_3].selected_answer,
+            response_by_question_id[question_id_3]['selected_answer'],
             'Wrong answer',
         )
-        self.assertFalse(response_by_question_id[question_id_3].is_correct)
+        self.assertFalse(response_by_question_id[question_id_3]['is_correct'])
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1010,56 +1048,61 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 }
             },
         )
-        response_models: Sequence[
-            gae_models.CertificateAssessmentResponseModel
-        ] = gae_models.CertificateAssessmentResponseModel.query(
-            gae_models.CertificateAssessmentResponseModel.attempt_id
-            == attempt_model.id
-        ).fetch()
+        response_model = (
+            gae_models.CertificateAssessmentResponseModel.get_by_id(
+                attempt_model.id
+            )
+        )
+        self.assertIsNotNone(response_model)
         response_by_question_id = {
-            response.question_id: response for response in response_models
+            response['question_id']: response
+            for response in response_model.responses
         }
-        self.assertTrue(response_by_question_id['q_string'].is_correct)
-        self.assertTrue(response_by_question_id['q_int'].is_correct)
-        self.assertFalse(response_by_question_id['q_float'].is_correct)
-        self.assertTrue(response_by_question_id['q_dict'].is_correct)
-        self.assertFalse(response_by_question_id['q_list'].is_correct)
-        self.assertTrue(response_by_question_id['q_nested_list'].is_correct)
-        self.assertFalse(response_by_question_id['q_no_answer'].is_correct)
+        self.assertTrue(response_by_question_id['q_string']['is_correct'])
+        self.assertTrue(response_by_question_id['q_int']['is_correct'])
+        self.assertFalse(response_by_question_id['q_float']['is_correct'])
+        self.assertTrue(response_by_question_id['q_dict']['is_correct'])
+        self.assertFalse(response_by_question_id['q_list']['is_correct'])
+        self.assertTrue(response_by_question_id['q_nested_list']['is_correct'])
+        self.assertFalse(response_by_question_id['q_no_answer']['is_correct'])
         # A missing is_correct flag defaults to an incorrect answer.
-        self.assertFalse(response_by_question_id['q_missing_flag'].is_correct)
+        self.assertFalse(
+            response_by_question_id['q_missing_flag']['is_correct']
+        )
         self.assertEqual(
-            response_by_question_id['q_string'].selected_answer,
+            response_by_question_id['q_string']['selected_answer'],
             '  my answer  ',
         )
-        self.assertEqual(response_by_question_id['q_int'].selected_answer, '7')
         self.assertEqual(
-            response_by_question_id['q_float'].selected_answer, '3.5'
+            response_by_question_id['q_int']['selected_answer'], '7'
         )
         self.assertEqual(
-            json.loads(response_by_question_id['q_dict'].selected_answer),
+            response_by_question_id['q_float']['selected_answer'], '3.5'
+        )
+        self.assertEqual(
+            json.loads(response_by_question_id['q_dict']['selected_answer']),
             {
-                'isNegative': False,
-                'wholeNumber': 0,
-                'numerator': 1,
-                'denominator': 2,
+                'isNegative': 'False',
+                'wholeNumber': '0',
+                'numerator': '1',
+                'denominator': '2',
             },
         )
         self.assertEqual(
-            json.loads(response_by_question_id['q_list'].selected_answer),
+            json.loads(response_by_question_id['q_list']['selected_answer']),
             ['a', 'b'],
         )
         self.assertEqual(
             json.loads(
-                response_by_question_id['q_nested_list'].selected_answer
+                response_by_question_id['q_nested_list']['selected_answer']
             ),
             [['a'], ['b', 'c']],
         )
         self.assertEqual(
-            response_by_question_id['q_no_answer'].selected_answer, ''
+            response_by_question_id['q_no_answer']['selected_answer'], ''
         )
         self.assertEqual(
-            response_by_question_id['q_missing_flag'].selected_answer,
+            response_by_question_id['q_missing_flag']['selected_answer'],
             'answer without flag',
         )
 
@@ -1080,6 +1123,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     ) -> None:
         valid_model = mock.Mock()
         valid_model.version_data = {
+            'certificate_id': 'cert_1',
+            'certificate_version': 1,
+            'topic_versions': {'topic_1': 1},
             'question_versions': {},
             'question_topic_links': {},
         }
@@ -1490,15 +1536,34 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         ):
             selected_question_ids = pick_questions(['topic_1', 'topic_2'], 5)
 
+        self.assertEqual(len(selected_question_ids), 5)
+
+        # The topic share and the medium/easy/hard split follow the validator,
+        # while the specific question chosen within a difficulty bucket is
+        # sampled at random, so only the per-bucket counts are asserted.
+        selected_by_topic_and_difficulty: dict[tuple[str, str], int] = {}
+        for question_id, topic_id in selected_question_ids:
+            difficulty = next(
+                difficulty
+                for difficulty, question_ids in (
+                    topic_id_to_question_ids_by_difficulty[topic_id].items()
+                )
+                if question_id in question_ids
+            )
+            bucket = (topic_id, difficulty)
+            selected_by_topic_and_difficulty[bucket] = (
+                selected_by_topic_and_difficulty.get(bucket, 0) + 1
+            )
+
         self.assertEqual(
-            selected_question_ids,
-            [
-                ('q1', 'topic_1'),
-                ('q3', 'topic_1'),
-                ('q4', 'topic_1'),
-                ('q5', 'topic_2'),
-                ('q6', 'topic_2'),
-            ],
+            selected_by_topic_and_difficulty,
+            {
+                ('topic_1', CERTIFICATE_DIFFICULTY_MEDIUM): 1,
+                ('topic_1', CERTIFICATE_DIFFICULTY_EASY): 1,
+                ('topic_1', CERTIFICATE_DIFFICULTY_HARD): 1,
+                ('topic_2', CERTIFICATE_DIFFICULTY_MEDIUM): 1,
+                ('topic_2', CERTIFICATE_DIFFICULTY_EASY): 1,
+            },
         )
 
     def test_pick_questions_raises_when_questions_are_insufficient(

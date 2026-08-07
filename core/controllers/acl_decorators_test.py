@@ -48,9 +48,6 @@ from core.domain import (
     user_services,
 )
 from core.platform import models
-from core.storage.certificate_assessment import (
-    gae_models as certificate_assessment_models,
-)
 from core.tests import test_utils
 
 import webapp2
@@ -59,11 +56,14 @@ from typing import Any, Dict, Final, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, secrets_services
-
+    from mypy_imports import (
+        certificate_assessment_offering_models,
+        datastore_services,
+        secrets_services,
+    )
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
-(certificate_assessment_models,) = models.Registry.import_models(
+(certificate_assessment_offering_models,) = models.Registry.import_models(
     [models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 (suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
@@ -226,19 +226,24 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
         learner_id: str,
         is_submitted: bool = False,
         question_versions: Optional[Dict[str, int]] = None,
-    ) -> certificate_assessment_models.CertificateAssessmentAttemptModel:
+    ) -> (
+        certificate_assessment_offering_models.CertificateAssessmentAttemptModel
+    ):
         """Creates a certificate assessment attempt model for tests."""
         if question_versions is None:
             question_versions = {'q1': 1}
         question_topic_links = {
             question_id: ['topic_1'] for question_id in question_versions
         }
-        return certificate_assessment_models.CertificateAssessmentAttemptModel.create(
+        return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
             version_data={
+                'certificate_id': 'cert_id',
+                'certificate_version': 1,
+                'topic_versions': {'topic_1': 1},
                 'question_versions': question_versions,
                 'question_topic_links': question_topic_links,
             },

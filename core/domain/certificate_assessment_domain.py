@@ -375,20 +375,25 @@ class CertificateAssessmentAttempt:
             raise utils.ValidationError(
                 'total_score must be a non-negative number.'
             )
+        # In-progress attempts are stored with a placeholder index of 0 until
+        # they are submitted, at which point the real 1-based index is set.
+        min_attempt_index = 1 if self.is_submitted else 0
         if (
             isinstance(self.attempt_index, bool)
             or not isinstance(self.attempt_index, int)
-            or self.attempt_index < 1
+            or self.attempt_index < min_attempt_index
         ):
             raise utils.ValidationError(
-                'attempt_index must be a positive integer.'
+                'attempt_index must be a %s integer.'
+                % ('positive' if self.is_submitted else 'non-negative')
             )
 
     def _validate_attempt_data(self) -> None:
         """Validates the per-topic attempt statistics."""
         if not isinstance(self.attempt_data, dict):
             raise utils.ValidationError('attempt_data must be a dict.')
-        if not self.attempt_data:
+        # In-progress attempts have empty per-topic stats until submission.
+        if not self.attempt_data and self.is_submitted:
             raise utils.ValidationError(
                 'attempt_data must contain stats for at least one topic.'
             )

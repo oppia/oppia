@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from core import feconf, utils
-from core.controllers import acl_decorators, base
+from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import certificate_assessment_services
 
 from typing import Any, Dict, List, Optional, TypedDict
@@ -495,32 +495,10 @@ class SubmitCertificateAssessmentHandler(
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'dict',
-                        'properties': [
-                            {
-                                'name': 'question_id',
-                                'schema': {'type': 'basestring'},
-                            },
-                            {
-                                'name': 'selected_answer',
-                                'schema': {
-                                    'type': 'weak_multiple',
-                                    'options': [
-                                        'int',
-                                        'float',
-                                        'basestring',
-                                        'dict',
-                                        'list',
-                                    ],
-                                },
-                                'default_value': None,
-                            },
-                            {
-                                'name': 'is_correct',
-                                'schema': {'type': 'bool'},
-                            },
-                        ],
-                        'required': ['question_id', 'is_correct'],
+                        'type': 'object_dict',
+                        'validation_method': (
+                            domain_objects_validator.validate_certificate_assessment_answer
+                        ),
                     },
                 }
             },

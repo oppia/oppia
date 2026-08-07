@@ -520,27 +520,31 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
 
 class CertificateAssessmentResponseModel(base_models.BaseModel):
-    """Storage model for a single response submitted by a learner during
-    a certificate assessment attempt.
+    """Storage model for the responses submitted during a certificate
+    assessment attempt.
 
-    The ID of instances of this class is the deterministic composite
-    '<attempt_id>-<question_id>'. Using a deterministic ID means a retried
-    submission overwrites the same response instead of creating duplicates.
+    The ID of instances of this class is the ID of the
+    CertificateAssessmentAttemptModel the responses belong to. Storing all of
+    an attempt's responses in a single entity keeps them in the same entity
+    group as the submission transaction writes, so the attempt and its
+    responses can be persisted atomically without touching one entity group
+    per question. Using the attempt ID as the entity ID also means a retried
+    submission overwrites the same entity instead of creating duplicates.
     """
 
     # The ID of the CertificateAssessmentAttemptModel this response
     # belongs to.
     attempt_id = datastore_services.StringProperty(required=True, indexed=True)
-    # The ID of the question that was answered.
-    question_id = datastore_services.StringProperty(required=True, indexed=True)
-    # The version of the question that was answered.
-    question_version = datastore_services.IntegerProperty(
-        required=True, indexed=False
-    )
-    # The answer selected by the learner.
-    selected_answer = datastore_services.TextProperty(required=True)
-    # Whether the selected answer was correct.
-    is_correct = datastore_services.BooleanProperty(required=True, indexed=True)
+    # List of dicts, each capturing the answer to one question, e.g.
+    # [
+    #     {
+    #         'question_id': 'question_id_1',
+    #         'question_version': 1,
+    #         'selected_answer': 'Option A',
+    #         'is_correct': True
+    #     }
+    # ]
+    responses = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -606,89 +610,30 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         return {
             **super(cls, cls).get_export_policy(),
             'attempt_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'question_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'selected_answer': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'is_correct': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'responses': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
-
-    @classmethod
-    def _get_response_id(cls, attempt_id: str, question_id: str) -> str:
-        """Returns the deterministic ID for a question's response.
-
-        Args:
-            attempt_id: str. The ID of the attempt this response belongs to.
-            question_id: str. The ID of the question being answered.
-
-        Returns:
-            str. The ID of the CertificateAssessmentResponseModel instance.
-        """
-        return '%s-%s' % (attempt_id, question_id)
 
     @classmethod
     def create(
         cls,
         attempt_id: str,
-        question_id: str,
-        question_version: int,
-        selected_answer: str,
-        is_correct: bool,
+        responses: List[CertificateAssessmentResponseCreateDict],
     ) -> CertificateAssessmentResponseModel:
-        """Creates a new certificate assessment response instance.
+        """Creates a certificate assessment responses instance.
 
         Args:
-            attempt_id: str. The ID of the attempt this response belongs to.
-            question_id: str. The ID of the question being answered.
-            question_version: int. The version of the question answered.
-            selected_answer: str. The answer selected by the learner.
-            is_correct: bool. Whether the selected answer was correct.
+            attempt_id: str. The ID of the attempt these responses belong to.
+            responses: list(dict). The per-question response dicts to persist.
 
         Returns:
             CertificateAssessmentResponseModel. Instance of the new entry.
         """
-        instance_id = cls._get_response_id(attempt_id, question_id)
         response_instance = cls(
-            id=instance_id,
+            id=attempt_id,
             attempt_id=attempt_id,
-            question_id=question_id,
-            question_version=question_version,
-            selected_answer=selected_answer,
-            is_correct=is_correct,
+            responses=responses,
         )
         response_instance.update_timestamps()
         response_instance.put()
 
         return response_instance
-
-    @classmethod
-    def create_multi(
-        cls,
-        response_dicts: List[CertificateAssessmentResponseCreateDict],
-    ) -> List[CertificateAssessmentResponseModel]:
-        """Creates and persists multiple certificate assessment responses.
-
-        Args:
-            response_dicts: list(CertificateAssessmentResponseCreateDict).
-                The response payloads to persist.
-
-        Returns:
-            list(CertificateAssessmentResponseModel). The newly created
-            response instances.
-        """
-        response_instances = [
-            cls(
-                id=cls._get_response_id(
-                    response_dict['attempt_id'],
-                    response_dict['question_id'],
-                ),
-                attempt_id=response_dict['attempt_id'],
-                question_id=response_dict['question_id'],
-                question_version=response_dict['question_version'],
-                selected_answer=response_dict['selected_answer'],
-                is_correct=response_dict['is_correct'],
-            )
-            for response_dict in response_dicts
-        ]
-        cls.update_timestamps_multi(response_instances)
-        cls.put_multi(response_instances)
-        return response_instances

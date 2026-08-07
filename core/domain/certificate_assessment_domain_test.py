@@ -377,6 +377,22 @@ class CertificateAssessmentAttemptTest(test_utils.GenericTestBase):
         attempt.is_submitted = False
         attempt.validate()
 
+    def test_validate_accepts_placeholder_values_for_unsubmitted_attempt(
+        self,
+    ) -> None:
+        attempt = certificate_assessment_domain.CertificateAssessmentAttempt(
+            attempt_id='attempt_abc123',
+            learner_id='learner_id_1',
+            total_score=0.0,
+            attempt_index=0,
+            attempt_data={},
+            version_data=self._get_sample_version_data(),
+            started_at=self.SAMPLE_STARTED_AT,
+            finished_at=None,
+            is_submitted=False,
+        )
+        attempt.validate()
+
     def test_validate_rejects_non_dict_attempt_data(self) -> None:
         attempt = self._get_sample_attempt()
         # Here we use MyPy ignore because this test intentionally assigns an
