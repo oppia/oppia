@@ -4,9 +4,8 @@
                               (retryAssessment)="onRetryAssessment()"
                               (resumeAssessment)="onResumeAssessment()">
   </oppia-assessment-interrupt>
-
-  <oppia-assessment-introduction-card #introCard
-                                      *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INTRO"
+<!-- TODO(#24717-M2.15): Add certificate-assessment-titled-shared-background-banner component. -->
+  <oppia-assessment-introduction-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INTRO"
                                       [certificateId]="certificateId"
                                       (continue)="showInstructions()">
   </oppia-assessment-introduction-card>
@@ -21,9 +20,12 @@
                                                   [currentQuestionIndex]="currentQuestionIndex"
                                                   [totalQuestions]="mockQuestions.length"
                                                   [progressPercentage]="getProgressPercentage()"
-                                                  [isLastQuestion]="currentQuestionIndex === mockQuestions.length - 1"
+                                                  [isLastQuestion]="isCurrentQuestionLast()"
+                                                  [savedResponse]="getSavedResponse()"
+                                                  (previousQuestion)="previousQuestion()"
                                                   (nextQuestion)="nextQuestion()"
-                                                  (submitAssessment)="submitAssessment()">
+                                                  (submitAssessment)="submitAssessment()"
+                                                  (responseChange)="updateResponse($event)">
   </oppia-certificate-assessment-conversation-skin>
 
   <oppia-certificate-assessment-result-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_RESULT"
