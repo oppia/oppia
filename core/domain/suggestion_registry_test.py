@@ -2008,7 +2008,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             {
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
-                'content_id': 'description',
+                'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
                 'language_code': 'hi',
                 'content_html': 'original description',
                 'translation_html': 'translated description',

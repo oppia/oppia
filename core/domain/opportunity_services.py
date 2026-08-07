@@ -44,7 +44,17 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import (
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+    overload,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -335,32 +345,84 @@ def _compute_incomplete_translation_languages(
     return sorted(list(incomplete_translation_language_codes))
 
 
+@overload
 def get_entity_by_type_and_id(entity_type: str, entity_id: str) -> Union[
     exp_domain.Exploration,
     story_domain.Story,
     skill_domain.Skill,
     topic_domain.Topic,
+]: ...
+
+
+@overload
+def get_entity_by_type_and_id(
+    entity_type: str, entity_id: str, *, strict: Literal[True]
+) -> Union[
+    exp_domain.Exploration,
+    story_domain.Story,
+    skill_domain.Skill,
+    topic_domain.Topic,
+]: ...
+
+
+@overload
+def get_entity_by_type_and_id(
+    entity_type: str, entity_id: str, *, strict: Literal[False]
+) -> Optional[
+    Union[
+        exp_domain.Exploration,
+        story_domain.Story,
+        skill_domain.Skill,
+        topic_domain.Topic,
+    ]
+]: ...
+
+
+def get_entity_by_type_and_id(
+    entity_type: str, entity_id: str, strict: bool = True
+) -> Optional[
+    Union[
+        exp_domain.Exploration,
+        story_domain.Story,
+        skill_domain.Skill,
+        topic_domain.Topic,
+    ]
 ]:
     """Helper method to fetch an entity by type and ID.
 
     Args:
         entity_type: str. The type of the entity.
         entity_id: str. The ID of the entity.
+        strict: bool. Whether to fail noisily if no entity with the given
+            id exists.
 
     Returns:
-        BaseTranslatableObject. The domain object corresponding to the given ID.
+        BaseTranslatableObject or None. The domain object corresponding to
+        the given ID, or None if it does not exist.
 
     Raises:
         ValueError. If an unsupported entity type is provided.
     """
+    if strict:
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            return exp_fetchers.get_exploration_by_id(entity_id)
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            return story_fetchers.get_story_by_id(entity_id)
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            return skill_fetchers.get_skill_by_id(entity_id)
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            return topic_fetchers.get_topic_by_id(entity_id)
+        else:
+            raise ValueError(f'Unsupported entity type: {entity_type}')
+
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-        return exp_fetchers.get_exploration_by_id(entity_id)
+        return exp_fetchers.get_exploration_by_id(entity_id, strict=False)
     elif entity_type == feconf.ENTITY_TYPE_STORY:
-        return story_fetchers.get_story_by_id(entity_id)
+        return story_fetchers.get_story_by_id(entity_id, strict=False)
     elif entity_type == feconf.ENTITY_TYPE_SKILL:
-        return skill_fetchers.get_skill_by_id(entity_id)
+        return skill_fetchers.get_skill_by_id(entity_id, strict=False)
     elif entity_type == feconf.ENTITY_TYPE_TOPIC:
-        return topic_fetchers.get_topic_by_id(entity_id)
+        return topic_fetchers.get_topic_by_id(entity_id, strict=False)
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
 

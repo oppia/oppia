@@ -830,8 +830,12 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         self.validate()
         entity = opportunity_services.get_entity_by_type_and_id(
-            self.target_type, self.target_id
+            self.target_type, self.target_id, strict=False
         )
+        if entity is None:
+            raise utils.ValidationError(
+                'The %s with the given id doesn\'t exist.' % self.target_type
+            )
         if (
             self.change_cmd.state_name
             == constants.DEFAULT_SUGGESTION_STATE_NAME
@@ -846,9 +850,13 @@ class SuggestionTranslateContent(BaseSuggestion):
                     self.change_cmd.content_id
                     not in translatable_contents.content_id_to_translatable_content
                 ):
+                    msg = (
+                        'Expected %s to be a valid metadata content ID'
+                        if self.target_type == feconf.ENTITY_TYPE_EXPLORATION
+                        else 'Expected %s to be a valid content ID'
+                    )
                     raise utils.ValidationError(
-                        'Expected %s to be a valid content ID'
-                        % self.change_cmd.content_id
+                        msg % self.change_cmd.content_id
                     )
             else:
                 raise utils.ValidationError(
