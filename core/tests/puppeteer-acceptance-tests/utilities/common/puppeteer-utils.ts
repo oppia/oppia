@@ -817,10 +817,15 @@ export class BaseUser {
     );
 
     if (isTextInput) {
-      // Clear input/textarea elements via the native value setter and dispatch
-      // input/change events. This updates Angular's ngModel deterministically
-      // without depending on focus/selection timing, which can be flaky right
-      // after an element (e.g. a modal input) becomes clickable.
+      // Click the field to move the pointer (so hover-paused toasts dismiss)
+      // and to focus it before clearing, matching the keyboard-only behavior.
+      await element.click();
+
+      // Clear via the native value setter and an input event to update ngModel
+      // deterministically without depending on focus/selection timing. Do not
+      // dispatch 'change' here: change-bound editors (e.g. the URL fragment
+      // editor) would commit an empty value to their model before the user
+      // types; the native 'change' fires on the next blur with the full value.
       await element.evaluate(el => {
         const valueSetter = Object.getOwnPropertyDescriptor(
           el instanceof HTMLTextAreaElement
@@ -831,7 +836,6 @@ export class BaseUser {
 
         valueSetter?.call(el, '');
         el.dispatchEvent(new Event('input', {bubbles: true}));
-        el.dispatchEvent(new Event('change', {bubbles: true}));
       });
     } else {
       // Rich-text editors (e.g. CKEditor) expose contenteditable divs, which
