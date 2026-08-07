@@ -155,7 +155,6 @@ topic-viewer-page .oppia-topic-viewer-container {
 
 topic-viewer-page-root .navbar-light .navbar-container {
   background: #00645c;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 topic-viewer-page .coming-soon-title {
@@ -176,6 +175,12 @@ topic-viewer-page-root .topic-viewer-page-content {
 
 topic-viewer-page-root .oppia-navbar {
   box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  topic-viewer-page-root .oppia-navbar.headroom--unpinned {
+    transform: translateY(0%);
+  }
 }
 
 topic-viewer-page-root .oppia-topic-viewer-container .background-banner-position {

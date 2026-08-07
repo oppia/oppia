@@ -10,6 +10,7 @@
 
     <div class="adventure-navigation-wrapper"
          [class.adventure-navigation-wrapper--centered]="!hasHorizontalOverflow"
+          [class.adventure-navigation-wrapper--overflow]="hasHorizontalOverflow"
          #scrollWrapper
          (scroll)="onScroll()">
       <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx"
@@ -24,6 +25,7 @@
                                       class="adventure-navigation-clickable"
                                       (click)="onLessonClick(lesson.lessonNumber, adventureIdx)"
                                       [attr.aria-label]="'Go to lesson ' + lesson.lessonNumber"
+                                      title="Go to lesson {{ lesson.lessonNumber }}"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onLessonClick(lesson.lessonNumber, adventureIdx)"
@@ -39,6 +41,7 @@
                                       class="adventure-navigation-clickable"
                                       (click)="onPracticeClick(adventureIdx)"
                                       [attr.aria-label]="'Go to practice'"
+                                      title="Go to practice"
                                       role="button"
                                       tabindex="0"
                                       (keydown.enter)="onPracticeClick(adventureIdx)"

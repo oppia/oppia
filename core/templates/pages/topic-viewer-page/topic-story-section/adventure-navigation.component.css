@@ -30,8 +30,7 @@
   min-width: 0;
   overflow-x: auto;
   padding-bottom: 4px;
-  /* Hide native scrollbar — arrows replace it */
-  scrollbar-width: none;
+  position: relative;
 }
 
 .adventure-navigation-wrapper--centered {
@@ -40,6 +39,28 @@
 
 .adventure-navigation-wrapper::-webkit-scrollbar {
   display: none;
+}
+
+.adventure-navigation-wrapper--overflow::before,
+.adventure-navigation-wrapper--overflow::after {
+  content: '';
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 4px;
+  width: 22px;
+  z-index: 3;
+}
+
+.adventure-navigation-wrapper--overflow::before {
+  left: 0;
+  background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.adventure-navigation-wrapper--overflow::after {
+  right: 0;
+  background: linear-gradient(to left, #fff 0%, rgba(255, 255, 255, 0) 100%);
 }
 
 .adventure-navigation-arrow {
@@ -130,8 +151,15 @@
 
 @media (max-width: 768px) {
   .adventure-navigation-container {
+    margin: 0;
+    padding: 0 14px;
     margin-top: 0;
     padding-top: 0;
+  }
+
+  .adventure-navigation-wrapper--overflow::before,
+  .adventure-navigation-wrapper--overflow::after {
+    display: block;
   }
 
   .adventure-navigation-wrapper {
@@ -166,8 +194,15 @@
 
 @media (max-width: 450px) {
   .adventure-navigation-container {
+    margin: 0;
+    padding: 0 12px;
     margin-top: 0;
     padding-top: 0;
+  }
+
+  .adventure-navigation-wrapper--overflow::before,
+  .adventure-navigation-wrapper--overflow::after {
+    width: 18px;
   }
 
   .adventure-navigation-wrapper {
