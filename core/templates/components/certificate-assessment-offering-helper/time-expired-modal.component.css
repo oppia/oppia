@@ -37,18 +37,6 @@
   margin: 20px 0;
 }
 
-.assessment-modal-close-button {
-  background: transparent;
-  border: 0;
-  color: #7b8794;
-  cursor: pointer;
-  line-height: 1;
-  padding: 4px;
-}
-.assessment-modal-close-button:hover {
-  color: #334e68;
-}
-
 .assessment-modal-message {
   color: #46545e;
   font-size: 16px;

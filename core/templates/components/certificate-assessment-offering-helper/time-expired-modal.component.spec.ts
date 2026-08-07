@@ -88,9 +88,7 @@ describe('TimeExpiredModalComponent', () => {
     });
 
     it('should dismiss the modal when the header close button is clicked', () => {
-      const closeButton = fixture.debugElement.query(
-        By.css('.assessment-modal-close-button')
-      );
+      const closeButton = fixture.debugElement.query(By.css('.btn-close'));
 
       closeButton.triggerEventHandler('click', null);
 

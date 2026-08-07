@@ -5,11 +5,7 @@
       <h2 id="unanswered-question-modal-title" class="assessment-modal-title">{{ 'I18N_UNANSWERED_QUESTION_MODAL_TITLE' | translate }}</h2>
     </div>
 
-    <button type="button" class="assessment-modal-close-button" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON' | translate" (click)="goBackToAssessment()">
-      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <button type="button" class="btn-close" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_CLOSE_BUTTON' | translate" (click)="goBackToAssessment()"></button>
   </div>
 
   <p id="unanswered-question-modal-message" class="assessment-modal-message">
@@ -19,9 +15,7 @@
   <p class="assessment-modal-message">
     {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_BEFORE' | translate }}
     <button type="button" class="assessment-modal-inline-key" [attr.aria-label]="'I18N_UNANSWERED_QUESTION_MODAL_GO_BACK_BUTTON_ALT' | translate" (click)="goBackToAssessment()">
-      <svg width="10" height="10" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 4L16 16M16 4L4 16" stroke="#334e68" stroke-width="2.4" stroke-linecap="round"/>
-      </svg>
+      &times;
     </button>
     {{ 'I18N_UNANSWERED_QUESTION_MODAL_PRESS_PROMPT_AFTER' | translate }}
   </p>
