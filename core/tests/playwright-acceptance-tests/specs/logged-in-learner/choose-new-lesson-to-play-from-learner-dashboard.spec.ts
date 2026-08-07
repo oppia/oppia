@@ -154,7 +154,7 @@ test.describe('Logged-In Learner', function () {
     // await loggedInLearner.resumeLessonFromLearnerDashboard(
     //   'Chapter 2: Test Chapter 2'
     // );
-    // await loggedInLearner.continueToNextCard();
+    // await loggedInLearner.continueToNextCardAsLoggedOutUser();
     // await loggedInLearner.navigateToLearnerDashboard();
 
     // await loggedInLearner.expectLearnSomethingNewInLDToBeEmpty()

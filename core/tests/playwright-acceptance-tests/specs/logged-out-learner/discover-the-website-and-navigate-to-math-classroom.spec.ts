@@ -101,7 +101,7 @@ test.describe('Logged-Out Learner', function () {
   });
 
   test('should be able to find list of subjects to learn', async function () {
-    await loggedOutLearner.navigateToSplashPage();
+    await loggedOutLearner.navigateToSplashPageAsLoggedOutUser();
     await loggedOutLearner.expectHomePageTitleToBe(
       'Free Education for Everyone'
     );

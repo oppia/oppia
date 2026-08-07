@@ -135,7 +135,7 @@ test.describe('Logged-in Learner', function () {
       true
     );
     await loggedInLearner.navigateThroughClassroomButtonOnRLD();
-    await loggedInLearner.expectToBeOnPage('/learn/math');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser('/learn/math');
   });
 
   test('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
@@ -144,7 +144,7 @@ test.describe('Logged-in Learner', function () {
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToProgressSection();
@@ -171,8 +171,8 @@ test.describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -199,8 +199,8 @@ test.describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -218,8 +218,8 @@ test.describe('Logged-in Learner', function () {
       'Classroom Lessons',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

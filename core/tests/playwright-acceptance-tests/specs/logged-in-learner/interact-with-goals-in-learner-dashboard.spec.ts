@@ -146,8 +146,8 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('What are the Place Values');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
@@ -170,8 +170,8 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('Find the Value of a Number');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
@@ -196,8 +196,8 @@ test.describe('Logged-In Learner', function () {
     await loggedInUser.clickLessonCardButton('Comparing Numbers');
 
     await loggedInUser.expectContinueToNextCardButtonToBePresent(true);
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
+    await loggedInUser.continueToNextCardAsLoggedOutUser();
 
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'

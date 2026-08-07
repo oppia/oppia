@@ -84,7 +84,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
     await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
 
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1'

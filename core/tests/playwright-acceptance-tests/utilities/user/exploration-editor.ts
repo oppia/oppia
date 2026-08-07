@@ -20,10 +20,10 @@ import {Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {ExplorationEditorModal} from '../common/exploration-editor';
+import {ExplorationEditorUtils} from '../common/exploration-editor-utils';
+import {RTEEditor} from '../common/rte-editor';
 import * as fs from 'fs';
 import * as path from 'path';
-import {RTEEditor} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -175,9 +175,6 @@ const historyTableIndex = '.e2e-test-history-table-index';
 const historyListOptions = '.e2e-test-history-table-option';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
-const nextCardButton = '.e2e-test-next-card-button';
-const nextCardArrowButton = '.e2e-test-next-button';
-const previousCardButton = '.e2e-test-back-button';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -618,21 +615,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    * @param {boolean} skipVerification - Whether to skip verification of the card content.
    */
-  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
-    try {
-      await this.clickOnElementWithSelector(nextCardButton);
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('Timeout')) {
-        await this.clickOnElementWithSelector(nextCardArrowButton);
-      } else {
-        throw error;
-      }
-    }
-
-    if (skipVerification) {
-      return;
-    }
-    await this.expectElementToBeVisible(previousCardButton);
+  async continueToNextCardAsExplorationEditor(
+    skipVerification: boolean = false
+  ): Promise<void> {
+    const explorationPlayerUtils = new ExplorationEditorUtils(this);
+    await explorationPlayerUtils.continueToNextCard(skipVerification);
   }
 
   /**
@@ -796,7 +783,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
-    const explorationEditor = new ExplorationEditorModal(this);
+    const explorationEditor = new ExplorationEditorUtils(this);
     await explorationEditor.dismissWelcomeModal(failIfMissing);
   }
 

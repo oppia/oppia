@@ -157,7 +157,7 @@ test.describe('Logged-In Learner', function () {
 
   test('should navigate directly to math classroom', async function () {
     await loggedInLearner.navigateToClassroomFromLearnerDashboard('math');
-    await loggedInLearner.expectToBeOnPage('learn/math');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser('learn/math');
     await loggedInLearner.expectScreenshotToMatch('mathClassroomPage');
     showMessage('Navigated to math classroom from learner dashboard.');
   });
@@ -165,7 +165,9 @@ test.describe('Logged-In Learner', function () {
   test('should navigate directly to the Place Values topic in the math classroom', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToTopicPageByCard('Place Values');
-    await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser(
+      'learn/math/place-values'
+    );
     await loggedInLearner.expectScreenshotToMatch('placeValuesTopicPage');
     showMessage('Navigated to Place Values topic from learner dashboard.');
   });
@@ -173,12 +175,14 @@ test.describe('Logged-In Learner', function () {
   test('should display in-progress and recommended lessons after starting a lesson', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToTopicPageByCard('Place Values');
-    await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+    await loggedInLearner.expectToBeOnPageAsLoggedInUser(
+      'learn/math/place-values'
+    );
     await loggedInLearner.selectChapterWithinStoryToLearn(
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.navigateToLearnerDashboard();
     // Did not finish the chapter,So still in  In-progress section.
     await loggedInLearner.expectElementsToBePresentInRLD(
@@ -219,8 +223,8 @@ test.describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -244,8 +248,8 @@ test.describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -270,8 +274,8 @@ test.describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -296,8 +300,8 @@ test.describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 4: Rounding Numbers part 1'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
@@ -315,8 +319,8 @@ test.describe('Logged-In Learner', function () {
       'Lessons in progress',
       'Chapter 5: Rounding Numbers part 2'
     );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
+    await loggedInLearner.continueToNextCardAsLoggedOutUser();
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );

@@ -20,6 +20,7 @@ import {Page, expect, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {NavigationUtils} from '../common/navigation-utils';
 
 const baseUrl = testConstants.URLs.BaseURL;
 const contributorDashboardAdminUrl =
@@ -741,18 +742,9 @@ export class LoggedInUser extends BaseUser {
    * Verifies that the current page URL includes the expected page pathname.
    * @param {string} expectedPage - The expected page pathname (e.g., 'learner-dashboard').
    */
-  async expectToBeOnPage(expectedPage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    const url = this.page.url();
-
-    // Replace spaces in the expectedPage with hyphens.
-    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
-
-    if (!url.toLowerCase().includes(expectedPageInUrl.toLowerCase())) {
-      throw new Error(
-        `Expected to be on page ${expectedPage}, but found ${url}`
-      );
-    }
+  async expectToBeOnPageAsLoggedInUser(expectedPage: string): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.expectToBeOnPage(expectedPage);
   }
 
   /**
@@ -1980,22 +1972,22 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the splash page.
    * @param {string} expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
-  async navigateToSplashPage(
+  async navigateToSplashPageAsLoggedInUser(
     expectedURL: string = learnerDashboardUrl
   ): Promise<void> {
-    // We explicitly check for expected URL instead of verifying it through
-    // BaseUser.goto as /splash redirects user to a different page.
-    await this.goto(splashPageUrl, false);
-
-    expect(this.page.url()).toBe(expectedURL);
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToSplashPage(expectedURL);
   }
 
   /**
    * Navigates to the exploration page and starts playing the exploration.
    * @param {string} explorationId - The ID of the exploration to play.
    */
-  async playExploration(explorationId: string | null): Promise<void> {
-    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  async playExplorationAsLoggedInUser(
+    explorationId: string | null
+  ): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.playExploration(baseUrl, explorationId);
   }
 
   /**
