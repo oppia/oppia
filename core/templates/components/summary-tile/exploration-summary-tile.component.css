@@ -3,14 +3,14 @@
   compilation, here are some additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-oppia-exploration-summary-tile .oppia-exploration-dashboard-card {
+.oppia-exploration-dashboard-card {
   position: relative;
   text-align: left;
   width: 198px;
   z-index: 5;
 }
 
-oppia-exploration-summary-tile .oppia-play-exploration-button {
+.oppia-play-exploration-button {
   display: block;
   margin: auto;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -19,7 +19,7 @@ oppia-exploration-summary-tile .oppia-play-exploration-button {
   user-select: none;
 }
 
-oppia-exploration-summary-tile .oppia-return-to-parent-button {
+.oppia-return-to-parent-button {
   margin-top: 12px;
 }
 
@@ -29,7 +29,7 @@ oppia-exploration-summary-tile .oppia-return-to-parent-button {
   to replace the value of the input style to whatever is specified in the
   comment.
 */
-oppia-exploration-summary-tile .oppia-arrow-icon {
+.oppia-arrow-icon {
   font-size: 19px;
   padding-top: 1.5px;
   -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
@@ -38,7 +38,7 @@ oppia-exploration-summary-tile .oppia-arrow-icon {
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 
-oppia-exploration-summary-tile .oppia-learner-confirm-button {
+.oppia-learner-confirm-button {
   background: #0d48a1;
   color: #fff;
   font-size: 16px;
@@ -46,31 +46,31 @@ oppia-exploration-summary-tile .oppia-learner-confirm-button {
   padding: 6px 12px;
 }
 
-oppia-exploration-summary-tile .mobile-activity-summary-card {
+.mobile-activity-summary-card {
   box-shadow: slategrey 2px 4px 4px 0;
   padding: 0 0 0 0;
   width: 340px;
 }
 
-oppia-exploration-summary-tile .mobile-exploration-card-image-container {
+.mobile-exploration-card-image-container {
   align-self: center;
   width: 63px;
 }
 
-oppia-exploration-summary-tile .mobile-exploration-card-image {
+.mobile-exploration-card-image {
   height: 100%;
   width: auto;
 }
 
-oppia-exploration-summary-tile .views-text {
+.views-text {
   margin-left: 6px;
 }
 
-oppia-exploration-summary-tile .thumbnail-image {
+.thumbnail-image {
   display: block;
 }
 
-oppia-exploration-summary-tile .exploration-summary-btn {
+.exploration-summary-btn {
   align-items: center;
   background-color: #fff;
   border: none;
@@ -88,29 +88,29 @@ oppia-exploration-summary-tile .exploration-summary-btn {
   width: 325px;
 }
 
-oppia-exploration-summary-tile a:hover {
+a:hover {
   text-decoration: none;
 }
 
-oppia-exploration-summary-tile .exploration-summary-btn p {
+.exploration-summary-btn p {
   text-align: right;
 }
 
-oppia-exploration-summary-tile .arrow-icon {
+.arrow-icon {
   font-size: 24px;
   margin-right: 10px;
 }
 
-oppia-exploration-summary-tile .star-icon {
+.star-icon {
   margin-right: 5px;
 }
 
-oppia-exploration-summary-tile .exploration-summary-btn span {
+.exploration-summary-btn span {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 16px;
 }
 
-oppia-exploration-summary-tile .oppia-exploration-dashboard-card .layout-row {
+.oppia-exploration-dashboard-card .layout-row {
   align-items: center;
   display: flex;
   flex-direction: row;
@@ -118,14 +118,14 @@ oppia-exploration-summary-tile .oppia-exploration-dashboard-card .layout-row {
   max-width: 100%;
 }
 
-oppia-exploration-summary-tile .tags-section {
+.tags-section {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   margin-top: 8px;
 }
 
-oppia-exploration-summary-tile .tag-badge {
+.tag-badge {
   background: #f0f0f0;
   border: 1px solid #d0d0d0;
   border-radius: 4px;
@@ -136,16 +136,16 @@ oppia-exploration-summary-tile .tag-badge {
 }
 
 @media (max-width: 480px) {
-  oppia-exploration-summary-tile .exploration-summary-btn {
+  .exploration-summary-btn {
     font-size: 13px;
     width: 240px;
   }
 
-  oppia-exploration-summary-tile .arrow-icon {
+  .arrow-icon {
     font-size: 18px;
   }
 
-  oppia-exploration-summary-tile .exploration-summary-btn span {
+  .exploration-summary-btn span {
     font-size: 13px;
   }
 
