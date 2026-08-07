@@ -38,6 +38,7 @@
     "core/templates/pages/blog-author-profile-page/blog-author-profile-page.component.css",
     "core/templates/pages/blog-home-page/blog-home-page.component.css",
     "core/templates/pages/blog-post-page/blog-post-page.component.css",
+    "core/templates/pages/certificate-assessment-player-page/certificate-assessment-player-page.component.css",
     "core/tests/protractor-browserstack.conf.js",
     "core/tests/wdio.conf.js",
     "data/README.md",
