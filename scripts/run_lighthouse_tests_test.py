@@ -68,12 +68,15 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         puppeteer_path = os.path.join(
             'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
         )
-        self.puppeteer_bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+        self.puppeteer_bash_command = [
+            common.LIGHTHOUSE_NODE_BIN_PATH,
+            puppeteer_path,
+        ]
         lhci_path = os.path.join(
             'node_modules', '@lhci', 'cli', 'src', 'cli.js'
         )
         self.lighthouse_check_bash_command = [
-            common.NODE_BIN_PATH,
+            common.LIGHTHOUSE_NODE_BIN_PATH,
             lhci_path,
             'autorun',
             '--config=%s'
@@ -842,7 +845,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     'get_entity',
                     lambda line: ('topic', '123') if 'topic' in line else None,
                 ),
-                self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node'),
+                self.swap(common, 'LIGHTHOUSE_NODE_BIN_PATH', '/usr/bin/node'),
                 self.print_swap,
             ):
                 entities = run_lighthouse_tests.run_lighthouse_puppeteer_script(

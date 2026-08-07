@@ -33,7 +33,6 @@ module.exports = {
     assertions: {
       // Performance category.
       'first-contentful-paint': ['warn', {maxNumericValue: 1230000}],
-      'first-meaningful-paint': ['warn', {maxNumericValue: 1280000}],
       'speed-index': ['warn', {maxNumericValue: 1230000}],
       interactive: ['warn', {maxNumericValue: 1540000}],
       'max-potential-fid': ['warn', {maxNumericValue: 130000}],
@@ -41,14 +40,13 @@ module.exports = {
       'uses-rel-preconnect': ['error', {minScore: 0.5}],
       'efficient-animated-content': ['error', {minScore: 1}],
       'offscreen-images': ['error', {minScore: 0.45}],
-      'time-to-first-byte': ['off', {}],
+      'server-response-time': ['off', {}],
       // Best practices category.
       'no-document-write': ['error', {minScore: 1}],
       'geolocation-on-start': ['error', {minScore: 1}],
       doctype: ['error', {minScore: 1}],
-      'no-vulnerable-libraries': ['off', {minScore: 1}],
       'notification-on-start': ['error', {minScore: 1}],
-      'password-inputs-can-be-pasted-into': ['error', {minScore: 1}],
+      'paste-preventing-inputs': ['error', {minScore: 1}],
       'image-aspect-ratio': ['error', {minScore: 1}],
       'is-on-https': ['off', {}],
       'uses-http2': ['off', {}],
@@ -58,7 +56,6 @@ module.exports = {
     'errors-in-console': ['error', {minScore: 1}],
     'modern-image-formats': ['error', {maxLength: 0, strategy: 'pessimistic'}],
     'uses-passive-event-listeners': ['error', {minScore: 1}],
-    'uses-rel-preload': ['error', {minScore: 1}],
     deprecations: ['error', {minScore: 1}],
     redirects: ['error', {minScore: 1}],
     'uses-responsive-images': ['error', {minScore: 0.8}],

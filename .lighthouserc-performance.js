@@ -83,7 +83,6 @@ module.exports = {
             ],
             // The YouTube embed on donate page uses passive listeners.
             'uses-passive-event-listeners': ['error', {minScore: 0}],
-            'uses-rel-preload': ['error', {minScore: 1}],
             // TODO(#20286): There is a deprecated API on the /donate page due to the
             // donorbox script, change the minScore to 1 once it is fixed.
             deprecations: ['error', {minScore: 0}],
@@ -116,7 +115,6 @@ module.exports = {
             'uses-passive-event-listeners': ['error', {minScore: 0}],
             // Sign up redirects logged-in user to learner dashboard page.
             // Learner dashboard Page cannot be preloaded.
-            'uses-rel-preload': ['error', {minScore: 0}],
             deprecations: ['error', {minScore: 1}],
             redirects: ['error', {minScore: 0}],
             'uses-responsive-images': ['error', {minScore: 0.8}],
@@ -172,7 +170,6 @@ module.exports = {
             'uses-passive-event-listeners': ['error', {minScore: 0}],
             // MIDI library uses some deprecated API.
             deprecations: ['error', {minScore: 0}],
-            'uses-rel-preload': ['error', {minScore: 1}],
             redirects: ['error', {minScore: 1}],
             'uses-responsive-images': ['error', {minScore: 1}],
           },

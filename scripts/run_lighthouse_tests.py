@@ -93,7 +93,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     puppeteer_path = os.path.join(
         'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
     )
-    bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+    bash_command = [common.LIGHTHOUSE_NODE_BIN_PATH, puppeteer_path]
     if record:
         # Add arguments to lighthouse_setup that enable video recording.
         bash_command.append('-record')
@@ -180,7 +180,7 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
     # The max-old-space-size is a quick fix for node running out of heap memory
     # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
-        common.NODE_BIN_PATH,
+        common.LIGHTHOUSE_NODE_BIN_PATH,
         lhci_path,
         'autorun',
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],

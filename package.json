@@ -28,7 +28,7 @@
     "@angular-eslint/template-parser": "^14.0.0",
     "@angular/cli": "~11.2.10",
     "@angular/compiler-cli": "^11.2.10",
-    "@lhci/cli": "^0.9.0",
+    "@lhci/cli": "0.15.1",
     "@types/ckeditor": "^4.9.8",
     "@types/d3": "^5.7.2",
     "@types/d3-array": "^2.0.0",
