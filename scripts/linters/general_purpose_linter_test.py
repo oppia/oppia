@@ -347,6 +347,17 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_todo_in_string_literal_does_not_fail(self) -> None:
+        def _mock_readlines_valid_todo_string(unused_self: str) -> List[str]:
+            return ['const name = "TODO #123"\n']
+
+        with self.swap(FILE_CACHE, 'readlines', _mock_readlines_valid_todo_string):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_TODO_FILEPATH], FILE_CACHE
+            )
+            lint_task_report = linter.check_bad_patterns()
+            self.assertFalse(lint_task_report.failed)
+
     def test_error_message_includes_filepath(self) -> None:
         def _mock_readlines_error(unused_self: str) -> None:
             raise Exception('filecache error')
