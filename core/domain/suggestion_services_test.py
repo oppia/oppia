@@ -793,9 +793,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
             'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
             'language_code': 'hi',
-            'content_html': '<p>Skill Description</p>',
-            'translation_html': '<p>Skill Description in Hindi</p>',
-            'data_format': 'html',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
         }
 
         suggestion = suggestion_services.create_suggestion(
