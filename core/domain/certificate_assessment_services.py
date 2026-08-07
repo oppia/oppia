@@ -323,6 +323,9 @@ def _get_topic_question_ids_by_difficulty(
         question_ids_by_difficulty: Dict[str, List[str]] = (
             collections.defaultdict(list)
         )
+        seen_question_ids_by_difficulty: Dict[str, set[str]] = (
+            collections.defaultdict(set)
+        )
         skill_ids = list(topic.get_all_skill_ids())
         skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
         for skill_id, skill_model in zip(skill_ids, skill_models_list):
@@ -342,10 +345,15 @@ def _get_topic_question_ids_by_difficulty(
                 )
                 if difficulty_label is None:
                     continue
+                # Deduplicate with a set so the membership check is O(1)
+                # instead of a linear scan of the per-bucket list.
                 if (
                     question_skill_link.question_id
-                    not in question_ids_by_difficulty[difficulty_label]
+                    not in seen_question_ids_by_difficulty[difficulty_label]
                 ):
+                    seen_question_ids_by_difficulty[difficulty_label].add(
+                        question_skill_link.question_id
+                    )
                     question_ids_by_difficulty[difficulty_label].append(
                         question_skill_link.question_id
                     )
@@ -469,22 +477,28 @@ def _get_next_attempt_index_for_certificate(
     Returns:
         int. The 1-based index to assign to the next submitted attempt.
     """
-    attempt_models: Sequence[gae_models.CertificateAssessmentAttemptModel] = (
+    submitted_attempt_models: Sequence[
+        gae_models.CertificateAssessmentAttemptModel
+    ] = (
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
-            == learner_id
-        ).fetch()
+            == learner_id,
+            # The certificate_id is stored inside the non-indexed
+            # version_data JSON blob, so the query can only bound the scan to
+            # the learner's submitted attempts and the certificate filter has
+            # to be applied in Python. Ordering by attempt_index descending
+            # means the first matching attempt is the highest index, so the
+            # scan stops early instead of fetching every learner attempt.
+            # pylint: disable=singleton-comparison
+            gae_models.CertificateAssessmentAttemptModel.is_submitted == True,
+        )
+        .order(-gae_models.CertificateAssessmentAttemptModel.attempt_index)
+        .fetch()
     )
-    highest_submitted_index = max(
-        (
-            attempt.attempt_index
-            for attempt in attempt_models
-            if attempt.is_submitted
-            and attempt.version_data.get('certificate_id') == certificate_id
-        ),
-        default=0,
-    )
-    return highest_submitted_index + 1
+    for attempt_model in submitted_attempt_models:
+        if attempt_model.version_data.get('certificate_id') == certificate_id:
+            return attempt_model.attempt_index + 1
+    return 1
 
 
 def start_certificate_assessment_attempt(

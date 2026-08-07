@@ -692,3 +692,10 @@ indexes:
   - name: status
   - name: created_on
     direction: desc
+
+- kind: CertificateAssessmentAttemptModel
+  properties:
+  - name: learner_id
+  - name: is_submitted
+  - name: attempt_index
+    direction: desc

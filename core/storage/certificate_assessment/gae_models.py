@@ -525,10 +525,9 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
 
     The ID of instances of this class is the ID of the
     CertificateAssessmentAttemptModel the responses belong to. Storing all of
-    an attempt's responses in a single entity keeps them in the same entity
-    group as the submission transaction writes, so the attempt and its
-    responses can be persisted atomically without touching one entity group
-    per question. Using the attempt ID as the entity ID also means a retried
+    an attempt's responses in a single entity keeps the submission
+    transaction at a fixed two entity groups, instead of one entity group per
+    question. Using the attempt ID as the entity ID also means a retried
     submission overwrites the same entity instead of creating duplicates.
     """
 
