@@ -67,4 +67,4 @@ import {CertificateAssessmentResultCardComponent} from 'pages/certificate-assess
     CertificateAssessmentTitledBackgroundBannerComponent,
   ],
 })
-export class CertificateAssessmentPlsayerPageModule {}
+export class CertificateAssessmentPlayerPageModule {}
