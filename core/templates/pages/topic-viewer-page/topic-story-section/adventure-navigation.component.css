@@ -43,24 +43,24 @@
 
 .adventure-navigation-wrapper--overflow::before,
 .adventure-navigation-wrapper--overflow::after {
+  bottom: 4px;
   content: '';
   display: none;
   pointer-events: none;
   position: absolute;
   top: 0;
-  bottom: 4px;
   width: 22px;
   z-index: 3;
 }
 
 .adventure-navigation-wrapper--overflow::before {
-  left: 0;
   background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
+  left: 0;
 }
 
 .adventure-navigation-wrapper--overflow::after {
-  right: 0;
   background: linear-gradient(to left, #fff 0%, rgba(255, 255, 255, 0) 100%);
+  right: 0;
 }
 
 .adventure-navigation-arrow {
@@ -152,8 +152,8 @@
 @media (max-width: 768px) {
   .adventure-navigation-container {
     margin: 0;
-    padding: 0 14px;
     margin-top: 0;
+    padding: 0 14px;
     padding-top: 0;
   }
 
@@ -195,8 +195,8 @@
 @media (max-width: 450px) {
   .adventure-navigation-container {
     margin: 0;
-    padding: 0 12px;
     margin-top: 0;
+    padding: 0 12px;
     padding-top: 0;
   }
 

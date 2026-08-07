@@ -10,7 +10,7 @@
 
     <div class="adventure-navigation-wrapper"
          [class.adventure-navigation-wrapper--centered]="!hasHorizontalOverflow"
-          [class.adventure-navigation-wrapper--overflow]="hasHorizontalOverflow"
+         [class.adventure-navigation-wrapper--overflow]="hasHorizontalOverflow"
          #scrollWrapper
          (scroll)="onScroll()">
       <div class="adventure-navigation-group" *ngFor="let adventureGroup of adventureGroups; index as adventureIdx"
