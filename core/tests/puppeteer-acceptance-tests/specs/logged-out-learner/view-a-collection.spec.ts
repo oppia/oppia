@@ -40,6 +40,8 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
+    await loggedOutLearner.navigateToCommunityLibraryPage();
+    await loggedOutLearner.changeSiteLanguage('en');
     lessonCreator = (await UserFactory.createNewUser(
       'lessonCreator',
       'lessoncreator@example.com',
