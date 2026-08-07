@@ -29,6 +29,7 @@ from core.domain import (
     feature_flag_services,
     fs_services,
     html_validation_service,
+    opportunity_services,
     platform_parameter_list,
     question_domain,
     question_services,
@@ -2030,6 +2031,18 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'The skill with the given id doesn\'t exist.',
         ):
             suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'skill1'
+        with self.swap(
+            opportunity_services,
+            'get_entity_by_type_and_id',
+            lambda *args, **kwargs: object(),
+        ):
+            with self.assertRaisesRegex(
+                utils.ValidationError,
+                'Expected entity to be a translatable object',
+            ):
+                suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)
