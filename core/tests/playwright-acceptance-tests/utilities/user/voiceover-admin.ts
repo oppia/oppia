@@ -107,14 +107,10 @@ export class VoiceoverAdmin extends BaseUser {
       // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
       // which expands the mobile navigation bar.
       if (!element) {
-        await this.page.waitForSelector(mobileOptionsButtonSelector, {
-          state: 'visible',
-        });
+        await this.expectElementToBeVisible(mobileOptionsButtonSelector);
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
-      await this.page.waitForSelector(mobileNavbarDropdown, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
@@ -133,7 +129,7 @@ export class VoiceoverAdmin extends BaseUser {
             {state: 'hidden', timeout: 10000}
           );
         } catch (error) {
-          await this.page.click(mobileNavbarDropdown);
+          await this.clickOnElementWithSelector(mobileNavbarDropdown);
           await this.page.waitForSelector(
             navigationDropdownInMobileVisibleSelector,
             {state: 'hidden'}
@@ -157,10 +153,7 @@ export class VoiceoverAdmin extends BaseUser {
       for (const dropdown of dropdowns) {
         try {
           // Wait a short time for the element to be visible, if it doesn't appear, skip it.
-          await this.page.waitForSelector(dropdown, {
-            state: 'visible',
-            timeout: 2000,
-          });
+          await this.expectElementToBeVisible(dropdown, true, this.page, 2000);
           await this.clickOnElementWithSelector(dropdown);
         } catch (error) {
           // Element not visible or doesn't exist - skip it.
@@ -168,21 +161,17 @@ export class VoiceoverAdmin extends BaseUser {
         }
       }
     } else {
-      await this.page.waitForSelector(settingsTabSelector, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(settingsTabSelector);
       await this.clickOnElementWithSelector(settingsTabSelector);
     }
 
-    await this.page.waitForSelector(settingsContainerSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(settingsContainerSelector);
     showMessage('Settings tab is opened successfully.');
   }
 
   /**
    * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
@@ -191,7 +180,7 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to navigate to exploration editor.
-   * @param explorationId - id of the exploration.
+   * @param {string | null} explorationId - id of the exploration.
    */
   async navigateToExplorationEditor(
     explorationId: string | null
@@ -207,7 +196,7 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Asserts that a voiceover artist does not exist in the list.
-   * @param artistUsername - The username of the voiceover artist to check for.
+   * @param {string} artistUsername - The username of the voiceover artist to check for.
    */
   async expectVoiceoverArtistsListDoesNotContain(
     artistUsername: string
@@ -247,7 +236,8 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Add voiceover artists to an exploration.
-   * @param voiceArtists - The username list of the voiceover artists to add.
+   * @param {string[]} voiceArtists - The username list of the voiceover artists to add.
+   * @param {boolean} verify - Whether to verify each artist was added.
    */
   async addVoiceoverArtistsToExploration(
     voiceArtists: string[],
@@ -261,9 +251,7 @@ export class VoiceoverAdmin extends BaseUser {
       await this.expectElementToBeVisible(editVoiceoverArtistButton);
       await this.clickOnElementWithSelector(editVoiceoverArtistButton);
       await this.clickOnElementWithSelector(voiceArtistUsernameInputBox);
-      await this.page.waitForSelector(voiceArtistUsernameInputBox, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(voiceArtistUsernameInputBox);
       await this.clearAllTextFrom(voiceArtistUsernameInputBox);
       await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtists[i]);
       await this.clickOnElementWithSelector(saveVoiceoverArtistEditButton);
@@ -271,9 +259,8 @@ export class VoiceoverAdmin extends BaseUser {
       // the added voice artist is not an user.
       if (verify) {
         try {
-          await this.page.waitForSelector(
-            `div.e2e-test-voice-artist-${voiceArtists[i]}`,
-            {state: 'visible'}
+          await this.expectElementToBeVisible(
+            `div.e2e-test-voice-artist-${voiceArtists[i]}`
           );
           showMessage(voiceArtists[i] + ' has been added as a voice artist.');
         } catch (error) {
@@ -289,7 +276,7 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to remove voiceover artist from an exploration.
-   * @param voiceArtistUsername - The username of the voiceover artist to remove.
+   * @param {string} voiceArtistUsername - The username of the voiceover artist to remove.
    */
   async removeVoiceoverArtist(voiceArtistUsername: string): Promise<void> {
     const removeVoiceoverArtistBtnSelector =
@@ -300,11 +287,8 @@ export class VoiceoverAdmin extends BaseUser {
     const selector = `div.e2e-test-voice-artist-${voiceArtistUsername}`;
     await this.expectElementToBeVisible(selector);
 
-    const removeBtn = await this.page.waitForSelector(
-      `${selector} ${removeVoiceoverArtistBtnSelector}`,
-      {
-        state: 'visible',
-      }
+    const removeBtn = await this.expectElementToBeVisible(
+      `${selector} ${removeVoiceoverArtistBtnSelector}`
     );
     if (!removeBtn) {
       throw new Error('Remove button not found.');
@@ -320,7 +304,7 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to expect to see error toast message
-   * @param expectedErrorMessage - expected error message.
+   * @param {string} expectedErrorMessage - expected error message.
    */
   async expectToSeeErrorToastMessage(
     expectedErrorMessage: string
@@ -351,12 +335,12 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to expect voiceover artists list to contain.
-   * @param artistUsername - artist username.
+   * @param {string} artistUsername - artist username.
    */
   async expectVoiceoverArtistsListContains(
     artistUsername: string
   ): Promise<void> {
-    await this.page.waitForSelector(updatedVoiceoverArtist);
+    await this.expectElementToBeVisible(updatedVoiceoverArtist);
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
     if (!allVoiceoverArtists.includes(artistUsername)) {
       throw new Error(
@@ -395,7 +379,7 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to verify voiceover artist is still omitted.
-   * @param artistUsername - artist username.
+   * @param {string} artistUsername - artist username.
    */
   async verifyVoiceoverArtistStillOmitted(
     artistUsername: string

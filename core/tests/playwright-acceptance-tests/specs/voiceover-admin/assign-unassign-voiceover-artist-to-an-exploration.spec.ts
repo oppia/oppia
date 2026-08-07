@@ -39,6 +39,13 @@ enum INTERACTION_TYPES {
 
 test.describe.configure({mode: 'serial'});
 
+// ConsoleReporter.setConsoleErrorsToIgnore([
+//   new RegExp(
+//     'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
+//   ),
+//   new RegExp('Sorry, we could not find the specified user.'),
+// ]);
+
 test.describe('Voiceover Admin', function () {
   let voiceoverAdmin: VoiceoverAdmin;
   let explorationEditor: ExplorationEditor;
