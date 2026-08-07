@@ -25,6 +25,7 @@ import {
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {PageContextService} from 'services/page-context.service';
@@ -117,7 +118,12 @@ export class TranslationOpportunitiesComponent implements OnChanges {
         totalCount: totalCount,
         translationsCount: translationsCount,
         reviewerOnlyContentCount: reviewerOnlyContentCount,
-        entityType: this.activeEntityType,
+        entityType:
+          this.activeEntityType && this.activeEntityType !== 'all'
+            ? this.activeEntityType
+            : opportunity.entityType && opportunity.entityType !== 'all'
+              ? opportunity.entityType
+              : AppConstants.ENTITY_TYPE.EXPLORATION,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (

@@ -119,8 +119,12 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
+      const actualTargetType =
+        !targetType || targetType === 'all'
+          ? AppConstants.ENTITY_TYPE.EXPLORATION
+          : targetType;
       return this.fetchSubmittedSuggestionsAsync(
-        targetType,
+        actualTargetType,
         'translate_content',
         limit || 0,
         offset,
@@ -139,8 +143,12 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
+      const actualTargetType =
+        !targetType || targetType === 'all'
+          ? AppConstants.ENTITY_TYPE.EXPLORATION
+          : targetType;
       return this.fetchReviewableSuggestionsAsync(
-        targetType,
+        actualTargetType,
         'translate_content',
         limit,
         offset,

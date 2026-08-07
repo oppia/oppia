@@ -404,10 +404,15 @@ class TranslationOpportunityModel(base_models.BaseModel):
         else:
             start_cursor = datastore_services.make_cursor()
 
-        query = cls.query(
-            cls.entity_type == entity_type,
-            cls.incomplete_translation_language_codes == language_code,
-        )
+        if entity_type:
+            query = cls.query(
+                cls.entity_type == entity_type,
+                cls.incomplete_translation_language_codes == language_code,
+            )
+        else:
+            query = cls.query(
+                cls.incomplete_translation_language_codes == language_code,
+            )
 
         if topic_id:
             query = query.filter(cls.topic_ids == topic_id)

@@ -1223,6 +1223,9 @@ class AdminHandler(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>'
             )
             skill_services.save_new_skill(self.user_id, skill)
+            opportunity_services.create_translation_opportunity(
+                {feconf.ENTITY_TYPE_SKILL: [skill_id]}
+            )
             for i in range(15):
                 question_id = question_services.get_new_question_id()
                 question_name = 'Question number %s %s' % (str(i), skill_name)

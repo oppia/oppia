@@ -187,13 +187,15 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      const params = {
+      const params: Record<string, string> = {
         language_code: languageCode,
         topic_name:
           topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
         cursor: cursor,
-        entity_type: entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
       };
+      if (entityType && entityType !== 'all') {
+        params.entity_type = entityType;
+      }
 
       return this.http
         .get<TranslationContributionOpportunitiesBackendDictV2>(
@@ -273,7 +275,9 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      params.entity_type = entityType;
+      if (entityType && entityType !== 'all') {
+        params.entity_type = entityType;
+      }
       return this.http
         .get<ReviewableTranslationOpportunitiesBackendDictV2>(
           '/getreviewableopportunitieshandlerv2',

@@ -54,6 +54,11 @@ export class TranslateTextBackendApiService {
     languageCode: string,
     entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<TranslatableTexts> {
+    const targetEntityType =
+      !entityType || entityType === 'all'
+        ? AppConstants.ENTITY_TYPE.EXPLORATION
+        : entityType;
+
     if (
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
@@ -64,7 +69,7 @@ export class TranslateTextBackendApiService {
           {
             params: {
               entity_id: entityId,
-              entity_type: entityType,
+              entity_type: targetEntityType,
               language_code: languageCode,
             },
           }
@@ -100,9 +105,14 @@ export class TranslateTextBackendApiService {
     dataFormat: string,
     entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<void> {
+    const targetEntityType =
+      !entityType || entityType === 'all'
+        ? AppConstants.ENTITY_TYPE.EXPLORATION
+        : entityType;
+
     const postData: Data = {
       suggestion_type: 'translate_content',
-      target_type: entityType,
+      target_type: targetEntityType,
       description: 'Adds translation',
       target_id: expId,
       target_version_at_submission: expVersion,

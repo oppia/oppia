@@ -341,7 +341,8 @@ class ContributionOpportunitiesHandlerV2(
                 'schema': {
                     'type': 'basestring',
                     'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
-                }
+                },
+                'default_value': None,
             },
         }
     }
@@ -359,7 +360,7 @@ class ContributionOpportunitiesHandlerV2(
         cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request['language_code']
         topic_name = self.normalized_request.get('topic_name')
-        entity_type = self.normalized_request['entity_type']
+        entity_type = self.normalized_request.get('entity_type')
 
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities_with_new_models(
@@ -547,7 +548,8 @@ class ReviewableOpportunitiesHandlerV2(
                 'schema': {
                     'type': 'basestring',
                     'choices': feconf.TRANSLATABLE_ENTITY_TYPES,
-                }
+                },
+                'default_value': None,
             },
         }
     }
@@ -564,7 +566,10 @@ class ReviewableOpportunitiesHandlerV2(
 
         topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
-        entity_type = self.normalized_request['entity_type']
+        entity_type = (
+            self.normalized_request.get('entity_type')
+            or feconf.ENTITY_TYPE_EXPLORATION
+        )
 
         opportunity_dicts = []
         if self.user_id:
