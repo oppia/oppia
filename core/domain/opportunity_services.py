@@ -1547,9 +1547,11 @@ def _get_translation_opportunity_cards_from_models(
             if exp_summary is not None:
                 exp_summary_map[exp_summary.id] = exp_summary
 
+    exp_and_skill_entity_ids = exp_entity_ids + skill_entity_ids
+    if exp_and_skill_entity_ids:
         in_review_counts = (
             _build_exp_id_to_translation_suggestion_in_review_count(
-                exp_entity_ids, language_code
+                exp_and_skill_entity_ids, language_code
             )
         )
 

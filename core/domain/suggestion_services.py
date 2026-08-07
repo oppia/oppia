@@ -83,8 +83,15 @@ if MYPY:  # pragma: no cover
         suggestion_registry.SuggestionAddQuestion,
     ]
 
-feedback_models, suggestion_models, user_models = models.Registry.import_models(
-    [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
+feedback_models, opportunity_models, suggestion_models, user_models = (
+    models.Registry.import_models(
+        [
+            models.Names.FEEDBACK,
+            models.Names.OPPORTUNITY,
+            models.Names.SUGGESTION,
+            models.Names.USER,
+        ]
+    )
 )
 
 transaction_services = models.Registry.import_transaction_services()
@@ -3350,6 +3357,33 @@ def _update_question_reviewer_total_stats_models(
     )
 
 
+def _get_topic_id_for_translation_suggestion(
+    suggestion: suggestion_registry.BaseSuggestion,
+) -> str:
+    """Returns the topic ID associated with a translation suggestion's target opportunity."""
+    target_type = getattr(
+        suggestion, 'target_type', feconf.ENTITY_TYPE_EXPLORATION
+    )
+    if target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+        )
+        if exp_opportunity is not None:
+            return exp_opportunity.topic_id
+
+    opp_models = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+            target_type, [suggestion.target_id]
+        )
+    )
+    if opp_models and opp_models[0] and opp_models[0].topic_ids:
+        return opp_models[0].topic_ids[0]
+
+    return ''
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
 ) -> None:
@@ -3362,16 +3396,7 @@ def update_translation_contribution_stats_at_submission(
             submitted.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_for_translation_suggestion(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3538,16 +3563,7 @@ def update_translation_contribution_stats_at_review(
             reviewed.
     """
     content_word_count = 0
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_for_translation_suggestion(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3698,16 +3714,7 @@ def update_translation_review_stats(
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
         )
-    exp_opportunity = (
-        opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        )
-    )
-    # We can confirm that exp_opportunity will not be None since there should
-    # be an assigned opportunity for a given translation. Hence we can rule out
-    # the possibility of None for mypy type checking.
-    assert exp_opportunity is not None
-    topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_for_translation_suggestion(suggestion)
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
