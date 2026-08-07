@@ -83,6 +83,7 @@ export interface ValidationResponse {
 @Component({
   selector: 'oppia-certificate-offering-review-and-availability',
   templateUrl: './certificate-offering-review-and-availability.component.html',
+  styleUrls: ['./certificate-offering-review-and-availability.component.css'],
 })
 export class CertificateOfferingReviewAndAvailabilityComponent
   implements OnInit

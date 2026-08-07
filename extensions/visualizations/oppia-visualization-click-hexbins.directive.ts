@@ -62,6 +62,7 @@ export type Hexbin = HexbinBin<ClickOnImageAnswer>;
 @Component({
   selector: 'oppia-visualization-click-hexbins',
   templateUrl: './oppia-visualization-click-hexbins.directive.html',
+  styleUrls: ['./oppia-visualization-click-hexbins.directive.css'],
 })
 export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   @Input() data!: ClickOnImageAnswer[];

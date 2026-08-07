@@ -21,6 +21,7 @@ import './certificate-offering-available-page.component.css';
 @Component({
   selector: 'oppia-available-certificate-offering-page',
   templateUrl: './certificate-offering-available-page.component.html',
+  styleUrls: ['./certificate-offering-available-page.component.css'],
 })
 export class AvailableCertificateOfferingPageComponent {
   @Input() classroomUrlFragment: string = '';

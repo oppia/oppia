@@ -21,6 +21,7 @@ import './technical-feedback-dashboard-page.component.css';
 @Component({
   selector: 'oppia-technical-feedback-dashboard-page',
   templateUrl: './technical-feedback-dashboard-page.component.html',
+  styleUrls: ['./technical-feedback-dashboard-page.component.css'],
 })
 export class TechnicalFeedbackDashboardPageComponent {
   constructor() {}

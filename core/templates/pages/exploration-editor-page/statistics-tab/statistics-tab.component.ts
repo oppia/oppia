@@ -49,6 +49,7 @@ interface PieChartOptions {
 @Component({
   selector: 'oppia-statistics-tab',
   templateUrl: './statistics-tab.component.html',
+  styleUrls: ['./statistics-tab.component.css'],
 })
 export class StatisticsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

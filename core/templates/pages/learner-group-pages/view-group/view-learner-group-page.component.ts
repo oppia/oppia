@@ -36,6 +36,7 @@ import './view-learner-group-page.component.css';
 @Component({
   selector: 'oppia-view-learner-group-page',
   templateUrl: './view-learner-group-page.component.html',
+  styleUrls: ['./view-learner-group-page.component.css'],
 })
 export class ViewLearnerGroupPageComponent implements OnInit {
   VIEW_LEARNER_GROUP_TABS_I18N_IDS =

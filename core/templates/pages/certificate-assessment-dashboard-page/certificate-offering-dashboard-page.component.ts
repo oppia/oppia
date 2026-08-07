@@ -33,6 +33,7 @@ interface CertificateOfferingSummary {
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
+  styleUrls: ['./certificate-offering-dashboard-page.component.css'],
 })
 export class CertificateOfferingDashboardPageComponent implements OnInit {
   readonly certificatesPerPage = 5;

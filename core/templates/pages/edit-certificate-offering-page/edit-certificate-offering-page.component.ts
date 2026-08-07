@@ -42,6 +42,7 @@ import './edit-certificate-offering-page.component.css';
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
   templateUrl: './edit-certificate-offering-page.component.html',
+  styleUrls: ['./edit-certificate-offering-page.component.css'],
 })
 export class EditCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
