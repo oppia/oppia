@@ -2523,6 +2523,18 @@ div#ng-curtain {
   height: 56px;
 }
 
+@media (min-width: 801px) {
+  /* Keep topic preview dock below global and topic preview headers on desktop. */
+  body.topic-editor-page-active .e2e-test-topic-preview-tab-container .adventure-navigation-container {
+    top: 126px !important;
+  }
+}
+
+/* Keep the global navbar visible while scrolling in topic editor pages. */
+body.topic-editor-page-active .oppia-navbar.headroom--unpinned {
+  transform: translateY(0%) !important;
+}
+
 .oppia-navbar-brand-name {
   float: right;
   height: 56px;

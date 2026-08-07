@@ -16,7 +16,8 @@
  * @fileoverview Component for the topic editor page.
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {DOCUMENT} from '@angular/common';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
@@ -38,6 +39,7 @@ import {TopicEditorStateService} from './services/topic-editor-state.service';
   templateUrl: './topic-editor-page.component.html',
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
+  private static readonly TOPIC_EDITOR_BODY_CLASS = 'topic-editor-page-active';
   topic: Topic | null = null;
   validationIssues: string[] = [];
   prepublishValidationIssues: string[] = [];
@@ -56,7 +58,8 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     private topicEditorRoutingService: TopicEditorRoutingService,
     private topicEditorStateService: TopicEditorStateService,
     private undoRedoService: UndoRedoService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -238,6 +241,9 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.document.body.classList.add(
+      TopicEditorPageComponent.TOPIC_EDITOR_BODY_CLASS
+    );
     this.loaderService.showLoadingScreen('Loading Topic');
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() => {
@@ -271,6 +277,9 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.document.body.classList.remove(
+      TopicEditorPageComponent.TOPIC_EDITOR_BODY_CLASS
+    );
     this.directiveSubscriptions.unsubscribe();
   }
 }
