@@ -623,7 +623,6 @@ const collectionSummaryTileTitleSelector =
 const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
 const collectionPreviewTileLinkSelector =
   '.oppia-exploration-summary-tile a[href*="/explore/"]';
-const collectionPreviewPlayButtonSelector = '.e2e-test-play-exploration-button';
 
 const viewSolutionButtonSelector = '.e2e-test-view-solution';
 const viewHintButtonSelector = '.e2e-test-view-hint';
@@ -7761,81 +7760,11 @@ export class LoggedOutUser extends BaseUser {
         timeout: 60000,
       });
     } else if (isMobile) {
-      await tile.evaluate(el => {
-        el.scrollIntoView({block: 'center', inline: 'center'});
-        el.dispatchEvent(
-          new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            composed: true,
-          })
-        );
+      await tile.click();
+      await this.page.waitForSelector(collectionPreviewTileLinkSelector, {
+        visible: true,
+        timeout: 10000,
       });
-
-      await this.page.waitForFunction(
-        (
-          previewTileLinkSelector: string,
-          previewPlayButtonSelector: string
-        ) => {
-          const isVisible = (node: Element | null): boolean => {
-            if (!node) {
-              return false;
-            }
-            const element = node as HTMLElement;
-            const style = window.getComputedStyle(element);
-            const rect = element.getBoundingClientRect();
-            return (
-              style.visibility !== 'hidden' &&
-              style.display !== 'none' &&
-              rect.width > 0 &&
-              rect.height > 0
-            );
-          };
-
-          return Boolean(
-            isVisible(document.querySelector(previewPlayButtonSelector)) ||
-              isVisible(document.querySelector(previewTileLinkSelector))
-          );
-        },
-        {timeout: 10000},
-        collectionPreviewTileLinkSelector,
-        collectionPreviewPlayButtonSelector
-      );
-
-      const previewPlayButton = await this.page.$(
-        collectionPreviewPlayButtonSelector
-      );
-
-      if (previewPlayButton) {
-        const previousUrl = this.page.url();
-        await Promise.all([
-          this.page
-            .waitForNavigation({
-              waitUntil: 'domcontentloaded',
-              timeout: 30000,
-            })
-            .catch(() => null),
-          this.page
-            .waitForFunction(
-              (oldUrl: string) => {
-                return (
-                  window.location.href !== oldUrl &&
-                  window.location.pathname.includes('/explore/')
-                );
-              },
-              {timeout: 30000},
-              previousUrl
-            )
-            .catch(() => null),
-          previewPlayButton.click(),
-        ]);
-      }
-
-      if (this.page.url().includes('/explore/')) {
-        await this.waitForPageToFullyLoad();
-        return;
-      }
-
       const previewLink = await this.page
         .$eval(collectionPreviewTileLinkSelector, el => {
           const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
@@ -7844,29 +7773,15 @@ export class LoggedOutUser extends BaseUser {
             : href;
         })
         .catch(() => null);
-
-      if (previewLink) {
-        await this.page.goto(`http://localhost:8181${previewLink}`, {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000,
-        });
-      } else {
-        if (!previewPlayButton) {
-          throw new Error(
-            'Could not resolve exploration link from preview tile.'
-          );
-        }
-
-        await Promise.all([
-          this.page
-            .waitForNavigation({
-              waitUntil: 'domcontentloaded',
-              timeout: 30000,
-            })
-            .catch(() => null),
-          previewPlayButton.click(),
-        ]);
+      if (!previewLink) {
+        throw new Error(
+          'Could not resolve exploration link from preview tile.'
+        );
       }
+      await this.page.goto(`http://localhost:8181${previewLink}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
     } else {
       await Promise.all([
         this.page.waitForNavigation({
@@ -7904,43 +7819,11 @@ export class LoggedOutUser extends BaseUser {
    * key-less collection URLs.
    */
   async clickBackToCollectionButton(): Promise<void> {
-    if (this.page.url().includes('/collection/')) {
-      return;
-    }
-
-    const backToCollectionButton = await this.page.$(
-      backToCollectionButtonSelector
-    );
-
-    if (backToCollectionButton) {
-      await Promise.all([
-        this.page
-          .waitForNavigation({
-            waitUntil: 'domcontentloaded',
-            timeout: 30000,
-          })
-          .catch(() => null),
-        backToCollectionButton.click(),
-      ]);
-    } else {
-      const collectionIdFromUrl = new URL(this.page.url()).searchParams.get(
-        'collection_id'
-      );
-      const fallbackCollectionPath =
-        this.storedCollectionPath ??
-        (collectionIdFromUrl ? `/collection/${collectionIdFromUrl}` : null);
-
-      if (!fallbackCollectionPath) {
-        throw new Error(
-          'Back-to-collection button was not visible and no collection path was stored.'
-        );
-      }
-
-      await this.page.goto(`http://localhost:8181${fallbackCollectionPath}`, {
-        waitUntil: 'domcontentloaded',
-        timeout: 60000,
-      });
-    }
+    await this.page.waitForSelector(backToCollectionButtonSelector, {
+      visible: true,
+      timeout: 10000,
+    });
+    await this.clickOnElementWithSelector(backToCollectionButtonSelector);
 
     if (this.storedCollectionPath?.includes('key=')) {
       await this.page.goto(
