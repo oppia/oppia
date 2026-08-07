@@ -1492,7 +1492,7 @@ def _get_translation_opportunity_cards_from_models(
                         is not None
                     ):
                         return feconf.ENTITY_TYPE_SKILL
-            return model.entity_type
+            return str(model.entity_type)
         return feconf.ENTITY_TYPE_EXPLORATION
 
     exp_entity_ids = [

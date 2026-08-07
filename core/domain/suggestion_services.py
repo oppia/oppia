@@ -3379,7 +3379,7 @@ def _get_topic_id_for_translation_suggestion(
         )
     )
     if opp_models and opp_models[0] and opp_models[0].topic_ids:
-        return opp_models[0].topic_ids[0]
+        return str(opp_models[0].topic_ids[0])
 
     return ''
 
