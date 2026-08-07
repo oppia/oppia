@@ -836,16 +836,23 @@ class SuggestionTranslateContent(BaseSuggestion):
             self.change_cmd.state_name
             == constants.DEFAULT_SUGGESTION_STATE_NAME
         ):
-            translatable_contents = entity.get_translatable_contents_collection(
-                override_metadata_feature_flag=True
-            )
-            if (
-                self.change_cmd.content_id
-                not in translatable_contents.content_id_to_translatable_content
-            ):
+            if isinstance(entity, translation_domain.BaseTranslatableObject):
+                translatable_contents = (
+                    entity.get_translatable_contents_collection(
+                        override_metadata_feature_flag=True
+                    )
+                )
+                if (
+                    self.change_cmd.content_id
+                    not in translatable_contents.content_id_to_translatable_content
+                ):
+                    raise utils.ValidationError(
+                        'Expected %s to be a valid content ID'
+                        % self.change_cmd.content_id
+                    )
+            else:
                 raise utils.ValidationError(
-                    'Expected %s to be a valid content ID'
-                    % self.change_cmd.content_id
+                    'Expected entity to be a translatable object'
                 )
         else:
             if not isinstance(entity, exp_domain.Exploration) or (

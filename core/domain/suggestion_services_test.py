@@ -791,7 +791,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
-            'content_id': 'rubric_0',
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
             'language_code': 'hi',
             'content_html': '<p>Skill Description</p>',
             'translation_html': '<p>Skill Description in Hindi</p>',
