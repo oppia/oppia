@@ -40,12 +40,11 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
-    lessonCreator = (await UserFactory.createNewUser(
+    lessonCreator = await UserFactory.createNewUser(
       'lessonCreator',
       'lessoncreator@example.com',
       [ROLES.COLLECTION_EDITOR]
-    )) as unknown as ExplorationEditor & CollectionEditor;
-
+    );
     const expId1 = await lessonCreator.createAndPublishExplorationWithCards(
       FIRST_EXPLORATION_TITLE
     );
