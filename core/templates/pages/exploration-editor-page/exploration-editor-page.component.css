@@ -125,12 +125,12 @@
   width: 90px;
 }
 
-.navbar-icons .nav-list-item:hover {
-  background-color: #4eb0c0;
-}
-
 .navbar-icons .nav-list-item {
   position: relative;
+}
+
+.navbar-icons .nav-list-item:hover {
+  background-color: #4eb0c0;
 }
 
 .navbar-icons .nav-list-item > .nav-link {

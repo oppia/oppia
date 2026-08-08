@@ -29,14 +29,14 @@
   color: #f0ad4e;
 }
 
-.teach-oppia-modal .response-edit-button:hover,  .teach-oppia-modal .confrim-respose-button:hover {
-  background: whitesmoke;
-}
-
 .teach-oppia-modal .confrim-respose-button {
   background: white;
   border-color: green;
   color: green;
+}
+
+.teach-oppia-modal .response-edit-button:hover,  .teach-oppia-modal .confrim-respose-button:hover {
+  background: whitesmoke;
 }
 .teach-oppia-modal .oppia-unresolved-answers-container {
   padding-top: 10px;
