@@ -282,6 +282,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
+          entityType: 'exploration',
         },
         {
           id: '1',
@@ -293,6 +294,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
+          entityType: 'exploration',
         },
       ]);
     }
@@ -325,6 +327,7 @@ describe('Translation opportunities component', () => {
         totalCount: 4,
         translationsCount: 2,
         reviewerOnlyContentCount: 0,
+        entityType: 'exploration',
       });
       expect(component.allOpportunities['2']).toEqual({
         id: '2',
@@ -336,6 +339,7 @@ describe('Translation opportunities component', () => {
         totalCount: 10,
         translationsCount: 4,
         reviewerOnlyContentCount: 0,
+        entityType: 'exploration',
       });
 
       expect(opportunitiesDicts.length).toBe(2);
@@ -354,6 +358,7 @@ describe('Translation opportunities component', () => {
           totalCount: 4,
           translationsCount: 2,
           reviewerOnlyContentCount: 0,
+          entityType: 'exploration',
         },
         {
           id: '2',
@@ -365,6 +370,7 @@ describe('Translation opportunities component', () => {
           totalCount: 10,
           translationsCount: 4,
           reviewerOnlyContentCount: 0,
+          entityType: 'exploration',
         },
       ]);
     }

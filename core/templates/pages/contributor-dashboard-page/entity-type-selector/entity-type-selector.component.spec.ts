@@ -42,17 +42,23 @@ describe('EntityTypeSelectorComponent', () => {
     expect(component.activeEntityType).toBe('all');
   });
 
-  it('should toggle dropdown visibility', () => {
+  it('should toggle dropdown visibility with or without event', () => {
     expect(component.dropdownShown).toBeFalse();
-    component.toggleDropdown();
+    const event = new MouseEvent('click');
+    spyOn(event, 'stopPropagation');
+    component.toggleDropdown(event);
+    expect(event.stopPropagation).toHaveBeenCalled();
     expect(component.dropdownShown).toBeTrue();
     component.toggleDropdown();
     expect(component.dropdownShown).toBeFalse();
   });
 
-  it('should select an option and emit the event', () => {
+  it('should select an option and emit the event with or without event parameter', () => {
     spyOn(component.setActiveEntityType, 'emit');
-    component.selectOption('skill');
+    const event = new MouseEvent('click');
+    spyOn(event, 'stopPropagation');
+    component.selectOption('skill', event);
+    expect(event.stopPropagation).toHaveBeenCalled();
     expect(component.activeEntityType).toBe('skill');
     expect(component.setActiveEntityType.emit).toHaveBeenCalledWith('skill');
     expect(component.dropdownShown).toBeFalse();
