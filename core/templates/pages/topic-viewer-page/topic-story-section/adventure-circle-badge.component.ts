@@ -39,6 +39,10 @@ export class AdventureCircleBadgeComponent {
       : 'adventure-circle-badge';
   }
 
+  get hasIcon(): boolean {
+    return this.iconName !== '';
+  }
+
   getAriaLabel(): string {
     return this.label || this.iconName;
   }

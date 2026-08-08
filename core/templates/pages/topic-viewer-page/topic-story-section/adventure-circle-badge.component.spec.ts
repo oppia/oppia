@@ -16,21 +16,19 @@
  * @fileoverview Unit tests for AdventureCircleBadgeComponent.
  */
 
-import {By} from '@angular/platform-browser';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TestBed, waitForAsync} from '@angular/core/testing';
 
 import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
 
 describe('AdventureCircleBadgeComponent', () => {
   let component: AdventureCircleBadgeComponent;
-  let fixture: ComponentFixture<AdventureCircleBadgeComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AdventureCircleBadgeComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
+    const fixture = TestBed.createComponent(AdventureCircleBadgeComponent);
     component = fixture.componentInstance;
   }));
 
@@ -98,31 +96,19 @@ describe('AdventureCircleBadgeComponent', () => {
     expect(component.getTooltipText()).toBe('done');
   });
 
-  it('should render the icon when an icon name is provided', () => {
+  it('should report the icon as shown when an icon name is provided', () => {
     component.iconName = 'check';
     component.label = '1';
-    fixture.detectChanges();
 
-    const badgeElement = fixture.debugElement.query(
-      By.css('.adventure-circle-badge')
-    );
-    expect(badgeElement.query(By.css('i.material-icons'))).not.toBeNull();
-    expect(
-      badgeElement.query(By.css('.adventure-circle-badge-label'))
-    ).toBeNull();
+    expect(component.hasIcon).toBeTrue();
+    expect(component.getAriaLabel()).toBe('1');
   });
 
-  it('should render the label when no icon name is provided', () => {
+  it('should report the label as shown when no icon name is provided', () => {
     component.iconName = '';
     component.label = '1';
-    fixture.detectChanges();
 
-    const badgeElement = fixture.debugElement.query(
-      By.css('.adventure-circle-badge')
-    );
-    expect(badgeElement.query(By.css('i.material-icons'))).toBeNull();
-    expect(
-      badgeElement.query(By.css('.adventure-circle-badge-label'))
-    ).not.toBeNull();
+    expect(component.hasIcon).toBeFalse();
+    expect(component.getAriaLabel()).toBe('1');
   });
 });

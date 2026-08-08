@@ -6,12 +6,12 @@
         'border-color': borderColor,
         color: textColor
       }">
-  <i *ngIf="iconName"
+  <i *ngIf="hasIcon"
      class="material-icons"
      aria-hidden="true">
     {{ iconName }}
   </i>
-  <span *ngIf="!iconName" class="adventure-circle-badge-label">
+  <span *ngIf="!hasIcon" class="adventure-circle-badge-label">
     {{ label }}
   </span>
 </span>
