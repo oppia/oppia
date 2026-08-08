@@ -462,7 +462,7 @@ class ReviewableOpportunitiesHandler(
         # 4. Move any pinned summaries to the top.
 
         pinned_opportunity_summary = None
-        if topic_name is None:
+        if not topic_name:
             topic_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids()
             )

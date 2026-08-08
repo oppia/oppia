@@ -3287,6 +3287,22 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
         )
         self.assertEqual(response['opportunities'], [])
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_handles_empty_topic_name(self) -> None:
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'hi'
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&topic_name='
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertIn('opportunities', response)
+
 
 class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
     """Unit test for the TranslatableContentsHandlerV2."""
