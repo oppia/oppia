@@ -3605,6 +3605,14 @@ describe('TopicStorySectionComponent', () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
+  it('should do nothing when a non-Tab key is pressed on the dialog', () => {
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+
+    component.onDialogTab(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
   it('should prevent Tab navigation when the dialog has no focusable elements', () => {
     component.showAdventureMasteredModal = true;
     component.adventureMasteredDialog = new ElementRef(
