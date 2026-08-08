@@ -41,7 +41,7 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
-    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
       showMessage('Skipping the test setup, TODO #26642');
@@ -68,7 +68,7 @@ describe('Logged-Out Learner', function () {
   }, LONG_SETUP_TIMEOUT_MSECS);
 
   it('should find the collection in the community library', async function () {
-    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
       showMessage('Skipping the test, TODO #26642');
@@ -79,7 +79,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should display both explorations on the collection page', async function () {
-    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
       showMessage('Skipping the test, TODO #26642');
@@ -98,7 +98,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should complete an exploration started from the collection', async function () {
-    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
       showMessage('Skipping the test, TODO #26642');
@@ -120,7 +120,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should return to the collection after completing the exploration', async function () {
-    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
       showMessage('Skipping the test, TODO #26642');
@@ -133,7 +133,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should display "COMPARTIR ESTA COLECCIÓN" when language is changed to Spanish', async function () {
-    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
       showMessage('Skipping the test, TODO #26642');
