@@ -21,9 +21,14 @@ from unittest import mock
 
 from core import feconf, utils
 from core.controllers import certificate_assessment
-from core.domain import certificate_assessment_services, topic_fetchers
+from core.domain import (
+    certificate_assessment_domain,
+    certificate_assessment_services,
+    topic_fetchers,
+)
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
+
 from typing import Dict, List, Union
 
 
@@ -584,11 +589,11 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         handler.user_id = 'user_id_1'
         handler.normalized_payload = {
             'answers': [
-                {
-                    'question_id': 'q1',
-                    'selected_answer': 'A',
-                    'is_correct': True,
-                }
+                certificate_assessment_domain.CertificateAssessmentAnswer(
+                    question_id='q1',
+                    selected_answer='A',
+                    is_correct=True,
+                )
             ]
         }
         with mock.patch.object(
@@ -621,11 +626,11 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         handler.user_id = 'user_id_1'
         handler.normalized_payload = {
             'answers': [
-                {
-                    'question_id': 'q1',
-                    'selected_answer': 'A',
-                    'is_correct': True,
-                }
+                certificate_assessment_domain.CertificateAssessmentAnswer(
+                    question_id='q1',
+                    selected_answer='A',
+                    is_correct=True,
+                )
             ]
         }
         attempt = mock.Mock(learner_id='user_id_1', is_submitted=False)
@@ -792,7 +797,9 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         )
         self.logout()
 
-        self.assertIn('Missing keys: [\'is_correct\']', response['error'])
+        self.assertIn(
+            'Schema validation for \'answers\' failed', response['error']
+        )
 
 
 class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):

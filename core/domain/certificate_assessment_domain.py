@@ -19,10 +19,12 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import utils
+from core.domain import state_domain
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 # Valid values for async_status field.
 VALID_ASYNC_STATUSES: List[str] = ['Available', 'Not_Ready', 'Blocked']
@@ -32,6 +34,12 @@ MIN_TIME_LIMIT_IN_MINUTES = 5
 MAX_TIME_LIMIT_IN_MINUTES = 60
 MIN_TOTAL_QUESTIONS = 3
 MAX_TOTAL_QUESTIONS = 50
+
+# Maximum size in bytes of a JSON-serialized selected_answer for a
+# certificate assessment. Each response is stored in its own Datastore
+# entity, so this bound keeps a single answer well below the entity
+# size limit (1 MB).
+MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES = 10 * 1024
 
 # Keys that must be present in a version_data dict for an attempt.
 REQUIRED_VERSION_DATA_KEYS: List[str] = [
@@ -556,6 +564,164 @@ class CertificateAssessmentAttempt:
             started_at=attempt_dict['started_at'],
             finished_at=attempt_dict['finished_at'],
             is_submitted=attempt_dict['is_submitted'],
+        )
+
+
+class CertificateAssessmentAnswerDict(TypedDict):
+    """Dict representation of a single answer submitted for a certificate
+    assessment.
+    """
+
+    question_id: str
+    # Here we use type Any because the selected answer can be any of the
+    # accepted interaction answer types (None, str, int, dict, list, or list
+    # of lists), which cannot be expressed as a single specific type in the
+    # TypedDict.
+    selected_answer: Any
+    is_correct: bool
+
+
+class CertificateAssessmentAnswer:
+    """Domain object representing a single answer a learner submits.
+
+    The learner's browser already grades each answer and sends the is_correct
+    flag, so this object never judges whether an answer is right or wrong. It
+    exists to give the raw submit payload a validated, well-defined shape at
+    the API boundary: checking the payload here means bad input is rejected
+    with a clean error instead of reaching the Datastore as corrupt or
+    oversized data.
+    """
+
+    def __init__(
+        self,
+        question_id: str,
+        selected_answer: state_domain.AcceptableCorrectAnswerTypes,
+        is_correct: bool,
+    ) -> None:
+        """Initializes a CertificateAssessmentAnswer domain object.
+
+        Args:
+            question_id: str. The ID of the question being answered.
+            selected_answer: AcceptableCorrectAnswerTypes. The answer the
+                learner selected. None means the question was unanswered.
+            is_correct: bool. Whether the selected answer was correct.
+        """
+        self.question_id = question_id
+        self.selected_answer = selected_answer
+        self.is_correct = is_correct
+
+    def _is_valid_answer_value(
+        self, value: state_domain.AcceptableCorrectAnswerTypes
+    ) -> bool:
+        """Checks whether the answer is a value we can safely store.
+
+        We trust the learner's browser to grade each answer, so this helper
+        never judges whether an answer is right or wrong. Its only job is to
+        confirm the answer looks like something an Oppia interaction actually
+        produces: a text string, a whole number, a fraction dict with string
+        keys and values, a list of choices, or a list of choice lists. None
+        means the learner skipped the question. Whitelisting these shapes
+        keeps arbitrary JSON from crashing the write or blowing past the
+        Datastore entity size limit.
+
+        Args:
+            value: AcceptableCorrectAnswerTypes. The selected_answer value to
+                check.
+
+        Returns:
+            bool. Whether the value has an accepted type and shape.
+        """
+        if value is None or isinstance(value, str):
+            return True
+        if isinstance(value, int) and not isinstance(value, bool):
+            return True
+        if isinstance(value, dict):
+            return all(
+                isinstance(key, str) and isinstance(item, str)
+                for key, item in value.items()
+            )
+        if isinstance(value, list):
+            if all(isinstance(item, str) for item in value):
+                return True
+            return all(
+                isinstance(item, list)
+                and all(isinstance(inner, str) for inner in item)
+                for item in value
+            )
+        return False
+
+    def validate(self) -> None:
+        """Validates the CertificateAssessmentAnswer domain object.
+
+        This is the entry gate for the SubmitCertificateAssessmentHandler
+        request schema. The learner's browser already grades each answer and
+        sends the is_correct flag, so this method does not re-score anything.
+        Its job is to make sure the payload is well-formed before it reaches
+        the Datastore: question_id must be a real question id, is_correct
+        must genuinely be a boolean (otherwise bool('false') would silently
+        count as correct), and selected_answer must be a value Oppia can
+        store that is not large enough to overflow the responses entity.
+        Catching these problems here gives the learner a clean error they can
+        retry, instead of a half-written attempt.
+
+        Raises:
+            utils.ValidationError. If any field is invalid.
+        """
+        if not isinstance(self.question_id, str) or not self.question_id:
+            raise utils.ValidationError(
+                'question_id must be a non-empty string.'
+            )
+        if not isinstance(self.is_correct, bool):
+            raise utils.ValidationError('is_correct must be a boolean.')
+        if not self._is_valid_answer_value(self.selected_answer):
+            raise utils.ValidationError(
+                'selected_answer must be None, a str, an int, a dict with '
+                'str keys and str values, a list of str, or a list of lists '
+                'of str.'
+            )
+        if (
+            len(json.dumps(self.selected_answer).encode('utf-8'))
+            > MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+        ):
+            raise utils.ValidationError(
+                'selected_answer must be at most %d bytes when '
+                'JSON-serialized.' % MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            )
+
+    def to_dict(self) -> CertificateAssessmentAnswerDict:
+        """Returns a dict representation of this CertificateAssessmentAnswer.
+
+        Returns:
+            CertificateAssessmentAnswerDict. A dictionary containing all
+            fields of this domain object.
+        """
+        return {
+            'question_id': self.question_id,
+            'selected_answer': self.selected_answer,
+            'is_correct': self.is_correct,
+        }
+
+    @classmethod
+    def from_dict(
+        cls, answer_dict: CertificateAssessmentAnswerDict
+    ) -> CertificateAssessmentAnswer:
+        """Returns a CertificateAssessmentAnswer domain object from a dict.
+
+        The selected_answer key is optional; when omitted it defaults to None,
+        which represents an unanswered question.
+
+        Args:
+            answer_dict: CertificateAssessmentAnswerDict. A dictionary
+                containing all fields needed to construct a
+                CertificateAssessmentAnswer.
+
+        Returns:
+            CertificateAssessmentAnswer. The corresponding domain object.
+        """
+        return cls(
+            question_id=answer_dict['question_id'],
+            selected_answer=answer_dict.get('selected_answer'),
+            is_correct=answer_dict['is_correct'],
         )
 
 

@@ -44,7 +44,6 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
-datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
@@ -488,16 +487,19 @@ def _get_next_attempt_index_for_certificate(
             # the learner's submitted attempts and the certificate filter has
             # to be applied in Python. Ordering by attempt_index descending
             # means the first matching attempt is the highest index, so the
-            # scan stops early instead of fetching every learner attempt.
-            # pylint: disable=singleton-comparison
-            gae_models.CertificateAssessmentAttemptModel.is_submitted == True,
+            # Python scan stops at the first match.
+            gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
+            == True,
         )
         .order(-gae_models.CertificateAssessmentAttemptModel.attempt_index)
         .fetch()
     )
     for attempt_model in submitted_attempt_models:
         if attempt_model.version_data.get('certificate_id') == certificate_id:
-            return attempt_model.attempt_index + 1
+            # Here we use cast because attempt_index is an IntegerProperty,
+            # which mypy types as Any, so mypy cannot infer the result type of
+            # the addition.
+            return cast(int, attempt_model.attempt_index) + 1
     return 1
 
 
@@ -640,10 +642,6 @@ def submit_certificate_assessment_attempt(
     )
     if attempt_model is None:
         raise utils.ValidationError('Attempt does not exist.')
-    if attempt_model.is_submitted:
-        raise utils.ValidationError(
-            'This assessment has already been submitted.'
-        )
 
     answers_by_question_id = {
         answer['question_id']: answer for answer in answers
@@ -705,12 +703,12 @@ def submit_certificate_assessment_attempt(
             attempt_model.learner_id,
             attempt_model.version_data['certificate_id'],
         )
-        # The responses are stored in a single entity keyed by the attempt ID,
-        # so the attempt and its responses belong to one entity group and the
-        # transaction never touches more entity groups than the number of
-        # questions would otherwise require.
-        gae_models.CertificateAssessmentResponseModel.create(
-            attempt_id=attempt_id, responses=responses
+        # The responses are stored as children of the attempt, one entity per
+        # question keyed by the question ID, so the attempt and all of its
+        # responses belong to a single entity group and a retried submission
+        # overwrites the same entities instead of creating duplicates.
+        gae_models.CertificateAssessmentResponseModel.create_multi(
+            attempt_key=attempt_model.key, response_dicts=responses
         )
         attempt_model.attempt_data = dict(attempt_data)
         attempt_model.total_score = (

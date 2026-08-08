@@ -34,6 +34,8 @@ if MYPY:  # pragma: no cover
     [models.Names.BASE_MODEL, models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 class CertificateAssessmentOfferingSnapshotContentModelTests(
     test_utils.GenericTestBase
@@ -423,16 +425,12 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             )
         )
         gae_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt.key,
             attempt_id=attempt.id,
-            responses=[
-                {
-                    'attempt_id': attempt.id,
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                }
-            ],
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
         )
 
         self.assertTrue(
@@ -471,25 +469,19 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             )
         )
         response = gae_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt.key,
             attempt_id=attempt.id,
-            responses=[
-                {
-                    'attempt_id': attempt.id,
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                }
-            ],
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
         )
 
         gae_models.CertificateAssessmentResponseModel.apply_deletion_policy(
             'learner_id_1'
         )
 
-        self.assertIsNone(
-            gae_models.CertificateAssessmentResponseModel.get_by_id(response.id)
-        )
+        self.assertIsNone(response.key.get())
 
     def test_apply_deletion_policy_noops_when_user_has_no_attempts(
         self,
@@ -526,16 +518,12 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
             )
             responses.append(
                 gae_models.CertificateAssessmentResponseModel.create(
+                    attempt_key=attempt.key,
                     attempt_id=attempt.id,
-                    responses=[
-                        {
-                            'attempt_id': attempt.id,
-                            'question_id': 'question_id_1',
-                            'question_version': 1,
-                            'selected_answer': 'Option A',
-                            'is_correct': True,
-                        }
-                    ],
+                    question_id='question_id_1',
+                    question_version=1,
+                    selected_answer='Option A',
+                    is_correct=True,
                 )
             )
 
@@ -550,142 +538,111 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         )
 
         for response in responses:
-            self.assertIsNone(
-                gae_models.CertificateAssessmentResponseModel.get_by_id(
-                    response.id
-                )
-            )
+            self.assertIsNone(response.key.get())
 
     def test_create_and_retrieve_lifecycle(self) -> None:
+        attempt_key = datastore_services.Key(
+            gae_models.CertificateAssessmentAttemptModel, 'attempt_id_1'
+        )
         response = certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt_key,
             attempt_id='attempt_id_1',
-            responses=[
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                }
-            ],
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
         )
-        response_id = response.id
 
-        self.assertEqual(response_id, 'attempt_id_1')
+        self.assertEqual(response.id, 'question_id_1')
+        self.assertEqual(response.key.parent(), attempt_key)
 
-        fetched_model = (
-            certificate_models.CertificateAssessmentResponseModel.get_by_id(
-                response_id
-            )
-        )
+        fetched_model = response.key.get()
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.attempt_id, 'attempt_id_1')
-        self.assertEqual(
-            fetched_model.responses,
-            [
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                }
-            ],
+        self.assertEqual(fetched_model.question_id, 'question_id_1')
+        self.assertEqual(fetched_model.question_version, 1)
+        self.assertEqual(fetched_model.selected_answer, 'Option A')
+        self.assertTrue(fetched_model.is_correct)
+
+    def test_create_multi_and_retrieve_lifecycle(self) -> None:
+        attempt_key = datastore_services.Key(
+            gae_models.CertificateAssessmentAttemptModel, 'attempt_id_1'
         )
-
-    def test_create_stores_all_responses_in_single_entity(self) -> None:
-        response = certificate_models.CertificateAssessmentResponseModel.create(
-            attempt_id='attempt_id_1',
-            responses=[
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                },
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_2',
-                    'question_version': 1,
-                    'selected_answer': 'Option B',
-                    'is_correct': False,
-                },
-            ],
-        )
-
-        self.assertEqual(len(response.responses), 2)
-
-        fetched_model = (
-            certificate_models.CertificateAssessmentResponseModel.get_by_id(
-                response.id
+        responses = (
+            certificate_models.CertificateAssessmentResponseModel.create_multi(
+                attempt_key=attempt_key,
+                response_dicts=[
+                    {
+                        'attempt_id': 'attempt_id_1',
+                        'question_id': 'question_id_1',
+                        'question_version': 1,
+                        'selected_answer': 'Option A',
+                        'is_correct': True,
+                    },
+                    {
+                        'attempt_id': 'attempt_id_1',
+                        'question_id': 'question_id_2',
+                        'question_version': 1,
+                        'selected_answer': 'Option B',
+                        'is_correct': False,
+                    },
+                ],
             )
         )
-        self.assertIsNotNone(fetched_model)
+
         self.assertEqual(
-            fetched_model.responses,
-            [
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                },
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_2',
-                    'question_version': 1,
-                    'selected_answer': 'Option B',
-                    'is_correct': False,
-                },
-            ],
+            [response.id for response in responses],
+            ['question_id_1', 'question_id_2'],
+        )
+        for response in responses:
+            self.assertEqual(response.key.parent(), attempt_key)
+
+        fetched_models = [response.key.get() for response in responses]
+        self.assertEqual(
+            [fetched_model.attempt_id for fetched_model in fetched_models],
+            ['attempt_id_1', 'attempt_id_1'],
+        )
+        self.assertEqual(
+            [fetched_model.question_id for fetched_model in fetched_models],
+            ['question_id_1', 'question_id_2'],
+        )
+        self.assertEqual(
+            [fetched_model.selected_answer for fetched_model in fetched_models],
+            ['Option A', 'Option B'],
+        )
+        self.assertEqual(
+            [fetched_model.is_correct for fetched_model in fetched_models],
+            [True, False],
         )
 
     def test_create_overwrites_existing_response_on_retry(self) -> None:
         """Ensures a retried submission overwrites the same entity."""
-        certificate_models.CertificateAssessmentResponseModel.create(
-            attempt_id='attempt_id_1',
-            responses=[
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option A',
-                    'is_correct': True,
-                }
-            ],
+        attempt_key = datastore_services.Key(
+            gae_models.CertificateAssessmentAttemptModel, 'attempt_id_1'
         )
         certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt_key,
             attempt_id='attempt_id_1',
-            responses=[
-                {
-                    'attempt_id': 'attempt_id_1',
-                    'question_id': 'question_id_1',
-                    'question_version': 1,
-                    'selected_answer': 'Option B',
-                    'is_correct': False,
-                }
-            ],
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option A',
+            is_correct=True,
+        )
+        certificate_models.CertificateAssessmentResponseModel.create(
+            attempt_key=attempt_key,
+            attempt_id='attempt_id_1',
+            question_id='question_id_1',
+            question_version=1,
+            selected_answer='Option B',
+            is_correct=False,
         )
 
-        fetched_model = (
-            certificate_models.CertificateAssessmentResponseModel.get_by_id(
-                'attempt_id_1'
-            )
+        fetched_models = (
+            certificate_models.CertificateAssessmentResponseModel.query(
+                certificate_models.CertificateAssessmentResponseModel.attempt_id
+                == 'attempt_id_1'
+            ).fetch()
         )
-        self.assertIsNotNone(fetched_model)
-        self.assertEqual(
-            fetched_model.responses[0]['selected_answer'], 'Option B'
-        )
-        self.assertFalse(fetched_model.responses[0]['is_correct'])
-
-        self.assertEqual(
-            len(
-                certificate_models.CertificateAssessmentResponseModel.query(
-                    certificate_models.CertificateAssessmentResponseModel.attempt_id
-                    == 'attempt_id_1'
-                ).fetch()
-            ),
-            1,
-        )
+        self.assertEqual(len(fetched_models), 1)
+        self.assertEqual(fetched_models[0].selected_answer, 'Option B')
+        self.assertFalse(fetched_models[0].is_correct)

@@ -17,10 +17,13 @@
 from __future__ import annotations
 
 from core import feconf, utils
-from core.controllers import acl_decorators, base, domain_objects_validator
-from core.domain import certificate_assessment_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    certificate_assessment_domain,
+    certificate_assessment_services,
+)
 
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, TypedDict
 
 
 class CertificateAssessmentOfferingTopicDict(TypedDict):
@@ -70,23 +73,10 @@ class StartCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
     certificate_id: str
 
 
-class SubmitCertificateAssessmentAnswerDict(TypedDict):
-    """Dict representation of a single submitted answer."""
-
-    question_id: str
-    # Here we use type Any because the selected answer can be any of the
-    # accepted interaction answer types (int, float, str, dict, list, or
-    # None), which cannot be expressed as a single specific type in the
-    # payload schema.
-    selected_answer: Optional[Any]
-    # Whether the client's answer classification marked the answer as correct.
-    is_correct: bool
-
-
 class SubmitCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of SubmitCertificateAssessmentHandler payload."""
 
-    answers: List[SubmitCertificateAssessmentAnswerDict]
+    answers: List[certificate_assessment_domain.CertificateAssessmentAnswer]
 
 
 class SubmitCertificateAssessmentHandlerNormalizedRequestDict(TypedDict):
@@ -496,8 +486,8 @@ class SubmitCertificateAssessmentHandler(
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            domain_objects_validator.validate_certificate_assessment_answer
+                        'object_class': (
+                            certificate_assessment_domain.CertificateAssessmentAnswer
                         ),
                     },
                 }
@@ -510,12 +500,13 @@ class SubmitCertificateAssessmentHandler(
         assert self.normalized_payload is not None
         # Here we use type Any because each submitted answer can hold a value
         # of any accepted interaction answer type (int, float, str, dict,
-        # list, or None), as validated by the weak_multiple schema.
+        # list, or None), as validated by the CertificateAssessmentAnswer
+        # domain object.
         answers: List[Dict[str, Any]] = [
             {
-                'question_id': answer['question_id'],
-                'selected_answer': answer['selected_answer'],
-                'is_correct': answer['is_correct'],
+                'question_id': answer.question_id,
+                'selected_answer': answer.selected_answer,
+                'is_correct': answer.is_correct,
             }
             for answer in self.normalized_payload['answers']
         ]

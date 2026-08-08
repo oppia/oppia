@@ -39,7 +39,7 @@ from core.platform import models
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
-from typing import TypedDict
+from typing import Sequence, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -912,32 +912,32 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             },
         )
 
-        response_model = (
-            gae_models.CertificateAssessmentResponseModel.get_by_id(
-                attempt_model.id
-            )
-        )
-        self.assertIsNotNone(response_model)
+        response_models: Sequence[
+            gae_models.CertificateAssessmentResponseModel
+        ] = gae_models.CertificateAssessmentResponseModel.query(
+            gae_models.CertificateAssessmentResponseModel.attempt_id
+            == attempt_model.id
+        ).fetch()
+        self.assertEqual(len(response_models), 3)
         response_by_question_id = {
-            response['question_id']: response
-            for response in response_model.responses
+            response_model.question_id: response_model
+            for response_model in response_models
         }
-        self.assertEqual(len(response_by_question_id), 3)
         self.assertEqual(
-            response_by_question_id[question_id_1]['selected_answer'],
+            response_by_question_id[question_id_1].selected_answer,
             '  Solution  ',
         )
-        self.assertTrue(response_by_question_id[question_id_1]['is_correct'])
+        self.assertTrue(response_by_question_id[question_id_1].is_correct)
         self.assertEqual(
-            response_by_question_id[question_id_2]['selected_answer'],
+            response_by_question_id[question_id_2].selected_answer,
             'Wrong answer',
         )
-        self.assertFalse(response_by_question_id[question_id_2]['is_correct'])
+        self.assertFalse(response_by_question_id[question_id_2].is_correct)
         self.assertEqual(
-            response_by_question_id[question_id_3]['selected_answer'],
+            response_by_question_id[question_id_3].selected_answer,
             'Wrong answer',
         )
-        self.assertFalse(response_by_question_id[question_id_3]['is_correct'])
+        self.assertFalse(response_by_question_id[question_id_3].is_correct)
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1048,39 +1048,36 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
                 }
             },
         )
-        response_model = (
-            gae_models.CertificateAssessmentResponseModel.get_by_id(
-                attempt_model.id
-            )
-        )
-        self.assertIsNotNone(response_model)
+        response_models: Sequence[
+            gae_models.CertificateAssessmentResponseModel
+        ] = gae_models.CertificateAssessmentResponseModel.query(
+            gae_models.CertificateAssessmentResponseModel.attempt_id
+            == attempt_model.id
+        ).fetch()
+        self.assertEqual(len(response_models), 8)
         response_by_question_id = {
-            response['question_id']: response
-            for response in response_model.responses
+            response_model.question_id: response_model
+            for response_model in response_models
         }
-        self.assertTrue(response_by_question_id['q_string']['is_correct'])
-        self.assertTrue(response_by_question_id['q_int']['is_correct'])
-        self.assertFalse(response_by_question_id['q_float']['is_correct'])
-        self.assertTrue(response_by_question_id['q_dict']['is_correct'])
-        self.assertFalse(response_by_question_id['q_list']['is_correct'])
-        self.assertTrue(response_by_question_id['q_nested_list']['is_correct'])
-        self.assertFalse(response_by_question_id['q_no_answer']['is_correct'])
+        self.assertTrue(response_by_question_id['q_string'].is_correct)
+        self.assertTrue(response_by_question_id['q_int'].is_correct)
+        self.assertFalse(response_by_question_id['q_float'].is_correct)
+        self.assertTrue(response_by_question_id['q_dict'].is_correct)
+        self.assertFalse(response_by_question_id['q_list'].is_correct)
+        self.assertTrue(response_by_question_id['q_nested_list'].is_correct)
+        self.assertFalse(response_by_question_id['q_no_answer'].is_correct)
         # A missing is_correct flag defaults to an incorrect answer.
-        self.assertFalse(
-            response_by_question_id['q_missing_flag']['is_correct']
-        )
+        self.assertFalse(response_by_question_id['q_missing_flag'].is_correct)
         self.assertEqual(
-            response_by_question_id['q_string']['selected_answer'],
+            response_by_question_id['q_string'].selected_answer,
             '  my answer  ',
         )
+        self.assertEqual(response_by_question_id['q_int'].selected_answer, '7')
         self.assertEqual(
-            response_by_question_id['q_int']['selected_answer'], '7'
+            response_by_question_id['q_float'].selected_answer, '3.5'
         )
         self.assertEqual(
-            response_by_question_id['q_float']['selected_answer'], '3.5'
-        )
-        self.assertEqual(
-            json.loads(response_by_question_id['q_dict']['selected_answer']),
+            json.loads(response_by_question_id['q_dict'].selected_answer),
             {
                 'isNegative': 'False',
                 'wholeNumber': '0',
@@ -1089,20 +1086,20 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(
-            json.loads(response_by_question_id['q_list']['selected_answer']),
+            json.loads(response_by_question_id['q_list'].selected_answer),
             ['a', 'b'],
         )
         self.assertEqual(
             json.loads(
-                response_by_question_id['q_nested_list']['selected_answer']
+                response_by_question_id['q_nested_list'].selected_answer
             ),
             [['a'], ['b', 'c']],
         )
         self.assertEqual(
-            response_by_question_id['q_no_answer']['selected_answer'], ''
+            response_by_question_id['q_no_answer'].selected_answer, ''
         )
         self.assertEqual(
-            response_by_question_id['q_missing_flag']['selected_answer'],
+            response_by_question_id['q_missing_flag'].selected_answer,
             'answer without flag',
         )
 

@@ -520,30 +520,30 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
 
 class CertificateAssessmentResponseModel(base_models.BaseModel):
-    """Storage model for the responses submitted during a certificate
-    assessment attempt.
+    """Storage model for a single response submitted by a learner during
+    a certificate assessment attempt.
 
-    The ID of instances of this class is the ID of the
-    CertificateAssessmentAttemptModel the responses belong to. Storing all of
-    an attempt's responses in a single entity keeps the submission
-    transaction at a fixed two entity groups, instead of one entity group per
-    question. Using the attempt ID as the entity ID also means a retried
-    submission overwrites the same entity instead of creating duplicates.
+    The ID of an instance is the ID of the question the response answers, and
+    its parent is the CertificateAssessmentAttemptModel the response belongs
+    to. Using the question ID as the entity ID means a retried submission
+    overwrites the same entity instead of creating duplicates, and parenting
+    responses under their attempt keeps all of an attempt's responses in one
+    entity group.
     """
 
     # The ID of the CertificateAssessmentAttemptModel this response
     # belongs to.
     attempt_id = datastore_services.StringProperty(required=True, indexed=True)
-    # List of dicts, each capturing the answer to one question, e.g.
-    # [
-    #     {
-    #         'question_id': 'question_id_1',
-    #         'question_version': 1,
-    #         'selected_answer': 'Option A',
-    #         'is_correct': True
-    #     }
-    # ]
-    responses = datastore_services.JsonProperty(required=True)
+    # The ID of the question that was answered.
+    question_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The version of the question that was answered.
+    question_version = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    # The answer selected by the learner.
+    selected_answer = datastore_services.TextProperty(required=True)
+    # Whether the selected answer was correct.
+    is_correct = datastore_services.BooleanProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -609,30 +609,80 @@ class CertificateAssessmentResponseModel(base_models.BaseModel):
         return {
             **super(cls, cls).get_export_policy(),
             'attempt_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'responses': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'selected_answer': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_correct': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
 
     @classmethod
     def create(
         cls,
+        attempt_key: datastore_services.Key,
         attempt_id: str,
-        responses: List[CertificateAssessmentResponseCreateDict],
+        question_id: str,
+        question_version: int,
+        selected_answer: str,
+        is_correct: bool,
     ) -> CertificateAssessmentResponseModel:
-        """Creates a certificate assessment responses instance.
+        """Creates a new certificate assessment response instance.
 
         Args:
-            attempt_id: str. The ID of the attempt these responses belong to.
-            responses: list(dict). The per-question response dicts to persist.
+            attempt_key: Key. The key of the CertificateAssessmentAttemptModel
+                this response belongs to.
+            attempt_id: str. The ID of the attempt this response belongs to.
+            question_id: str. The ID of the question being answered.
+            question_version: int. The version of the question answered.
+            selected_answer: str. The answer selected by the learner.
+            is_correct: bool. Whether the selected answer was correct.
 
         Returns:
             CertificateAssessmentResponseModel. Instance of the new entry.
         """
         response_instance = cls(
-            id=attempt_id,
+            id=question_id,
+            parent=attempt_key,
             attempt_id=attempt_id,
-            responses=responses,
+            question_id=question_id,
+            question_version=question_version,
+            selected_answer=selected_answer,
+            is_correct=is_correct,
         )
         response_instance.update_timestamps()
         response_instance.put()
 
         return response_instance
+
+    @classmethod
+    def create_multi(
+        cls,
+        attempt_key: datastore_services.Key,
+        response_dicts: List[CertificateAssessmentResponseCreateDict],
+    ) -> List[CertificateAssessmentResponseModel]:
+        """Creates and persists multiple certificate assessment responses.
+
+        Args:
+            attempt_key: Key. The key of the CertificateAssessmentAttemptModel
+                these responses belong to.
+            response_dicts: list(CertificateAssessmentResponseCreateDict).
+                The response payloads to persist.
+
+        Returns:
+            list(CertificateAssessmentResponseModel). The newly created
+            response instances.
+        """
+        response_instances = [
+            cls(
+                id=response_dict['question_id'],
+                parent=attempt_key,
+                attempt_id=response_dict['attempt_id'],
+                question_id=response_dict['question_id'],
+                question_version=response_dict['question_version'],
+                selected_answer=response_dict['selected_answer'],
+                is_correct=response_dict['is_correct'],
+            )
+            for response_dict in response_dicts
+        ]
+        cls.update_timestamps_multi(response_instances)
+        cls.put_multi(response_instances)
+        return response_instances
