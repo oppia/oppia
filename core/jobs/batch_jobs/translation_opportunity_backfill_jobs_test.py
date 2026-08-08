@@ -1030,40 +1030,38 @@ class AuditBackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
         translation_opportunity_backfill_jobs.AuditBackfillSkillOpportunityModelJob
     )
 
-    def test_audit_identifies_matching_skill_model(self) -> None:
-        matching_model = opportunity_models.TranslationOpportunityModel(
-            id='skill.skill_1',
-            entity_type=feconf.TranslatableEntityType.SKILL.value,
-            entity_id=self.skill_id,
+    def test_audit_job_does_not_modify_datastore(self) -> None:
+        orphaned_model = opportunity_models.TranslationOpportunityModel(
+            id='skill.orphaned_skill_id',
+            entity_type='skill',
+            entity_id='orphaned_skill_id',
             topic_ids=['topic_id'],
-            content_count=1,
-            incomplete_translation_language_codes=[
-                lang['id']
-                for lang in constants.SUPPORTED_AUDIO_LANGUAGES
-                if lang['id'] != 'en'
-            ],
-            translation_counts={},
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 1},
         )
-        matching_model.update_timestamps()
-        matching_model.put()
+        orphaned_model.update_timestamps()
+        orphaned_model.put()
 
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stdout=(
-                        'Audit Summary:\n'
-                        '- Matches: 1\n'
-                        '- Missing in Datastore: 0\n'
-                        '- Discrepancies: 0\n'
-                        '- Orphaned in Datastore: 0\n'
-                        '- Total Content Count (Existing): 1\n'
-                        '- Total Content Count (Computed): 1\n'
-                        '- Total Translation Counts (Existing): None\n'
-                        '- Total Translation Counts (Computed): None'
-                    )
-                ),
-                job_run_result.JobRunResult(
                     stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
                 ),
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL DELETION SUCCESS: 1'
+                ),
             ]
+        )
+
+        # Datastore should not be updated since DATASTORE_UPDATES_ALLOWED is False.
+        self.assertIsNotNone(
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                'skill.orphaned_skill_id'
+            )
+        )
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get_by_id(
+                'skill.skill_1'
+            )
         )
