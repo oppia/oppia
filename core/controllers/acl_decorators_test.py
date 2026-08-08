@@ -237,6 +237,7 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
         }
         return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
+            certificate_id='cert_id',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},

@@ -246,6 +246,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         finished_at = started_at + datetime.timedelta(minutes=7)
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
+            certificate_id='cert_abc123',
             total_score=84.5,
             attempt_index=2,
             attempt_data=self._get_sample_attempt_data(),
@@ -287,6 +288,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         started_at = datetime.datetime.utcnow()
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
+            certificate_id='cert_abc123',
             total_score=60.0,
             attempt_index=1,
             attempt_data=self._get_sample_attempt_data(),
@@ -306,6 +308,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(fetched_model)
         self.assertEqual(fetched_model.learner_id, 'learner_id_1')
+        self.assertEqual(fetched_model.certificate_id, 'cert_abc123')
         self.assertEqual(fetched_model.total_score, 60.0)
         self.assertEqual(fetched_model.attempt_index, 1)
         self.assertEqual(
@@ -334,6 +337,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
     def test_apply_deletion_policy_deletes_attempts_for_user(self) -> None:
         attempt = certificate_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_id_1',
+            certificate_id='cert_abc123',
             total_score=60.0,
             attempt_index=1,
             attempt_data=self._get_sample_attempt_data(),
@@ -373,6 +377,7 @@ class CertificateAssessmentAttemptModelUnitTests(test_utils.GenericTestBase):
         ), get_by_id_swap, convert_to_hash_swap:
             certificate_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=0.0,
                 attempt_index=1,
                 attempt_data=self._get_sample_attempt_data(),
@@ -404,6 +409,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         attempt: gae_models.CertificateAssessmentAttemptModel = (
             gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=75.0,
                 attempt_index=1,
                 attempt_data={
@@ -448,6 +454,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         attempt: gae_models.CertificateAssessmentAttemptModel = (
             gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=75.0,
                 attempt_index=1,
                 attempt_data={
@@ -497,6 +504,7 @@ class CertificateAssessmentResponseModelUnitTests(test_utils.GenericTestBase):
         for index in range(31):
             attempt = gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_id_1',
+                certificate_id='cert_abc123',
                 total_score=75.0,
                 attempt_index=index + 1,
                 attempt_data={

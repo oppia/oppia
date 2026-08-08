@@ -479,6 +479,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
 
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -507,6 +508,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         for attempt_index in (1, 3):
             gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id='learner_1',
+                certificate_id='cert_1',
                 total_score=0.0,
                 attempt_index=attempt_index,
                 attempt_data={},
@@ -524,6 +526,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         # A submitted attempt for a different certificate is not counted.
         gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_2',
             total_score=0.0,
             attempt_index=2,
             attempt_data={},
@@ -541,6 +544,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         # An in-progress attempt is ignored even if it carries a higher index.
         gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=5,
             attempt_data={},
@@ -576,6 +580,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     ) -> None:
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -618,6 +623,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     ) -> None:
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -656,6 +662,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     ) -> None:
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -720,6 +727,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         in_progress_attempt = (
             gae_models.CertificateAssessmentAttemptModel.create(
                 learner_id=owner_id,
+                certificate_id=created_offering.certificate_id,
                 total_score=0.0,
                 attempt_index=1,
                 attempt_data={},
@@ -805,6 +813,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     ) -> None:
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='learner_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -856,6 +865,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=owner_id,
+            certificate_id=created_offering.certificate_id,
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -969,6 +979,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         ]
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=owner_id,
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},

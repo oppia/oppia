@@ -696,6 +696,7 @@ indexes:
 - kind: CertificateAssessmentAttemptModel
   properties:
   - name: learner_id
+  - name: certificate_id
   - name: is_submitted
   - name: attempt_index
     direction: desc

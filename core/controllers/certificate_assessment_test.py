@@ -658,6 +658,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         }
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=owner_id,
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -703,6 +704,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         }
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=owner_id,
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -765,6 +767,7 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         }
         attempt = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=owner_id,
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -808,6 +811,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
         handler.user_id = 'user_id_1'
         gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='user_id_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},
@@ -848,6 +852,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
         handler.user_id = 'user_id_1'
         gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='user_id_1',
+            certificate_id='cert_1',
             total_score=0.0,
             attempt_index=1,
             attempt_data={},

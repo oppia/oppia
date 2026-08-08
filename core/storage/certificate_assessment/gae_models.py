@@ -330,6 +330,10 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
     # The ID of the learner who made this attempt.
     learner_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The ID of the certificate assessment being attempted.
+    certificate_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The total score achieved by the learner in this attempt.
     total_score = datastore_services.FloatProperty(required=True, indexed=True)
     # The index of this attempt for the given learner (1-based, increasing
@@ -403,6 +407,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         return {
             **super(cls, cls).get_export_policy(),
             'learner_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'certificate_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_score': base_models.EXPORT_POLICY.EXPORTED,
             'attempt_index': base_models.EXPORT_POLICY.EXPORTED,
             'attempt_data': base_models.EXPORT_POLICY.EXPORTED,
@@ -474,6 +479,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
     def create(
         cls,
         learner_id: str,
+        certificate_id: str,
         total_score: float,
         attempt_index: int,
         attempt_data: Dict[str, Dict[str, int]],
@@ -486,6 +492,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
 
         Args:
             learner_id: str. The ID of the learner making the attempt.
+            certificate_id: str. The ID of the certificate being attempted.
             total_score: float. The total score achieved in this attempt.
             attempt_index: int. The 1-based count of submitted attempts for
                 this learner and certificate. In-progress attempts should be
@@ -505,6 +512,7 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
         attempt_instance = cls(
             id=instance_id,
             learner_id=learner_id,
+            certificate_id=certificate_id,
             total_score=total_score,
             attempt_index=attempt_index,
             attempt_data=attempt_data,

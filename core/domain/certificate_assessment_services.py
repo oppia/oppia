@@ -38,7 +38,7 @@ from core.domain import (
 from core.platform import models
 from core.storage.certificate_assessment import gae_models
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
+from typing import Dict, List, Optional, Tuple, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -467,7 +467,10 @@ def _get_next_attempt_index_for_certificate(
     from a count of submitted attempts. A count would need a global query
     filtered on is_submitted, which is not strongly consistent inside the
     submission transaction, and could therefore yield a stale or duplicated
-    index for concurrent submissions.
+    index for concurrent submissions. The certificate_id is indexed on the
+    model itself, so the query is bounded to the submitted attempts for this
+    certificate only, and fetching a single entity ordered by attempt_index
+    descending yields the highest one directly.
 
     Args:
         learner_id: str. The learner submitting the attempt.
@@ -476,31 +479,26 @@ def _get_next_attempt_index_for_certificate(
     Returns:
         int. The 1-based index to assign to the next submitted attempt.
     """
-    submitted_attempt_models: Sequence[
+    highest_submitted_attempt: Optional[
         gae_models.CertificateAssessmentAttemptModel
     ] = (
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
             == learner_id,
-            # The certificate_id is stored inside the non-indexed
-            # version_data JSON blob, so the query can only bound the scan to
-            # the learner's submitted attempts and the certificate filter has
-            # to be applied in Python. Ordering by attempt_index descending
-            # means the first matching attempt is the highest index, so the
-            # Python scan stops at the first match.
+            gae_models.CertificateAssessmentAttemptModel.certificate_id
+            == certificate_id,
             gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
             == True,
         )
         .order(-gae_models.CertificateAssessmentAttemptModel.attempt_index)
-        .fetch()
+        .get()
     )
-    for attempt_model in submitted_attempt_models:
-        if attempt_model.version_data.get('certificate_id') == certificate_id:
-            # Here we use cast because attempt_index is an IntegerProperty,
-            # which mypy types as Any, so mypy cannot infer the result type of
-            # the addition.
-            return cast(int, attempt_model.attempt_index) + 1
-    return 1
+    if highest_submitted_attempt is None:
+        return 1
+    # Here we use cast because attempt_index is an IntegerProperty, which
+    # mypy types as Any, so mypy cannot infer the result type of the
+    # addition.
+    return cast(int, highest_submitted_attempt.attempt_index) + 1
 
 
 def start_certificate_assessment_attempt(
@@ -536,6 +534,7 @@ def start_certificate_assessment_attempt(
             )
         attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
+            certificate_id=certificate_id,
             total_score=0.0,
             attempt_index=0,
             attempt_data={},
@@ -706,7 +705,7 @@ def submit_certificate_assessment_attempt(
             )
         attempt_model.attempt_index = _get_next_attempt_index_for_certificate(
             attempt_model.learner_id,
-            attempt_model.version_data['certificate_id'],
+            attempt_model.certificate_id,
         )
         # The responses are stored as children of the attempt, one entity per
         # question keyed by the question ID, so the attempt and all of its
