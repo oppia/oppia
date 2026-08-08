@@ -47,7 +47,7 @@ export interface AssessmentQuestion {
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
-  currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
+  currentStage: 'intro' | 'instructions' | 'questions' = 'intro';
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
@@ -107,8 +107,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     if (currentRoute === 'session') {
       this.currentStage = 'questions';
-    } else if (currentRoute === 'result') {
-      this.currentStage = 'result';
     }
   }
 
