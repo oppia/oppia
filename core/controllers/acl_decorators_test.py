@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 
 from core import android_validation_constants, feature_flag_list, feconf
@@ -55,11 +56,20 @@ from typing import Any, Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, secrets_services
+    from mypy_imports import (
+        certificate_assessment_models,
+        datastore_services,
+        secrets_services,
+    )
 
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+(
+    certificate_assessment_models,
+    suggestion_models,
+) = models.Registry.import_models(
+    [models.Names.CERTIFICATE_ASSESSMENT_OFFERING, models.Names.SUGGESTION]
+)
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
@@ -469,6 +479,103 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response('/mock/', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
+
+
+class CertificateAssessmentAttemptResultAccessDecoratorTests(
+    test_utils.GenericTestBase
+):
+    """Tests for can_access_certificate_assessment_attempt_result decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+    other_username = 'otheruser'
+    other_email = 'otheruser@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'attempt_id': {'schema': {'type': 'basestring'}}
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_certificate_assessment_attempt_result
+        def get(self, attempt_id: str) -> None:
+            self.render_json({'attempt_id': attempt_id})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.other_email, self.other_username)
+        self.user_id = self.get_user_id_from_email(self.user_email)
+
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_certificate_attempt/<attempt_id>',
+                        self.MockHandler,
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+        self.attempt = certificate_assessment_models.CertificateAssessmentAttemptModel.create(
+            learner_id=self.user_id,
+            total_score=80.0,
+            attempt_index=1,
+            attempt_data={
+                'topic_id_101': {
+                    'total_related_questions': 5,
+                    'total_correct_questions': 3,
+                }
+            },
+            version_data={
+                'certificate_id': 'cert_abc123',
+                'certificate_version': 1,
+                'topic_versions': {'topic_id_101': 2},
+                'question_versions': {'question_id_1': 1},
+                'question_topic_links': {'question_id_1': ['topic_id_101']},
+            },
+            started_at=datetime.datetime(2026, 7, 18),
+            finished_at=None,
+            is_submitted=True,
+        )
+
+    def test_attempt_owner_can_access_attempt(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_certificate_attempt/%s' % self.attempt.id
+            )
+        self.assertEqual(response['attempt_id'], self.attempt.id)
+        self.logout()
+
+    def test_other_user_cannot_access_attempt(self) -> None:
+        self.login(self.other_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_certificate_attempt/%s' % self.attempt.id,
+                expected_status_int=401,
+            )
+        self.logout()
+
+    def test_guest_user_cannot_access_attempt(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_certificate_attempt/%s' % self.attempt.id,
+                expected_status_int=401,
+            )
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+    def test_missing_attempt_returns_404(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_certificate_attempt/missing_attempt_id',
+                expected_status_int=404,
+            )
+        self.logout()
 
 
 class PlayExplorationDecoratorTests(test_utils.GenericTestBase):

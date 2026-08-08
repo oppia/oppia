@@ -16,12 +16,103 @@
 
 from __future__ import annotations
 
+import datetime
 from unittest import mock
 
 from core import feconf, utils
 from core.controllers import certificate_assessment
-from core.domain import certificate_assessment_services, topic_fetchers
+from core.domain import (
+    certificate_assessment_domain,
+    certificate_assessment_services,
+    topic_fetchers,
+)
+from core.platform import models
 from core.tests import test_utils
+
+from typing import Dict, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import certificate_assessment_models
+
+(certificate_assessment_models,) = models.Registry.import_models(
+    [models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
+)
+
+
+def _create_attempt_model(
+    learner_id: str,
+    certificate_id: str,
+    total_score: float,
+    attempt_index: int,
+    started_at: Optional[datetime.datetime] = None,
+    is_submitted: bool = True,
+) -> certificate_assessment_models.CertificateAssessmentAttemptModel:
+    """Creates and returns a certificate assessment attempt model.
+
+    Args:
+        learner_id: str. The ID of the learner making the attempt.
+        certificate_id: str. The ID of the certificate offering the attempt
+            was generated for.
+        total_score: float. The total score achieved in the attempt.
+        attempt_index: int. The index of the attempt for the learner.
+        started_at: datetime.datetime|None. When the attempt was started.
+        is_submitted: bool. Whether the attempt has been submitted.
+
+    Returns:
+        CertificateAssessmentAttemptModel. The created attempt model.
+    """
+    return (
+        certificate_assessment_models.CertificateAssessmentAttemptModel.create(
+            learner_id=learner_id,
+            total_score=total_score,
+            attempt_index=attempt_index,
+            attempt_data={
+                'topic_place_values': {
+                    'total_related_questions': 5,
+                    'total_correct_questions': 4,
+                }
+            },
+            version_data={
+                'certificate_id': certificate_id,
+                'certificate_version': 1,
+                'topic_versions': {'topic_place_values': 1},
+                'question_versions': {'dummy_question_id': 1},
+                'question_topic_links': {
+                    'dummy_question_id': ['topic_place_values']
+                },
+            },
+            started_at=(
+                started_at
+                if started_at is not None
+                else datetime.datetime(2026, 7, 18)
+            ),
+            finished_at=None,
+            is_submitted=is_submitted,
+        )
+    )
+
+
+def _create_certificate_offering() -> (
+    certificate_assessment_domain.CertificateAssessmentOffering
+):
+    """Creates and returns a certificate assessment offering for tests.
+
+    Returns:
+        CertificateAssessmentOffering. The created certificate offering.
+    """
+    return (
+        certificate_assessment_services.create_certificate_assessment_offering(
+            title='Everyday Arithmetic & Number Confidence',
+            description='Covers place values, addition and subtraction.',
+            classroom_id='math_classroom_01',
+            topic_ids=['topic_place_values'],
+            total_questions=12,
+            time_limit_in_minutes=60,
+            demonstrates=['Understanding of whole numbers'],
+            async_status='Available',
+        )
+    )
 
 
 class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
@@ -490,19 +581,29 @@ class SubmitCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
 class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentResultHandler."""
 
-    def test_get_returns_hardcoded_result_payload(self) -> None:
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.learner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.certificate_offering = _create_certificate_offering()
+        self.attempt = _create_attempt_model(
+            self.learner_id, self.certificate_offering.certificate_id, 80.0, 1
+        )
+
+    def test_get_returns_real_result(self) -> None:
+        self.login(self.OWNER_EMAIL)
         response = self.get_json(
             feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
-                '<attempt_id>', 'dummy_attempt_id'
+                '<attempt_id>', self.attempt.id
             )
         )
         self.assertEqual(
             response,
             {
                 'title': 'Everyday Arithmetic & Number Confidence',
-                'total_score': 80,
+                'total_score': 80.0,
                 'attempt_data': {
-                    'dummy_topic_id': {
+                    'topic_place_values': {
                         'total_related_questions': 5,
                         'total_correct_questions': 4,
                     },
@@ -510,26 +611,94 @@ class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
                 'is_submitted': True,
             },
         )
+        self.logout()
+
+    def test_get_returns_404_for_missing_attempt(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', 'missing_attempt_id'
+            ),
+            expected_status_int=404,
+        )
+        self.logout()
+
+    def test_get_returns_401_for_another_users_attempt(self) -> None:
+        self.signup('otheruser@example.com', 'otheruser')
+        other_user_id = self.get_user_id_from_email('otheruser@example.com')
+        other_attempt = _create_attempt_model(
+            other_user_id, self.certificate_offering.certificate_id, 70.0, 1
+        )
+        self.login(self.OWNER_EMAIL)
+        self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', other_attempt.id
+            ),
+            expected_status_int=401,
+        )
+        self.logout()
+
+    def test_get_returns_401_for_guest_user(self) -> None:
+        self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', self.attempt.id
+            ),
+            expected_status_int=401,
+        )
 
 
 class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentAttemptsHandler."""
 
-    def test_get_returns_hardcoded_attempts_list(self) -> None:
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.learner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.certificate_offering = _create_certificate_offering()
+
+    def test_get_returns_real_attempts_history(self) -> None:
+        first_attempt = _create_attempt_model(
+            self.learner_id, self.certificate_offering.certificate_id, 80.0, 1
+        )
+        second_attempt = _create_attempt_model(
+            self.learner_id,
+            self.certificate_offering.certificate_id,
+            90.0,
+            2,
+        )
+        self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER)
         self.assertEqual(
             response,
             {
                 'attempts': [
                     {
-                        'attempt_id': 'dummy_attempt_id',
-                        'classroom_id': 'dummy_classroom_id',
-                        'title': ('Everyday Arithmetic & Number Confidence'),
-                        'total_score': 80,
+                        'attempt_id': first_attempt.id,
+                        'classroom_id': 'math_classroom_01',
+                        'title': 'Everyday Arithmetic & Number Confidence',
+                        'total_score': 80.0,
                         'attempt_index': 1,
                         'started_at': '2026-07-18T00:00:00Z',
                         'is_submitted': True,
-                    }
+                    },
+                    {
+                        'attempt_id': second_attempt.id,
+                        'classroom_id': 'math_classroom_01',
+                        'title': 'Everyday Arithmetic & Number Confidence',
+                        'total_score': 90.0,
+                        'attempt_index': 2,
+                        'started_at': '2026-07-18T00:00:00Z',
+                        'is_submitted': True,
+                    },
                 ]
             },
         )
+        self.logout()
+
+    def test_get_returns_empty_attempts_for_learner_without_attempts(
+        self,
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER)
+        self.assertEqual(response, {'attempts': []})
+        self.logout()

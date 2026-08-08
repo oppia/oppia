@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 from unittest import mock
 
 from core import utils
@@ -38,9 +39,17 @@ from typing import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import skill_models
+    from mypy_imports import certificate_assessment_models, skill_models
 
-(skill_models,) = models.Registry.import_models([models.Names.SKILL])
+(
+    certificate_assessment_models,
+    skill_models,
+) = models.Registry.import_models(
+    [
+        models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
+        models.Names.SKILL,
+    ]
+)
 
 CERTIFICATE_DIFFICULTY_EASY = (
     certificate_assessment_services.CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
@@ -1034,3 +1043,128 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertEqual(
             topic_errors[CERTIFICATE_DIFFICULTY_EASY]['required'], 1
         )
+
+
+class CertificateAssessmentAttemptServicesTest(test_utils.GenericTestBase):
+    """Tests for certificate assessment attempt services."""
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.learner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def _create_attempt(
+        self,
+        learner_id: str,
+        total_score: float,
+        attempt_index: int,
+    ) -> certificate_assessment_models.CertificateAssessmentAttemptModel:
+        """Creates and returns a certificate assessment attempt model.
+
+        Args:
+            learner_id: str. The ID of the learner making the attempt.
+            total_score: float. The total score achieved in the attempt.
+            attempt_index: int. The index of the attempt for the learner.
+
+        Returns:
+            CertificateAssessmentAttemptModel. The created attempt model.
+        """
+        return certificate_assessment_models.CertificateAssessmentAttemptModel.create(
+            learner_id=learner_id,
+            total_score=total_score,
+            attempt_index=attempt_index,
+            attempt_data={
+                'topic_id_101': {
+                    'total_related_questions': 5,
+                    'total_correct_questions': 3,
+                }
+            },
+            version_data={
+                'certificate_id': 'cert_abc123',
+                'certificate_version': 1,
+                'topic_versions': {'topic_id_101': 2},
+                'question_versions': {'question_id_1': 1},
+                'question_topic_links': {'question_id_1': ['topic_id_101']},
+            },
+            started_at=datetime.datetime(2026, 7, 18),
+            finished_at=None,
+            is_submitted=True,
+        )
+
+    def test_get_certificate_attempt_returns_full_result_data(self) -> None:
+        created_attempt = self._create_attempt(self.learner_id, 84.5, 1)
+
+        attempt = certificate_assessment_services.get_certificate_attempt(
+            created_attempt.id
+        )
+
+        self.assertEqual(attempt.attempt_id, created_attempt.id)
+        self.assertEqual(attempt.learner_id, self.learner_id)
+        self.assertEqual(attempt.total_score, 84.5)
+        self.assertEqual(attempt.attempt_index, 1)
+        self.assertEqual(
+            attempt.attempt_data,
+            {
+                'topic_id_101': {
+                    'total_related_questions': 5,
+                    'total_correct_questions': 3,
+                }
+            },
+        )
+        self.assertEqual(attempt.version_data['certificate_id'], 'cert_abc123')
+        self.assertEqual(attempt.started_at, datetime.datetime(2026, 7, 18))
+        self.assertTrue(attempt.is_submitted)
+
+    def test_get_certificate_attempt_raises_for_missing_attempt(self) -> None:
+        with self.assertRaisesRegex(
+            certificate_assessment_services.CertificateAssessmentAttemptNotFoundException,
+            'Certificate assessment attempt missing_attempt_id does not exist.',
+        ):
+            certificate_assessment_services.get_certificate_attempt(
+                'missing_attempt_id'
+            )
+
+    def test_get_certificate_attempts_returns_all_attempts_in_index_order(
+        self,
+    ) -> None:
+        first_attempt = self._create_attempt(self.learner_id, 60.0, 1)
+        second_attempt = self._create_attempt(self.learner_id, 84.5, 2)
+
+        attempts = certificate_assessment_services.get_certificate_attempts(
+            self.learner_id
+        )
+
+        self.assertEqual(len(attempts), 2)
+        self.assertEqual(
+            [attempt.attempt_id for attempt in attempts],
+            [first_attempt.id, second_attempt.id],
+        )
+        self.assertEqual(
+            [attempt.attempt_index for attempt in attempts], [1, 2]
+        )
+
+    def test_get_certificate_attempts_returns_empty_for_learner_without_attempts(
+        self,
+    ) -> None:
+        attempts = certificate_assessment_services.get_certificate_attempts(
+            self.learner_id
+        )
+
+        self.assertEqual(attempts, [])
+
+    def test_get_certificate_attempts_only_returns_matching_learner(
+        self,
+    ) -> None:
+        self._create_attempt(self.learner_id, 60.0, 1)
+        self.signup('otheruser@example.com', 'otheruser')
+        other_learner_id = self.get_user_id_from_email('otheruser@example.com')
+        other_attempt = self._create_attempt(other_learner_id, 90.0, 1)
+
+        attempts = certificate_assessment_services.get_certificate_attempts(
+            other_learner_id
+        )
+
+        self.assertEqual(len(attempts), 1)
+        self.assertEqual(attempts[0].attempt_id, other_attempt.id)
