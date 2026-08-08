@@ -591,11 +591,20 @@ class CertificateAssessmentAttemptsHandler(
         attempts = certificate_assessment_services.get_certificate_attempts(
             self.user_id
         )
+        certificate_ids = list(
+            {attempt.version_data['certificate_id'] for attempt in attempts}
+        )
+        offerings_by_id = certificate_assessment_services.get_certificate_assessment_offerings_by_ids(
+            certificate_ids
+        )
+        # Here we use object because the attempt summary values are
+        # heterogeneous JSON payloads (strings, floats, integers and booleans).
         attempt_summaries: List[Dict[str, object]] = []
         for attempt in attempts:
-            certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
-                attempt.version_data['certificate_id']
-            )
+            certificate_id = attempt.version_data['certificate_id']
+            if certificate_id not in offerings_by_id:
+                continue
+            certificate_offering = offerings_by_id[certificate_id]
             attempt_summaries.append(
                 {
                     'attempt_id': attempt.attempt_id,

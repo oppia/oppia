@@ -39,10 +39,13 @@ from typing import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import certificate_assessment_models, skill_models
+    from mypy_imports import (
+        certificate_assessment_offering_models,
+        skill_models,
+    )
 
 (
-    certificate_assessment_models,
+    certificate_assessment_offering_models,
     skill_models,
 ) = models.Registry.import_models(
     [
@@ -203,6 +206,77 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             certificate_assessment_services.get_certificate_assessment_offering(
                 created_offering.certificate_id
             )
+
+    def test_get_certificate_assessment_offerings_by_ids_returns_mapping(
+        self,
+    ) -> None:
+        first_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Geography Essentials',
+            description='Covers maps and spatial reasoning.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=6,
+            time_limit_in_minutes=30,
+            demonstrates=['Map reading'],
+            async_status='Available',
+        )
+        second_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Biology Basics',
+            description='Covers cells and ecosystems.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=6,
+            time_limit_in_minutes=30,
+            demonstrates=['Living systems'],
+            async_status='Available',
+        )
+
+        offerings_by_id = certificate_assessment_services.get_certificate_assessment_offerings_by_ids(
+            [
+                first_offering.certificate_id,
+                second_offering.certificate_id,
+            ]
+        )
+
+        self.assertEqual(
+            set(offerings_by_id.keys()),
+            {first_offering.certificate_id, second_offering.certificate_id},
+        )
+        self.assertEqual(
+            offerings_by_id[first_offering.certificate_id].title,
+            'Geography Essentials',
+        )
+        self.assertEqual(
+            offerings_by_id[second_offering.certificate_id].title,
+            'Biology Basics',
+        )
+
+    def test_get_certificate_assessment_offerings_by_ids_omits_missing(
+        self,
+    ) -> None:
+        created_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Biology Basics',
+            description='Covers cells and ecosystems.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=6,
+            time_limit_in_minutes=30,
+            demonstrates=['Living systems'],
+            async_status='Available',
+        )
+
+        offerings_by_id = certificate_assessment_services.get_certificate_assessment_offerings_by_ids(
+            [created_offering.certificate_id, 'non_existent_certificate']
+        )
+
+        self.assertEqual(
+            offerings_by_id,
+            {
+                created_offering.certificate_id: offerings_by_id[
+                    created_offering.certificate_id
+                ]
+            },
+        )
 
 
 class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
@@ -1060,7 +1134,9 @@ class CertificateAssessmentAttemptServicesTest(test_utils.GenericTestBase):
         learner_id: str,
         total_score: float,
         attempt_index: int,
-    ) -> certificate_assessment_models.CertificateAssessmentAttemptModel:
+    ) -> (
+        certificate_assessment_offering_models.CertificateAssessmentAttemptModel
+    ):
         """Creates and returns a certificate assessment attempt model.
 
         Args:
@@ -1071,7 +1147,7 @@ class CertificateAssessmentAttemptServicesTest(test_utils.GenericTestBase):
         Returns:
             CertificateAssessmentAttemptModel. The created attempt model.
         """
-        return certificate_assessment_models.CertificateAssessmentAttemptModel.create(
+        return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=learner_id,
             total_score=total_score,
             attempt_index=attempt_index,

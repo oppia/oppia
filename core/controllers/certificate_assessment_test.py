@@ -29,13 +29,13 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional
+from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import certificate_assessment_models
+    from mypy_imports import certificate_assessment_offering_models
 
-(certificate_assessment_models,) = models.Registry.import_models(
+(certificate_assessment_offering_models,) = models.Registry.import_models(
     [models.Names.CERTIFICATE_ASSESSMENT_OFFERING]
 )
 
@@ -47,7 +47,7 @@ def _create_attempt_model(
     attempt_index: int,
     started_at: Optional[datetime.datetime] = None,
     is_submitted: bool = True,
-) -> certificate_assessment_models.CertificateAssessmentAttemptModel:
+) -> certificate_assessment_offering_models.CertificateAssessmentAttemptModel:
     """Creates and returns a certificate assessment attempt model.
 
     Args:
@@ -62,34 +62,32 @@ def _create_attempt_model(
     Returns:
         CertificateAssessmentAttemptModel. The created attempt model.
     """
-    return (
-        certificate_assessment_models.CertificateAssessmentAttemptModel.create(
-            learner_id=learner_id,
-            total_score=total_score,
-            attempt_index=attempt_index,
-            attempt_data={
-                'topic_place_values': {
-                    'total_related_questions': 5,
-                    'total_correct_questions': 4,
-                }
+    return certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
+        learner_id=learner_id,
+        total_score=total_score,
+        attempt_index=attempt_index,
+        attempt_data={
+            'topic_place_values': {
+                'total_related_questions': 5,
+                'total_correct_questions': 4,
+            }
+        },
+        version_data={
+            'certificate_id': certificate_id,
+            'certificate_version': 1,
+            'topic_versions': {'topic_place_values': 1},
+            'question_versions': {'dummy_question_id': 1},
+            'question_topic_links': {
+                'dummy_question_id': ['topic_place_values']
             },
-            version_data={
-                'certificate_id': certificate_id,
-                'certificate_version': 1,
-                'topic_versions': {'topic_place_values': 1},
-                'question_versions': {'dummy_question_id': 1},
-                'question_topic_links': {
-                    'dummy_question_id': ['topic_place_values']
-                },
-            },
-            started_at=(
-                started_at
-                if started_at is not None
-                else datetime.datetime(2026, 7, 18)
-            ),
-            finished_at=None,
-            is_submitted=is_submitted,
-        )
+        },
+        started_at=(
+            started_at
+            if started_at is not None
+            else datetime.datetime(2026, 7, 18)
+        ),
+        finished_at=None,
+        is_submitted=is_submitted,
     )
 
 
@@ -701,4 +699,47 @@ class CertificateAssessmentAttemptsHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER)
         self.assertEqual(response, {'attempts': []})
+        self.logout()
+
+    def test_get_skips_attempts_with_deleted_certificate_offering(
+        self,
+    ) -> None:
+        existing_attempt = _create_attempt_model(
+            self.learner_id, self.certificate_offering.certificate_id, 80.0, 1
+        )
+        deleted_offering = certificate_assessment_services.create_certificate_assessment_offering(
+            title='Geography Essentials',
+            description='Covers maps and spatial reasoning.',
+            classroom_id='geography_classroom_01',
+            topic_ids=['topic_place_values'],
+            total_questions=6,
+            time_limit_in_minutes=30,
+            demonstrates=['Map reading'],
+            async_status='Available',
+        )
+        _create_attempt_model(
+            self.learner_id, deleted_offering.certificate_id, 90.0, 2
+        )
+        certificate_assessment_services.delete_certificate_assessment_offering(
+            deleted_offering.certificate_id
+        )
+
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(feconf.CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER)
+        self.assertEqual(
+            response,
+            {
+                'attempts': [
+                    {
+                        'attempt_id': existing_attempt.id,
+                        'classroom_id': 'math_classroom_01',
+                        'title': 'Everyday Arithmetic & Number Confidence',
+                        'total_score': 80.0,
+                        'attempt_index': 1,
+                        'started_at': '2026-07-18T00:00:00Z',
+                        'is_submitted': True,
+                    }
+                ]
+            },
+        )
         self.logout()

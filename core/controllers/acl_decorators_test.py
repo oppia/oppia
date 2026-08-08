@@ -57,15 +57,16 @@ from typing import Any, Dict, Final, List, Union
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
-        certificate_assessment_models,
+        certificate_assessment_offering_models,
         datastore_services,
         secrets_services,
+        suggestion_models,
     )
 
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
 (
-    certificate_assessment_models,
+    certificate_assessment_offering_models,
     suggestion_models,
 ) = models.Registry.import_models(
     [models.Names.CERTIFICATE_ASSESSMENT_OFFERING, models.Names.SUGGESTION]
@@ -519,7 +520,7 @@ class CertificateAssessmentAttemptResultAccessDecoratorTests(
                 debug=feconf.DEBUG,
             )
         )
-        self.attempt = certificate_assessment_models.CertificateAssessmentAttemptModel.create(
+        self.attempt = certificate_assessment_offering_models.CertificateAssessmentAttemptModel.create(
             learner_id=self.user_id,
             total_score=80.0,
             attempt_index=1,

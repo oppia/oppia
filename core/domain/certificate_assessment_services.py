@@ -578,6 +578,37 @@ def get_certificate_assessment_offering(
     return _model_to_domain(certificate_assessment_offering_model)
 
 
+def get_certificate_assessment_offerings_by_ids(
+    certificate_ids: List[str],
+) -> Dict[str, certificate_assessment_domain.CertificateAssessmentOffering]:
+    """Returns a mapping from certificate ID to certificate assessment offering.
+
+    Args:
+        certificate_ids: list(str). The IDs of the certificate assessment
+            offerings to fetch.
+
+    Returns:
+        dict(str, CertificateAssessmentOffering). A mapping from each requested
+        certificate ID to its certificate assessment offering. Only IDs for
+        which an offering exists are included in the mapping.
+    """
+    certificate_assessment_offering_models = (
+        gae_models.CertificateAssessmentOfferingModel.get_multi(certificate_ids)
+    )
+    offerings_by_id: Dict[
+        str, certificate_assessment_domain.CertificateAssessmentOffering
+    ] = {}
+    for certificate_id, certificate_assessment_offering_model in zip(
+        certificate_ids, certificate_assessment_offering_models
+    ):
+        if certificate_assessment_offering_model is None:
+            continue
+        offerings_by_id[certificate_id] = _model_to_domain(
+            certificate_assessment_offering_model
+        )
+    return offerings_by_id
+
+
 def update_certificate_assessment_offering(
     certificate_id: str,
     title: str,
@@ -786,13 +817,19 @@ def get_certificate_attempts(
         list(CertificateAssessmentAttempt). All attempts made by the learner,
         ordered by attempt_index.
     """
-    attempt_models = (
+    attempt_models: List[
+        gae_models.CertificateAssessmentAttemptModel
+        # Here we use cast because the datastore fetch returns a generic sequence and
+        # mypy cannot infer the concrete CertificateAssessmentAttemptModel item
+        # type from this storage-layer API.
+    ] = cast(
+        List[gae_models.CertificateAssessmentAttemptModel],
         gae_models.CertificateAssessmentAttemptModel.query(
             gae_models.CertificateAssessmentAttemptModel.learner_id
             == learner_id
         )
         .order(gae_models.CertificateAssessmentAttemptModel.attempt_index)
-        .fetch()
+        .fetch(),
     )
     return [
         _attempt_model_to_domain(attempt_model)
