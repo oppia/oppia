@@ -781,6 +781,14 @@ export class ExplorationEditor extends BaseUser {
     await this.typeInInputField(historyUserFilterSelector, username);
 
     await this.page.keyboard.press('Enter');
+
+    // clearAllTextFrom clears the field programmatically, so the input is not
+    // marked as user-edited and Enter alone does not fire a change event. Since
+    // the filter only re-applies on change, dispatch it explicitly so that the
+    // filter reflects the current input value.
+    await this.page.$eval(historyUserFilterSelector, el => {
+      el.dispatchEvent(new Event('change', {bubbles: true}));
+    });
   }
 
   /**
