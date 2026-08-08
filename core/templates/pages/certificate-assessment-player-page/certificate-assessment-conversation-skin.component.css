@@ -1,0 +1,241 @@
+.certificate-assessment-conversation-skin {
+  margin: 0 auto;
+  max-width: 925px;
+  padding-top: 6vh;
+  width: min(100%, calc(100vw - 32px));
+}
+
+.certificate-assessment-progress-card {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  margin: 0 20px 24px;
+  padding: 20px 20px 16px;
+}
+
+.certificate-assessment-question-player-progress {
+  background-color: #fff;
+  border: 2px solid #0d48a1;
+  border-radius: 10px;
+  box-sizing: border-box;
+  height: 20px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.certificate-assessment-progress-meta {
+  align-items: center;
+  color: #334e68;
+  display: flex;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  font-style: italic;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.certificate-assessment-current-progress {
+  color: rgba(0, 0, 0, .87);
+}
+
+.certificate-assessment-question-counter {
+  color: #334e68;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 19px;
+  left: -20px;
+  margin: 20px 25px 12px;
+  position: absolute;
+  top: -70px;
+}
+
+.certificate-assessment-question-card {
+  background: white;
+  margin: 80px auto 0;
+  max-width: 35vw;
+  position: relative !important;
+}
+
+.certificate-assessment-question-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.certificate-assessment-avatar {
+  flex: 0 0 auto;
+  position: absolute;
+  top: 10px;
+  transform: translateX(-87px);
+}
+
+.certificate-assessment-avatar img {
+  background: #fff;
+  border: 2px solid #00645c;
+  border-radius: 50%;
+  height: 100px;
+  width: 100px;
+}
+
+.certificate-assessment-prompt-pill {
+  background: #e8f2f1;
+  border-radius: 4px;
+  color: #102a43;
+  flex: 1 1 auto;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  margin: 20px;
+  padding: 10px 20px;
+}
+
+.certificate-assessment-options {
+  display: grid;
+  gap: 14px;
+  margin: 20px;
+}
+
+.certificate-assessment-option-row {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+}
+
+.certificate-assessment-radio,
+.certificate-assessment-checkbox {
+  accent-color: #0d47a1;
+  border: 2px solid #0d48a1;
+  height: 16px;
+  width: 16px;
+}
+
+.certificate-assessment-option-text {
+  color: #0d48a1;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+}
+
+.certificate-assessment-free-response {
+  padding: 10px 20px 15px;
+}
+
+.certificate-assessment-free-response-input {
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  padding: 10px 14px;
+  width: 100%;
+}
+
+.certificate-assessment-actions {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  max-width: 35vw;
+}
+
+.certificate-assessment-navigation-link {
+  background: none;
+  border: none;
+  color: #00645c;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 0;
+}
+
+.certificate-assessment-navigation-arrow {
+  display: inline-block;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.certificate-assessment-primary-button {
+  background-color: #00645c;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 20px;
+}
+
+.certificate-assessment-progress-fill {
+  background: #0d48a1;
+  border-radius: 8px;
+  height: 16px;
+}
+
+@media screen and (max-width: 959px) {
+  .certificate-assessment-conversation-skin {
+    width: 100%;
+  }
+
+  .certificate-assessment-progress-card,
+  .certificate-assessment-question-card,
+  .certificate-assessment-actions {
+    width: 50%
+  }
+
+  .certificate-assessment-question-card {
+    margin-top: 72px;
+  }
+
+  .certificate-assessment-question-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-top: 20px;
+  }
+
+  .certificate-assessment-avatar {
+    left: 100%;
+    top: 0;
+    transform: translate(-100%, -100%);
+    z-index: 1;
+  }
+
+  .certificate-assessment-avatar img {
+    height: 40px;
+    width: 40px;
+  }
+
+  .certificate-assessment-prompt-pill {
+    margin: 20px 12px 12px 16px;
+    min-width: 0;
+  }
+
+  .certificate-assessment-options {
+    margin: 16px 12px;
+  }
+
+  .certificate-assessment-free-response {
+    padding: 10px 12px 15px;
+  }
+
+  .certificate-assessment-navigation-link,
+  .certificate-assessment-primary-button {
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .certificate-assessment-conversation-skin {
+    width: 100%;
+  }
+
+  .certificate-assessment-question-card,
+  .certificate-assessment-progress-card,
+  .certificate-assessment-actions {
+    max-width: 90%;
+  }
+
+  .certificate-assessment-avatar {
+    left: 100%;
+    top: 0;
+    transform: none;
+  }
+}

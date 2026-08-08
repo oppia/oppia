@@ -223,7 +223,12 @@ class TasksTests(test_utils.EmailTestBase):
 
         user_id = self.user_id_a
         user_services.update_email_preferences(
-            user_id, True, False, False, False
+            user_id,
+            True,
+            False,
+            False,
+            False,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         payload = {

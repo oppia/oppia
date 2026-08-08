@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.platform import models
 
+import apache_beam as beam
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+from apache_beam.options import pipeline_options
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
 from typing import Any, List, Optional, Tuple, Type, Union, cast
@@ -36,6 +38,24 @@ if MYPY:  # pragma: no cover
 app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+
+
+def resolve_project_id(pipeline: beam.Pipeline | None) -> str:
+    """Returns the Google Cloud Project ID for the given pipeline.
+
+    Args:
+        pipeline: beam.Pipeline|None. The Apache Beam pipeline.
+
+    Returns:
+        str. The Google Cloud Project ID.
+
+    Raises:
+        ValueError. When the pipeline is None.
+    """
+    if pipeline is None:
+        raise ValueError('pipeline must not be None')
+    gcp_options = pipeline.options.view_as(pipeline_options.GoogleCloudOptions)
+    return str(gcp_options.project)
 
 
 # Here we use type Any because argument 'new_values' can accept arbitrary
