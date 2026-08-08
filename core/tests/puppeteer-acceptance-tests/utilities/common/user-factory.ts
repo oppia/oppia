@@ -136,11 +136,7 @@ type BasicRolesUser = LoggedOutUser &
  * Global user instances that are created and can be reused again.
  */
 let superAdminInstance:
-  | (SuperAdmin &
-      BlogAdmin &
-      TranslationAdmin &
-      VoiceoverAdmin &
-      CollectionEditor)
+  | (SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin)
   | null = null;
 let activeUsers: BaseUser[] = [];
 
@@ -335,13 +331,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<
-    SuperAdmin &
-      BlogAdmin &
-      TranslationAdmin &
-      VoiceoverAdmin &
-      CollectionEditor
-  > {
+  ): Promise<SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -359,13 +349,10 @@ export class UserFactory {
     await superAdmin.expectUserToHaveRole(username, ROLES.TRANSLATION_ADMIN);
     await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.VOICEOVER_ADMIN);
-    await superAdmin.assignRoleToUser(username, ROLES.COLLECTION_EDITOR);
-    await superAdmin.expectUserToHaveRole(username, ROLES.COLLECTION_EDITOR);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
       TranslationAdminFactory(),
       VoiceoverAdminFactory(),
-      CollectionEditorFactory(),
     ]);
 
     return superAdminInstance;
