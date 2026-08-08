@@ -601,6 +601,36 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'test description',
             )
 
+    def test_create_suggestion_with_generic_state_name_fails_if_content_id_not_found(
+        self,
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'invalid_content_id',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>New.</p>',
+            'data_format': 'html',
+        }
+
+        with self.assertRaisesRegex(Exception, 'State  does not exist'):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.target_id,
+                exp.version,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
+
     def test_create_suggestion_with_generic_state_name_succeeds(self) -> None:
         """Test that creating a translation suggestion with state_name='Content'
         successfully resolves the correct state name from the content_id.
@@ -837,6 +867,99 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
         )
+
+    def test_create_skill_translation_suggestion_with_invalid_skill_id(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>Hindi</p>',
+            'data_format': 'html',
+        }
+        with self.assertRaisesRegex(
+            Exception, 'No entity found for type skill with id invalid_skill_id'
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_SKILL,
+                'invalid_skill_id',
+                1,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
+
+    def test_create_translation_suggestion_with_invalid_target_type(
+        self,
+    ) -> None:
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>Html</p>',
+            'translation_html': '<p>Hindi</p>',
+            'data_format': 'html',
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected target_type to be among allowed choices',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_TOPIC,
+                'topic_1',
+                1,
+                self.author_id,
+                change_dict,
+                'test description',
+            )
+
+    def test_get_topic_id_for_translation_suggestion_skill(self) -> None:
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            'suggestion_1',
+            'skill_1',
+            1,
+            'review',
+            'author_id',
+            None,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Content',
+                'content_id': 'content_0',
+                'language_code': 'hi',
+                'content_html': '<p>Html</p>',
+                'translation_html': '<p>Hindi</p>',
+                'data_format': 'html',
+            },
+            'score',
+            'hi',
+            False,
+            self.fake_date,
+            self.fake_date,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+        )
+
+        opp_model = opportunity_models.TranslationOpportunityModel(
+            id='skill|skill_1|hi',
+            topic_ids=['topic_1'],
+            target_id='skill_1',
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            language_code='hi',
+            content_count=1,
+            incomplete_rule_content_count=1,
+            incomplete_translation_content_count=1,
+        )
+        opp_model.put()
+
+        topic_id = suggestion_services._get_topic_id_for_translation_suggestion(
+            suggestion
+        )
+        self.assertEqual(topic_id, 'topic_1')
 
     def test_get_submitted_submissions(self) -> None:
         suggestion_services.create_suggestion(

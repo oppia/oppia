@@ -801,6 +801,9 @@ class UtilsTests(test_utils.GenericTestBase):
         filename = 'filename.svg'
         utils.require_valid_thumbnail_filename(filename)
 
+        # Passing None should not raise an exception.
+        utils.require_valid_thumbnail_filename(None)  # type: ignore[arg-type]
+
     def _assert_valid_image_filename(
         self, expected_error_substring: str, image_filename: str
     ) -> None:
@@ -836,6 +839,9 @@ class UtilsTests(test_utils.GenericTestBase):
         )
         filename = 'filename.svg'
         utils.require_valid_image_filename(filename)
+
+        # Passing None should not raise an exception.
+        utils.require_valid_image_filename(None)  # type: ignore[arg-type]
 
     def test_get_time_in_millisecs(self) -> None:
         dt = datetime.datetime(2020, 6, 15)
@@ -1138,6 +1144,38 @@ class UtilsTests(test_utils.GenericTestBase):
                 ),
             ),
         )
+
+    def test_get_exploration_components_from_dir_with_ds_store(self) -> None:
+        def mock_os_walk(
+            dir_path: str,
+        ) -> Iterator[Tuple[str, List[str], List[str]]]:
+            yield (dir_path, ['assets'], ['dummy.yaml', '.DS_Store'])
+            yield (
+                os.path.join(dir_path, 'assets'),
+                [],
+                ['image.png', '.DS_Store'],
+            )
+
+        yaml_content = 'name: Test'
+
+        def mock_get_file_contents(
+            filepath: str, raw_bytes: bool = False, mode: str = 'r'
+        ) -> Union[str, bytes]:
+            if filepath.endswith('.yaml'):
+                return yaml_content
+            return b'image_data'
+
+        with self.swap(os, 'walk', mock_os_walk), self.swap(
+            utils, 'get_file_contents', mock_get_file_contents
+        ):
+            result_yaml, result_assets = (
+                utils.get_exploration_components_from_dir('dummy_dir')
+            )
+            self.assertEqual(result_yaml, yaml_content)
+            self.assertEqual(
+                result_assets,
+                [('image.png', b'image_data'), ('.DS_Store', b'image_data')],
+            )
 
     def test_get_current_utc_datetime_returns_naive_utc_datetime(self) -> None:
         # TODO(#26624): This will be updated to assertIsNotNone after

@@ -262,10 +262,11 @@ export class ContributionOpportunitiesBackendApiService {
     languageCode?: string,
     entityType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
-    const params: Record<string, string> = {
-      topic_name:
-        topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
-    };
+    const params: Record<string, string> = {};
+
+    if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
+      params.topic_name = topicName;
+    }
 
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
