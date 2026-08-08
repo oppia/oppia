@@ -408,6 +408,35 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('Subprocess execution failed.', self.print_arr)
 
+    def test_run_lighthouse_checks_uses_lighthouse_node_on_path(self) -> None:
+        class MockTask:
+            returncode = 0
+
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
+                return (b'Task output', b'No error.')
+
+        captured_kwargs: dict[str, dict[str, str]] = {}
+
+        def mock_popen(
+            *unused_args: str, **popen_kwargs: dict[str, str]
+        ) -> MockTask:  # pylint: disable=unused-argument
+            captured_kwargs['env'] = popen_kwargs['env']
+            return MockTask()
+
+        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+
+        with self.print_swap, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks(
+                LIGHTHOUSE_MODE_PERFORMANCE
+            )
+
+        self.assertEqual(
+            captured_kwargs['env']['PATH'].split(os.pathsep)[0],
+            os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH),
+        )
+
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
             returncode = 0

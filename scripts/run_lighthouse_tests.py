@@ -169,6 +169,24 @@ def get_entity(line: str) -> tuple[str, str] | None:
     return None
 
 
+def _get_lighthouse_environment() -> dict[str, str]:
+    """Returns an environment with the Lighthouse node runtime on PATH.
+
+    LHCI spawns the Lighthouse child process using the `node` binary that is
+    found on PATH (see node_modules/@lhci/cli/src/collect/node-runner.js).
+    common.py prepends the Node 16 binary to PATH at import time, but
+    Lighthouse 12 requires Node 18.20 or newer and uses JSON import
+    attributes that Node 16 cannot parse. Prepending the Lighthouse node
+    runtime to PATH for the LHCI subprocess ensures that the child process
+    also runs on the Lighthouse node.
+    """
+    env = os.environ.copy()
+    env['PATH'] = os.pathsep.join(
+        [os.path.dirname(common.LIGHTHOUSE_NODE_BIN_PATH), env['PATH']]
+    )
+    return env
+
+
 def run_lighthouse_checks(lighthouse_mode: str) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
@@ -188,7 +206,10 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
     ]
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        bash_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_get_lighthouse_environment(),
     )
     stdout, stderr = process.communicate()
 

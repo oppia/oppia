@@ -536,7 +536,14 @@ def main() -> None:
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n',
     )
-    subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
+    # The --ignore-engines flag is required because Lighthouse 12 requires
+    # Node 18.20 or newer, but the dependencies are installed using Node 16.
+    # Lighthouse is a pure-JS package that is only run under the Node 20
+    # runtime (see LIGHTHOUSE_NODE_BIN_PATH in common.py), so the engine check
+    # is a false positive for the install step.
+    subprocess.check_call(
+        ['yarn', 'install', '--pure-lockfile', '--ignore-engines']
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
