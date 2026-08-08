@@ -1,5 +1,37 @@
-<div class="assessment-card">
-  <h2>Certificate Assessment</h2>
-  <p>This assessment is linked to certificate id: {{certificateId}}</p>
-  <button class="btn btn-primary" (click)="onContinue()">Continue</button>
+<oppia-titled-background-banner [title]="'I18N_CERTIFICATE_ASSESSMENT'"
+                                [buttonText]="'I18N_CERTIFICATE_ASSESSMENT_BACK_BUTTON'"
+                                [buttonRoute]="['/learn', 'math', 'certificate-offering-available']">
+</oppia-titled-background-banner>
+<div class="intro-card-container">
+  <div class="intro-card">
+    <h1 class="certificate-title">{{ certificateTitle | titlecase }}</h1>
+    <p class="certificate-description">{{ certificateDescription }}</p>
+    <div class="demonstrates-box">
+      <p class="demonstrates-heading">{{ demonstratesHeadingI18nKey | translate }}</p>
+      <ul class="demonstrates-list">
+        <li *ngFor="let item of demonstratesList">{{ item | titlecase }}</li>
+      </ul>
+    </div>
+
+    <h2 class="topics-heading">{{ topicsHeadingI18nKey | translate }}</h2>
+    <p class="topics-subtext">
+       {{ topicsSubtextI18nKey | translate }}
+    </p>
+
+    <div class="topics-row">
+      <div class="topic-tile" *ngFor="let topic of recommendedTopics"
+           [ngClass]="topic.colorClass">
+        <div class="topic-tile-info">
+          <p class="topic-name">{{ topic.name | titlecase }}</p>
+          <p class="topic-lessons">{{ topic.lessonCount }} Lessons</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button type="button" class="continue-button" (click)="onContinue()">
+            {{ continueButtonI18nKey | translate }}
+      </button>
+    </div>
+  </div>
 </div>

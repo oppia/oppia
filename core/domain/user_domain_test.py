@@ -724,13 +724,16 @@ class UserGlobalPrefsTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Testing init method."""
         user_global_prefs = user_domain.UserGlobalPrefs(
-            True, False, True, False
+            True, False, True, False, True
         )
 
         self.assertTrue(user_global_prefs.can_receive_email_updates)
         self.assertFalse(user_global_prefs.can_receive_editor_role_email)
         self.assertTrue(user_global_prefs.can_receive_feedback_message_email)
         self.assertFalse(user_global_prefs.can_receive_subscription_email)
+        self.assertTrue(
+            user_global_prefs.can_receive_contributor_dashboard_email
+        )
 
     def test_create_default_prefs(self) -> None:
         """Testing create_default_prefs."""
@@ -753,6 +756,10 @@ class UserGlobalPrefsTests(test_utils.GenericTestBase):
         self.assertEqual(
             default_user_global_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+        )
+        self.assertEqual(
+            default_user_global_prefs.can_receive_contributor_dashboard_email,
+            feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
 
@@ -817,7 +824,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_initialization(self) -> None:
         """Testing init method."""
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
             'user_id0', 'exp_id0', 0, current_time, 'state0'
         )
@@ -830,7 +837,7 @@ class ExpUserLastPlaythroughTests(test_utils.GenericTestBase):
 
     def test_update_last_played_information(self) -> None:
         """Testing update_last_played_information."""
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         exp_last_playthrough = user_domain.ExpUserLastPlaythrough(
             'user_id0', 'exp_id0', 0, current_time, 'state0'
         )

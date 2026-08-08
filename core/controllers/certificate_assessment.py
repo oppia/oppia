@@ -117,6 +117,14 @@ class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
     certificate_id: str
 
 
+class CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict(
+    TypedDict
+):
+    """Dict representation of classroom_id path args."""
+
+    classroom_id: str
+
+
 class ValidateCertificateAssessmentOfferingHandler(
     base.BaseHandler[
         ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict,
@@ -382,6 +390,45 @@ class CertificateAssessmentOfferingByIdHandler(
         ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json({})
+
+
+class CertificateAssessmentOfferingsForClassroomHandler(
+    base.BaseHandler[
+        CertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict,
+    ]
+):
+    """Stub handler for retrieving certificate assessment offerings."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {'classroom_id': {'schema': {'type': 'basestring'}}}
+
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, classroom_id: str) -> None:  # pylint: disable=unused-argument
+        """Returns a stub response for certificate offerings."""
+
+        # TODO(#24717-M2.12): Replace this stub implementation by calling
+        # get_certificate_offerings_for_classroom(classroom_id).
+        # The service should:
+        # - Fetch CertificateAssessmentOfferingModel records for the specified
+        #   classroom.
+        # - Filter offerings to async_status == 'Available'.
+        # - Cross-reference the learner's attempt history and populate
+        #   attempt_status ('Passed', 'Not Passed', or 'Not Attempted').
+        # - Return real data from the datastore instead of mock data.
+        self.render_json(
+            {
+                'available_certificate_offerings': [
+                    {
+                        'certificate_id': 'sample_certificate_id',
+                        'title': 'Sample Certificate',
+                        'attempt_status': 'Not Attempted',
+                    }
+                ]
+            }
+        )
 
 
 class StartCertificateAssessmentHandler(
