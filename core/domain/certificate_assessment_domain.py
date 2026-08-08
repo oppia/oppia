@@ -339,7 +339,7 @@ class CertificateAssessmentAttempt:
             total_score: float. The total score achieved in this
                 attempt.
             attempt_index: int. The index of this attempt for the
-                given learner (1-based).
+                given learner and certificate (1-based).
             attempt_data: dict. Maps topic_id to a dict containing
                 'total_related_questions' and
                 'total_correct_questions' for that topic.

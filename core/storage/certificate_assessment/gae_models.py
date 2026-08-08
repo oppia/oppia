@@ -336,8 +336,9 @@ class CertificateAssessmentAttemptModel(base_models.BaseModel):
     )
     # The total score achieved by the learner in this attempt.
     total_score = datastore_services.FloatProperty(required=True, indexed=True)
-    # The index of this attempt for the given learner (1-based, increasing
-    # with every new attempt made by the same learner).
+    # The index of this attempt for the given learner and certificate
+    # (1-based, increasing with every new submitted attempt made by the
+    # same learner for the same certificate).
     attempt_index = datastore_services.IntegerProperty(
         required=True, indexed=True
     )

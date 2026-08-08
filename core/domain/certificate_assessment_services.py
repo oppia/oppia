@@ -461,23 +461,19 @@ def _get_active_attempt_for_learner(
 def _get_next_attempt_index_for_certificate(
     learner_id: str, certificate_id: str
 ) -> int:
-    """Returns the next 1-based attempt index for the given certificate.
+    """Returns the next attempt index for a learner and a certificate.
 
-    The index is derived from the highest submitted attempt index instead of
-    from a count of submitted attempts. A count would need a global query
-    filtered on is_submitted, which is not strongly consistent inside the
-    submission transaction, and could therefore yield a stale or duplicated
-    index for concurrent submissions. The certificate_id is indexed on the
-    model itself, so the query is bounded to the submitted attempts for this
-    certificate only, and fetching a single entity ordered by attempt_index
-    descending yields the highest one directly.
+    The index is 1-based and counts submitted attempts per learner and
+    certificate. For example, learner A's first attempt at certificate A is
+    index 1, learner B's first attempt at the same certificate is also index 1,
+    and learner A's next attempt at certificate A is index 2.
 
     Args:
         learner_id: str. The learner submitting the attempt.
         certificate_id: str. The certificate being attempted.
 
     Returns:
-        int. The 1-based index to assign to the next submitted attempt.
+        int. The next index to assign to the submitted attempt.
     """
     highest_submitted_attempt: Optional[
         gae_models.CertificateAssessmentAttemptModel
