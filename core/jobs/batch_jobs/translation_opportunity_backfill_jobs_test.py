@@ -990,6 +990,42 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
         self.assertEqual(model.topic_ids, ['topic_id'])
         self.assertEqual(model.content_count, 1)
 
+    def test_creates_skill_translation_opportunity_model_with_translations(
+        self,
+    ) -> None:
+        translation_model = translation_models.EntityTranslationsModel(
+            id=f'skill.{self.skill_id}.1.hi',
+            entity_type='skill',
+            entity_id=self.skill_id,
+            entity_version=1,
+            language_code='hi',
+            translations={
+                'rubric_explanation_0': {
+                    'content_format': 'html',
+                    'content_value': '<p>Hindi explanation</p>',
+                    'needs_update': False,
+                }
+            },
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='SKILL TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = opportunity_models.TranslationOpportunityModel.get(
+            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                feconf.TranslatableEntityType.SKILL.value, self.skill_id
+            )
+        )
+        self.assertIsNotNone(model)
+        self.assertEqual(model.translation_counts, {'hi': 1})
+
     def test_deletes_orphaned_skill_translation_opportunity_model(
         self,
     ) -> None:
