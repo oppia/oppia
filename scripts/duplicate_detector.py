@@ -29,13 +29,16 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 # Here we use type Any because the parsed JSON object is highly dynamic.
-def _get_template_lines_recursive(path: str, template_lines: Set[str]) -> None:
+def _get_template_lines_recursive(path: str) -> Set[str]:
     """Helper function to recursively find and parse template files.
 
     Args:
         path: str. The current path to process.
-        template_lines: set. A set to store the boilerplate lines.
+
+    Returns:
+        set. A set containing the boilerplate template lines.
     """
+    template_lines: Set[str] = set()
     if os.path.isfile(path):
         if path.endswith('.md') or path.endswith('.yml'):
             with open(path, 'r', encoding='utf-8') as f:
@@ -45,9 +48,11 @@ def _get_template_lines_recursive(path: str, template_lines: Set[str]) -> None:
                         template_lines.add(clean_line.lower())
     elif os.path.isdir(path):
         for item in os.listdir(path):
-            _get_template_lines_recursive(
-                os.path.join(path, item), template_lines
+            template_lines.update(
+                _get_template_lines_recursive(os.path.join(path, item))
             )
+
+    return template_lines
 
 
 def get_template_lines(workspace: str) -> Set[str]:
@@ -59,14 +64,13 @@ def get_template_lines(workspace: str) -> Set[str]:
     Returns:
         set. A set of stripped, lowercased lines from the templates.
     """
-    template_lines: Set[str] = set()
     issue_template_dir = os.path.join(workspace, '.github', 'ISSUE_TEMPLATE')
     pr_template_file = os.path.join(
         workspace, '.github', 'PULL_REQUEST_TEMPLATE.md'
     )
 
-    _get_template_lines_recursive(issue_template_dir, template_lines)
-    _get_template_lines_recursive(pr_template_file, template_lines)
+    template_lines: Set[str] = _get_template_lines_recursive(issue_template_dir)
+    template_lines.update(_get_template_lines_recursive(pr_template_file))
 
     return template_lines
 

@@ -21,6 +21,6 @@ pytest-timeout==2.2.0
 pytest-xdist==3.5.0
 PyYAML==6.0.2
 rcssmin==1.2.1
-sentence-transformers
+sentence-transformers==5.6.0
 webtest==3.0.6
 xmltodict==0.15.0
