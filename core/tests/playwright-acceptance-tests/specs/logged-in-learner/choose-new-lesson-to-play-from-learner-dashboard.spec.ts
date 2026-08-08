@@ -141,7 +141,7 @@ test.describe('Logged-In Learner', function () {
     );
     await loggedInLearner.page.waitForLoadState('networkidle');
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     // TODO(#20869): A flaky behaviour is observed due to issue in the backend.
     // Even after completing the lesson, the node isn't marked as completed.
     // Once fixed, uncomment the below code.

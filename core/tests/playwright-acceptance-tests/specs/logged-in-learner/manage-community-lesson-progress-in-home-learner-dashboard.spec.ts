@@ -77,7 +77,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should be able to see community lessons in In Progress section if not completed fully', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToCommunityLibraryOnNavbar();
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
@@ -85,7 +85,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
 
     await loggedInLearner.continueToNextCardAsLoggedOutUser();
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1'
     );

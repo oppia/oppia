@@ -53,7 +53,7 @@ test.describe('Logged-Out Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
     await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
     await curriculumAdmin.createSkillForTopic(
       'Math',

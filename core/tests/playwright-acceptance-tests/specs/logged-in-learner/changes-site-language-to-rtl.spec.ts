@@ -128,7 +128,7 @@ test.describe('Logged-In Learner', function () {
 
     await loggedInUser1.expectElementToBeVisible('.mat-mdc-menu-panel', false);
 
-    await loggedInUser1.navigateToLearnerDashboard();
+    await loggedInUser1.navigateToLearnerDashboardAsLoggedInUser();
 
     await loggedInUser1.verifyPageIsRTL();
 

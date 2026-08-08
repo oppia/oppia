@@ -28,12 +28,9 @@ const contributorDashboardAdminUrl =
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const loginPageUrl = testConstants.URLs.Login;
-const moderatorPageUrl = testConstants.URLs.ModeratorPage;
-const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
 const splashPageUrl = testConstants.URLs.splash;
-const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 // Auth Pages selectors.
 const loginPage = '.e2e-test-login-page';
@@ -885,11 +882,13 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Navigates to the learner dashboard.
+   * @param {boolean} verifyUrl - Whether to verify the URL after navigation. Defaults to true.
    */
-  async navigateToLearnerDashboard(): Promise<void> {
-    await this.goto(learnerDashboardUrl);
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeAttachedInDOM(homeTabSectionInLearnerDashboard);
+  async navigateToLearnerDashboardAsLoggedInUser(
+    verifyUrl: boolean = true
+  ): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToLearnerDashboard(verifyUrl);
   }
 
   /**
@@ -1231,9 +1230,13 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Navigates to the Moderator page.
+   * @param {boolean} verifyUrl - Whether to verify the URL after navigation. Defaults to true.
    */
-  async navigateToModeratorPage(): Promise<void> {
-    await this.goto(moderatorPageUrl);
+  async navigateToModeratorPageAsLoggedInUser(
+    verifyUrl: boolean = true
+  ): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToModeratorPage(verifyUrl);
   }
 
   /**
@@ -1252,8 +1255,11 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Release Coordinator page.
    */
-  async navigateToReleaseCoordinatorPage(): Promise<void> {
-    await this.goto(releaseCoordinatorPageUrl);
+  async navigateToReleaseCoordinatorPageAsLoggedInUser(
+    verifyUrl: boolean = true
+  ): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToReleaseCoordinatorPage();
   }
 
   /**
@@ -1281,8 +1287,9 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Topics and Skills Dashboard page.
    */
-  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
-    await this.goto(topicsAndSkillsDashboardUrl);
+  async navigateToTopicsAndSkillsDashboardPageAsLoggedInUser(): Promise<void> {
+    const navigationUtils = new NavigationUtils(this);
+    await navigationUtils.navigateToTopicsAndSkillsDashboardPage();
   }
 
   /**

@@ -67,7 +67,7 @@ test.describe('Logged-Out Learner', function () {
       'Algebra',
       'fractions'
     );
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToTopicsAndSkillsDashboardPageAsTopicManager();
 
     await curriculumAdmin.openSkillEditor('fractions');
     await curriculumAdmin.navigateToSkillQuestionEditorTab();

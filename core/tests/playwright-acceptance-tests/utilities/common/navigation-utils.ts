@@ -22,7 +22,14 @@ import {expect} from '@playwright/test';
 import {BaseUser} from './playwright-utils';
 import testConstants from './test-constants';
 
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const splashPageUrl = testConstants.URLs.splash;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+
+const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 
 export class NavigationUtils {
   userInstance: BaseUser;
@@ -50,6 +57,44 @@ export class NavigationUtils {
   }
 
   /**
+   * Function for navigating to the classroom admin page.
+   */
+  async navigateToClassroomAdminPage(): Promise<void> {
+    await this.userInstance.page.bringToFront();
+    await this.userInstance.waitForNetworkIdle();
+    await this.userInstance.goto(classroomAdminUrl);
+  }
+
+  /**
+   * Navigates to the learner dashboard.
+   * @param {boolean} verifyUrl - Whether to verify the URL after navigation.
+   */
+  async navigateToLearnerDashboard(verifyUrl: boolean = true): Promise<void> {
+    await this.userInstance.goto(learnerDashboardUrl, verifyUrl);
+    await this.userInstance.waitForPageToFullyLoad();
+    if (verifyUrl) {
+      await this.userInstance.expectElementToBeAttachedInDOM(
+        homeTabSectionInLearnerDashboard
+      );
+    }
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   * @param {boolean} verifyUrl - Whether to verify the URL after navigation.
+   */
+  async navigateToModeratorPage(verifyUrl: boolean = true): Promise<void> {
+    await this.userInstance.goto(moderatorPageUrl, verifyUrl);
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.userInstance.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
    * Navigates to the splash page and verifies the resulting URL. Since
    * /splash redirects the user to a different page depending on their auth
    * state, the expected destination must be supplied by the caller rather
@@ -62,6 +107,13 @@ export class NavigationUtils {
     await this.userInstance.goto(splashPageUrl, false);
 
     expect(this.userInstance.page.url()).toBe(expectedURL);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.userInstance.goto(topicsAndSkillsDashboardUrl);
   }
 
   /**

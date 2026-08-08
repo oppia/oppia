@@ -126,7 +126,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
       'Home'
     );
@@ -163,7 +163,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should navigate directly to the Place Values topic in the math classroom', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToTopicPageByCard('Place Values');
     await loggedInLearner.expectToBeOnPageAsLoggedInUser(
       'learn/math/place-values'
@@ -173,7 +173,7 @@ test.describe('Logged-In Learner', function () {
   });
 
   test('should display in-progress and recommended lessons after starting a lesson', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToTopicPageByCard('Place Values');
     await loggedInLearner.expectToBeOnPageAsLoggedInUser(
       'learn/math/place-values'
@@ -183,7 +183,7 @@ test.describe('Logged-In Learner', function () {
       'What are the Place Values'
     );
     await loggedInLearner.continueToNextCardAsLoggedOutUser();
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     // Did not finish the chapter,So still in  In-progress section.
     await loggedInLearner.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
@@ -218,7 +218,7 @@ test.describe('Logged-In Learner', function () {
 
   test('should not recommend any lessons if currently on last lesson', async function () {
     test.setTimeout(480000); // Takes longer than default timeout.
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 1: What are the Place Values'
@@ -229,7 +229,7 @@ test.describe('Logged-In Learner', function () {
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter2AndRecommendedForYouChapter3'
     );
@@ -254,7 +254,7 @@ test.describe('Logged-In Learner', function () {
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter3AndRecommendedForYouChapter4'
     );
@@ -280,7 +280,7 @@ test.describe('Logged-In Learner', function () {
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter4AndRecommendedForYouChapter5'
     );
@@ -305,7 +305,7 @@ test.describe('Logged-In Learner', function () {
     await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6'
     );
@@ -325,7 +325,7 @@ test.describe('Logged-In Learner', function () {
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLearnerDashboardAsLoggedInUser();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter6AndNoRecommendedForYouChapter'
     );
