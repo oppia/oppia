@@ -25,7 +25,6 @@ import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment
 import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
-import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
 import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
 import {TranslateModule} from '@ngx-translate/core';
@@ -45,11 +44,6 @@ import {TranslateModule} from '@ngx-translate/core';
         component: CertificateAssessmentPlayerPageRootComponent,
         canActivate: [CertificateAssessmentPlayerPageAuthGuard],
       },
-      {
-        path: 'result/:attempt_id',
-        component: CertificateAssessmentPlayerPageRootComponent,
-        canActivate: [CertificateAssessmentPlayerPageAuthGuard],
-      },
     ]),
     TranslateModule,
   ],
@@ -59,7 +53,6 @@ import {TranslateModule} from '@ngx-translate/core';
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
     CertificateAssessmentTitledBackgroundBannerComponent,
   ],
   entryComponents: [
@@ -68,7 +61,6 @@ import {TranslateModule} from '@ngx-translate/core';
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
     CertificateAssessmentTitledBackgroundBannerComponent,
   ],
 })
