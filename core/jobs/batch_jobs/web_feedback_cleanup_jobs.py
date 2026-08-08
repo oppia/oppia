@@ -42,9 +42,8 @@ from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Optional
-
 import apache_beam as beam
+from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -345,6 +344,7 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
         Args:
             platform_feedback_model: PlatformFeedbackModel. The feedback model
                 whose screenshot should be deleted.
+            oppia_project_id: Optional[str]. The ID of the Oppia project.
         """
         screenshot_filename = platform_feedback_model.screenshot_filename
         screenshot_entity_id = platform_feedback_model.screenshot_entity_id
@@ -426,6 +426,7 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
         Args:
             platform_feedback_model: PlatformFeedbackModel. The feedback model
                 to clean up.
+            oppia_project_id: Optional[str]. The ID of the Oppia project.
 
         Returns:
             PlatformFeedbackModel. The deleted feedback model.
