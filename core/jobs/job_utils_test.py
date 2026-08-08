@@ -20,19 +20,21 @@ from __future__ import annotations
 
 import datetime
 
-from core.jobs import job_utils
+from core import utils
+from core.jobs import job_options, job_utils
 from core.platform import models
 from core.tests import test_utils
 
+import apache_beam as beam
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
-(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
-
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class FooModel(datastore_services.Model):
@@ -51,6 +53,20 @@ class CoreModel(base_models.BaseModel):
     """Simple BaseModel subclass with a 'prop' float property."""
 
     prop = datastore_services.FloatProperty()
+
+
+class ResolveProjectIdTests(test_utils.TestBase):
+
+    def test_pipeline_with_valid_options_returns_project_id(self) -> None:
+        with self.swap_to_always_return(
+            app_identity_services, 'get_application_id', 'LOL'
+        ):
+            pipeline = beam.Pipeline(options=job_options.JobOptions())
+            self.assertEqual(job_utils.resolve_project_id(pipeline), 'LOL')
+
+    def test_none_pipeline_raises_value_error(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'must not be None'):
+            job_utils.resolve_project_id(None)
 
 
 class CloneTests(test_utils.TestBase):
@@ -224,7 +240,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
-        utcnow = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
 
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
@@ -236,7 +252,9 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 3.14,
-                'created_on': utcnow.replace(tzinfo=datetime.timezone.utc),
+                'created_on': current_time.replace(
+                    tzinfo=datetime.timezone.utc
+                ),
                 'last_updated': None,
                 'deleted': False,
             }
@@ -247,7 +265,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
                 id='abc',
                 project=self.oppia_project_id,
                 prop=3.14,
-                created_on=utcnow,
+                created_on=current_time,
             ),
             job_utils.get_ndb_model_from_beam_entity(beam_entity),
         )
@@ -271,8 +289,8 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties(
             {
                 'prop': 123,
-                'created_on': datetime.datetime.utcnow(),
-                'last_updated': datetime.datetime.utcnow(),
+                'created_on': utils.get_current_utc_datetime(),
+                'last_updated': utils.get_current_utc_datetime(),
                 'deleted': False,
             }
         )

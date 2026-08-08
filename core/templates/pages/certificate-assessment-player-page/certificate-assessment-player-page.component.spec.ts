@@ -25,31 +25,37 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
   let component: CertificateAssessmentPlayerPageComponent;
   let fixture: ComponentFixture<CertificateAssessmentPlayerPageComponent>;
   let router: Router;
-
-  const activatedRouteStub = (routePath: string | null) => ({
+  let activatedRouteStubValue: {
     snapshot: {
-      paramMap: {
-        get: (name: string) => {
-          if (name === 'certificate_id') {
-            return 'cert-123';
-          }
-          return null;
-        },
-      },
-      url: routePath ? [{path: routePath}] : [],
-    },
-  });
+      paramMap: {get: (name: string) => string | null};
+      url: {path: string}[];
+    };
+  };
 
   const configureComponent = async (
     routePath: string | null
   ): Promise<void> => {
+    activatedRouteStubValue = {
+      snapshot: {
+        paramMap: {
+          get: (name: string) => {
+            if (name === 'certificate_id') {
+              return 'cert-123';
+            }
+            return null;
+          },
+        },
+        url: routePath ? [{path: routePath}] : [],
+      },
+    };
+
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [CertificateAssessmentPlayerPageComponent],
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: activatedRouteStub(routePath),
+          useValue: activatedRouteStubValue,
         },
         {
           provide: Router,
@@ -70,7 +76,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     await configureComponent(null);
   });
 
-  it('should initialize intro stage for the base route', () => {
+  it('should initialize intro stage for the base route and expose the certificate id', () => {
     fixture.detectChanges();
 
     expect(component.certificateId).toBe('cert-123');
@@ -87,6 +93,12 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     await configureComponent('result');
     fixture.detectChanges();
     expect(component.currentStage).toBe('result');
+  });
+
+  it('should keep intro stage when the route path is unrecognized', async () => {
+    await configureComponent('unknown');
+    fixture.detectChanges();
+    expect(component.currentStage).toBe('intro');
   });
 
   it('should navigate to the session route on startAssessment', () => {
@@ -106,7 +118,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.submitAssessment();
 
     expect(router.navigate).toHaveBeenCalledWith([
-      '/certificate-assessment/cert-123/result',
+      '/certificate-assessment',
+      'cert-123',
+      'result',
       'attempt-1234',
     ]);
   });
@@ -140,6 +154,24 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     );
   });
 
+  it('should go back one question when previousQuestion is called away from the start', () => {
+    fixture.detectChanges();
+    component.currentQuestionIndex = 2;
+
+    component.previousQuestion();
+
+    expect(component.currentQuestionIndex).toBe(1);
+  });
+
+  it('should not go back past the first question', () => {
+    fixture.detectChanges();
+    component.currentQuestionIndex = 0;
+
+    component.previousQuestion();
+
+    expect(component.currentQuestionIndex).toBe(0);
+  });
+
   it('should compute the progress percentage based on the current question index', () => {
     fixture.detectChanges();
     component.currentQuestionIndex = 0;
@@ -156,5 +188,26 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.currentQuestionIndex = 1;
 
     expect(component.getCurrentQuestion()).toEqual(component.mockQuestions[1]);
+  });
+
+  it('should report whether the current question is the last one', () => {
+    fixture.detectChanges();
+    component.currentQuestionIndex = 0;
+    expect(component.isCurrentQuestionLast()).toBeFalse();
+
+    component.currentQuestionIndex = component.mockQuestions.length - 1;
+    expect(component.isCurrentQuestionLast()).toBeTrue();
+  });
+
+  it('should read and store submitted responses by question index', () => {
+    fixture.detectChanges();
+
+    expect(component.getSavedResponse()).toBe('');
+
+    component.updateResponse('b');
+    expect(component.getSavedResponse()).toBe('b');
+
+    component.currentQuestionIndex = 1;
+    expect(component.getSavedResponse()).toBe('');
   });
 });

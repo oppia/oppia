@@ -1,7 +1,7 @@
-<background-banner></background-banner>
+<ng-container *ngIf="selectedReportId === null; else detailView">
+  <background-banner></background-banner>
 
-<div class=" oppia-technical-feedback-dashboard-page">
-  <ng-container *ngIf="selectedReportId === null; else detailView">
+  <div class="oppia-technical-feedback-dashboard-page">
     <div class="oppia-technical-feedback-dashboard-page-header">
       <h2>
         {{ 'I18N_TOPNAV_TECHNICAL_FEEDBACK_DASHBOARD' | translate }}
@@ -22,11 +22,15 @@
                           (previousPage)="onPreviousPage()">
     </oppia-feedback-table>
 
-  </ng-container>
+  </div>
+</ng-container>
 
-  <ng-template #detailView>
-    <oppia-feedback-detail-page [feedbackDetailResponse]="feedbackDetailResponse"
-                                (goBack)="navigateBackToDashboard()">
-    </oppia-feedback-detail-page>
-  </ng-template>
-</div>
+<ng-template #detailView>
+  <oppia-feedback-detail-page [feedbackDetailResponse]="feedbackDetailResponse"
+                              [feedbackDetailPageConfig]="cardConfig"
+                              [screenshotDataUrl]="screenshotDataUrl"
+                              (statusChange)="onStatusChange($event)"
+                              (githubTransfer)="onGithubTransfer($event)"
+                              (goBack)="navigateBackToDashboard()">
+  </oppia-feedback-detail-page>
+</ng-template>
