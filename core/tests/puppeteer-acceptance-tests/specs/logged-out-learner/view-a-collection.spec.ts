@@ -24,6 +24,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CollectionEditor} from '../../utilities/user/collection-editor';
+import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
 const FIRST_EXPLORATION_TITLE = 'Positive Numbers';
@@ -40,6 +41,12 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
+    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // visible. Once fixed, allow testing for mobile viewport.
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test setup, TODO #26642');
+      return;
+    }
     lessonCreator = await UserFactory.createNewUser(
       'lessonCreator',
       'lessoncreator@example.com',
@@ -61,11 +68,23 @@ describe('Logged-Out Learner', function () {
   }, LONG_SETUP_TIMEOUT_MSECS);
 
   it('should find the collection in the community library', async function () {
+    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // visible. Once fixed, allow testing for mobile viewport.
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
     await loggedOutLearner.navigateToCommunityLibraryPage();
     await loggedOutLearner.expectCollectionToBeVisibleInLibrary('Numbers');
   });
 
   it('should display both explorations on the collection page', async function () {
+    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // visible. Once fixed, allow testing for mobile viewport.
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
     await loggedOutLearner.navigateToCollectionFromLibrary('Numbers');
 
     // Verify the collection begin button and both explorations are visible.
@@ -79,6 +98,12 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should complete an exploration started from the collection', async function () {
+    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // visible. Once fixed, allow testing for mobile viewport.
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
     // Open the first exploration from the collection page.
     await loggedOutLearner.navigateToExplorationFromCollection(
       FIRST_EXPLORATION_TITLE
@@ -95,12 +120,25 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should return to the collection after completing the exploration', async function () {
+    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // visible. Once fixed, allow testing for mobile viewport.
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
+
     await loggedOutLearner.clickBackToCollectionButton();
 
     await loggedOutLearner.expectToBeOnPage('/collection/');
   });
 
   it('should display "COMPARTIR ESTA COLECCIÓN" when language is changed to Spanish', async function () {
+    // TODO #26642: On mobile the collection editor's Save Draft button is not
+    // visible. Once fixed, allow testing for mobile viewport.
+    if (loggedOutLearner.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, TODO #26642');
+      return;
+    }
     // Change the site language to Spanish and reload the collection page.
     await loggedOutLearner.changeSiteLanguage('es');
     await loggedOutLearner.navigateToCollectionPage();
