@@ -4635,7 +4635,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     def test_exploration_handler_returns_data_with_no_exploration_id(
         self,
     ) -> None:
-        # If no exploration ID is provided, no suggestions are returned.
+        # If no exploration ID is provided, all reviewable suggestions are returned.
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content',
             {
@@ -4644,8 +4644,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
             },
         )
-        self.assertEqual(len(response['suggestions']), 0)
-        self.assertEqual(response['next_offset'], 0)
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
 
     def test_exploration_handler_returns_data_with_valid_exploration_id(
         self,

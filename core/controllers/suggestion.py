@@ -1038,6 +1038,8 @@ class UserSubmittedSuggestionsHandler(
                 suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
                     translatable_suggestions
                 )
+            suggestions = suggestions_with_translatable_exps
+
         self._render_suggestions(target_type, suggestions, next_offset)
 
 

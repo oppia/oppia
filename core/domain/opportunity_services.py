@@ -783,6 +783,8 @@ def _compute_topic_ids_of_translation_opportunities(
             found_exp_ids: Set[str] = set()
 
             for topic_summary in topic_summaries:
+                if topic_summary is None:
+                    continue
                 topic_id = topic_summary.id
                 for (
                     exp_ids
@@ -1391,7 +1393,7 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
 
 
 def get_translation_opportunities_with_new_models(
-    entity_type: str,
+    entity_type: Optional[str],
     language_code: str,
     topic_name: Optional[str] = None,
     cursor: Optional[str] = None,
@@ -1446,7 +1448,7 @@ def _get_translation_opportunity_cards_from_models(
     opportunity_models_list: Sequence[
         opportunity_models.TranslationOpportunityModel
     ],
-    entity_type: str,
+    entity_type: Optional[str],
     language_code: str,
 ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
     """Returns a list of translation opportunity card info objects for the given

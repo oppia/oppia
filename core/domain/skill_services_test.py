@@ -1199,7 +1199,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_update_skill_updates_v2_translation_opportunity(self) -> None:
+    def test_update_skill_with_topic_updates_v2_translation_opportunity(
+        self,
+    ) -> None:
         topic = topic_domain.Topic.create_default_topic(
             'topic_id', 'Topic 1', 'abbrev', 'description', 'fragment'
         )

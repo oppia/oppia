@@ -244,7 +244,7 @@ describe('Contribution and review backend API service', () => {
     const putBody = {
       action: 'accept',
       review_message: 'test review message',
-      skill_difficulty: 'easy',
+      skill_difficulty: 0.3,
     };
 
     carbas

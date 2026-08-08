@@ -823,7 +823,7 @@ describe('Contribution and review service', () => {
     const requestBody = {
       action: 'accept',
       review_message: 'review message',
-      skill_difficulty: 'easy',
+      skill_difficulty: 0.3,
     };
 
     let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
@@ -847,7 +847,7 @@ describe('Contribution and review service', () => {
           'pqr',
           'accept',
           'review message',
-          'easy',
+          0.3,
           onSuccess,
           onFailure
         );
@@ -876,7 +876,7 @@ describe('Contribution and review service', () => {
           'pqr',
           'accept',
           'review message',
-          'easy',
+          0.3,
           onSuccess,
           onFailure
         );

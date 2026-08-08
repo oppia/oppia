@@ -376,7 +376,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
     @classmethod
     def get_by_entity_type_and_topic(
         cls,
-        entity_type: str,
+        entity_type: Optional[str],
         topic_id: Optional[str],
         language_code: str,
         page_size: int,
