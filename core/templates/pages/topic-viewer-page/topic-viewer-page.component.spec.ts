@@ -184,6 +184,7 @@ describe('Topic viewer page', () => {
   });
 
   afterEach(() => {
+    topicViewerPageComponent.ngOnDestroy();
     httpTestingController.verify();
   });
 
@@ -198,6 +199,9 @@ describe('Topic viewer page', () => {
     spyOn(windowRef.nativeWindow.history, 'pushState');
 
     topicViewerPageComponent.ngOnInit();
+    expect(document.body.classList).not.toContain(
+      'redesigned-topic-viewer-page-active'
+    );
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
     expect(topicViewerPageComponent.activeView).toBe(
       topicViewerPageComponent.VIEW_NAMES.STORY
@@ -307,6 +311,37 @@ describe('Topic viewer page', () => {
       'I18N_TOPIC_VIEWER_PAGE_TITLE'
     );
   });
+
+  it('should apply redesigned styles only for the enabled lifecycle', fakeAsync(() => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(topicViewerPageComponent, 'subscribeToOnLangChange');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+
+    topicViewerPageComponent.ngOnInit();
+
+    expect(document.body.classList).toContain(
+      'redesigned-topic-viewer-page-active'
+    );
+
+    const req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`
+    );
+    req.flush(topicDict);
+    flushMicrotasks();
+
+    topicViewerPageComponent.ngOnDestroy();
+
+    expect(document.body.classList).not.toContain(
+      'redesigned-topic-viewer-page-active'
+    );
+  }));
 
   it('should unsubscribe upon component destruction', () => {
     topicViewerPageComponent.subscribeToOnLangChange();

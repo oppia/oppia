@@ -16,7 +16,14 @@
  * @fileoverview Component for the topic viewer.
  */
 
-import {Component, OnInit, OnDestroy, ViewEncapsulation} from '@angular/core';
+import {DOCUMENT} from '@angular/common';
+import {
+  Component,
+  Inject,
+  OnInit,
+  OnDestroy,
+  ViewEncapsulation,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -56,6 +63,8 @@ interface TopicViewerStorySectionData {
   encapsulation: ViewEncapsulation.None,
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
+  private static readonly REDESIGNED_TOPIC_VIEWER_BODY_CLASS =
+    'redesigned-topic-viewer-page-active';
   directiveSubscriptions = new Subscription();
   readonly VIEW_NAMES = {
     STORY: 'story',
@@ -91,10 +100,16 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   ngOnInit(): void {
+    if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
+      this.document.body.classList.add(
+        TopicViewerPageComponent.REDESIGNED_TOPIC_VIEWER_BODY_CLASS
+      );
+    }
     const pathname = this.urlService.getPathname();
     if (pathname.endsWith(this.VIEW_NAMES.STUDYGUIDE)) {
       this.activeView = this.VIEW_NAMES.STUDYGUIDE;
@@ -198,6 +213,9 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.document.body.classList.remove(
+      TopicViewerPageComponent.REDESIGNED_TOPIC_VIEWER_BODY_CLASS
+    );
     this.directiveSubscriptions.unsubscribe();
   }
 

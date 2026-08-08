@@ -40,6 +40,15 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    RedesignedTopicViewerPage: {
+      isEnabled: false,
+    },
+  };
+}
 
 class MockPageContextService {
   getExplorationId() {
@@ -67,6 +76,7 @@ describe('Topic editor page', () => {
   let urlService: UrlService;
   let topic: Topic;
   let ngbModal: NgbModal;
+  let platformFeatureService: MockPlatformFeatureService;
   let runSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
@@ -86,6 +96,10 @@ describe('Topic editor page', () => {
         UndoRedoService,
         TopicEditorStateService,
         UrlService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
         {
           provide: PageContextService,
           useClass: MockPageContextService,
@@ -109,6 +123,9 @@ describe('Topic editor page', () => {
     urlService = TestBed.inject(UrlService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     ngbModal = TestBed.inject(NgbModal);
+    platformFeatureService = TestBed.inject(
+      PlatformFeatureService
+    ) as unknown as MockPlatformFeatureService;
     runSpy = jasmine.createSpy('run');
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
@@ -203,6 +220,24 @@ describe('Topic editor page', () => {
 
     component.hideWarnings();
     expect(component.warningsAreShown).toBe(false);
+  });
+
+  it('should only apply redesigned page styles when the feature is enabled', () => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'loadTopic');
+
+    component.ngOnInit();
+
+    expect(document.body.classList).not.toContain('topic-editor-page-active');
+
+    platformFeatureService.status.RedesignedTopicViewerPage.isEnabled = true;
+    component.ngOnInit();
+
+    expect(document.body.classList).toContain('topic-editor-page-active');
+
+    component.ngOnDestroy();
+
+    expect(document.body.classList).not.toContain('topic-editor-page-active');
   });
 
   it('should open modal, clear changes, reset flag and run callback when confirmed', fakeAsync(() => {
