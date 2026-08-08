@@ -621,6 +621,19 @@ class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_get_returns_404_for_missing_certificate_offering(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        orphan_attempt = _create_attempt_model(
+            self.learner_id, 'missing_certificate_id', 80.0, 1
+        )
+        self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', orphan_attempt.id
+            ),
+            expected_status_int=404,
+        )
+        self.logout()
+
     def test_get_returns_401_for_another_users_attempt(self) -> None:
         self.signup('otheruser@example.com', 'otheruser')
         other_user_id = self.get_user_id_from_email('otheruser@example.com')
