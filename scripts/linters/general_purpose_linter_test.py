@@ -117,6 +117,9 @@ INVALID_MERGE_CONFLICT_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_merge_conflict.py'
 )
 INVALID_TODO_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'invalid_todo.py')
+VALID_TODO_IN_STRING_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_todo_in_string.py'
+)
 INVALID_COPYRIGHT_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py'
 )
@@ -831,4 +834,17 @@ class GeneralLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_modal_component_patterns()
         self.assertEqual(lint_task_report.trimmed_messages, [])
         self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_valid_todo_in_string_is_not_flagged(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [VALID_TODO_IN_STRING_FILEPATH], FILE_CACHE
+        )
+        lint_task_report = linter.check_bad_patterns()
+
+        self.assertEqual(
+            [],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)

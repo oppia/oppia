@@ -32,13 +32,14 @@ if MYPY:  # pragma: no cover
     from scripts.linters import run_lint_checks
 
 
-class BadPatternRegexpDict(TypedDict):
+class BadPatternRegexpDict(TypedDict, total=False):
     """Dictionary representation of bad pattern regular expressions."""
 
     regexp: Pattern[str]
     message: str
     excluded_files: Tuple[str, ...]
     excluded_dirs: Tuple[str, ...]
+    only_check_in_comments: bool
 
 
 class BadPatternsDict(TypedDict):
@@ -193,6 +194,7 @@ BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
         'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (),
         'excluded_dirs': (),
+        'only_check_in_comments': True,
     }
 ]
 
@@ -393,6 +395,16 @@ def check_bad_pattern_in_file(
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
             if regexp.search(stripped_line):
+                if pattern.get('only_check_in_comments'):
+                    comment_index = -1
+                    if '//' in stripped_line:
+                        comment_index = stripped_line.index('//')
+                    elif '#' in stripped_line:
+                        comment_index = stripped_line.index('#')
+                    if comment_index == -1:
+                        continue
+                    if not regexp.search(stripped_line[comment_index:]):
+                        continue
                 error_message = '%s --> Line %s: %s' % (
                     filepath,
                     line_num,
