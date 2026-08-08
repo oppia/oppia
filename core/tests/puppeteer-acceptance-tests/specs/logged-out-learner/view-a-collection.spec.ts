@@ -44,7 +44,7 @@ describe('Logged-Out Learner', function () {
     // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test setup, TODO(#26642)');
+      showMessage('Skipping the test setup, see issue #26642)');
       return;
     }
     lessonCreator = await UserFactory.createNewUser(
@@ -71,7 +71,7 @@ describe('Logged-Out Learner', function () {
     // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO(#26642)');
+      showMessage('Skipping the test, see issue #26642)');
       return;
     }
     await loggedOutLearner.navigateToCommunityLibraryPage();
@@ -82,7 +82,7 @@ describe('Logged-Out Learner', function () {
     // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO(#26642)');
+      showMessage('Skipping the test, see issue #26642)');
       return;
     }
     await loggedOutLearner.navigateToCollectionFromLibrary('Numbers');
@@ -101,7 +101,7 @@ describe('Logged-Out Learner', function () {
     // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO(#26642)');
+      showMessage('Skipping the test, see issue #26642)');
       return;
     }
     // Open the first exploration from the collection page.
@@ -123,7 +123,7 @@ describe('Logged-Out Learner', function () {
     // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO(#26642)');
+      showMessage('Skipping the test, see issue #26642)');
       return;
     }
 
@@ -136,7 +136,7 @@ describe('Logged-Out Learner', function () {
     // TODO(#26642): On mobile the collection editor's Save Draft button is not
     // visible. Once fixed, allow testing for mobile viewport.
     if (loggedOutLearner.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO(#26642)');
+      showMessage('Skipping the test, see issue #26642)');
       return;
     }
     // Change the site language to Spanish and reload the collection page.
