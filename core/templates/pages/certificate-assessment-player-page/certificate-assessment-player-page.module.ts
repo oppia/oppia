@@ -28,7 +28,6 @@ import {CertificateAssessmentConversationSkinComponent} from './certificate-asse
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
 import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
 import {TranslateModule} from '@ngx-translate/core';
-import {CertificateAssessmentResultCardComponent} from 'pages/certificate-assessment-result-page/certificate-assessment-result-card.component';
 
 @NgModule({
   imports: [
@@ -54,7 +53,6 @@ import {CertificateAssessmentResultCardComponent} from 'pages/certificate-assess
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
     CertificateAssessmentTitledBackgroundBannerComponent,
   ],
   entryComponents: [
@@ -63,7 +61,6 @@ import {CertificateAssessmentResultCardComponent} from 'pages/certificate-assess
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
     CertificateAssessmentTitledBackgroundBannerComponent,
   ],
 })
