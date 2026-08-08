@@ -183,6 +183,9 @@ class CloudTaskRunModel(base_models.BaseModel):
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
                 ),
                 'current_retry_attempt': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'additional_contextual_information': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
             },
         )
 
