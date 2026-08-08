@@ -432,6 +432,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 change_dict,
                 'test description',
             )
+
     def test_create_translation_suggestion_fails_if_duplicate_exists(
         self,
     ) -> None:
