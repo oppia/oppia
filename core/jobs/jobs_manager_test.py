@@ -19,12 +19,12 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 from unittest import mock
 
-from core import feconf
+from core import feconf, utils
 from core.domain import beam_job_services
 from core.jobs import base_jobs, job_options, jobs_manager
+from core.jobs.batch_jobs import firebase_server_sync_jobs
 from core.jobs.types import job_run_result
 from core.storage.beam_job import gae_models as beam_job_models
 from core.tests import test_utils
@@ -60,7 +60,6 @@ class FailingJob(base_jobs.JobBase):
 
 
 class RunJobTests(test_utils.GenericTestBase):
-
     def test_working_sync_job(self) -> None:
         run = jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
 
@@ -142,7 +141,6 @@ class RunJobTests(test_utils.GenericTestBase):
 
 
 class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -155,7 +153,7 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_PENDING,
-            current_state_time=datetime.datetime.utcnow(),
+            current_state_time=utils.get_current_utc_datetime(),
         )
 
         self.dataflow_client_mock = mock.Mock()
@@ -227,7 +225,6 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
 
 
 class CancelJobTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -240,7 +237,7 @@ class CancelJobTests(test_utils.GenericTestBase):
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_CANCELLING,
-            current_state_time=datetime.datetime.utcnow(),
+            current_state_time=utils.get_current_utc_datetime(),
         )
 
         self.dataflow_client_mock = mock.Mock()
@@ -283,7 +280,6 @@ class CancelJobTests(test_utils.GenericTestBase):
 
 
 class LimitJobResourcesTests(test_utils.GenericTestBase):
-
     def test_does_job_requires_limiting_workers_true(self) -> None:
         job_name = 'VoiceoverSynthesisJob'
         self.assertTrue(
@@ -310,3 +306,63 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
             beam_job_services.get_beam_job_run_result(run.id).to_dict(),
             {'stdout': 'o', 'stderr': 'e'},
         )
+
+
+class ServiceAccountEmailOptionTests(test_utils.GenericTestBase):
+    @mock.patch('apache_beam.Pipeline', return_value=mock.MagicMock())
+    def test_service_account_email_via_options_raises_error(
+        self, unused_pipeline: mock.Mock
+    ) -> None:
+        with self.assertRaisesRegex(
+            ValueError, 'service_account_email cannot be passed'
+        ):
+            jobs_manager.run_job(
+                WorkingJob,
+                sync=True,
+                namespace=self.namespace,
+                parameterized_args={'service_account_email': 'a@a.com'},
+            )
+
+    def test_service_account_email_option(self) -> None:
+        for job_class, expected_id in self.TEST_CASES:
+            with (
+                mock.patch(
+                    'apache_beam.Pipeline',
+                    return_value=mock.MagicMock(),
+                ) as mocked_pipeline_class,
+                self.subTest(
+                    job_class=job_class,
+                    expected_id=expected_id,
+                ),
+            ):
+                jobs_manager.run_job(
+                    job_class,
+                    sync=True,
+                    namespace=self.namespace,
+                )
+
+                self.assertTrue(mocked_pipeline_class.called)
+                unused_args, kwargs = mocked_pipeline_class.call_args
+                self.assertIsInstance(
+                    options := kwargs.get('options'), job_options.JobOptions
+                )
+                self.assertEqual(
+                    options.get_all_options().get('service_account_email'),
+                    expected_id
+                    and f'{expected_id}@dev-project-id.iam.gserviceaccount.com',
+                )
+
+    TEST_CASES = (
+        (
+            firebase_server_sync_jobs.AuditFirebaseServerSyncJob,
+            feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID,
+        ),
+        (
+            firebase_server_sync_jobs.FirebaseServerSyncJob,
+            feconf.SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID,
+        ),
+        (
+            WorkingJob,
+            None,
+        ),
+    )

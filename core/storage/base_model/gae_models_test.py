@@ -18,11 +18,10 @@
 
 from __future__ import annotations
 
-import datetime
 import re
 import types
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -346,15 +345,15 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             to the datastore.
             """
             self._last_updated_timestamp_is_fresh = True
-            self.last_updated_by_human = datetime.datetime.utcnow()
+            self.last_updated_by_human = utils.get_current_utc_datetime()
 
             # These if conditions can be removed once the auto_now property
             # is set True to these attributes.
             if self.created_on is None:
-                self.created_on = datetime.datetime.utcnow()
+                self.created_on = utils.get_current_utc_datetime()
 
             if self.last_updated is None:
-                self.last_updated = datetime.datetime.utcnow()
+                self.last_updated = utils.get_current_utc_datetime()
 
             # We are using BaseModel.put() to save the changes to the datastore
             # since the put() method which TestBaseHumanMaintainedModel class
@@ -1252,6 +1251,23 @@ class BaseFeedbackModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(next_cursor)
         self.assertTrue(more)
+
+    def test_fetch_page_returns_no_cursor_when_final_page_is_full(
+        self,
+    ) -> None:
+        self._create_feedback_model('feedback_1')
+        self._create_feedback_model('feedback_2')
+
+        feedback_models, next_cursor, more = TestBaseFeedbackModel.fetch_page(
+            page_size=2
+        )
+
+        self.assertEqual(
+            [feedback_model.id for feedback_model in feedback_models],
+            ['feedback_2', 'feedback_1'],
+        )
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
 
     def test_fetch_page_accepts_cursor_for_later_page(
         self,
