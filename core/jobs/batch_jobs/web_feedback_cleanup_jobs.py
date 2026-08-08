@@ -37,10 +37,12 @@ import logging
 
 from core import feconf
 from core.domain import fs_services
-from core.jobs import base_jobs
+from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
+
+from typing import Optional
 
 import apache_beam as beam
 
@@ -336,6 +338,7 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
     def delete_platform_feedback_screenshot(
         self,
         platform_feedback_model: general_feedback_models.PlatformFeedbackModel,
+        oppia_project_id: Optional[str] = None,
     ) -> None:
         """Deletes the screenshot associated with a platform feedback report.
 
@@ -352,6 +355,7 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_FEEDBACK,
             screenshot_entity_id,
+            oppia_project_id=oppia_project_id,
         )
 
         try:
@@ -415,6 +419,7 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
     def cleanup_platform_feedback(
         self,
         platform_feedback_model: general_feedback_models.PlatformFeedbackModel,
+        oppia_project_id: Optional[str] = None,
     ) -> general_feedback_models.PlatformFeedbackModel:
         """Deletes all resources associated with a platform feedback report.
 
@@ -425,7 +430,9 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
         Returns:
             PlatformFeedbackModel. The deleted feedback model.
         """
-        self.delete_platform_feedback_screenshot(platform_feedback_model)
+        self.delete_platform_feedback_screenshot(
+            platform_feedback_model, oppia_project_id
+        )
 
         self.delete_platform_feedback_session_log(platform_feedback_model)
 
@@ -474,6 +481,8 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
             JobRunResult. A collection of job
             run results describing the cleanup performed.
         """
+        custom_options = self.pipeline.options.view_as(job_options.JobOptions)
+        oppia_project_id = custom_options.oppia_project_id
         platform_feedback_models = (
             self.pipeline
             | 'Get PlatformFeedbackModels from the datastore'
@@ -494,7 +503,12 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
             processed_platform_feedback_models = (
                 expired_platform_feedback_models
                 | 'Delete expired PlatformFeedback resources'
-                >> beam.Map(self.cleanup_platform_feedback)
+                >> beam.Map(
+                    lambda model: self.cleanup_platform_feedback(
+                        model,
+                        oppia_project_id,
+                    )
+                )
             )
         else:
             processed_platform_feedback_models = (

@@ -210,9 +210,15 @@ class PlatformFeedbackCleanupJobTestBase(job_test_utils.JobTestBase):
     class FakeGcsFileSystem:
         """Fake GCS file system that records deleted filepaths."""
 
-        def __init__(self, entity_type: str, entity_id: str) -> None:
+        def __init__(
+            self,
+            entity_type: str,
+            entity_id: str,
+            oppia_project_id: str | None = None,
+        ) -> None:
             self.entity_type = entity_type
             self.entity_id = entity_id
+            self.oppia_project_id = oppia_project_id
 
         def delete(self, filepath: str) -> None:
             """Records the filepath that would be deleted."""
