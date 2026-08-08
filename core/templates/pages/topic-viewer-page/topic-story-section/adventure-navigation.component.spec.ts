@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for AdventureNavigationComponent.
  */
 
-import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
+import {ElementRef, NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {
   ComponentFixture,
@@ -135,7 +135,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 0,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.ngAfterViewInit();
 
@@ -153,7 +155,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 0,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.onWindowResize();
 
@@ -167,7 +171,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 10,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.onScroll();
 
@@ -182,7 +188,9 @@ describe('AdventureNavigationComponent', () => {
       scrollLeft: 100,
       scrollBy: jasmine.createSpy('scrollBy'),
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.scrollLeft();
 
@@ -201,7 +209,9 @@ describe('AdventureNavigationComponent', () => {
       scrollLeft: 100,
       scrollBy: jasmine.createSpy('scrollBy'),
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.scrollRight();
 
@@ -214,13 +224,13 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should not crash when scrollWrapper is not defined for scrollLeft', () => {
-    component.scrollWrapper = undefined as never;
+    component.scrollWrapper = undefined as unknown as ElementRef<HTMLElement>;
 
     expect(() => component.scrollLeft()).not.toThrowError();
   });
 
   it('should not crash when scrollWrapper is not defined for scrollRight', () => {
-    component.scrollWrapper = undefined as never;
+    component.scrollWrapper = undefined as unknown as ElementRef<HTMLElement>;
 
     expect(() => component.scrollRight()).not.toThrowError();
   });
@@ -231,7 +241,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 0,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.ngAfterViewInit();
 
@@ -247,7 +259,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 100,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.ngOnChanges({
       adventureGroups: new SimpleChange(
@@ -277,7 +291,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 0,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.showLeftArrow = false;
     component.showRightArrow = false;
@@ -298,7 +314,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 0,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.onScroll();
 
@@ -312,7 +330,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 300,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.onScroll();
 
@@ -326,7 +346,9 @@ describe('AdventureNavigationComponent', () => {
       clientWidth: 200,
       scrollLeft: 0,
     };
-    component.scrollWrapper = {nativeElement: mockElement} as never;
+    component.scrollWrapper = {
+      nativeElement: mockElement,
+    } as unknown as ElementRef<HTMLElement>;
 
     component.onScroll();
 
@@ -335,13 +357,15 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should not update arrows when scrollWrapper nativeElement is null', () => {
-    component.scrollWrapper = {nativeElement: null} as never;
+    component.scrollWrapper = {
+      nativeElement: null,
+    } as unknown as ElementRef<HTMLElement>;
 
     expect(() => component.onScroll()).not.toThrowError();
   });
 
   it('should not update arrows when scrollWrapper is undefined', () => {
-    component.scrollWrapper = undefined as never;
+    component.scrollWrapper = undefined as unknown as ElementRef<HTMLElement>;
 
     expect(() => component.onScroll()).not.toThrowError();
   });

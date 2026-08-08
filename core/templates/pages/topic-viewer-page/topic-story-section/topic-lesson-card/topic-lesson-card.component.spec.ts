@@ -702,19 +702,13 @@ describe('TopicLessonCardComponent', () => {
     );
   });
 
-  it('should toggle isExpanded from false to true', () => {
+  it('should toggle isExpanded in both directions', () => {
     component.isExpanded = false;
 
     component.toggleExpanded();
-
     expect(component.isExpanded).toBeTrue();
-  });
-
-  it('should toggle isExpanded from true to false', () => {
-    component.isExpanded = true;
 
     component.toggleExpanded();
-
     expect(component.isExpanded).toBeFalse();
   });
 

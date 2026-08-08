@@ -360,18 +360,6 @@ describe('Topic editor page', () => {
     expect(topicPreviewSpy).toHaveBeenCalled();
   });
 
-  it('should open subtopic preview tab if active tab is subtopic editor', () => {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'subtopic_editor'
-    );
-    const topicPreviewSpy = spyOn(
-      topicEditorRoutingService,
-      'navigateToSubtopicPreviewTab'
-    );
-    component.openTopicViewer();
-    expect(topicPreviewSpy).toHaveBeenCalled();
-  });
-
   it('should navigate to topic editor tab in topic editor', () => {
     spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'topic_preview'

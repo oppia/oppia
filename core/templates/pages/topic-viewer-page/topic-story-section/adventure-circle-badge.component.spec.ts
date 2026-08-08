@@ -47,36 +47,6 @@ describe('AdventureCircleBadgeComponent', () => {
     expect(component.title).toBe('');
   });
 
-  it('should return default class when size is md', () => {
-    component.size = 'md';
-
-    expect(component.circleClass).toBe('adventure-circle-badge');
-  });
-
-  it('should return small class when size is sm', () => {
-    component.size = 'sm';
-
-    expect(component.circleClass).toBe(
-      'adventure-circle-badge adventure-circle-badge--sm'
-    );
-  });
-
-  it('should update input properties', () => {
-    component.label = '1';
-    component.iconName = 'done';
-    component.backgroundColor = '#000000';
-    component.borderColor = '#111111';
-    component.textColor = '#ffffff';
-    component.size = 'sm';
-
-    expect(component.label).toBe('1');
-    expect(component.iconName).toBe('done');
-    expect(component.backgroundColor).toBe('#000000');
-    expect(component.borderColor).toBe('#111111');
-    expect(component.textColor).toBe('#ffffff');
-    expect(component.size).toBe('sm');
-  });
-
   it('should update circleClass when size changes', () => {
     component.size = 'md';
     expect(component.circleClass).toBe('adventure-circle-badge');

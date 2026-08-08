@@ -290,6 +290,45 @@ describe('TopicStorySectionComponent', () => {
     return storySummarySpy as jasmine.SpyObj<StorySummary>;
   };
 
+  const createStoryNodeSpy = (
+    title: string,
+    description: string,
+    explorationId: string | null,
+    nodeId: string,
+    thumbnailFilename: string | null = null,
+    options: {
+      status?: string;
+      textLanguageCodes?: string[];
+    } = {}
+  ): jasmine.SpyObj<StoryNode> => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+      'getStatus',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
+      'getAvailableVoiceoverLanguageAccentDescriptions',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue(title);
+    storyNodeSpy.getDescription.and.returnValue(description);
+    storyNodeSpy.getThumbnailFilename.and.returnValue(thumbnailFilename);
+    storyNodeSpy.getExplorationId.and.returnValue(explorationId);
+    storyNodeSpy.getId.and.returnValue(nodeId);
+    storyNodeSpy.getStatus.and.returnValue(options.status);
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(
+      options.textLanguageCodes ?? []
+    );
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
+    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
+      {}
+    );
+
+    return storyNodeSpy;
+  };
+
   const createLessonCard = (
     lessonNumber: number,
     lessonProgressStatus:
@@ -352,37 +391,21 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should build adventure groups when story has arcs', () => {
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy1.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      null
+    );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node title 2');
-    storyNodeSpy2.getDescription.and.returnValue('Node description 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node title 2',
+      'Node description 2',
+      'exp_2',
+      'node_2',
+      null
+    );
 
     const arcs = [
       {
@@ -425,26 +448,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should build lesson cards from storySummary and not create practice card', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -466,26 +478,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should mark lesson as completed when node is completed', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -508,26 +509,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should mark lesson as in_progress when node is visited but not completed', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -547,26 +537,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should load checkpoint counts from chapter progress service on init', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const mockSummary = new ChapterProgressSummary('exp_1', 5, 3, false);
@@ -593,25 +572,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should preserve checkpoint counts after non-story input changes', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const mockSummary = new ChapterProgressSummary('exp_1', 3, 1, false);
@@ -641,26 +610,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should show adventure-end-test card when lesson cards exist and practice is enabled', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -729,26 +687,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should build lesson start url with all fields when exploration id present', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -770,26 +717,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should fallback lesson thumbnail when story id is missing', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue(null);
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      null,
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -856,25 +792,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should construct practice card url when arcs and fragments are present', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -904,25 +830,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should use positional arc id in practice card url for non-numeric arc ids', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -1011,21 +927,13 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should ignore arc node ids not present in all nodes', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      null
+    );
 
     const arcs = [
       {
@@ -1051,26 +959,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return # as startUrl when exploration id is null', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue(null);
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      null,
+      'node_1',
+      null,
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -1087,26 +984,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle chapter progress loader failure gracefully', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     chapterProgressLoaderService.loadChapterProgressForStory.and.rejectWith(
@@ -1129,26 +1015,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle loadChapterProgress with no exploration IDs gracefully', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue(null);
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      null,
+      'node_1',
+      null,
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(
@@ -1171,46 +1046,20 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return correct adventure completion text', () => {
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node 1');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node 2');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     const storySummary = createStorySummarySpy(
@@ -1247,25 +1096,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should mark lesson as coming_soon when exploration id is null', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Coming Soon Node');
-    storyNodeSpy.getDescription.and.returnValue('Description');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue(null);
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Coming Soon Node',
+      'Description',
+      null,
+      'node_1',
+      null
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1284,27 +1120,15 @@ describe('TopicStorySectionComponent', () => {
   it('should mark ready-to-publish lesson as coming soon when serial learner flag is enabled', () => {
     platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Coming Soon Node');
-    storyNodeSpy.getDescription.and.returnValue('Description');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Ready To Publish');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Coming Soon Node',
+      'Description',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Ready To Publish',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1325,25 +1149,15 @@ describe('TopicStorySectionComponent', () => {
     chapterLabelVisibilityService.isNewChapterLabelVisible.and.returnValue(
       true
     );
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node title 1');
-    storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node title 1',
+      'Node description 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1370,25 +1184,12 @@ describe('TopicStorySectionComponent', () => {
 
   it('should call loadChapterProgress on non-first change of storySummary', async () => {
     chapterProgressLoaderService.loadChapterProgressForStory.calls.reset();
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
     component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
     component.classroomUrlFragment = 'math';
@@ -1405,25 +1206,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return empty adventure groups when arcs are empty', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
     component.storySummary = createStorySummarySpy(
       ['Node'],
@@ -1441,25 +1229,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should select first lesson as active when all lessons are completed', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Completed Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Completed Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     const storySummary = createStorySummarySpy(
@@ -1480,25 +1255,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle lesson thumbnail url when node has no thumbnail and story has no id', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     const storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
@@ -1516,25 +1278,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return # as lesson start url when classroom or topic fragment is missing', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
@@ -1550,46 +1299,20 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle adventure navigation lesson selected', fakeAsync(() => {
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node 1');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node 2');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1624,46 +1347,20 @@ describe('TopicStorySectionComponent', () => {
   it('should restore skipped adventures from localStorage on init', () => {
     localStorageService.getSkippedAdventures.and.returnValue([0]);
 
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node 1');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node 2');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1702,46 +1399,20 @@ describe('TopicStorySectionComponent', () => {
   it('should auto-expand first adventure when all adventures are skipped', () => {
     localStorageService.getSkippedAdventures.and.returnValue([0, 1]);
 
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node 1');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node 2');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1774,46 +1445,20 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should persist skipped adventures when proceeding with skip confirmation', fakeAsync(() => {
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node 1');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node 2');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     component.storySummary = createStorySummarySpy(
@@ -1875,46 +1520,20 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should not show skip confirmation when all earlier adventures are completed', fakeAsync(() => {
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Node 1');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Node 2');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Node 2',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     const storySummary = createStorySummarySpy(
@@ -2100,46 +1719,20 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should select first not_started lesson as active when no in_progress', () => {
-    const storyNodeSpy1 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy1.getTitle.and.returnValue('Completed Node');
-    storyNodeSpy1.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy1.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy1.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy1.getId.and.returnValue('node_1');
-    storyNodeSpy1.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy1.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy1 = createStoryNodeSpy(
+      'Completed Node',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null
     );
 
-    const storyNodeSpy2 = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy2.getTitle.and.returnValue('Not Started Node');
-    storyNodeSpy2.getDescription.and.returnValue('Desc 2');
-    storyNodeSpy2.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy2.getExplorationId.and.returnValue('exp_2');
-    storyNodeSpy2.getId.and.returnValue('node_2');
-    storyNodeSpy2.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy2.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy2 = createStoryNodeSpy(
+      'Not Started Node',
+      'Desc 2',
+      'exp_2',
+      'node_2',
+      null
     );
 
     const storySummary = createStorySummarySpy(
@@ -2226,7 +1819,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component._expandedAdventureIndices.size).toBe(0);
+    expect(component.isAdventureExpanded(0)).toBe(false);
   });
 
   it('should return isPracticeCardVisible from shouldShowAdventureEndTestCard', () => {
@@ -2380,25 +1973,12 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should handle buildAdventureGroups when arcs is null', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     const storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
@@ -2459,25 +2039,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return # as lesson start url when only topic fragment is missing', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
@@ -2493,25 +2060,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return # as lesson start url when only classroom fragment is missing', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
@@ -2538,25 +2092,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should handle getActiveLessonNumber when visitedChapterTitles is null', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     const storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
@@ -2572,27 +2113,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should populate adventureNavigationGroups with lesson numbers and accent colors', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Published');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -2628,27 +2157,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should mark completed lessons in adventureNavigationGroups', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Completed Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Published');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Completed Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -2681,50 +2198,26 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should exclude non-published lessons from adventure navigation groups', () => {
-    const publishedNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    publishedNodeSpy.getTitle.and.returnValue('Published Node');
-    publishedNodeSpy.getDescription.and.returnValue('Desc');
-    publishedNodeSpy.getThumbnailFilename.and.returnValue(null);
-    publishedNodeSpy.getExplorationId.and.returnValue('exp_1');
-    publishedNodeSpy.getId.and.returnValue('node_1');
-    publishedNodeSpy.getStatus.and.returnValue('Published');
-    publishedNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    publishedNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    publishedNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const publishedNodeSpy = createStoryNodeSpy(
+      'Published Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
-    const draftNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    draftNodeSpy.getTitle.and.returnValue('Draft Node');
-    draftNodeSpy.getDescription.and.returnValue('Desc');
-    draftNodeSpy.getThumbnailFilename.and.returnValue(null);
-    draftNodeSpy.getExplorationId.and.returnValue('exp_2');
-    draftNodeSpy.getId.and.returnValue('node_2');
-    draftNodeSpy.getStatus.and.returnValue('Draft');
-    draftNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    draftNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    draftNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const draftNodeSpy = createStoryNodeSpy(
+      'Draft Node',
+      'Desc',
+      'exp_2',
+      'node_2',
+      null,
+      {
+        status: 'Draft',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -2811,25 +2304,12 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should populate lessonCount from storySummary on init', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     component.storySummary = createStorySummarySpy(
@@ -2862,25 +2342,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should set lessonProgressStatus from loadChapterProgress for completed node', async () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node 1');
-    storyNodeSpy.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      'thumb.png',
+      {
+        textLanguageCodes: ['en'],
+      }
     );
 
     const storySummary = createStorySummarySpy(['Node 1'], [storyNodeSpy]);
@@ -2938,25 +2408,12 @@ describe('TopicStorySectionComponent', () => {
     chapterLabelVisibilityService.isNewChapterLabelVisible.and.throwError(
       'Service error'
     );
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
 
     component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
@@ -2969,28 +2426,14 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return false from isChapterPublished when getStatus throws', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.throwError('Status error');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
+    storyNodeSpy.getStatus.and.throwError('Status error');
 
     component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
     component.classroomUrlFragment = 'math';
@@ -3004,28 +2447,14 @@ describe('TopicStorySectionComponent', () => {
   it('should return false from isChapterReadyToPublish when getStatus throws and serial flag enabled', () => {
     platformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.throwError('Status error');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null
     );
+    storyNodeSpy.getStatus.and.throwError('Status error');
 
     component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
     component.classroomUrlFragment = 'math';
@@ -3183,7 +2612,7 @@ describe('TopicStorySectionComponent', () => {
     ];
     component.masteredAdventureIndex = 0;
     component.showAdventureMasteredModal = true;
-    component._expandedAdventureIndices = new Set([0]);
+    component.toggleAdventure(0);
 
     component.onAdventureMasteredContinue();
 
@@ -3195,27 +2624,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should return false from isChapterPublished when getStatus returns null', () => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node');
-    storyNodeSpy.getDescription.and.returnValue('Desc');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue(null);
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node',
+      'Desc',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: null,
+      }
     );
 
     component.storySummary = createStorySummarySpy(['Node'], [storyNodeSpy]);
@@ -3264,27 +2681,15 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should report practice completion for a mastered adventure arc', fakeAsync(() => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node 1');
-    storyNodeSpy.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Published');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -3323,27 +2728,15 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should not show the mastered modal when arc_id does not start with a digit', fakeAsync(() => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node 1');
-    storyNodeSpy.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Published');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -3381,27 +2774,15 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should not show the mastered modal when arc_id is empty', fakeAsync(() => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node 1');
-    storyNodeSpy.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Published');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
@@ -3439,27 +2820,15 @@ describe('TopicStorySectionComponent', () => {
   }));
 
   it('should not show the mastered modal when arc_id does not match any adventure', fakeAsync(() => {
-    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
-      'getTitle',
-      'getDescription',
-      'getThumbnailFilename',
-      'getExplorationId',
-      'getId',
-      'getStatus',
-      'getAvailableTextLanguageCodes',
-      'getAvailableVoiceoverLanguageCodes',
-      'getAvailableVoiceoverLanguageAccentDescriptions',
-    ]);
-    storyNodeSpy.getTitle.and.returnValue('Node 1');
-    storyNodeSpy.getDescription.and.returnValue('Desc 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
-    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
-    storyNodeSpy.getId.and.returnValue('node_1');
-    storyNodeSpy.getStatus.and.returnValue('Published');
-    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue([]);
-    storyNodeSpy.getAvailableVoiceoverLanguageAccentDescriptions.and.returnValue(
-      {}
+    const storyNodeSpy = createStoryNodeSpy(
+      'Node 1',
+      'Desc 1',
+      'exp_1',
+      'node_1',
+      null,
+      {
+        status: 'Published',
+      }
     );
 
     component.storySummary = createStorySummarySpy(
