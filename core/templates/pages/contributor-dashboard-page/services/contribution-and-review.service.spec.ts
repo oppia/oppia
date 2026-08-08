@@ -408,7 +408,8 @@ describe('Contribution and review service', () => {
         0,
         'sort_key',
         null,
-        'topicName'
+        'topicName',
+        'exploration'
       );
     });
   });
