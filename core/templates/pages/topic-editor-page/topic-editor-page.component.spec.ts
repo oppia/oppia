@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for topic editor page component.
  */
 
+import {DOCUMENT} from '@angular/common';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -76,7 +77,7 @@ describe('Topic editor page', () => {
   let urlService: UrlService;
   let topic: Topic;
   let ngbModal: NgbModal;
-  let platformFeatureService: MockPlatformFeatureService;
+  let platformFeatureService: PlatformFeatureService;
   let runSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
@@ -100,10 +101,6 @@ describe('Topic editor page', () => {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
         },
-        {
-          provide: PageContextService,
-          useClass: MockPageContextService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -123,9 +120,7 @@ describe('Topic editor page', () => {
     urlService = TestBed.inject(UrlService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     ngbModal = TestBed.inject(NgbModal);
-    platformFeatureService = TestBed.inject(
-      PlatformFeatureService
-    ) as unknown as MockPlatformFeatureService;
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     runSpy = jasmine.createSpy('run');
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
@@ -222,29 +217,34 @@ describe('Topic editor page', () => {
     expect(component.warningsAreShown).toBe(false);
   });
 
-  it('should not apply redesigned page body styles when the feature is disabled', () => {
+  it('should not add the redesigned page body class when the feature is disabled', () => {
+    const document = TestBed.inject(DOCUMENT);
+    const classListAddSpy = spyOn(document.body.classList, 'add');
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'loadTopic');
 
     component.ngOnInit();
 
-    expect(document.body.classList).not.toContain('topic-editor-page-active');
+    expect(classListAddSpy).not.toHaveBeenCalled();
 
     component.ngOnDestroy();
   });
 
-  it('should apply and clean up redesigned page body styles when the feature is enabled', () => {
+  it('should add and remove the redesigned page body class for the enabled lifecycle', () => {
+    const document = TestBed.inject(DOCUMENT);
+    const classListAddSpy = spyOn(document.body.classList, 'add');
+    const classListRemoveSpy = spyOn(document.body.classList, 'remove');
     platformFeatureService.status.RedesignedTopicViewerPage.isEnabled = true;
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'loadTopic');
 
     component.ngOnInit();
 
-    expect(document.body.classList).toContain('topic-editor-page-active');
+    expect(classListAddSpy).toHaveBeenCalledWith('topic-editor-page-active');
 
     component.ngOnDestroy();
 
-    expect(document.body.classList).not.toContain('topic-editor-page-active');
+    expect(classListRemoveSpy).toHaveBeenCalledWith('topic-editor-page-active');
   });
 
   it('should open modal, clear changes, reset flag and run callback when confirmed', fakeAsync(() => {

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for AdventureCircleBadgeComponent.
  */
 
+import {By} from '@angular/platform-browser';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
@@ -62,13 +63,13 @@ describe('AdventureCircleBadgeComponent', () => {
     component.label = '1';
     fixture.detectChanges();
 
-    const badgeElement = fixture.nativeElement.querySelector(
-      '.adventure-circle-badge'
+    const badgeElement = fixture.debugElement.query(
+      By.css('.adventure-circle-badge')
     );
-    const iconElement = badgeElement.querySelector('i.material-icons');
-    expect(iconElement.textContent.trim()).toBe('check');
+    const iconElement = badgeElement.query(By.css('i.material-icons'));
+    expect(iconElement.nativeElement.textContent.trim()).toBe('check');
     expect(
-      badgeElement.querySelector('.adventure-circle-badge-label')
+      badgeElement.query(By.css('.adventure-circle-badge-label'))
     ).toBeNull();
   });
 
@@ -77,15 +78,15 @@ describe('AdventureCircleBadgeComponent', () => {
     component.label = '1';
     fixture.detectChanges();
 
-    const badgeElement = fixture.nativeElement.querySelector(
-      '.adventure-circle-badge'
+    const badgeElement = fixture.debugElement.query(
+      By.css('.adventure-circle-badge')
     );
     expect(
       badgeElement
-        .querySelector('.adventure-circle-badge-label')
-        .textContent.trim()
+        .query(By.css('.adventure-circle-badge-label'))
+        .nativeElement.textContent.trim()
     ).toBe('1');
-    expect(badgeElement.querySelector('i.material-icons')).toBeNull();
+    expect(badgeElement.query(By.css('i.material-icons'))).toBeNull();
   });
 
   it('should use the explicit title for the tooltip', () => {
@@ -94,10 +95,12 @@ describe('AdventureCircleBadgeComponent', () => {
     component.iconName = '';
     fixture.detectChanges();
 
-    const badgeElement = fixture.nativeElement.querySelector(
-      '.adventure-circle-badge'
+    const badgeElement = fixture.debugElement.query(
+      By.css('.adventure-circle-badge')
     );
-    expect(badgeElement.getAttribute('title')).toBe('Go to lesson 1');
+    expect(badgeElement.nativeElement.getAttribute('title')).toBe(
+      'Go to lesson 1'
+    );
   });
 
   it('should fall back to the label for the tooltip when no title is provided', () => {
@@ -106,10 +109,10 @@ describe('AdventureCircleBadgeComponent', () => {
     component.iconName = '';
     fixture.detectChanges();
 
-    const badgeElement = fixture.nativeElement.querySelector(
-      '.adventure-circle-badge'
+    const badgeElement = fixture.debugElement.query(
+      By.css('.adventure-circle-badge')
     );
-    expect(badgeElement.getAttribute('title')).toBe('1');
+    expect(badgeElement.nativeElement.getAttribute('title')).toBe('1');
   });
 
   it('should fall back to the icon name for the tooltip when no title or label is provided', () => {
@@ -118,9 +121,9 @@ describe('AdventureCircleBadgeComponent', () => {
     component.iconName = 'done';
     fixture.detectChanges();
 
-    const badgeElement = fixture.nativeElement.querySelector(
-      '.adventure-circle-badge'
+    const badgeElement = fixture.debugElement.query(
+      By.css('.adventure-circle-badge')
     );
-    expect(badgeElement.getAttribute('title')).toBe('done');
+    expect(badgeElement.nativeElement.getAttribute('title')).toBe('done');
   });
 });

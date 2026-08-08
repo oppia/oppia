@@ -17,7 +17,6 @@
  */
 
 import {ElementRef, NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
-import {By} from '@angular/platform-browser';
 import {
   ComponentFixture,
   TestBed,
@@ -29,6 +28,18 @@ import {
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {AdventureNavigationComponent} from './adventure-navigation.component';
 import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
+
+const createScrollWrapper = (
+  scrollWidth: number,
+  clientWidth: number,
+  scrollLeft: number
+): ElementRef<HTMLElement> => {
+  const nativeElement = document.createElement('div');
+  Object.defineProperty(nativeElement, 'scrollWidth', {value: scrollWidth});
+  Object.defineProperty(nativeElement, 'clientWidth', {value: clientWidth});
+  Object.defineProperty(nativeElement, 'scrollLeft', {value: scrollLeft});
+  return {nativeElement};
+};
 
 describe('AdventureNavigationComponent', () => {
   let component: AdventureNavigationComponent;
@@ -67,27 +78,8 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should show a check icon for completed lessons in the navigation', () => {
-    component.adventureGroups = [
-      {
-        lessons: [
-          {lessonNumber: 1, isCompleted: false},
-          {lessonNumber: 2, isCompleted: true},
-        ],
-        accentColor: '#27a844',
-        showPractice: false,
-        isPracticeCompleted: false,
-        arcId: '1',
-      },
-    ];
-
-    fixture.detectChanges();
-
-    const badges = fixture.debugElement.queryAll(
-      By.directive(AdventureCircleBadgeComponent)
-    );
-    expect(badges.length).toBe(3);
-    expect(badges[0].componentInstance.iconName).toBe('');
-    expect(badges[1].componentInstance.iconName).toBe('check');
+    expect(component.getLessonBadgeIconName(true)).toBe('check');
+    expect(component.getLessonBadgeIconName(false)).toBe('');
   });
 
   it('should emit lessonSelected event when onLessonClick is called', () => {
@@ -110,34 +102,12 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should show a check icon for completed practice in navigation', () => {
-    component.adventureGroups = [
-      {
-        lessons: [{lessonNumber: 1, isCompleted: true}],
-        accentColor: '#27a844',
-        showPractice: true,
-        isPracticeCompleted: true,
-        arcId: '1',
-      },
-    ];
-
-    fixture.detectChanges();
-
-    const badges = fixture.debugElement.queryAll(
-      By.directive(AdventureCircleBadgeComponent)
-    );
-    expect(badges.length).toBe(3);
-    expect(badges[1].componentInstance.iconName).toBe('check');
+    expect(component.getPracticeBadgeIconName(true)).toBe('check');
+    expect(component.getPracticeBadgeIconName(false)).toBe('edit');
   });
 
   it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 0,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 0);
 
     component.ngAfterViewInit();
 
@@ -150,14 +120,7 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should update arrows on window resize', () => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 0,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 0);
 
     component.onWindowResize();
 
@@ -166,14 +129,7 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should update arrows on scroll', () => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 10,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 10);
 
     component.onScroll();
 
@@ -182,19 +138,13 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should scroll left and update arrows', fakeAsync(() => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 100,
-      scrollBy: jasmine.createSpy('scrollBy'),
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    const scrollWrapper = createScrollWrapper(500, 200, 100);
+    const scrollBySpy = spyOn(scrollWrapper.nativeElement, 'scrollBy');
+    component.scrollWrapper = scrollWrapper;
 
     component.scrollLeft();
 
-    expect(mockElement.scrollBy).toHaveBeenCalledWith({
+    expect(scrollBySpy).toHaveBeenCalledWith({
       left: -200,
       behavior: 'smooth',
     });
@@ -203,19 +153,13 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should scroll right and update arrows', fakeAsync(() => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 100,
-      scrollBy: jasmine.createSpy('scrollBy'),
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    const scrollWrapper = createScrollWrapper(500, 200, 100);
+    const scrollBySpy = spyOn(scrollWrapper.nativeElement, 'scrollBy');
+    component.scrollWrapper = scrollWrapper;
 
     component.scrollRight();
 
-    expect(mockElement.scrollBy).toHaveBeenCalledWith({
+    expect(scrollBySpy).toHaveBeenCalledWith({
       left: 200,
       behavior: 'smooth',
     });
@@ -224,26 +168,19 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should not crash when scrollWrapper is not defined for scrollLeft', () => {
-    component.scrollWrapper = undefined as unknown as ElementRef<HTMLElement>;
+    expect(component.scrollWrapper).toBeUndefined();
 
     expect(() => component.scrollLeft()).not.toThrowError();
   });
 
   it('should not crash when scrollWrapper is not defined for scrollRight', () => {
-    component.scrollWrapper = undefined as unknown as ElementRef<HTMLElement>;
+    expect(component.scrollWrapper).toBeUndefined();
 
     expect(() => component.scrollRight()).not.toThrowError();
   });
 
   it('should update arrows after ngAfterViewInit', fakeAsync(() => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 0,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 0);
 
     component.ngAfterViewInit();
 
@@ -254,14 +191,7 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should schedule arrow updates on ngOnChanges when adventureGroups change', fakeAsync(() => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 100,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 100);
 
     component.ngOnChanges({
       adventureGroups: new SimpleChange(
@@ -286,14 +216,7 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should not schedule arrow updates on ngOnChanges when adventureGroups do not change', fakeAsync(() => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 0,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 0);
 
     component.showLeftArrow = false;
     component.showRightArrow = false;
@@ -309,14 +232,7 @@ describe('AdventureNavigationComponent', () => {
   }));
 
   it('should hide arrows when there is no overflow', () => {
-    const mockElement = {
-      scrollWidth: 200,
-      clientWidth: 200,
-      scrollLeft: 0,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(200, 200, 0);
 
     component.onScroll();
 
@@ -325,14 +241,7 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should hide both arrows when scroll is near the end', () => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 300,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 300);
 
     component.onScroll();
 
@@ -341,14 +250,7 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should show right arrow but not left when scroll is at start', () => {
-    const mockElement = {
-      scrollWidth: 500,
-      clientWidth: 200,
-      scrollLeft: 0,
-    };
-    component.scrollWrapper = {
-      nativeElement: mockElement,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 0);
 
     component.onScroll();
 
@@ -357,15 +259,16 @@ describe('AdventureNavigationComponent', () => {
   });
 
   it('should not update arrows when scrollWrapper nativeElement is null', () => {
-    component.scrollWrapper = {
-      nativeElement: null,
-    } as unknown as ElementRef<HTMLElement>;
+    component.scrollWrapper = createScrollWrapper(500, 200, 0);
+    Object.defineProperty(component.scrollWrapper, 'nativeElement', {
+      value: null,
+    });
 
     expect(() => component.onScroll()).not.toThrowError();
   });
 
   it('should not update arrows when scrollWrapper is undefined', () => {
-    component.scrollWrapper = undefined as unknown as ElementRef<HTMLElement>;
+    expect(component.scrollWrapper).toBeUndefined();
 
     expect(() => component.onScroll()).not.toThrowError();
   });

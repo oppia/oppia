@@ -157,4 +157,12 @@ export class AdventureNavigationComponent
   onPracticeClick(arcId: string): void {
     this.practiceSelected.emit(arcId);
   }
+
+  getLessonBadgeIconName(isCompleted: boolean): string {
+    return isCompleted ? 'check' : '';
+  }
+
+  getPracticeBadgeIconName(isPracticeCompleted: boolean): string {
+    return isPracticeCompleted ? 'check' : 'edit';
+  }
 }
