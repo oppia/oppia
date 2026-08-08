@@ -662,23 +662,28 @@ def submit_certificate_assessment_attempt(
         is_correct = bool(answer.get('is_correct', False))
         if is_correct:
             correct_count += 1
-        responses.append(
-            {
-                'attempt_id': attempt_id,
-                'question_id': question_id,
-                'question_version': question_version,
-                'selected_answer': (
-                    ''
-                    if selected_answer is None
-                    else (
-                        selected_answer
-                        if isinstance(selected_answer, str)
-                        else json.dumps(selected_answer)
-                    )
-                ),
-                'is_correct': is_correct,
-            }
+        # The response model stores the answer as a string, so non-string
+        # answers (None for unanswered questions, ints, dicts and lists for
+        # the other interactions) are serialized here, before the domain
+        # object validates the stored form.
+        serialized_selected_answer = (
+            ''
+            if selected_answer is None
+            else (
+                selected_answer
+                if isinstance(selected_answer, str)
+                else json.dumps(selected_answer)
+            )
         )
+        response = certificate_assessment_domain.CertificateAssessmentResponse(
+            attempt_id=attempt_id,
+            question_id=question_id,
+            question_version=question_version,
+            selected_answer=serialized_selected_answer,
+            is_correct=is_correct,
+        )
+        response.validate()
+        responses.append(response.to_dict())
         for topic_id in question_topic_links.get(question_id, []):
             attempt_data[topic_id]['total_related_questions'] += 1
             if is_correct:

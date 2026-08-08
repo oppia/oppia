@@ -782,18 +782,55 @@ class CertificateAssessmentResponseTest(test_utils.GenericTestBase):
         ):
             response.validate()
 
-    def test_validate_rejects_empty_selected_answer(self) -> None:
+    def test_validate_allows_empty_selected_answer_for_unanswered(self) -> None:
         response = self._get_sample_response()
-        response.selected_answer = '   '
+        response.selected_answer = ''
+        response.validate()
+
+    def test_validate_rejects_non_string_selected_answer(self) -> None:
+        response = self._get_sample_response()
+        setattr(response, 'selected_answer', None)
         with self.assertRaisesRegex(
-            Exception, 'selected_answer must be a non-empty string'
+            Exception, 'selected_answer must be a string'
         ):
             response.validate()
 
         response = self._get_sample_response()
-        setattr(response, 'selected_answer', None)
+        setattr(response, 'selected_answer', 42)
         with self.assertRaisesRegex(
-            Exception, 'selected_answer must be a non-empty string'
+            Exception, 'selected_answer must be a string'
+        ):
+            response.validate()
+
+    def test_validate_rejects_oversized_selected_answer(self) -> None:
+        response = self._get_sample_response()
+        response.selected_answer = 'a' * (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            + 1
+        )
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be at most'
+        ):
+            response.validate()
+
+    def test_validate_accepts_answer_at_size_limit(self) -> None:
+        response = self._get_sample_response()
+        response.selected_answer = 'a' * (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+        )
+        response.validate()
+
+    def test_validate_oversized_limit_is_byte_based(self) -> None:
+        # Non-ASCII characters encode to two bytes each in UTF-8, so a string
+        # below the character limit can still exceed the byte limit.
+        oversized_character_count = (
+            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
+            // 2
+        ) + 1
+        response = self._get_sample_response()
+        response.selected_answer = '\u00e9' * oversized_character_count
+        with self.assertRaisesRegex(
+            Exception, 'selected_answer must be at most'
         ):
             response.validate()
 
@@ -817,168 +854,3 @@ class CertificateAssessmentResponseTest(test_utils.GenericTestBase):
             ).to_dict(),
             original_dict,
         )
-
-
-class CertificateAssessmentAnswerTest(test_utils.GenericTestBase):
-    """Tests for the CertificateAssessmentAnswer domain object."""
-
-    def _get_sample_answer(
-        self,
-    ) -> certificate_assessment_domain.CertificateAssessmentAnswer:
-        """Returns a fully populated CertificateAssessmentAnswer for use in
-        tests.
-        """
-        return certificate_assessment_domain.CertificateAssessmentAnswer(
-            question_id='question_id_1',
-            selected_answer='Option A',
-            is_correct=True,
-        )
-
-    def _get_sample_answer_dict(
-        self,
-    ) -> certificate_assessment_domain.CertificateAssessmentAnswerDict:
-        """Returns a dict matching the sample answer above."""
-        return {
-            'question_id': 'question_id_1',
-            'selected_answer': 'Option A',
-            'is_correct': True,
-        }
-
-    def test_init_sets_all_attributes_correctly(self) -> None:
-        answer = self._get_sample_answer()
-        self.assertEqual(answer.question_id, 'question_id_1')
-        self.assertEqual(answer.selected_answer, 'Option A')
-        self.assertTrue(answer.is_correct)
-
-    def test_validate_succeeds_for_valid_answer(self) -> None:
-        self._get_sample_answer().validate()
-
-    def test_validate_succeeds_for_all_accepted_answer_types(self) -> None:
-        valid_answers = [
-            None,
-            'some answer',
-            42,
-            {'wholeNumber': '0', 'numerator': '1', 'denominator': '2'},
-            ['a', 'b'],
-            [['a'], ['b', 'c']],
-        ]
-        for selected_answer in valid_answers:
-            answer = certificate_assessment_domain.CertificateAssessmentAnswer(
-                question_id='question_id_1',
-                selected_answer=selected_answer,
-                is_correct=True,
-            )
-            answer.validate()
-
-    def test_validate_rejects_empty_question_id(self) -> None:
-        answer = self._get_sample_answer()
-        answer.question_id = ''
-        with self.assertRaisesRegex(
-            Exception, 'question_id must be a non-empty string'
-        ):
-            answer.validate()
-
-    def test_validate_rejects_non_string_question_id(self) -> None:
-        answer = self._get_sample_answer()
-        setattr(answer, 'question_id', 42)
-        with self.assertRaisesRegex(
-            Exception, 'question_id must be a non-empty string'
-        ):
-            answer.validate()
-
-    def test_validate_rejects_non_boolean_is_correct(self) -> None:
-        answer = self._get_sample_answer()
-        setattr(answer, 'is_correct', 'yes')
-        with self.assertRaisesRegex(Exception, 'is_correct must be a boolean'):
-            answer.validate()
-
-    def test_validate_rejects_invalid_selected_answer_types(self) -> None:
-        invalid_answers = [
-            True,
-            3.5,
-            b'bytes',
-            [1, 2],
-            [['a'], [1]],
-            {'wholeNumber': 0},
-            {1: 'value'},
-            [{'a': 'b'}],
-        ]
-        for selected_answer in invalid_answers:
-            answer = self._get_sample_answer()
-            setattr(answer, 'selected_answer', selected_answer)
-            with self.assertRaisesRegex(
-                Exception, 'selected_answer must be None, a str, an int'
-            ):
-                answer.validate()
-
-    def test_validate_rejects_oversized_selected_answer(self) -> None:
-        answer = self._get_sample_answer()
-        answer.selected_answer = 'a' * (
-            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
-            + 1
-        )
-        with self.assertRaisesRegex(
-            Exception, 'selected_answer must be at most'
-        ):
-            answer.validate()
-
-    def test_validate_accepts_answer_at_size_limit(self) -> None:
-        # The json.dumps call wraps the string in two quote characters, so a
-        # string of MAX minus 2 characters serializes to exactly MAX bytes.
-        max_size_answer = 'a' * (
-            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
-            - 2
-        )
-        answer = certificate_assessment_domain.CertificateAssessmentAnswer(
-            question_id='question_id_1',
-            selected_answer=max_size_answer,
-            is_correct=True,
-        )
-        answer.validate()
-
-    def test_validate_oversized_limit_is_byte_based(self) -> None:
-        # Non-ASCII characters serialize to six bytes each ('\uXXXX'), so a
-        # string below the character limit can still exceed the byte limit.
-        oversized_character_count = (
-            certificate_assessment_domain.MAX_CERTIFICATE_ASSESSMENT_ANSWER_BYTES
-            // 6
-        ) + 1
-        answer = certificate_assessment_domain.CertificateAssessmentAnswer(
-            question_id='question_id_1',
-            selected_answer='\u00e9' * oversized_character_count,
-            is_correct=True,
-        )
-        with self.assertRaisesRegex(
-            Exception, 'selected_answer must be at most'
-        ):
-            answer.validate()
-
-    def test_to_dict_matches_expected_dict(self) -> None:
-        self.assertEqual(
-            self._get_sample_answer().to_dict(),
-            self._get_sample_answer_dict(),
-        )
-
-    def test_from_dict_then_to_dict_matches_original_dict(self) -> None:
-        original_dict = self._get_sample_answer_dict()
-        self.assertEqual(
-            certificate_assessment_domain.CertificateAssessmentAnswer.from_dict(
-                original_dict
-            ).to_dict(),
-            original_dict,
-        )
-
-    def test_from_dict_defaults_omitted_selected_answer_to_none(self) -> None:
-        # Here we use MyPy ignore because the dict intentionally omits the
-        # optional selected_answer key.
-        answer = (
-            certificate_assessment_domain.CertificateAssessmentAnswer.from_dict(
-                {  # type: ignore[typeddict-item]
-                    'question_id': 'question_id_1',
-                    'is_correct': True,
-                }
-            )
-        )
-        self.assertEqual(answer.question_id, 'question_id_1')
-        self.assertIsNone(answer.selected_answer)
-        self.assertTrue(answer.is_correct)

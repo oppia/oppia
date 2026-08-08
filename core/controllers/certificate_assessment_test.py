@@ -21,11 +21,7 @@ from unittest import mock
 
 from core import feconf, utils
 from core.controllers import certificate_assessment
-from core.domain import (
-    certificate_assessment_domain,
-    certificate_assessment_services,
-    topic_fetchers,
-)
+from core.domain import certificate_assessment_services, topic_fetchers
 from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
@@ -589,11 +585,11 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         handler.user_id = 'user_id_1'
         handler.normalized_payload = {
             'answers': [
-                certificate_assessment_domain.CertificateAssessmentAnswer(
-                    question_id='q1',
-                    selected_answer='A',
-                    is_correct=True,
-                )
+                {
+                    'question_id': 'q1',
+                    'selected_answer': 'A',
+                    'is_correct': True,
+                }
             ]
         }
         with mock.patch.object(
@@ -626,11 +622,11 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         handler.user_id = 'user_id_1'
         handler.normalized_payload = {
             'answers': [
-                certificate_assessment_domain.CertificateAssessmentAnswer(
-                    question_id='q1',
-                    selected_answer='A',
-                    is_correct=True,
-                )
+                {
+                    'question_id': 'q1',
+                    'selected_answer': 'A',
+                    'is_correct': True,
+                }
             ]
         }
         attempt = mock.Mock(learner_id='user_id_1', is_submitted=False)

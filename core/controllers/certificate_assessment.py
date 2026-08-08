@@ -18,10 +18,8 @@ from __future__ import annotations
 
 from core import feconf, utils
 from core.controllers import acl_decorators, base
-from core.domain import (
-    certificate_assessment_domain,
-    certificate_assessment_services,
-)
+from core.controllers import domain_objects_validator as validation_method
+from core.domain import certificate_assessment_services
 
 from typing import Any, Dict, List, TypedDict
 
@@ -76,7 +74,10 @@ class StartCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
 class SubmitCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of SubmitCertificateAssessmentHandler payload."""
 
-    answers: List[certificate_assessment_domain.CertificateAssessmentAnswer]
+    # Here we use type Any because each submitted answer can hold a selected
+    # answer of any accepted interaction answer type (None, str, int, dict,
+    # list, or list of lists).
+    answers: List[Dict[str, Any]]
 
 
 class SubmitCertificateAssessmentHandlerNormalizedRequestDict(TypedDict):
@@ -486,8 +487,8 @@ class SubmitCertificateAssessmentHandler(
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': (
-                            certificate_assessment_domain.CertificateAssessmentAnswer
+                        'validation_method': (
+                            validation_method.validate_certificate_assessment_answer
                         ),
                     },
                 }
@@ -498,18 +499,9 @@ class SubmitCertificateAssessmentHandler(
     @acl_decorators.can_submit_assessment_response
     def post(self, attempt_id: str) -> None:
         assert self.normalized_payload is not None
-        # Here we use type Any because each submitted answer can hold a value
-        # of any accepted interaction answer type (int, float, str, dict,
-        # list, or None), as validated by the CertificateAssessmentAnswer
-        # domain object.
-        answers: List[Dict[str, Any]] = [
-            {
-                'question_id': answer.question_id,
-                'selected_answer': answer.selected_answer,
-                'is_correct': answer.is_correct,
-            }
-            for answer in self.normalized_payload['answers']
-        ]
+        # Here we use type Any because each submitted answer can hold a
+        # selected answer of any accepted interaction answer type.
+        answers: List[Dict[str, Any]] = self.normalized_payload['answers']
         try:
             attempt = certificate_assessment_services.submit_certificate_assessment_attempt(
                 attempt_id, answers
