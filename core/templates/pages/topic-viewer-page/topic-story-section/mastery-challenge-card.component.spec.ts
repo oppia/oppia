@@ -16,13 +16,7 @@
  * @fileoverview Unit tests for MasteryChallengeCardComponent.
  */
 
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync,
-} from '@angular/core/testing';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {MasteryChallengeCardComponent} from './mastery-challenge-card.component';
@@ -38,7 +32,6 @@ class MockWindowRef {
 
 describe('MasteryChallengeCardComponent', () => {
   let component: MasteryChallengeCardComponent;
-  let fixture: ComponentFixture<MasteryChallengeCardComponent>;
   let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
@@ -53,7 +46,7 @@ describe('MasteryChallengeCardComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MasteryChallengeCardComponent);
+    const fixture = TestBed.createComponent(MasteryChallengeCardComponent);
     component = fixture.componentInstance;
     windowRef = TestBed.inject(WindowRef);
   }));
@@ -103,15 +96,14 @@ describe('MasteryChallengeCardComponent', () => {
     expect(component.hasActionUrl()).toBeTrue();
   });
 
-  it('should disable the button when unlocked with only the default placeholder URL', () => {
+  it('should report the action button as disabled for an unlocked placeholder URL', () => {
     component.isUnlocked = true;
     component.actionUrl = '#';
-    fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector(
-      '.mastery-challenge-button'
-    );
-    expect(button.disabled).toBeTrue();
+    expect(component.isActionDisabled()).toBeTrue();
+
+    component.actionUrl = '/practice/session/1';
+    expect(component.isActionDisabled()).toBeFalse();
   });
 
   it('should show helper tooltip for 5 seconds for a locked challenge', fakeAsync(() => {

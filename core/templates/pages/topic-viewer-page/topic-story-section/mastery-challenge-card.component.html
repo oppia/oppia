@@ -13,7 +13,7 @@
     <button class="mastery-challenge-button"
             type="button"
             [class.mastery-challenge-button-locked]="!isUnlocked"
-            [disabled]="isUnlocked && !hasActionUrl()"
+            [disabled]="isActionDisabled()"
             (click)="onChallengeButtonClick()">
       <span class="mastery-challenge-button-icon"
             [class.mastery-challenge-button-icon-locked]="!isUnlocked"

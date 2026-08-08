@@ -58,6 +58,10 @@ export class MasteryChallengeCardComponent implements OnDestroy {
     return this.actionUrl !== '' && this.actionUrl !== '#';
   }
 
+  isActionDisabled(): boolean {
+    return this.isUnlocked && !this.hasActionUrl();
+  }
+
   private showHelperTooltip(): void {
     this.showLockedTooltip = true;
     this.clearHelperTooltipTimeout();

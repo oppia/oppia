@@ -297,7 +297,7 @@ describe('TopicStorySectionComponent', () => {
     nodeId: string,
     thumbnailFilename: string | null = null,
     options: {
-      status?: string;
+      status?: string | null;
       textLanguageCodes?: string[];
     } = {}
   ): jasmine.SpyObj<StoryNode> => {
