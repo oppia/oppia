@@ -263,6 +263,10 @@ export class TopicStorySectionComponent
   }
 
   onDialogTab(event: KeyboardEvent): void {
+    if (event.key !== 'Tab') {
+      return;
+    }
+
     const dialogElement = this.showAdventureMasteredModal
       ? this.adventureMasteredDialog?.nativeElement
       : this.arcSkipConfirmationDialog?.nativeElement;

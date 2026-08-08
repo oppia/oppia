@@ -3611,7 +3611,10 @@ describe('TopicStorySectionComponent', () => {
       document.createElement('div')
     );
 
-    const event = new KeyboardEvent('keydown', {key: 'Tab'});
+    const event = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      cancelable: true,
+    });
     component.onDialogTab(event);
 
     expect(event.defaultPrevented).toBe(true);

@@ -239,7 +239,7 @@
            aria-labelledby="arc-skip-confirmation-title"
            tabindex="-1"
            #arcSkipConfirmationDialog
-           (keydown.tab)="onDialogTab($event)"
+           (keydown)="onDialogTab($event)"
            (click)="$event.stopPropagation()">
     <button type="button"
             class="arc-skip-confirmation-close"
@@ -290,7 +290,7 @@
            aria-labelledby="adventure-mastered-title"
            tabindex="-1"
            #adventureMasteredDialog
-           (keydown.tab)="onDialogTab($event)">
+           (keydown)="onDialogTab($event)">
     <div class="adventure-mastered-confetti" aria-hidden="true">
       <span class="adventure-mastered-confetti-piece piece-1"></span>
       <span class="adventure-mastered-confetti-piece piece-2"></span>

@@ -306,7 +306,10 @@ describe('Topic Preview Tab Component', () => {
     storySummarySpy.getTitle.and.returnValue('title');
     storySummarySpy.getDescription.and.returnValue('');
     storySummarySpy.getNodeTitles.and.returnValue([]);
-    componentInstance.canonicalStorySummaries = [storySummarySpy];
+    spyOn(
+      topicEditorStateService,
+      'getCanonicalStorySummaries'
+    ).and.returnValue([storySummarySpy]);
 
     componentInstance.ngOnInit();
 
