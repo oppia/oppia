@@ -19,7 +19,7 @@
                                       [label]="lesson.lessonNumber.toString()"
                                       [iconName]="lesson.isCompleted ? 'check' : ''"
                                       [size]="'sm'"
-                            [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? adventureGroup.accentColor : (lesson.isCompleted ? '#e7f6e9' : '#fff')"
+                                      [backgroundColor]="isActiveLesson(lesson.lessonNumber) ? adventureGroup.accentColor : (lesson.isCompleted ? '#e7f6e9' : '#fff')"
                                       [borderColor]="lesson.isCompleted ? '#40a84f' : adventureGroup.accentColor"
                             [textColor]="isActiveLesson(lesson.lessonNumber) ? '#fff' : (lesson.isCompleted ? '#40a84f' : adventureGroup.accentColor)"
                                       class="adventure-navigation-clickable"

@@ -24,25 +24,15 @@ import {
 } from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopicHeaderComponent} from './topic-header.component';
-import {UrlService} from 'services/contextual/url.service';
 
 describe('TopicHeaderComponent', () => {
   let component: TopicHeaderComponent;
   let fixture: ComponentFixture<TopicHeaderComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let urlService: jasmine.SpyObj<UrlService>;
 
   beforeEach(waitForAsync(() => {
-    urlService = jasmine.createSpyObj('UrlService', [
-      'getClassroomUrlFragmentFromLearnerUrl',
-      'getTopicUrlFragmentFromLearnerUrl',
-      'getLearnerClassroomUrl',
-      'getLearnerTopicStoryUrl',
-      'getPathname',
-    ]);
     TestBed.configureTestingModule({
       declarations: [TopicHeaderComponent, MockTranslatePipe],
-      providers: [{provide: UrlService, useValue: urlService}],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -52,12 +42,6 @@ describe('TopicHeaderComponent', () => {
     component = fixture.componentInstance;
 
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    urlService = TestBed.inject(UrlService) as jasmine.SpyObj<UrlService>;
-    urlService.getPathname.and.returnValue('/learn/math/place-values/story');
-    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
-    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
-      'place-values'
-    );
 
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
       'topic.title.translation.key',
@@ -88,16 +72,18 @@ describe('TopicHeaderComponent', () => {
     component.topicName = 'Place Values';
     component.topicDescription = 'Learn about place values.';
     component.classroomName = 'Math';
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'place-values';
 
     fixture.detectChanges();
   });
 
-  it('should have inputs set from parent and fetch classroomUrlFragment internally', () => {
+  it('should have inputs set from parent', () => {
     expect(component.topicName).toBe('Place Values');
     expect(component.topicDescription).toBe('Learn about place values.');
     expect(component.classroomName).toBe('Math');
-    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(component.classroomUrlFragment).toBe('math');
+    expect(component.topicUrlFragment).toBe('place-values');
   });
 
   it('should return /learn/<fragment> or /learn', () => {
@@ -112,73 +98,6 @@ describe('TopicHeaderComponent', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = '';
     expect(component.getTopicStoryUrl()).toBe('/learn');
-  });
-
-  it('should not derive fragments from the URL when they are provided', () => {
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'place-values';
-    urlService.getClassroomUrlFragmentFromLearnerUrl.calls.reset();
-    urlService.getTopicUrlFragmentFromLearnerUrl.calls.reset();
-
-    component.ngOnInit();
-
-    expect(
-      urlService.getClassroomUrlFragmentFromLearnerUrl
-    ).not.toHaveBeenCalled();
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).not.toHaveBeenCalled();
-    expect(component.classroomUrlFragment).toBe('math');
-    expect(component.topicUrlFragment).toBe('place-values');
-  });
-
-  it('should not derive fragments from the URL when not on a learner URL', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-    urlService.getPathname.and.returnValue('/topic_editor/topic_id');
-    urlService.getClassroomUrlFragmentFromLearnerUrl.calls.reset();
-    urlService.getTopicUrlFragmentFromLearnerUrl.calls.reset();
-
-    component.ngOnInit();
-
-    expect(
-      urlService.getClassroomUrlFragmentFromLearnerUrl
-    ).not.toHaveBeenCalled();
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).not.toHaveBeenCalled();
-    expect(component.classroomUrlFragment).toBe('');
-    expect(component.topicUrlFragment).toBe('');
-  });
-
-  it('should derive the topic URL fragment on /explore paths', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-    urlService.getPathname.and.returnValue('/explore/place-values');
-    urlService.getClassroomUrlFragmentFromLearnerUrl.calls.reset();
-    urlService.getTopicUrlFragmentFromLearnerUrl.calls.reset();
-
-    component.ngOnInit();
-
-    expect(
-      urlService.getClassroomUrlFragmentFromLearnerUrl
-    ).not.toHaveBeenCalled();
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(component.classroomUrlFragment).toBe('');
-    expect(component.topicUrlFragment).toBe('place-values');
-  });
-
-  it('should derive the topic URL fragment on /lesson paths', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-    urlService.getPathname.and.returnValue('/lesson/place-values');
-    urlService.getClassroomUrlFragmentFromLearnerUrl.calls.reset();
-    urlService.getTopicUrlFragmentFromLearnerUrl.calls.reset();
-
-    component.ngOnInit();
-
-    expect(
-      urlService.getClassroomUrlFragmentFromLearnerUrl
-    ).not.toHaveBeenCalled();
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(component.classroomUrlFragment).toBe('');
-    expect(component.topicUrlFragment).toBe('place-values');
   });
 
   it('should delegate RTL detection to I18nLanguageCodeService', () => {

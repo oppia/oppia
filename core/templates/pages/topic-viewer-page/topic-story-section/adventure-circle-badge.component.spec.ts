@@ -87,6 +87,37 @@ describe('AdventureCircleBadgeComponent', () => {
     );
   });
 
+  it('should render the icon when an icon name is provided', () => {
+    component.iconName = 'check';
+    component.label = '1';
+    fixture.detectChanges();
+
+    const badgeElement = fixture.nativeElement.querySelector(
+      '.adventure-circle-badge'
+    );
+    const iconElement = badgeElement.querySelector('i.material-icons');
+    expect(iconElement.textContent.trim()).toBe('check');
+    expect(
+      badgeElement.querySelector('.adventure-circle-badge-label')
+    ).toBeNull();
+  });
+
+  it('should render the label when no icon name is provided', () => {
+    component.iconName = '';
+    component.label = '1';
+    fixture.detectChanges();
+
+    const badgeElement = fixture.nativeElement.querySelector(
+      '.adventure-circle-badge'
+    );
+    expect(
+      badgeElement
+        .querySelector('.adventure-circle-badge-label')
+        .textContent.trim()
+    ).toBe('1');
+    expect(badgeElement.querySelector('i.material-icons')).toBeNull();
+  });
+
   it('should use the explicit title for the tooltip', () => {
     component.title = 'Go to lesson 1';
     component.label = '1';

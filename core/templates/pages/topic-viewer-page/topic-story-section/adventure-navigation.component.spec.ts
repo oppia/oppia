@@ -17,6 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
+import {By} from '@angular/platform-browser';
 import {
   ComponentFixture,
   TestBed,
@@ -27,6 +28,7 @@ import {
 
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {AdventureNavigationComponent} from './adventure-navigation.component';
+import {AdventureCircleBadgeComponent} from './adventure-circle-badge.component';
 
 describe('AdventureNavigationComponent', () => {
   let component: AdventureNavigationComponent;
@@ -34,7 +36,10 @@ describe('AdventureNavigationComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AdventureNavigationComponent],
+      declarations: [
+        AdventureNavigationComponent,
+        AdventureCircleBadgeComponent,
+      ],
       imports: [MockTranslateModule],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -77,11 +82,12 @@ describe('AdventureNavigationComponent', () => {
 
     fixture.detectChanges();
 
-    const badges = fixture.nativeElement.querySelectorAll(
-      'topic-adventure-circle-badge'
+    const badges = fixture.debugElement.queryAll(
+      By.directive(AdventureCircleBadgeComponent)
     );
-    expect(badges[0].iconName).toBe('');
-    expect(badges[1].iconName).toBe('check');
+    expect(badges.length).toBe(3);
+    expect(badges[0].componentInstance.iconName).toBe('');
+    expect(badges[1].componentInstance.iconName).toBe('check');
   });
 
   it('should emit lessonSelected event when onLessonClick is called', () => {
@@ -116,10 +122,11 @@ describe('AdventureNavigationComponent', () => {
 
     fixture.detectChanges();
 
-    const badges = fixture.nativeElement.querySelectorAll(
-      'topic-adventure-circle-badge'
+    const badges = fixture.debugElement.queryAll(
+      By.directive(AdventureCircleBadgeComponent)
     );
-    expect(badges[1].iconName).toBe('check');
+    expect(badges.length).toBe(3);
+    expect(badges[1].componentInstance.iconName).toBe('check');
   });
 
   it('should clear timeouts and stop scheduled updates on destroy', fakeAsync(() => {

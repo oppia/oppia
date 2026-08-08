@@ -186,9 +186,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     this.isExpanded = !this.isExpanded;
   }
 
-  onPlayAgainClick(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+  onPlayAgainClick(): void {
     this.onStartButtonClick();
   }
 

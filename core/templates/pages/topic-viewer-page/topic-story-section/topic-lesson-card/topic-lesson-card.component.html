@@ -23,7 +23,6 @@
         </topic-adventure-circle-badge>
         <topic-adventure-circle-badge *ngIf="isExpanded || !isCompletedLesson"
                                       [label]="lessonNumber.toString()"
-                                      [iconName]="''"
                                       [size]="'sm'"
                                       [backgroundColor]="isExpanded ? adventureAccentColor : '#fff'"
                                       [borderColor]="isExpanded ? adventureAccentColor : '#d1d5db'"
@@ -56,7 +55,7 @@
                 *ngIf="!isExpanded && isCompletedLesson"
                 class="topic-lesson-card-play-again-button"
                 [disabled]="isComingSoonLesson || !startUrl"
-                (click)="onPlayAgainClick($event)">
+                (click)="onPlayAgainClick()">
           <i class="material-icons" aria-hidden="true">replay</i>
           {{ 'I18N_TOPIC_VIEWER_LESSON_PLAY_AGAIN_BUTTON' | translate }}
         </button>
@@ -67,7 +66,6 @@
                 [disabled]="isComingSoonSectionCard"
                 (click)="toggleExpanded()"
                 [attr.aria-expanded]="isExpanded"
-                title="Toggle lesson details"
                 [attr.aria-label]="'I18N_TOPIC_VIEWER_TOGGLE_LESSON_DETAILS' | translate">
           <i class="material-icons" aria-hidden="true">expand_more</i>
         </button>

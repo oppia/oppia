@@ -222,7 +222,7 @@ describe('Topic editor page', () => {
     expect(component.warningsAreShown).toBe(false);
   });
 
-  it('should only apply redesigned page styles when the feature is enabled', () => {
+  it('should not apply redesigned page body styles when the feature is disabled', () => {
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'loadTopic');
 
@@ -230,7 +230,14 @@ describe('Topic editor page', () => {
 
     expect(document.body.classList).not.toContain('topic-editor-page-active');
 
+    component.ngOnDestroy();
+  });
+
+  it('should apply and clean up redesigned page body styles when the feature is enabled', () => {
     platformFeatureService.status.RedesignedTopicViewerPage.isEnabled = true;
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'loadTopic');
+
     component.ngOnInit();
 
     expect(document.body.classList).toContain('topic-editor-page-active');

@@ -18,7 +18,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
-import {UrlService} from 'services/contextual/url.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -43,10 +42,7 @@ export class TopicHeaderComponent implements OnInit {
   topicDescTranslationKey!: string;
   classroomNameTranslationKey!: string;
 
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private urlService: UrlService
-  ) {}
+  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
 
   ngOnInit(): void {
     this.topicNameTranslationKey =
@@ -59,24 +55,6 @@ export class TopicHeaderComponent implements OnInit {
         this.topicId,
         TranslationKeyType.DESCRIPTION
       );
-
-    // The fragments may be passed in directly (e.g. in the topic editor
-    // preview, where the current URL is not a learner URL). Only derive them
-    // from the URL when they were not provided.
-    const pathname = this.urlService.getPathname();
-    if (!this.classroomUrlFragment && pathname.startsWith('/learn')) {
-      this.classroomUrlFragment =
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    }
-    if (
-      !this.topicUrlFragment &&
-      (pathname.startsWith('/learn') ||
-        pathname.startsWith('/explore') ||
-        pathname.startsWith('/lesson'))
-    ) {
-      this.topicUrlFragment =
-        this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    }
 
     if (this.classroomName) {
       this.classroomNameTranslationKey =

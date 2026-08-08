@@ -793,15 +793,9 @@ describe('TopicLessonCardComponent', () => {
     spyOn(component, 'onStartButtonClick');
     component.startUrl = '/explore/123';
     component.isExpanded = true;
-    const event = jasmine.createSpyObj<Event>('Event', [
-      'preventDefault',
-      'stopPropagation',
-    ]);
 
-    component.onPlayAgainClick(event);
+    component.onPlayAgainClick();
 
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(event.stopPropagation).toHaveBeenCalled();
     expect(component.onStartButtonClick).toHaveBeenCalled();
     expect(component.isExpanded).toBeTrue();
   });
