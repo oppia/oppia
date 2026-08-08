@@ -652,23 +652,23 @@
     },
     {
       "name": "release-coordinator/enable-feature-flag",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/enable-feature-flag.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/release-coordinator/enable-feature-flag.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "release-coordinator/enable-the-promo-bar",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/enable-the-promo-bar.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/release-coordinator/enable-the-promo-bar.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "release-coordinator/flush-the-memory-cache",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/flush-the-memory-cache.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/release-coordinator/flush-the-memory-cache.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "super-admin/edit-platform-parameter",

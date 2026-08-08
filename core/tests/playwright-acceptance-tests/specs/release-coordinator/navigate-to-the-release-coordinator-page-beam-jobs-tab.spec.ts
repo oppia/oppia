@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * RC.BJ Navigate to the release coordinator page, Beam Jobs tab.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
@@ -29,26 +30,26 @@ const DUMMY_PASS_BEAM_JOB_OUTPUT = 'SUCCESS: Dummy job completed successfully';
 const DUMMY_FAIL_BEAM_JOB_ERROR =
   'Exception: DummyFailJob intentionally failed.';
 
-describe('Release Coordinator', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'releaseCoordinator@example.com',
+      browser,
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
   });
 
-  it('should be able to visit release coordinator page', async function () {
+  test('should be able to visit release coordinator page', async function () {
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
-    await releaseCoordinator.expectScreenshotToMatch(
-      'releaseCoordinatorPage',
-      __dirname
-    );
+    await releaseCoordinator.expectScreenshotToMatch('releaseCoordinatorPage');
   });
 
-  it('should be able to run beam job (success)', async function () {
+  test('should be able to run beam job (success)', async function () {
     await releaseCoordinator.selectAndRunJob(DUMMY_PASS_BEAM_JOB);
     // Beam jobs, take a while to run.
     await releaseCoordinator.waitForJobToComplete();
@@ -62,7 +63,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectJobOutputToBe(DUMMY_PASS_BEAM_JOB_OUTPUT);
   });
 
-  it('should be able to handle beam job (failure)', async function () {
+  test('should be able to handle beam job (failure)', async function () {
     await releaseCoordinator.closeOutputModal();
     await releaseCoordinator.selectAndRunJob(DUMMY_FAIL_BEAM_JOB);
     await releaseCoordinator.waitForJobToComplete();
@@ -75,7 +76,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectJobOutputToBe(DUMMY_FAIL_BEAM_JOB_ERROR);
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
