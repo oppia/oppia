@@ -364,7 +364,7 @@ describe('Contribution Opportunities backend API service', function () {
       )
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor=&entity_type=exploration'
+      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
     );
     expect(req.request.method).toEqual('GET');
     req.flush(translationOpportunityResponseV2);
@@ -409,7 +409,7 @@ describe('Contribution Opportunities backend API service', function () {
         )
         .then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor=&entity_type=exploration'
+        '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor='
       );
 
       expect(req.request.method).toEqual('GET');
@@ -701,7 +701,7 @@ describe('Contribution Opportunities backend API service', function () {
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
-        '/getreviewableopportunitieshandler?language_code=<languageCode>',
+        '/getreviewableopportunitieshandler?topic_name=&language_code=<languageCode>',
         {languageCode}
       )
     );

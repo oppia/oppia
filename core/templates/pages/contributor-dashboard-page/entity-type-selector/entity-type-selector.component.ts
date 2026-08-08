@@ -36,6 +36,7 @@ export interface EntityTypeOption {
 @Component({
   selector: 'entity-type-selector',
   templateUrl: './entity-type-selector.component.html',
+  styleUrls: ['./entity-type-selector.component.css'],
 })
 export class EntityTypeSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
