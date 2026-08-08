@@ -21,10 +21,12 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {classroomDisplayInfo} from '../../../domain/classroom/classroom-backend-api.service';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import './update-classrooms-order-modal.component.css';
 
 @Component({
   selector: 'oppia-update-classrooms-order-modal',
   templateUrl: './update-classrooms-order-modal.component.html',
+  styleUrls: ['./update-classrooms-order-modal.component.css'],
 })
 export class UpdateClassroomsOrderModalComponent extends ConfirmOrCancelModal {
   constructor(private ngbActiveModal: NgbActiveModal) {
