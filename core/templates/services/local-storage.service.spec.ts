@@ -51,6 +51,7 @@ describe('LocalStorageService', () => {
     let windowRef: WindowRef;
 
     beforeEach(() => {
+      localStorage.clear();
       localStorageService = TestBed.inject(LocalStorageService);
       windowRef = TestBed.inject(WindowRef);
 
