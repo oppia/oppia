@@ -38,4 +38,12 @@ export class AdventureCircleBadgeComponent {
       ? 'adventure-circle-badge adventure-circle-badge--sm'
       : 'adventure-circle-badge';
   }
+
+  getAriaLabel(): string {
+    return this.label || this.iconName;
+  }
+
+  getTooltipText(): string {
+    return this.title || this.label || this.iconName;
+  }
 }
