@@ -18,6 +18,7 @@
 
 import {Component, Input} from '@angular/core';
 import {AppConstants} from 'app.constants';
+import './badge.component.css';
 
 interface ContributionSubTypeTexts {
   submission: string;
@@ -28,7 +29,7 @@ interface ContributionSubTypeTexts {
 @Component({
   selector: 'badge',
   templateUrl: './badge.component.html',
-  styleUrls: [],
+  styleUrls: ['./badge.component.css'],
 })
 export class BadgeComponent {
   @Input() contributionType!: string;
