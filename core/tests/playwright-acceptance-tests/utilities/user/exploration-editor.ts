@@ -33,7 +33,6 @@ const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
 const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
 const languageUpdateDropdown =
@@ -1660,10 +1659,6 @@ export class ExplorationEditor extends BaseUser {
     await this.expectTextContentToBe(multipleChoiceResponseDropdown, answer);
   }
 
-  async addTextInputInteraction(): Promise<void> {
-    await this.addInteraction('Text Input');
-  }
-
   async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
     for (let i = 0; i < options.length - 1; i++) {
       await this.expectElementToBeVisible(addResponseOptionButton);
@@ -1823,6 +1818,8 @@ export class ExplorationEditor extends BaseUser {
     const element = elements.nth(index);
     await element.fill(value);
     await expect(element).toHaveValue(value);
+  }
+
   /**
    * Function to navigate to the history tab.
    */
