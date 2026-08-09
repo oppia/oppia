@@ -135,12 +135,6 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     expect(component.currentStage).toBe('questions');
   });
 
-  it('should set current stage to result when route is result', async () => {
-    await configureComponent('result');
-    fixture.detectChanges();
-    expect(component.currentStage).toBe('result');
-  });
-
   it('should keep intro stage when the route path is unrecognized', async () => {
     await configureComponent('unknown');
     fixture.detectChanges();

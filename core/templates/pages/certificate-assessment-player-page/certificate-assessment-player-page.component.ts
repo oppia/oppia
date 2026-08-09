@@ -54,7 +54,7 @@ export interface AssessmentQuestion {
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
   certificateId = '';
-  currentStage: 'intro' | 'instructions' | 'questions' | 'result' = 'intro';
+  currentStage: 'intro' | 'instructions' | 'questions' = 'intro';
   // TODO(#24717-m2.18-m2.19): The showTimeExpiredModal and
   // showUnansweredQuestionModal flags are currently initialized with default
   // values. Update these flags based on the appropriate conditions once the
@@ -124,8 +124,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     if (currentRoute === 'session') {
       this.currentStage = 'questions';
-    } else if (currentRoute === 'result') {
-      this.currentStage = 'result';
     }
     if (this.showTimeExpiredModal) {
       this.openTimeExpiredModal();
