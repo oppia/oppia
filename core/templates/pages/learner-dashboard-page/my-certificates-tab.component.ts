@@ -18,6 +18,7 @@
 
 import {Component} from '@angular/core';
 import {CertificateAttemptSummary} from 'domain/certificate-assessment/certificate-assessment.model';
+import './my-certificates-tab.component.css';
 
 @Component({
   selector: 'oppia-my-certificates-tab',
