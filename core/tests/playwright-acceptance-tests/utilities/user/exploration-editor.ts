@@ -1743,10 +1743,6 @@ export class ExplorationEditor extends BaseUser {
     await this.expectTextContentToBe(multipleChoiceResponseDropdown, answer);
   }
 
-  async addTextInputInteraction(): Promise<void> {
-    await this.addInteraction('Text Input');
-  }
-
   async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
     for (let i = 0; i < options.length - 1; i++) {
       await this.expectElementToBeVisible(addResponseOptionButton);
