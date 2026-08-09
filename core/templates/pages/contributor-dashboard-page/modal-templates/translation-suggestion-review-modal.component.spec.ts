@@ -782,7 +782,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.acceptAndReviewNext();
         tick();
 
-        expect(component.queuedSuggestionSummaryEmit).toHaveBeenCalledWith(
+        expect(component.queuedSuggestionSummaryEmit.emit).toHaveBeenCalledWith(
           jasmine.objectContaining({
             target_type: AppConstants.ENTITY_TYPE.SKILL,
           })

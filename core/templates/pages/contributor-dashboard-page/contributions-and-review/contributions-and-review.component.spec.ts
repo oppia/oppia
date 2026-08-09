@@ -854,6 +854,9 @@ describe('Contributions and review component', () => {
         component.getTranslationContributionsSummary(suggestionsDict);
 
       expect(summaries[0].subheading).toBe('Math / Chapter 1');
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
     });
 
     it('should be able to change language', fakeAsync(() => {
