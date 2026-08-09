@@ -27,8 +27,4 @@
                                                   (submitAssessment)="submitAssessment()"
                                                   (responseChange)="updateResponse($event)">
   </oppia-certificate-assessment-conversation-skin>
-
-  <oppia-certificate-assessment-result-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_RESULT"
-                                            [certificateId]="certificateId">
-  </oppia-certificate-assessment-result-card>
 </div>

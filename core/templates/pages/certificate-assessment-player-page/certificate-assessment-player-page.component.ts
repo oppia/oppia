@@ -117,8 +117,6 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
     if (currentRoute === 'session') {
       this.currentStage =
         CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
-    } else if (currentRoute === 'result') {
-      this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_RESULT;
     }
   }
 

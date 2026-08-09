@@ -20,5 +20,4 @@ export const CertificateAssessmentPlayerPageConstants = {
   STAGE_INTRO: 'intro',
   STAGE_INSTRUCTIONS: 'instructions',
   STAGE_QUESTIONS: 'questions',
-  STAGE_RESULT: 'result',
 } as const;
