@@ -272,8 +272,12 @@ describe('FeedbackModalComponent', () => {
       'getExplorationVersion',
     ]);
 
-    pageContextService.getExplorationId.and.returnValue('exp1');
-    pageContextService.getExplorationVersion.and.returnValue(1);
+    (pageContextService.getExplorationId as jasmine.Spy).and.returnValue(
+      'exp1'
+    );
+    (pageContextService.getExplorationVersion as jasmine.Spy).and.returnValue(
+      1
+    );
 
     feedbackSessionInfoService.getSessionInfo.and.returnValue(
       feedbackSessionInfo
