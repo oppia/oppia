@@ -184,6 +184,7 @@ describe('User Backend Api Service', () => {
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: true,
       can_receive_subscription_email: true,
+      can_receive_contributor_dashboard_email: true,
       subscription_list: [],
     };
     userBackendApiService.getPreferencesAsync().then(preferencesData => {

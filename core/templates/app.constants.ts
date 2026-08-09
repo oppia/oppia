@@ -196,6 +196,7 @@ export const AppConstants = {
     QUESTION: 'question',
     BLOG_POST: 'blog_post',
     CLASSROOM: 'classroom',
+    FEEDBACK: 'feedback',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
