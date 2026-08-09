@@ -16,7 +16,7 @@
  * @fileoverview Component for the topic preview tab.
  */
 
-import {Component, ViewEncapsulation} from '@angular/core';
+import {Component} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subscription} from 'rxjs';
@@ -44,8 +44,6 @@ interface TopicViewerStorySectionData {
   selector: 'oppia-topic-preview-tab',
   templateUrl: './topic-preview-tab.component.html',
   styleUrls: ['./topic-preview-tab.component.css'],
-  // We need ViewEncapsulation.None because the preview reuses shared topic viewer styles that must remain globally scoped.
-  encapsulation: ViewEncapsulation.None,
 })
 export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';

@@ -17,13 +17,7 @@
  */
 
 import {DOCUMENT} from '@angular/common';
-import {
-  Component,
-  Inject,
-  OnInit,
-  OnDestroy,
-  ViewEncapsulation,
-} from '@angular/core';
+import {Component, Inject, OnInit, OnDestroy} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -60,7 +54,6 @@ interface TopicViewerStorySectionData {
   selector: 'topic-viewer-page',
   templateUrl: './topic-viewer-page.component.html',
   styleUrls: ['./topic-viewer-page.component.css'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   private static readonly REDESIGNED_TOPIC_VIEWER_BODY_CLASS =
