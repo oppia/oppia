@@ -19,25 +19,18 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Router} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
 
 describe('MyCertificatesTabComponent', () => {
   let component: MyCertificatesTabComponent;
   let fixture: ComponentFixture<MyCertificatesTabComponent>;
-  let router: Router;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [CommonModule],
+      imports: [CommonModule, RouterTestingModule],
       declarations: [MyCertificatesTabComponent, MockTranslatePipe],
-      providers: [
-        {
-          provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigateByUrl']),
-        },
-      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -45,7 +38,6 @@ describe('MyCertificatesTabComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MyCertificatesTabComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -105,10 +97,16 @@ describe('MyCertificatesTabComponent', () => {
     );
   });
 
-  it('should navigate to the result page for the clicked attempt', () => {
-    component.navigateToResultPage('stub_attempt_id_1');
-    expect(router.navigateByUrl).toHaveBeenCalledWith(
-      'certificate-assessment-result/stub_attempt_id_1'
+  it('should render a link to the result page for each attempt', () => {
+    const links = fixture.nativeElement.querySelectorAll(
+      '.certificate-title-link'
+    );
+    expect(links.length).toBe(3);
+    expect(links[0].getAttribute('href')).toBe(
+      '/certificate-assessment-result/stub_attempt_id_1'
+    );
+    expect(links[1].getAttribute('href')).toBe(
+      '/certificate-assessment-result/stub_attempt_id_2'
     );
   });
 });

@@ -71,17 +71,23 @@
   padding: 16px 12px;
 }
 
-.certificates-table-row {
-  cursor: pointer;
-}
-
 .certificates-table-row:hover {
   background: #f5faf9;
 }
 
 .certificate-title-cell {
+  font-weight: 700;
+}
+
+.certificate-title-link {
   color: var(--oppia-teal-dark);
   font-weight: 700;
+  text-decoration: none;
+}
+
+.certificate-title-link:hover,
+.certificate-title-link:focus {
+  text-decoration: underline;
 }
 
 .subject-cell,

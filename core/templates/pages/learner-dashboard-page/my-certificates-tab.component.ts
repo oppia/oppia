@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {Router} from '@angular/router';
 import {CertificateAttemptSummary} from 'domain/certificate-assessment/certificate-assessment.model';
 
 @Component({
@@ -62,7 +61,7 @@ export class MyCertificatesTabComponent {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor() {}
 
   get filteredAttempts(): CertificateAttemptSummary[] {
     if (this.selectedFilter === 'passed') {
@@ -96,11 +95,5 @@ export class MyCertificatesTabComponent {
       science: 'I18N_LIBRARY_CATEGORIES_SCIENCE',
     };
     return subjectByClassroomId[classroomId] || classroomId;
-  }
-
-  navigateToResultPage(attemptId: string): void {
-    void this.router.navigateByUrl(
-      'certificate-assessment-result/' + attemptId
-    );
   }
 }

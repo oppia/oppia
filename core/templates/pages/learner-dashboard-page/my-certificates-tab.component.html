@@ -2,6 +2,9 @@
 <div class="my-certificates-tab">
   <div class="my-certificates-filter">
     <div class="my-certificates-filter-select-container">
+      <label class="visually-hidden" for="certificate-attempt-status-filter">
+        {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_FILTER_LABEL' | translate }}
+      </label>
       <select id="certificate-attempt-status-filter"
               class="my-certificates-filter-select"
               (change)="onFilterChange($event)">
@@ -29,9 +32,13 @@
     </thead>
     <tbody>
       <tr *ngFor="let attempt of filteredAttempts"
-          class="certificates-table-row"
-          (click)="navigateToResultPage(attempt.attempt_id)">
-        <td class="certificate-title-cell">{{ attempt.title }}</td>
+          class="certificates-table-row">
+        <td class="certificate-title-cell">
+          <a class="certificate-title-link"
+             [routerLink]="'/certificate-assessment-result/' + attempt.attempt_id">
+            {{ attempt.title }}
+          </a>
+        </td>
         <td class="subject-cell">{{ getSubject(attempt.classroom_id) | translate }}</td>
         <td class="attempt-cell">{{ attempt.attempt_index }}</td>
         <td class="score-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
