@@ -24,6 +24,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CollectionEditor} from '../../utilities/user/collection-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
 
@@ -47,6 +48,13 @@ describe('Collection Creator', function () {
       [ROLES.COLLECTION_EDITOR]
     );
     loggedOutUser = await UserFactory.createLoggedOutUser();
+
+    // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
+    // once fixed, allow testing for mobile viewport.
+    if (loggedOutUser.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, check issue #26642');
+      return;
+    }
 
     // Create 3 explorations: Positive Numbers, Negative Numbers, Whole Numbers.
     await explorationCreator.navigateToCreatorDashboardPage();
@@ -90,6 +98,13 @@ describe('Collection Creator', function () {
   });
 
   it('should be able to create a collection and add explorations', async function () {
+    // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
+    // once fixed, allow testing for mobile viewport.
+    if (loggedOutUser.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, check issue #26642');
+      return;
+    }
+
     // Navigate to creator dashboard and create a new collection.
     await collectionEditor.navigateToCreatorDashboardUsingProfileDropdown();
     await collectionEditor.createACollection();
@@ -146,6 +161,13 @@ describe('Collection Creator', function () {
   });
 
   it('should be able to save and publish the collection draft', async function () {
+    // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
+    // once fixed, allow testing for mobile viewport.
+    if (loggedOutUser.isViewportAtMobileWidth()) {
+      showMessage('Skipping the test, check issue #26642');
+      return;
+    }
+
     // Save exploration draft.
     await collectionEditor.saveCollectionDraft();
 
