@@ -1150,7 +1150,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         missing_attempt_calls = {'count': 0}
 
         def _get_returns_missing(
-            attempt_id: str, **unused_kwargs: object
+            attempt_id: str, **unused_kwargs: bool
         ) -> mock.Mock:
             missing_attempt_calls['count'] += 1
             if missing_attempt_calls['count'] == 1:
@@ -1176,7 +1176,7 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         already_submitted_calls = {'count': 0}
 
         def _get_returns_submitted(
-            unused_attempt_id: str, **unused_kwargs: object
+            unused_attempt_id: str, **unused_kwargs: bool
         ) -> mock.Mock:
             already_submitted_calls['count'] += 1
             if already_submitted_calls['count'] == 1:
