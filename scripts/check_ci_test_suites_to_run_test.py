@@ -120,13 +120,16 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
         'login',
         'contact',
         'donate',
+    ],
+    '2': [
         'get-started',
         'teach',
         'thanks',
         'volunteer',
         'contributor-dashboard',
+        'learner-dashboard',
+        'email-dashboard',
     ],
-    '2': ['learner-dashboard', 'email-dashboard'],
 }
 
 LIGHTHOUSE_PAGES: List[check_ci_test_suites_to_run.LighthousePageDict] = [
@@ -169,9 +172,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         'exploration-player/view-exploration.spec.ts': [
                             'exploration-player/view-exploration.spec.ts'
                         ],
-                        '.lighthouserc-performance.js': [
-                            '.lighthouserc-performance.js'
-                        ],
+                        '.lighthouserc.js': ['.lighthouserc.js'],
                     }
                 )
             )
@@ -403,35 +404,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     },
                 ],
             },
-            'lighthouse_accessibility': {
+            'lighthouse': {
                 'count': 2,
                 'suites': [
                     {
                         'name': '1',
-                        'module': '.lighthouserc-accessibility.js',
+                        'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
                     },
                     {
                         'name': '2',
-                        'module': '.lighthouserc-accessibility.js',
-                        'environment': 'python',
-                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
-                    },
-                ],
-            },
-            'lighthouse_performance': {
-                'count': 2,
-                'suites': [
-                    {
-                        'name': '1',
-                        'module': '.lighthouserc-performance.js',
-                        'environment': 'python',
-                        'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
-                    },
-                    {
-                        'name': '2',
-                        'module': '.lighthouserc-performance.js',
+                        'module': '.lighthouserc.js',
                         'environment': 'python',
                         'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                     },
@@ -625,12 +609,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', lighthouse_pages
+                '.lighthouserc.js', lighthouse_pages
             ),
             [
                 {
                     'name': '1',
-                    'module': 'performance.js',
+                    'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': [
                         'splash',
@@ -648,18 +632,18 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     ) -> None:
         self.assertEqual(
             check_ci_test_suites_to_run.partition_lighthouse_pages_into_test_suites(
-                'performance.js', LIGHTHOUSE_PAGES
+                '.lighthouserc.js', LIGHTHOUSE_PAGES
             ),
             [
                 {
                     'name': '1',
-                    'module': 'performance.js',
+                    'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['1'],
                 },
                 {
                     'name': '2',
-                    'module': 'performance.js',
+                    'module': '.lighthouserc.js',
                     'environment': 'python',
                     'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES['2'],
                 },
@@ -765,11 +749,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -849,28 +829,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         }
                                     ],
                                 },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 1,
                                     'suites': [
                                         {
                                             'name': '1',
-                                            'module': '.lighthouserc-performance.js',  # pylint: disable=line-too-long
-                                            'environment': 'python',
-                                            'pages_to_run': [
-                                                'about',
-                                                'exploration-player',
-                                                'splash',
-                                                'terms',
-                                            ],
-                                        }
-                                    ],
-                                },
-                                'lighthouse_accessibility': {
-                                    'count': 1,
-                                    'suites': [
-                                        {
-                                            'name': '1',
-                                            'module': '.lighthouserc-accessibility.js',  # pylint: disable=line-too-long
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': [
                                                 'about',
@@ -929,11 +893,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         }
                                     ],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },
@@ -949,7 +909,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
-                        lambda *args: ['.lighthouserc-performance.js'],
+                        lambda *args: ['.lighthouserc.js'],
                     ):
                         check_ci_test_suites_to_run.main(
                             [
@@ -971,16 +931,12 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 2,
                                     'suites': [
                                         {
                                             'name': '1',
-                                            'module': '.lighthouserc-performance.js',
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '1'
@@ -988,7 +944,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         },
                                         {
                                             'name': '2',
-                                            'module': '.lighthouserc-performance.js',
+                                            'module': '.lighthouserc.js',
                                             'environment': 'python',
                                             'pages_to_run': LIGHTHOUSE_PAGES_FOR_SUITES[
                                                 '2'
@@ -1052,11 +1008,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     'count': 0,
                                     'suites': [],
                                 },
-                                'lighthouse_accessibility': {
-                                    'count': 0,
-                                    'suites': [],
-                                },
-                                'lighthouse_performance': {
+                                'lighthouse': {
                                     'count': 0,
                                     'suites': [],
                                 },

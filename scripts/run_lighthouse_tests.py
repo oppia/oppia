@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This script performs lighthouse checks and creates lighthouse reports.
-Any callers must pass in a flag, either --accessibility or --performance.
-"""
+"""This script performs lighthouse checks and creates lighthouse reports."""
 
 from __future__ import annotations
 
@@ -30,15 +28,10 @@ from scripts import build, common, servers
 
 from typing import Final, Iterator, List, Optional
 
-LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
-LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
-LIGHTHOUSE_CONFIG_FILENAMES: Final = {
-    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js',
-}
+LIGHTHOUSE_CONFIG_FILENAME: Final = '.lighthouserc.js'
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml',
@@ -53,13 +46,6 @@ Run the script from the oppia root folder:
     python -m scripts.run_lighthouse_tests
 Note that the root folder MUST be named 'oppia'.
 """
-)
-
-_PARSER.add_argument(
-    '--mode',
-    help='Sets the mode for the lighthouse tests',
-    required=True,
-    choices=['accessibility', 'performance'],
 )
 
 _PARSER.add_argument(
@@ -187,13 +173,8 @@ def _get_lighthouse_environment() -> dict[str, str]:
     return env
 
 
-def run_lighthouse_checks(lighthouse_mode: str) -> None:
-    """Runs the Lighthouse checks through the Lighthouse config.
-
-    Args:
-        lighthouse_mode: str. Represents whether the lighthouse checks are in
-            accessibility mode or performance mode.
-    """
+def run_lighthouse_checks() -> None:
+    """Runs the Lighthouse checks through the Lighthouse config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
     # when executing the performance tests: https://stackoverflow.com/a/59572966
@@ -201,7 +182,7 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
         common.LIGHTHOUSE_NODE_BIN_PATH,
         lhci_path,
         'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
+        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAME,
         '--max-old-space-size=4096',
     ]
 
@@ -351,13 +332,6 @@ def main(args: Optional[List[str]] = None) -> None:
     # Verify if Chrome is installed.
     common.setup_chrome_bin_env_variable()
 
-    if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
-        lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
-        server_mode = SERVER_MODE_DEV
-    else:
-        lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
-        server_mode = SERVER_MODE_PROD
-
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -368,50 +342,35 @@ def main(args: Optional[List[str]] = None) -> None:
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)
             )
 
-        if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-            if parsed_args.skip_build:
-                print(
-                    'Building files in development mode for setup skipping '
-                    'clean build.'
-                )
-                common.modify_constants(prod_env=False, emulator_mode=True)
-                common.write_hashes_json_file({})
-                servers.run_ng_compilation()
-            else:
-                print('Building files in development mode for setup.')
-                build.main(args=[])
-                servers.run_ng_compilation()
-
-            with managed_lighthouse_appserver(SERVER_MODE_DEV):
-                entities = run_lighthouse_puppeteer_script(
-                    parsed_args.record_screen
-                )
-
-            if parsed_args.skip_build:
-                print('Restoring production constants for Lighthouse checks.')
-                common.modify_constants(prod_env=True, emulator_mode=True)
-            else:
-                # Builds ng.
-                print('Building files in production mode.')
-                build.main(args=['--prod_env'])
+        if parsed_args.skip_build:
+            print(
+                'Building files in development mode for setup skipping '
+                'clean build.'
+            )
+            common.modify_constants(prod_env=False, emulator_mode=True)
+            common.write_hashes_json_file({})
+            servers.run_ng_compilation()
         else:
-            # Accessibility mode skip ng build.
+            print('Building files in development mode for setup.')
             build.main(args=[])
             servers.run_ng_compilation()
 
-            with managed_lighthouse_appserver(server_mode):
-                entities = run_lighthouse_puppeteer_script(
-                    parsed_args.record_screen
-                )
-                set_lighthouse_url_environment_variables(
-                    parsed_args.pages, entities
-                )
-                run_lighthouse_checks(lighthouse_mode)
-            return
+        with managed_lighthouse_appserver(SERVER_MODE_DEV):
+            entities = run_lighthouse_puppeteer_script(
+                parsed_args.record_screen
+            )
+
+        if parsed_args.skip_build:
+            print('Restoring production constants for Lighthouse checks.')
+            common.modify_constants(prod_env=True, emulator_mode=True)
+        else:
+            # Builds ng.
+            print('Building files in production mode.')
+            build.main(args=['--prod_env'])
 
         set_lighthouse_url_environment_variables(parsed_args.pages, entities)
-        with managed_lighthouse_appserver(server_mode):
-            run_lighthouse_checks(lighthouse_mode)
+        with managed_lighthouse_appserver(SERVER_MODE_PROD):
+            run_lighthouse_checks()
 
 
 if __name__ == '__main__':  # pragma: no cover

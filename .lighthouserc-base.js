@@ -34,8 +34,9 @@ module.exports = {
       // Performance category.
       'first-contentful-paint': ['warn', {maxNumericValue: 1230000}],
       'speed-index': ['warn', {maxNumericValue: 1230000}],
-      interactive: ['warn', {maxNumericValue: 1540000}],
-      'max-potential-fid': ['warn', {maxNumericValue: 130000}],
+      'largest-contentful-paint': ['warn', {maxNumericValue: 2500000}],
+      'total-blocking-time': ['warn', {maxNumericValue: 300}],
+      'cumulative-layout-shift': ['warn', {maxNumericValue: 0.1}],
       'uses-optimized-images': ['error', {minScore: 1}],
       'uses-rel-preconnect': ['error', {minScore: 0.5}],
       'efficient-animated-content': ['error', {minScore: 1}],
@@ -59,8 +60,12 @@ module.exports = {
     deprecations: ['error', {minScore: 1}],
     redirects: ['error', {minScore: 1}],
     'uses-responsive-images': ['error', {minScore: 0.8}],
-  },
-  baseAccessibilityAssertions: {
-    'categories:accessibility': ['error', {minScore: 1}],
+    charset: ['warn', {minScore: 1}],
+    viewport: ['warn', {minScore: 1}],
+    'font-size': ['warn', {minScore: 1}],
+    'image-size-responsive': ['warn', {minScore: 1}],
+    'third-party-cookies': ['warn', {minScore: 1}],
+    'inspector-issues': ['warn', {minScore: 1}],
+    'redirects-http': ['warn', {minScore: 1}],
   },
 };
