@@ -761,4 +761,49 @@ export class SiteAnalyticsService {
       }
     );
   }
+
+  registerLessonFeedbackModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('lesson_feedback_modal_open', {
+      exploration_id: explorationId,
+    });
+  }
+
+  registerLessonIssueModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics('lesson_issue_modal_open', {
+      exploration_id: explorationId,
+    });
+  }
+
+  registerWebsiteIssueModalOpenEvent(): void {
+    this._sendEventToGoogleAnalytics('website_issue_modal_open', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerLessonFeedbackSubmittedEvent(
+    explorationId: string,
+    feedbackId: string
+  ): void {
+    this._sendEventToGoogleAnalytics('lesson_feedback_submitted', {
+      exploration_id: explorationId,
+      feedbackId: feedbackId,
+    });
+  }
+
+  registerLessonIssueSubmittedEvent(
+    explorationId: string,
+    feedbackId: string
+  ): void {
+    this._sendEventToGoogleAnalytics('lesson_issue_submitted', {
+      exploration_id: explorationId,
+      feedbackId: feedbackId,
+    });
+  }
+
+  registerWebsiteIssueSubmittedEvent(feedbackId: string): void {
+    this._sendEventToGoogleAnalytics('website_issue_submitted', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      feedbackId: feedbackId,
+    });
+  }
 }
