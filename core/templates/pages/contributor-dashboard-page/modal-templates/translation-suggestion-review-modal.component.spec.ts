@@ -774,33 +774,19 @@ describe('Translation Suggestion Review Modal Component', function () {
         ).toBe(false);
       });
 
-      it('should call reviewSkillSuggestion when accepting a skill translation suggestion', fakeAsync(() => {
+      it('should queue skill translation suggestion when accepting', fakeAsync(() => {
         component.ngOnInit();
         component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
-        spyOn(
-          contributionAndReviewService,
-          'reviewSkillSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            message,
-            difficulty,
-            successCallback,
-            errorCallback
-          ) => {
-            successCallback();
-            return Promise.resolve();
-          }
-        );
+        spyOn(component.queuedSuggestionSummaryEmit, 'emit');
 
         component.acceptAndReviewNext();
         tick();
 
-        expect(
-          contributionAndReviewService.reviewSkillSuggestion
-        ).toHaveBeenCalled();
+        expect(component.queuedSuggestionSummaryEmit).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            target_type: AppConstants.ENTITY_TYPE.SKILL,
+          })
+        );
       }));
     });
   });
@@ -1331,6 +1317,32 @@ describe('Translation Suggestion Review Modal Component', function () {
         ]);
       }
     );
+
+    it('should call reviewSkillSuggestion when accepting a skill translation suggestion', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          message,
+          difficulty,
+          successCallback,
+          errorCallback
+        ) => {
+          successCallback();
+          return Promise.resolve();
+        }
+      );
+
+      component.acceptAndReviewNext();
+      tick();
+
+      expect(
+        contributionAndReviewService.reviewSkillSuggestion
+      ).toHaveBeenCalled();
+    }));
 
     it(
       'should allow the reviewer to fix the suggestion if the backend pre' +
