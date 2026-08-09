@@ -26,7 +26,7 @@ import {CertificateAssessmentOfferingBackendApiService} from './certificate-asse
 import {
   AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentOfferingData,
-} from './certificate-assessment-offering.model';
+} from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 describe('Certificate Assessment Offering backend api service', () => {

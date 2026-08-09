@@ -18,7 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
-import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import './certificate-offering-available-page.component.css';

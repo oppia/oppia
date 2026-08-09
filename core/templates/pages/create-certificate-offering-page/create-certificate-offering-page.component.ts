@@ -24,7 +24,7 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {
   CertificateAssessmentOfferingData,
   CertificateAssessmentOfferingTopicData,
-} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+} from 'domain/certificate-assessment/certificate-assessment.model';
 import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,

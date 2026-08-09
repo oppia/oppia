@@ -24,7 +24,7 @@ import {
   AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
-} from './certificate-assessment-offering.model';
+} from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {

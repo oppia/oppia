@@ -21,7 +21,7 @@ import {
   CertificateAssessmentOfferingBackendDict,
   AvailableCertificateAssessmentOfferingData,
   AvailableCertificateAssessmentOfferingBackendDict,
-} from './certificate-assessment-offering.model';
+} from './certificate-assessment.model';
 
 describe('Available Certificate Assessment Offering Data Model', () => {
   let backendDict: AvailableCertificateAssessmentOfferingBackendDict;
