@@ -19,6 +19,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import './certificate-assessment-player-page.component.css';
 
 export type AssessmentQuestionType =
   | 'multiple_choice'

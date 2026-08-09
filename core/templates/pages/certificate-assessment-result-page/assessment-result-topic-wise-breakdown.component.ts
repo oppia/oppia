@@ -18,6 +18,7 @@
  */
 
 import {Component, Input} from '@angular/core';
+import './assessment-result-topic-wise-breakdown.component.css';
 
 export interface AssessmentResultTopicWiseBreakdown {
   topicName: string;
