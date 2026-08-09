@@ -945,13 +945,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
         opp_model = opportunity_models.TranslationOpportunityModel(
-            id='skill.skill_1',
-            entity_type=feconf.ENTITY_TYPE_SKILL,
-            entity_id='skill_1',
+            id='skill|skill_1|hi',
             topic_ids=['topic_1'],
+            target_id='skill_1',
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            language_code='hi',
             content_count=1,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={},
+            incomplete_rule_content_count=1,
+            incomplete_translation_content_count=1,
         )
         opp_model.put()
 
