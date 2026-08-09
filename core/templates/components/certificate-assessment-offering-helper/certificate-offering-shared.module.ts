@@ -19,6 +19,7 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {TranslateModule} from '@ngx-translate/core';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
 import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
@@ -26,10 +27,12 @@ import {CertificateOfferingDetailsComponent} from './certificate-offering-detail
 import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
+import {TimeExpiredModalComponent} from './time-expired-modal.component';
+import {UnansweredQuestionModalComponent} from './unanswered-question-modal.component';
 import {FormsModule} from '@angular/forms';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule],
+  imports: [CommonModule, FormsModule, SharedComponentsModule, TranslateModule],
   declarations: [
     CertificateOfferingDetailsComponent,
     CertificateOfferingProgressComponent,
@@ -37,6 +40,8 @@ import {FormsModule} from '@angular/forms';
     CertificateOfferingReviewAndAvailabilityComponent,
     CertificateOfferingConfirmationModalComponent,
     PostCertificateOfferingResultModalComponent,
+    TimeExpiredModalComponent,
+    UnansweredQuestionModalComponent,
   ],
   exports: [
     CertificateOfferingDetailsComponent,
@@ -45,10 +50,14 @@ import {FormsModule} from '@angular/forms';
     CertificateOfferingReviewAndAvailabilityComponent,
     CertificateOfferingConfirmationModalComponent,
     PostCertificateOfferingResultModalComponent,
+    TimeExpiredModalComponent,
+    UnansweredQuestionModalComponent,
   ],
   entryComponents: [
     CertificateOfferingConfirmationModalComponent,
     PostCertificateOfferingResultModalComponent,
+    TimeExpiredModalComponent,
+    UnansweredQuestionModalComponent,
   ],
 })
 export class CertificateOfferingSharedModule {}
