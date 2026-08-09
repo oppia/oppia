@@ -163,7 +163,7 @@ export class TranslationSubmitter extends BaseUser {
         `Translate button for chapter ${chapterName} and story ${storyName} not found.`
       );
     }
-    await translateButton.click();
+    await this.clickOnElement(translateButton);
 
     // Verify that the translation editor is opened.
     await this.expectElementToBeVisible(

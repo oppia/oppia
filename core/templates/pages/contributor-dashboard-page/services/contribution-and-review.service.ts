@@ -192,7 +192,7 @@ export class ContributionAndReviewService {
     explorationId: string,
     targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
   ): Promise<FetchSuggestionsResponse> {
-    if (targetType !== AppConstants.ENTITY_TYPE.EXPLORATION) {
+    if (targetType === AppConstants.ENTITY_TYPE.SKILL) {
       return this.contributionAndReviewBackendApiService
         .fetchSuggestionsAsync(
           'REVIEWABLE_TRANSLATION_SUGGESTIONS',
