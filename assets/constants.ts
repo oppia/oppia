@@ -6938,6 +6938,24 @@ export default {
         }
       ]
     },
+    "CERTIFICATE_ASSESSMENT_RESULT": {
+      "ROUTE": "certificate-assessment-result/:attempt_id",
+      "TITLE": "Certificate Assessment Result | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "View the result of a certificate assessment attempt in Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "View the result of a certificate assessment attempt in Oppia."
+        }
+      ]
+    },
     "FACILITATOR_DASHBOARD": {
       "ROUTE": "facilitator-dashboard",
       "TITLE": "Facilitator Dashboard - Oppia",
