@@ -27,6 +27,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
+import result
 from typing import List, cast
 
 MYPY = False
@@ -223,6 +224,25 @@ class BackfillTranslationOpportunityModelJobTests(
         # Exploration currently has 4 metadata fields (title, objective, category, 1 tag) when flag is overridden.
         self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
+
+    def test_create_translation_opportunity_with_supported_language_code(
+        self,
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration('exp_es')
+        exp.language_code = 'es'
+        res = translation_opportunity_backfill_jobs.BackfillTranslationOpportunityModelJob._create_translation_opportunity(  # pylint: disable=protected-access
+            (
+                'exp_es',
+                {
+                    'topic_ids': ['topic_id'],
+                    'exp': [exp],
+                    'translations': [],
+                },
+            )
+        )
+        self.assertTrue(res.is_ok())
+        model = res.unwrap()  # pylint: disable=assignment-from-no-return
+        self.assertNotIn('es', model.incomplete_translation_language_codes)
 
     def test_run_with_datastore_updates_disabled(self) -> None:
         orphaned_model = opportunity_models.TranslationOpportunityModel(
@@ -1025,6 +1045,66 @@ class BackfillSkillOpportunityModelJobTests(SkillOpportunityJobTestBase):
         )
         self.assertIsNotNone(model)
         self.assertEqual(model.translation_counts, {'hi': 1})
+
+    def test_create_skill_translation_opportunity_returns_error_cases(
+        self,
+    ) -> None:
+        err1 = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_skill_translation_opportunity(  # pylint: disable=protected-access
+            ('skill_1', {'topic_ids': [], 'skill': [], 'translations': []})
+        )
+        self.assertEqual(err1, result.Err('Missing topic_id'))
+
+        err2 = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_skill_translation_opportunity(  # pylint: disable=protected-access
+            (
+                'skill_1',
+                {'topic_ids': ['topic_id'], 'skill': [], 'translations': []},
+            )
+        )
+        self.assertEqual(err2, result.Err('Missing SkillModel'))
+
+    def test_create_skill_translation_opportunity_with_needs_update_and_supported_lang(
+        self,
+    ) -> None:
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']
+            ),
+        ]
+        skill = skill_domain.Skill.create_default_skill(
+            'skill_es', 'Skill Description', rubrics
+        )
+        skill.version = 1
+        skill.language_code = 'es'
+
+        translation_model = translation_models.EntityTranslationsModel(
+            id='skill.skill_es.1.es',
+            entity_type='skill',
+            entity_id='skill_es',
+            entity_version=1,
+            language_code='es',
+            translations={
+                'rubric_explanation_0': {
+                    'content_format': 'html',
+                    'content_value': '<p>Spanish explanation</p>',
+                    'needs_update': True,
+                }
+            },
+        )
+
+        res = translation_opportunity_backfill_jobs.BackfillSkillOpportunityModelJob._create_skill_translation_opportunity(  # pylint: disable=protected-access
+            (
+                'skill_es',
+                {
+                    'topic_ids': ['topic_id'],
+                    'skill': [skill],
+                    'translations': [translation_model],
+                },
+            )
+        )
+        self.assertTrue(res.is_ok())
+        model = res.unwrap()  # pylint: disable=assignment-from-no-return
+        self.assertEqual(model.translation_counts, {'es': 0})
+        self.assertNotIn('es', model.incomplete_translation_language_codes)
 
     def test_deletes_orphaned_skill_translation_opportunity_model(
         self,
