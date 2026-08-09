@@ -42,10 +42,11 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import skill_models
+    from mypy_imports import datastore_services, skill_models
 
 transaction_services = models.Registry.import_transaction_services()
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
+datastore_services = models.Registry.import_datastore_services()
 
 CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY: str = (
     constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY
@@ -56,6 +57,15 @@ CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: str = (
 CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: str = (
     constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
 )
+
+# The order in which questions are sampled for a certificate attempt. Medium
+# is sampled before easy and hard so that when multiple difficulties compete
+# for the same questions, the core mastery evidence is claimed first.
+CERTIFICATE_ASSESSMENT_DIFFICULTY_SAMPLING_ORDER: List[str] = [
+    CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM,
+    CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY,
+    CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD,
+]
 
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
@@ -70,11 +80,6 @@ class CertificateAssessmentAttemptNotReadyException(Exception):
     """Raised when the certificate question pool is no longer valid."""
 
     pass
-
-
-def _get_current_time() -> datetime.datetime:
-    """Returns the current UTC time."""
-    return datetime.datetime.utcnow()
 
 
 def _get_topic_name_to_question_ids_map(
@@ -101,16 +106,17 @@ def _get_topic_name_to_question_ids_map(
         assert topic is not None
 
         question_ids: set[str] = set()
-        skill_ids = list(topic.get_all_skill_ids())
-        skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
-        for skill_id, skill_model in zip(skill_ids, skill_models_list):
+        skill_models_list = skill_models.SkillModel.get_multi(
+            topic.get_all_skill_ids()
+        )
+        for skill_model in skill_models_list:
             if skill_model is None:
                 continue
             skill = skill_fetchers.get_skill_from_model(skill_model)
             question_ids.update(
                 link.question_id
                 for link in question_services.get_question_skill_links_of_skill(
-                    skill_id, skill.description
+                    skill_model.id, skill.description
                 )
             )
 
@@ -131,11 +137,7 @@ def _get_difficulty_counts(total_questions: int) -> Dict[str, int]:
     # then hard so the extra questions are biased toward the core mastery
     # evidence and discrimination buckets instead of over-allocating easy
     # questions.
-    cycle = [
-        CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM,
-        CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY,
-        CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD,
-    ]
+    cycle = CERTIFICATE_ASSESSMENT_DIFFICULTY_SAMPLING_ORDER
     for index in range(total_questions):
         counts[cycle[index % len(cycle)]] += 1
     return counts
@@ -317,24 +319,21 @@ def _get_topic_question_ids_by_difficulty(
 ) -> Dict[str, Dict[str, List[str]]]:
     """Returns available question ids grouped by topic and difficulty."""
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
-    topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, List[str]]] = {}
+    topic_id_to_question_ids_by_difficulty: Dict[str, Dict[str, set[str]]] = (
+        collections.defaultdict(lambda: collections.defaultdict(set))
+    )
     for topic_id, topic in zip(topic_ids, topics):
-        question_ids_by_difficulty: Dict[str, List[str]] = (
-            collections.defaultdict(list)
+        skill_models_list = skill_models.SkillModel.get_multi(
+            topic.get_all_skill_ids()
         )
-        seen_question_ids_by_difficulty: Dict[str, set[str]] = (
-            collections.defaultdict(set)
-        )
-        skill_ids = list(topic.get_all_skill_ids())
-        skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
-        for skill_id, skill_model in zip(skill_ids, skill_models_list):
+        for skill_model in skill_models_list:
             if skill_model is None:
                 continue
             skill = skill_fetchers.get_skill_from_model(skill_model)
             for (
                 question_skill_link
             ) in question_services.get_question_skill_links_of_skill(
-                skill_id, skill.description
+                skill_model.id, skill.description
             ):
                 # Add the question to every difficulty bucket that any of its
                 # linked skills produce, matching the validator's available
@@ -344,22 +343,21 @@ def _get_topic_question_ids_by_difficulty(
                 )
                 if difficulty_label is None:
                     continue
-                # Deduplicate with a set so the membership check is O(1)
-                # instead of a linear scan of the per-bucket list.
-                if (
-                    question_skill_link.question_id
-                    not in seen_question_ids_by_difficulty[difficulty_label]
-                ):
-                    seen_question_ids_by_difficulty[difficulty_label].add(
-                        question_skill_link.question_id
-                    )
-                    question_ids_by_difficulty[difficulty_label].append(
-                        question_skill_link.question_id
-                    )
-        topic_id_to_question_ids_by_difficulty[topic_id] = (
-            question_ids_by_difficulty
-        )
-    return topic_id_to_question_ids_by_difficulty
+                topic_id_to_question_ids_by_difficulty[topic_id][
+                    difficulty_label
+                ].add(question_skill_link.question_id)
+    # Iterate over topic_ids (not the defaultdict's keys) so that every topic
+    # gets an entry, even one with no question links, because _pick_questions
+    # looks each topic up directly.
+    return {
+        topic_id: {
+            difficulty_label: list(question_ids)
+            for difficulty_label, question_ids in (
+                topic_id_to_question_ids_by_difficulty.get(topic_id, {}).items()
+            )
+        }
+        for topic_id in topic_ids
+    }
 
 
 def _pick_questions(
@@ -377,11 +375,7 @@ def _pick_questions(
     for index, topic_id in enumerate(topic_ids):
         topic_share = per_topic + (1 if index < remainder else 0)
         difficulty_counts = get_required_questions_for_topic_share(topic_share)
-        for difficulty in (
-            CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM,
-            CERTIFICATE_ASSESSMENT_DIFFICULTY_EASY,
-            CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD,
-        ):
+        for difficulty in CERTIFICATE_ASSESSMENT_DIFFICULTY_SAMPLING_ORDER:
             available_question_ids = [
                 question_id
                 for question_id in topic_id_to_question_ids_by_difficulty[
@@ -456,6 +450,34 @@ def _get_active_attempt_for_learner(
             'No active certificate assessment attempt was found.'
         )
     return attempt_model
+
+
+def _get_certificate_assessment_attempt_model(
+    attempt_id: str,
+) -> gae_models.CertificateAssessmentAttemptModel:
+    """Returns the attempt model with the given ID or raises.
+
+    The underlying EntityNotFoundError includes the failing attempt ID, which
+    helps server admins debug missing attempts, so it is chained to the
+    raised error.
+
+    Args:
+        attempt_id: str. The ID of the attempt.
+
+    Returns:
+        CertificateAssessmentAttemptModel. The attempt model with the given ID.
+
+    Raises:
+        utils.ValidationError. If the attempt does not exist.
+    """
+    try:
+        return gae_models.CertificateAssessmentAttemptModel.get(
+            attempt_id, strict=True
+        )
+    except (
+        gae_models.CertificateAssessmentAttemptModel.EntityNotFoundError
+    ) as e:
+        raise utils.ValidationError('Attempt does not exist.') from e
 
 
 def _get_next_attempt_index_for_certificate(
@@ -544,7 +566,7 @@ def start_certificate_assessment_attempt(
                 ],
                 version_data,
             ),
-            started_at=_get_current_time(),
+            started_at=datetime.datetime.utcnow(),
             finished_at=None,
             is_submitted=False,
         )
@@ -605,6 +627,74 @@ def start_certificate_assessment_attempt(
     )
 
 
+def _create_responses_in_attempt_entity_group(
+    attempt_key: datastore_services.Key,
+    response_dicts: List[gae_models.CertificateAssessmentResponseCreateDict],
+) -> None:
+    """Stores the submitted responses as children of the attempt.
+
+    The responses are persisted as children of the attempt, one entity per
+    question keyed by the question ID, so the attempt and all of its responses
+    belong to a single entity group. A retried submission therefore overwrites
+    the same response entities instead of creating duplicates.
+
+    Args:
+        attempt_key: Key. The key of the attempt the responses belong to.
+        response_dicts: list(dict). The validated response dicts to store.
+    """
+    gae_models.CertificateAssessmentResponseModel.create_multi(
+        attempt_key=attempt_key, response_dicts=response_dicts
+    )
+
+
+def _build_question_response(
+    attempt_id: str,
+    question_id: str,
+    question_version: int,
+    answer: Dict[str, Union[state_domain.AcceptableCorrectAnswerTypes, bool]],
+) -> Tuple[gae_models.CertificateAssessmentResponseCreateDict, bool]:
+    """Builds and validates the stored response for one submitted question.
+
+    The learner's answer is serialized to a string before storage because the
+    response model stores selected_answer as a string: None (unanswered
+    questions) becomes an empty string, strings are kept as-is, and ints,
+    dicts and lists (the other interaction answer types) are JSON-encoded.
+    The resulting response is validated before it is returned, so malformed
+    or oversized answers never reach the Datastore.
+
+    Args:
+        attempt_id: str. The ID of the attempt being submitted.
+        question_id: str. The ID of the question.
+        question_version: int. The version of the question in the attempt.
+        answer: dict. The submitted answer dict for the question, which is
+            empty when the learner did not answer the question.
+
+    Returns:
+        tuple. A tuple containing the validated response dict and whether
+        the answer was correct.
+    """
+    selected_answer = answer.get('selected_answer')
+    is_correct = bool(answer.get('is_correct', False))
+    serialized_selected_answer = (
+        ''
+        if selected_answer is None
+        else (
+            selected_answer
+            if isinstance(selected_answer, str)
+            else json.dumps(selected_answer)
+        )
+    )
+    response = certificate_assessment_domain.CertificateAssessmentResponse(
+        attempt_id=attempt_id,
+        question_id=question_id,
+        question_version=question_version,
+        selected_answer=serialized_selected_answer,
+        is_correct=is_correct,
+    )
+    response.validate()
+    return response.to_dict(), is_correct
+
+
 def submit_certificate_assessment_attempt(
     attempt_id: str,
     answers: List[
@@ -632,11 +722,7 @@ def submit_certificate_assessment_attempt(
         utils.ValidationError. If the attempt does not exist or has already
             been submitted.
     """
-    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
-        attempt_id
-    )
-    if attempt_model is None:
-        raise utils.ValidationError('Attempt does not exist.')
+    attempt_model = _get_certificate_assessment_attempt_model(attempt_id)
 
     answers_by_question_id = {
         answer['question_id']: answer for answer in answers
@@ -652,33 +738,15 @@ def submit_certificate_assessment_attempt(
     )
     correct_count = 0
     for question_id, question_version in question_versions.items():
-        answer = answers_by_question_id.get(question_id, {})
-        selected_answer = answer.get('selected_answer')
-        is_correct = bool(answer.get('is_correct', False))
+        response_dict, is_correct = _build_question_response(
+            attempt_id,
+            question_id,
+            question_version,
+            answers_by_question_id.get(question_id, {}),
+        )
+        responses.append(response_dict)
         if is_correct:
             correct_count += 1
-        # The response model stores the answer as a string, so non-string
-        # answers (None for unanswered questions, ints, dicts and lists for
-        # the other interactions) are serialized here, before the domain
-        # object validates the stored form.
-        serialized_selected_answer = (
-            ''
-            if selected_answer is None
-            else (
-                selected_answer
-                if isinstance(selected_answer, str)
-                else json.dumps(selected_answer)
-            )
-        )
-        response = certificate_assessment_domain.CertificateAssessmentResponse(
-            attempt_id=attempt_id,
-            question_id=question_id,
-            question_version=question_version,
-            selected_answer=serialized_selected_answer,
-            is_correct=is_correct,
-        )
-        response.validate()
-        responses.append(response.to_dict())
         for topic_id in question_topic_links.get(question_id, []):
             attempt_data[topic_id]['total_related_questions'] += 1
             if is_correct:
@@ -690,11 +758,7 @@ def submit_certificate_assessment_attempt(
         # Re-fetch inside the transaction so that the submitted check and the
         # writes are atomic, and responses cannot be left behind for an
         # unsubmitted attempt.
-        attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
-            attempt_id
-        )
-        if attempt_model is None:
-            raise utils.ValidationError('Attempt does not exist.')
+        attempt_model = _get_certificate_assessment_attempt_model(attempt_id)
         if attempt_model.is_submitted:
             raise utils.ValidationError(
                 'This assessment has already been submitted.'
@@ -703,20 +767,14 @@ def submit_certificate_assessment_attempt(
             attempt_model.learner_id,
             attempt_model.certificate_id,
         )
-        # The responses are stored as children of the attempt, one entity per
-        # question keyed by the question ID, so the attempt and all of its
-        # responses belong to a single entity group and a retried submission
-        # overwrites the same entities instead of creating duplicates.
-        gae_models.CertificateAssessmentResponseModel.create_multi(
-            attempt_key=attempt_model.key, response_dicts=responses
-        )
+        _create_responses_in_attempt_entity_group(attempt_model.key, responses)
         attempt_model.attempt_data = dict(attempt_data)
         attempt_model.total_score = (
             float(correct_count) / float(len(question_versions)) * 100.0
             if question_versions
             else 0.0
         )
-        attempt_model.finished_at = _get_current_time()
+        attempt_model.finished_at = datetime.datetime.utcnow()
         attempt_model.is_submitted = True
         attempt = _attempt_model_to_domain(attempt_model)
         attempt.validate()
@@ -755,11 +813,7 @@ def get_question_state_data_for_assessment_attempt(
             to the learner, has already been submitted, or does not contain
             the requested question.
     """
-    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
-        attempt_id
-    )
-    if attempt_model is None:
-        raise utils.ValidationError('Attempt does not exist.')
+    attempt_model = _get_certificate_assessment_attempt_model(attempt_id)
     if attempt_model.learner_id != learner_id:
         raise utils.ValidationError(
             'This attempt does not belong to the current learner.'
@@ -868,16 +922,17 @@ def validate_certificate_assessment_offering(
             CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: set(),
         }
         if topic is not None:
-            skill_ids = list(topic.get_all_skill_ids())
-            skill_models_list = skill_models.SkillModel.get_multi(skill_ids)
-            for skill_id, skill_model in zip(skill_ids, skill_models_list):
+            skill_models_list = skill_models.SkillModel.get_multi(
+                topic.get_all_skill_ids()
+            )
+            for skill_model in skill_models_list:
                 if skill_model is None:
                     continue
                 skill = skill_fetchers.get_skill_from_model(skill_model)
                 for (
                     question_skill_link
                 ) in question_services.get_question_skill_links_of_skill(
-                    skill_id, skill.description
+                    skill_model.id, skill.description
                 ):
                     difficulty_label = _get_difficulty_label(
                         question_skill_link.skill_difficulty
@@ -1023,11 +1078,7 @@ def get_certificate_assessment_attempt(
     Raises:
         utils.ValidationError. If the attempt does not exist.
     """
-    attempt_model = gae_models.CertificateAssessmentAttemptModel.get_by_id(
-        attempt_id
-    )
-    if attempt_model is None:
-        raise utils.ValidationError('Attempt does not exist.')
+    attempt_model = _get_certificate_assessment_attempt_model(attempt_id)
     return _attempt_model_to_domain(attempt_model)
 
 

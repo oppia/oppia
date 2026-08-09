@@ -45,6 +45,16 @@ from core.domain import (
 
 from typing import Any, Dict, Mapping
 
+# The required fields of a certificate assessment answer. These are
+# immutable because the answer schema never changes at runtime.
+REQUIRED_CERTIFICATE_ASSESSMENT_ANSWER_KEYS = frozenset(
+    {'question_id', 'is_correct'}
+)
+# The optional field of a certificate assessment answer. When it is not
+# provided, the selected_answer defaults to None, which represents an
+# unanswered question.
+OPTIONAL_CERTIFICATE_ASSESSMENT_ANSWER_KEYS = frozenset({'selected_answer'})
+
 
 def validate_suggestion_change(
     obj: Mapping[str, change_domain.AcceptableChangeDictTypes],
@@ -250,16 +260,17 @@ def validate_certificate_assessment_answer(
     if not isinstance(answer_dict, dict):
         raise Exception('Expected dict, received %s' % answer_dict)
 
-    expected_keys = ['question_id', 'is_correct']
-    missing_keys = list(sorted(set(expected_keys) - set(answer_dict.keys())))
-    extra_keys = list(
-        sorted(
-            set(answer_dict.keys()) - set(expected_keys) - {'selected_answer'}
-        )
+    expected_keys = REQUIRED_CERTIFICATE_ASSESSMENT_ANSWER_KEYS
+    missing_keys = expected_keys - set(answer_dict.keys())
+    extra_keys = (
+        set(answer_dict.keys())
+        - expected_keys
+        - OPTIONAL_CERTIFICATE_ASSESSMENT_ANSWER_KEYS
     )
     if missing_keys or extra_keys:
         raise Exception(
-            'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys)
+            'Missing keys: %s, Extra keys: %s'
+            % (sorted(missing_keys), sorted(extra_keys))
         )
 
     question_id = answer_dict['question_id']

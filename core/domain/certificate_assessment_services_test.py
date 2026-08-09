@@ -380,12 +380,16 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             'skill_unclassified',
         ]
         skill_1 = mock.Mock()
+        skill_1.id = 'skill_1'
         skill_1.description = 'Skill 1 description'
         skill_2 = mock.Mock()
+        skill_2.id = 'skill_2'
         skill_2.description = 'Skill 2 description'
         skill_3 = mock.Mock()
+        skill_3.id = 'skill_3'
         skill_3.description = 'Skill 3 description'
         skill_unclassified = mock.Mock()
+        skill_unclassified.id = 'skill_unclassified'
         skill_unclassified.description = 'Skill unclassified description'
         skill_1_links = [mock.Mock(question_id='q_1', skill_difficulty=0.6)]
         skill_2_links = [mock.Mock(question_id='q_1', skill_difficulty=0.3)]
@@ -436,7 +440,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             result['topic_1'][CERTIFICATE_DIFFICULTY_EASY], ['q_1']
         )
-        self.assertEqual(result['topic_1'][CERTIFICATE_DIFFICULTY_HARD], [])
+        self.assertEqual(
+            result['topic_1'].get(CERTIFICATE_DIFFICULTY_HARD, []), []
+        )
 
     def test_build_version_data_includes_certificate_and_topic_versions(
         self,
@@ -1143,16 +1149,21 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
 
         missing_attempt_calls = {'count': 0}
 
-        def _get_by_id_returns_missing(_: str) -> mock.Mock | None:
+        def _get_returns_missing(
+            attempt_id: str, **unused_kwargs: object
+        ) -> mock.Mock:
             missing_attempt_calls['count'] += 1
             if missing_attempt_calls['count'] == 1:
                 return valid_model
-            return None
+            raise gae_models.CertificateAssessmentAttemptModel.EntityNotFoundError(
+                'Entity for class CertificateAssessmentAttemptModel with id '
+                '%s not found' % attempt_id
+            )
 
         with mock.patch.object(
             gae_models.CertificateAssessmentAttemptModel,
-            'get_by_id',
-            side_effect=_get_by_id_returns_missing,
+            'get',
+            side_effect=_get_returns_missing,
         ), self.assertRaisesRegex(
             utils.ValidationError,
             'Attempt does not exist.',
@@ -1164,7 +1175,9 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
 
         already_submitted_calls = {'count': 0}
 
-        def _get_by_id_returns_submitted(_: str) -> mock.Mock:
+        def _get_returns_submitted(
+            unused_attempt_id: str, **unused_kwargs: object
+        ) -> mock.Mock:
             already_submitted_calls['count'] += 1
             if already_submitted_calls['count'] == 1:
                 return valid_model
@@ -1172,8 +1185,8 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
 
         with mock.patch.object(
             gae_models.CertificateAssessmentAttemptModel,
-            'get_by_id',
-            side_effect=_get_by_id_returns_submitted,
+            'get',
+            side_effect=_get_returns_submitted,
         ), self.assertRaisesRegex(
             utils.ValidationError,
             'This assessment has already been submitted.',
@@ -1244,6 +1257,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
             topic_objects[topic_id] = topic
             for skill_id, question_ids in skill_to_question_ids.items():
                 skill = mock.Mock()
+                skill.id = skill_id
                 skill.description = '%s description' % skill_id
                 skill_objects[skill_id] = skill
                 question_link_map[skill_id] = [
@@ -1887,6 +1901,10 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         topic.get_all_skill_ids.return_value = ['skill_1', 'skill_2']
         skill = mock.Mock()
         skill.description = 'Skill description'
+        skill_model_1 = mock.Mock()
+        skill_model_1.id = 'skill_1'
+        skill_model_2 = mock.Mock()
+        skill_model_2.id = 'skill_2'
 
         with mock.patch.object(
             topic_fetchers,
@@ -1895,7 +1913,7 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         ) as get_topics_by_ids, mock.patch.object(
             skill_models.SkillModel,
             'get_multi',
-            return_value=[mock.Mock(), mock.Mock()],
+            return_value=[skill_model_1, skill_model_2],
         ) as get_multi_mock, mock.patch.object(
             skill_fetchers,
             'get_skill_from_model',
