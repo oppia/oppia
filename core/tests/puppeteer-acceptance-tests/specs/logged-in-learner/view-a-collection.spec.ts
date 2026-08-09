@@ -42,10 +42,10 @@ describe('Logged-in Learner', function () {
       'exploration_creator_lo13@example.com'
     );
 
-    // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+    // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
     // once fixed, allow testing for mobile viewport.
     if (explorationCreator.isViewportAtMobileWidth()) {
-      showMessage('Skipping the test, TODO #26642');
+      showMessage('Skipping the test, check issue #26642');
       return;
     }
 
@@ -116,10 +116,10 @@ describe('Logged-in Learner', function () {
   it(
     'should be able to play a collection',
     async function () {
-      // TODO #26642: Currently, the "Save Draft" button in collection editor isn't visible
+      // TODO (#26642): Currently, the "Save Draft" button in collection editor isn't visible
       // once fixed, allow testing for mobile viewport.
       if (explorationCreator.isViewportAtMobileWidth()) {
-        showMessage('Skipping the test, TODO #26642');
+        showMessage('Skipping the test, check issue #26642');
         return;
       }
       // Navigate to community library via the "Learn" navbar.
