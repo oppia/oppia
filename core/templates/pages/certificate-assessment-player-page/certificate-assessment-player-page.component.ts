@@ -134,12 +134,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
 
   submitAssessment(): void {
     const attemptId = `attempt-${Date.now()}`;
-    this.router.navigate([
-      '/certificate-assessment',
-      this.certificateId,
-      'result',
-      attemptId,
-    ]);
+    this.router.navigate(['/certificate-assessment-result', attemptId]);
   }
 
   getProgressPercentage(): number {

@@ -72,13 +72,16 @@ interface GetAvailableCertificateOfferingsForClassroomBackendResponse {
   available_certificate_offerings: AvailableCertificateAssessmentOfferingBackendDict[];
 }
 interface CertificateAssessmentTopicScoreBackendDict {
+  topic_name: string;
   total_related_questions: number;
   total_correct_questions: number;
 }
 
 interface GetCertificateAssessmentResultBackendResponse {
+  certificate_id: string;
   title: string;
   total_score: number;
+  time_taken_in_minutes: number | null;
   attempt_data: {[topicId: string]: CertificateAssessmentTopicScoreBackendDict};
   is_submitted: boolean;
 }

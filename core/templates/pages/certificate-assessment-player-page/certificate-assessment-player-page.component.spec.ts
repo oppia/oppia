@@ -112,9 +112,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.submitAssessment();
 
     expect(router.navigate).toHaveBeenCalledWith([
-      '/certificate-assessment',
-      'cert-123',
-      'result',
+      '/certificate-assessment-result',
       'attempt-1234',
     ]);
   });

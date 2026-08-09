@@ -17,18 +17,19 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AssessmentResultTopicWiseBreakdown} from './assessment-result-topic-wise-breakdown.component';
 
-// TODO(#24717-M1.17): Confirm the real result-endpoint contract. Until then we
-// assume the backend returns `scorePercentage` and derive `passed` from a
-// 70% threshold, rather than trusting an (unconfirmed) `passed` field.
+// The backend result response does not expose a pass/fail flag, so the pass
+// state is derived from the total score using a 70% threshold.
 const PASSING_SCORE_THRESHOLD = 70;
 
 interface AssessmentResult {
   certificateName: string;
   scorePercentage: number;
   topicBreakdown: AssessmentResultTopicWiseBreakdown[];
-  timeTakenMinutes: number;
+  timeTakenMinutes: number | null;
 }
 
 @Component({
@@ -40,13 +41,38 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
   @Input() attemptId = '';
 
   result: AssessmentResult | null = null;
+  certificateId = '';
   isLoading = true;
 
+  constructor(
+    private router: Router,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService
+  ) {}
+
   ngOnInit(): void {
-    // TODO(#24717-M1.17): Replace this mock with the real assessment result
-    // backend response keyed on this.attemptId after the API is wired up.
-    this.result = this.getMockResult();
-    this.isLoading = false;
+    this.certificateAssessmentOfferingBackendApiService
+      .getCertificateAssessmentResultAsync(this.attemptId)
+      .then(resultData => {
+        this.certificateId = resultData.certificate_id;
+        this.result = {
+          certificateName: resultData.title,
+          scorePercentage: resultData.total_score,
+          topicBreakdown: Object.entries(resultData.attempt_data).map(
+            ([topicId, topicStats]) => ({
+              topicName: topicStats.topic_name,
+              scorePercentage: this.getTopicScorePercentage(
+                topicStats.total_related_questions,
+                topicStats.total_correct_questions
+              ),
+            })
+          ),
+          timeTakenMinutes: resultData.time_taken_in_minutes,
+        };
+        this.isLoading = false;
+      })
+      .catch(() => {
+        this.isLoading = false;
+      });
   }
 
   get passed(): boolean {
@@ -57,24 +83,20 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
   }
 
   onRetryAssessment(): void {
-    // TODO(#24717-M1.17): Navigate back into the assessment retry flow.
+    this.router.navigate([
+      '/certificate-assessment',
+      this.certificateId,
+      'session',
+    ]);
   }
 
-  private getMockResult(): AssessmentResult {
-    // Keep a single stub result until the backend endpoint returns persisted
-    // attempt data for this page.
-    const MOCK_FAILED_RESULT: AssessmentResult = {
-      certificateName: 'Everyday Arithmetic & Number Confidence',
-      scorePercentage: 50,
-      topicBreakdown: [
-        {topicName: 'Place Values', scorePercentage: 48},
-        {topicName: 'Addition & Subtraction', scorePercentage: 55},
-        {topicName: 'Multiplication', scorePercentage: 65},
-        {topicName: 'Division', scorePercentage: 33},
-      ],
-      timeTakenMinutes: 48,
-    };
-
-    return MOCK_FAILED_RESULT;
+  private getTopicScorePercentage(
+    totalRelatedQuestions: number,
+    totalCorrectQuestions: number
+  ): number {
+    if (totalRelatedQuestions === 0) {
+      return 0;
+    }
+    return Math.round((totalCorrectQuestions / totalRelatedQuestions) * 100);
   }
 }

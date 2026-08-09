@@ -1,4 +1,9 @@
 <div class="certificate-assessment-page-container position-relative">
+  <oppia-titled-background-banner [title]="'I18N_CERTIFICATE_ASSESSMENT'"
+                                  [buttonText]="'I18N_CERTIFICATE_ASSESSMENT_EXIT_BUTTON'"
+                                  [buttonRoute]="['/learner-dashboard']">
+  </oppia-titled-background-banner>
+
   <div class="result-card" [ngClass]="{ 'result-card--failed': !passed }"
        *ngIf="!isLoading && result">
     <h1 class="result-card-heading">
@@ -44,10 +49,10 @@
           [topicBreakdown]="result.topicBreakdown">
         </oppia-assessment-result-topic-wise-breakdown>
 
-        <p class="result-card-time-taken">
+        <p class="result-card-time-taken" *ngIf="result?.timeTakenMinutes !== null">
           <i class="fas fa-history" aria-hidden="true"></i>
           <strong>{{ 'I18N_CERTIFICATE_ASSESSMENT_RESULT_TIME_TAKEN_LABEL' | translate }}</strong>:
-          {{ result.timeTakenMinutes }} minutes
+          {{ result?.timeTakenMinutes }} minutes
         </p>
       </div>
     </div>

@@ -20,7 +20,7 @@ import datetime
 
 from core import feconf, utils
 from core.controllers import acl_decorators, base
-from core.domain import certificate_assessment_services
+from core.domain import certificate_assessment_services, topic_fetchers
 
 from typing import Dict, List, TypedDict
 
@@ -565,11 +565,32 @@ class CertificateAssessmentResultHandler(
             certificate_assessment_services.CertificateAssessmentOfferingNotFoundException
         ) as e:
             raise self.NotFoundException(str(e)) from e
+        topics = topic_fetchers.get_topics_by_ids(
+            list(attempt.attempt_data.keys())
+        )
+        topic_names_by_id = {
+            topic.id: topic.name for topic in topics if topic is not None
+        }
+        # Here we use object because attempt_data values are heterogeneous
+        # payloads mixing strings and integers.
+        attempt_data: Dict[str, Dict[str, object]] = {}
+        for topic_id, topic_stats in attempt.attempt_data.items():
+            attempt_data[topic_id] = {
+                'topic_name': topic_names_by_id.get(topic_id, topic_id),
+                'total_related_questions': topic_stats[
+                    'total_related_questions'
+                ],
+                'total_correct_questions': topic_stats[
+                    'total_correct_questions'
+                ],
+            }
         self.render_json(
             {
+                'certificate_id': certificate_offering.certificate_id,
                 'title': certificate_offering.title,
                 'total_score': attempt.total_score,
-                'attempt_data': attempt.attempt_data,
+                'time_taken_in_minutes': attempt.get_time_taken_in_minutes(),
+                'attempt_data': attempt_data,
                 'is_submitted': attempt.is_submitted,
             }
         )

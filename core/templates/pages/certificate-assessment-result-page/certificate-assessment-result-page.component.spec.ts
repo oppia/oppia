@@ -18,6 +18,8 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
+import {Router} from '@angular/router';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
@@ -26,14 +28,46 @@ import {CertificateAssessmentResultPageComponent} from './certificate-assessment
 describe('CertificateAssessmentResultPageComponent', () => {
   let component: CertificateAssessmentResultPageComponent;
   let fixture: ComponentFixture<CertificateAssessmentResultPageComponent>;
+  let backendApiServiceSpy: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    backendApiServiceSpy = jasmine.createSpyObj(
+      'CertificateAssessmentOfferingBackendApiService',
+      ['getCertificateAssessmentResultAsync']
+    );
+    backendApiServiceSpy.getCertificateAssessmentResultAsync.and.returnValue(
+      Promise.resolve({
+        certificate_id: 'cert-1',
+        title: 'Test Certificate',
+        total_score: 80,
+        time_taken_in_minutes: 20,
+        attempt_data: {
+          topic_1: {
+            topic_name: 'Place Values',
+            total_related_questions: 5,
+            total_correct_questions: 4,
+          },
+        },
+        is_submitted: true,
+      })
+    );
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    routerSpy.navigate.and.returnValue(Promise.resolve(true));
+
     await TestBed.configureTestingModule({
       declarations: [
         CertificateAssessmentResultPageComponent,
         CertificateAssessmentResultCardComponent,
         AssessmentResultTopicWiseBreakdownComponent,
         MockTranslatePipe,
+      ],
+      providers: [
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: backendApiServiceSpy,
+        },
+        {provide: Router, useValue: routerSpy},
       ],
     }).compileComponents();
 

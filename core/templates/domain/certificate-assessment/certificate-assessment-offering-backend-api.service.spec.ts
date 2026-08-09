@@ -888,10 +888,13 @@ describe('Certificate Assessment Offering backend api service', () => {
     );
     expect(req.request.method).toEqual('GET');
     req.flush({
+      certificate_id: 'mock_certificate_id',
       title: 'Everyday Arithmetic & Number Confidence',
       total_score: 80,
+      time_taken_in_minutes: 35,
       attempt_data: {
         dummy_topic_id: {
+          topic_name: 'Place Values',
           total_related_questions: 5,
           total_correct_questions: 4,
         },
@@ -902,10 +905,13 @@ describe('Certificate Assessment Offering backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
+      certificate_id: 'mock_certificate_id',
       title: 'Everyday Arithmetic & Number Confidence',
       total_score: 80,
+      time_taken_in_minutes: 35,
       attempt_data: {
         dummy_topic_id: {
+          topic_name: 'Place Values',
           total_related_questions: 5,
           total_correct_questions: 4,
         },
