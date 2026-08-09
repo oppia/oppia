@@ -2812,6 +2812,52 @@ export default {
       "x",
       "y"
     ],
+    "foreignobject": [
+      "class",
+      "clip-path",
+      "color",
+      "direction",
+      "display",
+      "fill",
+      "filter",
+      "font-family",
+      "font-size",
+      "font-style",
+      "font-weight",
+      "height",
+      "id",
+      "opacity",
+      "stroke",
+      "style",
+      "transform",
+      "visibility",
+      "width",
+      "x",
+      "y"
+    ],
+    "foreignObject": [
+      "class",
+      "clip-path",
+      "color",
+      "direction",
+      "display",
+      "fill",
+      "filter",
+      "font-family",
+      "font-size",
+      "font-style",
+      "font-weight",
+      "height",
+      "id",
+      "opacity",
+      "stroke",
+      "style",
+      "transform",
+      "visibility",
+      "width",
+      "x",
+      "y"
+    ],
     "font": [
       "about",
       "alignment-baseline",
@@ -4212,6 +4258,18 @@ export default {
       "writing-mode",
       "x",
       "y"
+    ],
+    "span": [
+      "class",
+      "color",
+      "direction",
+      "display",
+      "font-family",
+      "font-size",
+      "font-style",
+      "font-weight",
+      "id",
+      "style"
     ],
     "stop": [
       "about",
@@ -6876,6 +6934,24 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Take a certificate assessment in Oppia and review what you have learned in your classroom."
+        }
+      ]
+    },
+    "CERTIFICATE_ASSESSMENT_RESULT": {
+      "ROUTE": "certificate-assessment-result/:attempt_id",
+      "TITLE": "Certificate Assessment Result | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "View the result of a certificate assessment attempt in Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "View the result of a certificate assessment attempt in Oppia."
         }
       ]
     },

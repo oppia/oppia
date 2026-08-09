@@ -25,8 +25,9 @@ import {CertificateAssessmentPlayerPageComponent} from './certificate-assessment
 import {AssessmentIntroductionCardComponent} from './assessment-introduction-card.component';
 import {AssessmentInstructionPanelComponent} from './assessment-instruction-panel.component';
 import {CertificateAssessmentConversationSkinComponent} from './certificate-assessment-conversation-skin.component';
-import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment-player-page-auth.guard';
+import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -43,12 +44,8 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
         component: CertificateAssessmentPlayerPageRootComponent,
         canActivate: [CertificateAssessmentPlayerPageAuthGuard],
       },
-      {
-        path: 'result/:attempt_id',
-        component: CertificateAssessmentPlayerPageRootComponent,
-        canActivate: [CertificateAssessmentPlayerPageAuthGuard],
-      },
     ]),
+    TranslateModule,
   ],
   declarations: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -56,7 +53,7 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
+    CertificateAssessmentTitledBackgroundBannerComponent,
   ],
   entryComponents: [
     CertificateAssessmentPlayerPageRootComponent,
@@ -64,7 +61,7 @@ import {CertificateAssessmentPlayerPageAuthGuard} from './certificate-assessment
     AssessmentIntroductionCardComponent,
     AssessmentInstructionPanelComponent,
     CertificateAssessmentConversationSkinComponent,
-    CertificateAssessmentResultCardComponent,
+    CertificateAssessmentTitledBackgroundBannerComponent,
   ],
 })
 export class CertificateAssessmentPlayerPageModule {}

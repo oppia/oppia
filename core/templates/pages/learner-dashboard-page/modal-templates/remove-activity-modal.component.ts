@@ -69,11 +69,6 @@ export class RemoveActivityModalComponent implements OnInit {
     let removeActivityUrlPrefix = '';
     if (
       this.sectionNameI18nId ===
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST
-    ) {
-      removeActivityUrlPrefix = '/learnerplaylistactivityhandler/';
-    } else if (
-      this.sectionNameI18nId ===
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .INCOMPLETE
     ) {

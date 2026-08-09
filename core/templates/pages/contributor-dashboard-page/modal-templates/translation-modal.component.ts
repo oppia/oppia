@@ -57,8 +57,16 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import './translation-modal.component.css';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
+const EXPLORATION_TITLE_CONTENT_ID = 'exploration_title';
+const EXPLORATION_TITLE_CHAR_LIMIT = 36;
+const CONTENT_TYPE_METADATA = 'metadata';
+const EXPLORATION_OBJECTIVE_CONTENT_ID = 'exploration_objective';
+const EXPLORATION_CATEGORY_CONTENT_ID = 'exploration_category';
+const EXPLORATION_TAG_CONTENT_ID_PREFIX = 'exploration_tag_';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -106,6 +114,7 @@ export interface ImageDetails {
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html',
+  styleUrls: ['./translation-modal.component.css'],
 })
 export class TranslationModalComponent {
   // These properties below are initialized using Angular lifecycle hooks
@@ -147,6 +156,8 @@ export class TranslationModalComponent {
   hasImgCopyError: boolean = false;
   hasImgTextError: boolean = false;
   hasIncompleteTranslationError: boolean = false;
+  hasLengthValidationError: boolean = false;
+  lengthValidationErrorMessage: string = '';
   editorIsShown: boolean = true;
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
@@ -250,7 +261,8 @@ export class TranslationModalComponent {
         this.modifyTranslationOpportunity.contentId.split('_')[0];
       this.activeContentType = this.getFormattedContentType(
         contentType,
-        this.modifyTranslationOpportunity.interactionId
+        this.modifyTranslationOpportunity.interactionId,
+        this.modifyTranslationOpportunity.contentId
       );
       this.activeWrittenTranslation =
         this.modifyTranslationOpportunity.currentContentTranslation.translation;
@@ -408,7 +420,8 @@ export class TranslationModalComponent {
     const {contentType, ruleType, interactionId} = translatableItem;
     this.activeContentType = this.getFormattedContentType(
       contentType,
-      interactionId
+      interactionId,
+      this.translateTextService.activeContentId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType,
@@ -508,10 +521,25 @@ export class TranslationModalComponent {
 
   getFormattedContentType(
     contentType?: string,
-    interactionId?: string | null
+    interactionId?: string | null,
+    contentId?: string | null
   ): string {
     if (!contentType) {
       return '';
+    }
+    if (contentType === CONTENT_TYPE_METADATA && contentId) {
+      if (contentId === EXPLORATION_TITLE_CONTENT_ID) {
+        return 'title';
+      }
+      if (contentId === EXPLORATION_OBJECTIVE_CONTENT_ID) {
+        return 'objective';
+      }
+      if (contentId === EXPLORATION_CATEGORY_CONTENT_ID) {
+        return 'category';
+      }
+      if (contentId.startsWith(EXPLORATION_TAG_CONTENT_ID_PREFIX)) {
+        return 'tag';
+      }
     }
     switch (contentType) {
       case 'interaction':
@@ -563,7 +591,11 @@ export class TranslationModalComponent {
   }
 
   hasSubmitValidationErrors(): boolean {
-    return this.hasImgTextError || this.hasIncompleteTranslationError;
+    return (
+      this.hasImgTextError ||
+      this.hasIncompleteTranslationError ||
+      this.hasLengthValidationError
+    );
   }
 
   suggestTranslatedText(): void {
@@ -626,6 +658,7 @@ export class TranslationModalComponent {
     ) {
       this.hasImgTextError = false;
       this.hasIncompleteTranslationError = false;
+      this.hasLengthValidationError = false;
       return;
     }
 
@@ -640,6 +673,18 @@ export class TranslationModalComponent {
       translationError.hasDuplicateDescriptions;
     this.hasIncompleteTranslationError =
       translationError.hasUntranslatedElements;
+
+    this.hasLengthValidationError = false;
+    this.lengthValidationErrorMessage = '';
+    const activeContentId = this.translateTextService.activeContentId;
+    if (activeContentId === EXPLORATION_TITLE_CONTENT_ID) {
+      if (this.activeWrittenTranslation.length > EXPLORATION_TITLE_CHAR_LIMIT) {
+        this.hasLengthValidationError = true;
+        this.lengthValidationErrorMessage =
+          'Translation exceeds the allowed character limit. The translation ' +
+          `for the above content must be ${EXPLORATION_TITLE_CHAR_LIMIT} characters or fewer.`;
+      }
+    }
   }
 
   private closeWithoutUnsavedCheck(): void {
