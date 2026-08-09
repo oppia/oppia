@@ -18,27 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-
-export type AssessmentQuestionType =
-  | 'multiple_choice'
-  | 'multiple_select'
-  | 'text_input'
-  | 'numeric_input';
-
-export interface AssessmentQuestionOption {
-  id: string;
-  text: string;
-}
-
-export interface AssessmentQuestion {
-  id: string;
-  type: AssessmentQuestionType;
-  prompt: string;
-  hint: string;
-  options: AssessmentQuestionOption[];
-  placeholder?: string;
-  correctAnswerText: string;
-}
+import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
 
 @Component({
   selector: 'certificate-assessment-player-page',

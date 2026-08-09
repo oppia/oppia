@@ -18,15 +18,26 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Router} from '@angular/router';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
 
 describe('MyCertificatesTabComponent', () => {
   let component: MyCertificatesTabComponent;
   let fixture: ComponentFixture<MyCertificatesTabComponent>;
+  let router: Router;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MyCertificatesTabComponent],
+      imports: [CommonModule],
+      declarations: [MyCertificatesTabComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: Router,
+          useValue: jasmine.createSpyObj('Router', ['navigateByUrl']),
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -34,10 +45,70 @@ describe('MyCertificatesTabComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MyCertificatesTabComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should display all stub attempts by default', () => {
+    expect(component.filteredAttempts.length).toBe(3);
+    expect(component.filteredAttempts[0].attempt_id).toBe('stub_attempt_id_1');
+  });
+
+  it('should filter attempts by passed status', () => {
+    component.selectedFilter = 'passed';
+    expect(component.filteredAttempts.length).toBe(2);
+    expect(
+      component.filteredAttempts.every(attempt => component.isPassed(attempt))
+    ).toBeTrue();
+  });
+
+  it('should filter attempts by not passed status', () => {
+    component.selectedFilter = 'not_passed';
+    expect(component.filteredAttempts.length).toBe(1);
+    expect(component.isPassed(component.filteredAttempts[0])).toBeFalse();
+  });
+
+  it('should update the selected filter on filter change', () => {
+    const selectElement = fixture.nativeElement.querySelector(
+      '#certificate-attempt-status-filter'
+    );
+    selectElement.value = 'passed';
+    selectElement.dispatchEvent(new Event('change'));
+    expect(component.selectedFilter).toBe('passed');
+  });
+
+  it('should derive the passed status from the score threshold', () => {
+    expect(component.isPassed(component.certificateAttempts[0])).toBeTrue();
+    expect(component.isPassed(component.certificateAttempts[2])).toBeFalse();
+  });
+
+  it('should map classroom ids to subject names', () => {
+    expect(component.getSubject('math')).toBe(
+      'I18N_LIBRARY_CATEGORIES_MATHEMATICS'
+    );
+    expect(component.getSubject('science')).toBe(
+      'I18N_LIBRARY_CATEGORIES_SCIENCE'
+    );
+    expect(component.getSubject('unknown_id')).toBe('unknown_id');
+  });
+
+  it('should derive the status label i18n keys from the score', () => {
+    expect(component.getStatusLabel(component.certificateAttempts[0])).toBe(
+      'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED'
+    );
+    expect(component.getStatusLabel(component.certificateAttempts[2])).toBe(
+      'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED'
+    );
+  });
+
+  it('should navigate to the result page for the clicked attempt', () => {
+    component.navigateToResultPage('stub_attempt_id_1');
+    expect(router.navigateByUrl).toHaveBeenCalledWith(
+      'certificate-assessment-result/stub_attempt_id_1'
+    );
   });
 });

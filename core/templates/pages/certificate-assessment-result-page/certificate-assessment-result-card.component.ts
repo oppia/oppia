@@ -17,19 +17,12 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {AssessmentResultTopicWiseBreakdown} from './assessment-result-topic-wise-breakdown.component';
+import {AssessmentResult} from 'domain/certificate-assessment/certificate-assessment.model';
 
 // TODO(#24717-M1.17): Confirm the real result-endpoint contract. Until then we
 // assume the backend returns `scorePercentage` and derive `passed` from a
 // 70% threshold, rather than trusting an (unconfirmed) `passed` field.
 const PASSING_SCORE_THRESHOLD = 70;
-
-interface AssessmentResult {
-  certificateName: string;
-  scorePercentage: number;
-  topicBreakdown: AssessmentResultTopicWiseBreakdown[];
-  timeTakenMinutes: number;
-}
 
 @Component({
   selector: 'oppia-certificate-assessment-result-card-page',

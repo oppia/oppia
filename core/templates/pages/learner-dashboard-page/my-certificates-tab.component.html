@@ -1,2 +1,47 @@
-<!-- TODO(#24717-M2.12): This is a skeleton component created to establish the flow so that other PRs can be developed in parallel. The UI will be implemented in a future PR. -->
-<h1>My Certificates</h1>
+<!-- TODO(#24717-M2.17): This UI is rendered from stub data and will be wired to the certificate assessment attempts handler in a future PR. -->
+<div class="my-certificates-tab">
+  <div class="my-certificates-filter">
+    <div class="my-certificates-filter-select-container">
+      <select id="certificate-attempt-status-filter"
+              class="my-certificates-filter-select"
+              (change)="onFilterChange($event)">
+        <option value="all">{{ 'I18N_LEARNER_DASHBOARD_ALL' | translate }}</option>
+        <option value="passed">
+          {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED' | translate }}
+        </option>
+        <option value="not_passed">
+          {{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED' | translate }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <table class="certificates-table">
+    <thead>
+      <tr>
+        <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_CERTIFICATE_HEADING' | translate }}</th>
+        <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_SUBJECT_HEADING' | translate }}</th>
+        <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_ATTEMPT_HEADING' | translate }}</th>
+        <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_SCORE_HEADING' | translate }}</th>
+        <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_STATUS_HEADING' | translate }}</th>
+        <th>{{ 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_TABLE_DATE_HEADING' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let attempt of filteredAttempts"
+          class="certificates-table-row"
+          (click)="navigateToResultPage(attempt.attempt_id)">
+        <td class="certificate-title-cell">{{ attempt.title }}</td>
+        <td class="subject-cell">{{ getSubject(attempt.classroom_id) | translate }}</td>
+        <td class="attempt-cell">{{ attempt.attempt_index }}</td>
+        <td class="score-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
+          {{ attempt.total_score }}%
+        </td>
+        <td class="status-cell" [ngClass]="isPassed(attempt) ? 'is-passed' : 'is-not-passed'">
+          {{ getStatusLabel(attempt) | translate }}
+        </td>
+        <td class="date-cell">{{ attempt.started_at | date: 'MMM d, y' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

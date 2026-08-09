@@ -18,11 +18,7 @@
  */
 
 import {Component, Input} from '@angular/core';
-
-export interface AssessmentResultTopicWiseBreakdown {
-  topicName: string;
-  scorePercentage: number;
-}
+import {AssessmentResultTopicWiseBreakdown} from 'domain/certificate-assessment/certificate-assessment.model';
 
 @Component({
   selector: 'oppia-assessment-result-topic-wise-breakdown',
