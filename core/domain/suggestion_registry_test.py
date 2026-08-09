@@ -1128,8 +1128,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date,
         )
 
-        # conversion_fn wraps html with div
+        # Conversion_fn wraps html with div.
         def conversion_fn(html: str) -> str:
+
             return '<div>%s</div>' % html
 
         suggestion.convert_html_in_suggestion_change(conversion_fn)

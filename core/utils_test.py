@@ -29,7 +29,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.tests import test_utils
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Iterator, List, Tuple, Union
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -801,7 +801,7 @@ class UtilsTests(test_utils.GenericTestBase):
         filename = 'filename.svg'
         utils.require_valid_thumbnail_filename(filename)
 
-        # Passing None should not raise an exception.
+        # Here we use MyPy ignore because None is intentionally passed to test function behavior.
         utils.require_valid_thumbnail_filename(None)  # type: ignore[arg-type]
 
     def _assert_valid_image_filename(
@@ -840,7 +840,7 @@ class UtilsTests(test_utils.GenericTestBase):
         filename = 'filename.svg'
         utils.require_valid_image_filename(filename)
 
-        # Passing None should not raise an exception.
+        # Here we use MyPy ignore because None is intentionally passed to test function behavior.
         utils.require_valid_image_filename(None)  # type: ignore[arg-type]
 
     def test_get_time_in_millisecs(self) -> None:
@@ -1158,9 +1158,10 @@ class UtilsTests(test_utils.GenericTestBase):
 
         yaml_content = 'name: Test'
 
-        def mock_get_file_contents(
+        def mock_get_file_contents(  # pylint: disable=unused-argument
             filepath: str, raw_bytes: bool = False, mode: str = 'r'
         ) -> Union[str, bytes]:
+
             if filepath.endswith('.yaml'):
                 return yaml_content
             return b'image_data'

@@ -342,9 +342,13 @@ def create_suggestion(
             e.value for e in feconf.TranslatableEntityType
         ]
         if target_type in translatable_entity_types:
-            target_entity = opportunity_services.get_entity_by_type_and_id(
-                target_type, target_id
-            )
+            try:
+                target_entity = opportunity_services.get_entity_by_type_and_id(
+                    target_type, target_id
+                )
+            except Exception:
+                target_entity = None
+
             if target_entity is not None:
                 entity_translation = (
                     translation_fetchers.get_entity_translation(

@@ -33,7 +33,7 @@ if MYPY:  # pragma: no cover
     from core.domain import change_domain  # pylint: disable=invalid-import
     from mypy_imports import base_models, suggestion_models
 
-(base_models, suggestion_models, user_models) = models.Registry.import_models(
+base_models, suggestion_models, user_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER]
 )
 
@@ -851,7 +851,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
         # Test passing target_type.
-        suggestions, offset_2 = (
+        suggestions, _ = (
             suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_with_exp_ids_by_offset(
                 limit,
                 0,
@@ -862,6 +862,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
             )
         )
+
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(suggestions[0].target_id, 'exp1')
 
@@ -1122,7 +1123,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 2)
 
         # Test passing target_type.
-        results, offset_2 = (
+        results, _ = (
             suggestion_models.GeneralSuggestionModel.get_in_review_translation_suggestions_by_offset(
                 limit=None,
                 offset=0,
@@ -1132,6 +1133,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
             )
         )
+
         assert results is not None
         self.assertEqual(len(results), 2)
 
