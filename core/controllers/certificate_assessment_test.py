@@ -46,6 +46,7 @@ def _create_attempt_model(
     total_score: float,
     attempt_index: int,
     started_at: Optional[datetime.datetime] = None,
+    finished_at: Optional[datetime.datetime] = None,
     is_submitted: bool = True,
 ) -> certificate_assessment_offering_models.CertificateAssessmentAttemptModel:
     """Creates and returns a certificate assessment attempt model.
@@ -57,6 +58,7 @@ def _create_attempt_model(
         total_score: float. The total score achieved in the attempt.
         attempt_index: int. The index of the attempt for the learner.
         started_at: datetime.datetime|None. When the attempt was started.
+        finished_at: datetime.datetime|None. When the attempt was finished.
         is_submitted: bool. Whether the attempt has been submitted.
 
     Returns:
@@ -86,7 +88,7 @@ def _create_attempt_model(
             if started_at is not None
             else datetime.datetime(2026, 7, 18)
         ),
-        finished_at=None,
+        finished_at=finished_at,
         is_submitted=is_submitted,
     )
 
@@ -598,16 +600,70 @@ class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response,
             {
+                'certificate_id': self.certificate_offering.certificate_id,
                 'title': 'Everyday Arithmetic & Number Confidence',
                 'total_score': 80.0,
+                'time_taken_in_minutes': None,
                 'attempt_data': {
                     'topic_place_values': {
+                        'topic_name': 'topic_place_values',
                         'total_related_questions': 5,
                         'total_correct_questions': 4,
                     },
                 },
                 'is_submitted': True,
             },
+        )
+        self.logout()
+
+    def test_get_returns_time_taken_for_finished_attempt(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        finished_attempt = _create_attempt_model(
+            self.learner_id,
+            self.certificate_offering.certificate_id,
+            80.0,
+            1,
+            started_at=datetime.datetime(2026, 7, 18, 10, 0),
+            finished_at=datetime.datetime(2026, 7, 18, 10, 35),
+        )
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', finished_attempt.id
+            )
+        )
+        self.assertEqual(response['time_taken_in_minutes'], 35)
+        self.logout()
+
+    def test_get_returns_topic_name_from_fetched_topic(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.OWNER_EMAIL,
+            name='Place Values',
+            abbreviated_name='place_values',
+        )
+        attempt_with_topic = _create_attempt_model(
+            self.learner_id,
+            self.certificate_offering.certificate_id,
+            80.0,
+            2,
+        )
+        attempt_with_topic.attempt_data = {
+            topic_id: {
+                'total_related_questions': 5,
+                'total_correct_questions': 4,
+            }
+        }
+        attempt_with_topic.update_timestamps()
+        attempt_with_topic.put()
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_RESULT_HANDLER.replace(
+                '<attempt_id>', attempt_with_topic.id
+            )
+        )
+        self.assertEqual(
+            response['attempt_data'][topic_id]['topic_name'], 'Place Values'
         )
         self.logout()
 
