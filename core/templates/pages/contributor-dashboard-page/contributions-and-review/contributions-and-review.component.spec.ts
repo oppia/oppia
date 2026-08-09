@@ -806,6 +806,56 @@ describe('Contributions and review component', () => {
       expect(component.activeExplorationId).toBeNull();
     }));
 
+    it('should clear activeExplorationId and emit reload when activeEntityType changes in ngOnChanges', () => {
+      component.activeExplorationId = 'exp1';
+      component.ngOnChanges({
+        activeEntityType: {
+          currentValue: 'skill',
+          previousValue: 'exploration',
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      });
+
+      expect(component.activeExplorationId).toBeNull();
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+      ).toHaveBeenCalled();
+    });
+
+    it('should format subheading using topic_name and entity_description when V2 flag is enabled', () => {
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+      const suggestionsDict: Record<string, SuggestionDetails> = {
+        sug_1: {
+          suggestion: {
+            change_cmd: {
+              skill_id: '',
+              content_html: 'Content',
+              translation_html: 'Translation',
+              question_dict: null,
+              skill_difficulty: [],
+            },
+            status: 'review',
+            suggestion_type: 'translate_content',
+            target_id: 'exp1',
+            suggestion_id: 'sug_1',
+            author_name: 'Author',
+            exploration_content_html: 'Content',
+          },
+          details: {
+            topic_name: 'Math',
+            entity_description: 'Chapter 1',
+          },
+        },
+      };
+
+      const summaries =
+        component.getTranslationContributionsSummary(suggestionsDict);
+
+      expect(summaries[0].subheading).toBe('Math / Chapter 1');
+    });
+
     it('should be able to change language', fakeAsync(() => {
       component.opportunitiesListRef = TestBed.inject(
         OpportunitiesListComponent

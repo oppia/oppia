@@ -535,4 +535,23 @@ describe('Translation opportunities component', () => {
 
     expect(component.languageSelected).toBe(true);
   }));
+
+  it('should emit reloadOpportunitiesEventEmitter when activeEntityType changes', () => {
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit'
+    );
+    component.ngOnChanges({
+      activeEntityType: {
+        currentValue: 'skill',
+        previousValue: 'exploration',
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+    ).toHaveBeenCalled();
+  });
 });

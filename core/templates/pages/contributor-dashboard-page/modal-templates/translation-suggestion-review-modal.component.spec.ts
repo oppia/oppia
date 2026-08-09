@@ -773,6 +773,35 @@ describe('Translation Suggestion Review Modal Component', function () {
           )
         ).toBe(false);
       });
+
+      it('should call reviewSkillSuggestion when accepting a skill translation suggestion', fakeAsync(() => {
+        component.ngOnInit();
+        component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+        spyOn(
+          contributionAndReviewService,
+          'reviewSkillSuggestion'
+        ).and.callFake(
+          (
+            targetId,
+            suggestionId,
+            action,
+            message,
+            difficulty,
+            successCallback,
+            errorCallback
+          ) => {
+            successCallback();
+            return Promise.resolve();
+          }
+        );
+
+        component.acceptAndReviewNext();
+        tick();
+
+        expect(
+          contributionAndReviewService.reviewSkillSuggestion
+        ).toHaveBeenCalled();
+      }));
     });
   });
 

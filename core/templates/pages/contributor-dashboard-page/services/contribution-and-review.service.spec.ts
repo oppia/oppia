@@ -864,6 +864,34 @@ describe('Contribution and review service', () => {
       })
     );
 
+    it('should resolve suggestion to skill correctly when skillDifficulty is null', fakeAsync(() => {
+      spyOn(carbas, 'reviewSkillSuggestionAsync').and.returnValue(
+        Promise.resolve()
+      );
+
+      cars.reviewSkillSuggestion(
+        'abc',
+        'pqr',
+        'accept',
+        'review message',
+        null,
+        onSuccess,
+        onFailure
+      );
+      tick();
+
+      expect(carbas.reviewSkillSuggestionAsync).toHaveBeenCalledWith(
+        'abc',
+        'pqr',
+        {
+          action: 'accept',
+          review_message: 'review message',
+        }
+      );
+      expect(onSuccess).toHaveBeenCalledWith('pqr');
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
     it(
       'should call onFailure function when' +
         'resolving suggestion to skill fails',

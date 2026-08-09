@@ -625,7 +625,7 @@ class ReviewableOpportunitiesHandlerV2(
 
         filtered_opportunities = []
         for opp in opportunities:
-            if topic_name is None or opp.topic_name == topic_name:
+            if not topic_name or opp.topic_name == topic_name:
                 filtered_opportunities.append(opp)
 
         return filtered_opportunities

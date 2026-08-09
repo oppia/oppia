@@ -939,8 +939,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'score',
             'hi',
             False,
-            self.fake_date,
-            self.fake_date,
+            datetime.datetime.now(),
+            datetime.datetime.now(),
             target_type=feconf.ENTITY_TYPE_SKILL,
         )
 
@@ -956,10 +956,42 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         opp_model.put()
 
-        topic_id = suggestion_services._get_topic_id_for_translation_suggestion(
+        topic_id = suggestion_services._get_topic_id_for_translation_suggestion(  # pylint: disable=protected-access
             suggestion
         )
         self.assertEqual(topic_id, 'topic_1')
+
+    def test_get_topic_id_for_translation_suggestion_skill_without_topic_ids(
+        self,
+    ) -> None:
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            'suggestion_2',
+            'skill_2',
+            1,
+            'review',
+            'author_id',
+            None,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Content',
+                'content_id': 'content_0',
+                'language_code': 'hi',
+                'content_html': '<p>Html</p>',
+                'translation_html': '<p>Hindi</p>',
+                'data_format': 'html',
+            },
+            'score',
+            'hi',
+            False,
+            datetime.datetime.now(),
+            datetime.datetime.now(),
+            target_type=feconf.ENTITY_TYPE_SKILL,
+        )
+
+        topic_id = suggestion_services._get_topic_id_for_translation_suggestion(  # pylint: disable=protected-access
+            suggestion
+        )
+        self.assertEqual(topic_id, '')
 
     def test_get_submitted_submissions(self) -> None:
         suggestion_services.create_suggestion(
