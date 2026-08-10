@@ -19,6 +19,8 @@
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.css",
     "core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.css",
     "core/templates/components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component.css",
+    "core/templates/components/certificate-assessment-offering-helper/time-expired-modal.component.css",
+    "core/templates/components/certificate-assessment-offering-helper/unanswered-question-modal.component.css",
     "core/templates/components/forms/validators/README.md",
     "core/templates/css/README.md",
     "core/templates/css/shepherd-overrides.css",
@@ -38,6 +40,9 @@
     "core/templates/pages/blog-author-profile-page/blog-author-profile-page.component.css",
     "core/templates/pages/blog-home-page/blog-home-page.component.css",
     "core/templates/pages/blog-post-page/blog-post-page.component.css",
+    "core/templates/pages/certificate-assessment-player-page/certificate-assessment-player-page.component.css",
+    "core/templates/pages/certificate-assessment-result-page/assessment-result-topic-wise-breakdown.component.css",
+    "core/templates/pages/certificate-assessment-result-page/certificate-assessment-result-card.component.css",
     "core/tests/protractor-browserstack.conf.js",
     "core/tests/wdio.conf.js",
     "data/README.md",
@@ -70,10 +75,9 @@
     "core/templates/pages/story-viewer-page/story-viewer-page.component.css",
     "core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css",
     "core/templates/pages/teach-page/teach-page.component.css",
-    "core/templates/pages/topic-viewer-page/topic-viewer-page.component.css",
-    "core/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css",
     "core/tests/puppeteer-acceptance-tests/utilities/common/window-defs.d.ts",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
+    "core/templates/domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",

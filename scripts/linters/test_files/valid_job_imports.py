@@ -34,6 +34,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     exp_migration_jobs,
     exp_search_indexing_jobs,
     exploration_voiceover_sync_jobs,
+    firebase_server_sync_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
     number_with_units_audit_jobs,

@@ -401,7 +401,7 @@ const pauseVoiceoverButton = '.e2e-test-pause-circle';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
-const playLaterButton = '.e2e-test-add-to-playlist-btn';
+
 const newsletterEmailInputField = '.e2e-test-newsletter-input';
 const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
 const newsletterSubscriptionThanksMessage =
@@ -614,7 +614,8 @@ const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 const sitemapXmlLocTag = '<loc>';
 
 const metaOgTitleSelector = 'meta[property="og:title"]';
-const metaDescriptionSelector = 'meta[name="description"]';
+const metaDescriptionSelector =
+  'meta[name="description"], meta[itemprop="description"]';
 const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
 
@@ -3716,14 +3717,6 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl, verifyURL);
-  }
-
-  /**
-   * Function to verify that the user cannot add an exploration to the Play Later list.
-   */
-  async expectCannotAddExplorationToPlayLater(): Promise<void> {
-    const isButtonVisible = (await this.page.$(playLaterButton)) !== null;
-    expect(isButtonVisible).toBe(false);
   }
 
   /**
@@ -7552,13 +7545,14 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // If an expected description is provided, assert meta description matches it.
+    // Some routes populate description via itemprop while others use name.
     if (expected.description !== undefined) {
       const description = await this.page.$eval(metaDescriptionSelector, el =>
         el.getAttribute('content')
       );
       if (description !== expected.description) {
         throw new Error(
-          `meta name=\"description\" mismatch. Expected: "${expected.description}", Found: "${description}"`
+          `meta description mismatch (name/itemprop). Expected: "${expected.description}", Found: "${description}"`
         );
       }
     }

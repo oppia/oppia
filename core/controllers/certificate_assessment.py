@@ -57,6 +57,44 @@ class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
     async_status: str
 
 
+class CertificateQuestionRefDict(TypedDict):
+    """Dict representation of a question reference returned on start."""
+
+    question_id: str
+    question_version: int
+
+
+class StartCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of StartCertificateAssessmentHandler payload."""
+
+    certificate_id: str
+
+
+class SubmitCertificateAssessmentAnswerDict(TypedDict):
+    """Dict representation of a single submitted answer."""
+
+    question_id: str
+    selected_answer: str
+
+
+class SubmitCertificateAssessmentHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SubmitCertificateAssessmentHandler payload."""
+
+    answers: List[SubmitCertificateAssessmentAnswerDict]
+
+
+class SubmitCertificateAssessmentHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of attempt_id path args."""
+
+    attempt_id: str
+
+
+class CertificateAssessmentResultHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of attempt_id path args."""
+
+    attempt_id: str
+
+
 class ValidateCertificateAssessmentOfferingHandlerNormalizedPayloadDict(
     TypedDict
 ):
@@ -77,6 +115,14 @@ class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of certificate_id path args."""
 
     certificate_id: str
+
+
+class CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict(
+    TypedDict
+):
+    """Dict representation of classroom_id path args."""
+
+    classroom_id: str
 
 
 class ValidateCertificateAssessmentOfferingHandler(
@@ -344,3 +390,183 @@ class CertificateAssessmentOfferingByIdHandler(
         ) as e:
             raise self.NotFoundException(str(e)) from e
         self.render_json({})
+
+
+class CertificateAssessmentOfferingsForClassroomHandler(
+    base.BaseHandler[
+        CertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict,
+    ]
+):
+    """Handler for learner-facing certificate offerings in a classroom."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.require_user_id_else_redirect_to_homepage
+    def get(self, classroom_url_fragment: str) -> None:
+        """Returns certificate offerings for the classroom."""
+        if self.user_id is None:
+            raise self.NotLoggedInException
+        certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            classroom_url_fragment, self.user_id
+        )
+        self.render_json({'certificate_offerings': certificate_offerings})
+
+
+class StartCertificateAssessmentHandler(
+    base.BaseHandler[
+        StartCertificateAssessmentHandlerNormalizedPayloadDict,
+        Dict[str, str],
+    ]
+):
+    """Stub handler for starting a certificate assessment attempt."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'certificate_id': {'schema': {'type': 'basestring'}},
+        },
+    }
+
+    # TODO(#24717-2.13): Replace open_access with
+    # require_user_id_else_redirect_to_homepage once the real
+    # start_certificate_assessment_attempt() service is wired in.
+    @acl_decorators.open_access
+    def post(self) -> None:
+        """Returns a hardcoded attempt_id and question list."""
+        self.render_json(
+            {
+                'attempt_id': 'dummy_attempt_id',
+                'questions': [
+                    {
+                        'question_id': 'dummy_question_id_1',
+                        'question_version': 1,
+                    },
+                    {
+                        'question_id': 'dummy_question_id_2',
+                        'question_version': 1,
+                    },
+                ],
+            }
+        )
+
+
+class SubmitCertificateAssessmentHandler(
+    base.BaseHandler[
+        SubmitCertificateAssessmentHandlerNormalizedPayloadDict,
+        SubmitCertificateAssessmentHandlerNormalizedRequestDict,
+    ]
+):
+    """Stub handler for submitting a certificate assessment attempt."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'attempt_id': {'schema': {'type': 'basestring'}},
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'answers': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'question_id',
+                                'schema': {'type': 'basestring'},
+                            },
+                            {
+                                'name': 'selected_answer',
+                                'schema': {'type': 'basestring'},
+                            },
+                        ],
+                        'required': ['question_id', 'selected_answer'],
+                    },
+                }
+            },
+        },
+    }
+
+    # TODO(#24717-2.13): Replace open_access with
+    # can_submit_assessment_response once real submission logic exists.
+    @acl_decorators.open_access
+    def post(self, attempt_id: str) -> None:
+        """Returns a hardcoded submission confirmation."""
+        self.render_json(
+            {
+                'attempt_id': attempt_id,
+                'is_submitted': True,
+            }
+        )
+
+
+class CertificateAssessmentResultHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        CertificateAssessmentResultHandlerNormalizedRequestDict,
+    ]
+):
+    """Stub handler for fetching a certificate assessment result."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'attempt_id': {'schema': {'type': 'basestring'}},
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    # TODO(#24717-2.14): Replace open_access with
+    # can_access_certificate_assessment_attempt once real result
+    # fetching logic exists.
+    @acl_decorators.open_access
+    def get(self, attempt_id: str) -> None:  # pylint: disable=unused-argument
+        """Returns a hardcoded result payload."""
+        self.render_json(
+            {
+                'title': 'Everyday Arithmetic & Number Confidence',
+                'total_score': 80,
+                'attempt_data': {
+                    'dummy_topic_id': {
+                        'total_related_questions': 5,
+                        'total_correct_questions': 4,
+                    },
+                },
+                'is_submitted': True,
+            }
+        )
+
+
+class CertificateAssessmentAttemptsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Stub handler for listing a learner's certificate attempts."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    # TODO(#24717-2.14): Replace open_access with
+    # require_user_id_else_redirect_to_homepage once learner_id is
+    # pulled from the session for the real implementation.
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns a hardcoded list of attempts."""
+        self.render_json(
+            {
+                'attempts': [
+                    {
+                        'attempt_id': 'dummy_attempt_id',
+                        'classroom_id': 'dummy_classroom_id',
+                        'title': 'Everyday Arithmetic & Number Confidence',
+                        'total_score': 80,
+                        'attempt_index': 1,
+                        'started_at': '2026-07-18T00:00:00Z',
+                        'is_submitted': True,
+                    }
+                ]
+            }
+        )

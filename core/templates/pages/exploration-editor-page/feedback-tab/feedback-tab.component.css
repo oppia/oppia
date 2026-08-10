@@ -1,0 +1,37 @@
+feedback-tab > .btn-sm {
+  padding: 1px 5px 1px 5px;
+}
+/* Overwrite the default "success" color to a darker shade of green in order
+  to prevent this overshadowing the active action buttons (like "Create New
+  Thread"). */
+.oppia-feedback-card span.badge.bg-success {
+  background-color: #038603;
+}
+.activeThreadView {
+  margin-top: 10px;
+  word-wrap: break-word;
+}
+.oppia-back-arrow-icon {
+  font-size: 19px;
+}
+.oppia-feedback-card .oppia-thread-button {
+  margin-top: 15px;
+}
+.oppia-feedback-card .oppia-thread-text {
+  font-size: larger;
+}
+.oppia-feedback-card .oppia-view-suggestion-button-container {
+  white-space: pre-wrap;
+  word-break: break-word
+}
+.oppia-feedback-card .oppia-view-suggestion-btn {
+  margin-bottom: 6px;
+  margin-top: 6px;
+}
+.oppia-feedback-card .oppia-icon-container {
+  color: #f00;
+  margin-top: 7px;
+}
+.oppia-feedback-card .oppia-feedback-response-send-btn {
+  margin-top: 10px;
+}
