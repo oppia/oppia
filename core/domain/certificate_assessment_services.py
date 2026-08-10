@@ -25,6 +25,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
+    classroom_config_services,
     question_services,
     skill_fetchers,
     topic_domain,
@@ -50,6 +51,7 @@ CERTIFICATE_ASSESSMENT_DIFFICULTY_MEDIUM: str = (
 CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD: str = (
     constants.CERTIFICATE_ASSESSMENT_DIFFICULTY_HARD
 )
+CERTIFICATE_ASSESSMENT_PASSING_SCORE_THRESHOLD: float = 80.0
 
 
 class CertificateAssessmentOfferingValidationResultDict(TypedDict):
@@ -58,6 +60,14 @@ class CertificateAssessmentOfferingValidationResultDict(TypedDict):
     is_valid: bool
     validation_errors: Dict[str, Dict[str, Dict[str, int]]]
     validation_message: str
+
+
+class CertificateOfferingClassroomSummary(TypedDict):
+    """Dict representation of a classroom-facing certificate offering."""
+
+    certificate_id: str
+    title: str
+    attempt_status: str
 
 
 def _get_topic_name_to_question_ids_map(
@@ -713,3 +723,112 @@ def get_certificate_assessment_offerings() -> (
             certificate_assessment_offering_models
         )
     ]
+
+
+def get_certificate_offerings_for_classroom(
+    classroom_url_fragment: str, learner_id: str
+) -> List[CertificateOfferingClassroomSummary]:
+    """Fetches certificate offerings for a classroom, available to a learner.
+
+    Args:
+        classroom_url_fragment: str. The URL fragment of the classroom to
+            fetch offerings for.
+        learner_id: str. The ID of the learner to filter attempts by.
+
+    Returns:
+        list(CertificateOfferingClassroomSummary). A list of certificate
+        offering summaries with attempt status for the given learner.
+    """
+    classroom = classroom_config_services.get_classroom_by_url_fragment(
+        classroom_url_fragment
+    )
+    if classroom is None:
+        return []
+
+    certificate_assessment_offering_models: List[
+        gae_models.CertificateAssessmentOfferingModel
+        # Here we use cast because .fetch() returns a generic list,
+        # but we need a typed list for the type checker.
+    ] = cast(
+        List[gae_models.CertificateAssessmentOfferingModel],
+        gae_models.CertificateAssessmentOfferingModel.query(
+            gae_models.CertificateAssessmentOfferingModel.classroom_id
+            == classroom.classroom_id,
+            gae_models.CertificateAssessmentOfferingModel.async_status
+            == 'Available',
+        ).fetch(),
+    )
+    certificate_assessment_offering_models.sort(
+        key=lambda offering_model: str(offering_model.title.lower())
+    )
+    if not certificate_assessment_offering_models:
+        return []
+
+    certificate_ids = [
+        offering_model.id
+        for offering_model in certificate_assessment_offering_models
+    ]
+    # Here we use cast because .fetch() returns a generic list,
+    # but we need a typed list for the type checker.
+    attempt_models: List[gae_models.CertificateAssessmentAttemptModel] = cast(
+        List[gae_models.CertificateAssessmentAttemptModel],
+        gae_models.CertificateAssessmentAttemptModel.query(
+            gae_models.CertificateAssessmentAttemptModel.learner_id
+            == learner_id,
+            gae_models.CertificateAssessmentAttemptModel.certificate_id.IN(
+                certificate_ids
+            ),
+            gae_models.CertificateAssessmentAttemptModel.is_submitted  # pylint: disable=singleton-comparison
+            == True,
+        ).fetch(),
+    )
+
+    latest_attempt_by_certificate_id: Dict[
+        str, gae_models.CertificateAssessmentAttemptModel
+    ] = {}
+    for attempt_model in attempt_models:
+        certificate_id = getattr(attempt_model, 'certificate_id', None)
+        if certificate_id is None:
+            certificate_id = attempt_model.version_data['certificate_id']
+        if certificate_id not in certificate_ids:
+            continue
+        existing_attempt_model = latest_attempt_by_certificate_id.get(
+            certificate_id
+        )
+        if existing_attempt_model is None:
+            latest_attempt_by_certificate_id[certificate_id] = attempt_model
+            continue
+        if attempt_model.attempt_index > existing_attempt_model.attempt_index:
+            latest_attempt_by_certificate_id[certificate_id] = attempt_model
+            continue
+        if (
+            attempt_model.attempt_index == existing_attempt_model.attempt_index
+            and attempt_model.finished_at is not None
+            and (
+                existing_attempt_model.finished_at is None
+                or attempt_model.finished_at
+                > existing_attempt_model.finished_at
+            )
+        ):
+            latest_attempt_by_certificate_id[certificate_id] = attempt_model
+
+    certificate_offerings: List[CertificateOfferingClassroomSummary] = []
+    for offering_model in certificate_assessment_offering_models:
+        latest_attempt = latest_attempt_by_certificate_id.get(offering_model.id)
+        if latest_attempt is None:
+            attempt_status = 'Not Attempted'
+        elif (
+            latest_attempt.total_score
+            >= CERTIFICATE_ASSESSMENT_PASSING_SCORE_THRESHOLD
+        ):
+            attempt_status = 'Passed'
+        else:
+            attempt_status = 'Not Passed'
+        certificate_offerings.append(
+            {
+                'certificate_id': offering_model.id,
+                'title': offering_model.title,
+                'attempt_status': attempt_status,
+            }
+        )
+    return certificate_offerings
