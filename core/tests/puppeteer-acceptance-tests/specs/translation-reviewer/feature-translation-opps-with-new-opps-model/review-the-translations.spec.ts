@@ -19,7 +19,6 @@
  * TR.CD. Review the translations.
  */
 
-import path from 'path';
 import testConstants from '../../../utilities/common/test-constants';
 import {UserFactory} from '../../../utilities/common/user-factory';
 import {Contributor} from '../../../utilities/user/contributor';
@@ -160,7 +159,7 @@ describe('Translation Reviewer V2', function () {
     await translationReviewer.expectPinIconToBeVisible();
     await translationReviewer.expectScreenshotToMatch(
       'translationReviewerReviewTab',
-      path.join(__dirname, '..')
+      __dirname
     );
   });
 

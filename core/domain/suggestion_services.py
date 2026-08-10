@@ -342,11 +342,16 @@ def create_suggestion(
             e.value for e in feconf.TranslatableEntityType
         ]
         if target_type in translatable_entity_types:
+            # Some translatable entity types (e.g. question, classroom) have no
+            # fetcher in get_entity_by_type_and_id and raise a ValueError. Those
+            # are skipped, but a missing entity must still surface as an error
+            # so that suggestions cannot be created against entities that do
+            # not exist.
             try:
                 target_entity = opportunity_services.get_entity_by_type_and_id(
                     target_type, target_id
                 )
-            except Exception:
+            except ValueError:
                 target_entity = None
 
             if target_entity is not None:

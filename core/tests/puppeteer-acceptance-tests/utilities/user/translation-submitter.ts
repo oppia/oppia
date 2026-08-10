@@ -163,6 +163,14 @@ export class TranslationSubmitter extends BaseUser {
         `Translate button for chapter ${chapterName} and story ${storyName} not found.`
       );
     }
+    // On mobile the contributor dashboard header is sticky and tall enough to
+    // cover the middle of the viewport, so the default retry behaviour of
+    // scrolling the target to the centre leaves the button underneath the
+    // header and permanently unclickable. Aligning the button with the bottom
+    // of the viewport instead keeps it clear of the header.
+    if (this.isViewportAtMobileWidth()) {
+      await translateButton.evaluate(el => el.scrollIntoView({block: 'end'}));
+    }
     await this.clickOnElement(translateButton);
 
     // Verify that the translation editor is opened.

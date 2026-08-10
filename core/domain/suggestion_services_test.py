@@ -620,7 +620,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'data_format': 'html',
         }
 
-        with self.assertRaisesRegex(Exception, 'State  does not exist'):
+        with self.assertRaisesRegex(
+            Exception, 'State Generic Content does not exist'
+        ):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -881,7 +883,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'data_format': 'html',
         }
         with self.assertRaisesRegex(
-            Exception, 'No entity found for type skill with id invalid_skill_id'
+            Exception, 'No skill exists with ID: invalid_skill_id'
         ):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -905,14 +907,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>Hindi</p>',
             'data_format': 'html',
         }
+        # A classroom is a translatable entity type but is not an allowed
+        # suggestion target type, so creating a suggestion for it must fail
+        # validation.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected target_type to be among allowed choices',
         ):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_TOPIC,
-                'topic_1',
+                feconf.ENTITY_TYPE_CLASSROOM,
+                'classroom_1',
                 1,
                 self.author_id,
                 change_dict,
@@ -945,14 +950,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
         opp_model = opportunity_models.TranslationOpportunityModel(
-            id='skill|skill_1|hi',
+            id='skill.skill_1',
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id='skill_1',
             topic_ids=['topic_1'],
-            target_id='skill_1',
-            target_type=feconf.ENTITY_TYPE_SKILL,
-            language_code='hi',
             content_count=1,
-            incomplete_rule_content_count=1,
-            incomplete_translation_content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
         )
         opp_model.put()
 
