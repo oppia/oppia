@@ -593,8 +593,8 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
             ]
         }
         with mock.patch.object(
-            gae_models.CertificateAssessmentAttemptModel,
-            'get_by_id',
+            certificate_assessment_services,
+            'get_certificate_assessment_attempt',
             return_value=mock.Mock(
                 learner_id='user_id_1',
                 is_submitted=False,
@@ -631,8 +631,8 @@ class SubmitCertificateAssessmentHandlerUnitTests(test_utils.GenericTestBase):
         }
         attempt = mock.Mock(learner_id='user_id_1', is_submitted=False)
         with mock.patch.object(
-            gae_models.CertificateAssessmentAttemptModel,
-            'get_by_id',
+            certificate_assessment_services,
+            'get_certificate_assessment_attempt',
             return_value=attempt,
         ), mock.patch.object(
             certificate_assessment_services,
