@@ -148,11 +148,9 @@ export class TranslationSubmitter extends BaseUser {
     chapterName: string,
     storyName: string
   ): Promise<void> {
-    // The contributor dashboard header is sticky and, at mobile widths, tall
-    // enough to cover the middle of the viewport. A translate button that is
-    // scrolled to the centre therefore ends up underneath the header and
-    // silently swallows the click, so the opportunity is re-queried, parked
-    // clear of the header and clicked again if the modal does not open.
+    // The opportunity list re-renders whenever the language filter changes, so
+    // the opportunity is re-queried and clicked again if the modal does not
+    // open within the timeout.
     for (let attempt = 1; attempt <= translateButtonClickAttempts; attempt++) {
       const opportunityItem =
         await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
@@ -176,9 +174,20 @@ export class TranslationSubmitter extends BaseUser {
         );
       }
       if (this.isViewportAtMobileWidth()) {
+        // Aligning the button with the bottom of the viewport keeps it clear of
+        // the header so that the clickability check below can pass.
         await translateButton.evaluate(el => el.scrollIntoView({block: 'end'}));
+        await this.waitForElementToStabilize(translateButton);
+        await this.waitForElementToBeClickable(translateButton);
+        // Puppeteer scrolls a target back to the centre of the viewport before
+        // it dispatches a mouse event, which parks the button underneath the
+        // sticky header again and delivers the click to the header instead.
+        // That scroll happens after the check above, so the click is dispatched
+        // on the element itself where it cannot be intercepted.
+        await translateButton.evaluate(el => (el as HTMLElement).click());
+      } else {
+        await this.clickOnElement(translateButton);
       }
-      await this.clickOnElement(translateButton);
 
       // Verify that the translation editor is opened.
       try {
