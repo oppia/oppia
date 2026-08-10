@@ -63,10 +63,12 @@ interface CreatorFeedbackListState<TSummary> {
   cursorHistory: (string | null)[];
   moreAvailable: boolean;
 }
+import './feedback-tab.component.css';
 
 @Component({
   selector: 'oppia-feedback-tab',
   templateUrl: './feedback-tab.component.html',
+  styleUrls: ['./feedback-tab.component.css'],
 })
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
