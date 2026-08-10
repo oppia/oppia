@@ -21,14 +21,13 @@ from unittest import mock
 
 from core import feconf, utils
 from core.controllers import certificate_assessment
-from core.domain import certificate_assessment_services, topic_fetchers
-from core.storage.certificate_assessment import gae_models
 from core.domain import (
     certificate_assessment_services,
     classroom_config_domain,
     classroom_config_services,
     topic_fetchers,
 )
+from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 from typing import Dict, List, Union
@@ -496,10 +495,6 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
                 certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.get,
                 '__wrapped__',
             )(handler, self.classroom_url_fragment)
-
-
-class SubmitCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
-    """Tests class for SubmitCertificateAssessmentHandler."""
 
 
 class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):

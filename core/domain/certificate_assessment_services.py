@@ -28,8 +28,8 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     certificate_assessment_domain,
-    question_fetchers,
     classroom_config_services,
+    question_fetchers,
     question_services,
     skill_fetchers,
     state_domain,

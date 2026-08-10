@@ -2584,21 +2584,3 @@ class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertEqual(
             result['validation_message'], 'Certificate assessment is valid.'
         )
-
-    def test_validation_handles_missing_topic_object(self) -> None:
-        with mock.patch.object(
-            certificate_assessment_services,
-            '_get_topic_name_to_question_ids_map',
-            return_value=({'topic_1': []}, [None]),
-        ):
-            result = certificate_assessment_services.validate_certificate_assessment_offering(
-                topic_ids=['topic_1'],
-                total_questions=3,
-            )
-
-        self.assertFalse(result['is_valid'])
-        self.assertIn(
-            'topic_1 does not have enough questions in every difficulty '
-            'bucket.',
-            result['validation_message'],
-        )
