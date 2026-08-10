@@ -108,7 +108,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
   it('should return true when the score meets the passing threshold', () => {
     component.result = {
       certificateName: 'Test Certificate',
-      scorePercentage: 70,
+      scorePercentage: 80,
       topicBreakdown: [],
     };
 
@@ -129,8 +129,18 @@ describe('CertificateAssessmentResultCardComponent', () => {
       certificateName: 'Everyday Arithmetic & Number Confidence',
       scorePercentage: 80,
       topicBreakdown: [
-        {topicName: 'Place Values', scorePercentage: 80},
-        {topicName: 'Multiplication', scorePercentage: 33},
+        {
+          topicName: 'Place Values',
+          scorePercentage: 80,
+          totalCorrectQuestions: 4,
+          totalRelatedQuestions: 5,
+        },
+        {
+          topicName: 'Multiplication',
+          scorePercentage: 33,
+          totalCorrectQuestions: 1,
+          totalRelatedQuestions: 3,
+        },
       ],
       timeTakenMinutes: 35,
     });
@@ -142,7 +152,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
       Promise.resolve({
         certificate_id: 'cert-1',
         title: 'Test Certificate',
-        total_score: 50,
+        total_score: 99,
         attempt_data: {
           topic_1: {
             topic_name: 'Place Values',
@@ -160,7 +170,12 @@ describe('CertificateAssessmentResultCardComponent', () => {
     await fixture.whenStable();
 
     expect(component.result?.topicBreakdown).toEqual([
-      {topicName: 'Place Values', scorePercentage: 0},
+      {
+        topicName: 'Place Values',
+        scorePercentage: 0,
+        totalCorrectQuestions: 0,
+        totalRelatedQuestions: 0,
+      },
     ]);
   });
 
@@ -181,7 +196,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
       Promise.resolve({
         certificate_id: 'cert-1',
         title: 'Test Certificate',
-        total_score: 50,
+        total_score: 10,
         time_taken_in_minutes: null,
         attempt_data: {
           topic_1: {

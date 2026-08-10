@@ -36,8 +36,18 @@ describe('AssessmentResultTopicWiseBreakdownComponent', () => {
 
   it('should render topic breakdown rows', () => {
     component.topicBreakdown = [
-      {topicName: 'Place Values', scorePercentage: 88},
-      {topicName: 'Addition', scorePercentage: 95},
+      {
+        topicName: 'Place Values',
+        scorePercentage: 88,
+        totalCorrectQuestions: 7,
+        totalRelatedQuestions: 8,
+      },
+      {
+        topicName: 'Addition',
+        scorePercentage: 95,
+        totalCorrectQuestions: 19,
+        totalRelatedQuestions: 20,
+      },
     ];
     fixture.detectChanges();
 

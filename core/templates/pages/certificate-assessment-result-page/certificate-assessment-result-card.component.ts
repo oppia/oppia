@@ -22,8 +22,8 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {AssessmentResultTopicWiseBreakdown} from './assessment-result-topic-wise-breakdown.component';
 
 // The backend result response does not expose a pass/fail flag, so the pass
-// state is derived from the total score using a 70% threshold.
-const PASSING_SCORE_THRESHOLD = 70;
+// state is derived from the total score using an 80% threshold.
+const PASSING_SCORE_THRESHOLD = 80;
 
 interface AssessmentResult {
   certificateName: string;
@@ -54,18 +54,21 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
       .getCertificateAssessmentResultAsync(this.attemptId)
       .then(resultData => {
         this.certificateId = resultData.certificate_id;
+        const topicBreakdown = Object.entries(resultData.attempt_data).map(
+          ([topicId, topicStats]) => ({
+            topicName: topicStats.topic_name,
+            scorePercentage: this.getTopicScorePercentage(
+              topicStats.total_related_questions,
+              topicStats.total_correct_questions
+            ),
+            totalCorrectQuestions: topicStats.total_correct_questions,
+            totalRelatedQuestions: topicStats.total_related_questions,
+          })
+        );
         this.result = {
           certificateName: resultData.title,
           scorePercentage: resultData.total_score,
-          topicBreakdown: Object.entries(resultData.attempt_data).map(
-            ([topicId, topicStats]) => ({
-              topicName: topicStats.topic_name,
-              scorePercentage: this.getTopicScorePercentage(
-                topicStats.total_related_questions,
-                topicStats.total_correct_questions
-              ),
-            })
-          ),
+          topicBreakdown,
           timeTakenMinutes: resultData.time_taken_in_minutes,
         };
         this.isLoading = false;

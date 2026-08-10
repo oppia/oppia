@@ -22,6 +22,8 @@ import {Component, Input} from '@angular/core';
 export interface AssessmentResultTopicWiseBreakdown {
   topicName: string;
   scorePercentage: number;
+  totalCorrectQuestions: number;
+  totalRelatedQuestions: number;
 }
 
 @Component({

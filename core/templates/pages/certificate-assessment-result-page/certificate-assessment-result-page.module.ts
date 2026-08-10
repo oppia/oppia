@@ -25,7 +25,7 @@ import {CertificateAssessmentResultPageComponent} from './certificate-assessment
 import {CertificateAssessmentResultPageRoutingModule} from './certificate-assessment-result-page-routing.module';
 import {CertificateAssessmentResultCardComponent} from './certificate-assessment-result-card.component';
 import {AssessmentResultTopicWiseBreakdownComponent} from './assessment-result-topic-wise-breakdown.component';
-import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.component';
+import {CertificateAssessmentTitledBackgroundBannerModule} from 'components/certificate-assessment-offering-helper/certificate-assessment-titled-shared-background-banner.module';
 
 @NgModule({
   imports: [
@@ -33,20 +33,19 @@ import {CertificateAssessmentTitledBackgroundBannerComponent} from 'components/c
     SharedComponentsModule,
     RouterModule,
     CertificateAssessmentResultPageRoutingModule,
+    CertificateAssessmentTitledBackgroundBannerModule,
   ],
   declarations: [
     CertificateAssessmentResultPageRootComponent,
     CertificateAssessmentResultPageComponent,
     CertificateAssessmentResultCardComponent,
     AssessmentResultTopicWiseBreakdownComponent,
-    CertificateAssessmentTitledBackgroundBannerComponent,
   ],
   entryComponents: [
     CertificateAssessmentResultPageRootComponent,
     CertificateAssessmentResultPageComponent,
     CertificateAssessmentResultCardComponent,
     AssessmentResultTopicWiseBreakdownComponent,
-    CertificateAssessmentTitledBackgroundBannerComponent,
   ],
 })
 export class CertificateAssessmentResultPageModule {}
