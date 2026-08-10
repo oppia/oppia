@@ -23,6 +23,12 @@ from core import feconf, utils
 from core.controllers import certificate_assessment
 from core.domain import certificate_assessment_services, topic_fetchers
 from core.storage.certificate_assessment import gae_models
+from core.domain import (
+    certificate_assessment_services,
+    classroom_config_domain,
+    classroom_config_services,
+    topic_fetchers,
+)
 from core.tests import test_utils
 
 from typing import Dict, List, Union
@@ -405,7 +411,98 @@ class ValidateCertificateAssessmentOfferingHandlerUnitTests(
         self.assertFalse(response['is_valid'])
 
 
-class CertificateAssessmentResultHandlerUnitTests(test_utils.GenericTestBase):
+class CertificateAssessmentOfferingsForClassroomHandlerTest(
+    test_utils.GenericTestBase
+):
+    """Tests class for CertificateAssessmentOfferingsForClassroomHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.classroom_id = 'physics_classroom_01'
+        self.classroom_url_fragment = 'physics'
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_topic(self.topic_id, owner_id)
+        classroom = classroom_config_domain.Classroom(
+            self.classroom_id,
+            name='Physics',
+            url_fragment=self.classroom_url_fragment,
+            feedback_recipient_email='user@email.com',
+            course_details='Course details',
+            teaser_text='Teaser text',
+            topic_list_intro='Topic intro',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg',
+                'red',
+                1,
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.svg',
+                'blue',
+                1,
+            ),
+            index=0,
+        )
+        classroom_config_services.create_new_classroom(classroom)
+
+    def test_get_returns_certificate_offerings_for_classroom(self) -> None:
+        """Tests that the handler returns certificate offerings for a classroom."""
+
+        certificate_assessment_services.create_certificate_assessment_offering(
+            title='Sample Certificate',
+            description='Sample description.',
+            classroom_id=self.classroom_id,
+            topic_ids=[self.topic_id],
+            total_questions=5,
+            time_limit_in_minutes=30,
+            demonstrates=['Sample skill'],
+            async_status='Available',
+        )
+
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
+                '<classroom_url_fragment>', self.classroom_url_fragment
+            )
+        )
+
+        self.assertIn('certificate_offerings', response)
+        self.assertEqual(len(response['certificate_offerings']), 1)
+        self.assertTrue(response['certificate_offerings'][0]['certificate_id'])
+        self.assertEqual(
+            response['certificate_offerings'][0]['title'],
+            'Sample Certificate',
+        )
+        self.assertEqual(
+            response['certificate_offerings'][0]['attempt_status'],
+            'Not Attempted',
+        )
+
+    def test_get_raises_not_logged_in_when_user_id_is_missing(self) -> None:
+        handler = certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.__new__(
+            certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler
+        )
+        handler.user_id = None
+
+        with self.assertRaisesRegex(
+            certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.NotLoggedInException,
+            '^$',
+        ):
+            getattr(
+                certificate_assessment.CertificateAssessmentOfferingsForClassroomHandler.get,
+                '__wrapped__',
+            )(handler, self.classroom_url_fragment)
+
+
+class SubmitCertificateAssessmentHandlerTest(test_utils.GenericTestBase):
+    """Tests class for SubmitCertificateAssessmentHandler."""
+
+
+class CertificateAssessmentResultHandlerTest(test_utils.GenericTestBase):
     """Tests class for CertificateAssessmentResultHandler."""
 
     def test_get_returns_hardcoded_result_payload(self) -> None:
@@ -426,32 +523,6 @@ class CertificateAssessmentResultHandlerUnitTests(test_utils.GenericTestBase):
                     },
                 },
                 'is_submitted': True,
-            },
-        )
-
-
-class CertificateAssessmentOfferingsForClassroomHandlerUnitTests(
-    test_utils.GenericTestBase
-):
-    """Tests class for CertificateAssessmentOfferingsForClassroomHandler."""
-
-    def test_get_returns_hardcoded_certificate_offerings(self) -> None:
-        response = self.get_json(
-            feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
-                '<classroom_id>', 'math_classroom_01'
-            )
-        )
-
-        self.assertEqual(
-            response,
-            {
-                'available_certificate_offerings': [
-                    {
-                        'certificate_id': 'sample_certificate_id',
-                        'title': 'Sample Certificate',
-                        'attempt_status': 'Not Attempted',
-                    }
-                ]
             },
         )
 
