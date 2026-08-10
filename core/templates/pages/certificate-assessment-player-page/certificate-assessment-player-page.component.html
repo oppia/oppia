@@ -1,4 +1,5 @@
-<div class="certificate-assessment-page-container position-relative">
+<div class="certificate-assessment-page-container">
+<!-- TODO(#24717-M2.15): Add certificate-assessment-titled-shared-background-banner component. -->
   <oppia-assessment-introduction-card *ngIf="currentStage === 'intro'"
                                       [certificateId]="certificateId"
                                       (continue)="showInstructions()">
@@ -13,12 +14,11 @@
                                                   [currentQuestionIndex]="currentQuestionIndex"
                                                   [totalQuestions]="mockQuestions.length"
                                                   [progressPercentage]="getProgressPercentage()"
-                                                  [isLastQuestion]="currentQuestionIndex === mockQuestions.length - 1"
+                                                  [isLastQuestion]="isCurrentQuestionLast()"
+                                                  [savedResponse]="getSavedResponse()"
+                                                  (previousQuestion)="previousQuestion()"
                                                   (nextQuestion)="nextQuestion()"
-                                                  (submitAssessment)="submitAssessment()">
+                                                  (submitAssessment)="submitAssessment()"
+                                                  (responseChange)="updateResponse($event)">
   </oppia-certificate-assessment-conversation-skin>
-
-  <oppia-certificate-assessment-result-card *ngIf="currentStage === 'result'"
-                                            [certificateId]="certificateId">
-  </oppia-certificate-assessment-result-card>
 </div>
