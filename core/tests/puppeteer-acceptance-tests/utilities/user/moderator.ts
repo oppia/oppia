@@ -38,6 +38,7 @@ const explorationFeedbackTabContainerSelector =
 const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const toastMessageSelector = '.e2e-test-toast-message';
+const errorModalSelector = '.oppia-error-modal-window';
 
 export class Moderator extends BaseUser {
   /**
@@ -463,7 +464,7 @@ export class Moderator extends BaseUser {
 
     expect(
       (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
-        (await this.isElementVisible('.oppia-error-modal-window', true, 5000))
+        (await this.isElementVisible(errorModalSelector, true, 5000))
     ).toBe(true);
   }
 
@@ -508,7 +509,7 @@ export class Moderator extends BaseUser {
     if (
       !(
         (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
-        (await this.isElementVisible('.oppia-error-modal-window', true, 5000))
+        (await this.isElementVisible(errorModalSelector, true, 5000))
       )
     ) {
       throw new Error('Activity not unfeatured successfully.');
