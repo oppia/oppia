@@ -449,26 +449,7 @@ def get_suggestion_from_model(
             suggestion_model.suggestion_type
         ]
     )
-    if (
-        suggestion_model.suggestion_type
-        == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-    ):
-        return suggestion_registry.SuggestionTranslateContent(
-            suggestion_model.id,
-            suggestion_model.target_id,
-            suggestion_model.target_version_at_submission,
-            suggestion_model.status,
-            suggestion_model.author_id,
-            suggestion_model.final_reviewer_id,
-            suggestion_model.change_cmd,
-            suggestion_model.score_category,
-            suggestion_model.language_code,
-            suggestion_model.edited_by_reviewer,
-            suggestion_model.last_updated,
-            suggestion_model.created_on,
-            target_type=suggestion_model.target_type,
-        )
-    return suggestion_domain_class(
+    suggestion = suggestion_domain_class(
         suggestion_model.id,
         suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
@@ -482,6 +463,11 @@ def get_suggestion_from_model(
         suggestion_model.last_updated,
         suggestion_model.created_on,
     )
+    # A translation suggestion can target any translatable entity type, so the
+    # target type is restored from the model rather than left at the default
+    # assumed by the domain class.
+    suggestion.target_type = suggestion_model.target_type
+    return suggestion
 
 
 @overload
@@ -3319,6 +3305,44 @@ def _update_question_reviewer_total_stats_models(
     )
 
 
+def _get_topic_id_of_translation_target(
+    suggestion: suggestion_registry.BaseSuggestion,
+) -> str:
+    """Returns the ID of the topic that the target of the given translation
+    suggestion belongs to.
+
+    Args:
+        suggestion: Suggestion. The translation suggestion whose target's topic
+            is required.
+
+    Returns:
+        str. The ID of the topic that the target belongs to, or
+        'uncategorized' if the target is not part of any topic.
+    """
+    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_opportunity = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+        )
+        # We can confirm that exp_opportunity will not be None since there
+        # should be an assigned opportunity for a given translation. Hence we
+        # can rule out the possibility of None for mypy type checking.
+        assert exp_opportunity is not None
+        return exp_opportunity.topic_id
+
+    opportunity = (
+        opportunity_services.get_translation_opportunities_by_entity_ids(
+            suggestion.target_type, [suggestion.target_id]
+        )[suggestion.target_id]
+    )
+    # An entity such as a skill can be translated before it is assigned to any
+    # topic, in which case the contribution is not attributable to a topic.
+    if opportunity is None or not opportunity.topic_ids:
+        return 'uncategorized'
+    return opportunity.topic_ids[0]
+
+
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
 ) -> None:
@@ -3331,15 +3355,7 @@ def update_translation_contribution_stats_at_submission(
             submitted.
     """
     content_word_count = 0
-    topic_id = 'uncategorized'
-    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        exp_opportunity = (
-            opportunity_services.get_exploration_opportunity_summary_by_id(
-                suggestion.target_id
-            )
-        )
-        if exp_opportunity is not None:
-            topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3506,15 +3522,7 @@ def update_translation_contribution_stats_at_review(
             reviewed.
     """
     content_word_count = 0
-    topic_id = 'uncategorized'
-    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        exp_opportunity = (
-            opportunity_services.get_exploration_opportunity_summary_by_id(
-                suggestion.target_id
-            )
-        )
-        if exp_opportunity is not None:
-            topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
 
     if isinstance(suggestion.change_cmd.translation_html, list):
         for content in suggestion.change_cmd.translation_html:
@@ -3665,15 +3673,7 @@ def update_translation_review_stats(
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
         )
-    topic_id = 'uncategorized'
-    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        exp_opportunity = (
-            opportunity_services.get_exploration_opportunity_summary_by_id(
-                suggestion.target_id
-            )
-        )
-        if exp_opportunity is not None:
-            topic_id = exp_opportunity.topic_id
+    topic_id = _get_topic_id_of_translation_target(suggestion)
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )

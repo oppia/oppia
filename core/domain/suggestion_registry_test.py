@@ -1953,6 +1953,34 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.pre_accept_validate()
 
+    def test_pre_accept_validate_state_content_id(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+        suggestion.change_cmd.state_name = 'Introduction'
+
+        # A valid state name must not be enough on its own: the content ID has
+        # to belong to the exploration as well.
+        suggestion.change_cmd.content_id = 'invalid_content_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invalid_content_id to be a valid content ID',
+        ):
+            suggestion.pre_accept_validate()
+
     def test_pre_accept_validate_metadata_content_id(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict.copy()
@@ -2027,10 +2055,18 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.target_id = 'non_existent_skill_id'
         with self.assertRaisesRegex(
-            utils.ValidationError,
-            'The skill with the given id doesn\'t exist.',
+            Exception, 'No skill exists with ID: non_existent_skill_id'
         ):
             suggestion.pre_accept_validate()
+
+        suggestion.target_id = 'skill1'
+        suggestion.change_cmd.content_id = 'invalid_content_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected invalid_content_id to be a valid content ID',
+        ):
+            suggestion.pre_accept_validate()
+        suggestion.change_cmd.content_id = feconf.SKILL_DESCRIPTION_CONTENT_ID
 
         suggestion.target_id = 'skill1'
         with self.swap(

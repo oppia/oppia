@@ -830,39 +830,20 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         self.validate()
         entity = opportunity_services.get_entity_by_type_and_id(
-            self.target_type, self.target_id, strict=False
+            self.target_type, self.target_id
         )
-        if entity is None:
+        if not isinstance(entity, translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
-                'The %s with the given id doesn\'t exist.' % self.target_type
+                'Expected entity to be a translatable object'
             )
-        if (
+
+        translates_metadata = (
             self.change_cmd.state_name
             == constants.DEFAULT_SUGGESTION_STATE_NAME
-        ):
-            if isinstance(entity, translation_domain.BaseTranslatableObject):
-                translatable_contents = (
-                    entity.get_translatable_contents_collection(
-                        override_metadata_feature_flag=True
-                    )
-                )
-                if (
-                    self.change_cmd.content_id
-                    not in translatable_contents.content_id_to_translatable_content
-                ):
-                    msg = (
-                        'Expected %s to be a valid metadata content ID'
-                        if self.target_type == feconf.ENTITY_TYPE_EXPLORATION
-                        else 'Expected %s to be a valid content ID'
-                    )
-                    raise utils.ValidationError(
-                        msg % self.change_cmd.content_id
-                    )
-            else:
-                raise utils.ValidationError(
-                    'Expected entity to be a translatable object'
-                )
-        else:
+        )
+        # Only explorations organise their translatable content into states, so
+        # every other entity type uses the default state name as a sentinel.
+        if not translates_metadata:
             if not isinstance(entity, exp_domain.Exploration) or (
                 self.change_cmd.state_name not in entity.states
             ):
@@ -870,6 +851,24 @@ class SuggestionTranslateContent(BaseSuggestion):
                     'Expected %s to be a valid state name'
                     % self.change_cmd.state_name
                 )
+
+        # A valid state name does not guarantee a valid content ID, so the
+        # content ID is checked against the entity's translatable contents for
+        # every entity type.
+        translatable_contents = entity.get_translatable_contents_collection(
+            override_metadata_feature_flag=True
+        )
+        if (
+            self.change_cmd.content_id
+            not in translatable_contents.content_id_to_translatable_content
+        ):
+            msg = (
+                'Expected %s to be a valid metadata content ID'
+                if translates_metadata
+                and self.target_type == feconf.ENTITY_TYPE_EXPLORATION
+                else 'Expected %s to be a valid content ID'
+            )
+            raise utils.ValidationError(msg % self.change_cmd.content_id)
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
