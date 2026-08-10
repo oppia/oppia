@@ -30,11 +30,13 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {ConceptCardComponent} from './concept-card.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('Concept card component', () => {
   let fixture: ComponentFixture<ConceptCardComponent>;
   let componentInstance: ConceptCardComponent;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let conceptCard = new ConceptCard(
     new SubtitledHtml('', '1'),
     RecordedVoiceovers.createEmpty()
@@ -53,6 +55,7 @@ describe('Concept card component', () => {
     fixture = TestBed.createComponent(ConceptCardComponent);
     componentInstance = fixture.componentInstance;
     conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should initialize and load concept cards successfully', fakeAsync(() => {
@@ -67,6 +70,24 @@ describe('Concept card component', () => {
 
     expect(componentInstance.loadingMessage).toEqual('');
     expect(componentInstance.currentConceptCard).toEqual(conceptCard);
+  }));
+
+  it("should load concept cards in the learner's selected language", fakeAsync(() => {
+    spyOn(
+      i18nLanguageCodeService,
+      'getCurrentI18nLanguageCode'
+    ).and.returnValue('es');
+    const loadConceptCardsSpy = spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve(conceptCardObjects));
+    componentInstance.index = 0;
+    componentInstance.skillIds = ['skill_1'];
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(loadConceptCardsSpy).toHaveBeenCalledWith(['skill_1'], 'es');
   }));
 
   it('should initialize and handle error if fails to load concept cards', fakeAsync(() => {

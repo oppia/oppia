@@ -37,6 +37,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_fetchers,
     translation_services,
     user_services,
 )
@@ -61,6 +62,7 @@ if MYPY:  # pragma: no cover
         question_models,
         skill_models,
         topic_models,
+        translation_models,
         user_models,
     )
 
@@ -1773,3 +1775,65 @@ def get_categorized_skill_ids_and_descriptions() -> (
                 )
 
     return categorized_skills
+
+
+def get_concept_card_dicts(
+    skills: List[skill_domain.Skill],
+    language_code: Optional[str] = None,
+) -> List[skill_domain.SkillContentsDict]:
+    """Returns the concept card dicts for the given skills, with the
+    explanation translated into the given language where a translation exists.
+
+    Args:
+        skills: list(Skill). The skills whose concept cards are required.
+        language_code: str or None. The language code to display the concept
+            cards in. If None or English, the original content is returned.
+
+    Returns:
+        list(SkillContentsDict). The concept card dicts for the given skills.
+        Any content without an up-to-date translation falls back to English.
+    """
+    concept_card_dicts = [skill.skill_contents.to_dict() for skill in skills]
+
+    if (
+        language_code is None
+        or language_code == constants.DEFAULT_LANGUAGE_CODE
+    ):
+        return concept_card_dicts
+
+    entity_references: List[
+        translation_models.EntityTranslationReferenceDict
+    ] = [
+        {
+            'entity_type': feconf.TranslatableEntityType.SKILL,
+            'entity_id': skill.id,
+            'entity_version': skill.version,
+            'language_code': language_code,
+        }
+        for skill in skills
+    ]
+    entity_translations = translation_fetchers.get_multiple_entity_translations(
+        entity_references
+    )
+
+    for skill, concept_card_dict, entity_translation in zip(
+        skills, concept_card_dicts, entity_translations
+    ):
+        if entity_translation is None:
+            continue
+
+        explanation_translation = entity_translation.translations.get(
+            skill.skill_contents.explanation.content_id
+        )
+        # A translation that needs an update is stale because the English
+        # content changed after it was accepted, so it is not shown.
+        if (
+            explanation_translation is not None
+            and not explanation_translation.needs_update
+            and isinstance(explanation_translation.content_value, str)
+        ):
+            concept_card_dict['explanation'][
+                'html'
+            ] = explanation_translation.content_value
+
+    return concept_card_dicts
