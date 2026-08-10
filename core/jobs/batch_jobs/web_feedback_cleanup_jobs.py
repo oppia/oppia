@@ -37,12 +37,13 @@ import logging
 
 from core import feconf
 from core.domain import fs_services
-from core.jobs import base_jobs
+from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -59,6 +60,113 @@ OPEN_LESSON_FEEDBACK_RETENTION_DAYS = 365
 PLATFORM_FEEDBACK_RETENTION_DAYS = 90
 
 CLEARED_FEEDBACK_TEXT = '[Text cleared after 6 months for privacy protection]'
+
+
+class PrepareWebFeedbackRetentionTestJob(base_jobs.JobBase):
+    """Temporary job for release testing only.
+
+    Updates the created_on timestamps of web feedback models so they
+    satisfy the retention policy and can be cleaned up by the retention jobs.
+    """
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    def make_lesson_feedback_expired(
+        self,
+        model: general_feedback_models.LessonFeedbackModel,
+    ) -> general_feedback_models.LessonFeedbackModel:
+        """Makes lesson feedback eligible for cleanup."""
+
+        with datastore_services.get_ndb_context():
+            if model.status == feconf.STATUS_CHOICES_OPEN:
+                model.created_on = (
+                    datetime.datetime.utcnow() - datetime.timedelta(days=366)
+                )
+            else:
+                model.created_on = (
+                    datetime.datetime.utcnow() - datetime.timedelta(days=181)
+                )
+
+        return model
+
+    def make_platform_feedback_expired(
+        self,
+        model: general_feedback_models.PlatformFeedbackModel,
+    ) -> general_feedback_models.PlatformFeedbackModel:
+        """Makes platform feedback eligible for cleanup."""
+
+        with datastore_services.get_ndb_context():
+            model.created_on = datetime.datetime.utcnow() - datetime.timedelta(
+                days=91
+            )
+
+        return model
+
+    def create_lesson_count_job_run_result(
+        self, count: int
+    ) -> job_run_result.JobRunResult:
+        """Creates a JobRunResult for updated LessonFeedbackModel count."""
+        return job_run_result.JobRunResult.as_stdout(
+            'Updated %d LessonFeedbackModels.' % count
+        )
+
+    def create_platform_count_job_run_result(
+        self, count: int
+    ) -> job_run_result.JobRunResult:
+        """Creates a JobRunResult for updated PlatformFeedbackModel count."""
+        return job_run_result.JobRunResult.as_stdout(
+            'Updated %d PlatformFeedbackModels.' % count
+        )
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Runs the PrepareWebFeedbackRetentionTestJob."""
+        lesson_models = (
+            self.pipeline
+            | 'Get LessonFeedbackModels'
+            >> ndb_io.GetModels(
+                general_feedback_models.LessonFeedbackModel.get_all()
+            )
+            | 'Expire LessonFeedbackModels'
+            >> beam.Map(self.make_lesson_feedback_expired)
+        )
+
+        platform_models = (
+            self.pipeline
+            | 'Get PlatformFeedbackModels'
+            >> ndb_io.GetModels(
+                general_feedback_models.PlatformFeedbackModel.get_all()
+            )
+            | 'Expire PlatformFeedbackModels'
+            >> beam.Map(self.make_platform_feedback_expired)
+        )
+
+        _ = lesson_models | 'Write LessonFeedbackModels' >> ndb_io.PutModels()
+
+        _ = (
+            platform_models
+            | 'Write PlatformFeedbackModels' >> ndb_io.PutModels()
+        )
+
+        lesson_count_results = (
+            lesson_models
+            | 'Count updated LessonFeedbackModels'
+            >> beam.combiners.Count.Globally()
+            | 'Format updated LessonFeedbackModels count'
+            >> beam.Map(self.create_lesson_count_job_run_result)
+        )
+
+        platform_count_results = (
+            platform_models
+            | 'Count updated PlatformFeedbackModels'
+            >> beam.combiners.Count.Globally()
+            | 'Format updated PlatformFeedbackModels count'
+            >> beam.Map(self.create_platform_count_job_run_result)
+        )
+
+        return (
+            lesson_count_results,
+            platform_count_results,
+        ) | 'Combine updated web feedback counts' >> beam.Flatten()
 
 
 class LessonFeedbackCleanupJob(base_jobs.JobBase):
@@ -229,12 +337,14 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
     def delete_platform_feedback_screenshot(
         self,
         platform_feedback_model: general_feedback_models.PlatformFeedbackModel,
+        oppia_project_id: Optional[str] = None,
     ) -> None:
         """Deletes the screenshot associated with a platform feedback report.
 
         Args:
             platform_feedback_model: PlatformFeedbackModel. The feedback model
                 whose screenshot should be deleted.
+            oppia_project_id: Optional[str]. The ID of the Oppia project.
         """
         screenshot_filename = platform_feedback_model.screenshot_filename
         screenshot_entity_id = platform_feedback_model.screenshot_entity_id
@@ -245,6 +355,7 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_FEEDBACK,
             screenshot_entity_id,
+            oppia_project_id=oppia_project_id,
         )
 
         try:
@@ -308,17 +419,21 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
     def cleanup_platform_feedback(
         self,
         platform_feedback_model: general_feedback_models.PlatformFeedbackModel,
+        oppia_project_id: Optional[str] = None,
     ) -> general_feedback_models.PlatformFeedbackModel:
         """Deletes all resources associated with a platform feedback report.
 
         Args:
             platform_feedback_model: PlatformFeedbackModel. The feedback model
                 to clean up.
+            oppia_project_id: Optional[str]. The ID of the Oppia project.
 
         Returns:
             PlatformFeedbackModel. The deleted feedback model.
         """
-        self.delete_platform_feedback_screenshot(platform_feedback_model)
+        self.delete_platform_feedback_screenshot(
+            platform_feedback_model, oppia_project_id
+        )
 
         self.delete_platform_feedback_session_log(platform_feedback_model)
 
@@ -367,6 +482,8 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
             JobRunResult. A collection of job
             run results describing the cleanup performed.
         """
+        custom_options = self.pipeline.options.view_as(job_options.JobOptions)
+        oppia_project_id = custom_options.oppia_project_id
         platform_feedback_models = (
             self.pipeline
             | 'Get PlatformFeedbackModels from the datastore'
@@ -387,7 +504,12 @@ class PlatformFeedbackCleanupJob(base_jobs.JobBase):
             processed_platform_feedback_models = (
                 expired_platform_feedback_models
                 | 'Delete expired PlatformFeedback resources'
-                >> beam.Map(self.cleanup_platform_feedback)
+                >> beam.Map(
+                    lambda model: self.cleanup_platform_feedback(
+                        model,
+                        oppia_project_id,
+                    )
+                )
             )
         else:
             processed_platform_feedback_models = (
