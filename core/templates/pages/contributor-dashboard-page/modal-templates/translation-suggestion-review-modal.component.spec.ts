@@ -1344,6 +1344,119 @@ describe('Translation Suggestion Review Modal Component', function () {
       ).toHaveBeenCalled();
     }));
 
+    it('should warn when accepting a skill translation suggestion fails', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          message,
+          difficulty,
+          successCallback,
+          errorCallback
+        ) => {
+          errorCallback();
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'clearWarnings');
+      spyOn(alertsService, 'addWarning');
+
+      component.acceptAndReviewNext();
+      tick();
+
+      expect(component.resolvingSuggestion).toBeFalse();
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error updating skill suggestion'
+      );
+    }));
+
+    it('should call reviewSkillSuggestion when rejecting a skill translation suggestion', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          message,
+          difficulty,
+          successCallback,
+          errorCallback
+        ) => {
+          successCallback();
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'addSuccessMessage');
+
+      component.rejectAndReviewNext('Review message example');
+      tick();
+
+      expect(
+        contributionAndReviewService.reviewSkillSuggestion
+      ).toHaveBeenCalledWith(
+        '1',
+        'suggestion_1',
+        AppConstants.ACTION_REJECT_SUGGESTION,
+        'Review message example',
+        null,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion rejected.'
+      );
+    }));
+
+    it('should warn when rejecting a skill translation suggestion fails', fakeAsync(() => {
+      component.ngOnInit();
+      component.activeSuggestion.target_type = AppConstants.ENTITY_TYPE.SKILL;
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          message,
+          difficulty,
+          successCallback,
+          errorCallback
+        ) => {
+          errorCallback();
+          return Promise.resolve();
+        }
+      );
+      spyOn(alertsService, 'clearWarnings');
+      spyOn(alertsService, 'addWarning');
+
+      component.rejectAndReviewNext('Review message example');
+      tick();
+
+      expect(component.resolvingSuggestion).toBeFalse();
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error rejecting skill suggestion'
+      );
+    }));
+
+    it('should return exploration content html for every supported shape', () => {
+      component.ngOnInit();
+
+      component.explorationContentHtml = ['<p>first</p>', '<p>second</p>'];
+      expect(component.explorationContentHtmlAsString).toBe('<p>first</p>');
+
+      component.explorationContentHtml = [];
+      expect(component.explorationContentHtmlAsString).toBe('');
+
+      // The active suggestion may carry no exploration content at all, in
+      // which case the getter must still return a string.
+      component.explorationContentHtml = null;
+      expect(component.explorationContentHtmlAsString).toBe('');
+    });
+
     it(
       'should allow the reviewer to fix the suggestion if the backend pre' +
         ' accept/reject validation failed',

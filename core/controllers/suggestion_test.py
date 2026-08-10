@@ -4063,6 +4063,38 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             )
         self.assertEqual(len(response['suggestions']), 3)
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_none_opportunity_for_missing_card(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        # A suggestion can outlive its translation opportunity, in which case no
+        # card is returned for its target and the target must still appear in
+        # the response mapped to None.
+        with self.swap_to_always_return(
+            opportunity_services,
+            'get_translation_opportunity_cards_by_entity_ids_with_new_models',
+            [],
+        ):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'], {self.EXP_ID: None}
+        )
+
     def test_skill_handler_returns_data(self) -> None:
         self.login(self.AUTHOR_EMAIL)
 

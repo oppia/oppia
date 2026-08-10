@@ -742,6 +742,64 @@ describe('Contribution and review service', () => {
         });
       }
     );
+
+    it(
+      'should fetch translation suggestions for a skill without ' +
+        'loading an exploration',
+      async () => {
+        const skillFetchResponse = {
+          suggestions: [
+            {
+              suggestion_type: 'translate_content',
+              suggestion_id: 'skill_suggestion_1',
+              target_type: 'skill',
+              target_id: 'skill_1',
+              status: 'review',
+              author_name: 'author',
+              change_cmd: {
+                state_name: 'Generic Content',
+                content_id: 'content_0',
+              },
+              last_updated_msecs: 0,
+            },
+          ],
+          target_id_to_opportunity_dict: {
+            skill_1: 'skill opportunity',
+          },
+          next_offset: 1,
+        };
+        fetchSuggestionsAsyncSpy.and.returnValue(
+          Promise.resolve(skillFetchResponse)
+        );
+
+        const response = await cars.fetchTranslationSuggestionsAsync(
+          'skill_1',
+          AppConstants.ENTITY_TYPE.SKILL
+        );
+
+        expect(response).toEqual({
+          suggestionIdToDetails: {
+            skill_suggestion_1: {
+              suggestion: skillFetchResponse.suggestions[0],
+              details: 'skill opportunity',
+            },
+          },
+          more: false,
+        });
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          'skill_1',
+          null,
+          AppConstants.ENTITY_TYPE.SKILL
+        );
+        // A skill translation review never needs exploration state data, so
+        // the exploration must not be fetched.
+        expect(fetchExplorationSpy).not.toHaveBeenCalled();
+      }
+    );
   });
 
   describe('reviewExplorationSuggestion', () => {

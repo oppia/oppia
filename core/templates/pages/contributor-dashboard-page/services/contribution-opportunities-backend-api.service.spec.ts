@@ -455,6 +455,36 @@ describe('Contribution Opportunities backend API service', function () {
     expect(successHandler).toHaveBeenCalled();
   }));
 
+  it('should fetch V2 translation opportunities with a specific entityType', fakeAsync(() => {
+    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    } as unknown as FeatureStatusChecker);
+
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(
+        'hi',
+        'Topic 1',
+        '',
+        AppConstants.ENTITY_TYPE.SKILL
+      )
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor=' +
+        '&entity_type=skill'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(translationOpportunityResponseV2);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+  }));
+
   it(
     'should fail to fetch the translation opportunities data ' +
       'given invalid language code ' +

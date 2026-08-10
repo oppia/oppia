@@ -48,7 +48,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Union, cast
+from typing import Dict, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2257,38 +2257,6 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, [], 'hi'
         )
         self.assertEqual(cards, [])
-
-    @test_utils.enable_feature_flags(
-        [
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
-        ]
-    )
-    def test_get_entity_type_from_model_fallback(self) -> None:
-        class DummyModel:
-            """Dummy model to simulate TranslationOpportunityModel."""
-
-            id = 'dummy_id'
-            entity_type = feconf.ENTITY_TYPE_EXPLORATION
-            entity_id = 'skill_id_1'
-            topic_ids = ['topic_id_1']
-            content_count = 1
-            translation_counts: Dict[str, int] = {}
-            incomplete_translation_language_codes: List[str] = ['hi']
-            translation_in_review_counts: Dict[str, int] = {}
-
-        cards = opportunity_services._get_translation_opportunity_cards_from_models(  # pylint: disable=protected-access
-            [
-                # Here we use cast because DummyModel simulates TranslationOpportunityModel for testing entity type resolution.
-                cast(
-                    opportunity_models.TranslationOpportunityModel, DummyModel()
-                )
-            ],
-            feconf.ENTITY_TYPE_SKILL,
-            'hi',
-        )
-
-        self.assertEqual(len(cards), 1)
-        self.assertEqual(cards[0].entity_type, feconf.ENTITY_TYPE_SKILL)
 
     @test_utils.enable_feature_flags(
         [

@@ -1477,25 +1477,11 @@ def _get_translation_opportunity_cards_from_models(
     def _get_entity_type_from_model(
         model: opportunity_models.TranslationOpportunityModel,
     ) -> str:
-        if hasattr(model, 'id') and '.' in model.id:
-            return model.id.split('.')[0]
-        if hasattr(model, 'entity_type') and model.entity_type:
-            if model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                if (
-                    exp_fetchers.get_exploration_by_id(
-                        model.entity_id, strict=False
-                    )
-                    is None
-                ):
-                    if (
-                        skill_fetchers.get_skill_by_id(
-                            model.entity_id, strict=False
-                        )
-                        is not None
-                    ):
-                        return feconf.ENTITY_TYPE_SKILL
-            return str(model.entity_type)
-        return feconf.ENTITY_TYPE_EXPLORATION
+        # The ID of a translation opportunity is always generated as
+        # {entity_type}.{entity_id}, and entity_type is validated against
+        # feconf.TRANSLATABLE_ENTITY_TYPES before the model is stored, so the
+        # prefix is always a valid entity type.
+        return model.id.split('.')[0]
 
     exp_entity_ids = [
         m.entity_id

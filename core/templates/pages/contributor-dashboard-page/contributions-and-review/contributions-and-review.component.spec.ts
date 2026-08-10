@@ -3015,6 +3015,94 @@ describe('Contributions and review component', () => {
       ).not.toHaveBeenCalled();
     });
 
+    it('should commit a queued skill suggestion', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'skill_1',
+        target_type: 'skill',
+        suggestion_id: 'suggestion_1',
+        action_status: 'accept',
+        reviewer_message: 'test',
+      };
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          reviewMessage,
+          skillDifficulty,
+          successCallback,
+          errorCallback
+        ) => {
+          return Promise.resolve(successCallback(suggestionId));
+        }
+      );
+      component.contributions = {suggestion_1: {}};
+      spyOn(alertsService, 'addSuccessMessage');
+      spyOn(alertsService, 'clearMessages');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
+
+      component.commitQueuedSuggestion();
+
+      expect(
+        contributionAndReviewService.reviewSkillSuggestion
+      ).toHaveBeenCalledWith(
+        'skill_1',
+        'suggestion_1',
+        'accept',
+        'test',
+        null,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion accepted.'
+      );
+      expect(removeSpy).toHaveBeenCalledWith(['suggestion_1']);
+      expect(component.isCommitting).toBeFalse();
+    });
+
+    it('should warn when committing a queued skill suggestion fails', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'skill_1',
+        target_type: 'skill',
+        suggestion_id: 'suggestion_1',
+        action_status: 'reject',
+        reviewer_message: 'test',
+      };
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          reviewMessage,
+          skillDifficulty,
+          successCallback,
+          errorCallback
+        ) => {
+          return Promise.reject(errorCallback(suggestionId));
+        }
+      );
+      component.contributions = {};
+      spyOn(alertsService, 'addWarning');
+      spyOn(alertsService, 'clearWarnings');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
+
+      component.commitQueuedSuggestion();
+
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error updating skill suggestion'
+      );
+      expect(removeSpy).not.toHaveBeenCalled();
+      expect(component.isCommitting).toBeFalse();
+    });
+
     it('should not call remove suggestion emitter if network call fails', function () {
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
@@ -3210,6 +3298,48 @@ describe('Contributions and review component', () => {
 
       mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
         false;
+    }));
+
+    it('should use the skill description as the subheading for skill translation suggestions', fakeAsync(() => {
+      const suggestionIdToSuggestions = {
+        suggestion_1: {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            target_type: 'skill',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 1',
+              translation_html: 'Translation 1',
+            },
+            exploration_content_html: 'Content 1',
+          },
+          details: {
+            skill_description: 'Skill description',
+          },
+        },
+        suggestion_2: {
+          suggestion: {
+            suggestion_id: 'suggestion_2',
+            target_type: 'skill',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 2',
+              translation_html: 'Translation 2',
+            },
+            exploration_content_html: 'Content 2',
+          },
+          // A skill whose description has not loaded must fall back to an
+          // empty subheading rather than rendering "undefined".
+          details: {},
+        },
+      } as unknown as Record<string, SuggestionDetails>;
+
+      const summaryList = component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions
+      );
+
+      expect(summaryList[0].subheading).toBe('Skill description');
+      expect(summaryList[1].subheading).toBe('');
     }));
 
     it('should open translation suggestion modal with correct subheading when EnableTranslationOppsWithNewOppModels is enabled', fakeAsync(() => {
