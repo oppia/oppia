@@ -2750,6 +2750,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
+   * @returns {string} The exploration id of the published exploration.
    */
   async publishExplorationWithMetadata(
     title: string,
