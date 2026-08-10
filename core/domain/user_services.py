@@ -364,6 +364,7 @@ def get_users_settings(
                     username='admin',
                     has_viewed_lesson_info_modal_once=False,
                     last_agreed_to_terms=utils.get_current_utc_datetime(),
+                    profile_name_for_certificate='',
                 )
             )
         else:
@@ -1108,6 +1109,9 @@ def _get_user_settings_from_model(
         preferred_translation_language_code=(
             user_settings_model.preferred_translation_language_code
         ),
+        profile_name_for_certificate=(
+            user_settings_model.profile_name_for_certificate
+        ),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
@@ -1230,6 +1234,7 @@ def create_new_user(auth_id: str, email: str) -> user_domain.UserSettings:
         False,
         False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+        profile_name_for_certificate='',
     )
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -1301,6 +1306,7 @@ def create_new_profiles(
             False,
             False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+            profile_name_for_certificate='',
             pin=modifiable_user_data.pin,
         )
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)

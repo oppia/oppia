@@ -1280,6 +1280,8 @@
   "I18N_PREFERENCES_BIO_EXPLAIN_TEXT": "Text displayed in the preferences page. - Text shown below the text entry for the user biography.",
   "I18N_PREFERENCES_BREADCRUMB": "Text displayed in the preferences page. - Text shown in the top left corner of the nav bar.\n{{Identical|Preferences}}",
   "I18N_PREFERENCES_CANCEL_BUTTON": "Text displayed in the preferences page. - Text of the cancel button of the dialog shown to upload a profile picture.\n{{Identical|Cancel}}",
+  "I18N_PREFERENCES_CERTIFICATE_NAME": "Text displayed in the preferences page. - Label for the certificate name field.",
+  "I18N_PREFERENCES_CERTIFICATE_NAME_EXPLAIN_TEXT": "Text displayed in the preferences page. - Help text explaining what the certificate name is used for.",
   "I18N_PREFERENCES_CHANGE_PICTURE": "Text displayed in the preferences page. - Text shown as a tooltip when the user hovers the space for the profile picture. If the user clicks this area, a dialog to Upload a picture is displayed.",
   "I18N_PREFERENCES_EMAIL": "Text displayed in the preferences page. - Text shown to the left of the user email address.\n{{Identical|E-mail}}",
   "I18N_PREFERENCES_EMAIL_CLARIFICATION": "Text displayed in the preferences page. - Text shown below the email address.",

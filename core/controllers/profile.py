@@ -325,6 +325,9 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         self.values.update(
             {
+                'profile_name_for_certificate': (
+                    user_settings.profile_name_for_certificate
+                ),
                 'preferred_language_codes': user_settings.preferred_language_codes,
                 'preferred_site_language_code': (
                     user_settings.preferred_site_language_code
@@ -423,6 +426,9 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                         % feconf.MAX_BIO_LENGTH_IN_CHARS
                     )
                 user_settings.user_bio = data
+            elif update_type == 'profile_name_for_certificate':
+                self.__validate_data_type(update_type, str, data)
+                user_settings.profile_name_for_certificate = data
             elif update_type == 'preferred_site_language_code':
                 self.__validate_data_type(update_type, str, data)
                 user_settings.preferred_site_language_code = data
