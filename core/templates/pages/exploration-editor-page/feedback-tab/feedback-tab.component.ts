@@ -32,10 +32,12 @@ import {ThreadDataBackendApiService} from './services/thread-data-backend-api.se
 import {ThreadStatusDisplayService} from './services/thread-status-display.service';
 import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
+import './feedback-tab.component.css';
 
 @Component({
   selector: 'oppia-feedback-tab',
   templateUrl: './feedback-tab.component.html',
+  styleUrls: ['./feedback-tab.component.css'],
 })
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
