@@ -16,7 +16,7 @@
  * @fileoverview Utility File for Playwright Acceptance Tests.
  */
 
-import {Locator, ViewportSize} from '@playwright/test';
+import {ViewportSize} from '@playwright/test';
 import test, {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
@@ -1239,7 +1239,10 @@ export class BaseUser {
     await this.expectElementToBeVisible(selector);
     await this.clickOnElementWithSelector(selector);
 
-    const option = this.page.getByRole('option', { name: optionText, exact: useExactMatch });
+    const option = this.page.getByRole('option', {
+      name: optionText,
+      exact: useExactMatch,
+    });
     await option.waitFor({state: 'visible'});
     await option.click();
     await this.expectElementToBeVisible('mat-option', false);
@@ -1256,11 +1259,17 @@ export class BaseUser {
     selectElementLabel: string,
     optionText: string,
     useExactMatch: boolean = true
-  ) {
-    const selectElement = this.page.getByRole('combobox', { name: selectElementLabel, exact: true});
+  ): Promise<void> {
+    const selectElement = this.page.getByRole('combobox', {
+      name: selectElementLabel,
+      exact: true,
+    });
     await selectElement.click();
 
-    const option = this.page.getByRole('option', { name: optionText, exact: useExactMatch });
+    const option = this.page.getByRole('option', {
+      name: optionText,
+      exact: useExactMatch,
+    });
     await option.click();
     await this.expectElementToBeVisible('mat-option', false);
   }
@@ -1274,7 +1283,7 @@ export class BaseUser {
   async changeMatSelectOption(
     currentOption: string,
     newOption: string
-  ) {
+  ): Promise<void> {
     const selectElement = this.page.getByText(currentOption, {exact: true});
     await selectElement.click();
 
@@ -1355,7 +1364,10 @@ export class BaseUser {
    * @param {string} selectMenuLabel The label used for select element.
    * @param {string} optionLabel The label used for option element.
    */
-  async selectOption(selectMenuLabel: string, optionLabel: string) {
+  async selectOption(
+    selectMenuLabel: string,
+    optionLabel: string
+  ): Promise<void> {
     const selectElement = this.page.getByLabel(selectMenuLabel);
     await selectElement.selectOption({label: optionLabel});
     await expect(selectElement).toHaveValue(

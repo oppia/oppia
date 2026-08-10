@@ -40,7 +40,7 @@ const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const addRoleButton = 'button.oppia-add-role-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
-const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
+// const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
 
 const justifyContentDiv = 'div.justify-content-between';
 const userRoleDescriptionSelector = '.oppia-user-role-description';

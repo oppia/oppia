@@ -90,7 +90,10 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
     }
     await this.expectElementToBeVisible(topicStatusDropdownSelector);
-    await this.selectMatOptionUsingSelector(topicStatusDropdownSelector, status);
+    await this.selectMatOptionUsingSelector(
+      topicStatusDropdownSelector,
+      status
+    );
 
     const dropdownValue = this.page.locator(
       `${topicStatusDropdownSelector} .mat-select-value-text`
@@ -207,7 +210,11 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
     }
     await this.expectElementToBeVisible(sortDropdownSelector);
-    await this.selectMatOptionUsingSelector(sortDropdownSelector, sortOption, false);
+    await this.selectMatOptionUsingSelector(
+      sortDropdownSelector,
+      sortOption,
+      false
+    );
 
     const dropdownValue = this.page.locator(
       `${sortDropdownSelector} .mat-select-value-text`
@@ -331,7 +338,10 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
     }
     await this.expectElementToBeVisible(skillStatusDropdownSelector);
-    await this.selectMatOptionUsingSelector(skillStatusDropdownSelector, status);
+    await this.selectMatOptionUsingSelector(
+      skillStatusDropdownSelector,
+      status
+    );
 
     const dropdownValue = this.page.locator(
       `${skillStatusDropdownSelector} .mat-select-value-text`
@@ -345,7 +355,9 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Expects the filtered skills to match the provided list.
+   * Expects the filtered skills to match the provided list (doesn't check exclusively).
+   * @param expectedSkills {string[]} List of skills that should be checked for.
+   * @param visible {Boolean} If skills should be visible or hidden.
    */
   async expectFilteredSkills(
     expectedSkills: string[],
@@ -354,26 +366,33 @@ export class TopicManager extends BaseUser {
     const skillNameSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
+
     await this.waitForStaticAssetsToLoad();
 
     const skillElements = this.page.locator(skillNameSelector);
     await this.waitForNetworkIdle();
-    const count = await skillElements.count();
-    const foundSkills: string[] = [];
-    for (let i = 0; i < count; i++) {
-      const text = (await skillElements.nth(i).textContent())?.trim();
-      if (text) {
-        foundSkills.push(text);
-      }
-    }
 
-    for (const skill of expectedSkills) {
-      if (visible) {
-        expect(foundSkills).toContain(skill);
-      } else {
-        expect(foundSkills).not.toContain(skill);
-      }
-    }
+    await expect
+      .poll(
+        async () => {
+          const foundSkills = (await skillElements.allTextContents())
+            .map(text => text.trim())
+            .filter(Boolean);
+
+          for (const skill of expectedSkills) {
+            if (visible) {
+              expect(foundSkills).toContain(skill);
+            } else {
+              expect(foundSkills).not.toContain(skill);
+            }
+          }
+
+          return true;
+        },
+        {timeout: 5000}
+      )
+      .toBe(true);
+
     showMessage('Filtered skills match the expected skills.');
   }
 
@@ -448,17 +467,17 @@ export class TopicManager extends BaseUser {
    * @param {string} newSort New sort method to choose.
    */
   async changeSkillSort(currentSort: string, newSort: string): Promise<void> {
-      await this.navigateToTopicAndSkillsDashboardPage();
-      await this.navigateToSkillsTab();
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOnElementWithSelector(displayMobileFiltersButton);
-      }
-      
-await this.changeMatSelectOption(currentSort, newSort);     
- if (this.isViewportAtMobileWidth()) {
-        await this.clickOnElementWithSelector(closeMobileFiltersButton);
-      }
-      showMessage(`Sorted skills by "${newSort}"`);
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToSkillsTab();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(displayMobileFiltersButton);
+    }
+
+    await this.changeMatSelectOption(currentSort, newSort);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(closeMobileFiltersButton);
+    }
+    showMessage(`Sorted skills by "${newSort}"`);
   }
 
   /**
@@ -505,9 +524,11 @@ await this.changeMatSelectOption(currentSort, newSort);
    * Expects a question to be visible.
    */
   async expectQuestionToBeVisible(question: string): Promise<void> {
-    const questionTextElement = this.page.locator(questionTextSelector, {
-      hasText: question,
-    }).first();
+    const questionTextElement = this.page
+      .locator(questionTextSelector, {
+        hasText: question,
+      })
+      .first();
     await questionTextElement.waitFor({state: 'visible'});
     showMessage(`Question ${question} is visible.`);
   }
