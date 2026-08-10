@@ -17,6 +17,10 @@
  */
 
 import {Component} from '@angular/core';
+import {
+  CERTIFICATE_ATTEMPT_STATUSES,
+  CertificateAttemptStatus,
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {CertificateAttemptSummary} from 'domain/certificate-assessment/certificate-assessment.model';
 import './my-certificates-tab.component.css';
 
@@ -30,7 +34,7 @@ import './my-certificates-tab.component.css';
 // to the certificate assessment attempts handler.
 export class MyCertificatesTabComponent {
   PASSING_SCORE_THRESHOLD = 70;
-  selectedFilter: string = 'all';
+  selectedFilter: CertificateAttemptStatus = CERTIFICATE_ATTEMPT_STATUSES.ALL;
 
   certificateAttempts: CertificateAttemptSummary[] = [
     {
@@ -65,10 +69,10 @@ export class MyCertificatesTabComponent {
   constructor() {}
 
   get filteredAttempts(): CertificateAttemptSummary[] {
-    if (this.selectedFilter === 'passed') {
+    if (this.selectedFilter === CERTIFICATE_ATTEMPT_STATUSES.PASSED) {
       return this.certificateAttempts.filter(attempt => this.isPassed(attempt));
     }
-    if (this.selectedFilter === 'not_passed') {
+    if (this.selectedFilter === CERTIFICATE_ATTEMPT_STATUSES.NOT_PASSED) {
       return this.certificateAttempts.filter(
         attempt => !this.isPassed(attempt)
       );
@@ -77,7 +81,8 @@ export class MyCertificatesTabComponent {
   }
 
   onFilterChange(event: Event): void {
-    this.selectedFilter = (event.target as HTMLSelectElement).value;
+    this.selectedFilter = (event.target as HTMLSelectElement)
+      .value as CertificateAttemptStatus;
   }
 
   isPassed(attempt: CertificateAttemptSummary): boolean {

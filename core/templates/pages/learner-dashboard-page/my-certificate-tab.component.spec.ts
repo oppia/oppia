@@ -21,6 +21,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterTestingModule} from '@angular/router/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {CERTIFICATE_ATTEMPT_STATUSES} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
 
 describe('MyCertificatesTabComponent', () => {
@@ -51,7 +52,7 @@ describe('MyCertificatesTabComponent', () => {
   });
 
   it('should filter attempts by passed status', () => {
-    component.selectedFilter = 'passed';
+    component.selectedFilter = CERTIFICATE_ATTEMPT_STATUSES.PASSED;
     expect(component.filteredAttempts.length).toBe(2);
     expect(
       component.filteredAttempts.every(attempt => component.isPassed(attempt))
@@ -59,7 +60,7 @@ describe('MyCertificatesTabComponent', () => {
   });
 
   it('should filter attempts by not passed status', () => {
-    component.selectedFilter = 'not_passed';
+    component.selectedFilter = CERTIFICATE_ATTEMPT_STATUSES.NOT_PASSED;
     expect(component.filteredAttempts.length).toBe(1);
     expect(component.isPassed(component.filteredAttempts[0])).toBeFalse();
   });
@@ -68,9 +69,9 @@ describe('MyCertificatesTabComponent', () => {
     const selectElement = fixture.nativeElement.querySelector(
       '#certificate-attempt-status-filter'
     );
-    selectElement.value = 'passed';
+    selectElement.value = CERTIFICATE_ATTEMPT_STATUSES.PASSED;
     selectElement.dispatchEvent(new Event('change'));
-    expect(component.selectedFilter).toBe('passed');
+    expect(component.selectedFilter).toBe(CERTIFICATE_ATTEMPT_STATUSES.PASSED);
   });
 
   it('should derive the passed status from the score threshold', () => {

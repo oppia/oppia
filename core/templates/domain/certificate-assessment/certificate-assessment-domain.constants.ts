@@ -70,3 +70,12 @@ export const CERTIFICATE_OFFERING_ASYNC_STATUSES = {
 
 export type CertificateOfferingAsyncStatus =
   (typeof CERTIFICATE_OFFERING_ASYNC_STATUSES)[keyof typeof CERTIFICATE_OFFERING_ASYNC_STATUSES];
+
+export const CERTIFICATE_ATTEMPT_STATUSES = {
+  ALL: 'all',
+  PASSED: 'passed',
+  NOT_PASSED: 'not_passed',
+} as const;
+
+export type CertificateAttemptStatus =
+  (typeof CERTIFICATE_ATTEMPT_STATUSES)[keyof typeof CERTIFICATE_ATTEMPT_STATUSES];
