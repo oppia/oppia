@@ -304,6 +304,7 @@ describe('Classroom Page Component', () => {
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
     );
+    component.isUserLoggedIn = true;
 
     spyOn(component, 'ngOnInit').and.stub();
     fixture.detectChanges();
@@ -334,6 +335,7 @@ describe('Classroom Page Component', () => {
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
     );
+    component.isUserLoggedIn = true;
 
     spyOn(component, 'ngOnInit').and.stub();
     fixture.detectChanges();
