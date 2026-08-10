@@ -31,6 +31,7 @@ import './certificate-offering-confirmation-modal.component.css';
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',
   templateUrl: './certificate-offering-confirmation-modal.component.html',
+  styleUrls: ['./certificate-offering-confirmation-modal.component.css'],
 })
 export class CertificateOfferingConfirmationModalComponent {
   @Input() action: CertificateOfferingConfirmationAction =
