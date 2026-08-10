@@ -89,6 +89,10 @@ describe('Topic Manager', function () {
     }
 
     await curriculumAdmin.saveStoryDraft();
+    // TODO(#27082): Reduce the setup time for this spec while migrating to
+    // Playwright. The 45-minute timeout is needed because the beforeAll hook
+    // creates 11 published explorations, a topic, a classroom, and an
+    // 11-chapter story, which can take 30+ minutes on slow CI runners.
   }, 2700000);
 
   it(
