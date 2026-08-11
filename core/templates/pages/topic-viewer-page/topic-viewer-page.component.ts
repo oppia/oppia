@@ -36,19 +36,8 @@ import {PageTitleService} from 'services/page-title.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {TopicViewerStorySectionData} from 'pages/topic-viewer-page/topic-viewer-content/topic-viewer-content.component';
 import './topic-viewer-page.component.css';
-
-interface TopicViewerStorySectionData {
-  storyId: string;
-  storyTitle: string;
-  storyDescription: string;
-  storySummary: StorySummary;
-  practiceSubtopicIds: number[];
-  classroomUrlFragment: string;
-  topicUrlFragment: string;
-  lessonCount: number;
-  practiceCount: number;
-}
 
 @Component({
   selector: 'topic-viewer-page',
@@ -169,13 +158,6 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           }
         }
       );
-  }
-
-  trackStoryDataById(
-    index: number,
-    storyData: TopicViewerStorySectionData
-  ): string {
-    return storyData.storyId;
   }
 
   private getCanonicalStorySectionData(

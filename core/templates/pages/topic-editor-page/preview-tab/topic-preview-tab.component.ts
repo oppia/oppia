@@ -26,24 +26,11 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
-import './topic-preview-tab.component.css';
-
-interface TopicViewerStorySectionData {
-  storyId: string;
-  storyTitle: string;
-  storyDescription: string;
-  storySummary: StorySummary;
-  practiceSubtopicIds: number[];
-  classroomUrlFragment: string;
-  topicUrlFragment: string;
-  lessonCount: number;
-  practiceCount: number;
-}
+import {TopicViewerStorySectionData} from 'pages/topic-viewer-page/topic-viewer-content/topic-viewer-content.component';
 
 @Component({
   selector: 'oppia-topic-preview-tab',
   templateUrl: './topic-preview-tab.component.html',
-  styleUrls: ['./topic-preview-tab.component.css'],
 })
 export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';
@@ -125,13 +112,6 @@ export class TopicPreviewTabComponent {
   isRedesignedTopicViewerPageFeatureEnabled(): boolean {
     return this.platformFeatureService.status.RedesignedTopicViewerPage
       .isEnabled;
-  }
-
-  trackStoryDataById(
-    index: number,
-    storyData: TopicViewerStorySectionData
-  ): string {
-    return storyData.storyId;
   }
 
   private getCanonicalStorySectionData(): readonly TopicViewerStorySectionData[] {

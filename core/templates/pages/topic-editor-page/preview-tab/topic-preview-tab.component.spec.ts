@@ -245,15 +245,6 @@ describe('Topic Preview Tab Component', () => {
     ).toEqual(1);
   });
 
-  it('should track story section data by story id', () => {
-    expect(
-      componentInstance.trackStoryDataById(
-        0,
-        componentInstance.canonicalStorySectionData[0]
-      )
-    ).toEqual('id');
-  });
-
   it('should get static image url', () => {
     expect(componentInstance.getStaticImageUrl('image_path')).toEqual(mockUrl);
   });
