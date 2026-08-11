@@ -72,7 +72,6 @@ const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 const creationModalSelector = '.e2e-test-creation-modal';
 const createExplorationFromModalSelector = '.e2e-test-create-exploration';
-const modalWindowSelector = 'ngb-modal-window.modal.show';
 const rolesHeaderSelector = '.e2e-test-roles-header';
 const rolesContentSelector = '.e2e-test-roles-content';
 const usernameSelector = '.e2e-test-role-username';
@@ -427,7 +426,6 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
-const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
 const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
