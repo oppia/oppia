@@ -1092,24 +1092,6 @@ def get_certificate_assessment_attempt(
     return _attempt_model_to_domain(attempt_model)
 
 
-def get_active_certificate_assessment_attempt(
-    learner_id: str,
-) -> certificate_assessment_domain.CertificateAssessmentAttempt:
-    """Returns the learner's active in-progress assessment attempt.
-
-    Args:
-        learner_id: str. The ID of the learner.
-
-    Returns:
-        CertificateAssessmentAttempt. The learner's active attempt.
-
-    Raises:
-        utils.ValidationError. If the learner has no active attempt.
-    """
-    attempt_model = _get_active_attempt_for_learner(learner_id)
-    return _attempt_model_to_domain(attempt_model)
-
-
 def create_certificate_assessment_offering(
     title: str,
     description: str,
