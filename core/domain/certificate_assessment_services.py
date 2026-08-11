@@ -34,7 +34,7 @@ from core.domain import (
 from core.platform import models
 from core.storage.certificate_assessment import gae_models
 
-from typing import Dict, List, TypedDict, cast
+from typing import Dict, List, Optional, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -68,6 +68,8 @@ class CertificateOfferingClassroomSummary(TypedDict):
     certificate_id: str
     title: str
     attempt_status: str
+    passed_on_date: Optional[float]
+    failed_on_date: Optional[float]
 
 
 def _get_topic_name_to_question_ids_map(
@@ -824,11 +826,27 @@ def get_certificate_offerings_for_classroom(
             attempt_status = 'Passed'
         else:
             attempt_status = 'Not Passed'
+        passed_on_date: Optional[float] = None
+        failed_on_date: Optional[float] = None
+        if (
+            latest_attempt is not None
+            and latest_attempt.finished_at is not None
+        ):
+            if attempt_status == 'Passed':
+                passed_on_date = utils.get_time_in_millisecs(
+                    latest_attempt.finished_at
+                )
+            else:
+                failed_on_date = utils.get_time_in_millisecs(
+                    latest_attempt.finished_at
+                )
         certificate_offerings.append(
             {
                 'certificate_id': offering_model.id,
                 'title': offering_model.title,
                 'attempt_status': attempt_status,
+                'passed_on_date': passed_on_date,
+                'failed_on_date': failed_on_date,
             }
         )
     return certificate_offerings

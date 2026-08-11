@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import datetime
 from unittest import mock
 
 from core import feconf, utils
@@ -26,6 +27,7 @@ from core.domain import (
     classroom_config_services,
     topic_fetchers,
 )
+from core.storage.certificate_assessment import gae_models
 from core.tests import test_utils
 
 
@@ -456,6 +458,33 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
             demonstrates=['Sample skill'],
             async_status='Available',
         )
+        learner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        certificate_ids = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            self.classroom_url_fragment, learner_id
+        )
+        started_at = datetime.datetime(2026, 1, 2, 3, 4, 5)
+        finished_at = started_at + datetime.timedelta(minutes=5)
+        gae_models.CertificateAssessmentAttemptModel.create(
+            learner_id=learner_id,
+            total_score=90.0,
+            attempt_index=1,
+            attempt_data={
+                self.topic_id: {
+                    'total_related_questions': 1,
+                    'total_correct_questions': 1,
+                }
+            },
+            version_data={
+                'certificate_id': certificate_ids[0]['certificate_id'],
+                'certificate_version': 1,
+                'topic_versions': {self.topic_id: 1},
+                'question_versions': {'question_id_1': 1},
+                'question_topic_links': {'question_id_1': [self.topic_id]},
+            },
+            started_at=started_at,
+            finished_at=finished_at,
+            is_submitted=True,
+        )
 
         response = self.get_json(
             feconf.CERTIFICATE_ASSESSMENT_OFFERINGS_FOR_CLASSROOM_HANDLER.replace(
@@ -463,16 +492,25 @@ class CertificateAssessmentOfferingsForClassroomHandlerTest(
             )
         )
 
-        self.assertIn('certificate_offerings', response)
-        self.assertEqual(len(response['certificate_offerings']), 1)
-        self.assertTrue(response['certificate_offerings'][0]['certificate_id'])
+        self.assertIn('available_certificate_offerings', response)
+        self.assertEqual(len(response['available_certificate_offerings']), 1)
+        self.assertTrue(
+            response['available_certificate_offerings'][0]['certificate_id']
+        )
         self.assertEqual(
-            response['certificate_offerings'][0]['title'],
+            response['available_certificate_offerings'][0]['title'],
             'Sample Certificate',
         )
         self.assertEqual(
-            response['certificate_offerings'][0]['attempt_status'],
-            'Not Attempted',
+            response['available_certificate_offerings'][0]['attempt_status'],
+            'Passed',
+        )
+        self.assertEqual(
+            response['available_certificate_offerings'][0]['passed_on_date'],
+            utils.get_time_in_millisecs(finished_at),
+        )
+        self.assertIsNone(
+            response['available_certificate_offerings'][0]['failed_on_date']
         )
 
     def test_get_raises_not_logged_in_when_user_id_is_missing(self) -> None:
