@@ -84,7 +84,6 @@ export class TopicManager extends BaseUser {
   async filterTopicsByStatus(
     status: 'Published' | 'Not Published' | 'All'
   ): Promise<void> {
-    await this.page.bringToFront();
     await this.navigateToTopicsAndSkillsDashboardPage();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
@@ -204,7 +203,6 @@ export class TopicManager extends BaseUser {
       | 'Newly Created'
       | 'Oldest Created'
   ): Promise<void> {
-    await this.page.bringToFront();
     await this.navigateToTopicsAndSkillsDashboardPage();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
@@ -262,7 +260,6 @@ export class TopicManager extends BaseUser {
    * Filters topics by keyword.
    */
   async filterTopicsByKeyword(keyword: string): Promise<void> {
-    await this.page.bringToFront();
     await this.navigateToTopicsAndSkillsDashboardPage();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(displayMobileFiltersButton);
@@ -331,7 +328,6 @@ export class TopicManager extends BaseUser {
    * Filters skills by status.
    */
   async filterSkillsByStatus(status: string): Promise<void> {
-    await this.page.bringToFront();
     await this.navigateToTopicsAndSkillsDashboardPage();
     await this.navigateToSkillsTab();
     if (this.isViewportAtMobileWidth()) {
@@ -431,7 +427,6 @@ export class TopicManager extends BaseUser {
    * Filters skills by keyword.
    */
   async filterSkillsByKeyword(keyword: string): Promise<void> {
-    await this.page.bringToFront();
     await this.navigateToTopicsAndSkillsDashboardPage();
     await this.navigateToSkillsTab();
     if (this.isViewportAtMobileWidth()) {
@@ -456,7 +451,6 @@ export class TopicManager extends BaseUser {
    * Navigate to the topic and skills dashboard page.
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
-    await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicsAndSkillsDashboardUrl);
   }

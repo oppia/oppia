@@ -976,14 +976,12 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(confirmSkillCreationButton);
     await this.waitForNetworkIdle();
     await this.expectElementToBeVisible(confirmSkillCreationButton, false);
-    await this.page.bringToFront();
   }
 
   /**
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
-    await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(classroomAdminUrl);
   }
@@ -1058,7 +1056,6 @@ export class CurriculumAdmin extends TopicManager {
     const skillButtonSelector = this.isViewportAtMobileWidth()
       ? createNewSkillMobileButton
       : createNewSkillButton;
-    await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(skillsTab);
     await this.expectElementToBeVisible(skillButtonSelector);
@@ -1074,7 +1071,6 @@ export class CurriculumAdmin extends TopicManager {
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
-    await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOnElementWithSelector(skillsTab);
     await this.expectElementToBeVisible(skillSelector);
