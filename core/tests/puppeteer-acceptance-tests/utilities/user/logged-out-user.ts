@@ -627,14 +627,11 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
-const shareCollectionFooterSelector = '.e2e-test-share-collection-footer';
 const desktopCollectionExplorationTileSelector =
   '.e2e-test-collection-exploration';
 const mobileCollectionExplorationTileSelector =
   '.e2e-mobile-test-collection-exploration';
 const backToCollectionButtonSelector = '.conversation-skin-back-to-collection';
-const collectionSummaryTileTitleSelector =
-  '.e2e-test-collection-summary-tile-title';
 const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
 const collectionPreviewTileLinkSelector =
   '.oppia-exploration-summary-tile a[href*="/explore/"]';
@@ -7920,27 +7917,6 @@ export class LoggedOutUser extends BaseUser {
 
   private storedCollectionPath: string | null = null;
   /**
-   * Expects a collection with the given name to be visible in the community
-   * library.
-   * @param {string} collectionName - The name of the collection expected to be visible.
-   */
-  async expectCollectionToBeVisibleInLibrary(
-    collectionName: string
-  ): Promise<void> {
-    await this.page.waitForSelector(collectionSummaryTileTitleSelector, {
-      visible: true,
-    });
-    const titles = await this.page.$$eval(
-      collectionSummaryTileTitleSelector,
-      elements => elements.map(el => el.textContent?.trim() ?? '')
-    );
-    if (!titles.includes(collectionName)) {
-      throw new Error(
-        `${collectionName} collection was not visible in Community Library.`
-      );
-    }
-  }
-  /**
    * Navigates to the named collection from the community library. Internally
    * stores the collection URL path so it can be reused later (e.g. after a
    * language change).
@@ -8191,25 +8167,6 @@ export class LoggedOutUser extends BaseUser {
       timeout: 60000,
     });
     await this.waitForPageToFullyLoad();
-  }
-
-  /**
-   * Expects the share-collection footer to display exactly the given text
-   * (compared upper-case so the caller may pass either casing).
-   */
-  async expectShareCollectionFooterText(expectedText: string): Promise<void> {
-    await this.page.waitForSelector(shareCollectionFooterSelector, {
-      timeout: 10000,
-    });
-    const actualText = await this.page.$eval(
-      shareCollectionFooterSelector,
-      el => el.textContent?.trim().toUpperCase() ?? ''
-    );
-    if (actualText !== expectedText.toUpperCase()) {
-      throw new Error(
-        `Expected share footer "${expectedText}" but found "${actualText}".`
-      );
-    }
   }
 
   /**

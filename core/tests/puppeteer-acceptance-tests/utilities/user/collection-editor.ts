@@ -21,52 +21,66 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 // Creator Dashboard selectors.
-const createActivityButtonSelector = 'button.e2e-test-create-activity';
-const createCollectionButtonSelector = '.e2e-test-create-collection';
+const createActivityButton = 'button.e2e-test-create-activity';
+const createCollectionButton = 'button.e2e-test-create-collection';
+
+// Collection Editor selectors.
+const collectionEditorCardsContainer =
+  '.e2e-test-collection-editor-cards-container';
+const addExplorationInput = '.e2e-test-add-exploration-input';
+const addExplorationButton = '.e2e-test-add-exploration-button';
+const saveDraftButton = '.e2e-test-save-draft-button';
+const closeSaveModalButton = '.e2e-test-close-save-modal-button';
+const saveModal = '.e2e-test-save-modal';
+const commitMessageInput = '.e2e-test-commit-message-input';
+const editorPublishButton = '.e2e-test-editor-publish-button';
+const editorTitleInput = '.e2e-test-collection-editor-title-input';
+const collectionEditorObjectiveInput =
+  '.e2e-test-collection-editor-objective-input';
+const categoryFilterDropdown = '.e2e-test-collection-editor-category-dropdown';
+const saveChangesButton = '.e2e-test-collection-save-changes-button';
+const saveInProgressLabel = '.e2e-test-save-in-progress-label';
+
+// Node selectors.
+const collectionEditorNode = '.collection-editor-node';
+const collectionEditorNodeTitle = '.collection-editor-node-title';
+const editorShiftLeft = '.e2e-test-editor-shift-left';
+const editorShiftRight = '.e2e-test-editor-shift-right';
+const editorDeleteNode = '.e2e-test-editor-delete-node';
+
+// Library page selectors.
+const searchInput = '.e2e-test-search-input';
+
+const addExplorationInputSelector = '.e2e-test-add-exploration-input';
+const addExplorationButtonSelector = '.e2e-test-add-exploration-button';
+const publishCollectionButtonSelector = '.e2e-test-editor-publish-button';
+const saveDraftButtonSelector = '.e2e-test-save-draft-button';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const collectionTitleInputSelector = '.e2e-test-collection-editor-title-input';
+const collectionObjectiveInputSelector =
+  '.e2e-test-collection-editor-objective-input';
+const collectionCategoryDropdownSelector =
+  '.e2e-test-collection-editor-category-dropdown';
+const collectionSaveChangesButtonSelector =
+  '.e2e-test-collection-save-changes-button';
 const createNewExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const creationModalSelector = '.e2e-test-creation-modal';
-
-// Collection Editor selectors.
-const collectionEditorCardsContainerSelector =
-  '.e2e-test-collection-editor-cards-container';
-const addExplorationInputSelector = '.e2e-test-add-exploration-input';
-const addExplorationButtonSelector = '.e2e-test-add-exploration-button';
-const saveDraftButtonSelector = '.e2e-test-save-draft-button';
-const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
-const saveModalSelector = '.e2e-test-save-modal';
-const commitMessageInputSelector = '.e2e-test-commit-message-input';
-const editorPublishButtonSelector = '.e2e-test-editor-publish-button';
-const editorTitleInputSelector = '.e2e-test-collection-editor-title-input';
-const collectionEditorObjectiveInputSelector =
-  '.e2e-test-collection-editor-objective-input';
-const categoryFilterDropdownSelector =
-  '.e2e-test-collection-editor-category-dropdown';
-const collectionCategoryMatSelectSelector = `${categoryFilterDropdownSelector} mat-select`;
+const createCollectionButtonSelector = '.e2e-test-create-collection';
+const collectionCategoryMatSelectSelector = `${collectionCategoryDropdownSelector} mat-select`;
 const collectionCategoryOptionSelector = 'mat-option .mat-option-text';
-const saveChangesButtonSelector = '.e2e-test-collection-save-changes-button';
-const saveInProgressLabelSelector = '.e2e-test-save-in-progress-label';
-
-// Node selectors.
-const collectionEditorNodeSelector = '.collection-editor-node';
-const collectionEditorNodeTitleSelector = '.collection-editor-node-title';
-const editorShiftLeftSelector = '.e2e-test-editor-shift-left';
-const editorShiftRightSelector = '.e2e-test-editor-shift-right';
-const editorDeleteNodeSelector = '.e2e-test-editor-delete-node';
-
-// Library page selectors.
-const searchInputSelector = '.e2e-test-search-input';
 
 export class CollectionEditor extends BaseUser {
   /**
    * Creates a new collection from the Creator Dashboard.
    */
   async createACollection(): Promise<void> {
-    await this.clickOnElementWithSelector(createActivityButtonSelector);
-    await this.expectElementToBeVisible(createCollectionButtonSelector);
-    await this.clickOnElementWithSelector(createCollectionButtonSelector);
+    await this.clickOnElementWithSelector(createActivityButton);
+    await this.expectElementToBeVisible(createCollectionButton);
+    await this.clickOnElementWithSelector(createCollectionButton);
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(collectionEditorCardsContainerSelector);
+    await this.expectElementToBeVisible(collectionEditorCardsContainer);
     showMessage('Created a new collection.');
   }
 
@@ -75,24 +89,23 @@ export class CollectionEditor extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to add.
    */
   async addExistingExploration(explorationId: string): Promise<void> {
-    await this.expectElementToBeVisible(addExplorationInputSelector);
-    await this.clearAllTextFrom(addExplorationInputSelector);
-    await this.typeInInputField(addExplorationInputSelector, explorationId);
+    await this.expectElementToBeVisible(addExplorationInput);
+    await this.clearAllTextFrom(addExplorationInput);
+    await this.typeInInputField(addExplorationInput, explorationId);
 
     // Wait for the button to become active after debouncing.
     await this.expectElementToBeVisible(
-      `${addExplorationButtonSelector}:not([disabled])`
+      `${addExplorationButton}:not([disabled])`
     );
     // Capture node count before clicking to avoid race conditions.
-    const nodeCountBefore = (await this.page.$$(collectionEditorNodeSelector))
-      .length;
-    await this.clickOnElementWithSelector(addExplorationButtonSelector);
+    const nodeCountBefore = (await this.page.$$(collectionEditorNode)).length;
+    await this.clickOnElementWithSelector(addExplorationButton);
     await this.page.waitForFunction(
       (selector: string, expectedCount: number) => {
         return document.querySelectorAll(selector).length === expectedCount;
       },
       {timeout: 10000},
-      collectionEditorNodeSelector,
+      collectionEditorNode,
       nodeCountBefore + 1
     );
     showMessage(`Added exploration ${explorationId} to the collection.`);
@@ -143,10 +156,10 @@ export class CollectionEditor extends BaseUser {
     shouldBeVisible: boolean
   ): Promise<void> {
     const arrowSelector =
-      direction === 'left' ? editorShiftLeftSelector : editorShiftRightSelector;
+      direction === 'left' ? editorShiftLeft : editorShiftRight;
     const arrowLabel = direction === 'left' ? 'Move Left' : 'Move Right';
 
-    const nodes = await this.page.$$(collectionEditorNodeSelector);
+    const nodes = await this.page.$$(collectionEditorNode);
     if (index >= nodes.length) {
       throw new Error(
         `Node at index ${index} does not exist. Only ${nodes.length} nodes found.`
@@ -194,7 +207,7 @@ export class CollectionEditor extends BaseUser {
     await this.page.waitForFunction(
       (selector: string) => document.querySelectorAll(selector).length === 0,
       {timeout: 10000},
-      collectionEditorNodeSelector
+      collectionEditorNode
     );
     showMessage('Collection editor is empty as expected.');
   }
@@ -229,7 +242,7 @@ export class CollectionEditor extends BaseUser {
    * Verifies the "Add Exploration" input is visible on the page.
    */
   async expectAddExplorationInputToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(addExplorationInputSelector);
+    await this.expectElementToBeVisible(addExplorationInput);
     showMessage('"Add Exploration" input is visible.');
   }
 
@@ -238,7 +251,7 @@ export class CollectionEditor extends BaseUser {
    * @param {number} index - The 0-based index of the node to shift.
    */
   async shiftNodeLeft(index: number): Promise<void> {
-    const shiftLeftButtons = await this.page.$$(editorShiftLeftSelector);
+    const shiftLeftButtons = await this.page.$$(editorShiftLeft);
     if (index >= shiftLeftButtons.length) {
       throw new Error(
         `Cannot shift node at index ${index}. Only ${shiftLeftButtons.length} nodes exist.`
@@ -257,8 +270,8 @@ export class CollectionEditor extends BaseUser {
         return current.join(',') !== before;
       },
       {timeout: 10000},
-      collectionEditorNodeSelector,
-      collectionEditorNodeTitleSelector,
+      collectionEditorNode,
+      collectionEditorNodeTitle,
       titlesBefore.join(',')
     );
     showMessage(`Shifted node at index ${index} to the left.`);
@@ -269,7 +282,7 @@ export class CollectionEditor extends BaseUser {
    * @param {number} index - The 0-based index of the node to shift.
    */
   async shiftNodeRight(index: number): Promise<void> {
-    const shiftRightButtons = await this.page.$$(editorShiftRightSelector);
+    const shiftRightButtons = await this.page.$$(editorShiftRight);
     if (index >= shiftRightButtons.length) {
       throw new Error(
         `Cannot shift node at index ${index}. Only ${shiftRightButtons.length} nodes exist.`
@@ -288,8 +301,8 @@ export class CollectionEditor extends BaseUser {
         return current.join(',') !== before;
       },
       {timeout: 10000},
-      collectionEditorNodeSelector,
-      collectionEditorNodeTitleSelector,
+      collectionEditorNode,
+      collectionEditorNodeTitle,
       titlesBefore.join(',')
     );
     showMessage(`Shifted node at index ${index} to the right.`);
@@ -300,14 +313,13 @@ export class CollectionEditor extends BaseUser {
    * @param {number} index - The 0-based index of the node to delete.
    */
   async deleteNode(index: number): Promise<void> {
-    const deleteButtons = await this.page.$$(editorDeleteNodeSelector);
+    const deleteButtons = await this.page.$$(editorDeleteNode);
     if (index >= deleteButtons.length) {
       throw new Error(
         `Cannot delete node at index ${index}. Only ${deleteButtons.length} nodes exist.`
       );
     }
-    const nodeCountBefore = (await this.page.$$(collectionEditorNodeSelector))
-      .length;
+    const nodeCountBefore = (await this.page.$$(collectionEditorNode)).length;
     await this.clickOnElement(deleteButtons[index]);
 
     // Post-check: wait for the node to be removed.
@@ -316,7 +328,7 @@ export class CollectionEditor extends BaseUser {
         return document.querySelectorAll(selector).length < expectedCount;
       },
       {timeout: 10000},
-      collectionEditorNodeSelector,
+      collectionEditorNode,
       nodeCountBefore
     );
     showMessage(`Deleted node at index ${index}.`);
@@ -327,17 +339,17 @@ export class CollectionEditor extends BaseUser {
    * handles the commit message modal, and waits for the save to complete.
    */
   async saveCollectionDraft(): Promise<void> {
-    await this.clickOnElementWithSelector(saveDraftButtonSelector);
+    await this.clickOnElementWithSelector(saveDraftButton);
 
     // Handle the commit message modal that opens after clicking Save Draft.
-    await this.expectElementToBeVisible(saveModalSelector);
-    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+    await this.expectElementToBeVisible(saveModal);
+    await this.clickOnElementWithSelector(closeSaveModalButton);
 
     // Wait for the modal to close and save to complete.
-    await this.expectElementToBeVisible(saveModalSelector, false);
+    await this.expectElementToBeVisible(saveModal, false);
 
     // Post-check: save draft button should be disabled after a successful save.
-    await this.page.waitForSelector(`${saveDraftButtonSelector}[disabled]`, {
+    await this.page.waitForSelector(`${saveDraftButton}[disabled]`, {
       timeout: 10000,
     });
     showMessage('Saved collection draft.');
@@ -347,7 +359,7 @@ export class CollectionEditor extends BaseUser {
    * Verifies that the "Save Draft" button is disabled.
    */
   async expectSaveDraftButtonDisabled(): Promise<void> {
-    await this.page.waitForSelector(`${saveDraftButtonSelector}[disabled]`);
+    await this.page.waitForSelector(`${saveDraftButton}[disabled]`);
     showMessage('"Save Draft" button is disabled as expected.');
   }
 
@@ -355,9 +367,7 @@ export class CollectionEditor extends BaseUser {
    * Verifies that the "Publish" button is clickable (not disabled).
    */
   async expectPublishButtonClickable(): Promise<void> {
-    await this.page.waitForSelector(
-      `${editorPublishButtonSelector}:not([disabled])`
-    );
+    await this.page.waitForSelector(`${editorPublishButton}:not([disabled])`);
     showMessage('"Publish" button is clickable as expected.');
   }
 
@@ -371,7 +381,7 @@ export class CollectionEditor extends BaseUser {
     // The separate Publish button is removed from the DOM after publishing
     // (it is only shown for private collections via *ngIf). The save draft
     // button is relabeled to "Publish Changes" for public collections.
-    await this.page.waitForSelector(`${saveDraftButtonSelector}[disabled]`);
+    await this.page.waitForSelector(`${saveDraftButton}[disabled]`);
     showMessage('"Publish Changes" button is disabled (no unsaved changes).');
   }
 
@@ -380,10 +390,10 @@ export class CollectionEditor extends BaseUser {
    * @param {string} message - The commit message to set.
    */
   async setCommitMessage(message: string): Promise<void> {
-    await this.expectElementToBeVisible(saveModalSelector);
-    await this.expectElementToBeVisible(commitMessageInputSelector);
-    await this.clearAllTextFrom(commitMessageInputSelector);
-    await this.typeInInputField(commitMessageInputSelector, message);
+    await this.expectElementToBeVisible(saveModal);
+    await this.expectElementToBeVisible(commitMessageInput);
+    await this.clearAllTextFrom(commitMessageInput);
+    await this.typeInInputField(commitMessageInput, message);
 
     // Post-check: verify the input contains the expected message.
     await this.page.waitForFunction(
@@ -394,7 +404,7 @@ export class CollectionEditor extends BaseUser {
         return input && input.value === expected;
       },
       {timeout: 10000},
-      commitMessageInputSelector,
+      commitMessageInput,
       message
     );
     showMessage('Set commit message.');
@@ -404,9 +414,9 @@ export class CollectionEditor extends BaseUser {
    * Closes the save modal.
    */
   async closeSaveModal(): Promise<void> {
-    await this.expectElementToBeVisible(closeSaveModalButtonSelector);
-    await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
-    await this.expectElementToBeVisible(closeSaveModalButtonSelector, false);
+    await this.expectElementToBeVisible(closeSaveModalButton);
+    await this.clickOnElementWithSelector(closeSaveModalButton);
+    await this.expectElementToBeVisible(closeSaveModalButton, false);
     showMessage('Closed save modal.');
   }
 
@@ -414,10 +424,10 @@ export class CollectionEditor extends BaseUser {
    * Clicks the publish collection button.
    */
   async clickOnPublishCollectionButton(): Promise<void> {
-    await this.clickOnElementWithSelector(editorPublishButtonSelector);
+    await this.clickOnElementWithSelector(editorPublishButton);
 
     // Post-check: wait for the publish metadata form to appear.
-    await this.expectElementToBeVisible(editorTitleInputSelector);
+    await this.expectElementToBeVisible(editorTitleInput);
     showMessage('Clicked publish collection button.');
   }
 
@@ -426,10 +436,10 @@ export class CollectionEditor extends BaseUser {
    * @param {string} title - The title to set.
    */
   async setTitle(title: string): Promise<void> {
-    await this.expectElementToBeVisible(editorTitleInputSelector);
-    await this.clearAllTextFrom(editorTitleInputSelector);
-    await this.typeInInputField(editorTitleInputSelector, title);
-    await this.expectInputValueToBe(editorTitleInputSelector, title);
+    await this.expectElementToBeVisible(editorTitleInput);
+    await this.clearAllTextFrom(editorTitleInput);
+    await this.typeInInputField(editorTitleInput, title);
+    await this.expectInputValueToBe(editorTitleInput, title);
     showMessage(`Set collection title to "${title}".`);
   }
 
@@ -438,16 +448,10 @@ export class CollectionEditor extends BaseUser {
    * @param {string} objective - The objective to set.
    */
   async setObjective(objective: string): Promise<void> {
-    await this.expectElementToBeVisible(collectionEditorObjectiveInputSelector);
-    await this.clearAllTextFrom(collectionEditorObjectiveInputSelector);
-    await this.typeInInputField(
-      collectionEditorObjectiveInputSelector,
-      objective
-    );
-    await this.expectInputValueToBe(
-      collectionEditorObjectiveInputSelector,
-      objective
-    );
+    await this.expectElementToBeVisible(collectionEditorObjectiveInput);
+    await this.clearAllTextFrom(collectionEditorObjectiveInput);
+    await this.typeInInputField(collectionEditorObjectiveInput, objective);
+    await this.expectInputValueToBe(collectionEditorObjectiveInput, objective);
     showMessage(`Set collection objective to "${objective}".`);
   }
 
@@ -459,7 +463,7 @@ export class CollectionEditor extends BaseUser {
    * @param {string} category - The category to select.
    */
   async setCategory(category: string): Promise<void> {
-    await this.clickOnElementWithSelector(categoryFilterDropdownSelector);
+    await this.clickOnElementWithSelector(categoryFilterDropdown);
 
     try {
       await this.selectMatOption(category);
@@ -467,7 +471,9 @@ export class CollectionEditor extends BaseUser {
       showMessage(
         'selectMatOption helper failed; falling back to manual mat-option dispatch.'
       );
-      await this.clickOnElementWithSelector(collectionCategoryMatSelectSelector);
+      await this.clickOnElementWithSelector(
+        collectionCategoryMatSelectSelector
+      );
       await this.page.waitForFunction(
         (cat: string, selector: string) => {
           const options = Array.from(document.querySelectorAll(selector));
@@ -500,7 +506,7 @@ export class CollectionEditor extends BaseUser {
         return el && el.textContent?.trim().includes(expected);
       },
       {timeout: 10000},
-      categoryFilterDropdownSelector,
+      categoryFilterDropdown,
       category
     );
     showMessage(`Set collection category to "${category}".`);
@@ -516,16 +522,16 @@ export class CollectionEditor extends BaseUser {
         return btn && !btn.hasAttribute('disabled');
       },
       {},
-      saveChangesButtonSelector
+      saveChangesButton
     );
     // Use JavaScript click to bypass any overlay issues (e.g., toast messages).
-    await this.page.$eval(saveChangesButtonSelector, (button: Element) =>
+    await this.page.$eval(saveChangesButton, (button: Element) =>
       (button as HTMLButtonElement).click()
     );
 
     // Wait for the save to complete.
-    await this.expectElementToBeVisible(saveChangesButtonSelector, false);
-    await this.expectElementToBeVisible(saveInProgressLabelSelector, false);
+    await this.expectElementToBeVisible(saveChangesButton, false);
+    await this.expectElementToBeVisible(saveInProgressLabel, false);
     showMessage('Saved changes and published collection.');
   }
 
@@ -547,9 +553,9 @@ export class CollectionEditor extends BaseUser {
    * @param {string} searchQuery - The search query.
    */
   async searchForCollection(searchQuery: string): Promise<void> {
-    await this.expectElementToBeVisible(searchInputSelector);
-    await this.clearAllTextFrom(searchInputSelector);
-    await this.typeInInputField(searchInputSelector, searchQuery);
+    await this.expectElementToBeVisible(searchInput);
+    await this.clearAllTextFrom(searchInput);
+    await this.typeInInputField(searchInput, searchQuery);
     await this.page.keyboard.press('Enter');
     await this.waitForPageToFullyLoad();
     showMessage(`Searched for collection: "${searchQuery}".`);
@@ -664,8 +670,8 @@ export class CollectionEditor extends BaseUser {
     await this.waitForNetworkIdle();
 
     try {
-      await this.clickOnElementWithSelector(editorPublishButtonSelector);
-      await this.page.waitForSelector(editorTitleInputSelector, {
+      await this.clickOnElementWithSelector(publishCollectionButtonSelector);
+      await this.page.waitForSelector(collectionTitleInputSelector, {
         visible: true,
         timeout: 5000,
       });
@@ -686,17 +692,17 @@ export class CollectionEditor extends BaseUser {
             el.dispatchEvent(ev);
           });
         }
-      }, editorPublishButtonSelector);
-      await this.page.waitForSelector(editorTitleInputSelector, {
+      }, publishCollectionButtonSelector);
+      await this.page.waitForSelector(collectionTitleInputSelector, {
         visible: true,
         timeout: 5000,
       });
     }
-    await this.page.click(editorTitleInputSelector);
-    await this.page.type(editorTitleInputSelector, title);
+    await this.page.click(collectionTitleInputSelector);
+    await this.page.type(collectionTitleInputSelector, title);
 
-    await this.page.click(collectionEditorObjectiveInputSelector);
-    await this.page.type(collectionEditorObjectiveInputSelector, objective);
+    await this.page.click(collectionObjectiveInputSelector);
+    await this.page.type(collectionObjectiveInputSelector, objective);
 
     await this.clickOnElementWithSelector(collectionCategoryMatSelectSelector);
 
@@ -726,7 +732,9 @@ export class CollectionEditor extends BaseUser {
     );
 
     try {
-      await this.clickOnElementWithSelector(saveChangesButtonSelector);
+      await this.clickOnElementWithSelector(
+        collectionSaveChangesButtonSelector
+      );
     } catch (e) {
       showMessage(
         'Save changes click failed; performing in-page click fallback.'
@@ -744,7 +752,7 @@ export class CollectionEditor extends BaseUser {
             el.dispatchEvent(ev);
           });
         }
-      }, saveChangesButtonSelector);
+      }, collectionSaveChangesButtonSelector);
     }
     await this.waitForNetworkIdle();
 
@@ -759,10 +767,10 @@ export class CollectionEditor extends BaseUser {
    * @returns {string[]} Array of node titles.
    */
   private async getNodeTitles(): Promise<string[]> {
-    const nodes = await this.page.$$(collectionEditorNodeSelector);
+    const nodes = await this.page.$$(collectionEditorNode);
     const titles: string[] = [];
     for (const node of nodes) {
-      const titleElement = await node.$(collectionEditorNodeTitleSelector);
+      const titleElement = await node.$(collectionEditorNodeTitle);
       if (titleElement) {
         const text = await titleElement.evaluate(
           el => el.textContent?.trim() || ''
