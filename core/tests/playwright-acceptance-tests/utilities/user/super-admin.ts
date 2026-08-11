@@ -40,7 +40,6 @@ const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const addRoleButton = 'button.oppia-add-role-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
-// const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
 
 const justifyContentDiv = 'div.justify-content-between';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
@@ -156,62 +155,6 @@ export class SuperAdmin extends LoggedInUser {
       },
       {selector: assignedTopicSelector, topic: topicName}
     );
-
-    // await this.expectElementToBeVisible(selectTopicForAssignmentSelector);
-    // const selectElement = await this.page.$(selectTopicForAssignmentSelector);
-    // if (!selectElement) {
-    //   throw new Error('Select element not found');
-    // }
-
-    // await this.expectElementToBeVisible('.e2e-test-select-topic option');
-    // const optionElements = await selectElement.$$('option');
-    // if (!optionElements.length) {
-    //   throw new Error('No options found in the select element');
-    // }
-
-    // for (const optionElement of optionElements) {
-    //   const optionText = await this.page.evaluate(
-    //     el => el.textContent,
-    //     optionElement
-    //   );
-    //   if (!optionText) {
-    //     throw new Error('Option text not found');
-    //   }
-
-    //   if (optionText.trim() === topicName) {
-    //     const optionValue = await this.page.evaluate(
-    //       el => el.value,
-    //       optionElement
-    //     );
-    //     if (!optionValue) {
-    //       throw new Error('Option value not found');
-    //     }
-
-    //     await this.select(selectTopicForAssignmentSelector, optionValue);
-    //     await this.expectElementToBeVisible(addTopicButton);
-    //     const button = await this.page.$(addTopicButton);
-    //     if (!button) {
-    //       throw new Error('Button not found');
-    //     }
-    //     await this.clickOnElement(button);
-
-    //     await this.page.waitForFunction(
-    //       ({selector, topic}: {selector: string; topic: string}) => {
-    //         const assignedTopicElements = document.querySelectorAll(selector);
-    //         for (const element of Array.from(assignedTopicElements)) {
-    //           if (element.textContent === topic) {
-    //             return true;
-    //           }
-    //         }
-    //         return false;
-    //       },
-    //       {selector: assignedTopicSelector, topic: topicName}
-    //     );
-    //     return;
-    //   }
-    // }
-
-    // throw new Error(`Topic "${topicName}" not found in the options`);
   }
 
   /**
