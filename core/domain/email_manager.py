@@ -474,6 +474,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),
+    feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID
+    ),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID
     ),

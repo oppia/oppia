@@ -19,7 +19,10 @@ from __future__ import annotations
 import urllib.parse
 
 from core import feconf, utils
-from core.domain import general_feedback_domain
+from core.domain import (
+    general_feedback_domain,
+    general_feedback_email_services,
+)
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, Union, cast
@@ -252,7 +255,10 @@ def create_lesson_feedback(
     )
 
     model = general_feedback_models.LessonFeedbackModel.get_by_id(feedback_id)
-    return _lesson_feedback_model_to_domain(model)
+    feedback = _lesson_feedback_model_to_domain(model)
+
+    general_feedback_email_services.send_feedback_submission_email(feedback)
+    return feedback
 
 
 def get_lesson_feedback(
@@ -485,7 +491,7 @@ def update_lesson_feedback(
         return None
     if model.lesson_metadata['exploration_id'] != exp_id:
         raise ValueError('Invalid exploration ID: %s' % exp_id)
-
+    old_status = model.status
     model.status = new_status
     if reply_text is not None:
         _append_lesson_feedback_model_response(
@@ -495,7 +501,22 @@ def update_lesson_feedback(
         )
     model.update_timestamps()
     model.put()
-    return _lesson_feedback_model_to_domain(model)
+    feedback = _lesson_feedback_model_to_domain(model)
+
+    if old_status != new_status:
+        general_feedback_email_services.send_feedback_status_change_email(
+            feedback,
+            author_id=model.author_id,
+        )
+
+    if reply_text is not None:
+        general_feedback_email_services.send_feedback_reply_email(
+            feedback,
+            reply_text,
+            author_id=model.author_id,
+        )
+
+    return feedback
 
 
 def create_platform_report(
@@ -592,7 +613,10 @@ def create_platform_report(
         )
 
     model = general_feedback_models.PlatformFeedbackModel.get_by_id(report_id)
-    return _platform_feedback_model_to_domain(model)
+    feedback = _platform_feedback_model_to_domain(model)
+
+    general_feedback_email_services.send_feedback_submission_email(feedback)
+    return feedback
 
 
 def get_platform_feedback(

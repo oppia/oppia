@@ -181,6 +181,12 @@ class EmailRightsTest(test_utils.GenericTestBase):
                 False,
             ),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (True, False, True, False),
+            feconf.EMAIL_INTENT_WEB_USER_FEEDBACK_MESSAGE_NOTIFICATION: {
+                True,
+                False,
+                False,
+                False,
+            },
         }
 
         for intent, results in expected_validation_results.items():
