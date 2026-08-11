@@ -20,7 +20,6 @@ import {Page} from '@playwright/test';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
-import {NavigationUtils} from '../common/navigation-utils';
 
 const baseURL = testConstants.URLs.BaseURL;
 const curriculumAdminThumbnailImage =
@@ -97,7 +96,7 @@ export class CurriculumAdmin extends TopicManager {
     urlFragment: string,
     feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
-    await this.navigateToClassroomAdminPageAsCurriculumAdmin();
+    await this.navigateToClassroomAdminPage();
     await this.clickOnElementWithSelector(createNewClassroomButton);
     await this.expectElementToBeVisible(createNewClassroomModal);
     await this.typeInInputField(newClassroomNameInputField, classroomName);
@@ -116,21 +115,13 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} classroomName - The name of the classroom.
    */
   async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPageAsCurriculumAdmin();
+    await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
     await this.clickOnElementWithSelector(enableDiagnosticTestButton);
     await this.clickOnElementWithSelector(saveClassroomButton);
     await this.expectElementToBeVisible(saveClassroomButton, false);
 
     showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
-  }
-
-  /**
-   * Function for navigating to the classroom admin page.
-   */
-  async navigateToClassroomAdminPageAsCurriculumAdmin(): Promise<void> {
-    const navigationUtils = new NavigationUtils(this);
-    await navigationUtils.navigateToClassroomAdminPage();
   }
 
   /**
@@ -153,7 +144,7 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPageAsCurriculumAdmin();
+    await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
     await this.clickOnElementWithSelector(publishClassroomButton);
     await this.clickOnElementWithSelector(saveClassroomButton);
@@ -183,7 +174,7 @@ export class CurriculumAdmin extends TopicManager {
     bannerImage: string = classroomBannerImage,
     feedbackRecipientEmail: string = 'user@email.com'
   ): Promise<void> {
-    await this.navigateToClassroomAdminPageAsCurriculumAdmin();
+    await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
 
     await this.typeInInputField(editClassroomTeaserTextInputField, teaserText);

@@ -21,6 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {NavigationUtils} from '../common/navigation-utils';
 
+const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 
@@ -405,7 +406,7 @@ export class TopicManager extends BaseUser {
     topicName: string,
     prerequisiteTopics: string[] = []
   ): Promise<void> {
-    await this.navigateToClassroomAdminPageAsTopicManager();
+    await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
 
     await this.clickOnElementWithSelector(openTopicDropdownButton);
@@ -758,7 +759,7 @@ export class TopicManager extends BaseUser {
    * @param {string} classroomName - The name of the classroom to be edited.
    */
   async editClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPageAsTopicManager();
+    await this.navigateToClassroomAdminPage();
     await this.expectElementToBeVisible(classroomTileSelector);
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
@@ -864,9 +865,10 @@ export class TopicManager extends BaseUser {
   /**
    * Function for navigating to the classroom admin page.
    */
-  async navigateToClassroomAdminPageAsTopicManager(): Promise<void> {
-    const navigationUtils = new NavigationUtils(this);
-    await navigationUtils.navigateToClassroomAdminPage();
+  async navigateToClassroomAdminPage(): Promise<void> {
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(classroomAdminUrl);
   }
 
   /**

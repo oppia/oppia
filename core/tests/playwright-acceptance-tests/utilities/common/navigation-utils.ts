@@ -23,7 +23,6 @@ import {BaseUser} from './playwright-utils';
 import testConstants from './test-constants';
 
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
-const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const splashPageUrl = testConstants.URLs.splash;
@@ -54,15 +53,6 @@ export class NavigationUtils {
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
     }
-  }
-
-  /**
-   * Function for navigating to the classroom admin page.
-   */
-  async navigateToClassroomAdminPage(): Promise<void> {
-    await this.userInstance.page.bringToFront();
-    await this.userInstance.waitForNetworkIdle();
-    await this.userInstance.goto(classroomAdminUrl);
   }
 
   /**
