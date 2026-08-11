@@ -38,6 +38,7 @@ import {UserService} from 'services/user.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   opportunities: SkillOpportunityBackendDict[];
@@ -193,7 +194,10 @@ export class ContributionOpportunitiesBackendApiService {
           topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
         cursor: cursor,
       };
-      if (entityType && entityType !== AppConstants.ENTITY_TYPE_SENTINEL_ALL) {
+      if (
+        entityType &&
+        entityType !== ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+      ) {
         params.entity_type = entityType;
       }
 
@@ -276,7 +280,10 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      if (entityType && entityType !== AppConstants.ENTITY_TYPE_SENTINEL_ALL) {
+      if (
+        entityType &&
+        entityType !== ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
+      ) {
         params.entity_type = entityType;
       }
       return this.http

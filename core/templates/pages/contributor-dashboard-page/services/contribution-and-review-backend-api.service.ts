@@ -22,6 +22,7 @@ import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OpportunityDict} from './contribution-and-review.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 interface FetchSuggestionsResponse {
   target_id_to_opportunity_dict: {
@@ -120,7 +121,8 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       const actualTargetType =
-        !targetType || targetType === AppConstants.ENTITY_TYPE_SENTINEL_ALL
+        !targetType ||
+        targetType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
           ? AppConstants.ENTITY_TYPE.EXPLORATION
           : targetType;
       return this.fetchSubmittedSuggestionsAsync(
@@ -144,7 +146,8 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       const actualTargetType =
-        !targetType || targetType === AppConstants.ENTITY_TYPE_SENTINEL_ALL
+        !targetType ||
+        targetType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
           ? AppConstants.ENTITY_TYPE.EXPLORATION
           : targetType;
       return this.fetchReviewableSuggestionsAsync(

@@ -27,6 +27,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 export interface EntityTypeOption {
   id: string;
@@ -49,7 +50,7 @@ export class EntityTypeSelectorComponent implements OnInit {
   dropdownShown = false;
   entityTypeOptions: EntityTypeOption[] = [
     {
-      id: AppConstants.ENTITY_TYPE_SENTINEL_ALL,
+      id: ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL,
       label: 'All',
     },
     {
@@ -64,7 +65,8 @@ export class EntityTypeSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.activeEntityType) {
-      this.activeEntityType = AppConstants.ENTITY_TYPE_SENTINEL_ALL;
+      this.activeEntityType =
+        ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
     }
     this.setActiveEntityType.emit(this.activeEntityType);
   }

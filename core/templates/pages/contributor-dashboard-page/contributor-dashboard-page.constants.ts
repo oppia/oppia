@@ -31,6 +31,11 @@ export interface ContributorDashboardTabsDetails {
 }
 
 export const ContributorDashboardConstants = {
+  // Sentinel used by the entity type filter to mean "do not filter by entity
+  // type". It is never sent to the backend as an entity type, and never
+  // describes an individual opportunity.
+  ENTITY_TYPE_SENTINEL_ALL: 'all',
+
   CONTRIBUTOR_DASHBOARD_TABS_DETAILS: {
     myContributionTab: {
       ariaLabel: 'Check your contributions.',

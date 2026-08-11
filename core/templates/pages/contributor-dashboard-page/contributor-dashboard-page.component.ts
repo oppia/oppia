@@ -56,7 +56,8 @@ export class ContributorDashboardPageComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
   languageCode!: string;
   topicName!: string;
-  activeEntityType: string = AppConstants.ENTITY_TYPE_SENTINEL_ALL;
+  activeEntityType: string =
+    ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL;
   activeTabName!: string;
   // The following property is set to null when the
   // user is not logged in.
