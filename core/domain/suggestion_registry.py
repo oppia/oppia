@@ -459,6 +459,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         edited_by_reviewer: bool,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
+        target_type: str = feconf.ENTITY_TYPE_EXPLORATION,
     ) -> None:
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
@@ -466,7 +467,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
-        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
+        self.target_type = target_type
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -996,6 +997,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         edited_by_reviewer: bool,
         last_updated: datetime.datetime,
         created_on: datetime.datetime,
+        target_type: str = feconf.ENTITY_TYPE_SKILL,
     ) -> None:
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
@@ -1003,7 +1005,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
-        self.target_type = feconf.ENTITY_TYPE_SKILL
+        self.target_type = target_type
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id

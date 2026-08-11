@@ -644,6 +644,12 @@ class SuggestionToSkillActionHandler(
             )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            # Only question suggestions copy images at this point, because they
+            # are stored under the question suggestion image context. Images in
+            # a translation suggestion are copied at submission time instead,
+            # by _copy_images_from_target_content_to_translation, which handles
+            # every target type. This mirrors the exploration action handler,
+            # which does not copy images on accept either.
             if (
                 suggestion.suggestion_type
                 == feconf.SUGGESTION_TYPE_ADD_QUESTION

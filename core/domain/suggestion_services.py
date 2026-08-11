@@ -449,7 +449,7 @@ def get_suggestion_from_model(
             suggestion_model.suggestion_type
         ]
     )
-    suggestion = suggestion_domain_class(
+    return suggestion_domain_class(
         suggestion_model.id,
         suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
@@ -462,12 +462,11 @@ def get_suggestion_from_model(
         suggestion_model.edited_by_reviewer,
         suggestion_model.last_updated,
         suggestion_model.created_on,
+        # A translation suggestion can target any translatable entity type, so
+        # the target type comes from the model rather than the default assumed
+        # by the domain class.
+        target_type=suggestion_model.target_type,
     )
-    # A translation suggestion can target any translatable entity type, so the
-    # target type is restored from the model rather than left at the default
-    # assumed by the domain class.
-    suggestion.target_type = suggestion_model.target_type
-    return suggestion
 
 
 @overload
@@ -3319,7 +3318,17 @@ def _get_topic_id_of_translation_target(
         str. The ID of the topic that the target belongs to, or
         'uncategorized' if the target is not part of any topic.
     """
-    if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+    # The exploration opportunity summaries are removed once the new
+    # opportunity models are rolled out, so they are only consulted while the
+    # feature flag is off. With the flag on, every entity type resolves its
+    # topic from the new opportunity model.
+    if (
+        suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        and not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            None,
+        )
+    ):
         exp_opportunity = (
             opportunity_services.get_exploration_opportunity_summary_by_id(
                 suggestion.target_id
