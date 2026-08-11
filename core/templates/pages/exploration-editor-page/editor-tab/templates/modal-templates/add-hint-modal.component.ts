@@ -26,6 +26,7 @@ import {Hint} from 'domain/exploration/hint-object.model';
 import {PageContextService} from 'services/page-context.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import './add-hint-modal.component.css';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -39,6 +40,7 @@ interface HintFormSchema {
 @Component({
   selector: 'oppia-add-hint-modal',
   templateUrl: './add-hint-modal.component.html',
+  styleUrls: ['./add-hint-modal.component.css'],
 })
 export class AddHintModalComponent
   extends ConfirmOrCancelModal

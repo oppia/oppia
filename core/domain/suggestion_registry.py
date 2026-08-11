@@ -774,6 +774,21 @@ class SuggestionTranslateContent(BaseSuggestion):
                 % (self.change_cmd.language_code, self.language_code)
             )
 
+        # Length validation for metadata translations.
+        if (
+            self.change_cmd.content_id == feconf.EXPLORATION_TITLE_CONTENT_ID
+            and isinstance(self.change_cmd.translation_html, str)
+            and (
+                len(self.change_cmd.translation_html)
+                > feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
+            )
+        ):
+            raise utils.ValidationError(
+                'Translation exceeds the allowed character limit. The translation '
+                'for the above content must be %s characters or fewer.'
+                % feconf.EXPLORATION_TITLE_TRANSLATION_CHAR_LIMIT
+            )
+
     def pre_update_validate(
         self, change_cmd: exp_domain.ExplorationChange
     ) -> None:
@@ -813,11 +828,29 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         self.validate()
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        if self.change_cmd.state_name not in exploration.states:
-            raise utils.ValidationError(
-                'Expected %s to be a valid state name'
-                % self.change_cmd.state_name
+        if (
+            self.change_cmd.state_name
+            == constants.DEFAULT_SUGGESTION_STATE_NAME
+        ):
+            translatable_contents = (
+                exploration.get_translatable_contents_collection(
+                    override_metadata_feature_flag=True
+                )
             )
+            if (
+                self.change_cmd.content_id
+                not in translatable_contents.content_id_to_translatable_content
+            ):
+                raise utils.ValidationError(
+                    'Expected %s to be a valid metadata content ID'
+                    % self.change_cmd.content_id
+                )
+        else:
+            if self.change_cmd.state_name not in exploration.states:
+                raise utils.ValidationError(
+                    'Expected %s to be a valid state name'
+                    % self.change_cmd.state_name
+                )
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
@@ -1984,6 +2017,7 @@ class ContributorCertificateInfoDict(TypedDict):
     contribution_hours: str
     contribution_word_count: int
     language: Optional[str]
+    certificate_profile_name: str
 
 
 class ContributorCertificateInfo:
@@ -1999,6 +2033,7 @@ class ContributorCertificateInfo:
         contribution_hours: str,
         contribution_word_count: int,
         language: Optional[str],
+        certificate_profile_name: str,
     ) -> None:
         self.from_date = from_date
         self.to_date = to_date
@@ -2006,6 +2041,7 @@ class ContributorCertificateInfo:
         self.contribution_hours = contribution_hours
         self.contribution_word_count = contribution_word_count
         self.language = language
+        self.certificate_profile_name = certificate_profile_name
 
     def to_dict(self) -> ContributorCertificateInfoDict:
         """Returns a dict representation of a ContributorCertificateInfo
@@ -2022,6 +2058,7 @@ class ContributorCertificateInfo:
             'contribution_hours': self.contribution_hours,
             'contribution_word_count': self.contribution_word_count,
             'language': self.language,
+            'certificate_profile_name': self.certificate_profile_name,
         }
 
 

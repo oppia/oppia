@@ -16,11 +16,10 @@
  * @fileoverview Component for a blog dashboard card.
  */
 
-interface EditorSchema {
-  type: string;
-  ui_config: object;
-}
-
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 import {AppConstants} from 'app.constants';
 import {
   ChangeDetectorRef,
@@ -51,6 +50,11 @@ import {UserService} from 'services/user.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import './blog-post-editor.component.css';
+
+type EditorSchema = Schema & {
+  ui_config: object;
+};
+
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html',
@@ -65,6 +69,7 @@ export class BlogPostEditorComponent implements OnInit {
   blogPostId!: string;
   authorProfilePicPngUrl!: string;
   authorProfilePicWebpUrl!: string;
+  uploadedImage: string | null = null;
   uploadedImageDataUrl!: string;
   title!: string;
   defaultTagsList!: string[];
@@ -80,6 +85,7 @@ export class BlogPostEditorComponent implements OnInit {
   contentEditorIsActive: boolean = false;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
+  showEditImageIcon: boolean = false;
   lastChangesWerePublished: boolean = false;
   saveInProgress: boolean = false;
   publishingInProgress: boolean = false;
@@ -275,9 +281,16 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 
-  updateLocalEditedContent($event: string): void {
-    if (this.localEditedContent !== $event) {
-      this.localEditedContent = $event;
+  cancel(): void {
+    this.showEditImageIcon = false;
+  }
+
+  updateLocalEditedContent(value: SchemaDefaultValue): void {
+    if (typeof value !== 'string') {
+      return;
+    }
+    if (this.localEditedContent !== value) {
+      this.localEditedContent = value;
       this.changeDetectorRef.detectChanges();
     }
   }

@@ -1397,7 +1397,12 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         self,
     ) -> None:
         user_services.update_email_preferences(
-            self.editor_id, True, False, False, False
+            self.editor_id,
+            True,
+            False,
+            False,
+            False,
+            can_receive_contributor_dashboard_email=feconf.DEFAULT_CONTRIBUTOR_DASHBOARD_EMAIL_PREFERENCE,
         )
 
         with self.can_send_feedback_email_ctx:
@@ -2309,6 +2314,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 can_receive_editor_role_email=user_pref.can_receive_editor_role_email,
                 can_receive_feedback_email=False,
                 can_receive_subscription_email=user_pref.can_receive_subscription_email,
+                can_receive_contributor_dashboard_email=user_pref.can_receive_contributor_dashboard_email,
                 bulk_email_db_already_updated=False,
             )
 
