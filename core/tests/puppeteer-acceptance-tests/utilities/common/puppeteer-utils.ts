@@ -1790,6 +1790,7 @@ export class BaseUser {
     );
     expect(placeholder).toBe(expectedPlaceholder);
   }
+
   /**
    * Checks if element is clickable or not.
    */

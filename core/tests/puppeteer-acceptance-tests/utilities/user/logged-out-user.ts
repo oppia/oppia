@@ -897,7 +897,6 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
-    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -5270,12 +5269,7 @@ export class LoggedOutUser extends BaseUser {
    * Opens the lesson info modal.
    */
   async openLessonInfoModal(): Promise<void> {
-    await this.page.waitForSelector(lessonInfoButton, {
-      visible: true,
-    });
-    await this.page.$eval(lessonInfoButton, el => {
-      (el as HTMLElement).click();
-    });
+    await this.clickOnElementWithSelector(lessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
   }
 

@@ -2867,8 +2867,7 @@ export class ExplorationEditor extends BaseUser {
     try {
       return await confirmPublish();
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      showMessage('Failed to publish the exploration.\n' + err.stack);
+      showMessage('Failed to publish the exploration.\n' + error.stack);
 
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
@@ -2992,52 +2991,14 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    // If any modal backdrops are still visible, they can intercept clicks.
-    // Only wait when needed, and keep it bounded to avoid inflating test time.
-    const hasVisibleModalBackdrop = await this.page
-      .waitForFunction(
-        (selector: string) => {
-          const elements = Array.from(
-            document.querySelectorAll(selector)
-          ) as HTMLElement[];
-          return elements.some(el => {
-            const style = window.getComputedStyle(el);
-            const rect = el.getBoundingClientRect();
-            return (
-              style.display !== 'none' &&
-              style.visibility !== 'hidden' &&
-              rect.width > 0 &&
-              rect.height > 0
-            );
-          });
-        },
-        {timeout: 250},
-        activeModalBackdropSelector
-      )
-      .then(() => true)
-      .catch(() => false);
-
-    if (hasVisibleModalBackdrop) {
-      await this.page.waitForFunction(
-        (selector: string) => {
-          const elements = Array.from(
-            document.querySelectorAll(selector)
-          ) as HTMLElement[];
-          return elements.every(el => {
-            const style = window.getComputedStyle(el);
-            const rect = el.getBoundingClientRect();
-            const visible =
-              style.display !== 'none' &&
-              style.visibility !== 'hidden' &&
-              rect.width > 0 &&
-              rect.height > 0;
-            return !visible;
-          });
-        },
-        {timeout: 10000},
-        activeModalBackdropSelector
-      );
-    }
+    // Wait for any lingering modals/backdrops to fully clear before interacting
+    // with the card content editor. Ghost modals from prior test steps can
+    // intercept clicks and cause hard-to-diagnose flakiness.
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout: 60000},
+      activeModalBackdropSelector
+    );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
       timeout: 60000,
@@ -3127,20 +3088,24 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    const [interactionTile] = await this.page.$x(
-      "//div[contains(@class, 'e2e-test-customize-interaction-body')]" +
-        "//div[contains(@class, 'oppia-interaction-tile-name') and " +
-        `normalize-space(.)='${interactionToAdd}']` +
-        "/ancestor::div[contains(@class, 'e2e-test-interaction-tile-')]"
+    // Use a higher timeout for math interactions as they are heavy to render.
+    let tileText = interactionToAdd;
+
+    // Scope the XPath search to the modal body. Searching the whole page
+    // (e.g. `//*[contains(text(), tileText)]`) can accidentally match
+    // unrelated elements outside the modal whose text happens to contain
+    // the interaction name as a substring — e.g. a state named
+    // "Text Input - 3" will match a search for "Text Input", causing us
+    // to click the state name header instead of the interaction tile
+    // while the modal is still open (and blocking the click).
+    const interactionElement = await this.page.waitForXPath(
+      `//*[contains(@class, "modal-body")]//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
     );
-
-    if (!interactionTile) {
-      throw new Error(
-        `Could not find interaction tile for ${interactionToAdd}.`
-      );
+    if (!interactionElement) {
+      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
     }
-
-    await this.clickOnElement(interactionTile);
+    await this.clickOnElement(interactionElement);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -3396,9 +3361,8 @@ export class ExplorationEditor extends BaseUser {
         throw new Error('The goal does not match the expected goal.');
       }
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      console.error('Error:', err.message);
-      throw err;
+      console.error('Error:', error.message);
+      throw error;
     }
   }
 
@@ -4266,10 +4230,8 @@ export class ExplorationEditor extends BaseUser {
         showMessage(`Unable to navigate to the card ${cardName}. Retrying...`);
         await this.navigateToCard(cardName, false);
       } else {
-        if (error instanceof Error) {
-          error.message =
-            `Unable to navigate to the card ${cardName}.\n` + error.message;
-        }
+        error.message =
+          `Unable to navigate to the card ${cardName}.\n` + error.message;
         throw error;
       }
     }
@@ -4292,14 +4254,11 @@ export class ExplorationEditor extends BaseUser {
   async updateDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string
   ): Promise<void> {
-    await this.viewOppiaResponses();
-
     await this.page.waitForSelector(openOutcomeFeedBackEditor, {
       visible: true,
     });
     await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
     await this.clickOnElementWithSelector(stateContentInputField);
-    await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(
       stateContentInputField,
       defaultResponseFeedback
@@ -4778,24 +4737,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
-    // A lingering modal can block the Preview tab click even after a save.
-    const hasOpenModal = await this.isElementVisible(
-      modalWindowSelector,
-      true,
-      1500
-    );
-    if (hasOpenModal) {
-      const closeModalButton = await this.page.$(closeModalButtonSelector);
-      if (closeModalButton) {
-        await this.clickOnElementWithSelector(closeModalButtonSelector);
-      } else {
-        await this.page.keyboard.press('Escape');
-      }
-      await this.page.waitForSelector(modalWindowSelector, {
-        hidden: true,
-      });
-    }
-
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
       const element = await this.page.$(mobileNavbarOptions);
@@ -5015,36 +4956,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the editor tab.
    */
   async navigateToEditorTab(): Promise<void> {
-    // A lingering modal can block Main tab and Save Draft interactions.
-    const hasOpenModal = await this.isElementVisible(
-      modalWindowSelector,
-      true,
-      1500
-    );
-    if (hasOpenModal) {
-      const closeModalButton = await this.page.$(closeModalButtonSelector);
-      if (closeModalButton) {
-        await this.clickOnElementWithSelector(closeModalButtonSelector);
-      } else {
-        await this.page.keyboard.press('Escape');
-      }
-      await this.page.waitForSelector(modalWindowSelector, {
-        hidden: true,
-      });
-    }
-
-    const isLessonInfoTooltipVisible = await this.isElementVisible(
-      closeLessonInfoTooltipSelector,
-      true,
-      1500
-    );
-    if (isLessonInfoTooltipVisible) {
-      await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
-      await this.page.waitForSelector(closeLessonInfoTooltipSelector, {
-        hidden: true,
-      });
-    }
-
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -5117,11 +5028,9 @@ export class ExplorationEditor extends BaseUser {
         matchCase
       );
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.stack ?? error.message : String(error);
       throw new Error(
-        `Card content for ${cardName} ${matchCase ? 'did not' : 'did'} match expected content.\n` +
-          `Original Error: ${errorMessage}`
+        `Card content ${matchCase ? 'did not' : 'did'} match expected content.\n` +
+          `Original Error: ${error.stack}`
       );
     }
   }
@@ -5131,13 +5040,6 @@ export class ExplorationEditor extends BaseUser {
    * @param skipVerification - Whether to skip verification of the card content.
    */
   async continueToNextCard(skipVerification: boolean = false): Promise<void> {
-    const previousCardContent = await this.page
-      .$eval(
-        stateConversationContent,
-        element => element.textContent?.trim() || ''
-      )
-      .catch(() => '');
-
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOnElementWithSelector(nextCardButton);
@@ -5148,47 +5050,12 @@ export class ExplorationEditor extends BaseUser {
         throw error;
       }
     }
-
-    // Transition can complete without showing a dedicated "Back" button in
-    // some interaction flows; we wait for any reliable signal of progression.
-    await this.page.waitForFunction(
-      (
-        previousButtonSelector: string,
-        primaryNextSelector: string,
-        secondaryNextSelector: string,
-        contentSelector: string,
-        oldContent: string
-      ) => {
-        const previousButton = document.querySelector(
-          previousButtonSelector
-        ) as HTMLElement | null;
-        if (previousButton && previousButton.offsetParent !== null) {
-          return true;
-        }
-
-        const nextButton = (document.querySelector(primaryNextSelector) ||
-          document.querySelector(secondaryNextSelector)) as HTMLElement | null;
-        const isNextButtonHidden =
-          !nextButton || nextButton.offsetParent === null;
-
-        const content =
-          (
-            document.querySelector(contentSelector) as HTMLElement | null
-          )?.textContent?.trim() || '';
-
-        return isNextButtonHidden || content !== oldContent;
-      },
-      {timeout: 10000},
-      previousCardButton,
-      nextCardButton,
-      nextCardArrowButton,
-      stateConversationContent,
-      previousCardContent
-    );
-
     if (skipVerification) {
       return;
     }
+    await this.page.waitForSelector(previousCardButton, {
+      visible: true,
+    });
   }
 
   /**
@@ -8504,7 +8371,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} expectedText - The Arabic text expected inside the
    *   text node.
    */
-
   async expectMathJaxToRenderArabicTextInSvgTextNode(
     expectedText: string
   ): Promise<void> {
@@ -8885,69 +8751,6 @@ export class ExplorationEditor extends BaseUser {
     await this.expectTextContentToBe(
       emptyCreatorDashboardMessageSelector,
       expectedText
-    );
-  }
-
-  /**
-   * Verifies that the multiple-choice option with the given text is
-   * rendered with the expected font style and/or font weight in preview.
-   * @param {string} optionText - The visible text of the option to check.
-   * @param {{fontStyle?: string; fontWeight?: string}} expectedStyle - The
-   *   expected computed style values to verify.
-   */
-  async expectMultipleChoiceOptionStyleToBe(
-    optionText: string,
-    expectedStyle: {fontStyle?: string; fontWeight?: string}
-  ): Promise<void> {
-    await this.page.waitForSelector(multipleChoiceOptionSelector, {
-      visible: true,
-    });
-
-    const actualStyle = await this.page.$$eval(
-      multipleChoiceOptionSelector,
-      (elements, text) => {
-        const target = elements.find(el => el.textContent?.trim() === text);
-        if (!target) {
-          return null;
-        }
-        const computed = window.getComputedStyle(target);
-        return {
-          fontStyle: computed.fontStyle,
-          fontWeight: computed.fontWeight,
-        };
-      },
-      optionText
-    );
-
-    if (!actualStyle) {
-      throw new Error(
-        `Multiple-choice option with text "${optionText}" not found.`
-      );
-    }
-
-    if (
-      expectedStyle.fontStyle &&
-      actualStyle.fontStyle !== expectedStyle.fontStyle
-    ) {
-      throw new Error(
-        `Expected option "${optionText}" to have font-style ` +
-          `"${expectedStyle.fontStyle}", but found "${actualStyle.fontStyle}".`
-      );
-    }
-
-    if (
-      expectedStyle.fontWeight &&
-      actualStyle.fontWeight !== expectedStyle.fontWeight
-    ) {
-      throw new Error(
-        `Expected option "${optionText}" to have font-weight ` +
-          `"${expectedStyle.fontWeight}", but found "${actualStyle.fontWeight}".`
-      );
-    }
-
-    showMessage(
-      `Multiple-choice option "${optionText}" has expected style: ` +
-        `${JSON.stringify(actualStyle)}`
     );
   }
 }

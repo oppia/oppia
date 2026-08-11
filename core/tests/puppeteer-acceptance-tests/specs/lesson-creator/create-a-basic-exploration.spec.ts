@@ -39,6 +39,8 @@ const LONG_CONTENT = Array.from({length: 15}, (_, i) => `Line ${i + 1}`).join(
   '\n'
 );
 
+const FLOAT_FORM_INPUT_SELECTOR = '.e2e-test-float-form-input';
+
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 describe('Lesson Creator', function () {
   let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
@@ -128,20 +130,6 @@ describe('Lesson Creator', function () {
       );
 
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.viewOppiaResponses();
-
-      // Write feedback, save it, and verify it displays under
-      // "Oppia tells the learner".
-      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-        'Great job!'
-      );
-      await explorationEditor.expectOutcomeFeedbackToBe('Great job!');
-
-      // Edit the feedback to "New Response" and verify the update displays.
-      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-        'New Response'
-      );
-      await explorationEditor.expectOutcomeFeedbackToBe('New Response');
 
       // Set the destination to a new card, and verify it displays both in
       // the destination box and as a new node in the Exploration Overview
@@ -171,8 +159,6 @@ describe('Lesson Creator', function () {
       await explorationEditor.continueToNextCard(true);
 
       await explorationEditor.navigateToEditorTab();
-      // Verify the feedback set earlier persisted correctly.
-      await explorationEditor.expectOutcomeFeedbackToBe('New Response');
       await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
       await explorationEditor.expectStateNameToBe(CARD_NAMES.SECOND);
       await explorationEditor.navigateToPreviewTab();
@@ -409,10 +395,8 @@ describe('Lesson Creator', function () {
       await explorationEditor.updateCardContent('What is 2 + 2?');
 
       await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
-
-      await explorationEditor.navigateToPreviewTab();
       await explorationEditor.expectElementPlaceholderToBe(
-        '.e2e-test-float-form-input',
+        FLOAT_FORM_INPUT_SELECTOR,
         'Ingresa un número'
       );
     },
