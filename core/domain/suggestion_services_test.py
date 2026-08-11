@@ -9381,6 +9381,57 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
         self.assertEqual(certificate_data['contribution_word_count'], 3)
         self.assertEqual(certificate_data['language'], 'Hindi')
+        self.assertEqual(
+            certificate_data['certificate_profile_name'], self.username
+        )
+
+    def test_generate_certificate_with_custom_profile_name(self) -> None:
+        user_settings = user_services.get_user_settings(self.author_id)
+        user_settings.profile_name_for_certificate = 'Custom Certificate Name'
+        user_services.save_user_settings(user_settings)
+
+        score_category: str = '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+        )
+        change_cmd = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1',
+            1,
+            suggestion_models.STATUS_ACCEPTED,
+            self.author_id,
+            'reviewer_1',
+            change_cmd,
+            score_category,
+            'exploration.exp1.thread_6',
+            'hi',
+        )
+
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            )
+        )
+
+        assert certificate_data is not None
+        self.assertEqual(
+            certificate_data['certificate_profile_name'],
+            'Custom Certificate Name',
+        )
 
     def test_create_translation_contributor_certificate_for_rule_translation(
         self,
