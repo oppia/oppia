@@ -6311,6 +6311,11 @@ export default {
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
 
+  // Sentinel used by the contributor dashboard entity type filter to mean
+  // "do not filter by entity type". It is never sent to the backend as an
+  // entity type, and never describes an individual opportunity.
+  "ENTITY_TYPE_SENTINEL_ALL": "all",
+
   // Review message to display for an obsolete translation suggestion with no
   // exploration content.
   // eslint-disable-next-line max-len

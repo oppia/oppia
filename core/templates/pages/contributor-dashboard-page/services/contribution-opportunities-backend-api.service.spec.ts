@@ -431,7 +431,7 @@ describe('Contribution Opportunities backend API service', function () {
     })
   );
 
-  it('should fetch V2 translation opportunities with entityType all', fakeAsync(() => {
+  it('should omit entity_type from the request when entityType is all', fakeAsync(() => {
     spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
       EnableTranslationOppsWithNewOppModels: {
         isEnabled: true,
@@ -445,10 +445,13 @@ describe('Contribution Opportunities backend API service', function () {
       .fetchTranslationOpportunitiesAsync('hi', 'Topic 1', '', 'all')
       .then(successHandler, failHandler);
 
+    // "all" means "do not filter by entity type", so the parameter is left
+    // off the request entirely rather than being sent as a literal value.
     const req = httpTestingController.expectOne(
       '/opportunitieshandlerv2?language_code=hi&topic_name=Topic%201&cursor='
     );
     expect(req.request.method).toEqual('GET');
+    expect(req.request.params.has('entity_type')).toBeFalse();
     req.flush(translationOpportunityResponseV2);
     flushMicrotasks();
 

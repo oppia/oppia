@@ -56,7 +56,7 @@ export class ContributorDashboardPageComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL!: string;
   languageCode!: string;
   topicName!: string;
-  activeEntityType: string = 'all';
+  activeEntityType: string = AppConstants.ENTITY_TYPE_SENTINEL_ALL;
   activeTabName!: string;
   // The following property is set to null when the
   // user is not logged in.
@@ -113,10 +113,18 @@ export class ContributorDashboardPageComponent implements OnInit {
   }
 
   showEntityTypeSelector(): boolean {
+    // Question contributions and reviews live inside the My Contributions tab,
+    // and filtering them by entity type is meaningless, so the selector is
+    // hidden whenever questions are being shown.
+    const userIsViewingQuestionSuggestions =
+      this.contributionAndReviewService.getActiveSuggestionType() ===
+      'add_question';
+
     return (
       (this.activeTabName === 'translateTextTab' ||
         this.activeTabName === 'myContributionTab' ||
         !this.activeTabName) &&
+      !userIsViewingQuestionSuggestions &&
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     );

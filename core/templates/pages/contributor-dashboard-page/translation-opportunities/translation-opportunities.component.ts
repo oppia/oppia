@@ -118,12 +118,12 @@ export class TranslationOpportunitiesComponent implements OnChanges {
         totalCount: totalCount,
         translationsCount: translationsCount,
         reviewerOnlyContentCount: reviewerOnlyContentCount,
+        // An opportunity's entity type comes from the opportunity itself, not
+        // from the dashboard filter, since the filter can be set to "all".
+        // Legacy opportunities carry no entity type and are always
+        // explorations.
         entityType:
-          this.activeEntityType && this.activeEntityType !== 'all'
-            ? this.activeEntityType
-            : opportunity.entityType && opportunity.entityType !== 'all'
-              ? opportunity.entityType
-              : AppConstants.ENTITY_TYPE.EXPLORATION,
+          opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (

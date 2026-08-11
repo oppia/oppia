@@ -193,7 +193,7 @@ export class ContributionOpportunitiesBackendApiService {
           topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
         cursor: cursor,
       };
-      if (entityType && entityType !== 'all') {
+      if (entityType && entityType !== AppConstants.ENTITY_TYPE_SENTINEL_ALL) {
         params.entity_type = entityType;
       }
 
@@ -276,7 +276,7 @@ export class ContributionOpportunitiesBackendApiService {
       this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
         .isEnabled
     ) {
-      if (entityType && entityType !== 'all') {
+      if (entityType && entityType !== AppConstants.ENTITY_TYPE_SENTINEL_ALL) {
         params.entity_type = entityType;
       }
       return this.http

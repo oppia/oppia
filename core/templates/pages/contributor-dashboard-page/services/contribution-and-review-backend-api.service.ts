@@ -120,7 +120,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       const actualTargetType =
-        !targetType || targetType === 'all'
+        !targetType || targetType === AppConstants.ENTITY_TYPE_SENTINEL_ALL
           ? AppConstants.ENTITY_TYPE.EXPLORATION
           : targetType;
       return this.fetchSubmittedSuggestionsAsync(
@@ -144,7 +144,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       const actualTargetType =
-        !targetType || targetType === 'all'
+        !targetType || targetType === AppConstants.ENTITY_TYPE_SENTINEL_ALL
           ? AppConstants.ENTITY_TYPE.EXPLORATION
           : targetType;
       return this.fetchReviewableSuggestionsAsync(

@@ -165,14 +165,10 @@ export class TranslateTextService {
     this.activeStateName = '';
     this.activeContentText = '';
     this.activeContentStatus = this.PENDING as Status;
-    const targetEntityType =
-      !entityType || entityType === 'all'
-        ? AppConstants.ENTITY_TYPE.EXPLORATION
-        : entityType;
     this.activeExpId = expId;
-    this.activeEntityType = targetEntityType;
+    this.activeEntityType = entityType;
     this.translateTextBackendApiService
-      .getTranslatableTextsAsync(expId, languageCode, targetEntityType)
+      .getTranslatableTextsAsync(expId, languageCode, entityType)
       .then((translatableTexts: TranslatableTexts) => {
         this.stateWiseContents = translatableTexts.stateWiseContents;
         this.activeExpVersion = translatableTexts.explorationVersion;

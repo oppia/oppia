@@ -234,9 +234,7 @@ export class TranslationModalComponent {
 
     if (!this.modifyTranslationOpportunity) {
       const entityType =
-        this.opportunity.entityType && this.opportunity.entityType !== 'all'
-          ? this.opportunity.entityType
-          : AppConstants.ENTITY_TYPE.EXPLORATION;
+        this.opportunity.entityType || AppConstants.ENTITY_TYPE.EXPLORATION;
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
       this.pageContextService.setCustomEntityContext(

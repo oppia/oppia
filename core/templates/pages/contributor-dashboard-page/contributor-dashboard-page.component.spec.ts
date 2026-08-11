@@ -383,6 +383,34 @@ describe('Contributor dashboard page', () => {
       expect(component.showEntityTypeSelector()).toBe(false);
     });
 
+    it('should hide entity type selector for question suggestions', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      const activeSuggestionTypeSpy = spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      );
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        true;
+
+      // Question contributions and question reviews are both shown inside the
+      // My Contributions tab, and neither can be filtered by entity type.
+      component.onTabClick('myContributionTab');
+      activeSuggestionTypeSpy.and.returnValue('add_question');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      activeSuggestionTypeSpy.and.returnValue('translate_content');
+      expect(component.showEntityTypeSelector()).toBe(true);
+
+      // The Submit Question tab has no entity type filter either.
+      component.onTabClick('submitQuestionTab');
+      expect(component.showEntityTypeSelector()).toBe(false);
+
+      mockPlatformFeatureService.status.EnableTranslationOppsWithNewOppModels.isEnabled =
+        false;
+    });
+
     it('should show topic selector for questions reviews', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)

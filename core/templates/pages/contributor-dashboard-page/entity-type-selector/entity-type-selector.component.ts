@@ -49,7 +49,7 @@ export class EntityTypeSelectorComponent implements OnInit {
   dropdownShown = false;
   entityTypeOptions: EntityTypeOption[] = [
     {
-      id: 'all',
+      id: AppConstants.ENTITY_TYPE_SENTINEL_ALL,
       label: 'All',
     },
     {
@@ -64,7 +64,7 @@ export class EntityTypeSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.activeEntityType) {
-      this.activeEntityType = 'all';
+      this.activeEntityType = AppConstants.ENTITY_TYPE_SENTINEL_ALL;
     }
     this.setActiveEntityType.emit(this.activeEntityType);
   }
