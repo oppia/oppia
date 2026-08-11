@@ -13,22 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the certificate assessment result card.
+ * @fileoverview Constants for the certificate assessment player page.
  */
 
-import {Component, Input} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-
-@Component({
-  selector: 'oppia-certificate-assessment-result-card',
-  templateUrl: './certificate-assessment-result-card.component.html',
-})
-export class CertificateAssessmentResultCardComponent {
-  @Input() certificateId = '';
-  attemptId = '';
-
-  constructor(private activatedRoute: ActivatedRoute) {
-    this.attemptId =
-      this.activatedRoute.snapshot.paramMap.get('attempt_id') || '';
-  }
-}
+export const CertificateAssessmentPlayerPageConstants = {
+  STAGE_INTRO: 'intro',
+  STAGE_INSTRUCTIONS: 'instructions',
+  STAGE_QUESTIONS: 'questions',
+} as const;

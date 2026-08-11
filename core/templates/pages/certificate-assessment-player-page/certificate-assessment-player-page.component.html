@@ -1,15 +1,21 @@
-<div class="certificate-assessment-page-container">
+<div class="certificate-assessment-page-container position-relative">
+  <oppia-assessment-interrupt #interruptCard
+                              *ngIf="showAssessmentInterruptCard"
+                              (retryAssessment)="onRetryAssessment()"
+                              (resumeAssessment)="onResumeAssessment()">
+  </oppia-assessment-interrupt>
 <!-- TODO(#24717-M2.15): Add certificate-assessment-titled-shared-background-banner component. -->
-  <oppia-assessment-introduction-card *ngIf="currentStage === 'intro'"
+  <oppia-assessment-introduction-card *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INTRO"
                                       [certificateId]="certificateId"
                                       (continue)="showInstructions()">
   </oppia-assessment-introduction-card>
 
-  <oppia-assessment-instruction-panel *ngIf="currentStage === 'instructions'"
+  <oppia-assessment-instruction-panel *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS"
                                       (startAssessment)="startAssessment()">
   </oppia-assessment-instruction-panel>
 
-  <oppia-certificate-assessment-conversation-skin *ngIf="currentStage === 'questions'"
+  <oppia-certificate-assessment-conversation-skin #conversationSkin
+                                                  *ngIf="currentStage === certificateAssessmentPlayerPageConstants.STAGE_QUESTIONS"
                                                   [currentQuestion]="getCurrentQuestion()"
                                                   [currentQuestionIndex]="currentQuestionIndex"
                                                   [totalQuestions]="mockQuestions.length"
@@ -21,8 +27,4 @@
                                                   (submitAssessment)="submitAssessment()"
                                                   (responseChange)="updateResponse($event)">
   </oppia-certificate-assessment-conversation-skin>
-
-  <oppia-certificate-assessment-result-card *ngIf="currentStage === 'result'"
-                                            [certificateId]="certificateId">
-  </oppia-certificate-assessment-result-card>
 </div>

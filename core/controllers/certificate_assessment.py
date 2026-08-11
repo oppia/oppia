@@ -398,36 +398,24 @@ class CertificateAssessmentOfferingsForClassroomHandler(
         CertificateAssessmentOfferingsForClassroomHandlerNormalizedRequestDict,
     ]
 ):
-    """Stub handler for retrieving certificate assessment offerings."""
+    """Handler for learner-facing certificate offerings in a classroom."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {'classroom_id': {'schema': {'type': 'basestring'}}}
-
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {'schema': {'type': 'basestring'}}
+    }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
-    @acl_decorators.open_access
-    def get(self, classroom_id: str) -> None:  # pylint: disable=unused-argument
-        """Returns a stub response for certificate offerings."""
-
-        # TODO(#24717-M2.12): Replace this stub implementation by calling
-        # get_certificate_offerings_for_classroom(classroom_id).
-        # The service should:
-        # - Fetch CertificateAssessmentOfferingModel records for the specified
-        #   classroom.
-        # - Filter offerings to async_status == 'Available'.
-        # - Cross-reference the learner's attempt history and populate
-        #   attempt_status ('Passed', 'Not Passed', or 'Not Attempted').
-        # - Return real data from the datastore instead of mock data.
+    @acl_decorators.require_user_id_else_redirect_to_homepage
+    def get(self, classroom_url_fragment: str) -> None:
+        """Returns certificate offerings for the classroom."""
+        if self.user_id is None:
+            raise self.NotLoggedInException
+        available_certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+            classroom_url_fragment, self.user_id
+        )
         self.render_json(
-            {
-                'available_certificate_offerings': [
-                    {
-                        'certificate_id': 'sample_certificate_id',
-                        'title': 'Sample Certificate',
-                        'attempt_status': 'Not Attempted',
-                    }
-                ]
-            }
+            {'available_certificate_offerings': available_certificate_offerings}
         )
 
 
