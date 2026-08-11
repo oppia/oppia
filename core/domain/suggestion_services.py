@@ -4523,17 +4523,22 @@ def generate_contributor_certificate_data(
     if user_id is None:
         raise Exception('There is no user for the given username.')
 
+    user_settings = user_services.get_user_settings(user_id)
+    certificate_profile_name = (
+        user_settings.profile_name_for_certificate or username
+    )
+
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         # For the suggestion_type translate_content, there should be a
         # corresponding language_code.
         assert isinstance(language_code, str)
         data = _generate_translation_contributor_certificate_data(
-            language_code, from_date, to_date, user_id
+            language_code, from_date, to_date, user_id, certificate_profile_name
         )
 
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         data = _generate_question_contributor_certificate_data(
-            from_date, to_date, user_id
+            from_date, to_date, user_id, certificate_profile_name
         )
 
     else:
@@ -4547,6 +4552,7 @@ def _generate_translation_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str,
+    certificate_profile_name: str,
 ) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate translation submitter certificate.
 
@@ -4558,6 +4564,7 @@ def _generate_translation_contributor_certificate_data(
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
         user_id: str. The user ID of the contributor.
+        certificate_profile_name: str. The name to be shown on the certificate.
 
     Returns:
         ContributorCertificateInfo|None. Data to generate translation submitter
@@ -4636,11 +4643,15 @@ def _generate_translation_contributor_certificate_data(
         str(hours_contributed),
         words_count,
         language_description,
+        certificate_profile_name,
     )
 
 
 def _generate_question_contributor_certificate_data(
-    from_date: datetime.datetime, to_date: datetime.datetime, user_id: str
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    user_id: str,
+    certificate_profile_name: str,
 ) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate question submitter certificate.
 
@@ -4650,6 +4661,7 @@ def _generate_question_contributor_certificate_data(
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
         user_id: str. The user ID of the contributor.
+        certificate_profile_name: str. The name to be shown on the certificate.
 
     Returns:
         ContributorCertificateInfo|None. Data to generate question submitter
@@ -4702,4 +4714,5 @@ def _generate_question_contributor_certificate_data(
         str(hours_contributed),
         0,
         None,
+        certificate_profile_name,
     )

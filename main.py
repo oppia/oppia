@@ -1674,6 +1674,14 @@ URLS.extend(
             r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
             cron.CronMailReviewerNewSuggestionsHandler,
         ),
+        get_redirect_route(
+            r'/cron/feedback/lesson_feedback_cleanup',
+            cron.CronLessonFeedbackCleanupHandler,
+        ),
+        get_redirect_route(
+            r'/cron/feedback/platform_feedback_cleanup',
+            cron.CronPlatformFeedbackCleanupHandler,
+        ),
     )
 )
 
