@@ -81,7 +81,7 @@ const subtopicPreviewContainerSelector =
 const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
 const mobileSubtopicContainerSelector = '.e2e-test-mobile-subtopic-content';
 const saveSubtopicExplanationButtonSelector =
-  '.e2e-test-save-subtopic-explanation-button';
+  '.e2e-test-save-subtopic-content-button';
 const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
 const topicsTab = 'a.e2e-test-topics-tab';
 
