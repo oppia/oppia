@@ -19,11 +19,13 @@
 import {Component, OnInit, Optional} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
+import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
 import {UnansweredQuestionModalComponent} from 'components/certificate-assessment-offering-helper/unanswered-question-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './certificate-assessment-player-page.component.css';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
@@ -33,8 +35,13 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
   styleUrls: ['./certificate-assessment-player-page.component.css'],
 })
 export class CertificateAssessmentPlayerPageComponent implements OnInit {
+  readonly certificateAssessmentPlayerPageConstants =
+    CertificateAssessmentPlayerPageConstants;
   certificateId = '';
-  currentStage: 'intro' | 'instructions' | 'questions' = 'intro';
+  currentStage: AssessmentStage =
+    CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+  // TODO(#24717-M2.20): This flag value is by default set as false so interrupt card does not render. In the future, this flag will change its value based on conditions.
+  showAssessmentInterruptCard = false;
   // TODO(#24717-m2.18-m2.19): The showTimeExpiredModal and
   // showUnansweredQuestionModal flags are currently initialized with default
   // values. Update these flags based on the appropriate conditions once the
@@ -42,6 +49,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   // implemented.
   showUnansweredQuestionModal = false;
   showTimeExpiredModal = false;
+
   currentQuestionIndex = 0;
   readonly mockQuestions: AssessmentQuestion[] = [
     {
@@ -103,7 +111,8 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
       this.activatedRoute.snapshot.paramMap.get('certificate_id') || '';
     const currentRoute = this.activatedRoute.snapshot.url[0]?.path || '';
     if (currentRoute === 'session') {
-      this.currentStage = 'questions';
+      this.currentStage =
+        CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
     }
     if (this.showTimeExpiredModal) {
       this.openTimeExpiredModal();
@@ -150,11 +159,24 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   }
 
   showInstructions(): void {
-    this.currentStage = 'instructions';
+    this.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_INSTRUCTIONS;
   }
 
   startAssessment(): void {
     this.router.navigate(['session'], {relativeTo: this.activatedRoute});
+  }
+
+  onRetryAssessment(): void {
+    this.showAssessmentInterruptCard = false;
+    this.currentStage = CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
+    this.currentQuestionIndex = 0;
+  }
+
+  onResumeAssessment(): void {
+    this.showAssessmentInterruptCard = false;
+    this.currentStage =
+      CertificateAssessmentPlayerPageConstants.STAGE_QUESTIONS;
   }
 
   nextQuestion(): void {

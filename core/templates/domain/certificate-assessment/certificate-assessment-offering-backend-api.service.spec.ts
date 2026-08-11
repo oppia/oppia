@@ -151,7 +151,7 @@ describe('Certificate Assessment Offering backend api service', () => {
 
     const req = httpTestingController.expectOne(
       CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
-        '<classroom_id>',
+        '<classroom_url_fragment>',
         'math_classroom_01'
       )
     );
@@ -162,6 +162,8 @@ describe('Certificate Assessment Offering backend api service', () => {
           certificate_id: 'mock_certificate_id',
           title: 'Sample Certificate',
           attempt_status: 'Not Attempted',
+          passed_on_date: null,
+          failed_on_date: null,
         },
       ],
     });
@@ -184,7 +186,7 @@ describe('Certificate Assessment Offering backend api service', () => {
 
     const req = httpTestingController.expectOne(
       CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
-        '<classroom_id>',
+        '<classroom_url_fragment>',
         'math_classroom_01'
       )
     );
@@ -216,7 +218,7 @@ describe('Certificate Assessment Offering backend api service', () => {
 
     const req = httpTestingController.expectOne(
       CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
-        '<classroom_id>',
+        '<classroom_url_fragment>',
         'math_classroom_01'
       )
     );

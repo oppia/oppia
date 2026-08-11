@@ -18,6 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {AssessmentResult} from 'domain/certificate-assessment/certificate-assessment.model';
+import './certificate-assessment-result-card.component.css';
 
 // TODO(#24717-M1.17): Confirm the real result-endpoint contract. Until then we
 // assume the backend returns `scorePercentage` and derive `passed` from a

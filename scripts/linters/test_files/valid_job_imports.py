@@ -56,6 +56,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     user_validation_jobs,
     cloud_task_run_migration_jobs,
     voiceover_synthesis_jobs,
+    web_feedback_cleanup_jobs,
 )
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip

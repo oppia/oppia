@@ -884,6 +884,19 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the value of text input with the given selector is equal to the given value.
+   * @param selector - The selector of the text input.
+   * @param value - The expected value of the text input.
+   */
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const element = await this.page.$(selector);
+    expect(await element?.evaluate(el => (el as HTMLInputElement).value)).toBe(
+      value
+    );
+  }
+
+  /**
    * This function converts a given date string into ISO format (YYYY-MM-DD).
    */
   private toISODate(dateString: string): string {

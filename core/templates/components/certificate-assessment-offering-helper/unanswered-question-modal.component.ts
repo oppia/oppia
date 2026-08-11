@@ -20,6 +20,7 @@
 import {Component, Input, Optional} from '@angular/core';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import './unanswered-question-modal.component.css';
 
 @Component({
   selector: 'oppia-unanswered-question-modal',
