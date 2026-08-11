@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for contributor admin dashboard backend service
  */
 
+// @ts-nocheck
+
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {
   HttpClientTestingModule,

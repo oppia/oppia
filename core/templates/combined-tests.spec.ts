@@ -14,12 +14,11 @@
 
 /**
  * @fileoverview Karma spec files accumulator.
+ *
+ * This file initializes the Angular testing environment and sets up
+ * the jasmine reporter. The Angular CLI's karma builder handles file
+ * discovery and preprocessing automatically.
  */
-
-// The following file finds all the spec files and merges them all to a single
-// file which Karma uses to run its tests. The Karma is unable to run the tests
-// on multiple files and the DI fails in that case, the reason of which is
-// unclear (related issue -> https://github.com/oppia/oppia/issues/7053).
 
 // These polyfills are necessary to help the TestBed resolve parameters for
 // ApplicationModule
@@ -39,31 +38,38 @@ import {
   platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
 
-// NOTE - These types are defined by taking
-// https://webpack.js.org/guides/dependency-management/#context-module-api
-// as a reference.
-interface RequireContext {
-  context: (
+// Declare webpack's require.context for dynamic module loading.
+declare var require: {
+  context(
     directory: string,
     useSubdirectories: boolean,
     regExp: RegExp
-  ) => Context;
-}
-
-interface Context {
-  (request: Object): void;
-  resolve: () => string;
-  keys: () => Object[];
-  id: string;
-}
-
-declare const require: RequireContext;
+  ): {
+    keys(): string[];
+    <T>(id: string): T;
+  };
+};
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
+
+// Load all spec files from core/templates and extensions.
+const testsContext = require.context(
+  '../../core/templates',
+  true,
+  /\.spec\.ts$/
+);
+testsContext.keys().forEach(testsContext);
+
+const extensionsContext = require.context(
+  '../../extensions',
+  true,
+  /\.spec\.ts$/
+);
+extensionsContext.keys().forEach(extensionsContext);
 
 jasmine.getEnv().addReporter({
   specDone: function (result) {
@@ -75,16 +81,3 @@ jasmine.getEnv().addReporter({
     }
   },
 });
-
-// Then we find all the tests, as well as any controller, directive,
-// service/factory files.
-// All files from the services_sources folder are exempted, because they
-// shouldn't be tested (those files are just intended as data files for backend
-// tests).
-// Known failing files are exempted (#6960).
-// TODO(#6960): Fix the tests that broke down after introduction of Webpack due
-//              to templateCache.
-// The '@bcoe', '@nodelib' and 'openapi3-ts' are excluded from the tests since they are
-// coming from third party library.
-const context = require.context('../../', true, /(:?)/);
-context.keys().forEach(context);

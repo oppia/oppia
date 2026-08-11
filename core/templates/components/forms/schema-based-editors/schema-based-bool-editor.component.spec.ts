@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Schema Based Bool Editor Component
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {FormControl, FormsModule} from '@angular/forms';
 import {

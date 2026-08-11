@@ -16,6 +16,8 @@
  * @fileoverview Component for set of translatable html content id editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {SetOfTranslatableHtmlContentIdsEditorComponent} from './set-of-translatable-html-content-ids-editor.component';

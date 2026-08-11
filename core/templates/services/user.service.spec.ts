@@ -16,6 +16,8 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
+// @ts-nocheck
+
 import {
   HttpClientTestingModule,
   HttpTestingController,

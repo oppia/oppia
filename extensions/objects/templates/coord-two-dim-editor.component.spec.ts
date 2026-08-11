@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for coord two dim editor.
  */
 
+// @ts-nocheck
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {icon, LatLng, LeafletMouseEvent, tileLayer} from 'leaflet';

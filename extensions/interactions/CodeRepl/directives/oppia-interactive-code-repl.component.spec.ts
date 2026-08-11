@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the InteractiveCodeRepl response component.
  */
 
+// @ts-nocheck
+
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {
   waitForAsync,

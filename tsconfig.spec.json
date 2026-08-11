@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["jasmine", "node"]
+  },
+  "files": [
+    "assets/constants.ts",
+    "assets/rich_text_components_definitions.ts"
+  ],
+  "include": [
+    "core/**/*.ts",
+    "extensions/**/*.ts",
+    "typings/**/*.ts",
+    "assets/**/*.ts"
+  ],
+  "exclude": [
+    "core/tests/puppeteer-acceptance-tests/**",
+    "core/tests/playwright-acceptance-tests/**",
+    "core/tests/test-dependencies/**",
+    "core/tests/build_sources/extensions/plugin.ts"
+  ]
+}

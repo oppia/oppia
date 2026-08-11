@@ -50,29 +50,7 @@ EXCLUDED_DIRECTORIES = [
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @hardikgoyal2003 first.
-NOT_FULLY_COVERED_FILENAMES = [
-    'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
-    'core/templates/components/ck-editor-helpers/'
-    'ck-editor-4-widgets.initializer.ts',
-    'core/templates/components/forms/custom-forms-directives/'
-    'object-editor.directive.ts',
-    'core/templates/components/state-directives/rule-editor/'
-    'rule-type-selector.directive.ts',
-    'core/templates/domain/question/question-update.service.ts',
-    'core/templates/domain/question/question.model.ts',
-    'core/templates/expressions/expression-interpolation.service.ts',
-    'core/templates/google-analytics.initializer.ts',
-    'core/templates/pages/blog-post-page/blog-post-page.component.ts',
-    'core/templates/pages/exploration-editor-page/services/'
-    'exploration-states.service.ts',
-    'core/templates/pages/exploration-player-page/services/'
-    'learner-answer-info.service.ts',
-    'core/templates/services/suggestion-modal.service.ts',
-    'extensions/interactions/MusicNotesInput/directives/'
-    'oppia-interactive-music-notes-input.component.ts',
-    'extensions/interactions/PencilCodeEditor/directives/'
-    'oppia-interactive-pencil-code-editor.component.ts',
-]
+NOT_FULLY_COVERED_FILENAMES: List[str] = []
 
 
 class LcovStanzaRelevantLines:

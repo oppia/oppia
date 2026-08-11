@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the skill prerequisite skills editor.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {

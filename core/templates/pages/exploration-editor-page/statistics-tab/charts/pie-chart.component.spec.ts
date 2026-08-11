@@ -73,6 +73,7 @@ describe('Pie Chart component', () => {
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty(window, 'google', {
       get: () => ({}),
+      configurable: true,
     });
     component.data = [];
     component.chart = mockedChart;

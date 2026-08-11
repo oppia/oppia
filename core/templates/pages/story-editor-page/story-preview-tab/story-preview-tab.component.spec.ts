@@ -57,13 +57,8 @@ describe('Story Preview tab', () => {
       providers: [
         {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
         {
-          StoryEditorNavigationService,
-          provide: [
-            {
-              provide: StoryEditorNavigationService,
-              UseClass: MockStoryEditorNavigationService,
-            },
-          ],
+          provide: StoryEditorNavigationService,
+          useClass: MockStoryEditorNavigationService,
         },
       ],
     }).compileComponents();

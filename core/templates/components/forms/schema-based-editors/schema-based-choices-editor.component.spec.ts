@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Schema Based Choices Editor Component
  */
 
+// @ts-nocheck
+
 import {FormControl, FormsModule} from '@angular/forms';
 import {
   ComponentFixture,

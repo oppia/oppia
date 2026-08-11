@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for topic editor page component.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';

@@ -369,7 +369,9 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.showUnansweredQuestionModal = false;
     fixture.detectChanges();
 
-    expect(bottomSheet.open).toHaveBeenCalledWith(TimeExpiredModalComponent);
+    expect(bottomSheet.open as jasmine.Spy).toHaveBeenCalledWith(
+      TimeExpiredModalComponent
+    );
   });
 
   it('should open the unanswered-question modal as a bottom sheet on mobile screens', () => {
@@ -382,7 +384,7 @@ describe('CertificateAssessmentPlayerPageComponent', () => {
     component.showUnansweredQuestionModal = true;
     fixture.detectChanges();
 
-    expect(bottomSheet.open).toHaveBeenCalledWith(
+    expect(bottomSheet.open as jasmine.Spy).toHaveBeenCalledWith(
       UnansweredQuestionModalComponent
     );
   });

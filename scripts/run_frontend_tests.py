@@ -130,9 +130,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     cmd = [
         common.NODE_BIN_PATH,
         '--max-old-space-size=4096',
-        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start',
-        os.path.join('core', 'tests', 'karma.conf.ts'),
+        os.path.join(common.NODE_MODULES_PATH, '@angular', 'cli', 'bin', 'ng'),
+        'test',
+        '--karma-config=core/tests/karma.conf.ts',
+        '--watch=false',
     ]
 
     specs_to_run: Set[str] = set()
@@ -179,7 +180,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     if specs_to_run:
         print('Running the following specs:', specs_to_run)
-        cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
+        for spec in sorted(specs_to_run):
+            cmd.append('--include=%s' % spec)
 
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
@@ -190,12 +192,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # CI overhead on par with the previous minify-third-party-only approach.
         build.main(args=['--prod_env', '--skip_ng_build'])
 
-        cmd.append('--prodEnv')
+        cmd.append('--configuration=production')
     else:
         build.main(args=[])
 
     if parsed_args.verbose:
-        cmd.append('--terminalEnabled')
+        os.environ['KARMA_TERMINAL_ENABLED'] = 'true'
 
     for attempt in range(MAX_ATTEMPTS):
         print(f'Attempt {attempt + 1} of {MAX_ATTEMPTS}')

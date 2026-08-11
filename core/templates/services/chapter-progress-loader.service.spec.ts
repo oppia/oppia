@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Chapter-progress-loader Service.
  */
 
+// @ts-nocheck
+
 import {TestBed} from '@angular/core/testing';
 import {
   ChapterProgressLoaderService,

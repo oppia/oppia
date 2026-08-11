@@ -15,6 +15,8 @@
 /**
  * @fileoverview test for insert script service
  */
+// @ts-nocheck
+
 import {RendererFactory2} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {

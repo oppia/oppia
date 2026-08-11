@@ -22,6 +22,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from './window-ref.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 describe('Url Service', () => {
   let urlService: UrlService;
@@ -269,7 +270,7 @@ describe('Url Service', () => {
   it('should correctly retrieve selected subtopics from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/practice/session';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(urlService.getSelectedSubtopicsFromUrl()).toBe('abcdefgijklm');
@@ -278,7 +279,7 @@ describe('Url Service', () => {
   it('should throw error for invalid practice session url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/topic/abcdefgijklm';
     expect(() => {
       urlService.getSelectedSubtopicsFromUrl();
@@ -433,7 +434,7 @@ describe('Url Service', () => {
   it('should correctly retrieve node id from practice url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/learn/math/fractions/practice/1';
     expect(urlService.getNodeIdFromPracticeUrl()).toBe('1');
 
@@ -444,7 +445,7 @@ describe('Url Service', () => {
   it('should correctly retrieve arc id from url', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
       StoryEditorArcs: {isEnabled: true},
-    });
+    } as FeatureStatusChecker);
     mockLocation.pathname = '/learn/math/fractions/test/arc/1';
     expect(urlService.getArcIdFromUrl()).toBe('1');
 

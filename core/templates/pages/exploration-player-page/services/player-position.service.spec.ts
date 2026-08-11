@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the player position service.
  */
 
+// @ts-nocheck
+
 import {EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 

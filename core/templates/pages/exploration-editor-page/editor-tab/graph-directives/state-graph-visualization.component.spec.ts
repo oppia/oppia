@@ -315,7 +315,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.graphLoaded).toBeTrue();
+    expect(component.graphLoaded).toBe(true);
     expect(component.GRAPH_WIDTH).toBe(630);
     expect(component.GRAPH_HEIGHT).toBe(280);
     expect(component.VIEWPORT_WIDTH).toBe('10000px');
@@ -467,28 +467,41 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         right: 20,
       });
       flush();
-      // Spies for d3 library.
-      var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
-        scaleExtent: () => ({
-          on: (evt: string, callback: () => void) => {
-            callback();
-            return {
-              apply: () => {},
-            };
-          },
-        }),
-      });
-      spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
-      spyOnProperty(d3, 'event').and.returnValue({
-        transform: {
-          x: 10,
-          y: 20,
-        },
+      let zoomListener: Function = () => {};
+      const originalCall = d3.selection.prototype.call;
+      spyOn(d3.selection.prototype, 'call').and.callFake(function (
+        this: unknown,
+        behavior: unknown,
+        ...args: unknown[]
+      ) {
+        const zoomBehavior = behavior as {on?: (eventName: string) => Function};
+        if (zoomBehavior && typeof zoomBehavior.on === 'function') {
+          const listener = zoomBehavior.on('zoom');
+          if (listener) {
+            zoomListener = listener;
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        return originalCall.apply(this, [behavior as Function, ...args]);
       });
 
       component.makeGraphPannable();
       tick();
       flush();
+
+      const mockEvent = {
+        transform: {
+          x: 10,
+          y: 20,
+        },
+      };
+      const pannableRect = fixture.nativeElement.querySelector('#pannableRect');
+      const d3WithCustomEvent = d3 as unknown as {customEvent: Function};
+      d3WithCustomEvent.customEvent(
+        mockEvent,
+        zoomListener as Function,
+        pannableRect
+      );
 
       expect(component.innerTransformStr).toBe('translate(10,20)');
     })
@@ -521,31 +534,44 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       };
 
       flush();
-      // Spies for d3 library.
-      var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
-        scaleExtent: () => ({
-          on: (evt: string, callback: () => void) => {
-            callback();
-            return {
-              apply: () => {},
-            };
-          },
-        }),
-      });
-      spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
-      spyOnProperty(d3, 'event').and.returnValue({
-        transform: {
-          x: 10,
-          y: 20,
-        },
+      let zoomListener: Function = () => {};
+      const originalCall = d3.selection.prototype.call;
+      spyOn(d3.selection.prototype, 'call').and.callFake(function (
+        this: unknown,
+        behavior: unknown,
+        ...args: unknown[]
+      ) {
+        const zoomBehavior = behavior as {on?: (eventName: string) => Function};
+        if (zoomBehavior && typeof zoomBehavior.on === 'function') {
+          const listener = zoomBehavior.on('zoom');
+          if (listener) {
+            zoomListener = listener;
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        return originalCall.apply(this, [behavior as Function, ...args]);
       });
 
       component.makeGraphPannable();
       tick();
       flush();
 
-      expect(d3.event.transform.x).toBe(0);
-      expect(d3.event.transform.y).toBe(0);
+      const mockEvent = {
+        transform: {
+          x: 10,
+          y: 20,
+        },
+      };
+      const pannableRect = fixture.nativeElement.querySelector('#pannableRect');
+      const d3WithCustomEvent = d3 as unknown as {customEvent: Function};
+      d3WithCustomEvent.customEvent(
+        mockEvent,
+        zoomListener as Function,
+        pannableRect
+      );
+
+      expect(mockEvent.transform.x).toBe(0);
+      expect(mockEvent.transform.y).toBe(0);
       expect(component.overallTransformStr).toBe('translate(465,487.5)');
     })
   );

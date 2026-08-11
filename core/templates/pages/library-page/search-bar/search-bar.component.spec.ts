@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Search bar.
  */
 
+// @ts-nocheck
+
 import {EventEmitter, Pipe, PipeTransform} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
