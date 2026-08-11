@@ -382,8 +382,6 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    // Use a higher timeout for math interactions as they are heavy to render.
-    let tileText = interactionToAdd;
     // Wait for active tab panel fade transition to complete.
     await this.expectElementToBeVisible('css=.tab-pane.active.show');
 
