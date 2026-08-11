@@ -34,7 +34,7 @@
   <section *ngIf="activeView === VIEW_NAMES.STORY && !canonicalStorySectionData.length"
            class="redesigned-stories-section"
            aria-labelledby="redesigned-stories-section-coming-soon-heading">
-    <mat-card dir="auto" class="oppia-page-card practice-tab-not-available-card">
+    <mat-card [attr.dir]="'auto'" class="oppia-page-card practice-tab-not-available-card">
       <h2 id="redesigned-stories-section-coming-soon-heading" class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
       </h2>
       <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_LESSONS' | translate">

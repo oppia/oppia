@@ -1,15 +1,15 @@
 <topic-viewer-content
-  *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer"
-  [topicName]="topicName"
-  [topicDescription]="topicDescription"
-  [topicId]="topicId"
-  [classroomName]="classroomName"
-  [classroomUrlFragment]="classroomUrlFragment"
-  [topicUrlFragment]="topicUrlFragment"
-  [canonicalStorySectionData]="canonicalStorySectionData"
-  [activeView]="activeView"
-  [topicIsLoading]="topicIsLoading"
-  [subtopics]="subtopics">
+                      *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer"
+                      [topicName]="topicName"
+                      [topicDescription]="topicDescription"
+                      [topicId]="topicId"
+                      [classroomName]="classroomName"
+                      [classroomUrlFragment]="classroomUrlFragment"
+                      [topicUrlFragment]="topicUrlFragment"
+                      [canonicalStorySectionData]="canonicalStorySectionData"
+                      [activeView]="activeView"
+                      [topicIsLoading]="topicIsLoading"
+                      [subtopics]="subtopics">
 </topic-viewer-content>
 
 <ng-template #legacyTopicViewerContainer>
