@@ -2523,8 +2523,13 @@ div#ng-curtain {
   height: 56px;
 }
 
+/* The topic editor adds a fixed .navbar-helper bar below the global navbar,
+   making the fixed header stack 126px tall. These rules keep the adventure
+   navigation dock below both bars and keep the global navbar visible while
+   scrolling. They are scoped to body.topic-editor-page-active, which is added
+   only when the RedesignedTopicViewerPage feature flag is enabled. */
 @media (min-width: 801px) {
-  /* Keep topic preview dock below global and topic preview headers on desktop. */
+  /* Keep the topic preview dock below the global and topic editor headers. */
   body.topic-editor-page-active .e2e-test-topic-preview-tab-container .adventure-navigation-container {
     top: 126px !important;
   }

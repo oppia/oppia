@@ -158,14 +158,13 @@ class PracticeSessionsPageDataHandler(
     ) -> Optional[Tuple[story_domain.Story, story_domain.Arc]]:
         """Returns the story-arc pair matching the given arc ID.
 
-        The arc_id parameter maps to an arc by its 1-based position among the
-        arcs of the first published story (e.g., '1' maps to the first arc,
-        '2' maps to the second) or by its full ID (e.g., 'default_arc' maps
-        to the arc whose id is 'default_arc').
+        The arc_id parameter is a 1-based index that maps to the nth arc in
+        the first published story of the topic (e.g., '1' maps to the first
+        arc).
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The 1-based arc position or full arc ID.
+            arc_id: str. The arc ID (1-based index).
 
         Returns:
             tuple(Story, Arc) or None. The matching story-arc pair, or None
@@ -178,10 +177,6 @@ class PracticeSessionsPageDataHandler(
             arc_index = int(arc_id)
             if 1 <= arc_index <= len(arcs_with_stories):
                 return arcs_with_stories[arc_index - 1]
-        target_arc_id = 'arc_%s' % arc_id
-        for story, arc in arcs_with_stories:
-            if arc.id in (target_arc_id, arc_id):
-                return (story, arc)
         return None
 
     def _get_skill_ids_for_arc(
@@ -189,14 +184,13 @@ class PracticeSessionsPageDataHandler(
     ) -> List[str]:
         """Returns skill IDs associated with all nodes in a given arc.
 
-        The arc_id parameter maps to an arc by its 1-based position among the
-        arcs of the first published story (e.g., '1' maps to the first arc)
-        or by its full ID (e.g., 'default_arc' maps to the arc whose id is
-        'default_arc').
+        The arc_id parameter is a 1-based index that maps to the nth arc in
+        the first published story of the topic (e.g., '1' maps to the first
+        arc).
 
         Args:
             topic: Topic. The topic object.
-            arc_id: str. The 1-based arc position or full arc ID.
+            arc_id: str. The arc ID (1-based index).
 
         Returns:
             list(str). The skill IDs for all nodes in the arc.
