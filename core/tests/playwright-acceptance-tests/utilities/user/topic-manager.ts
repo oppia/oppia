@@ -58,7 +58,7 @@ const photoUploadModal = 'edit-thumbnail-modal';
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
 const subtopicUrlFragmentField =
-  '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
+  '.e2e-test-subtopic-url-fragment-field .e2e-test-url-fragment-field';
 const richTextAreaField = 'div.e2e-test-rte';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
