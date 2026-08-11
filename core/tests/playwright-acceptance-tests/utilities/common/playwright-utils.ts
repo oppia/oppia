@@ -1387,7 +1387,7 @@ export class BaseUser {
    * @param role {string} Role of the element.
    * @param text {string} Text content of the element.
    */
-  async clickOnElementByRole(role: string, text: string) {
+  async clickOnElementByRole(role: string, text: string): Promise<void> {
     const locator = this.page.getByRole('button', {name: text});
     await locator.click();
   }
