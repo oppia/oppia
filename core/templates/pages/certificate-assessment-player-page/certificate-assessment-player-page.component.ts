@@ -20,6 +20,7 @@ import {Component, OnInit, Optional} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AssessmentQuestion} from 'domain/certificate-assessment/certificate-assessment.model';
 import {CertificateAssessmentPlayerPageConstants} from './certificate-assessment-player-page.constants';
+import type {CertificateAssessmentStage} from './certificate-assessment-player-page.constants';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TimeExpiredModalComponent} from 'components/certificate-assessment-offering-helper/time-expired-modal.component';
@@ -38,7 +39,7 @@ export class CertificateAssessmentPlayerPageComponent implements OnInit {
   readonly certificateAssessmentPlayerPageConstants =
     CertificateAssessmentPlayerPageConstants;
   certificateId = '';
-  currentStage: AssessmentStage =
+  currentStage: CertificateAssessmentStage =
     CertificateAssessmentPlayerPageConstants.STAGE_INTRO;
   // TODO(#24717-M2.20): This flag value is by default set as false so interrupt card does not render. In the future, this flag will change its value based on conditions.
   showAssessmentInterruptCard = false;
