@@ -597,8 +597,8 @@
     },
     {
       "name": "topic-manager/add-remove-and-edit-subtopics",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/add-remove-and-edit-subtopics.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/topic-manager/add-remove-and-edit-subtopics.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "topic-manager/create-delete-and-edit-the-stories-and-chapters",

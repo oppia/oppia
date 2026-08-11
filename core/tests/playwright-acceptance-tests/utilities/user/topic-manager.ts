@@ -50,9 +50,355 @@ const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
 
+const modalDiv = 'div.modal-content';
+const closeSaveModalButton = '.e2e-test-close-save-modal-button';
+const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
+const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
+const photoUploadModal = 'edit-thumbnail-modal';
+const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const subtopicTitleField = '.e2e-test-subtopic-title-field';
+const subtopicUrlFragmentField =
+  '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
+const richTextAreaField = 'div.e2e-test-rte';
+const subtopicPhotoBoxButton =
+  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
+const mobileSaveTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+const saveTopicButton = 'button.e2e-test-save-topic-button';
+const subtopicCardHeader = '.subtopic-name-card-header';
+const subtopicTitleSelector = '.e2e-test-subtopic';
+const topicPreviewTab = '.e2e-test-topic-preview-button';
+const contentTitle = '.content-title';
+const htmlContent = '.html-content';
+const editSubtopicExplanationSelector = '.e2e-test-edit-html-content';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const optionsSelector = '.e2e-test-show-subtopic-options';
+const deleteSubtopicButtonSelector = '.e2e-test-delete-subtopic-button';
+const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
+const subtopicEditorContainerSelector = '.e2e-test-subtopic-editor-container';
+const subtopicPreviewContainerSelector =
+  '.e2e-test-subtopic-preview-container';
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const mobileSubtopicContainerSelector = '.e2e-test-mobile-subtopic-content';
+const saveSubtopicExplanationButtonSelector =
+  '.e2e-test-save-subtopic-explanation-button';
+const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
+const topicsTab = 'a.e2e-test-topics-tab';
+
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 export class TopicManager extends BaseUser {
+  /**
+   * Open the topic editor page for a topic.
+   */
+  async openTopicEditor(topicName: string): Promise<void> {
+    const topicNameSelector = this.isViewportAtMobileWidth()
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOnElementWithSelector(topicsTab);
+    await this.expectElementToBeVisible(topicNameSelector);
+
+    await Promise.all([
+      this.clickOnElementWithSelectorAndText(topicNameSelector, topicName),
+      this.page.waitForNavigation(),
+    ]);
+
+    expect(this.page.url()).toContain('/topic_editor/');
+  }
+
+  /**
+   * Saves topic draft.
+   * @param {string} topicName - name of the topic to be saved.
+   * @param {string} description - description of the topic to be saved.
+   */
+  async saveTopicDraft(topicName: string, description?: string): Promise<void> {
+    await this.expectElementToBeVisible(modalDiv, false);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileSaveTopicButton);
+      await this.expectElementToBeVisible(topicEditorSaveModelSelector);
+      await this.typeInInputField(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
+      await this.expectElementToBeVisible(
+        `${closeSaveModalButton}:not([disabled])`
+      );
+      await this.clickOnElementWithSelector(closeSaveModalButton);
+      await this.expectElementToBeVisible(
+        topicEditorSaveModelSelector,
+        false
+      );
+    } else {
+      await this.clickOnElementWithSelector(saveTopicButton);
+      if (description) {
+        await this.typeInInputField(saveChangesMessageInput, description);
+        await this.expectElementValueToBe(saveChangesMessageInput, description);
+      }
+      await this.expectElementToBeVisible(
+        `${closeSaveModalButton}:not([disabled])`
+      );
+      await this.waitForElementToStabilize(closeSaveModalButton);
+      await this.clickOnElementWithSelector(closeSaveModalButton);
+      await this.expectElementToBeVisible(modalDiv, false);
+    }
+  }
+
+  /**
+   * Opens the subtopic editor for a given subtopic and topic.
+   * @param {string} subtopicName - The name of the subtopic to open.
+   * @param {string} topicName - The name of the topic that contains the subtopic.
+   */
+  async openSubtopicEditor(
+    subtopicName: string,
+    topicName?: string
+  ): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
+
+    // Expand subtopic list if it is not expanded.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSubtopicContainerSelector))
+    ) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
+    }
+
+    try {
+      await this.page.waitForSelector(subtopicCardHeader);
+      const subtopicElements = await this.page.$$(subtopicCardHeader);
+      for (let i = 0; i < subtopicElements.length; i++) {
+        const element = subtopicElements[i];
+        await this.page.waitForSelector(subtopicTitleSelector);
+        const titleElement = await element.$(subtopicTitleSelector);
+        if (titleElement) {
+          const titleTextContent = await this.page.evaluate(
+            el => el.textContent,
+            titleElement
+          );
+          if (titleTextContent && titleTextContent.includes(subtopicName)) {
+            await this.waitForElementToBeClickable(titleElement);
+            await titleElement.click();
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to open subtopic editor: ${error}`);
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+
+    await this.expectElementToBeVisible(subtopicEditorContainerSelector);
+  }
+
+  /**
+   * Edits the details of a subtopic.
+   *
+   * @param {string} title - The new title of the subtopic.
+   * @param {string} urlFragment - The new URL fragment of the subtopic.
+   * @param {string} explanation - The new explanation of the subtopic.
+   * @param {string} thumbnail - The path to the new thumbnail image for the subtopic.
+   */
+  async editSubTopicDetails(
+    title: string,
+    urlFragment: string,
+    explanation: string,
+    thumbnail?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(subtopicTitleField);
+    await this.clearAllTextFrom(subtopicTitleField);
+    await this.typeInInputField(subtopicTitleField, title);
+    if (urlFragment) {
+      await this.page.waitForSelector(subtopicUrlFragmentField, {
+        state: 'visible',
+      });
+      await this.clearAllTextFrom(subtopicUrlFragmentField);
+      await this.page.type(subtopicUrlFragmentField, urlFragment);
+    }
+
+    await this.clickOnElementWithSelector(editSubtopicExplanationSelector);
+    await this.page.waitForSelector(richTextAreaField, {state: 'visible'});
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, explanation);
+    await this.clickOnElementWithSelector(
+      saveSubtopicExplanationButtonSelector
+    );
+
+    // Update the thumbnail if it is provided.
+    if (thumbnail) {
+      await this.clickOnElementWithSelector(subtopicPhotoBoxButton);
+      await this.page.waitForSelector(photoUploadModal, {state: 'visible'});
+      await this.uploadFile(thumbnail);
+      await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+      await this.clickOnElementWithSelector(uploadPhotoButton);
+    }
+
+    await this.expectElementToBeVisible(photoUploadModal, false);
+  }
+
+  /**
+   * Deletes a subtopic from a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   */
+  async deleteSubtopicFromTopic(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOnElementWithSelector(subtopicReassignHeader);
+      }
+
+      await this.page.waitForSelector(subtopicCardHeader);
+      const subtopics = await this.page.$$(subtopicCardHeader);
+
+      for (const subtopic of subtopics) {
+        const subtopicTitle = await subtopic.$eval(
+          subtopicTitleSelector,
+          el => el.textContent?.trim() || ''
+        );
+
+        if (subtopicTitle === subtopicName) {
+          await subtopic.waitForSelector(optionsSelector);
+          const optionsButton = await subtopic.$(optionsSelector);
+          if (optionsButton) {
+            await this.waitForElementToBeClickable(optionsButton);
+            await optionsButton.click();
+            await subtopic.waitForSelector(deleteSubtopicButtonSelector);
+            const deleteButton = await subtopic.$(deleteSubtopicButtonSelector);
+            if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
+              await deleteButton.click();
+              await this.expectElementToBeVisible(
+                deleteSubtopicButtonSelector,
+                false
+              );
+              showMessage(
+                `Subtopic ${subtopicName} deleted from the topic ${topicName}.`
+              );
+              return;
+            }
+          }
+        }
+      }
+
+      throw new Error(
+        `Subtopic ${subtopicName} not found in topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to delete subtopic from topic: ${error}`
+      );
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies the presence of a subtopic in a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the subtopic should exist.
+   */
+  async verifySubtopicPresenceInTopic(
+    subtopicName: string,
+    topicName: string | null = null,
+    shouldExist: boolean = true
+  ): Promise<void> {
+    // Navigate to topic editor if topic name is provided.
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOnElementWithSelector(subtopicReassignHeader);
+      }
+    }
+
+    // Expand subtopic list if it is not expanded.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSubtopicContainerSelector))
+    ) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
+    }
+
+    // Check if subtopic exists or not.
+    await this.page.waitForFunction(
+      ({selector, subtopicName, present}) => {
+        const subtopicsElements = document.querySelectorAll(selector);
+        const subtopics = Array.from(subtopicsElements).map(
+          (el: Element) => el.textContent?.trim() || ''
+        );
+        return subtopics.includes(subtopicName) === present;
+      },
+      {
+        selector: subtopicTitleSelector,
+        subtopicName: subtopicName,
+        present: shouldExist,
+      },
+      {timeout: 10000}
+    );
+  }
+
+  /**
+   * Navigates to the subtopic preview tab.
+   */
+  async navigateToSubtopicPreviewTab(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openSubtopicEditor(subtopicName, topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(topicMobilePreviewTab);
+    } else {
+      await this.page.waitForSelector(topicPreviewTab);
+      await this.clickOnElementWithSelector(topicPreviewTab);
+    }
+
+    await this.expectElementToBeVisible(subtopicPreviewContainerSelector);
+    showMessage('Navigated to Subtopic Preview Tab');
+  }
+
+  /**
+   * Checks if the preview subtopic has the expected name and explanation.
+   * @param {string} subtopicName - The expected name of the subtopic.
+   * @param {string} explanation - The expected explanation of the subtopic.
+   */
+  async expectSubtopicPreviewToHave(
+    subtopicName: string,
+    explanation: string
+  ): Promise<void> {
+    await this.page.waitForSelector(contentTitle);
+    const previewSubtopicName = await this.page.$eval(
+      contentTitle,
+      el => el.textContent
+    );
+    if (previewSubtopicName !== subtopicName) {
+      throw new Error(
+        `Expected subtopic name to be "${subtopicName}", but it was "${previewSubtopicName}"`
+      );
+    }
+
+    await this.page.waitForSelector(htmlContent);
+    const isExplanationPresent = await this.isTextPresentOnPage(explanation);
+    if (!isExplanationPresent) {
+      throw new Error(
+        `Expected explanation "${explanation}" to be present on the page, but it was not`
+      );
+    }
+  }
   /**
    * Checks if the breadcrumb in the navbar contains the given text.
    */

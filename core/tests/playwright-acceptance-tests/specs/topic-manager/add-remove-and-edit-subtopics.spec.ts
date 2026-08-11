@@ -19,6 +19,7 @@
  * TM.TE Add, remove, and edit the subtopics of a topic.
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -27,14 +28,18 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Topic Manager', function () {
   let topicManager: TopicManager & ExplorationEditor & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(600_000);
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_adm@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -82,12 +87,13 @@ describe('Topic Manager', function () {
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
+      browser,
       [ROLES.TOPIC_MANAGER],
       'Arithmetic Operations'
     );
-  }, 600000);
+  });
 
-  it('should be able to add and delete a subtopic in a topic', async function () {
+  test('should be able to add and delete a subtopic in a topic', async function () {
     await topicManager.openTopicEditor('Arithmetic Operations');
     await topicManager.createSubtopicForTopic(
       'Subtraction',
@@ -112,7 +118,7 @@ describe('Topic Manager', function () {
     );
   });
 
-  it('should be able to edit and preview subtopic', async function () {
+  test('should be able to edit and preview subtopic', async function () {
     await topicManager.openSubtopicEditor('Addition');
     await topicManager.editSubTopicDetails(
       'Intro to Addition and Subtraction',
@@ -120,10 +126,7 @@ describe('Topic Manager', function () {
       'This is introduction to Addition and Subtraction.',
       testConstants.data.profilePicture
     );
-    await topicManager.expectScreenshotToMatch(
-      'updatedAdditionSubtopic',
-      __dirname
-    );
+    await topicManager.expectScreenshotToMatch('updatedAdditionSubtopic');
 
     await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
     await topicManager.expectToastMessageToBe('Changes Saved.');
@@ -138,7 +141,7 @@ describe('Topic Manager', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
