@@ -5163,7 +5163,7 @@ def can_submit_assessment_response(
     def test_can_submit(
         self: _SelfBaseHandlerType, attempt_id: str, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
-        """Stub handler for certificate assessment submission checks.
+        """Checks whether the current learner can submit the assessment attempt.
 
         Args:
             attempt_id: str. The ID of the assessment attempt.
@@ -5206,35 +5206,41 @@ def can_submit_assessment_response(
 def can_access_certificate_assessment_attempt(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Decorator to check access to a learner's active certificate assessment
-    attempt.
+    """Decorator to check access to a learner's certificate assessment attempt.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that checks whether the current
-        learner can access a question from the active certificate assessment
-        attempt.
+        learner can access a question from the certificate assessment attempt.
 
     Raises:
         base.UserFacingExceptions.NotLoggedInException. If the learner is not
             logged in.
-        base.UserFacingExceptions.UnauthorizedUserException. If no active
-            attempt exists.
-        base.UserFacingExceptions.InvalidInputException. If the question does
-            not belong to the active attempt.
+        base.UserFacingExceptions.NotFoundException. If the attempt cannot be
+            found.
+        base.UserFacingExceptions.UnauthorizedUserException. If the attempt
+            does not belong to the learner.
+        base.UserFacingExceptions.InvalidInputException. If the attempt has
+            already been submitted or the question does not belong to the
+            attempt.
     """
 
     # Here we use type Any because this method can accept arbitrary number of
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
-        self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
+        self: _SelfBaseHandlerType,
+        attempt_id: str,
+        question_id: str,
+        **kwargs: Any,
     ) -> _GenericHandlerFunctionReturnType:
-        """Stub handler for certificate assessment access checks.
+        """Checks whether the current learner can access a question from the
+        certificate assessment attempt.
 
         Args:
+            attempt_id: str. The ID of the assessment attempt.
             question_id: str. The ID of the question.
             **kwargs: *. Keyword arguments.
 
@@ -5244,26 +5250,35 @@ def can_access_certificate_assessment_attempt(
         Raises:
             base.UserFacingExceptions.NotLoggedInException. If the learner is
                 not logged in.
-            base.UserFacingExceptions.UnauthorizedUserException. If no active
-                attempt exists.
-            base.UserFacingExceptions.InvalidInputException. If the question
-                does not belong to the active attempt.
+            base.UserFacingExceptions.NotFoundException. If the attempt cannot
+                be found.
+            base.UserFacingExceptions.UnauthorizedUserException. If the attempt
+                does not belong to the learner.
+            base.UserFacingExceptions.InvalidInputException. If the attempt has
+                already been submitted or the question does not belong to the
+                attempt.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
         try:
-            attempt = certificate_assessment_services.get_active_certificate_assessment_attempt(
-                self.user_id
+            attempt = certificate_assessment_services.get_certificate_assessment_attempt(
+                attempt_id
             )
         except utils.ValidationError as e:
-            raise self.UnauthorizedUserException(str(e)) from e
+            raise self.NotFoundException(str(e)) from e
+        if attempt.learner_id != self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have permission to access this assessment.'
+            )
+        if attempt.is_submitted:
+            raise self.InvalidInputException(
+                'This assessment has already been submitted.'
+            )
         if question_id not in attempt.version_data['question_versions']:
             raise self.InvalidInputException(
                 'Question is not part of this assessment.'
             )
-        return handler(
-            self, question_id, attempt_id=attempt.attempt_id, **kwargs
-        )
+        return handler(self, attempt_id, question_id, **kwargs)
 
     return test_can_access
 

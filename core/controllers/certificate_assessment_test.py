@@ -911,7 +911,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
             certificate_assessment.CertificateQuestionHandler
         )
         handler.user_id = 'user_id_1'
-        gae_models.CertificateAssessmentAttemptModel.create(
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='user_id_1',
             certificate_id='cert_1',
             total_score=0.0,
@@ -935,10 +935,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
         ), mock.patch.object(
             certificate_assessment.CertificateQuestionHandler, 'render_json'
         ) as render_json_mock:
-            # Here attempt_id is omitted because the decorator injects it from
-            # the learner's active attempt, and pylint inspects the wrapped
-            # signature which lists attempt_id as a required parameter.
-            handler.get('q1')  # pylint: disable=no-value-for-parameter
+            handler.get(attempt_model.id, 'q1')
 
         render_json_mock.assert_called_once_with(
             {
@@ -952,7 +949,7 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
             certificate_assessment.CertificateQuestionHandler
         )
         handler.user_id = 'user_id_1'
-        gae_models.CertificateAssessmentAttemptModel.create(
+        attempt_model = gae_models.CertificateAssessmentAttemptModel.create(
             learner_id='user_id_1',
             certificate_id='cert_1',
             total_score=0.0,
@@ -977,4 +974,4 @@ class CertificateQuestionHandlerUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 handler.InvalidInputException, 'bad question'
             ):
-                handler.get('q1')  # pylint: disable=no-value-for-parameter
+                handler.get(attempt_model.id, 'q1')

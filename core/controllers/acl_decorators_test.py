@@ -193,12 +193,13 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
 
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
-            'question_id': {'schema': {'type': 'basestring'}}
+            'attempt_id': {'schema': {'type': 'basestring'}},
+            'question_id': {'schema': {'type': 'basestring'}},
         }
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_certificate_assessment_attempt
-        def get(self, question_id: str, attempt_id: str) -> None:
+        def get(self, attempt_id: str, question_id: str) -> None:
             self.render_json(
                 {'question_id': question_id, 'attempt_id': attempt_id}
             )
@@ -214,7 +215,8 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
                         '/submit/<attempt_id>', self.SubmitMockHandler
                     ),
                     webapp2.Route(
-                        '/question/<question_id>', self.QuestionMockHandler
+                        '/question/<attempt_id>/<question_id>',
+                        self.QuestionMockHandler,
                     ),
                 ],
                 debug=feconf.DEBUG,
@@ -338,47 +340,81 @@ class CertificateAssessmentDecoratorTests(test_utils.GenericTestBase):
 
     def test_question_decorator_rejects_logged_out_user(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/question/q1', expected_status_int=401)
+            response = self.get_json(
+                '/question/attempt_1/q1', expected_status_int=401
+            )
         self.assertIn(
             'You must be logged in to access this resource.',
             response['error'],
         )
 
-    def test_question_decorator_rejects_learner_without_active_attempt(
-        self,
-    ) -> None:
+    def test_question_decorator_rejects_missing_attempt(self) -> None:
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/question/q1', expected_status_int=401)
+            response = self.get_json(
+                '/question/nonexistent_attempt_id/q1',
+                expected_status_int=404,
+            )
         self.assertEqual(
             response['error'],
-            'No active certificate assessment attempt was found.',
+            'Could not find the resource '
+            'http://localhost/question/nonexistent_attempt_id/q1.',
         )
         self.logout()
 
-    def test_question_decorator_rejects_question_not_in_active_attempt(
-        self,
-    ) -> None:
-        self._create_certificate_assessment_attempt_model(
+    def test_question_decorator_rejects_another_learners_attempt(self) -> None:
+        self.signup('otheruser@example.com', 'otheruser')
+        other_user_id = self.get_user_id_from_email('otheruser@example.com')
+        attempt = self._create_certificate_assessment_attempt_model(
+            other_user_id
+        )
+        self.login(self.VIEWER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/question/%s/q1' % attempt.id, expected_status_int=401
+            )
+        self.assertEqual(
+            response['error'],
+            'You do not have permission to access this assessment.',
+        )
+        self.logout()
+
+    def test_question_decorator_rejects_submitted_attempt(self) -> None:
+        attempt = self._create_certificate_assessment_attempt_model(
+            self.user_id, is_submitted=True
+        )
+        self.login(self.VIEWER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/question/%s/q1' % attempt.id, expected_status_int=400
+            )
+        self.assertEqual(
+            response['error'],
+            'This assessment has already been submitted.',
+        )
+        self.logout()
+
+    def test_question_decorator_rejects_question_not_in_attempt(self) -> None:
+        attempt = self._create_certificate_assessment_attempt_model(
             self.user_id, question_versions={'q2': 1}
         )
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/question/q1', expected_status_int=400)
+            response = self.get_json(
+                '/question/%s/q1' % attempt.id, expected_status_int=400
+            )
         self.assertEqual(
             response['error'], 'Question is not part of this assessment.'
         )
         self.logout()
 
-    def test_question_decorator_accepts_question_in_active_attempt(
-        self,
-    ) -> None:
+    def test_question_decorator_accepts_question_in_attempt(self) -> None:
         attempt = self._create_certificate_assessment_attempt_model(
             self.user_id, question_versions={'q1': 1}
         )
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/question/q1')
+            response = self.get_json('/question/%s/q1' % attempt.id)
         self.assertEqual(response['question_id'], 'q1')
         self.assertEqual(response['attempt_id'], attempt.id)
         self.logout()

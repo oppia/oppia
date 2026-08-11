@@ -507,11 +507,14 @@ class CertificateQuestionHandler(
     """Fetches question state data for an in-progress certificate attempt."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {'question_id': {'schema': {'type': 'basestring'}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'attempt_id': {'schema': {'type': 'basestring'}},
+        'question_id': {'schema': {'type': 'basestring'}},
+    }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_certificate_assessment_attempt
-    def get(self, question_id: str, attempt_id: str) -> None:
+    def get(self, attempt_id: str, question_id: str) -> None:
         assert self.user_id is not None
         try:
             question_state_data = certificate_assessment_services.get_question_state_data_for_assessment_attempt(
