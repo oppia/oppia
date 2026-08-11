@@ -637,6 +637,13 @@ export class BaseUser {
   }
 
   /**
+   * Expects toast message to be the given text.
+   */
+  async expectToastMessageToBe(expectedMessage: string): Promise<void> {
+    await this.expectToastMessage(expectedMessage);
+  }
+
+  /**
    * Function to expect the page to have no translation ids.
    */
   async expectPageHasNoTranslationIds(): Promise<void> {
