@@ -57,6 +57,7 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import './contributions-and-review.component.css';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -129,6 +130,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
+  styleUrls: ['./contributions-and-review.component.css'],
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
   @Input() activeTopicName: string;

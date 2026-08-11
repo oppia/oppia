@@ -17,21 +17,40 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {RouterTestingModule} from '@angular/router/testing';
-import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {RouterTestingModule} from '@angular/router/testing';
+
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AvailableCertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {AlertsService} from 'services/alerts.service';
+import {AvailableCertificateOfferingPageComponent} from './certificate-offering-available-page.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('AvailableCertificateOfferingPageComponent', () => {
   let component: AvailableCertificateOfferingPageComponent;
   let fixture: ComponentFixture<AvailableCertificateOfferingPageComponent>;
+  let certificateAssessmentOfferingBackendApiService: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+  let alertsService: jasmine.SpyObj<AlertsService>;
 
   beforeEach(async () => {
+    certificateAssessmentOfferingBackendApiService = jasmine.createSpyObj(
+      'CertificateAssessmentOfferingBackendApiService',
+      ['getAvailableCertificateOfferingsForClassroomAsync']
+    );
+    alertsService = jasmine.createSpyObj('AlertsService', ['addWarning']);
+
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [
         AvailableCertificateOfferingPageComponent,
         MockTranslatePipe,
+      ],
+      providers: [
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: certificateAssessmentOfferingBackendApiService,
+        },
+        {provide: AlertsService, useValue: alertsService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -45,63 +64,98 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     component.classroomUrlFragment = 'math';
   });
 
-  it('should render the certificate offering content', () => {
-    fixture.detectChanges();
-
-    const buttons = Array.from(
-      fixture.nativeElement.querySelectorAll('button')
-    ).map(button => (button as HTMLButtonElement).textContent?.trim() || '');
-
-    expect(
-      buttons.includes(
-        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_CONTINUE_TO_ASSESSMENT_BUTTON_TEXT'
-      )
-    ).toBe(true);
-    expect(
-      buttons.includes(
-        'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_EXIT_BUTTON_TEXT'
-      )
-    ).toBe(true);
-    expect(
-      fixture.nativeElement.querySelector('h1[tabindex="0"]').textContent.trim()
-    ).toBe('I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_HEADING');
-  });
-
-  it('should render a tile for each available certificate', () => {
-    fixture.detectChanges();
-    const tiles = fixture.nativeElement.querySelectorAll(
-      '.oppia-certificate-offering-available-page-tile'
+  it('should load and render certificate offerings', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-2',
+          'Zoology',
+          'Passed'
+        ),
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-1',
+          'Arithmetic',
+          'Not Attempted'
+        ),
+      ])
     );
-    expect(tiles.length).toBe(component.availableCertificates.length);
-  });
 
-  it('should show the correct status label and date for each certificate', () => {
     fixture.detectChanges();
-    const statusEls = Array.from(
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const tiles: HTMLElement[] = Array.from(
       fixture.nativeElement.querySelectorAll(
-        '.oppia-certificate-offering-available-page-status'
+        '.oppia-certificate-offering-available-page-tile'
       )
-    ).map(el => (el as HTMLElement).textContent?.trim());
+    );
 
-    expect(statusEls).toEqual([
-      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED',
-      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_NOT_ATTEMPTED',
-      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED',
-    ]);
-
-    const dateEls = Array.from(
-      fixture.nativeElement.querySelectorAll(
-        '.oppia-certificate-offering-available-page-status-date'
-      )
-    ).map(el => (el as HTMLElement).textContent?.trim());
-
-    expect(dateEls).toEqual([
-      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON',
-      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON',
-    ]);
+    expect(
+      certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync
+    ).toHaveBeenCalledWith('math');
+    expect(tiles.length).toBe(2);
+    expect(tiles[0].querySelector('h3')?.textContent?.trim()).toBe(
+      'Arithmetic'
+    );
+    expect(tiles[1].querySelector('h3')?.textContent?.trim()).toBe('Zoology');
+    expect(component.hasError).toBe(false);
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'No certificates available yet.'
+    );
   });
 
-  it('should link assessment buttons to the certificate assessment page', () => {
+  it('should show an empty state when no offerings are returned', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      'No certificates available yet.'
+    );
+    expect(component.hasError).toBe(false);
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  });
+
+  it('should show an error message when the API call fails', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.reject('API error')
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to load certificate assessment offerings.'
+    );
+    expect(component.isLoading).toBe(false);
+    expect(component.hasError).toBe(true);
+    expect(component.availableCertificateOfferings).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain(
+      'Failed to load certificate assessment offerings.'
+    );
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'No certificates available yet.'
+    );
+  });
+
+  it('should link assessment buttons to the certificate assessment page', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-1',
+          'Arithmetic',
+          'Not Attempted'
+        ),
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
@@ -123,7 +177,29 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     });
   });
 
-  it('should show a Check Score button for passed and failed certificates', () => {
+  it('should show a Check Score button for passed and failed certificates', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-1',
+          'Arithmetic',
+          'Passed'
+        ),
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-2',
+          'Zoology',
+          'Failed'
+        ),
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-3',
+          'History',
+          'Not Attempted'
+        ),
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
     const buttons = Array.from(
       fixture.nativeElement.querySelectorAll('button')
@@ -138,6 +214,84 @@ describe('AvailableCertificateOfferingPageComponent', () => {
     ).length;
 
     expect(checkScoreButtons.length).toBe(passedOrFailedCount);
+    expect(checkScoreButtons.length).toBe(2);
+  });
+
+  it('should show passed and failed on dates for passed and failed certificates', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-1',
+          'Arithmetic',
+          'Passed',
+          1788300000000,
+          null
+        ),
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-2',
+          'Zoology',
+          'Not Passed',
+          null,
+          1788300000000
+        ),
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-3',
+          'History',
+          'Not Attempted'
+        ),
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const statusDateElements = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.oppia-certificate-offering-available-page-status-date'
+      )
+    );
+    expect(statusDateElements.length).toBe(2);
+    expect(fixture.nativeElement.textContent).toContain(
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON'
+    );
+    expect(fixture.nativeElement.textContent).toContain(
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON'
+    );
+  });
+
+  it('should not show date labels when dates are absent', async () => {
+    certificateAssessmentOfferingBackendApiService.getAvailableCertificateOfferingsForClassroomAsync.and.returnValue(
+      Promise.resolve([
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-1',
+          'Arithmetic',
+          'Passed'
+        ),
+        new AvailableCertificateAssessmentOfferingData(
+          'certificate-2',
+          'Zoology',
+          'Not Passed'
+        ),
+      ])
+    );
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const statusDateElements = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.oppia-certificate-offering-available-page-status-date'
+      )
+    );
+    expect(statusDateElements.length).toBe(0);
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_PASSED_ON'
+    );
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'I18N_CERTIFICATE_OFFERING_AVAILABLE_PAGE_STATUS_FAILED_ON'
+    );
   });
 
   it('should route the Exit button to the classroom page', () => {
