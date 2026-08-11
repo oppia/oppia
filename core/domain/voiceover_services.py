@@ -1770,8 +1770,10 @@ def get_language_description_from_code(language_code: str) -> Optional[str]:
         str|None. The language description corresponding to the given language
         code, or None if not found.
     """
+    print('language_code', language_code)
     for language_map in constants.constants.SUPPORTED_CONTENT_LANGUAGES:
         if language_map['code'] == language_code:
+            print(language_map, language_code)
             description = language_map.get('description')
             if isinstance(description, str):
                 return description

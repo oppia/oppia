@@ -18,24 +18,17 @@
 
 from __future__ import annotations
 
-import logging
-
-from core import feconf
-from core.constants import constants
-from core.domain import exp_fetchers, exp_services, opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms, results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-import result
-from typing import Any, Iterable, Optional, Sequence, Tuple
+from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models, datastore_services, exp_models
+    from mypy_imports import datastore_services, exp_models
 
 (base_models, exp_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.EXPLORATION]
@@ -51,7 +44,9 @@ class ExplorationEndStateNormalizationJob(base_jobs.JobBase):
     )
     DATASTORE_UPDATES_ALLOWED = True
 
-    def update_end_state_content(self, exploration_model: Any) -> Optional[Any]:
+    def update_end_state_content(
+        self, exploration_model: exp_models.ExplorationModel
+    ) -> Optional[exp_models.ExplorationModel]:
         """Updates the end state content of the exploration to have texts inside P tag.
 
         Args:
