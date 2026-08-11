@@ -1663,7 +1663,9 @@ export class ExplorationEditor extends BaseUser {
     const responseInputs = this.page.locator(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
       await responseInputs.nth(i).click({clickCount: 3});
-      await responseInputs.nth(i).fill(options[i]);
+      // CK Editor 4 relies on keyboard events instead of input events. So, we
+      // are using pressSequentially for fill().
+      await responseInputs.nth(i).pressSequentially(options[i]);
     }
 
     await this.clickOnElementWithSelector(saveInteractionButton);
