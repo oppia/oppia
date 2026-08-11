@@ -41,6 +41,7 @@ export interface ContributorCertificateInfo {
   contribution_word_count: number;
   team_lead: string;
   language: string | null;
+  certificate_profile_name: string;
 }
 
 interface ReviewExplorationSuggestionRequestBody {

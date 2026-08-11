@@ -1391,6 +1391,25 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
         self.assertEqual(status_by_title['Passed'], 'Passed')
         self.assertEqual(status_by_title['Not Passed'], 'Not Passed')
         self.assertEqual(status_by_title['Not Attempted'], 'Not Attempted')
+        offering_by_title = {
+            offering['title']: offering for offering in offerings
+        }
+        self.assertEqual(
+            offering_by_title['Passed']['passed_on_date'],
+            utils.get_time_in_millisecs(
+                started_at + datetime.timedelta(minutes=5)
+            ),
+        )
+        self.assertIsNone(offering_by_title['Passed']['failed_on_date'])
+        self.assertEqual(
+            offering_by_title['Not Passed']['failed_on_date'],
+            utils.get_time_in_millisecs(
+                started_at + datetime.timedelta(minutes=5)
+            ),
+        )
+        self.assertIsNone(offering_by_title['Not Passed']['passed_on_date'])
+        self.assertIsNone(offering_by_title['Not Attempted']['passed_on_date'])
+        self.assertIsNone(offering_by_title['Not Attempted']['failed_on_date'])
 
     def test_get_certificate_offerings_for_classroom_uses_most_recent_attempt(
         self,
@@ -1429,6 +1448,12 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             self.classroom_url_fragment, 'learner_id_1'
         )
         self.assertEqual(offerings[0]['attempt_status'], 'Passed')
+        self.assertEqual(
+            offerings[0]['passed_on_date'],
+            utils.get_time_in_millisecs(
+                started_at + datetime.timedelta(minutes=15)
+            ),
+        )
 
     def test_get_certificate_offerings_for_classroom_uses_later_finished_attempt(
         self,
@@ -1559,6 +1584,12 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             offerings[0]['certificate_id'], offering.certificate_id
         )
         self.assertEqual(offerings[0]['attempt_status'], 'Passed')
+        self.assertEqual(
+            offerings[0]['passed_on_date'],
+            utils.get_time_in_millisecs(
+                started_at + datetime.timedelta(minutes=40)
+            ),
+        )
 
 
 class ValidateCertificateAssessmentOfferingTest(test_utils.GenericTestBase):

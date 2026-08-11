@@ -408,10 +408,12 @@ class CertificateAssessmentOfferingsForClassroomHandler(
         """Returns certificate offerings for the classroom."""
         if self.user_id is None:
             raise self.NotLoggedInException
-        certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
+        available_certificate_offerings = certificate_assessment_services.get_certificate_offerings_for_classroom(
             classroom_url_fragment, self.user_id
         )
-        self.render_json({'certificate_offerings': certificate_offerings})
+        self.render_json(
+            {'available_certificate_offerings': available_certificate_offerings}
+        )
 
 
 class StartCertificateAssessmentHandler(
