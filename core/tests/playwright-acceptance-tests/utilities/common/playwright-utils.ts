@@ -1380,6 +1380,17 @@ export class BaseUser {
       )
     );
   }
+
+  /**
+   * Clicks on element given it's role and text content.
+   * Uses Playwright Locator.
+   * @param role {string} Role of the element.
+   * @param text {string} Text content of the element.
+   */
+  async clickOnElementByRole(role: string, text: string) {
+    const locator = this.page.getByRole('button', {name: text});
+    await locator.click();
+  }
 }
 
 export const BaseUserFactory = (page: Page): BaseUser => {

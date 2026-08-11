@@ -49,7 +49,9 @@ test.describe('Topic Manager', function () {
     const explorationId =
       await curriculumAdmin.createAndPublishExplorationWithCards(
         'Solving problems without a calculator',
-        'Mathematics'
+        'Mathematics',
+        2,
+        true
       );
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',

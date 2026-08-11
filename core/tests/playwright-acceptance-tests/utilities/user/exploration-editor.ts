@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page, ElementHandle, Locator} from '@playwright/test';
+import {Page, ElementHandle, Locator, expect} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -387,16 +387,7 @@ export class ExplorationEditor extends BaseUser {
     // Wait for active tab panel fade transition to complete.
     await this.expectElementToBeVisible('css=.tab-pane.active.show');
 
-    const interactionElement = await this.expectElementToBeVisible(
-      `xpath=//*[contains(normalize-space(text()), "${tileText}")]`,
-      true,
-      this.page,
-      90000
-    );
-    if (!interactionElement) {
-      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
-    }
-    await this.clickOnElement(interactionElement);
+    await this.clickOnElementByRole('button', interactionToAdd);
     if (skipInteractionCustomization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -1589,7 +1580,9 @@ export class ExplorationEditor extends BaseUser {
 
     const responseInputs = this.page.locator(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs.nth(i).fill(options[i]);
+      // CK Editor 4 relies on keyboard events instead of input events. So, we
+      // are using pressSequentially for fill().
+      await responseInputs.nth(i).pressSequentially(options[i]);
     }
 
     await this.clickOnElementWithSelector(saveInteractionButton);
@@ -1636,7 +1629,9 @@ export class ExplorationEditor extends BaseUser {
 
     const responseInputs = this.page.locator(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs.nth(i).fill(options[i]);
+      // CK Editor 4 relies on keyboard events instead of input events. So, we
+      // are using pressSequentially for fill().
+      await responseInputs.nth(i).pressSequentially(options[i]);
     }
 
     await this.clickOnElementWithSelector(saveInteractionButton);
@@ -1792,7 +1787,7 @@ export class ExplorationEditor extends BaseUser {
 
   async updateRuleInResponseModalTo(rule: string): Promise<void> {
     await this.expectElementToBeVisible(responseModalBodySelector);
-    const select = this.page.locator(`${responseModalBodySelector} mat-select`);
+    const select = this.page.getByRole('combobox', {name: 'Rule'});
     await select.click();
 
     await this.expectElementToBeVisible('mat-option');
