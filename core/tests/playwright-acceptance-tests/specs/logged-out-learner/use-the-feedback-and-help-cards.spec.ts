@@ -137,7 +137,7 @@ test.describe('Logged-Out Learner', function () {
   });
 
   test('should be able to continue to next card', async function () {
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.expectCardContentToMatch(
       'Give fraction with denominator 2.'
     );
@@ -184,17 +184,18 @@ test.describe('Logged-Out Learner', function () {
   test('should be able to learn again on wrong answer', async function () {
     await loggedOutLearner.submitAnswer('2/9');
     await loggedOutLearner.expectNextCardButtonTextToBe('LEARN AGAIN');
-    await loggedOutLearner.continueToNextCard();
+    // We start from the first card after clicking on the LEARN AGAIN button. So there is no back button on the first card.
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser(true);
     await loggedOutLearner.expectCardContentToMatch(
       'Welcome, to the Place Values Exploration.'
     );
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
   });
 
   test('should be able to submit a correct answer and see the celebration pop-up', async function () {
     await loggedOutLearner.submitAnswer('1/2');
 
-    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.continueToNextCardAsLoggedOutUser();
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
