@@ -65,6 +65,9 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
+      // Note: `KARMA_TERMINAL_ENABLED` is explicitly injected as a process environment
+      // variable by `scripts/run_frontend_tests.py` when the `--verbose` flag is passed.
+      // It is not natively provided by the Angular CLI.
       terminal: process.env.KARMA_TERMINAL_ENABLED === 'true',
     },
     // Continue running in the background after running tests.

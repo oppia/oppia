@@ -38,6 +38,11 @@ import {
   platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
 
+// Note: In Angular 11, the native @angular-devkit/build-angular:karma builder
+// still uses Webpack under the hood. We are required to have a custom main entry
+// point with require.context so that the builder can discover our tests and initialize
+// our custom Jasmine reporter. Once the codebase is upgraded to Angular 15+, we can
+// safely delete this file and rely on the CLI's auto-discovery.
 // Declare webpack's require.context for dynamic module loading.
 declare var require: {
   context(
