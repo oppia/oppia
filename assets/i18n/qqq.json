@@ -941,6 +941,7 @@
   "I18N_LEARNER_DASHBOARD_LEARNER_GROUP_SECTION_DECLINE_INVITATION": "Button text for declining an invitation to join a learner group in learner groups section on learner dashboard.",
   "I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION": "Text for the 'Learn Something New' section in the learner dashboard.",
   "I18N_LEARNER_DASHBOARD_MORNING_GREETING": "Good morning greeting on the learner dashboard.\n{{Identical|Good}}",
+  "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_EMPTY_STATE": "Message shown in the 'My Certificates' tab of the learner dashboard when the learner has no certificate attempts.",
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_FILTER_LABEL": "Accessible label for the status filter dropdown in the 'My Certificates' tab of the learner dashboard.",
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED": "Status label shown in the 'My Certificates' tab for certificate attempts that were not passed. It is also used as a filter option.",
   "I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED": "Status label shown in the 'My Certificates' tab for certificate attempts that were passed. It is also used as a filter option.",

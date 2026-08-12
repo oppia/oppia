@@ -19,6 +19,14 @@
   margin-bottom: 24px;
 }
 
+.my-certificates-empty-state {
+  color: var(--body-text);
+  font-size: 20px;
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+}
+
 .my-certificates-filter-select-container {
   position: relative;
 }

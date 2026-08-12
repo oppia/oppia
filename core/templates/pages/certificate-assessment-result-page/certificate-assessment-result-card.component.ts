@@ -80,11 +80,7 @@ export class CertificateAssessmentResultCardComponent implements OnInit {
   }
 
   onRetryAssessment(): void {
-    this.router.navigate([
-      '/certificate-assessment',
-      this.certificateId,
-      'session',
-    ]);
+    this.router.navigate(['/certificate-assessment', this.certificateId]);
   }
 
   private getTopicScorePercentage(

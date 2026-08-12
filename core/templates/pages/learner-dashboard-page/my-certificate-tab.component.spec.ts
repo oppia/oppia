@@ -22,16 +22,99 @@ import {CommonModule} from '@angular/common';
 import {RouterTestingModule} from '@angular/router/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CERTIFICATE_ATTEMPT_STATUSES} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {CertificateAttemptSummary} from 'domain/certificate-assessment/certificate-assessment.model';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {MyCertificatesTabComponent} from './my-certificates-tab.component';
 
 describe('MyCertificatesTabComponent', () => {
   let component: MyCertificatesTabComponent;
   let fixture: ComponentFixture<MyCertificatesTabComponent>;
+  let backendApiServiceSpy: jasmine.SpyObj<CertificateAssessmentOfferingBackendApiService>;
+  let classroomBackendApiServiceSpy: jasmine.SpyObj<ClassroomBackendApiService>;
+
+  const mockAttempts: CertificateAttemptSummary[] = [
+    {
+      attempt_id: 'attempt_id_1',
+      classroom_id: 'math_classroom_01',
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 90,
+      attempt_index: 1,
+      started_at: '2026-01-15T08:30:00Z',
+      is_submitted: true,
+    },
+    {
+      attempt_id: 'attempt_id_2',
+      classroom_id: 'math_classroom_01',
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 85,
+      attempt_index: 2,
+      started_at: '2026-01-16T10:00:00Z',
+      is_submitted: true,
+    },
+    {
+      attempt_id: 'attempt_id_3',
+      classroom_id: 'science_classroom_01',
+      title: 'Everyday Arithmetic & Number Confidence',
+      total_score: 50,
+      attempt_index: 3,
+      started_at: '2026-01-17T09:15:00Z',
+      is_submitted: true,
+    },
+  ];
 
   beforeEach(waitForAsync(() => {
+    backendApiServiceSpy = jasmine.createSpyObj(
+      'CertificateAssessmentOfferingBackendApiService',
+      ['getCertificateAssessmentAttemptsAsync']
+    );
+    backendApiServiceSpy.getCertificateAssessmentAttemptsAsync.and.returnValue(
+      Promise.resolve(mockAttempts)
+    );
+    classroomBackendApiServiceSpy = jasmine.createSpyObj(
+      'ClassroomBackendApiService',
+      ['getClassroomDataAsync']
+    );
+    classroomBackendApiServiceSpy.getClassroomDataAsync.and.callFake(
+      async (classroomId: string) => ({
+        classroomDict: {
+          classroomId,
+          name: classroomId === 'math_classroom_01' ? 'Mathematics' : 'Science',
+          urlFragment: classroomId,
+          courseDetails: '',
+          feedbackRecipientEmail: '',
+          teaserText: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {},
+          isPublished: true,
+          diagnosticTestIsEnabled: false,
+          thumbnailData: {
+            filename: '',
+            sizeInBytes: 0,
+            bgColor: '',
+          },
+          bannerData: {
+            filename: '',
+            sizeInBytes: 0,
+            bgColor: '',
+          },
+        },
+      })
+    );
+
     TestBed.configureTestingModule({
       imports: [CommonModule, RouterTestingModule],
       declarations: [MyCertificatesTabComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: backendApiServiceSpy,
+        },
+        {
+          provide: ClassroomBackendApiService,
+          useValue: classroomBackendApiServiceSpy,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -46,12 +129,65 @@ describe('MyCertificatesTabComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display all stub attempts by default', () => {
-    expect(component.filteredAttempts.length).toBe(3);
-    expect(component.filteredAttempts[0].attempt_id).toBe('stub_attempt_id_1');
+  it('should not render the table while attempts are loading', () => {
+    expect(
+      fixture.nativeElement.querySelector('.certificates-table')
+    ).toBeNull();
   });
 
-  it('should filter attempts by passed status', () => {
+  it('should fetch and display real attempts on init', async () => {
+    await fixture.whenStable();
+
+    expect(
+      backendApiServiceSpy.getCertificateAssessmentAttemptsAsync
+    ).toHaveBeenCalled();
+    expect(component.certificateAttempts.length).toBe(3);
+    expect(component.certificateAttempts[0].attempt_id).toBe('attempt_id_3');
+    expect(component.isLoading).toBeFalse();
+  });
+
+  it('should keep attempts empty when the request fails', async () => {
+    await fixture.whenStable();
+    component.certificateAttempts = [];
+    backendApiServiceSpy.getCertificateAssessmentAttemptsAsync.and.returnValue(
+      Promise.reject('Error')
+    );
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.certificateAttempts).toEqual([]);
+    expect(component.isLoading).toBeFalse();
+  });
+
+  it('should show the empty state when there are no attempts', async () => {
+    await fixture.whenStable();
+    backendApiServiceSpy.getCertificateAssessmentAttemptsAsync.and.returnValue(
+      Promise.resolve([])
+    );
+
+    component.ngOnInit();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('.my-certificates-empty-state')
+    ).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('.certificates-table')
+    ).toBeNull();
+  });
+
+  it('should display all attempts by default', async () => {
+    await fixture.whenStable();
+
+    expect(component.filteredAttempts.length).toBe(3);
+    expect(component.filteredAttempts[0].attempt_id).toBe('attempt_id_3');
+  });
+
+  it('should filter attempts by passed status', async () => {
+    await fixture.whenStable();
+
     component.selectedFilter = CERTIFICATE_ATTEMPT_STATUSES.PASSED;
     expect(component.filteredAttempts.length).toBe(2);
     expect(
@@ -59,13 +195,18 @@ describe('MyCertificatesTabComponent', () => {
     ).toBeTrue();
   });
 
-  it('should filter attempts by not passed status', () => {
+  it('should filter attempts by not passed status', async () => {
+    await fixture.whenStable();
+
     component.selectedFilter = CERTIFICATE_ATTEMPT_STATUSES.NOT_PASSED;
     expect(component.filteredAttempts.length).toBe(1);
     expect(component.isPassed(component.filteredAttempts[0])).toBeFalse();
   });
 
-  it('should update the selected filter on filter change', () => {
+  it('should update the selected filter on filter change', async () => {
+    await fixture.whenStable();
+    fixture.detectChanges();
+
     const selectElement = fixture.nativeElement.querySelector(
       '#certificate-attempt-status-filter'
     );
@@ -74,22 +215,24 @@ describe('MyCertificatesTabComponent', () => {
     expect(component.selectedFilter).toBe(CERTIFICATE_ATTEMPT_STATUSES.PASSED);
   });
 
-  it('should derive the passed status from the score threshold', () => {
+  it('should derive the passed status from the score threshold', async () => {
+    await fixture.whenStable();
+
     expect(component.isPassed(component.certificateAttempts[0])).toBeTrue();
     expect(component.isPassed(component.certificateAttempts[2])).toBeFalse();
   });
 
-  it('should map classroom ids to subject names', () => {
-    expect(component.getSubject('math')).toBe(
-      'I18N_LIBRARY_CATEGORIES_MATHEMATICS'
-    );
-    expect(component.getSubject('science')).toBe(
-      'I18N_LIBRARY_CATEGORIES_SCIENCE'
-    );
-    expect(component.getSubject('unknown_id')).toBe('unknown_id');
+  it('should map classroom ids to subject names', async () => {
+    await fixture.whenStable();
+
+    expect(component.getSubjectName('math_classroom_01')).toBe('Mathematics');
+    expect(component.getSubjectName('science_classroom_01')).toBe('Science');
+    expect(component.getSubjectName('unknown_id')).toBe('');
   });
 
-  it('should derive the status label i18n keys from the score', () => {
+  it('should derive the status label i18n keys from the score', async () => {
+    await fixture.whenStable();
+
     expect(component.getStatusLabel(component.certificateAttempts[0])).toBe(
       'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_PASSED'
     );
@@ -98,16 +241,30 @@ describe('MyCertificatesTabComponent', () => {
     );
   });
 
-  it('should render a link to the result page for each attempt', () => {
+  it('should render a link to the result page for each attempt', async () => {
+    await fixture.whenStable();
+    fixture.detectChanges();
+
     const links = fixture.nativeElement.querySelectorAll(
       '.certificate-title-link'
     );
     expect(links.length).toBe(3);
     expect(links[0].getAttribute('href')).toBe(
-      '/certificate-assessment-result/stub_attempt_id_1'
+      '/certificate-assessment-result/attempt_id_1'
     );
     expect(links[1].getAttribute('href')).toBe(
-      '/certificate-assessment-result/stub_attempt_id_2'
+      '/certificate-assessment-result/attempt_id_2'
     );
+  });
+
+  it('should render the classroom name instead of the classroom id', async () => {
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const subjectCells =
+      fixture.nativeElement.querySelectorAll('.subject-cell');
+    expect(subjectCells[0].textContent.trim()).toBe('Science');
+    expect(subjectCells[1].textContent.trim()).toBe('Mathematics');
+    expect(subjectCells[2].textContent.trim()).not.toContain('classroom');
   });
 });

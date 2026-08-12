@@ -16,12 +16,14 @@
  * @fileoverview Component for my certificates tab in the Learner Dashboard page.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   CERTIFICATE_ATTEMPT_STATUSES,
   CertificateAttemptStatus,
 } from 'domain/certificate-assessment/certificate-assessment-domain.constants';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAttemptSummary} from 'domain/certificate-assessment/certificate-assessment.model';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import './my-certificates-tab.component.css';
 
 @Component({
@@ -29,44 +31,48 @@ import './my-certificates-tab.component.css';
   templateUrl: './my-certificates-tab.component.html',
   styleUrls: ['./my-certificates-tab.component.css'],
 })
-
-// TODO(#24717-M2.17): Replace the stub attempt data below with a real request
-// to the certificate assessment attempts handler.
-export class MyCertificatesTabComponent {
+export class MyCertificatesTabComponent implements OnInit {
   PASSING_SCORE_THRESHOLD = 70;
   selectedFilter: CertificateAttemptStatus = CERTIFICATE_ATTEMPT_STATUSES.ALL;
 
-  certificateAttempts: CertificateAttemptSummary[] = [
-    {
-      attempt_id: 'stub_attempt_id_1',
-      classroom_id: 'math',
-      title: 'Everyday Arithmetic & Number Confidence',
-      total_score: 90,
-      attempt_index: 1,
-      started_at: '2026-01-15T08:30:00Z',
-      is_submitted: true,
-    },
-    {
-      attempt_id: 'stub_attempt_id_2',
-      classroom_id: 'math',
-      title: 'Everyday Arithmetic & Number Confidence',
-      total_score: 85,
-      attempt_index: 2,
-      started_at: '2026-01-16T10:00:00Z',
-      is_submitted: true,
-    },
-    {
-      attempt_id: 'stub_attempt_id_3',
-      classroom_id: 'math',
-      title: 'Everyday Arithmetic & Number Confidence',
-      total_score: 50,
-      attempt_index: 3,
-      started_at: '2026-01-17T09:15:00Z',
-      is_submitted: true,
-    },
-  ];
+  certificateAttempts: CertificateAttemptSummary[] = [];
+  classroomIdToNameMap: Record<string, string> = {};
+  isLoading = true;
 
-  constructor() {}
+  constructor(
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private classroomBackendApiService: ClassroomBackendApiService
+  ) {}
+
+  ngOnInit(): void {
+    this.certificateAssessmentOfferingBackendApiService
+      .getCertificateAssessmentAttemptsAsync()
+      .then(attempts => {
+        this.certificateAttempts = this.sortAttemptsByRecency(attempts);
+        const classroomIds = [
+          ...new Set(attempts.map(attempt => attempt.classroom_id)),
+        ];
+        return Promise.all(
+          classroomIds.map(classroomId =>
+            this.classroomBackendApiService
+              .getClassroomDataAsync(classroomId)
+              .then(response => {
+                this.classroomIdToNameMap[classroomId] =
+                  response.classroomDict.name;
+              })
+              .catch(() => {
+                this.classroomIdToNameMap[classroomId] = '';
+              })
+          )
+        );
+      })
+      .then(() => {
+        this.isLoading = false;
+      })
+      .catch(() => {
+        this.isLoading = false;
+      });
+  }
 
   get filteredAttempts(): CertificateAttemptSummary[] {
     if (this.selectedFilter === CERTIFICATE_ATTEMPT_STATUSES.PASSED) {
@@ -95,11 +101,19 @@ export class MyCertificatesTabComponent {
       : 'I18N_LEARNER_DASHBOARD_MY_CERTIFICATES_NOT_PASSED';
   }
 
-  getSubject(classroomId: string): string {
-    const subjectByClassroomId: Record<string, string> = {
-      math: 'I18N_LIBRARY_CATEGORIES_MATHEMATICS',
-      science: 'I18N_LIBRARY_CATEGORIES_SCIENCE',
-    };
-    return subjectByClassroomId[classroomId] || classroomId;
+  getSubjectName(classroomId: string): string {
+    return this.classroomIdToNameMap[classroomId] || '';
+  }
+
+  private sortAttemptsByRecency(
+    attempts: CertificateAttemptSummary[]
+  ): CertificateAttemptSummary[] {
+    return attempts
+      .slice()
+      .sort(
+        (firstAttempt, secondAttempt) =>
+          new Date(secondAttempt.started_at).getTime() -
+          new Date(firstAttempt.started_at).getTime()
+      );
   }
 }

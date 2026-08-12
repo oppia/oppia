@@ -277,7 +277,7 @@ describe('CertificateAssessmentResultCardComponent', () => {
     expect(component.isLoading).toBeFalse();
   });
 
-  it('should navigate to the assessment session when retrying', () => {
+  it('should navigate to the assessment introduction when retrying', () => {
     component.certificateId = 'cert-1';
 
     component.onRetryAssessment();
@@ -285,7 +285,6 @@ describe('CertificateAssessmentResultCardComponent', () => {
     expect(routerSpy.navigate).toHaveBeenCalledWith([
       '/certificate-assessment',
       'cert-1',
-      'session',
     ]);
   });
 
