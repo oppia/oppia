@@ -220,10 +220,8 @@ class SuggestionHandler(
             self.normalized_payload['description'],
         )
 
-        if (
-            suggestion.suggestion_type
-            == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-            and suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
         ):
             (
                 suggestion_services
@@ -253,10 +251,7 @@ class SuggestionHandler(
             assert isinstance(
                 suggestion, suggestion_registry.SuggestionTranslateContent
             )
-            if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-                self._copy_images_from_target_exploration_content_to_translation(
-                    suggestion
-                )
+            self._copy_images_from_target_content_to_translation(suggestion)
 
             files = self.normalized_payload.get('files')
             new_image_filenames = (
@@ -304,19 +299,19 @@ class SuggestionHandler(
                 image_is_compressible,
             )
 
-    def _copy_images_from_target_exploration_content_to_translation(
+    def _copy_images_from_target_content_to_translation(
         self, suggestion: suggestion_registry.SuggestionTranslateContent
     ) -> None:
-        """Creates copies of images from the suggestion's target exploration
+        """Creates copies of images from the suggestion's target content
         for the translation suggestion to use.
 
         Args:
             suggestion: SuggestionTranslateContent. The translation suggestion
-                to copy its target exploration's images to.
+                to copy its target content's images to.
 
         Raises:
-            Exception. An image in the target exploration's content is not a
-                saved asset belonging to the target exploration.
+            Exception. An image in the target entity's content is not a
+                saved asset belonging to the target entity.
         """
         target_image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
@@ -649,6 +644,12 @@ class SuggestionToSkillActionHandler(
             )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            # Only question suggestions copy images at this point, because they
+            # are stored under the question suggestion image context. Images in
+            # a translation suggestion are copied at submission time instead,
+            # by _copy_images_from_target_content_to_translation, which handles
+            # every target type. This mirrors the exploration action handler,
+            # which does not copy images on accept either.
             if (
                 suggestion.suggestion_type
                 == feconf.SUGGESTION_TYPE_ADD_QUESTION
@@ -680,6 +681,10 @@ class SuggestionToSkillActionHandler(
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestion_services.update_question_review_stats(suggestion)
+        elif suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 

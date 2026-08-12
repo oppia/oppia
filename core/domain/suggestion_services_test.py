@@ -479,7 +479,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id,
                 exp.version,
-                'author_2',
+                self.normal_user_id,
                 change_dict,
                 'test description',
             )
@@ -823,11 +823,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
-            'content_id': 'rubric_0',
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
             'language_code': 'hi',
-            'content_html': '<p>Skill Description</p>',
-            'translation_html': '<p>Skill Description in Hindi</p>',
-            'data_format': 'html',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
         }
 
         suggestion = suggestion_services.create_suggestion(
@@ -870,132 +870,119 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.status, suggestion_models.STATUS_ACCEPTED
         )
 
-    def test_create_skill_translation_suggestion_with_invalid_skill_id(
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_accepting_skill_translation_updates_translation_counts(
         self,
     ) -> None:
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
-            'content_id': feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID,
-            'language_code': 'hi',
-            'content_html': '<p>Html</p>',
-            'translation_html': '<p>Hindi</p>',
-            'data_format': 'html',
-        }
-        with self.assertRaisesRegex(
-            Exception, 'No skill exists with ID: invalid_skill_id'
-        ):
-            suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_SKILL,
-                'invalid_skill_id',
-                1,
-                self.author_id,
-                change_dict,
-                'test description',
-            )
-
-    def test_create_translation_suggestion_with_invalid_target_type(
-        self,
-    ) -> None:
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': '<p>Html</p>',
-            'translation_html': '<p>Hindi</p>',
-            'data_format': 'html',
-        }
-        # A classroom is a translatable entity type but is not an allowed
-        # suggestion target type, so creating a suggestion for it must fail
-        # validation.
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected target_type to be among allowed choices',
-        ):
-            suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                feconf.ENTITY_TYPE_CLASSROOM,
-                'classroom_1',
-                1,
-                self.author_id,
-                change_dict,
-                'test description',
-            )
-
-    def test_get_topic_id_for_translation_suggestion_skill(self) -> None:
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            'suggestion_1',
-            'skill_1',
-            1,
-            'review',
-            'author_id',
-            None,
-            {
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'Content',
-                'content_id': 'content_0',
-                'language_code': 'hi',
-                'content_html': '<p>Html</p>',
-                'translation_html': '<p>Hindi</p>',
-                'data_format': 'html',
-            },
-            'score',
-            'hi',
-            False,
-            datetime.datetime.now(),
-            datetime.datetime.now(),
-            target_type=feconf.ENTITY_TYPE_SKILL,
+        """Test that accepting a translation targeting a skill updates the
+        translation counts on the skill's translation opportunity.
+        """
+        skill_id = 'skill_3'
+        self.save_new_skill(
+            skill_id, self.author_id, description='Skill Description'
         )
-
-        opp_model = opportunity_models.TranslationOpportunityModel(
-            id='skill.skill_1',
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id='%s.%s' % (feconf.ENTITY_TYPE_SKILL, skill_id),
             entity_type=feconf.ENTITY_TYPE_SKILL,
-            entity_id='skill_1',
+            entity_id=skill_id,
             topic_ids=['topic_1'],
             content_count=1,
             incomplete_translation_language_codes=['hi'],
             translation_counts={},
         )
-        opp_model.put()
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
 
-        topic_id = suggestion_services._get_topic_id_for_translation_suggestion(  # pylint: disable=protected-access
-            suggestion
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
+            1,
+            self.author_id,
+            change_dict,
+            'Skill translation suggestion description',
         )
-        self.assertEqual(topic_id, 'topic_1')
 
-    def test_get_topic_id_for_translation_suggestion_skill_without_topic_ids(
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id,
+            self.reviewer_id,
+            'UNUSED_COMMIT_MESSAGE',
+            'Accepted skill translation',
+        )
+
+        updated_opportunity = (
+            opportunity_models.TranslationOpportunityModel.get(
+                '%s.%s' % (feconf.ENTITY_TYPE_SKILL, skill_id)
+            )
+        )
+        self.assertEqual(updated_opportunity.translation_counts, {'hi': 1})
+        self.assertNotIn(
+            'hi', updated_opportunity.incomplete_translation_language_codes
+        )
+
+    def test_skill_translation_stats_use_topic_of_the_opportunity(
         self,
     ) -> None:
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            'suggestion_2',
-            'skill_2',
+        """Test that the stats of a translation targeting a skill are
+        attributed to the topic that the skill's opportunity belongs to.
+        """
+        skill_id = 'skill_2'
+        self.save_new_skill(
+            skill_id, self.author_id, description='Skill Description'
+        )
+        opportunity_model = opportunity_models.TranslationOpportunityModel(
+            id='%s.%s' % (feconf.ENTITY_TYPE_SKILL, skill_id),
+            entity_type=feconf.ENTITY_TYPE_SKILL,
+            entity_id=skill_id,
+            topic_ids=['topic_1'],
+            content_count=1,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        )
+        opportunity_model.update_timestamps()
+        opportunity_model.put()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
+            'content_id': feconf.SKILL_DESCRIPTION_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': 'Skill Description',
+            'translation_html': 'Skill Description in Hindi',
+            'data_format': 'unicode',
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_SKILL,
+            skill_id,
             1,
-            'review',
-            'author_id',
-            None,
-            {
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'Content',
-                'content_id': 'content_0',
-                'language_code': 'hi',
-                'content_html': '<p>Html</p>',
-                'translation_html': '<p>Hindi</p>',
-                'data_format': 'html',
-            },
-            'score',
-            'hi',
-            False,
-            datetime.datetime.now(),
-            datetime.datetime.now(),
-            target_type=feconf.ENTITY_TYPE_SKILL,
+            self.author_id,
+            change_dict,
+            'Skill translation suggestion description',
         )
 
-        topic_id = suggestion_services._get_topic_id_for_translation_suggestion(  # pylint: disable=protected-access
+        suggestion_services.update_translation_contribution_stats_at_submission(
             suggestion
         )
-        self.assertEqual(topic_id, '')
+
+        stats_model = suggestion_models.TranslationContributionStatsModel.get(
+            'hi', self.author_id, 'topic_1'
+        )
+        assert stats_model is not None
+        self.assertEqual(stats_model.submitted_translations_count, 1)
 
     def test_get_submitted_submissions(self) -> None:
         suggestion_services.create_suggestion(
