@@ -36,7 +36,7 @@
 
           <td class="oppia-feedback-table-td oppia-feedback-table-col-desc">
             <span class="oppia-feedback-table-desc">
-              {{ feedback.report_message_preview }}
+              {{ getFeedbackDescription(feedback) }}
             </span>
           </td>
 
@@ -47,7 +47,7 @@
           <td *ngIf="feedbackCardConfig.showCategory"
               class="oppia-feedback-table-td oppia-feedback-table-col-category">
             <span class="oppia-feedback-table-chip-category">
-              <oppia-feedback-chip [value]="feedback.category"
+              <oppia-feedback-chip [value]="getFeedbackCategory(feedback)"
                                    [type]="'category'">
               </oppia-feedback-chip>
             </span>

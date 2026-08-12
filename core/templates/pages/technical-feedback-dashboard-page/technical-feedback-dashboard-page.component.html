@@ -29,6 +29,7 @@
   <oppia-feedback-detail-page [feedbackDetailResponse]="feedbackDetailResponse"
                               [feedbackDetailPageConfig]="cardConfig"
                               [screenshotDataUrl]="screenshotDataUrl"
+                              [statusOptions]="statusOptions"
                               (statusChange)="onStatusChange($event)"
                               (githubTransfer)="onGithubTransfer($event)"
                               (goBack)="navigateBackToDashboard()">
