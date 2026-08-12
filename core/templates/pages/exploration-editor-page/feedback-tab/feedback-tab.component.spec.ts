@@ -784,12 +784,13 @@ describe('Feedback Tab Component', () => {
   });
 
   it('should navigate back to creator feedback list', () => {
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     component.selectedCreatorFeedbackId = 'feedback_id';
-    windowRef.nativeWindow.location.hash =
-      '#/feedback/lesson_feedback/feedback_id';
+    mockWindow.location.hash = '#/feedback/lesson_feedback/feedback_id';
 
     component.navigateBackToCreatorFeedbackList();
-    expect(windowRef.nativeWindow.location.hash).toBe('#/feedback');
+    expect(mockWindow.location.hash).toBe('#/feedback');
   });
 
   it('should fetch next page of lesson feedback', fakeAsync(() => {
@@ -1204,9 +1205,10 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should load lesson feedback detail from URL on init', fakeAsync(() => {
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     tick();
-    windowRef.nativeWindow.location.hash =
-      '#/feedback/lesson_feedback/feedback_id';
+    mockWindow.location.hash = '#/feedback/lesson_feedback/feedback_id';
 
     spyOn(
       feedbackBackendApiService,
@@ -1227,8 +1229,9 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should return creator feedback detail from URL', () => {
-    windowRef.nativeWindow.location.hash =
-      '#/feedback/lesson_feedback/feedback%20id';
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    mockWindow.location.hash = '#/feedback/lesson_feedback/feedback%20id';
 
     expect(component.getCreatorFeedbackDetailFromUrl()).toEqual({
       feedbackType: FeedbackModalType.LESSON_FEEDBACK,
@@ -1237,16 +1240,21 @@ describe('Feedback Tab Component', () => {
   });
 
   it('should return null when URL is not a creator feedback detail URL', () => {
-    windowRef.nativeWindow.location.hash = '#/feedback';
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    mockWindow.location.hash = '#/feedback';
 
     expect(component.getCreatorFeedbackDetailFromUrl()).toBeNull();
   });
 
   it('should clear stale creator feedback detail when URL has no detail', () => {
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+
     component.selectedCreatorFeedbackId = 'feedback_id';
     component.creatorFeedbackDetailResponse = mockLessonFeedbackDetailResponse;
     component.creatorFeedbackScreenshotDataUrl = 'image-url';
-    windowRef.nativeWindow.location.hash = '#/feedback';
+    mockWindow.location.hash = '#/feedback';
 
     component.syncCreatorFeedbackFromUrl();
 
@@ -1254,7 +1262,6 @@ describe('Feedback Tab Component', () => {
     expect(component.creatorFeedbackDetailResponse).toBeNull();
     expect(component.creatorFeedbackScreenshotDataUrl).toBeNull();
   });
-
   it('should do nothing when sending reply without selected feedback', () => {
     component.selectedCreatorFeedbackId = null;
     component.creatorFeedbackDetailResponse = null;
