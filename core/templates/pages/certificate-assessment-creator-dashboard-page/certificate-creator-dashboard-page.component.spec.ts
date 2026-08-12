@@ -30,7 +30,7 @@ import {AlertsService} from 'services/alerts.service';
 
 import {CertificateCreatorDashboardPageComponent} from './certificate-creator-dashboard-page.component';
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
-import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 interface CertificateSummary {

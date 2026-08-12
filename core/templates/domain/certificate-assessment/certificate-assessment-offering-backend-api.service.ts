@@ -24,7 +24,7 @@ import {
   AvailableCertificateAssessmentOfferingData,
   CertificateAssessmentOfferingBackendDict,
   CertificateAssessmentOfferingData,
-} from './certificate-assessment-offering.model';
+} from './certificate-assessment.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
@@ -117,7 +117,7 @@ export class CertificateAssessmentOfferingBackendApiService {
     classroomId: string
   ): string {
     return CertificateAssessmentDomainConstants.AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL.replace(
-      '<classroom_id>',
+      '<classroom_url_fragment>',
       classroomId
     );
   }

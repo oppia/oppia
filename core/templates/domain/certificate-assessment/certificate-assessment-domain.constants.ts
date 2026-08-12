@@ -25,7 +25,7 @@ export const CertificateAssessmentDomainConstants = {
   VALIDATE_CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
     '/validate_certificate_assessment_offering_handler',
   AVAILABLE_CERTIFICATE_ASSESSMENT_OFFERING_FOR_CLASSROOM_HANDLER_URL:
-    '/certificate_assessment_offerings_for_classroom_handler/<classroom_id>',
+    '/certificate_assessment_offerings_for_classroom_handler/<classroom_url_fragment>',
   CERTIFICATE_ASSESSMENT_RESULT_HANDLER_URL:
     '/certificate_assessment_result_handler/<attempt_id>',
   CERTIFICATE_ASSESSMENT_ATTEMPTS_HANDLER_URL:
@@ -70,3 +70,12 @@ export const CERTIFICATE_OFFERING_ASYNC_STATUSES = {
 
 export type CertificateOfferingAsyncStatus =
   (typeof CERTIFICATE_OFFERING_ASYNC_STATUSES)[keyof typeof CERTIFICATE_OFFERING_ASYNC_STATUSES];
+
+export const CERTIFICATE_ATTEMPT_STATUSES = {
+  ALL: 'all',
+  PASSED: 'passed',
+  NOT_PASSED: 'not_passed',
+} as const;
+
+export type CertificateAttemptStatus =
+  (typeof CERTIFICATE_ATTEMPT_STATUSES)[keyof typeof CERTIFICATE_ATTEMPT_STATUSES];

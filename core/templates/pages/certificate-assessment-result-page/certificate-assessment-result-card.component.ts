@@ -19,18 +19,12 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
-import {AssessmentResultTopicWiseBreakdown} from './assessment-result-topic-wise-breakdown.component';
+import {AssessmentResult} from 'domain/certificate-assessment/certificate-assessment.model';
+import './certificate-assessment-result-card.component.css';
 
 // The backend result response does not expose a pass/fail flag, so the pass
 // state is derived from the total score using an 80% threshold.
 const PASSING_SCORE_THRESHOLD = 80;
-
-interface AssessmentResult {
-  certificateName: string;
-  scorePercentage: number;
-  topicBreakdown: AssessmentResultTopicWiseBreakdown[];
-  timeTakenMinutes: number | null;
-}
 
 @Component({
   selector: 'oppia-certificate-assessment-result-card-page',

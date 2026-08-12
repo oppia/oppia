@@ -17,19 +17,8 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {RecommendedTopicStub} from 'domain/certificate-assessment/certificate-assessment.model';
 import './assessment-introduction-card.component.css';
-
-// TODO(##24717-M2.15): This is a stubbed structure for a recommended topic tile.
-// Once the backend endpoint that fetches
-// CertificateAssessmentOfferingModel data is wired up, this should be
-// replaced with the real topic summary type (e.g. name, lesson count and
-// a thumbnail/color derived from the topic's actual data).
-interface RecommendedTopicStub {
-  name: string;
-  lessonCount: number;
-  // Placeholder swatch shown instead of a topic thumbnail image.
-  colorClass: string;
-}
 
 @Component({
   selector: 'oppia-assessment-introduction-card',
