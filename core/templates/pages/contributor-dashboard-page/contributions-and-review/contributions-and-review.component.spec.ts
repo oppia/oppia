@@ -3082,7 +3082,9 @@ describe('Contributions and review component', () => {
           successCallback,
           errorCallback
         ) => {
-          return Promise.reject(errorCallback(suggestionId));
+          // The skill review service reports failures with no message, so the
+          // callback is invoked without arguments here as well.
+          return Promise.reject(errorCallback());
         }
       );
       component.contributions = {};
@@ -3097,7 +3099,7 @@ describe('Contributions and review component', () => {
 
       expect(alertsService.clearWarnings).toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error updating skill suggestion'
+        'Invalid Suggestion: Error updating suggestion'
       );
       expect(removeSpy).not.toHaveBeenCalled();
       expect(component.isCommitting).toBeFalse();

@@ -524,38 +524,45 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
     const currentSuggestionSummary = this.queuedSuggestionSummary;
     this.queuedSuggestionSummary = null;
 
+    const onSuccess = (): void => {
+      this.alertsService.clearMessages();
+      this.alertsService.addSuccessMessage(
+        `Suggestion ${
+          currentSuggestionSummary.action_status === 'accept'
+            ? 'accepted'
+            : 'rejected'
+        }.`
+      );
+      clearTimeout(this.commitTimeout);
+      this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+        [currentSuggestionSummary.suggestion_id]
+      );
+      delete this.contributions[currentSuggestionSummary.suggestion_id];
+      this.isCommitting = false;
+    };
+    // The skill review callback reports no message, so a generic one is used
+    // when the service does not supply the backend's error.
+    const onFailure = (errorMessage?: string): void => {
+      this.alertsService.clearWarnings();
+      this.alertsService.addWarning(
+        `Invalid Suggestion: ${errorMessage ?? 'Error updating suggestion'}`
+      );
+      this.isCommitting = false;
+    };
+
     if (
       currentSuggestionSummary.target_type === AppConstants.ENTITY_TYPE.SKILL
     ) {
+      // Skills have no commit message, since a skill suggestion is not applied
+      // as a versioned commit the way an exploration suggestion is.
       this.contributionAndReviewService.reviewSkillSuggestion(
         currentSuggestionSummary.target_id,
         currentSuggestionSummary.suggestion_id,
         currentSuggestionSummary.action_status,
         currentSuggestionSummary.reviewer_message,
         null,
-        () => {
-          this.alertsService.clearMessages();
-          this.alertsService.addSuccessMessage(
-            `Suggestion ${
-              currentSuggestionSummary?.action_status === 'accept'
-                ? 'accepted'
-                : 'rejected'
-            }.`
-          );
-          clearTimeout(this.commitTimeout);
-          this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-            [currentSuggestionSummary.suggestion_id]
-          );
-          delete this.contributions[currentSuggestionSummary.suggestion_id];
-          this.isCommitting = false;
-        },
-        () => {
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(
-            'Invalid Suggestion: Error updating skill suggestion'
-          );
-          this.isCommitting = false;
-        }
+        onSuccess,
+        onFailure
       );
     } else {
       this.contributionAndReviewService.reviewExplorationSuggestion(
@@ -563,32 +570,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy, OnChanges {
         currentSuggestionSummary.suggestion_id,
         currentSuggestionSummary.action_status,
         currentSuggestionSummary.reviewer_message,
+        // Only include commit_message for accepted suggestions.
         currentSuggestionSummary.action_status === 'accept' &&
           currentSuggestionSummary.commit_message
           ? currentSuggestionSummary.commit_message
           : null,
-        // Only include commit_message for accepted suggestions.
-        () => {
-          this.alertsService.clearMessages();
-          this.alertsService.addSuccessMessage(
-            `Suggestion ${
-              currentSuggestionSummary?.action_status === 'accept'
-                ? 'accepted'
-                : 'rejected'
-            }.`
-          );
-          clearTimeout(this.commitTimeout);
-          this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-            [currentSuggestionSummary.suggestion_id]
-          );
-          delete this.contributions[currentSuggestionSummary.suggestion_id];
-          this.isCommitting = false;
-        },
-        errorMessage => {
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-          this.isCommitting = false;
-        }
+        onSuccess,
+        onFailure
       );
     }
   }

@@ -172,13 +172,14 @@ class TaskThread(threading.Thread):
                         # or not a retryable error.
                         self.exception = e
                         self.stacktrace = traceback.format_exc()
-                        log(str(e))
-                        log(
-                            'ERROR {} - {:.1f} secs'.format(
-                                self.name, time.time() - self.start_time
-                            ),
-                            show_time=True,
-                        )
+                        if 'KeyboardInterrupt' not in str(e):
+                            log(str(e))
+                            log(
+                                'ERROR {} - {:.1f} secs'.format(
+                                    self.name, time.time() - self.start_time
+                                ),
+                                show_time=True,
+                            )
                         break
                     log('Retrying {} - error: {}'.format(self.name, e))
         finally:

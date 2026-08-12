@@ -409,7 +409,9 @@ describe('Contribution and review service', () => {
         'sort_key',
         null,
         'topicName',
-        'exploration'
+        // Question suggestions always target skills, so no entity type
+        // filter is forwarded for them.
+        undefined
       );
     });
   });

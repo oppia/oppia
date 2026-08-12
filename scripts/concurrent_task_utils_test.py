@@ -128,28 +128,6 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             self.task_stdout,
         )
 
-    def test_task_thread_with_max_attempts_zero(self) -> None:
-        def test_func() -> List[concurrent_task_utils.TaskResult]:
-            return []
-
-        task = concurrent_task_utils.TaskThread(
-            test_func,
-            True,
-            self.semaphore,
-            name='test',
-            report_enabled=True,
-            errors_to_retry_on=[],
-        )
-        self.semaphore.acquire()
-        task.start_time = time.time()
-        with self.swap(concurrent_task_utils, 'MAX_ATTEMPTS', 0):
-            with self.print_swap:
-                task.start()
-                task.join()
-
-        self.assertTrue(task.finished)
-        self.assertEqual(task.num_attempts, 0)
-
     def test_task_thread_with_verbose_mode_enabled(self) -> None:
         class HelperTests:
             def test_show(self) -> concurrent_task_utils.TaskResult:

@@ -109,7 +109,7 @@ export class ContributionAndReviewBackendApiService {
     sortKey: string,
     explorationId: string | null,
     topicName: string | null,
-    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -121,6 +121,9 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
+      // target_type is a path argument of the suggestion list endpoints, so a
+      // concrete value is always required. "All" therefore falls back to
+      // explorations until those endpoints can express every entity type.
       const actualTargetType =
         !targetType ||
         targetType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL
@@ -146,6 +149,9 @@ export class ContributionAndReviewBackendApiService {
       );
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
+      // target_type is a path argument of the suggestion list endpoints, so a
+      // concrete value is always required. "All" therefore falls back to
+      // explorations until those endpoints can express every entity type.
       const actualTargetType =
         !targetType ||
         targetType === ContributorDashboardConstants.ENTITY_TYPE_SENTINEL_ALL

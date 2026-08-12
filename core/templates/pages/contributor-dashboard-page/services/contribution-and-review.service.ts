@@ -135,7 +135,7 @@ export class ContributionAndReviewService {
     shouldResetOffset: boolean,
     explorationId: string | null,
     topicName: string | null,
-    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -190,7 +190,7 @@ export class ContributionAndReviewService {
 
   async fetchTranslationSuggestionsAsync(
     explorationId: string,
-    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     if (targetType === AppConstants.ENTITY_TYPE.SKILL) {
       return this.contributionAndReviewBackendApiService
@@ -413,7 +413,7 @@ export class ContributionAndReviewService {
   async getUserCreatedTranslationSuggestionsAsync(
     shouldResetOffset: boolean = true,
     sortKey: string,
-    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
@@ -429,7 +429,7 @@ export class ContributionAndReviewService {
     shouldResetOffset: boolean = true,
     sortKey: string,
     explorationId?: string,
-    targetType: string = AppConstants.ENTITY_TYPE.EXPLORATION
+    targetType?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;
     if (explorationId) {

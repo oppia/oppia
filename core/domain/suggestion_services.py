@@ -1691,17 +1691,13 @@ def get_suggestions_with_editable_explorations(
     Returns:
         list(Suggestion). List of filtered translation suggestions.
     """
+    # Only explorations can disallow edits, so just those are fetched here and
+    # suggestions targeting any other entity type always pass the filter below.
     suggestion_exp_ids = {
         suggestion.target_id
         for suggestion in suggestions
         if suggestion.target_type == feconf.ENTITY_TYPE_EXPLORATION
     }
-    if not suggestion_exp_ids:
-        return [
-            suggestion
-            for suggestion in suggestions
-            if suggestion.target_type != feconf.ENTITY_TYPE_EXPLORATION
-        ]
     suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         list(suggestion_exp_ids)
     )

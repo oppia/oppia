@@ -462,7 +462,7 @@ class ReviewableOpportunitiesHandler(
         # 4. Move any pinned summaries to the top.
 
         pinned_opportunity_summary = None
-        if not topic_name:
+        if topic_name is None:
             topic_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids()
             )
@@ -566,10 +566,7 @@ class ReviewableOpportunitiesHandlerV2(
 
         topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
-        entity_type = (
-            self.normalized_request.get('entity_type')
-            or feconf.ENTITY_TYPE_EXPLORATION
-        )
+        entity_type = self.normalized_request.get('entity_type')
 
         opportunity_dicts = []
         if self.user_id:
@@ -585,7 +582,7 @@ class ReviewableOpportunitiesHandlerV2(
     def _get_reviewable_translation_opportunities(
         self,
         user_id: str,
-        entity_type: str,
+        entity_type: Optional[str],
         topic_name: Optional[str],
         language: Optional[str],
     ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
@@ -594,7 +591,9 @@ class ReviewableOpportunitiesHandlerV2(
 
         Args:
             user_id: str. The user ID of the user.
-            entity_type: str. The type of the entity.
+            entity_type: str|None. The type of the entity to filter by. If
+                None, opportunities of every translatable entity type are
+                returned.
             topic_name: str|None. A topic name.
             language: str|None. ISO 639-1 language code.
 
@@ -619,13 +618,25 @@ class ReviewableOpportunitiesHandlerV2(
         if language is None:
             language = ''
 
-        opportunities = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            entity_type, in_review_suggestion_target_ids, language
+        # An absent entity type means the dashboard's content type filter is
+        # set to "all", so opportunities are gathered for every translatable
+        # entity type instead of defaulting to one of them.
+        entity_types_to_fetch = (
+            [entity_type] if entity_type else feconf.TRANSLATABLE_ENTITY_TYPES
         )
+        opportunities = []
+        for entity_type_to_fetch in entity_types_to_fetch:
+            opportunities.extend(
+                opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+                    entity_type_to_fetch,
+                    in_review_suggestion_target_ids,
+                    language,
+                )
+            )
 
         filtered_opportunities = []
         for opp in opportunities:
-            if not topic_name or opp.topic_name == topic_name:
+            if topic_name is None or opp.topic_name == topic_name:
                 filtered_opportunities.append(opp)
 
         return filtered_opportunities
@@ -1332,7 +1343,7 @@ class TranslationPreferenceHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
-        self.render_json(
+        return self.render_json(
             {
                 'preferred_translation_language_code': (
                     user_settings.preferred_translation_language_code

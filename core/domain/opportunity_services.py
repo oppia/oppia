@@ -621,9 +621,7 @@ def create_translation_opportunity(
         unique_ids = list(set(entity_ids))
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp_id_to_exploration = (
-                exp_fetchers.get_multiple_explorations_by_id(
-                    unique_ids, strict=False
-                )
+                exp_fetchers.get_multiple_explorations_by_id(unique_ids)
             )
             for exploration_id, exploration in exp_id_to_exploration.items():
                 complete_langs = translation_services.get_languages_with_complete_translation(
@@ -774,7 +772,7 @@ def _compute_topic_ids_of_translation_opportunities(
         topic_summaries = topic_fetchers.get_all_topic_summaries()
 
     all_topics = []
-    if 'skill' in entity_types_and_ids:
+    if feconf.ENTITY_TYPE_SKILL in entity_types_and_ids:
         all_topics = topic_fetchers.get_all_topics()
 
     for entity_type, entity_ids in entity_types_and_ids.items():
@@ -783,8 +781,6 @@ def _compute_topic_ids_of_translation_opportunities(
             found_exp_ids: Set[str] = set()
 
             for topic_summary in topic_summaries:
-                if topic_summary is None:
-                    continue
                 topic_id = topic_summary.id
                 for (
                     exp_ids
@@ -1438,7 +1434,7 @@ def get_translation_opportunities_with_new_models(
         return [], cursor, more
 
     card_infos = _get_translation_opportunity_cards_from_models(
-        opportunity_models_list, entity_type, language_code
+        opportunity_models_list, language_code
     )
 
     return card_infos, cursor, more
@@ -1448,22 +1444,19 @@ def _get_translation_opportunity_cards_from_models(
     opportunity_models_list: Sequence[
         opportunity_models.TranslationOpportunityModel
     ],
-    entity_type: Optional[str],
     language_code: str,
 ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
     """Returns a list of translation opportunity card info objects for the given
-    list of models.
+    list of models. Each card's entity type is taken from its own model, so a
+    list mixing entity types is handled correctly.
 
     Args:
         opportunity_models_list: list(TranslationOpportunityModel). The list of models.
-        entity_type: str. The entity type.
         language_code: str. The language code.
 
     Returns:
         list(TranslationOpportunityCardInfo). A list of TranslationOpportunityCardInfo.
     """
-    del entity_type
-
     topic_summaries = [
         ts for ts in topic_fetchers.get_all_topic_summaries() if ts is not None
     ]
@@ -1474,40 +1467,24 @@ def _get_translation_opportunity_cards_from_models(
     topic_map = {}
     exp_id_to_story_id = {}
 
-    def _get_entity_type_from_model(
-        model: opportunity_models.TranslationOpportunityModel,
-    ) -> str:
-        # The ID of a translation opportunity is always generated as
-        # {entity_type}.{entity_id}, and entity_type is validated against
-        # feconf.TRANSLATABLE_ENTITY_TYPES before the model is stored, so the
-        # prefix is always a valid entity type.
-        return model.id.split('.')[0]
+    # A single page of opportunities can mix entity types, so the models are
+    # grouped by their own entity type and each group is fetched in one batch.
+    entity_ids_by_type: Dict[str, List[str]] = collections.defaultdict(list)
+    for model in opportunity_models_list:
+        entity_ids_by_type[model.entity_type].append(model.entity_id)
 
-    exp_entity_ids = [
-        m.entity_id
-        for m in opportunity_models_list
-        if _get_entity_type_from_model(m) == feconf.ENTITY_TYPE_EXPLORATION
-    ]
-    story_entity_ids = [
-        m.entity_id
-        for m in opportunity_models_list
-        if _get_entity_type_from_model(m) == feconf.ENTITY_TYPE_STORY
-    ]
-    skill_entity_ids = [
-        m.entity_id
-        for m in opportunity_models_list
-        if _get_entity_type_from_model(m) == feconf.ENTITY_TYPE_SKILL
-    ]
-    topic_entity_ids = [
-        m.entity_id
-        for m in opportunity_models_list
-        if _get_entity_type_from_model(m) == feconf.ENTITY_TYPE_TOPIC
-    ]
+    exp_entity_ids = entity_ids_by_type[feconf.ENTITY_TYPE_EXPLORATION]
+    story_entity_ids = entity_ids_by_type[feconf.ENTITY_TYPE_STORY]
+    skill_entity_ids = entity_ids_by_type[feconf.ENTITY_TYPE_SKILL]
+    topic_entity_ids = entity_ids_by_type[feconf.ENTITY_TYPE_TOPIC]
 
     explorations_map = {}
     exp_summary_map = {}
     in_review_counts = {}
 
+    # Explorations are the only entity type reached through a story, so the
+    # story each one belongs to is resolved first and reused below for both the
+    # card's description and its story title.
     if exp_entity_ids:
         for ts in topic_summaries:
             for (
@@ -1569,7 +1546,7 @@ def _get_translation_opportunity_cards_from_models(
 
     card_infos = []
     for model in opportunity_models_list:
-        model_entity_type = _get_entity_type_from_model(model)
+        model_entity_type = model.entity_type
         topic_name_val = ''
         if model.topic_ids:
             for t_id in model.topic_ids:
@@ -1698,19 +1675,6 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
         )
     )
 
-    missing_ids = [
-        entity_id
-        for entity_id, model in zip(entity_ids, opportunity_models_from_db)
-        if model is None
-    ]
-    if missing_ids:
-        create_translation_opportunity({entity_type: missing_ids})
-        opportunity_models_from_db = (
-            opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
-                entity_type, entity_ids
-            )
-        )
-
     opportunity_models_list = [
         model for model in opportunity_models_from_db if model is not None
     ]
@@ -1718,7 +1682,7 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
         return []
 
     return _get_translation_opportunity_cards_from_models(
-        opportunity_models_list, entity_type, language_code
+        opportunity_models_list, language_code
     )
 
 

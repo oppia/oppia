@@ -1370,7 +1370,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.resolvingSuggestion).toBeFalse();
       expect(alertsService.clearWarnings).toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error updating skill suggestion'
+        'Invalid Suggestion: Error updating suggestion'
       );
     }));
 
@@ -1438,7 +1438,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.resolvingSuggestion).toBeFalse();
       expect(alertsService.clearWarnings).toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error rejecting skill suggestion'
+        'Invalid Suggestion: Error updating suggestion'
       );
     }));
 

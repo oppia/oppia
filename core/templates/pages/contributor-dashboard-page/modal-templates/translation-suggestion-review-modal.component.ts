@@ -610,49 +610,60 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         'Translation'
       );
 
-      if (
-        this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
-      ) {
-        this.contributionAndReviewService.reviewSkillSuggestion(
-          this.activeSuggestion.target_id,
-          this.activeSuggestionId,
-          AppConstants.ACTION_ACCEPT_SUGGESTION,
-          reviewMessageForSubmitter,
-          null,
-          () => {
-            this.alertsService.clearMessages();
-            this.alertsService.addSuccessMessage('Suggestion accepted.');
-            this.resolveSuggestionAndUpdateModal();
-          },
-          () => {
-            this.resolvingSuggestion = false;
-            this.alertsService.clearWarnings();
-            this.alertsService.addWarning(
-              'Invalid Suggestion: Error updating skill suggestion'
-            );
-          }
-        );
-      } else {
-        this.contributionAndReviewService.reviewExplorationSuggestion(
-          this.activeSuggestion.target_id,
-          this.activeSuggestionId,
-          AppConstants.ACTION_ACCEPT_SUGGESTION,
-          reviewMessageForSubmitter,
-          this.finalCommitMessage,
-          () => {
-            this.alertsService.clearMessages();
-            this.alertsService.addSuccessMessage('Suggestion accepted.');
-            this.resolveSuggestionAndUpdateModal();
-          },
-          errorMessage => {
-            this.resolvingSuggestion = false;
-            this.alertsService.clearWarnings();
-            this.alertsService.addWarning(
-              `Invalid Suggestion: ${errorMessage}`
-            );
-          }
-        );
-      }
+      this._reviewActiveSuggestion(
+        AppConstants.ACTION_ACCEPT_SUGGESTION,
+        reviewMessageForSubmitter,
+        'Suggestion accepted.'
+      );
+    }
+  }
+
+  /**
+   * Sends the review of the active suggestion to the service that matches its
+   * target type. Skills are reviewed through the skill endpoint and carry no
+   * commit message, since a skill suggestion is not applied as a versioned
+   * commit the way an exploration suggestion is.
+   */
+  private _reviewActiveSuggestion(
+    action: string,
+    reviewMessage: string,
+    successMessage: string
+  ): void {
+    const onSuccess = (): void => {
+      this.alertsService.clearMessages();
+      this.alertsService.addSuccessMessage(successMessage);
+      this.resolveSuggestionAndUpdateModal();
+    };
+    const onFailure = (errorMessage?: string): void => {
+      this.resolvingSuggestion = false;
+      this.alertsService.clearWarnings();
+      this.alertsService.addWarning(
+        `Invalid Suggestion: ${errorMessage ?? 'Error updating suggestion'}`
+      );
+    };
+
+    if (this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL) {
+      this.contributionAndReviewService.reviewSkillSuggestion(
+        this.activeSuggestion.target_id,
+        this.activeSuggestionId,
+        action,
+        reviewMessage,
+        null,
+        onSuccess,
+        onFailure
+      );
+    } else {
+      this.contributionAndReviewService.reviewExplorationSuggestion(
+        this.activeSuggestion.target_id,
+        this.activeSuggestionId,
+        action,
+        reviewMessage,
+        action === AppConstants.ACTION_ACCEPT_SUGGESTION
+          ? this.finalCommitMessage
+          : null,
+        onSuccess,
+        onFailure
+      );
     }
   }
 
@@ -692,49 +703,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
         // In case of rejection, the suggestion is not applied, so there is no
         // commit message. Because there is no commit to make.
-        if (
-          this.activeSuggestion.target_type === AppConstants.ENTITY_TYPE.SKILL
-        ) {
-          this.contributionAndReviewService.reviewSkillSuggestion(
-            this.activeSuggestion.target_id,
-            this.activeSuggestionId,
-            AppConstants.ACTION_REJECT_SUGGESTION,
-            reviewMessage || this.reviewMessage,
-            null,
-            () => {
-              this.alertsService.clearMessages();
-              this.alertsService.addSuccessMessage('Suggestion rejected.');
-              this.resolveSuggestionAndUpdateModal();
-            },
-            () => {
-              this.resolvingSuggestion = false;
-              this.alertsService.clearWarnings();
-              this.alertsService.addWarning(
-                'Invalid Suggestion: Error rejecting skill suggestion'
-              );
-            }
-          );
-        } else {
-          this.contributionAndReviewService.reviewExplorationSuggestion(
-            this.activeSuggestion.target_id,
-            this.activeSuggestionId,
-            AppConstants.ACTION_REJECT_SUGGESTION,
-            reviewMessage || this.reviewMessage,
-            null,
-            () => {
-              this.alertsService.clearMessages();
-              this.alertsService.addSuccessMessage('Suggestion rejected.');
-              this.resolveSuggestionAndUpdateModal();
-            },
-            errorMessage => {
-              this.resolvingSuggestion = false;
-              this.alertsService.clearWarnings();
-              this.alertsService.addWarning(
-                `Invalid Suggestion: ${errorMessage}`
-              );
-            }
-          );
-        }
+        this._reviewActiveSuggestion(
+          AppConstants.ACTION_REJECT_SUGGESTION,
+          reviewMessage || this.reviewMessage,
+          'Suggestion rejected.'
+        );
       }
     }
   }
