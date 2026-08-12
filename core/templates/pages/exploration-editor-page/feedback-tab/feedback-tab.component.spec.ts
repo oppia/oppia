@@ -48,6 +48,7 @@ import {
   CREATOR_DASHBOARD_FILTER_CONFIG,
   CreatorFeedbackType,
   FeedbackFilterState,
+  FeedbackModalType,
   FeedbackStatus,
   LessonFeedbackBackendResponse,
   LessonFeedbackDetailResponse,
@@ -139,6 +140,24 @@ describe('Feedback Tab Component', () => {
   let feedbackBackendApiService: FeedbackBackendApiService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
 
+  const createWindowWithHash = (): Window => {
+    let hash = '';
+    return {
+      location: {
+        get hash(): string {
+          return hash;
+        },
+        set hash(value: string) {
+          hash = value.startsWith('#') ? value : `#${value}`;
+        },
+        pathname: '',
+        search: '',
+      },
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    } as Window;
+  };
+
   class MockNgbModal {
     open() {
       return {
@@ -167,6 +186,10 @@ describe('Feedback Tab Component', () => {
   }));
 
   beforeEach(() => {
+    mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
+      false;
+    window.history.replaceState(null, '', window.location.pathname);
+
     fixture = TestBed.createComponent(FeedbackTabComponent);
     component = fixture.componentInstance;
 
@@ -701,25 +724,29 @@ describe('Feedback Tab Component', () => {
   });
 
   it('should navigate to lesson feedback detail when lesson feedback row is clicked', () => {
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =
       CreatorFeedbackType.FEEDBACK;
 
     component.onCreatorFeedbackRowClick('feedback_id');
 
     expect(component.selectedCreatorFeedbackId).toBe('feedback_id');
-    expect(windowRef.nativeWindow.location.hash).toBe(
+    expect(mockWindow.location.hash).toBe(
       '#/feedback/lesson_feedback/feedback_id'
     );
   });
 
   it('should navigate to lesson issue detail when report row is clicked', () => {
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =
       CreatorFeedbackType.REPORT;
 
     component.onCreatorFeedbackRowClick('feedback_id');
 
     expect(component.selectedCreatorFeedbackId).toBe('feedback_id');
-    expect(windowRef.nativeWindow.location.hash).toBe(
+    expect(mockWindow.location.hash).toBe(
       '#/feedback/lesson_issue/feedback_id'
     );
   });
@@ -1177,6 +1204,7 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should load lesson feedback detail from URL on init', fakeAsync(() => {
+    tick();
     windowRef.nativeWindow.location.hash =
       '#/feedback/lesson_feedback/feedback_id';
 
@@ -1197,6 +1225,35 @@ describe('Feedback Tab Component', () => {
       'feedback_id'
     );
   }));
+
+  it('should return creator feedback detail from URL', () => {
+    windowRef.nativeWindow.location.hash =
+      '#/feedback/lesson_feedback/feedback%20id';
+
+    expect(component.getCreatorFeedbackDetailFromUrl()).toEqual({
+      feedbackType: FeedbackModalType.LESSON_FEEDBACK,
+      feedbackId: 'feedback id',
+    });
+  });
+
+  it('should return null when URL is not a creator feedback detail URL', () => {
+    windowRef.nativeWindow.location.hash = '#/feedback';
+
+    expect(component.getCreatorFeedbackDetailFromUrl()).toBeNull();
+  });
+
+  it('should clear stale creator feedback detail when URL has no detail', () => {
+    component.selectedCreatorFeedbackId = 'feedback_id';
+    component.creatorFeedbackDetailResponse = mockLessonFeedbackDetailResponse;
+    component.creatorFeedbackScreenshotDataUrl = 'image-url';
+    windowRef.nativeWindow.location.hash = '#/feedback';
+
+    component.syncCreatorFeedbackFromUrl();
+
+    expect(component.selectedCreatorFeedbackId).toBeNull();
+    expect(component.creatorFeedbackDetailResponse).toBeNull();
+    expect(component.creatorFeedbackScreenshotDataUrl).toBeNull();
+  });
 
   it('should do nothing when sending reply without selected feedback', () => {
     component.selectedCreatorFeedbackId = null;
@@ -1241,6 +1298,8 @@ describe('Feedback Tab Component', () => {
   });
 
   it('should load report feedback detail when report row is clicked', fakeAsync(() => {
+    const mockWindow = createWindowWithHash();
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     component.currentCreatorFeedbackFilterState.creatorFeedbackType =
       CreatorFeedbackType.REPORT;
 
@@ -1252,15 +1311,9 @@ describe('Feedback Tab Component', () => {
     spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
       'image-url'
     );
-    mockPlatformFeatureService.status.ExplorationEditorNewCreatorFeedbackTab.isEnabled =
-      true;
-
-    component.ngOnInit();
-    tick();
-    fixture.detectChanges();
     component.onCreatorFeedbackRowClick('report_id');
 
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    component.syncCreatorFeedbackFromUrl();
     tick();
 
     expect(
