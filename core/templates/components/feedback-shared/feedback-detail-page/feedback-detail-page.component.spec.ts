@@ -30,13 +30,14 @@ import {
   FeedbackSessionInfo,
   ReportType,
 } from 'domain/feedback/feedback.model';
+import {LessonFeedbackDetailResponse} from '../../../domain/feedback/feedback.model';
 
 describe('FeedbackDetailPageComponent', () => {
   let component: FeedbackDetailPageComponent;
   let fixture: ComponentFixture<FeedbackDetailPageComponent>;
   let dateTimeFormatService: DateTimeFormatService;
   let windowRef: WindowRef;
-  const mockDetailResponse: PlatformFeedbackDetailResponse = {
+  const mockPlatformFeedbackDetailResponse: PlatformFeedbackDetailResponse = {
     id: 'report1',
     report_message: 'Sample report',
     source: ReportType.APP,
@@ -58,6 +59,16 @@ describe('FeedbackDetailPageComponent', () => {
     state_name: 'state1',
     state_index: 1,
     learner_current_answer: 'answer1',
+  };
+  const mockLessonFeedbackDetailresponse: LessonFeedbackDetailResponse = {
+    id: 'report1',
+    feedback_text: 'Sample report',
+    status: FeedbackStatus.OPEN,
+    lesson_metadata: mockLessonMetadata,
+    parent_feedback_id: null,
+    response_list: [],
+    unread_response_count: 0,
+    created_on_msecs: 1234567890,
   };
 
   const feedbackSessionInfo: FeedbackSessionInfo = {
@@ -114,7 +125,7 @@ describe('FeedbackDetailPageComponent', () => {
     userAgent: string
   ): URLSearchParams => {
     component.feedbackDetailResponse = {
-      ...mockDetailResponse,
+      ...mockPlatformFeedbackDetailResponse,
       session_info: {
         ...feedbackSessionInfo,
         environment: {
@@ -151,12 +162,14 @@ describe('FeedbackDetailPageComponent', () => {
   });
 
   it('should get correct Platform label', () => {
-    expect(component.getPlatformLabel(mockDetailResponse.platform)).toBe('Web');
+    expect(
+      component.getPlatformLabel(mockPlatformFeedbackDetailResponse.platform)
+    ).toBe('Web');
     expect(component.getPlatformLabel('android')).toBe('Android');
   });
 
   it('should format date correctly', () => {
-    const timestamp = mockDetailResponse.created_on_msecs;
+    const timestamp = mockPlatformFeedbackDetailResponse.created_on_msecs;
     const formattedDate = 'Jan 15, 1970, 11:56:07 PM';
 
     spyOn(
@@ -173,14 +186,14 @@ describe('FeedbackDetailPageComponent', () => {
   });
 
   it('should return early the Reported Lesson URL if no lesson metadata', () => {
-    component.feedbackDetailResponse = mockDetailResponse;
+    component.feedbackDetailResponse = mockPlatformFeedbackDetailResponse;
     const url = component.getReportedLessonUrl();
     expect(url).toBe(null);
   });
 
   it('should construct and return the Reported Lesson URL', () => {
     component.feedbackDetailResponse = {
-      ...mockDetailResponse,
+      ...mockPlatformFeedbackDetailResponse,
       source: ReportType.LESSON,
       lesson_metadata: {
         ...mockLessonMetadata,
@@ -192,14 +205,14 @@ describe('FeedbackDetailPageComponent', () => {
   });
 
   it('should return early the Reported state editor URL if no lesson metadata', () => {
-    component.feedbackDetailResponse = mockDetailResponse;
+    component.feedbackDetailResponse = mockPlatformFeedbackDetailResponse;
     const url = component.getReportedStateEditorUrl();
     expect(url).toBe(null);
   });
 
   it('should construct and return the Reported state editor URL', () => {
     component.feedbackDetailResponse = {
-      ...mockDetailResponse,
+      ...mockPlatformFeedbackDetailResponse,
       source: ReportType.LESSON,
       lesson_metadata: {
         ...mockLessonMetadata,
@@ -212,13 +225,18 @@ describe('FeedbackDetailPageComponent', () => {
   });
 
   it('should get sessionInfo when sessionInfo is not null', () => {
-    component.feedbackDetailResponse = mockDetailResponse;
+    component.feedbackDetailResponse = mockPlatformFeedbackDetailResponse;
     expect(component.sessionInfo).toBe(null);
     component.feedbackDetailResponse = {
-      ...mockDetailResponse,
+      ...mockPlatformFeedbackDetailResponse,
       session_info: feedbackSessionInfo,
     };
     expect(component.sessionInfo).toBe(feedbackSessionInfo);
+  });
+
+  it('should not get sessionInfo when feedbackDetailresponse is LessonFeedbackDetailResponse', () => {
+    component.feedbackDetailResponse = mockLessonFeedbackDetailresponse;
+    expect(component.sessionInfo).toBe(null);
   });
 
   it('should get correct category label', () => {
@@ -235,7 +253,7 @@ describe('FeedbackDetailPageComponent', () => {
   it('should get correct source label', () => {
     const source = ReportType.APP;
     expect(component.getSourceLabel(source)).toBe('App');
-    expect(component.getSourceLabel('new_source')).toBe('new_source');
+    expect(component.getSourceLabel('new_source')).toBe('Lesson');
   });
 
   it('should get correct destination label', () => {
@@ -262,7 +280,7 @@ describe('FeedbackDetailPageComponent', () => {
     const statusChangeSpy = spyOn(component.statusChange, 'emit');
     const githubTransferSpy = spyOn(component.githubTransfer, 'emit');
     component.feedbackDetailResponse = {
-      ...mockDetailResponse,
+      ...mockPlatformFeedbackDetailResponse,
       category: null,
       page_url: '',
     };
@@ -307,7 +325,7 @@ describe('FeedbackDetailPageComponent', () => {
       'getLocaleAbbreviatedDatetimeString'
     ).and.returnValue(formattedDate);
     component.feedbackDetailResponse = {
-      ...mockDetailResponse,
+      ...mockPlatformFeedbackDetailResponse,
       session_info: feedbackSessionInfo,
       lesson_metadata: mockLessonMetadata,
       screenshot_filename: 'screenshot',
@@ -443,7 +461,88 @@ describe('FeedbackDetailPageComponent', () => {
     });
   });
 
-  it('should return without performing any action when reply is sent', () => {
-    expect(component.onReplySend()).toBeUndefined();
+  it('should emit the reply and clear reply text', () => {
+    const replySpy = spyOn(component.messageSend, 'emit');
+    component.replyText = 'Looking into this';
+    component.onReplySend();
+    expect(replySpy).toHaveBeenCalledWith('Looking into this');
+    expect(component.replyText).toBe('');
+  });
+
+  it('should not emit empty reply text', () => {
+    const replySpy = spyOn(component.messageSend, 'emit');
+    component.replyText = '';
+    component.onReplySend();
+    expect(replySpy).not.toHaveBeenCalledWith('');
+  });
+
+  it('should return the right category depending on the feedbackResponse', () => {
+    expect(
+      component.getFeedbackCategory(mockLessonFeedbackDetailresponse)
+    ).toBeNull();
+    expect(
+      component.getFeedbackCategory(mockPlatformFeedbackDetailResponse)
+    ).toBe(ReportAnIssueCategory.OTHER_OR_NOT_SURE);
+  });
+
+  it('should return the right source label depending on the feedbackResponse', () => {
+    expect(
+      component.getFeedbackSourceLabel(mockLessonFeedbackDetailresponse)
+    ).toBe('Lesson');
+    expect(
+      component.getFeedbackSourceLabel(mockPlatformFeedbackDetailResponse)
+    ).toBe('App');
+  });
+
+  it('should return the right platform label depending on the feedbackResponse', () => {
+    expect(
+      component.getFeedbackPlatformLabel(mockLessonFeedbackDetailresponse)
+    ).toBe('Web');
+    expect(
+      component.getFeedbackPlatformLabel(mockPlatformFeedbackDetailResponse)
+    ).toBe('Web');
+  });
+
+  it('should return the page_url depending on the feedbackResponse', () => {
+    expect(
+      component.getFeedbackPageUrl(mockLessonFeedbackDetailresponse)
+    ).toBeNull();
+    expect(
+      component.getFeedbackPageUrl(mockPlatformFeedbackDetailResponse)
+    ).toBe(mockPlatformFeedbackDetailResponse.page_url);
+  });
+
+  it('should return the right feedback responses depending on the feedbackResponse', () => {
+    expect(
+      component.getFeedbackResponses(mockLessonFeedbackDetailresponse)
+    ).toBe(mockLessonFeedbackDetailresponse.response_list);
+    expect(
+      component.getFeedbackResponses(mockPlatformFeedbackDetailResponse)
+    ).toEqual([]);
+  });
+
+  it('should return empty string if feedbackDetailresponse is null', () => {
+    component.feedbackDetailResponse = null;
+    expect(component.getFeedbackMessage()).toBe('');
+  });
+
+  it('should return report_message if feedbackDetailresponse is platformFeedbackdetailResponse', () => {
+    component.feedbackDetailResponse = mockPlatformFeedbackDetailResponse;
+    expect(component.getFeedbackMessage()).toBe(
+      mockPlatformFeedbackDetailResponse.report_message
+    );
+  });
+
+  it('should return feedback_text if feedbackDetailresponse is LessonFeedbackDetailResponse', () => {
+    component.feedbackDetailResponse = mockLessonFeedbackDetailresponse;
+    expect(component.getFeedbackMessage()).toBe(
+      mockLessonFeedbackDetailresponse.feedback_text
+    );
+  });
+
+  it('should return empty string for getGithubIssueUrl if detailResponse is LessonfeedbackDetailresponse', () => {
+    component.feedbackDetailResponse = mockLessonFeedbackDetailresponse;
+    fixture.detectChanges();
+    expect(component.getGithubIssueUrl()).toBe('');
   });
 });
