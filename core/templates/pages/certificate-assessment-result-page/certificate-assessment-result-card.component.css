@@ -1,0 +1,115 @@
+.certificate-assessment-page-container {
+  --oppia-teal-dark: #00645c;
+  --oppia-teal-mid: #0f8b76;
+  --oppia-teal-pale: #d9edea;
+  --oppia-backdrop-blue: #aed6e6;
+  --oppia-track-gray: #dbe7e5;
+
+  --oppia-result-accent: var(--oppia-teal-dark);
+
+  background: #ece9e3;
+  min-height: calc(100vh - 56px);
+}
+
+.result-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  margin: 70px auto 48px;
+  max-width: 650px;
+  padding: 40px 44px 36px;
+  position: relative;
+  z-index: 1;
+}
+
+.result-card--failed {
+  --oppia-result-accent: #b3261e;
+}
+
+.result-card-heading {
+  color: var(--oppia-result-accent);
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.result-card-earned-banner {
+  border-radius: 6px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+}
+
+.result-card-earned-banner p {
+  color: #333;
+  font-size: 15px;
+  margin: 0;
+  text-align: center;
+}
+
+.result-card-summary {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.result-card-mascot {
+  flex: 0 0 auto;
+}
+
+.result-card-mascot-icon {
+  height: 200px;
+  object-fit: contain;
+  width: 200px;
+}
+
+.result-card-score-block {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.result-card-score {
+  color: var(--oppia-result-accent);
+  font-size: 4rem;
+  font-weight: 800;
+  margin: 4px 0 18px;
+}
+
+.result-card-time-taken {
+  color: #333;
+  margin-top: 16px;
+}
+
+.result-card-time-taken i {
+  color: var(--oppia-teal-dark);
+  margin-right: 6px;
+}
+
+.result-card-retry-btn {
+  background: #fff;
+  border: 2px solid var(--oppia-teal-pale);
+  border-radius: 4px;
+  color: var(--oppia-teal-dark);
+  font-weight: 700;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.result-card-retry-btn:hover {
+  background: var(--oppia-teal-pale);
+}
+
+@media (max-width: 640px) {
+  .result-card {
+    margin: -120px 16px 32px;
+    padding: 28px 20px 24px;
+  }
+
+  .result-card-summary {
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+}

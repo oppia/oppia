@@ -63,10 +63,12 @@ interface CreatorFeedbackListState<TSummary> {
   cursorHistory: (string | null)[];
   moreAvailable: boolean;
 }
+import './feedback-tab.component.css';
 
 @Component({
   selector: 'oppia-feedback-tab',
   templateUrl: './feedback-tab.component.html',
+  styleUrls: ['./feedback-tab.component.css'],
 })
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -482,7 +484,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = `/feedback/${feedbackType}/${encodeURIComponent(feedbackId)}`;
   }
 
-  private getCreatorFeedbackDetailFromUrl(): {
+  getCreatorFeedbackDetailFromUrl(): {
     feedbackType: FeedbackModalType;
     feedbackId: string;
   } | null {
@@ -494,24 +496,13 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     }
     const feedbackDetailPath = hash.substring(feedbackDetailHashPrefix.length);
     const [urlFeedbackType, urlFeedbackId] = feedbackDetailPath.split('/');
-
-    if (
-      urlFeedbackType !== FeedbackModalType.LESSON_FEEDBACK &&
-      urlFeedbackType !== FeedbackModalType.LESSON_ISSUE
-    ) {
-      return null;
-    }
-
-    if (!urlFeedbackId) {
-      return null;
-    }
     return {
-      feedbackType: urlFeedbackType,
+      feedbackType: urlFeedbackType as FeedbackModalType,
       feedbackId: decodeURIComponent(urlFeedbackId),
     };
   }
 
-  private syncCreatorFeedbackFromUrl(): void {
+  syncCreatorFeedbackFromUrl(): void {
     const detail = this.getCreatorFeedbackDetailFromUrl();
     if (!detail) {
       this.selectedCreatorFeedbackId = null;

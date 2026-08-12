@@ -1153,7 +1153,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
             url_fragment='sample-url-fragment',
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail',
@@ -1290,6 +1290,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_translation_language_code': None,
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
+            'profile_name_for_certificate': None,
         }
         user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}
@@ -1754,7 +1755,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
-            published_on=datetime.datetime.utcnow(),
+            published_on=utils.get_current_utc_datetime(),
             url_fragment='sample-url-fragment',
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail',
@@ -1927,6 +1928,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
+            'profile_name_for_certificate': None,
         }
 
         expected_subscriptions_data = {
@@ -2507,6 +2509,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS_2,
+            'profile_name_for_certificate': None,
         }
         user_skill_data = {self.SKILL_ID_3: self.DEGREE_OF_MASTERY_2}
         completed_activities_data = {

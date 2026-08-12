@@ -59,6 +59,7 @@ export interface LessonFeedbackBackendResponse {
 
 export interface LessonFeedbackResponse {
   response_text: string;
+  responded_by: string;
   responded_on: number;
 }
 

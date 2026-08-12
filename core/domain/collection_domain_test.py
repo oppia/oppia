@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.constants import constants
 from core.domain import collection_domain, collection_services
@@ -1141,7 +1139,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = datetime.datetime.utcnow()
+        current_time = utils.get_current_utc_datetime()
         self.collection_summary_dict = {
             'category': 'category',
             'status': constants.ACTIVITY_STATUS_PRIVATE,
@@ -1267,8 +1265,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_private())
 
@@ -1291,8 +1289,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(self.collection_summary.is_editable_by('other_id'))
 
@@ -1319,8 +1317,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')
@@ -1352,8 +1350,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             {},
             1,
             1,
-            datetime.datetime.utcnow(),
-            datetime.datetime.utcnow(),
+            utils.get_current_utc_datetime(),
+            utils.get_current_utc_datetime(),
         )
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id')
