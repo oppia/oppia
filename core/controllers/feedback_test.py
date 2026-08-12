@@ -114,7 +114,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             response_dict['feedback_thread_dicts'][0]
             | {
                 'status': 'open',
-            }
+            },
         )
 
         # Non-logged-in users can see individual messages.
@@ -132,7 +132,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
                 'updated_status': 'open',
                 'updated_subject': self._get_unicode_test_string('subject'),
                 'text': self._get_unicode_test_string('text'),
-            }
+            },
         )
 
     def test_non_logged_in_users_cannot_create_threads_and_messages(
@@ -204,7 +204,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'status': 'open',
                 'original_author_username': self.EDITOR_USERNAME,
                 'subject': 'New Thread ¡unicode!',
-            }
+            },
         )
 
         thread_url = '%s/%s' % (
@@ -220,7 +220,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'updated_status': 'open',
                 'updated_subject': 'New Thread ¡unicode!',
                 'text': 'Thread Text ¡unicode!',
-            }
+            },
         )
 
     def test_missing_thread_subject_raises_400_error(self) -> None:
@@ -309,7 +309,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'updated_status': 'open',
                 'updated_subject': 'New Thread ¡unicode!',
                 'text': 'Message 0 ¡unicode!',
-            }
+            },
         )
         self.assertEqual(
             response_dict['messages'][1],
@@ -321,7 +321,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1',
-            }
+            },
         )
 
         self.logout()

@@ -218,7 +218,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             first_message,
             first_message
-            | {'text': 'a sample message', 'author_username': 'editor'}
+            | {'text': 'a sample message', 'author_username': 'editor'},
         )
 
         # Add another message.
@@ -246,7 +246,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         second_message = messages_summary[1]
         self.assertEqual(
             second_message,
-            second_message | {'text': 'Message 1', 'author_username': 'editor'}
+            second_message | {'text': 'Message 1', 'author_username': 'editor'},
         )
 
         self.logout()

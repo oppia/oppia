@@ -269,7 +269,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             observed_suggestion.to_dict(),
-            observed_suggestion.to_dict() | expected_suggestion_dict
+            observed_suggestion.to_dict() | expected_suggestion_dict,
         )
 
     def test_cannot_create_suggestion_with_invalid_suggestion_type(

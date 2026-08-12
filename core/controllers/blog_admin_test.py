@@ -123,7 +123,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             ]
             | {
                 'value': 10,
-            }
+            },
         )
 
         payload = {
@@ -147,7 +147,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             ]
             | {
                 'value': new_platform_parameter_value,
-            }
+            },
         )
 
         self.logout()
@@ -168,7 +168,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             ]
             | {
                 'value': 10,
-            }
+            },
         )
 
         payload = {
@@ -235,7 +235,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             ]
             | {
                 'value': 10,
-            }
+            },
         )
 
         payload = {
@@ -277,7 +277,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             ]
             | {
                 'value': 10,
-            }
+            },
         )
 
         payload = {

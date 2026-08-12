@@ -270,7 +270,7 @@ class ExplorationDisplayableSummariesTest(
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertEqual(
             displayable_summaries[0],
-            displayable_summaries[0] | expected_summary
+            displayable_summaries[0] | expected_summary,
         )
 
     def test_get_displayable_exp_summary_dicts_matching_ids_with_invalid_exp_id(
@@ -392,7 +392,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         ][0]
         self.assertEqual(
             actual_exploration_summary_dict,
-            actual_exploration_summary_dict | expected_exploration_summary_dict
+            actual_exploration_summary_dict | expected_exploration_summary_dict,
         )
 
 
@@ -472,7 +472,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
                 'title': 'A title',
                 'num_views': 0,
                 'objective': 'An objective',
-            }
+            },
         )
 
     def test_language_code_filter(self) -> None:
@@ -500,7 +500,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             | {
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
-            }
+            },
         )
 
         featured_activity_summaries = (
@@ -515,7 +515,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             | {
                 'language_code': self.LANGUAGE_CODE_ES,
                 'id': self.EXP_ID_1,
-            }
+            },
         )
 
         featured_activity_summaries = (
@@ -530,7 +530,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             | {
                 'language_code': self.LANGUAGE_CODE_ES,
                 'id': self.EXP_ID_1,
-            }
+            },
         )
         self.assertEqual(
             featured_activity_summaries[1],
@@ -538,7 +538,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             | {
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
-            }
+            },
         )
 
         featured_activity_summaries = (
@@ -882,7 +882,7 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             top_rated_exploration_summaries[0],
-            top_rated_exploration_summaries[0] | expected_summary
+            top_rated_exploration_summaries[0] | expected_summary,
         )
 
         expected_ordering = [
@@ -932,7 +932,7 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         }
         self.assertEqual(
             top_rated_exploration_summaries[0],
-            top_rated_exploration_summaries[0] | expected_summary
+            top_rated_exploration_summaries[0] | expected_summary,
         )
 
         expected_ordering = [self.EXP_ID_2]
@@ -1049,15 +1049,15 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
         self.assertEqual(
             recently_published_exploration_summaries[0],
-            recently_published_exploration_summaries[0] | test_summary_3
+            recently_published_exploration_summaries[0] | test_summary_3,
         )
         self.assertEqual(
             recently_published_exploration_summaries[1],
-            recently_published_exploration_summaries[1] | test_summary_1
+            recently_published_exploration_summaries[1] | test_summary_1,
         )
         self.assertEqual(
             recently_published_exploration_summaries[2],
-            recently_published_exploration_summaries[2] | test_summary_2
+            recently_published_exploration_summaries[2] | test_summary_2,
         )
 
         # Test that editing an exploration does not change its
@@ -1088,7 +1088,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         )
         self.assertEqual(
             recently_published_exploration_summaries[0],
-            recently_published_exploration_summaries[0] | test_summary_3
+            recently_published_exploration_summaries[0] | test_summary_3,
         )
 
 

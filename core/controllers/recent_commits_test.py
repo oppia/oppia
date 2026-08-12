@@ -100,7 +100,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'version': 0,
                 'commit_message': 'created first commit',
                 'commit_type': 'create',
-            }
+            },
         )
         self.assertEqual(
             response_dict['results'][0],
@@ -112,7 +112,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'version': 1,
                 'commit_message': 'edited commit',
                 'commit_type': 'edit',
-            }
+            },
         )
         self.logout()
 

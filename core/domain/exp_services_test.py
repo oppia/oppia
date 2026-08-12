@@ -5919,7 +5919,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 ),
                 'commit_type': 'create',
                 'version_number': 1,
-            }
+            },
         )
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
@@ -5948,7 +5948,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 ),
                 'commit_type': 'create',
                 'version_number': 1,
-            }
+            },
         )
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
@@ -5989,7 +5989,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 ),
                 'commit_type': 'create',
                 'version_number': 1,
-            }
+            },
         )
         self.assertEqual(
             snapshots_metadata[1],
@@ -6000,7 +6000,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'commit_message': 'Changed title.',
                 'commit_type': 'edit',
                 'version_number': 2,
-            }
+            },
         )
         self.assertLess(
             snapshots_metadata[0]['created_on_ms'],
@@ -6058,7 +6058,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 ),
                 'commit_type': 'create',
                 'version_number': 1,
-            }
+            },
         )
         self.assertEqual(
             snapshots_metadata[1],
@@ -6069,7 +6069,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'commit_message': 'Changed title.',
                 'commit_type': 'edit',
                 'version_number': 2,
-            }
+            },
         )
         self.assertEqual(
             snapshots_metadata[2],
@@ -6080,7 +6080,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'commit_message': 'Second commit.',
                 'commit_type': 'edit',
                 'version_number': 3,
-            }
+            },
         )
         self.assertLess(
             snapshots_metadata[1]['created_on_ms'],
@@ -6185,12 +6185,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(len(snapshots_metadata), 3)
         self.assertEqual(
-            snapshots_metadata[2],
-            snapshots_metadata[2] | commit_dict_3
+            snapshots_metadata[2], snapshots_metadata[2] | commit_dict_3
         )
         self.assertEqual(
-            snapshots_metadata[1],
-            snapshots_metadata[1] | commit_dict_2
+            snapshots_metadata[1], snapshots_metadata[1] | commit_dict_2
         )
         for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
@@ -6226,16 +6224,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(len(snapshots_metadata), 4)
         self.assertEqual(
-            snapshots_metadata[3],
-            snapshots_metadata[3] | commit_dict_4
+            snapshots_metadata[3], snapshots_metadata[3] | commit_dict_4
         )
         self.assertEqual(
-            snapshots_metadata[2],
-            snapshots_metadata[2] | commit_dict_3
+            snapshots_metadata[2], snapshots_metadata[2] | commit_dict_3
         )
         self.assertEqual(
-            snapshots_metadata[1],
-            snapshots_metadata[1] | commit_dict_2
+            snapshots_metadata[1], snapshots_metadata[1] | commit_dict_2
         )
         for ind in range(len(snapshots_metadata) - 1):
             self.assertLess(
@@ -6356,12 +6351,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         }
         self.assertEqual(len(snapshots_metadata), 4)
         self.assertEqual(
-            snapshots_metadata[2],
-            snapshots_metadata[2] | commit_dict_3
+            snapshots_metadata[2], snapshots_metadata[2] | commit_dict_3
         )
         self.assertEqual(
-            snapshots_metadata[3],
-            snapshots_metadata[3] | commit_dict_4
+            snapshots_metadata[3], snapshots_metadata[3] | commit_dict_4
         )
         self.assertLess(
             snapshots_metadata[2]['created_on_ms'],
@@ -7182,8 +7175,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(all_commits), 1)
         commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertEqual(
-            commit_dicts[0],
-            commit_dicts[0] | self.COMMIT_ALBERT_PUBLISH_EXP_2
+            commit_dicts[0], commit_dicts[0] | self.COMMIT_ALBERT_PUBLISH_EXP_2
         )
 
         # TODO(frederikcreemers@gmail.com): Test max_age here.

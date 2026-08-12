@@ -223,7 +223,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -265,7 +265,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
     def test_library_handler_for_created_explorations(self) -> None:
@@ -283,7 +283,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'user_email': self.CURRICULUM_ADMIN_EMAIL,
                 'username': self.CURRICULUM_ADMIN_USERNAME,
                 'search_cursor': None,
-            }
+            },
         )
 
         # Create exploration A.
@@ -337,7 +337,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'Objective B',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
         self.assertEqual(
             response_dict['activity_list'][0],
@@ -349,7 +349,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'Objective A',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
         # Delete exploration A.
@@ -368,7 +368,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'Objective B',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
     def test_library_handler_with_exceeding_query_limit_logs_error(
@@ -529,7 +529,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             | {
                 'activity_summary_dicts_by_category': [],
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
 
         csrf_token = self.get_new_csrf_token()
@@ -551,7 +551,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             | {
                 'activity_summary_dicts_by_category': [],
                 'preferred_language_codes': ['de'],
-            }
+            },
         )
 
     def test_library_index_handler_update_top_rated_activity_summary_dict(
@@ -565,7 +565,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             | {
                 'activity_summary_dicts_by_category': [],
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
 
         # Load a demo.
@@ -581,7 +581,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             response_dict
             | {
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
         activity_summary_dicts_by_category = response_dict[
             'activity_summary_dicts_by_category'
@@ -597,7 +597,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
                 'has_full_results_page': True,
                 'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
                 'protractor_id': 'top-rated',
-            }
+            },
         )
 
         activity_summary_dicts = activity_summary_dicts_by_category[
@@ -614,7 +614,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
     def test_library_index_handler_updates_featured_activity_summary_dict(
@@ -628,7 +628,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             | {
                 'activity_summary_dicts_by_category': [],
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
 
         # Load a demo.
@@ -648,7 +648,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             response_dict
             | {
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
         activity_summary_dicts_by_category = response_dict[
             'activity_summary_dicts_by_category'
@@ -662,7 +662,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
                 'header_i18n_id': (feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES),
                 'has_full_results_page': False,
                 'full_results_url': None,
-            }
+            },
         )
 
         activity_summary_dicts = activity_summary_dicts_by_category[
@@ -680,7 +680,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
 
@@ -711,7 +711,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             | {
                 'activity_summary_dicts_by_category': [],
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
 
         csrf_token = self.get_new_csrf_token()
@@ -735,7 +735,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             response_dict
             | {
                 'preferred_language_codes': ['de'],
-            }
+            },
         )
 
     def test_handler_for_recently_published_library_group_page(self) -> None:
@@ -751,7 +751,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
                 'is_super_admin': False,
                 'activity_list': [],
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
 
         # Load a public demo exploration.
@@ -768,7 +768,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             | {
                 'header_i18n_id': 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED',
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
         self.assertEqual(
             response_dict['activity_list'][0],
@@ -780,7 +780,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
     def test_handler_for_top_rated_library_group_page(self) -> None:
@@ -800,7 +800,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
                 'is_super_admin': False,
                 'activity_list': [],
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
 
         # Assign rating to exploration to test handler for top rated
@@ -818,7 +818,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             | {
                 'header_i18n_id': 'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS',
                 'preferred_language_codes': ['en'],
-            }
+            },
         )
         self.assertEqual(len(response_dict['activity_list']), 1)
         self.assertEqual(
@@ -831,7 +831,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
         # Load another public demo exploration.
@@ -858,7 +858,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'solve Problem 1 on the Project Euler site',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
         self.assertEqual(
             response_dict['activity_list'][1],
@@ -870,7 +870,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
-            }
+            },
         )
 
 
@@ -1096,7 +1096,7 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
             response_dict
             | {
                 'summaries': [],
-            }
+            },
         )
 
         # Load a collection.
@@ -1117,5 +1117,5 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'tags': [],
                 'node_count': 4,
-            }
+            },
         )
