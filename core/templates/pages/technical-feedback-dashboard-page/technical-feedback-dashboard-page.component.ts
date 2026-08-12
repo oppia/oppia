@@ -23,6 +23,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {
+  CreatorFeedbackType,
   FeedbackCardConfig,
   FeedbackFilterConfig,
   FeedbackFilterState,
@@ -53,6 +54,7 @@ export class TechnicalFeedbackDashboardPageComponent {
   readonly filterConfig: FeedbackFilterConfig =
     TECHNICAL_DASHBOARD_FILTER_CONFIG;
   readonly cardConfig: FeedbackCardConfig = TECHNICAL_DASHBOARD_CARD_CONFIG;
+  readonly statusOptions = this.filterConfig.statusOptions;
 
   currentPage: number = 1;
   selectedTeam: TechnicalTeamType | null = null;
@@ -69,6 +71,7 @@ export class TechnicalFeedbackDashboardPageComponent {
     searchText: '',
     status: FeedbackStatus.OPEN,
     technicalTeam: TechnicalTeamType.TECH_EXTERNAL,
+    creatorFeedbackType: CreatorFeedbackType.FEEDBACK,
     dateRange: {
       start: null,
       end: null,
@@ -97,6 +100,7 @@ export class TechnicalFeedbackDashboardPageComponent {
 
   private loadScreenshot(): void {
     const response = this.feedbackDetailResponse;
+    this.screenshotDataUrl = null;
     if (!response?.screenshot_entity_id || !response?.screenshot_filename) {
       return;
     }

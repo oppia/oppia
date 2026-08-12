@@ -45,6 +45,7 @@ from core.jobs.batch_jobs import (
     exp_recommendation_computation_jobs,
     exp_search_indexing_jobs,
     user_stats_computation_jobs,
+    web_feedback_cleanup_jobs,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -1495,3 +1496,55 @@ class CronMarkStaleVoiceoverRegenerationContentAsFailedHandlerTests(
             self.get_html_response(
                 '/cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed'
             )
+
+
+class CronLessonFeedbackCleanupHandlerTests(test_utils.GenericTestBase):
+    """Tests for CronLessonFeedbackCleanupHandler."""
+
+    def test_cron_lesson_feedback_cleanup_handler(
+        self,
+    ) -> None:
+        testapp_swap = self.swap(
+            self, 'testapp', webtest.TestApp(main.app_without_context)
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services,
+            'run_beam_job',
+            lambda **_: None,
+            expected_kwargs=[
+                {
+                    'job_class': (
+                        web_feedback_cleanup_jobs.LessonFeedbackCleanupJob
+                    ),
+                }
+            ],
+        )
+        with swap_with_checks, testapp_swap:
+            self.get_html_response('/cron/feedback/lesson_feedback_cleanup')
+
+
+class CronPlatformFeedbackCleanupHandlerTests(test_utils.GenericTestBase):
+    """Tests for CronPlatformFeedbackCleanupHandler."""
+
+    def test_cron_platform_feedback_cleanup_handler(
+        self,
+    ) -> None:
+        testapp_swap = self.swap(
+            self, 'testapp', webtest.TestApp(main.app_without_context)
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_with_checks = self.swap_with_checks(
+            beam_job_services,
+            'run_beam_job',
+            lambda **_: None,
+            expected_kwargs=[
+                {
+                    'job_class': (
+                        web_feedback_cleanup_jobs.PlatformFeedbackCleanupJob
+                    ),
+                }
+            ],
+        )
+        with swap_with_checks, testapp_swap:
+            self.get_html_response('/cron/feedback/platform_feedback_cleanup')

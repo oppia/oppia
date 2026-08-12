@@ -77,6 +77,10 @@ class UserSettingsModel(base_models.BaseModel):
     # edited and is unique only among the profiles of the corresponding
     # regular user account.
     display_alias = datastore_services.StringProperty(default=None)
+    # Profile name to be shown on certificates.
+    profile_name_for_certificate = datastore_services.StringProperty(
+        default=None
+    )
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
     # Subject interests specified by the user.
@@ -209,6 +213,7 @@ class UserSettingsModel(base_models.BaseModel):
                 'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
                 'display_alias': base_models.EXPORT_POLICY.EXPORTED,
                 'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_name_for_certificate': base_models.EXPORT_POLICY.EXPORTED,
                 'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_language_codes': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_site_language_code': base_models.EXPORT_POLICY.EXPORTED,
@@ -323,6 +328,7 @@ class UserSettingsModel(base_models.BaseModel):
             'has_viewed_lesson_info_modal_once': (
                 user.has_viewed_lesson_info_modal_once
             ),
+            'profile_name_for_certificate': user.profile_name_for_certificate,
         }
 
     @classmethod
