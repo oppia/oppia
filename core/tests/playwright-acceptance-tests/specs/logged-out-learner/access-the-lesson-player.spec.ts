@@ -61,14 +61,14 @@ test.describe('Logged-Out Learner', function () {
     const wrongExplorationId =
       explorationId?.slice(5) ?? '' + explorationId?.slice(0, 5);
 
-    await loggedOutLearner.playExploration(wrongExplorationId);
+    await loggedOutLearner.playExplorationAsLoggedOutUser(wrongExplorationId);
     await loggedOutLearner.expectToBeOnErrorPage(404);
   });
 
   test('should be able to access existent lesson', async function () {
     // Navigate to exploration, verify URL, and match screenshot.
-    await loggedOutLearner.playExploration(explorationId);
-    await loggedOutLearner.expectToBeOnPage('/explore/');
+    await loggedOutLearner.playExplorationAsLoggedOutUser(explorationId);
+    await loggedOutLearner.expectToBeOnPageAsLoggedOutUser('/explore/');
 
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
