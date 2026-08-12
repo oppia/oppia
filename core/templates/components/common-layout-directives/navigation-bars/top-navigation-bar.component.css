@@ -443,8 +443,12 @@
   font-size: 22px;
   margin-top: -5px;
 }
+.oppia-top-navigation-bar .oppia-navbar-clickable-dropdown:hover {
+  z-index: 1000;
+}
 .oppia-top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
   display: block;
+  z-index: 1000;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:hover {
   opacity: 1;
